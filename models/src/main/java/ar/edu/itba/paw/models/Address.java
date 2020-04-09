@@ -1,9 +1,9 @@
 package ar.edu.itba.paw.models;
 
 public class Address {
-    private String street;
     private Province province;
     private int streetNumber;
+    private String street;
 
     public String getStreet() {
         return this.street;

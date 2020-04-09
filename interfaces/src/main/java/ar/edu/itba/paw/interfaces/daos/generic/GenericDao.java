@@ -8,7 +8,7 @@ import ar.edu.itba.paw.models.GenericModel;
  * @param <I> the Model's id type
  */
 public interface GenericDao<M extends GenericModel<I>, I> {
-    M getById(I id);
+    M findById(I id);
 
     void save(M model);
 

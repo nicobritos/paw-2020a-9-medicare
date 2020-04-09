@@ -18,5 +18,5 @@ public interface GenericSearchableDao<M extends GenericModel<I>, I> extends Gene
      * @param name the <M>'s name
      * @return a collection of matched <M>
      */
-    Collection<M> getByName(String name);
+    Collection<M> findByName(String name);
 }

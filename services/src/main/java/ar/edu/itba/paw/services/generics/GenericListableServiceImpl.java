@@ -1,9 +1,7 @@
 package ar.edu.itba.paw.services.generics;
 
 import ar.edu.itba.paw.interfaces.daos.generic.GenericListableDao;
-import ar.edu.itba.paw.interfaces.daos.generic.GenericSearchableDao;
 import ar.edu.itba.paw.interfaces.services.generic.GenericListableService;
-import ar.edu.itba.paw.interfaces.services.generic.GenericSearchableService;
 import ar.edu.itba.paw.models.GenericModel;
 
 import java.util.Collection;
@@ -20,7 +18,7 @@ public abstract class GenericListableServiceImpl<M extends GenericModel<I>, I> i
 
     @Override
     public M findById(I id) {
-        return this.repository.getById(id);
+        return this.repository.findById(id);
     }
 
     @Override

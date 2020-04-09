@@ -14,7 +14,7 @@ public abstract class GenericServiceImpl<M extends GenericModel<I>, I> implement
 
     @Override
     public M findById(I id) {
-        return this.repository.getById(id);
+        return this.repository.findById(id);
     }
 
     @Override

@@ -7,7 +7,7 @@ import ar.edu.itba.paw.models.Province;
 import java.util.Collection;
 
 public interface ProvinceDao extends GenericDao<Province, Integer> {
-    Collection<Province> getByCountry(Country country);
+    Collection<Province> findByCountry(Country country);
 
     /**
      * Returns Provinces with a name similar to the one provided filtered out by Country.
@@ -15,5 +15,5 @@ public interface ProvinceDao extends GenericDao<Province, Integer> {
      * @param name the province's name
      * @return a collection of matched provinces
      */
-    Collection<Province> getByCountryAndName(Country country, String name);
+    Collection<Province> findByCountryAndName(Country country, String name);
 }

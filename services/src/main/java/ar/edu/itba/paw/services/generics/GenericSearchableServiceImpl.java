@@ -18,7 +18,7 @@ public abstract class GenericSearchableServiceImpl<M extends GenericModel<I>, I>
 
     @Override
     public M findById(I id) {
-        return this.repository.getById(id);
+        return this.repository.findById(id);
     }
 
     @Override
@@ -28,6 +28,6 @@ public abstract class GenericSearchableServiceImpl<M extends GenericModel<I>, I>
 
     @Override
     public Collection<M> findByName(String name) {
-        return this.repository.getByName(name);
+        return this.repository.findByName(name);
     }
 }
