@@ -1,8 +1,8 @@
 package ar.edu.itba.paw.models;
 
-import ar.edu.itba.paw.interfaces.daos.annotations.Column;
-import ar.edu.itba.paw.interfaces.daos.annotations.Entity;
-import ar.edu.itba.paw.interfaces.daos.annotations.Table;
+import ar.edu.itba.paw.persistenceAnnotations.Column;
+import ar.edu.itba.paw.persistenceAnnotations.Entity;
+import ar.edu.itba.paw.persistenceAnnotations.Table;
 
 @Entity
 @Table(name = "staff", primaryKey = "staff_id")

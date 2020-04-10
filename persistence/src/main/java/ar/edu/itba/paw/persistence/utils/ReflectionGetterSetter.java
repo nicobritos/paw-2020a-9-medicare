@@ -8,6 +8,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 import java.util.function.Function;
 
 public abstract class ReflectionGetterSetter {
@@ -45,6 +46,14 @@ public abstract class ReflectionGetterSetter {
         return map;
     }
 
+    public static <T extends Annotation> void iterateFields(Class<?> mClass, Class<T> annotationClass, Consumer<Field> consumer) {
+        for (Field field : mClass.getDeclaredFields()) {
+            if (field.isAnnotationPresent(annotationClass)) {
+                consumer.accept(field);
+            }
+        }
+    }
+
     public static <T extends Annotation> void iterateValues(Object model, Class<T> annotationClass, BiConsumer<Field, Object> consumer) {
         for (Field field : model.getClass().getDeclaredFields()) {
             if (field.isAnnotationPresent(annotationClass)) {
@@ -59,6 +68,19 @@ public abstract class ReflectionGetterSetter {
 
     public static void set(Object model, String fieldName, Object data) throws NoSuchFieldException {
         set(model, getFieldByName(fieldName, model.getClass()), data);
+    }
+
+    public static void set(Object model, Field field, Object data) {
+        try {
+            PropertyDescriptor propertyDescriptor = new PropertyDescriptor(field.getName(), model.getClass());
+            propertyDescriptor.getWriteMethod().invoke(model, data);
+        } catch (IntrospectionException e) {
+            // TODO
+        } catch (IllegalAccessException e) {
+            // TODO
+        } catch (InvocationTargetException e) {
+            // TODO
+        }
     }
 
     private static Field getFieldByName(String fieldName, Class<?> className) throws NoSuchFieldException {
@@ -77,18 +99,5 @@ public abstract class ReflectionGetterSetter {
             // TODO
         }
         return null;
-    }
-
-    private static void set(Object model, Field field, Object data) {
-        try {
-            PropertyDescriptor propertyDescriptor = new PropertyDescriptor(field.getName(), model.getClass());
-            propertyDescriptor.getWriteMethod().invoke(model, data);
-        } catch (IntrospectionException e) {
-            // TODO
-        } catch (IllegalAccessException e) {
-            // TODO
-        } catch (InvocationTargetException e) {
-            // TODO
-        }
     }
 }

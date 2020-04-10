@@ -60,6 +60,7 @@
     <module>interfaces</module>
     <module>services</module>
     <module>persistence</module>
+    <module>persistenceAnnotations</module>
     <module>models</module>
   </modules>
 </project>

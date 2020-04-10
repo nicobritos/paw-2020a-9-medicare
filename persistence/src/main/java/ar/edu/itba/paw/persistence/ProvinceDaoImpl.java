@@ -21,15 +21,9 @@ import java.util.Collection;
 public class ProvinceDaoImpl extends GenericSearchableDaoImpl<Province, Integer> implements ProvinceDao {
     private static final RowMapper<Province> ROW_MAPPER = (resultSet, rowNum) -> {
         // TODO: Fix hydration
-        Country country = new Country();
-        country.setId(resultSet.getString("country_id"));
-
-        Province province = new Province();
-        province.setId(resultSet.getInt("province_id"));
-        province.setCountry(country);
-        province.setName(resultSet.getString("name"));
-
-        return province;
+//        Country country = new Country();
+//        country.setId(resultSet.getString("country_id"));
+        return hydrate(Province.class, resultSet);
     };
 
     @Autowired

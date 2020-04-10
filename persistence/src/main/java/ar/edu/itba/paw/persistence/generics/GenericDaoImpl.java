@@ -1,7 +1,5 @@
 package ar.edu.itba.paw.persistence.generics;
 
-import ar.edu.itba.paw.interfaces.daos.annotations.Column;
-import ar.edu.itba.paw.interfaces.daos.annotations.Table;
 import ar.edu.itba.paw.interfaces.daos.generic.GenericDao;
 import ar.edu.itba.paw.models.GenericModel;
 import ar.edu.itba.paw.persistence.utils.Pair;
@@ -9,11 +7,15 @@ import ar.edu.itba.paw.persistence.utils.ReflectionGetterSetter;
 import ar.edu.itba.paw.persistence.utils.builder.*;
 import ar.edu.itba.paw.persistence.utils.builder.JDBCWhereClauseBuilder.ColumnTransformer;
 import ar.edu.itba.paw.persistence.utils.builder.JDBCWhereClauseBuilder.Operation;
+import ar.edu.itba.paw.persistenceAnnotations.Column;
+import ar.edu.itba.paw.persistenceAnnotations.Table;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 
 import javax.sql.DataSource;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
@@ -181,16 +183,12 @@ public abstract class GenericDaoImpl<M extends GenericModel<I>, I> implements Ge
         return this.getTableName();
     }
 
-    protected String formatColumnFromName(String columnName, String tableName) {
-        return tableName + "." + columnName;
-    }
-
     protected String formatColumnFromName(String columnName) {
-        return this.formatColumnFromName(columnName, this.getTableName());
+        return formatColumnFromName(columnName, this.getTableName());
     }
 
     protected String formatColumnFromAlias(String columnName) {
-        return this.formatColumnFromName(columnName, this.getTableAlias());
+        return formatColumnFromName(columnName, this.getTableAlias());
     }
 
     protected abstract RowMapper<M> getRowMapper();
@@ -208,10 +206,45 @@ public abstract class GenericDaoImpl<M extends GenericModel<I>, I> implements Ge
 
         ReflectionGetterSetter.iterateValues(model, Column.class, (field, o) -> {
             Column column = field.getAnnotation(Column.class);
-            // TODO: Process many to one and many to many
+            // TODO: Process one to one, many to one and many to many
             map.put(column.name(), new Pair<>(":_r_" + column.name(), o));
         });
 
         return map;
+    }
+
+    protected static String formatColumnFromName(String columnName, String tableName) {
+        return tableName + "." + columnName;
+    }
+
+    protected static <M> M hydrate(Class<M> mClass, ResultSet resultSet) {
+        M m = null;
+        try {
+            m = mClass.newInstance();
+        } catch (InstantiationException e) {
+            return null;
+        } catch (IllegalAccessException e) {
+            return null;
+        }
+
+        M finalM = m;
+        Table table = mClass.getAnnotation(Table.class);
+        ReflectionGetterSetter.iterateFields(mClass, Column.class, field -> {
+            Column column = field.getAnnotation(Column.class);
+            try {
+                ReflectionGetterSetter.set(finalM, field, resultSet.getObject(formatColumnFromName(column.name(), table.name())));
+            } catch (SQLException e) {
+                // TODO
+                e.printStackTrace();
+            }
+        });
+        return finalM;
+    }
+
+    protected static <T extends GenericModel<I>, I> String getTableNameFromModel(Class<T> mClass) {
+        if (mClass.isAnnotationPresent(Table.class)) {
+            return mClass.getAnnotation(Table.class).name();
+        }
+        return null;
     }
 }

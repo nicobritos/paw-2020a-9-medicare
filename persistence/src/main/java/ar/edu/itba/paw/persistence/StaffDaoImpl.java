@@ -24,21 +24,12 @@ import java.util.stream.Collectors;
 
 @Repository
 public class StaffDaoImpl extends GenericSearchableDaoImpl<Staff, Integer> implements StaffDao {
+    private static final String SPECIALTIES_TABLE_NAME = getTableNameFromModel(StaffSpecialty.class);
     private static final RowMapper<Staff> ROW_MAPPER = (resultSet, rowNum) -> {
         // TODO: Fix office hydration
-        Office office = new Office();
-        office.setId(resultSet.getInt("office_id"));
-
-        Staff staff = new Staff();
-        staff.setId(resultSet.getInt("staff_id"));
-        staff.setOffice(office);
-        staff.setFirstName(resultSet.getString("first_name"));
-        staff.setSurname(resultSet.getString("surname"));
-        staff.setPhone(resultSet.getString("phone"));
-        staff.setEmail(resultSet.getString("email"));
-        staff.setRegistrationNumber(resultSet.getInt("registration_number"));
-
-        return staff;
+//        Office office = new Office();
+//        office.setId(resultSet.getInt("office_id"));
+        return hydrate(Staff.class, resultSet);
     };
 
     @Autowired
@@ -66,7 +57,7 @@ public class StaffDaoImpl extends GenericSearchableDaoImpl<Staff, Integer> imple
                 .join(this.getTableName(), "staff_id", "staff_id")
                 .where(new JDBCWhereClauseBuilder()
                         .in(
-                                this.formatColumnFromName("specialty_id", this.getSpecialtiesTableName()),
+                                formatColumnFromName("specialty_id", this.getSpecialtiesTableName()),
                                 specialtyParameters
                         )
                 )
@@ -99,7 +90,7 @@ public class StaffDaoImpl extends GenericSearchableDaoImpl<Staff, Integer> imple
                 .join(this.getTableName(), "staff_id", "staff_id")
                 .where(new JDBCWhereClauseBuilder()
                         .in(
-                                this.formatColumnFromName("specialty_id", this.getSpecialtiesTableName()),
+                                formatColumnFromName("specialty_id", this.getSpecialtiesTableName()),
                                 specialtyParameters
                         )
                         .and()
@@ -139,12 +130,12 @@ public class StaffDaoImpl extends GenericSearchableDaoImpl<Staff, Integer> imple
         JDBCWhereClauseBuilder whereClauseBuilder = new JDBCWhereClauseBuilder();
         whereClauseBuilder
                 .in(
-                        this.formatColumnFromName("specialty_id", this.getSpecialtiesTableName()),
+                        formatColumnFromName("specialty_id", this.getSpecialtiesTableName()),
                         specialtyParameters
                 )
                 .and()
                 .in(
-                        this.formatColumnFromName("office_id", this.getSpecialtiesTableName()),
+                        formatColumnFromName("office_id", this.getSpecialtiesTableName()),
                         officeParameters
                 );
 
@@ -184,6 +175,6 @@ public class StaffDaoImpl extends GenericSearchableDaoImpl<Staff, Integer> imple
     }
 
     private String getSpecialtiesTableName() {
-        return "system_staff_specialty_staff";
+        return SPECIALTIES_TABLE_NAME;
     }
 }
