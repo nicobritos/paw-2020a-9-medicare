@@ -127,6 +127,27 @@ public abstract class GenericDaoImpl<M extends GenericModel<I>, I> implements Ge
         return this.query(queryBuilder.getQueryAsString(), parameterSource);
     }
 
+    protected List<M> findByFieldIn(String columnName, Collection<?> values) {
+        Map<String, Object> parameters = new HashMap<>();
+        int i = 0;
+        for (Object value : values) {
+            parameters.put("_" + i, value);
+            i++;
+        }
+
+        JDBCQueryBuilder queryBuilder = new JDBCSelectQueryBuilder()
+                .select(JDBCSelectQueryBuilder.ALL)
+                .from(this.getTableName())
+                .where(new JDBCWhereClauseBuilder()
+                        .in(this.formatColumnFromName(columnName), parameters.keySet())
+                );
+
+        MapSqlParameterSource parameterSource = new MapSqlParameterSource();
+        parameterSource.addValues(parameters);
+
+        return this.query(queryBuilder.getQueryAsString(), parameterSource);
+    }
+
     protected List<M> query(String query) {
         return this.jdbcTemplate.query(query, this.getRowMapper());
     }
