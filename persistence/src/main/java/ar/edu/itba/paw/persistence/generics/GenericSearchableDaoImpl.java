@@ -2,10 +2,7 @@ package ar.edu.itba.paw.persistence.generics;
 
 import ar.edu.itba.paw.interfaces.daos.generic.GenericSearchableDao;
 import ar.edu.itba.paw.models.GenericModel;
-import ar.edu.itba.paw.persistence.database.JDBCQueryBuilder;
-import ar.edu.itba.paw.persistence.database.JDBCSelectQueryBuilder;
-import ar.edu.itba.paw.persistence.database.JDBCWhereClauseBuilder;
-import ar.edu.itba.paw.persistence.database.JDBCWhereClauseBuilder.Operation;
+import ar.edu.itba.paw.persistence.utils.builder.JDBCWhereClauseBuilder.Operation;
 
 import javax.sql.DataSource;
 import java.util.Collection;
@@ -24,15 +21,6 @@ public abstract class GenericSearchableDaoImpl<M extends GenericModel<I>, I> ext
 
     @Override
     public Collection<M> findByName(String name) {
-        JDBCQueryBuilder queryBuilder = new JDBCSelectQueryBuilder()
-                .select("*")
-                .from(this.getTableName(), this.getTableAlias())
-                .where(
-                        new JDBCWhereClauseBuilder()
-                                .where(this.getTableAlias() + "." + this.getIdColumnName(), Operation.LIKE, name, true)
-                )
-                .addArgument(name);
-
-        return this.query(queryBuilder.getQueryAsString(), queryBuilder.getArguments());
+        return this.findByFieldIgnoreCase(this.getIdColumnName(), Operation.LIKE, name);
     }
 }

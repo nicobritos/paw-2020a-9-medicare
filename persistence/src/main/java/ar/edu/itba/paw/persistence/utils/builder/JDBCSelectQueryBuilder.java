@@ -1,9 +1,13 @@
-package ar.edu.itba.paw.persistence.database;
+package ar.edu.itba.paw.persistence.utils.builder;
+
+import ar.edu.itba.paw.persistence.utils.builder.JDBCWhereClauseBuilder.Operation;
 
 import java.util.LinkedList;
 import java.util.List;
 
 public class JDBCSelectQueryBuilder extends JDBCQueryBuilder {
+    public static final String ALL = "*";
+
     public enum OrderCriteria {
         ASC(" ASC "),
         DESC(" DESC ");
@@ -25,7 +29,7 @@ public class JDBCSelectQueryBuilder extends JDBCQueryBuilder {
     }
 
     public enum JoinType {
-        INNER(""),
+        INNER(" "),
         LEFT(" LEFT OUTER "),
         RIGHT(" RIGHT OUTER "),
         FULL_OUTER(" FULL OUTER "),
@@ -77,6 +81,18 @@ public class JDBCSelectQueryBuilder extends JDBCQueryBuilder {
         return this.from(tableName + " AS ");
     }
 
+    public JDBCSelectQueryBuilder join(String table, String columnLeft, String columnRight) {
+        return this.join(table, columnLeft, Operation.EQ, columnRight, JoinType.INNER);
+    }
+
+    public JDBCSelectQueryBuilder join(String table, String columnLeft, String columnRight, JoinType joinType) {
+        return this.join(table, columnLeft, Operation.EQ, columnRight, joinType);
+    }
+
+    public JDBCSelectQueryBuilder join(String table, String columnLeft, JDBCWhereClauseBuilder.Operation operation, String columnRight) {
+        return this.join(table, columnLeft, operation, columnRight, JoinType.INNER);
+    }
+
     public JDBCSelectQueryBuilder join(String table, String columnLeft, JDBCWhereClauseBuilder.Operation operation, String columnRight, JoinType joinType) {
         StringBuilder stringBuilder = new StringBuilder();
 
@@ -99,8 +115,8 @@ public class JDBCSelectQueryBuilder extends JDBCQueryBuilder {
         return this;
     }
 
-    public JDBCSelectQueryBuilder distinct(boolean distinct) {
-        this.distinct = distinct;
+    public JDBCSelectQueryBuilder distinct() {
+        this.distinct = true;
         return this;
     }
 

@@ -1,6 +1,6 @@
 package ar.edu.itba.paw.services.generics;
 
-import ar.edu.itba.paw.interfaces.daos.generic.GenericListableDao;
+import ar.edu.itba.paw.interfaces.daos.generic.GenericDao;
 import ar.edu.itba.paw.interfaces.services.generic.GenericListableService;
 import ar.edu.itba.paw.models.GenericModel;
 
@@ -14,7 +14,7 @@ import java.util.Collection;
  * @param <I> the Model's id type
  */
 public abstract class GenericListableServiceImpl<M extends GenericModel<I>, I> implements GenericListableService<M, I> {
-    protected GenericListableDao<M, I> repository;
+    protected GenericDao<M, I> repository;
 
     @Override
     public M findById(I id) {
