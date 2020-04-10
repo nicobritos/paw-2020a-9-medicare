@@ -15,11 +15,7 @@ import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 
 import javax.sql.DataSource;
 import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.Map.Entry;
 
 /**
@@ -162,6 +158,7 @@ public abstract class GenericDaoImpl<M extends GenericModel<I>, I> implements Ge
     }
 
     protected List<M> query(String query) {
+        System.out.println(query);
         return this.jdbcTemplate.query(query, this.getRowMapper());
     }
 
@@ -218,7 +215,11 @@ public abstract class GenericDaoImpl<M extends GenericModel<I>, I> implements Ge
     }
 
     protected static <M> M hydrate(Class<M> mClass, ResultSet resultSet) {
-        M m = null;
+        return hydrate(mClass, resultSet, getTableNameFromModel(mClass), new LinkedList<>());
+    }
+
+    protected static <M> M hydrate(Class<M> mClass, ResultSet resultSet, String tableName, Collection<Class<?>> classesToAvoid) {
+        M m;
         try {
             m = mClass.newInstance();
         } catch (InstantiationException e) {
@@ -227,21 +228,63 @@ public abstract class GenericDaoImpl<M extends GenericModel<I>, I> implements Ge
             return null;
         }
 
-        M finalM = m;
-        Table table = mClass.getAnnotation(Table.class);
-        ReflectionGetterSetter.iterateFields(mClass, Column.class, field -> {
-            Column column = field.getAnnotation(Column.class);
-            try {
-                ReflectionGetterSetter.set(finalM, field, resultSet.getObject(formatColumnFromName(column.name(), table.name())));
-            } catch (SQLException e) {
-                // TODO
-                e.printStackTrace();
+        try {
+            System.out.println(resultSet.getMetaData().getColumnName(1));
+            System.out.println(resultSet.getMetaData().getColumnName(2));
+            System.out.println(resultSet.getMetaData().getColumnName(3));
+            System.out.println(resultSet.getMetaData().getColumnName(4));
+            System.out.println(resultSet.getMetaData().getColumnName(5));
+            System.out.println(resultSet.getMetaData().getColumnName(6));
+            System.out.println(resultSet.getMetaData().getColumnName(7));
+//            ResultSetMetaData rsmd = resultSet.getMetaData();
+//            int columnsNumber = rsmd.getColumnCount();
+            while (resultSet.next()) {
+                System.out.println("asdas");
+                System.out.println(resultSet.getString(1));
+//                for (int i = 1; i <= columnsNumber; i++) {
+//                    if (i > 1) System.out.print(",  ");
+//                    String columnValue = resultSet.getString(i);
+//                    System.out.print(columnValue + " " + rsmd.getColumnName(i));
+//                }
+//                System.out.println("");
             }
-        });
-        return finalM;
+        } catch (Exception e) {
+            System.err.println("shit");
+        }
+        return m;
+
+//        classesToAvoid.add(mClass);
+//        ReflectionGetterSetter.iterateFields(mClass, Column.class, field -> {
+//            if (!classesToAvoid.contains(field.getDeclaringClass())) {
+//                Column column = field.getAnnotation(Column.class);
+//                try {
+//                    if (column.relation() != TableRelation.NULL) {
+//                        // Esta columna es de relacion, tengo que ver como la meto
+//                        switch (column.relation()) {
+//                            case ONE_TO_ONE:
+//                                Object o = hydrate(field.getDeclaringClass(), resultSet, getTableNameFromModel(field.getDeclaringClass()), classesToAvoid);
+//                                ReflectionGetterSetter.set(m, field, o);
+//                                break;
+//                            case ONE_TO_MANY:
+//                                break;
+//                            case MANY_TO_ONE:
+//                                break;
+//                            case MANY_TO_MANY:
+//                                break;
+//                        }
+//                    } else {
+//                        ReflectionGetterSetter.set(m, field, resultSet.getObject(formatColumnFromName(column.name(), tableName)));
+//                    }
+//                } catch (SQLException e) {
+//                    // TODO
+//                    e.printStackTrace();
+//                }
+//            }
+//        });
+//        return m;
     }
 
-    protected static <T extends GenericModel<I>, I> String getTableNameFromModel(Class<T> mClass) {
+    protected static <M> String getTableNameFromModel(Class<M> mClass) {
         if (mClass.isAnnotationPresent(Table.class)) {
             return mClass.getAnnotation(Table.class).name();
         }

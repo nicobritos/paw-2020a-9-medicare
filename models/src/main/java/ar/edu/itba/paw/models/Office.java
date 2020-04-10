@@ -1,30 +1,27 @@
 package ar.edu.itba.paw.models;
 
 import ar.edu.itba.paw.persistenceAnnotations.Column;
-import ar.edu.itba.paw.persistenceAnnotations.Entity;
 import ar.edu.itba.paw.persistenceAnnotations.Table;
+import ar.edu.itba.paw.persistenceAnnotations.TableRelation;
 
-@Entity
+import java.util.Collection;
+
 @Table(name = "office", primaryKey = "office_id")
 public class Office extends GenericModel<Integer> {
     @Column(name = "phone")
     private String phone;
-
     @Column(name = "email")
     private String email;
-
     @Column(name = "name", required = true)
     private String name;
-
-    // TODO: mapping, FK class
-    @Column(name = "province_id", required = true)
+    @Column(name = "province_id", required = true, relation = TableRelation.ONE_TO_ONE)
     private Province province;
-
     @Column(name = "street_number", required = true)
     private int streetNumber;
-
     @Column(name = "street", required = true)
     private String street;
+    @Column(relation = TableRelation.ONE_TO_MANY, elementClass = Staff.class)
+    private Collection<Staff> staffs;
 
     public String getName() {
         return this.name;
@@ -72,5 +69,27 @@ public class Office extends GenericModel<Integer> {
 
     public void setStreetNumber(int streetNumber) {
         this.streetNumber = streetNumber;
+    }
+
+    public Collection<Staff> getStaffs() {
+        return this.staffs;
+    }
+
+    public void setStaffs(Collection<Staff> staffs) {
+        this.staffs = staffs;
+    }
+
+    @Override
+    public String toString() {
+        return "Office{" +
+                "phone='" + phone + '\'' +
+                ", email='" + email + '\'' +
+                ", name='" + name + '\'' +
+                ", province=" + province +
+                ", streetNumber=" + streetNumber +
+                ", street='" + street + '\'' +
+                ", staffs=" + staffs +
+                ", id=" + id +
+                '}';
     }
 }

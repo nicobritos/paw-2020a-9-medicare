@@ -73,12 +73,12 @@ public class JDBCSelectQueryBuilder extends JDBCQueryBuilder {
     }
 
     public JDBCSelectQueryBuilder from(String tableName) {
-        this.table = tableName;
-        return this;
+        return this.from(tableName, tableName);
     }
 
     public JDBCSelectQueryBuilder from(String tableName, String alias) {
-        return this.from(tableName + " AS ");
+        this.table = tableName + " AS " + alias;
+        return this;
     }
 
     public JDBCSelectQueryBuilder join(String table, String columnLeft, String columnRight) {

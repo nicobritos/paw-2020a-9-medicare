@@ -1,14 +1,17 @@
 package ar.edu.itba.paw.models;
 
 import ar.edu.itba.paw.persistenceAnnotations.Column;
-import ar.edu.itba.paw.persistenceAnnotations.Entity;
 import ar.edu.itba.paw.persistenceAnnotations.Table;
+import ar.edu.itba.paw.persistenceAnnotations.TableRelation;
 
-@Entity
+import java.util.Collection;
+
 @Table(name = "system_country", primaryKey = "country_id")
 public class Country extends GenericModel<String> {
     @Column(name = "name", required = true)
     private String name;
+    @Column(relation = TableRelation.ONE_TO_MANY, elementClass = Province.class)
+    private Collection<Province> provinces;
 
     public String getName() {
         return this.name;
@@ -16,5 +19,13 @@ public class Country extends GenericModel<String> {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public Collection<Province> getProvinces() {
+        return this.provinces;
+    }
+
+    public void setProvinces(Collection<Province> provinces) {
+        this.provinces = provinces;
     }
 }

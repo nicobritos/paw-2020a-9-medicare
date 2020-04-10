@@ -21,6 +21,6 @@ public abstract class GenericSearchableDaoImpl<M extends GenericModel<I>, I> ext
 
     @Override
     public Collection<M> findByName(String name) {
-        return this.findByFieldIgnoreCase(this.getIdColumnName(), Operation.LIKE, name);
+        return this.findByFieldIgnoreCase("name", Operation.LIKE, name);
     }
 }
