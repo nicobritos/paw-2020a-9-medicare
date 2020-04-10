@@ -1,11 +1,28 @@
 package ar.edu.itba.paw.models;
 
+import ar.edu.itba.paw.interfaces.daos.annotations.Column;
+import ar.edu.itba.paw.interfaces.daos.annotations.Entity;
+import ar.edu.itba.paw.interfaces.daos.annotations.Table;
+
+@Entity
+@Table(name = "staff", primaryKey = "staff_id")
 public class Staff extends GenericModel<Integer> {
+    @Column(name = "office_id", required = true)
     private Office office;
+
+    @Column(name = "first_name", required = true)
     private String firstName;
+
+    @Column(name = "surname", required = true)
     private String surname;
+
+    @Column(name = "phone")
     private String phone;
+
+    @Column(name = "email")
     private String email;
+
+    @Column(name = "registration_number", required = true)
     private int registrationNumber;
 
     public Office getOffice() {

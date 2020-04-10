@@ -5,7 +5,6 @@ import ar.edu.itba.paw.models.Office;
 import ar.edu.itba.paw.models.Staff;
 import ar.edu.itba.paw.models.StaffSpecialty;
 import ar.edu.itba.paw.persistence.generics.GenericSearchableDaoImpl;
-import ar.edu.itba.paw.persistence.utils.Pair;
 import ar.edu.itba.paw.persistence.utils.builder.JDBCQueryBuilder;
 import ar.edu.itba.paw.persistence.utils.builder.JDBCSelectQueryBuilder;
 import ar.edu.itba.paw.persistence.utils.builder.JDBCWhereClauseBuilder;
@@ -44,7 +43,7 @@ public class StaffDaoImpl extends GenericSearchableDaoImpl<Staff, Integer> imple
 
     @Autowired
     public StaffDaoImpl(DataSource dataSource) {
-        super(dataSource);
+        super(dataSource, Staff.class);
     }
 
     @Override
@@ -182,31 +181,6 @@ public class StaffDaoImpl extends GenericSearchableDaoImpl<Staff, Integer> imple
     @Override
     protected RowMapper<Staff> getRowMapper() {
         return ROW_MAPPER;
-    }
-
-    @Override
-    protected String getTableName() {
-        return "staff";
-    }
-
-    @Override
-    protected String getIdColumnName() {
-        return "staff_id";
-    }
-
-    @Override
-    protected Map<String, Pair<String, Object>> getModelColumnsArgumentValue(Staff model) {
-        Map<String, Pair<String, Object>> map = new HashMap<>();
-
-        map.put("staff_id", new Pair<>(":staff_id", model.getId()));
-        map.put("office_id", new Pair<>(":office_id", model.getOffice().getId()));
-        map.put("first_name", new Pair<>(":first_name", model.getFirstName()));
-        map.put("surname", new Pair<>(":surname", model.getSurname()));
-        map.put("registration_number", new Pair<>(":registration_number", model.getRegistrationNumber()));
-        map.put("phone", new Pair<>(":phone", model.getPhone()));
-        map.put("email", new Pair<>(":email", model.getEmail()));
-
-        return map;
     }
 
     private String getSpecialtiesTableName() {

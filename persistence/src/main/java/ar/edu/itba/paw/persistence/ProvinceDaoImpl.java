@@ -4,7 +4,6 @@ import ar.edu.itba.paw.interfaces.daos.ProvinceDao;
 import ar.edu.itba.paw.models.Country;
 import ar.edu.itba.paw.models.Province;
 import ar.edu.itba.paw.persistence.generics.GenericSearchableDaoImpl;
-import ar.edu.itba.paw.persistence.utils.Pair;
 import ar.edu.itba.paw.persistence.utils.builder.JDBCQueryBuilder;
 import ar.edu.itba.paw.persistence.utils.builder.JDBCSelectQueryBuilder;
 import ar.edu.itba.paw.persistence.utils.builder.JDBCWhereClauseBuilder;
@@ -17,8 +16,6 @@ import org.springframework.stereotype.Repository;
 
 import javax.sql.DataSource;
 import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
 
 @Repository
 public class ProvinceDaoImpl extends GenericSearchableDaoImpl<Province, Integer> implements ProvinceDao {
@@ -37,7 +34,7 @@ public class ProvinceDaoImpl extends GenericSearchableDaoImpl<Province, Integer>
 
     @Autowired
     public ProvinceDaoImpl(DataSource dataSource) {
-        super(dataSource);
+        super(dataSource, Province.class);
     }
 
     @Override
@@ -66,26 +63,5 @@ public class ProvinceDaoImpl extends GenericSearchableDaoImpl<Province, Integer>
     @Override
     protected RowMapper<Province> getRowMapper() {
         return ROW_MAPPER;
-    }
-
-    @Override
-    protected String getTableName() {
-        return "system_province";
-    }
-
-    @Override
-    protected String getIdColumnName() {
-        return "province_id";
-    }
-
-    @Override
-    protected Map<String, Pair<String, Object>> getModelColumnsArgumentValue(Province model) {
-        Map<String, Pair<String, Object>> map = new HashMap<>();
-
-        map.put("office_id", new Pair<>(":office_id", model.getId()));
-        map.put("province_id", new Pair<>(":province_id", model.getCountry().getId()));
-        map.put("name", new Pair<>(":name", model.getName()));
-
-        return map;
     }
 }

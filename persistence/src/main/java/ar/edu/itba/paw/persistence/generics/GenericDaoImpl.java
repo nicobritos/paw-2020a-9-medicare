@@ -1,8 +1,11 @@
 package ar.edu.itba.paw.persistence.generics;
 
+import ar.edu.itba.paw.interfaces.daos.annotations.Column;
+import ar.edu.itba.paw.interfaces.daos.annotations.Table;
 import ar.edu.itba.paw.interfaces.daos.generic.GenericDao;
 import ar.edu.itba.paw.models.GenericModel;
 import ar.edu.itba.paw.persistence.utils.Pair;
+import ar.edu.itba.paw.persistence.utils.ReflectionGetterSetter;
 import ar.edu.itba.paw.persistence.utils.builder.*;
 import ar.edu.itba.paw.persistence.utils.builder.JDBCWhereClauseBuilder.ColumnTransformer;
 import ar.edu.itba.paw.persistence.utils.builder.JDBCWhereClauseBuilder.Operation;
@@ -24,9 +27,17 @@ import java.util.Map.Entry;
  */
 public abstract class GenericDaoImpl<M extends GenericModel<I>, I> implements GenericDao<M, I> {
     protected NamedParameterJdbcTemplate jdbcTemplate;
+    private String tableName;
+    private String primaryKeyName;
 
-    public GenericDaoImpl(DataSource dataSource) {
+    public GenericDaoImpl(DataSource dataSource, Class<M> mClass) {
         this.jdbcTemplate = new NamedParameterJdbcTemplate(dataSource);
+
+        if (mClass.isAnnotationPresent(Table.class)) {
+            Table table = mClass.getAnnotation(Table.class);
+            this.tableName = table.name();
+            this.primaryKeyName = table.primaryKey();
+        }
     }
 
     @Override
@@ -184,9 +195,23 @@ public abstract class GenericDaoImpl<M extends GenericModel<I>, I> implements Ge
 
     protected abstract RowMapper<M> getRowMapper();
 
-    protected abstract String getTableName();
+    protected String getTableName() {
+        return this.tableName;
+    }
 
-    protected abstract String getIdColumnName();
+    protected String getIdColumnName() {
+        return this.primaryKeyName;
+    }
 
-    protected abstract Map<String, Pair<String, Object>> getModelColumnsArgumentValue(M model);
+    protected Map<String, Pair<String, Object>> getModelColumnsArgumentValue(M model) {
+        Map<String, Pair<String, Object>> map = new HashMap<>();
+
+        ReflectionGetterSetter.iterateValues(model, Column.class, (field, o) -> {
+            Column column = field.getAnnotation(Column.class);
+            // TODO: Process many to one and many to many
+            map.put(column.name(), new Pair<>(":_r_" + column.name(), o));
+        });
+
+        return map;
+    }
 }
