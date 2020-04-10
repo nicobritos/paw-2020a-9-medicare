@@ -4,9 +4,10 @@ import ar.edu.itba.paw.persistence.utils.builder.JDBCWhereClauseBuilder.Operatio
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class JDBCSelectQueryBuilder extends JDBCQueryBuilder {
-    public static final String ALL = "*";
+    public static final String ALL = " * ";
 
     public enum OrderCriteria {
         ASC(" ASC "),
@@ -59,15 +60,16 @@ public class JDBCSelectQueryBuilder extends JDBCQueryBuilder {
     private boolean distinct;
     private String orderBy;
     private String table;
+    private String alias;
     private int limit;
+    private boolean selectAll;
 
-    public JDBCSelectQueryBuilder select(String columnName) {
-        if (this.columns.size() > 0) this.columns.clear();
-        this.columns.add(columnName);
+    public JDBCSelectQueryBuilder selectAll() {
+        this.selectAll = true;
         return this;
     }
 
-    public JDBCSelectQueryBuilder addSelect(String columnName) {
+    public JDBCSelectQueryBuilder select(String columnName) {
         this.columns.add(columnName);
         return this;
     }
@@ -78,6 +80,7 @@ public class JDBCSelectQueryBuilder extends JDBCQueryBuilder {
 
     public JDBCSelectQueryBuilder from(String tableName, String alias) {
         this.table = tableName + " AS " + alias;
+        this.alias = alias;
         return this;
     }
 
@@ -94,18 +97,16 @@ public class JDBCSelectQueryBuilder extends JDBCQueryBuilder {
     }
 
     public JDBCSelectQueryBuilder join(String table, String columnLeft, JDBCWhereClauseBuilder.Operation operation, String columnRight, JoinType joinType) {
-        StringBuilder stringBuilder = new StringBuilder();
+        String string = joinType.getJoinType() +
+                " JOIN " +
+                table +
+                " ON " +
+                columnLeft +
+                operation.getOperation() +
+                columnRight;
 
-        if (joinType != null) stringBuilder.append(joinType.getJoinType());
+        this.joins.add(string);
 
-        stringBuilder
-                .append(table)
-                .append(" ON ")
-                .append(columnLeft)
-                .append(operation.getOperation())
-                .append(columnRight);
-
-        this.joins.add(stringBuilder.toString());
         return this;
     }
 
@@ -134,10 +135,20 @@ public class JDBCSelectQueryBuilder extends JDBCQueryBuilder {
     public String getQueryAsString() {
         StringBuilder stringBuilder = new StringBuilder("SELECT ");
 
-        if (this.distinct) stringBuilder.append("DISTINCT ");
+        if (this.distinct) stringBuilder.append(" DISTINCT ");
+
+        if (this.columns.size() > 0) {
+            stringBuilder.append(this.joinColumns());
+        } else if (this.selectAll) {
+            stringBuilder
+                    .append(this.alias)
+                    .append(".")
+                    .append(ALL);
+        } else {
+            return null;
+        }
 
         stringBuilder
-                .append(this.joinStrings(this.columns))
                 .append(" FROM ")
                 .append(this.table);
 
@@ -168,5 +179,9 @@ public class JDBCSelectQueryBuilder extends JDBCQueryBuilder {
         stringBuilder.append(";");
 
         return stringBuilder.toString();
+    }
+
+    private String joinColumns() {
+        return this.columns.stream().map(s -> this.alias + "." + s).collect(Collectors.joining(","));
     }
 }

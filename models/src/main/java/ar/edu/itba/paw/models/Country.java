@@ -2,7 +2,6 @@ package ar.edu.itba.paw.models;
 
 import ar.edu.itba.paw.persistenceAnnotations.Column;
 import ar.edu.itba.paw.persistenceAnnotations.Table;
-import ar.edu.itba.paw.persistenceAnnotations.TableRelation;
 
 import java.util.Collection;
 
@@ -10,7 +9,6 @@ import java.util.Collection;
 public class Country extends GenericModel<String> {
     @Column(name = "name", required = true)
     private String name;
-    @Column(relation = TableRelation.ONE_TO_MANY, elementClass = Province.class)
     private Collection<Province> provinces;
 
     public String getName() {

@@ -15,6 +15,7 @@ import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 
 import javax.sql.DataSource;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.*;
 import java.util.Map.Entry;
 
@@ -41,7 +42,7 @@ public abstract class GenericDaoImpl<M extends GenericModel<I>, I> implements Ge
     @Override
     public M findById(I id) {
         JDBCQueryBuilder queryBuilder = new JDBCSelectQueryBuilder()
-                .select(JDBCSelectQueryBuilder.ALL)
+                .selectAll()
                 .from(this.getTableName())
                 .where(new JDBCWhereClauseBuilder()
                         .where(this.formatColumnFromName(this.getIdColumnName()), Operation.EQ, ":id")
@@ -54,38 +55,49 @@ public abstract class GenericDaoImpl<M extends GenericModel<I>, I> implements Ge
         return list.size() > 0 ? list.get(0) : null;
     }
 
-    // TODO
     @Override
-    public M create(M model) {
-        Map<String, Pair<String, Object>> columnsArgumentValue = this.getModelColumnsArgumentValue(model);
+    public Collection<M> findByIds(Collection<I> ids) {
+        Map<String, Object> parameters = new HashMap<>();
+        Collection<String> idsParameters = new LinkedList<>();
 
-        Map<String, String> columnsArguments = new HashMap<>();
-        Map<String, Object> argumentsValues = new HashMap<>();
-        for (Entry<String, Pair<String, Object>> columnArgumentValue : columnsArgumentValue.entrySet()) {
-            columnsArguments.put(columnArgumentValue.getKey(), columnArgumentValue.getValue().getLeft());
-            argumentsValues.put(columnArgumentValue.getValue().getLeft(), columnArgumentValue.getValue().getRight());
+        int i = 0;
+        for (I id : ids) {
+            String parameter = "_ids_" + i;
+            parameters.put(parameter, id);
+            idsParameters.add(":" + parameter);
+            i++;
         }
 
-        JDBCQueryBuilder queryBuilder = new JDBCInsertQueryBuilder()
-                .into(this.getTableName())
-                .values(columnsArguments)
-                .returning(JDBCSelectQueryBuilder.ALL);
+        JDBCQueryBuilder queryBuilder = new JDBCSelectQueryBuilder()
+                .selectAll()
+                .from(this.getTableName())
+                .where(new JDBCWhereClauseBuilder()
+                        .in(this.formatColumnFromName(this.getIdColumnName()), idsParameters)
+                );
 
-        MapSqlParameterSource parameterSource = new MapSqlParameterSource();
-        parameterSource.addValues(argumentsValues);
+        MapSqlParameterSource args = new MapSqlParameterSource();
+        args.addValues(parameters);
 
-        return this.querySingle(queryBuilder.getQueryAsString(), parameterSource);
+        return this.query(queryBuilder.getQueryAsString(), args);
     }
 
-    // TODO
-    // TODO: How to know what fields to update
     @Override
-    public void save(M model) {
+    public M create(M model) {
+        return this.createOrUpdate(model, true);
+    }
 
+    @Override
+    public void update(M model) {
+        this.createOrUpdate(model, false);
     }
 
     @Override
     public void remove(M model) {
+        this.remove(model.getId());
+    }
+
+    @Override
+    public void remove(I id) {
         JDBCQueryBuilder queryBuilder = new JDBCDeleteQueryBuilder()
                 .from(this.getTableName())
                 .where(new JDBCWhereClauseBuilder()
@@ -93,7 +105,7 @@ public abstract class GenericDaoImpl<M extends GenericModel<I>, I> implements Ge
                 );
 
         MapSqlParameterSource parameterSource = new MapSqlParameterSource();
-        parameterSource.addValue("id", model.getId());
+        parameterSource.addValue("id", id);
 
         this.query(queryBuilder.getQueryAsString(), parameterSource);
     }
@@ -101,7 +113,7 @@ public abstract class GenericDaoImpl<M extends GenericModel<I>, I> implements Ge
     @Override
     public Collection<M> list() {
         JDBCQueryBuilder queryBuilder = new JDBCSelectQueryBuilder()
-                .select(JDBCSelectQueryBuilder.ALL)
+                .selectAll()
                 .from(this.getTableName());
 
         return this.query(queryBuilder.getQueryAsString());
@@ -109,7 +121,7 @@ public abstract class GenericDaoImpl<M extends GenericModel<I>, I> implements Ge
 
     protected List<M> findByFieldIgnoreCase(String columnName, Operation operation, String value) {
         JDBCQueryBuilder queryBuilder = new JDBCSelectQueryBuilder()
-                .select(JDBCSelectQueryBuilder.ALL)
+                .selectAll()
                 .from(this.getTableName())
                 .where(new JDBCWhereClauseBuilder()
                         .where(this.formatColumnFromName(columnName), operation, ":argument", ColumnTransformer.LOWER)
@@ -124,7 +136,7 @@ public abstract class GenericDaoImpl<M extends GenericModel<I>, I> implements Ge
 
     protected List<M> findByField(String columnName, Operation operation, Object value) {
         JDBCQueryBuilder queryBuilder = new JDBCSelectQueryBuilder()
-                .select(JDBCSelectQueryBuilder.ALL)
+                .selectAll()
                 .from(this.getTableName())
                 .where(new JDBCWhereClauseBuilder()
                         .where(this.formatColumnFromName(columnName), operation, ":argument")
@@ -145,7 +157,7 @@ public abstract class GenericDaoImpl<M extends GenericModel<I>, I> implements Ge
         }
 
         JDBCQueryBuilder queryBuilder = new JDBCSelectQueryBuilder()
-                .select(JDBCSelectQueryBuilder.ALL)
+                .selectAll()
                 .from(this.getTableName())
                 .where(new JDBCWhereClauseBuilder()
                         .in(this.formatColumnFromName(columnName), parameters.keySet())
@@ -203,11 +215,33 @@ public abstract class GenericDaoImpl<M extends GenericModel<I>, I> implements Ge
 
         ReflectionGetterSetter.iterateValues(model, Column.class, (field, o) -> {
             Column column = field.getAnnotation(Column.class);
-            // TODO: Process one to one, many to one and many to many
             map.put(column.name(), new Pair<>(":_r_" + column.name(), o));
         });
 
         return map;
+    }
+
+    private M createOrUpdate(M model, boolean create) {
+        Map<String, Pair<String, Object>> columnsArgumentValue = this.getModelColumnsArgumentValue(model);
+
+        if (!create) columnsArgumentValue.remove(this.getIdColumnName());
+
+        Map<String, String> columnsArguments = new HashMap<>();
+        Map<String, Object> argumentsValues = new HashMap<>();
+        for (Entry<String, Pair<String, Object>> columnArgumentValue : columnsArgumentValue.entrySet()) {
+            columnsArguments.put(columnArgumentValue.getKey(), columnArgumentValue.getValue().getLeft());
+            argumentsValues.put(columnArgumentValue.getValue().getLeft(), columnArgumentValue.getValue().getRight());
+        }
+
+        JDBCQueryBuilder queryBuilder = new JDBCInsertQueryBuilder()
+                .into(this.getTableName())
+                .values(columnsArguments)
+                .returning(JDBCSelectQueryBuilder.ALL);
+
+        MapSqlParameterSource parameterSource = new MapSqlParameterSource();
+        parameterSource.addValues(argumentsValues);
+
+        return this.querySingle(queryBuilder.getQueryAsString(), parameterSource);
     }
 
     protected static String formatColumnFromName(String columnName, String tableName) {
@@ -215,10 +249,6 @@ public abstract class GenericDaoImpl<M extends GenericModel<I>, I> implements Ge
     }
 
     protected static <M> M hydrate(Class<M> mClass, ResultSet resultSet) {
-        return hydrate(mClass, resultSet, getTableNameFromModel(mClass), new LinkedList<>());
-    }
-
-    protected static <M> M hydrate(Class<M> mClass, ResultSet resultSet, String tableName, Collection<Class<?>> classesToAvoid) {
         M m;
         try {
             m = mClass.newInstance();
@@ -228,60 +258,34 @@ public abstract class GenericDaoImpl<M extends GenericModel<I>, I> implements Ge
             return null;
         }
 
+        Table table = mClass.getAnnotation(Table.class);
+        String tableName = table.name();
         try {
-            System.out.println(resultSet.getMetaData().getColumnName(1));
-            System.out.println(resultSet.getMetaData().getColumnName(2));
-            System.out.println(resultSet.getMetaData().getColumnName(3));
-            System.out.println(resultSet.getMetaData().getColumnName(4));
-            System.out.println(resultSet.getMetaData().getColumnName(5));
-            System.out.println(resultSet.getMetaData().getColumnName(6));
-            System.out.println(resultSet.getMetaData().getColumnName(7));
-//            ResultSetMetaData rsmd = resultSet.getMetaData();
-//            int columnsNumber = rsmd.getColumnCount();
-            while (resultSet.next()) {
-                System.out.println("asdas");
-                System.out.println(resultSet.getString(1));
-//                for (int i = 1; i <= columnsNumber; i++) {
-//                    if (i > 1) System.out.print(",  ");
-//                    String columnValue = resultSet.getString(i);
-//                    System.out.print(columnValue + " " + rsmd.getColumnName(i));
-//                }
-//                System.out.println("");
+            try {
+                ReflectionGetterSetter.set(m, "id", resultSet.getObject(formatColumnFromName(table.primaryKey(), tableName)));
+            } catch (SQLException e) {
+                ReflectionGetterSetter.set(m, "id", resultSet.getObject(table.primaryKey()));
+                e.printStackTrace();
             }
         } catch (Exception e) {
-            System.err.println("shit");
+            e.printStackTrace();
+            return null;
         }
-        return m;
 
-//        classesToAvoid.add(mClass);
-//        ReflectionGetterSetter.iterateFields(mClass, Column.class, field -> {
-//            if (!classesToAvoid.contains(field.getDeclaringClass())) {
-//                Column column = field.getAnnotation(Column.class);
-//                try {
-//                    if (column.relation() != TableRelation.NULL) {
-//                        // Esta columna es de relacion, tengo que ver como la meto
-//                        switch (column.relation()) {
-//                            case ONE_TO_ONE:
-//                                Object o = hydrate(field.getDeclaringClass(), resultSet, getTableNameFromModel(field.getDeclaringClass()), classesToAvoid);
-//                                ReflectionGetterSetter.set(m, field, o);
-//                                break;
-//                            case ONE_TO_MANY:
-//                                break;
-//                            case MANY_TO_ONE:
-//                                break;
-//                            case MANY_TO_MANY:
-//                                break;
-//                        }
-//                    } else {
-//                        ReflectionGetterSetter.set(m, field, resultSet.getObject(formatColumnFromName(column.name(), tableName)));
-//                    }
-//                } catch (SQLException e) {
-//                    // TODO
-//                    e.printStackTrace();
-//                }
-//            }
-//        });
-//        return m;
+        ReflectionGetterSetter.iterateFields(mClass, Column.class, field -> {
+            Column column = field.getAnnotation(Column.class);
+            try {
+                try {
+                    ReflectionGetterSetter.set(m, field, resultSet.getObject(formatColumnFromName(column.name(), tableName)));
+                } catch (SQLException e) {
+                    ReflectionGetterSetter.set(m, field, resultSet.getObject(column.name()));
+                }
+            } catch (SQLException e) {
+                // TODO
+                e.printStackTrace();
+            }
+        });
+        return m;
     }
 
     protected static <M> String getTableNameFromModel(Class<M> mClass) {

@@ -12,11 +12,15 @@ import java.util.Collection;
 public interface GenericDao<M extends GenericModel<I>, I> {
     M findById(I id);
 
+    Collection<M> findByIds(Collection<I> ids);
+
     M create(M model);
 
-    void save(M model);
+    void update(M model);
 
     void remove(M model);
+
+    void remove(I id);
 
     Collection<M> list();
 }

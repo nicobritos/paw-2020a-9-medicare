@@ -2,7 +2,6 @@ package ar.edu.itba.paw.models;
 
 import ar.edu.itba.paw.persistenceAnnotations.Column;
 import ar.edu.itba.paw.persistenceAnnotations.Table;
-import ar.edu.itba.paw.persistenceAnnotations.TableRelation;
 
 import java.util.Collection;
 
@@ -14,13 +13,13 @@ public class Office extends GenericModel<Integer> {
     private String email;
     @Column(name = "name", required = true)
     private String name;
-    @Column(name = "province_id", required = true, relation = TableRelation.ONE_TO_ONE)
+    @Column(name = "province_id", required = true)
+    private int provinceId;
     private Province province;
     @Column(name = "street_number", required = true)
     private int streetNumber;
     @Column(name = "street", required = true)
     private String street;
-    @Column(relation = TableRelation.ONE_TO_MANY, elementClass = Staff.class)
     private Collection<Staff> staffs;
 
     public String getName() {
@@ -79,17 +78,11 @@ public class Office extends GenericModel<Integer> {
         this.staffs = staffs;
     }
 
-    @Override
-    public String toString() {
-        return "Office{" +
-                "phone='" + phone + '\'' +
-                ", email='" + email + '\'' +
-                ", name='" + name + '\'' +
-                ", province=" + province +
-                ", streetNumber=" + streetNumber +
-                ", street='" + street + '\'' +
-                ", staffs=" + staffs +
-                ", id=" + id +
-                '}';
+    public int getProvinceId() {
+        return this.provinceId;
+    }
+
+    public void setProvinceId(int provinceId) {
+        this.provinceId = provinceId;
     }
 }

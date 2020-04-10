@@ -24,13 +24,8 @@ import java.util.stream.Collectors;
 
 @Repository
 public class StaffDaoImpl extends GenericSearchableDaoImpl<Staff, Integer> implements StaffDao {
-    private static final String SPECIALTIES_TABLE_NAME = getTableNameFromModel(StaffSpecialty.class);
-    private static final RowMapper<Staff> ROW_MAPPER = (resultSet, rowNum) -> {
-        // TODO: Fix office hydration
-//        Office office = new Office();
-//        office.setId(resultSet.getInt("office_id"));
-        return hydrate(Staff.class, resultSet);
-    };
+    private static final RowMapper<Staff> ROW_MAPPER = (resultSet, rowNum) -> hydrate(Staff.class, resultSet);
+    public static final String TABLE_NAME = getTableNameFromModel(Staff.class);
 
     @Autowired
     public StaffDaoImpl(DataSource dataSource) {
@@ -45,14 +40,14 @@ public class StaffDaoImpl extends GenericSearchableDaoImpl<Staff, Integer> imple
         int i = 0;
         for (StaffSpecialty staffSpecialty : staffSpecialties) {
             String parameter = "_specialty_" + i;
-            parameters.put("_specialty_" + i, staffSpecialty.getId());
-            specialtyParameters.add(parameter);
+            parameters.put(parameter, staffSpecialty.getId());
+            specialtyParameters.add(":" + parameter);
             i++;
         }
 
 
         JDBCQueryBuilder queryBuilder = new JDBCSelectQueryBuilder()
-                .select(JDBCSelectQueryBuilder.ALL)
+                .selectAll()
                 .from(this.getSpecialtiesTableName())
                 .join(this.getTableName(), "staff_id", "staff_id")
                 .where(new JDBCWhereClauseBuilder()
@@ -78,14 +73,14 @@ public class StaffDaoImpl extends GenericSearchableDaoImpl<Staff, Integer> imple
         int i = 0;
         for (StaffSpecialty staffSpecialty : staffSpecialties) {
             String parameter = "_specialty_" + i;
-            parameters.put("_specialty_" + i, staffSpecialty.getId());
-            specialtyParameters.add(parameter);
+            parameters.put(parameter, staffSpecialty.getId());
+            specialtyParameters.add(":" + parameter);
             i++;
         }
 
 
         JDBCQueryBuilder queryBuilder = new JDBCSelectQueryBuilder()
-                .select(JDBCSelectQueryBuilder.ALL)
+                .selectAll()
                 .from(this.getSpecialtiesTableName())
                 .join(this.getTableName(), "staff_id", "staff_id")
                 .where(new JDBCWhereClauseBuilder()
@@ -114,15 +109,15 @@ public class StaffDaoImpl extends GenericSearchableDaoImpl<Staff, Integer> imple
         for (Office office : offices) {
             String parameter = "_office_" + i;
             parameters.put(parameter, office.getId());
-            officeParameters.add(parameter);
+            officeParameters.add(":" + parameter);
             i++;
         }
 
         i = 0;
         for (StaffSpecialty staffSpecialty : staffSpecialties) {
             String parameter = "_specialty_" + i;
-            parameters.put("_specialty_" + i, staffSpecialty.getId());
-            specialtyParameters.add(parameter);
+            parameters.put(parameter, staffSpecialty.getId());
+            specialtyParameters.add(":" + parameter);
             i++;
         }
 
@@ -147,7 +142,7 @@ public class StaffDaoImpl extends GenericSearchableDaoImpl<Staff, Integer> imple
         }
 
         JDBCQueryBuilder queryBuilder = new JDBCSelectQueryBuilder()
-                .select(JDBCSelectQueryBuilder.ALL)
+                .selectAll()
                 .from(this.getSpecialtiesTableName())
                 .join(this.getTableName(), "staff_id", "staff_id")
                 .where(whereClauseBuilder)
@@ -175,6 +170,6 @@ public class StaffDaoImpl extends GenericSearchableDaoImpl<Staff, Integer> imple
     }
 
     private String getSpecialtiesTableName() {
-        return SPECIALTIES_TABLE_NAME;
+        return StaffSpecialtyDaoImpl.TABLE_NAME;
     }
 }

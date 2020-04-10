@@ -10,7 +10,4 @@ import java.lang.annotation.Target;
 public @interface Column {
     String name() default "";
     boolean required() default false;
-    TableRelation relation() default TableRelation.NULL;
-    String intermediateTable() default "";
-    Class<?> elementClass() default Object.class;
 }

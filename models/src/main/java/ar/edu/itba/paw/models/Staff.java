@@ -2,13 +2,13 @@ package ar.edu.itba.paw.models;
 
 import ar.edu.itba.paw.persistenceAnnotations.Column;
 import ar.edu.itba.paw.persistenceAnnotations.Table;
-import ar.edu.itba.paw.persistenceAnnotations.TableRelation;
 
 import java.util.Collection;
 
 @Table(name = "staff", primaryKey = "staff_id")
 public class Staff extends GenericModel<Integer> {
-    @Column(name = "office_id", required = true, relation = TableRelation.MANY_TO_ONE)
+    @Column(name = "office_id", required = true)
+    private int officeId;
     private Office office;
     @Column(name = "first_name", required = true)
     private String firstName;
@@ -20,7 +20,6 @@ public class Staff extends GenericModel<Integer> {
     private String email;
     @Column(name = "registration_number", required = true)
     private int registrationNumber;
-    @Column(relation = TableRelation.MANY_TO_MANY, elementClass = StaffSpecialty.class, intermediateTable = "system_staff_specialty_staff")
     private Collection<StaffSpecialty> staffSpecialties;
 
     public Office getOffice() {
@@ -69,5 +68,21 @@ public class Staff extends GenericModel<Integer> {
 
     public void setRegistrationNumber(int registrationNumber) {
         this.registrationNumber = registrationNumber;
+    }
+
+    public int getOfficeId() {
+        return this.officeId;
+    }
+
+    public void setOfficeId(int officeId) {
+        this.officeId = officeId;
+    }
+
+    public Collection<StaffSpecialty> getStaffSpecialties() {
+        return this.staffSpecialties;
+    }
+
+    public void setStaffSpecialties(Collection<StaffSpecialty> staffSpecialties) {
+        this.staffSpecialties = staffSpecialties;
     }
 }

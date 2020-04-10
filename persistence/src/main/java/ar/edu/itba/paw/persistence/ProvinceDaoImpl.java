@@ -19,12 +19,8 @@ import java.util.Collection;
 
 @Repository
 public class ProvinceDaoImpl extends GenericSearchableDaoImpl<Province, Integer> implements ProvinceDao {
-    private static final RowMapper<Province> ROW_MAPPER = (resultSet, rowNum) -> {
-        // TODO: Fix hydration
-//        Country country = new Country();
-//        country.setId(resultSet.getString("country_id"));
-        return hydrate(Province.class, resultSet);
-    };
+    private static final RowMapper<Province> ROW_MAPPER = (resultSet, rowNum) -> hydrate(Province.class, resultSet);
+    public static final String TABLE_NAME = getTableNameFromModel(Province.class);
 
     @Autowired
     public ProvinceDaoImpl(DataSource dataSource) {
@@ -39,7 +35,7 @@ public class ProvinceDaoImpl extends GenericSearchableDaoImpl<Province, Integer>
     @Override
     public Collection<Province> findByCountryAndName(Country country, String name) {
         JDBCQueryBuilder queryBuilder = new JDBCSelectQueryBuilder()
-                .select(JDBCSelectQueryBuilder.ALL)
+                .selectAll()
                 .from(this.getTableName())
                 .where(new JDBCWhereClauseBuilder()
                         .where(this.formatColumnFromName("name"), Operation.LIKE, ":name", ColumnTransformer.LOWER)

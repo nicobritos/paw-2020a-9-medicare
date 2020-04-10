@@ -18,6 +18,10 @@ public abstract class ReflectionGetterSetter {
         for (Field field : model.getClass().getDeclaredFields()) {
             map.put(field.getName(), get(model, field));
         }
+        // We also need parent
+        for (Field field : model.getClass().getSuperclass().getDeclaredFields()) {
+            map.put(field.getName(), get(model, field));
+        }
 
         return map;
     }
@@ -26,6 +30,12 @@ public abstract class ReflectionGetterSetter {
         Map<String, Object> map = new HashMap<>();
 
         for (Field field : model.getClass().getDeclaredFields()) {
+            if (field.isAnnotationPresent(annotationClass)) {
+                map.put(field.getName(), get(model, field));
+            }
+        }
+        // We also need parent
+        for (Field field : model.getClass().getSuperclass().getDeclaredFields()) {
             if (field.isAnnotationPresent(annotationClass)) {
                 map.put(field.getName(), get(model, field));
             }
@@ -42,6 +52,12 @@ public abstract class ReflectionGetterSetter {
                 map.put(mapper.apply(field), get(model, field));
             }
         }
+        // We also need parent
+        for (Field field : model.getClass().getSuperclass().getDeclaredFields()) {
+            if (field.isAnnotationPresent(annotationClass)) {
+                map.put(mapper.apply(field), get(model, field));
+            }
+        }
 
         return map;
     }
@@ -52,10 +68,22 @@ public abstract class ReflectionGetterSetter {
                 consumer.accept(field);
             }
         }
+        // We also need parent
+        for (Field field : mClass.getSuperclass().getDeclaredFields()) {
+            if (field.isAnnotationPresent(annotationClass)) {
+                consumer.accept(field);
+            }
+        }
     }
 
     public static <T extends Annotation> void iterateValues(Object model, Class<T> annotationClass, BiConsumer<Field, Object> consumer) {
         for (Field field : model.getClass().getDeclaredFields()) {
+            if (field.isAnnotationPresent(annotationClass)) {
+                consumer.accept(field, get(model, field));
+            }
+        }
+        // We also need parent
+        for (Field field : model.getClass().getSuperclass().getDeclaredFields()) {
             if (field.isAnnotationPresent(annotationClass)) {
                 consumer.accept(field, get(model, field));
             }
@@ -84,7 +112,11 @@ public abstract class ReflectionGetterSetter {
     }
 
     private static Field getFieldByName(String fieldName, Class<?> className) throws NoSuchFieldException {
-        return className.getDeclaredField(fieldName);
+        try {
+            return className.getDeclaredField(fieldName);
+        } catch (NoSuchFieldException e) {
+            return className.getSuperclass().getDeclaredField(fieldName);
+        }
     }
 
     private static Object get(Object model, Field field) {

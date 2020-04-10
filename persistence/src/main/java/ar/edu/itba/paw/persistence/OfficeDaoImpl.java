@@ -13,13 +13,8 @@ import java.util.Collection;
 
 @Repository
 public class OfficeDaoImpl extends GenericSearchableDaoImpl<Office, Integer> implements OfficeDao {
-    private static final RowMapper<Office> ROW_MAPPER = (resultSet, rowNum) -> {
-        // TODO: Fix hydration
-//        Province province = new Province();
-//        province.setId(resultSet.getInt("province_id"));
-
-        return hydrate(Office.class, resultSet);
-    };
+    private static final RowMapper<Office> ROW_MAPPER = (resultSet, rowNum) -> hydrate(Office.class, resultSet);
+    public static final String TABLE_NAME = getTableNameFromModel(Office.class);
 
     @Autowired
     public OfficeDaoImpl(DataSource dataSource) {
