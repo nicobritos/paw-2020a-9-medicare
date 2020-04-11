@@ -15,9 +15,9 @@ import javax.sql.DataSource;
 @ComponentScan({ "ar.edu.itba.paw.webapp.controller","ar.edu.itba.paw.services","ar.edu.itba.paw.persistence"})
 @Configuration
 public class WebConfig {
-    protected static final String DB_URL = "jdbc:postgresql://localhost:5433/paw";
-    protected static final String DB_USER = "postgres";
-    protected static final String DB_PASSWORD = "postgres";
+    protected static final String DB_URL = "jdbc:postgresql://10.16.1.110:5432/paw-2020a-9";
+    protected static final String DB_USER = "paw-2020a-9";
+    protected static final String DB_PASSWORD = "N4wC7cmxe";
 
     @Bean
     public ViewResolver viewResolver() {
