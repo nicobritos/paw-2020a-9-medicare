@@ -1,12 +1,12 @@
 package ar.edu.itba.paw.interfaces.daos;
 
-import ar.edu.itba.paw.interfaces.daos.generic.GenericDao;
+import ar.edu.itba.paw.interfaces.daos.generic.GenericSearchableDao;
 import ar.edu.itba.paw.models.Country;
 import ar.edu.itba.paw.models.Province;
 
 import java.util.Collection;
 
-public interface ProvinceDao extends GenericDao<Province, Integer> {
+public interface ProvinceDao extends GenericSearchableDao<Province, Integer> {
     Collection<Province> findByCountry(Country country);
 
     /**

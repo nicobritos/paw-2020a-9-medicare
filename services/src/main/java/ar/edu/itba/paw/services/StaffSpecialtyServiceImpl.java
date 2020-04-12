@@ -10,7 +10,10 @@ import org.springframework.stereotype.Service;
 @Service
 public class StaffSpecialtyServiceImpl extends GenericSearchableServiceImpl<StaffSpecialtyDao, StaffSpecialty,Integer> implements StaffSpecialtyService {
     @Autowired
-    public StaffSpecialtyServiceImpl(StaffSpecialtyDao repository) {
-        super(repository);
+    private StaffSpecialtyDao repository;
+
+    @Override
+    protected StaffSpecialtyDao getRepository() {
+        return this.repository;
     }
 }

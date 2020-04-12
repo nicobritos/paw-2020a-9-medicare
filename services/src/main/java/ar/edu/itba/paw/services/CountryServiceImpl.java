@@ -10,7 +10,10 @@ import org.springframework.stereotype.Service;
 @Service
 public class CountryServiceImpl extends GenericSearchableServiceImpl<CountryDao, Country,String> implements CountryService {
     @Autowired
-    public CountryServiceImpl(CountryDao countryDao) {
-        super(countryDao);
+    private CountryDao repository;
+
+    @Override
+    protected CountryDao getRepository() {
+        return this.repository;
     }
 }

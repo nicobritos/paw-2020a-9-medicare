@@ -13,9 +13,7 @@ import java.util.Collection;
 @Service
 public class ProvinceServiceImpl extends GenericServiceImpl<ProvinceDao, Province, Integer> implements ProvinceService {
     @Autowired
-    public ProvinceServiceImpl(ProvinceDao repository) {
-        super(repository);
-    }
+    private ProvinceDao repository;
 
     @Override
     public Collection<Province> findByCountry(Country country) {
@@ -25,5 +23,10 @@ public class ProvinceServiceImpl extends GenericServiceImpl<ProvinceDao, Provinc
     @Override
     public Collection<Province> findByCountryAndName(Country country, String name) {
         return this.repository.findByCountryAndName(country, name);
+    }
+
+    @Override
+    protected ProvinceDao getRepository() {
+        return this.repository;
     }
 }

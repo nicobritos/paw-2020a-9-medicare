@@ -14,9 +14,7 @@ import java.util.Collection;
 @Service
 public class StaffServiceImpl extends GenericServiceImpl<StaffDao, Staff, Integer> implements StaffService {
     @Autowired
-    public StaffServiceImpl(StaffDao repository) {
-        super(repository);
-    }
+    private StaffDao repository;
 
     @Override
     public Collection<Staff> findByStaffSpecialties(Collection<StaffSpecialty> staffSpecialties) {
@@ -46,5 +44,10 @@ public class StaffServiceImpl extends GenericServiceImpl<StaffDao, Staff, Intege
     @Override
     public Collection<Staff> findByName(String name) {
         return this.repository.findByName(name);
+    }
+
+    @Override
+    protected StaffDao getRepository() {
+        return null;
     }
 }

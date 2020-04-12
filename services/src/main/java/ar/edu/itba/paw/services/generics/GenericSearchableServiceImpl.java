@@ -13,13 +13,9 @@ import java.util.Collection;
  * @param <M> the Service model type
  * @param <I> the Model's id type
  */
-public abstract class GenericSearchableServiceImpl<D extends GenericSearchableDao<M, I>, M extends GenericModel<I>, I> extends GenericServiceImpl<D, M, I> implements GenericSearchableService<M, I> {
-    public GenericSearchableServiceImpl(D repository) {
-        super(repository);
-    }
-
+public abstract class GenericSearchableServiceImpl<DAO extends GenericSearchableDao<M, I>, M extends GenericModel<I>, I> extends GenericServiceImpl<DAO, M, I> implements GenericSearchableService<M, I> {
     @Override
     public Collection<M> findByName(String name) {
-        return this.repository.findByName(name);
+        return this.getRepository().findByName(name);
     }
 }
