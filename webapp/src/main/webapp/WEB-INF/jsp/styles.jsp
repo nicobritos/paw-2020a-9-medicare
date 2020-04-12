@@ -104,6 +104,18 @@ input[type=text], input[type=email], input[type=password], textarea, select{
 	border-radius:4px;
 }
 
+table {
+  border-collapse: collapse;
+  width: 100%;
+}
+
+th, td {
+  text-align: left;
+  padding: 8px;
+}
+
+tr:nth-child(even) {background-color: #f2f2f2;}
+
 .tableText{
 	text-align:center;
 	font-weight:bold;
