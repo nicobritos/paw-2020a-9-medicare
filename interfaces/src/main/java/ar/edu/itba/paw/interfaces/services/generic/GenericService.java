@@ -2,6 +2,8 @@ package ar.edu.itba.paw.interfaces.services.generic;
 
 import ar.edu.itba.paw.models.GenericModel;
 
+import java.util.Collection;
+
 /**
  * This provides a generic Service interface
  * @param <M> the Service model type
@@ -10,5 +12,15 @@ import ar.edu.itba.paw.models.GenericModel;
 public interface GenericService<M extends GenericModel<I>, I> {
     M findById(I id);
 
+    Collection<M> findByIds(Collection<I> ids);
+
+    M create(M model);
+
+    void update(M model);
+
     void remove(M model);
+
+    void remove(I id);
+
+    Collection<M> list();
 }

@@ -13,17 +13,9 @@ import java.util.Collection;
  * @param <M> the Service model type
  * @param <I> the Model's id type
  */
-public abstract class GenericSearchableServiceImpl<M extends GenericModel<I>, I> implements GenericSearchableService<M, I> {
-    protected GenericSearchableDao<M, I> repository;
-
-    @Override
-    public M findById(I id) {
-        return this.repository.findById(id);
-    }
-
-    @Override
-    public void remove(M model) {
-        this.repository.remove(model);
+public abstract class GenericSearchableServiceImpl<D extends GenericSearchableDao<M, I>, M extends GenericModel<I>, I> extends GenericServiceImpl<D, M, I> implements GenericSearchableService<M, I> {
+    public GenericSearchableServiceImpl(D repository) {
+        super(repository);
     }
 
     @Override

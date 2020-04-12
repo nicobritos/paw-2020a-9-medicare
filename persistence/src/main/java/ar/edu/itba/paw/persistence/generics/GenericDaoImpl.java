@@ -210,19 +210,20 @@ public abstract class GenericDaoImpl<M extends GenericModel<I>, I> implements Ge
         return this.primaryKeyName;
     }
 
-    protected Map<String, Pair<String, Object>> getModelColumnsArgumentValue(M model) {
+    protected Map<String, Pair<String, Object>> getModelColumnsArgumentValue(M model, String prefix) {
         Map<String, Pair<String, Object>> map = new HashMap<>();
 
         ReflectionGetterSetter.iterateValues(model, Column.class, (field, o) -> {
             Column column = field.getAnnotation(Column.class);
-            map.put(column.name(), new Pair<>(":_r_" + column.name(), o));
+            map.put(column.name(), new Pair<>(":" + prefix + column.name(), o));
         });
 
         return map;
     }
 
     private M createOrUpdate(M model, boolean create) {
-        Map<String, Pair<String, Object>> columnsArgumentValue = this.getModelColumnsArgumentValue(model);
+        String prefix = "_r_";
+        Map<String, Pair<String, Object>> columnsArgumentValue = this.getModelColumnsArgumentValue(model, prefix);
 
         if (!create) columnsArgumentValue.remove(this.getIdColumnName());
 
@@ -230,7 +231,7 @@ public abstract class GenericDaoImpl<M extends GenericModel<I>, I> implements Ge
         Map<String, Object> argumentsValues = new HashMap<>();
         for (Entry<String, Pair<String, Object>> columnArgumentValue : columnsArgumentValue.entrySet()) {
             columnsArguments.put(columnArgumentValue.getKey(), columnArgumentValue.getValue().getLeft());
-            argumentsValues.put(columnArgumentValue.getValue().getLeft(), columnArgumentValue.getValue().getRight());
+            argumentsValues.put(prefix + columnArgumentValue.getKey(), columnArgumentValue.getValue().getRight());
         }
 
         JDBCQueryBuilder queryBuilder = new JDBCInsertQueryBuilder()

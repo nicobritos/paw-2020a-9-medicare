@@ -11,17 +11,19 @@ import org.springframework.stereotype.Service;
 import java.util.Collection;
 
 @Service
-public class ProvinceServiceImpl extends GenericServiceImpl<Province, Integer> implements ProvinceService {
+public class ProvinceServiceImpl extends GenericServiceImpl<ProvinceDao, Province, Integer> implements ProvinceService {
     @Autowired
-    ProvinceDao repository;
+    public ProvinceServiceImpl(ProvinceDao repository) {
+        super(repository);
+    }
 
     @Override
     public Collection<Province> findByCountry(Country country) {
-        return  this.repository.findByCountry(country);
+        return this.repository.findByCountry(country);
     }
 
     @Override
     public Collection<Province> findByCountryAndName(Country country, String name) {
-        return this.repository.findByCountryAndName(country,name);
+        return this.repository.findByCountryAndName(country, name);
     }
 }

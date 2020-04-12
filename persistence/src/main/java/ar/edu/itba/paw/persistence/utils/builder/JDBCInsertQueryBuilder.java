@@ -70,6 +70,6 @@ public class JDBCInsertQueryBuilder extends JDBCQueryBuilder {
             valueStringBuilder.append(pair.getValue());
         }
 
-        return " (" + valueStringBuilder.toString() + ") VALUES (" + keyStringBuilder.toString() + ") ";
+        return " (" + keyStringBuilder.toString() + ") VALUES (" + valueStringBuilder.toString() + ") ";
     }
 }
