@@ -11,7 +11,7 @@ import javax.sql.DataSource;
 
 @Repository
 public class StaffSpecialtyDaoImpl extends GenericSearchableDaoImpl<StaffSpecialty, Integer> implements StaffSpecialtyDao {
-    private static final RowMapper<StaffSpecialty> ROW_MAPPER = (resultSet, rowNum) -> hydrate(StaffSpecialty.class, resultSet);
+    private final RowMapper<StaffSpecialty> rowMapper = (resultSet, rowNum) -> this.hydrate(resultSet);
     public static final String TABLE_NAME = getTableNameFromModel(StaffSpecialty.class);
 
     @Autowired
@@ -21,6 +21,6 @@ public class StaffSpecialtyDaoImpl extends GenericSearchableDaoImpl<StaffSpecial
 
     @Override
     protected RowMapper<StaffSpecialty> getRowMapper() {
-        return ROW_MAPPER;
+        return rowMapper;
     }
 }

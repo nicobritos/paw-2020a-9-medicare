@@ -1,15 +1,13 @@
 package ar.edu.itba.paw.models;
 
 import ar.edu.itba.paw.persistenceAnnotations.Column;
+import ar.edu.itba.paw.persistenceAnnotations.ManyToMany;
 import ar.edu.itba.paw.persistenceAnnotations.Table;
 
 import java.util.Collection;
 
 @Table(name = "staff", primaryKey = "staff_id")
 public class Staff extends GenericModel<Integer> {
-    @Column(name = "office_id", required = true)
-    private int officeId;
-    private Office office;
     @Column(name = "first_name", required = true)
     private String firstName;
     @Column(name = "surname", required = true)
@@ -20,15 +18,8 @@ public class Staff extends GenericModel<Integer> {
     private String email;
     @Column(name = "registration_number", required = true)
     private int registrationNumber;
+    @ManyToMany(name = "staff_id", otherName = "specialty_id", tableName = "system_staff_specialty_staff", className = StaffSpecialty.class)
     private Collection<StaffSpecialty> staffSpecialties;
-
-    public Office getOffice() {
-        return this.office;
-    }
-
-    public void setOffice(Office office) {
-        this.office = office;
-    }
 
     public String getFirstName() {
         return this.firstName;
@@ -70,19 +61,24 @@ public class Staff extends GenericModel<Integer> {
         this.registrationNumber = registrationNumber;
     }
 
-    public int getOfficeId() {
-        return this.officeId;
-    }
-
-    public void setOfficeId(int officeId) {
-        this.officeId = officeId;
-    }
-
     public Collection<StaffSpecialty> getStaffSpecialties() {
         return this.staffSpecialties;
     }
 
     public void setStaffSpecialties(Collection<StaffSpecialty> staffSpecialties) {
         this.staffSpecialties = staffSpecialties;
+    }
+
+    @Override
+    public String toString() {
+        return "Staff{" +
+                "firstName='" + firstName + '\'' +
+                ", surname='" + surname + '\'' +
+                ", phone='" + phone + '\'' +
+                ", email='" + email + '\'' +
+                ", registrationNumber=" + registrationNumber +
+                ", staffSpecialties=" + staffSpecialties +
+                ", id=" + id +
+                '}';
     }
 }

@@ -5,9 +5,6 @@ import ar.edu.itba.paw.persistenceAnnotations.Table;
 
 @Table(name = "system_province", primaryKey = "province_id")
 public class Province extends GenericModel<Integer> {
-    @Column(name = "country_id", required = true)
-    private String countryId;
-    private Country country;
     @Column(name = "name", required = true)
     private String name;
 
@@ -19,19 +16,11 @@ public class Province extends GenericModel<Integer> {
         this.name = name;
     }
 
-    public Country getCountry() {
-        return this.country;
-    }
-
-    public void setCountry(Country country) {
-        this.country = country;
-    }
-
-    public String getCountryId() {
-        return this.countryId;
-    }
-
-    public void setCountryId(String countryId) {
-        this.countryId = countryId;
+    @Override
+    public String toString() {
+        return "Province{" +
+                "name='" + name + '\'' +
+                ", id=" + id +
+                '}';
     }
 }

@@ -19,7 +19,7 @@ import java.util.Collection;
 
 @Repository
 public class ProvinceDaoImpl extends GenericSearchableDaoImpl<Province, Integer> implements ProvinceDao {
-    private static final RowMapper<Province> ROW_MAPPER = (resultSet, rowNum) -> hydrate(Province.class, resultSet);
+    private final RowMapper<Province> rowMapper = (resultSet, rowNum) -> this.hydrate(resultSet);
     public static final String TABLE_NAME = getTableNameFromModel(Province.class);
 
     @Autowired
@@ -52,6 +52,6 @@ public class ProvinceDaoImpl extends GenericSearchableDaoImpl<Province, Integer>
 
     @Override
     protected RowMapper<Province> getRowMapper() {
-        return ROW_MAPPER;
+        return rowMapper;
     }
 }

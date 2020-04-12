@@ -13,7 +13,7 @@ import java.util.Collection;
 
 @Repository
 public class OfficeDaoImpl extends GenericSearchableDaoImpl<Office, Integer> implements OfficeDao {
-    private static final RowMapper<Office> ROW_MAPPER = (resultSet, rowNum) -> hydrate(Office.class, resultSet);
+    private final RowMapper<Office> rowMapper = (resultSet, rowNum) -> this.hydrate(resultSet);
     public static final String TABLE_NAME = getTableNameFromModel(Office.class);
 
     @Autowired
@@ -28,6 +28,6 @@ public class OfficeDaoImpl extends GenericSearchableDaoImpl<Office, Integer> imp
 
     @Override
     protected RowMapper<Office> getRowMapper() {
-        return ROW_MAPPER;
+        return rowMapper;
     }
 }

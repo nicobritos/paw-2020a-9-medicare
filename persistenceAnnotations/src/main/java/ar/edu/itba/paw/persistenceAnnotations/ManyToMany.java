@@ -7,7 +7,10 @@ import java.lang.annotation.Target;
 
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.FIELD)
-public @interface Column {
+public @interface ManyToMany {
     String name();
+    String otherName();
+    String tableName();
+    Class<?> className();
     boolean required() default false;
 }

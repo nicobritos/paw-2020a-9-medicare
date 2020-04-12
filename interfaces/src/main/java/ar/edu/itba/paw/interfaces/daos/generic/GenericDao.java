@@ -23,4 +23,8 @@ public interface GenericDao<M extends GenericModel<I>, I> {
     void remove(I id);
 
     Collection<M> list();
+
+    Collection<M> findByField(String columnName, Object value);
+
+    Class<M> getModelClass();
 }

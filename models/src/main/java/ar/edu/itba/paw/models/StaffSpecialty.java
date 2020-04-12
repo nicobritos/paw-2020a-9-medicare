@@ -15,4 +15,12 @@ public class StaffSpecialty extends GenericModel<Integer> {
     public void setName(String name) {
         this.name = name;
     }
+
+    @Override
+    public String toString() {
+        return "StaffSpecialty{" +
+                "name='" + name + '\'' +
+                ", id=" + id +
+                '}';
+    }
 }

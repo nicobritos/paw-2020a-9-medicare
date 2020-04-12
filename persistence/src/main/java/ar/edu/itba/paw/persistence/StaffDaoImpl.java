@@ -24,7 +24,7 @@ import java.util.stream.Collectors;
 
 @Repository
 public class StaffDaoImpl extends GenericSearchableDaoImpl<Staff, Integer> implements StaffDao {
-    private static final RowMapper<Staff> ROW_MAPPER = (resultSet, rowNum) -> hydrate(Staff.class, resultSet);
+    private final RowMapper<Staff> rowMapper = (resultSet, rowNum) -> this.hydrate(resultSet);
     public static final String TABLE_NAME = getTableNameFromModel(Staff.class);
 
     @Autowired
@@ -166,7 +166,7 @@ public class StaffDaoImpl extends GenericSearchableDaoImpl<Staff, Integer> imple
 
     @Override
     protected RowMapper<Staff> getRowMapper() {
-        return ROW_MAPPER;
+        return rowMapper;
     }
 
     private String getSpecialtiesTableName() {

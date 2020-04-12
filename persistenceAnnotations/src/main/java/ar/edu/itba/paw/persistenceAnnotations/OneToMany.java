@@ -7,7 +7,8 @@ import java.lang.annotation.Target;
 
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.FIELD)
-public @interface Column {
-    String name();
+public @interface OneToMany {
+    String joinedName();
+    Class<?> className();
     boolean required() default false;
 }

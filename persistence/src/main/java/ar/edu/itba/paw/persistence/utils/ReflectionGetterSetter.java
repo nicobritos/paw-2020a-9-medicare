@@ -12,6 +12,7 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 
 public abstract class ReflectionGetterSetter {
+
     public static Map<String, ?> listValues(Object model) {
         Map<String, Object> map = new HashMap<>();
 
