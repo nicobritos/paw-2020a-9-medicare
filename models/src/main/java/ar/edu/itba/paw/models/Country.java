@@ -28,13 +28,4 @@ public class Country extends GenericModel<String> {
     public void setProvinces(Collection<Province> provinces) {
         this.provinces = provinces;
     }
-
-    @Override
-    public String toString() {
-        return "Country{" +
-                "name='" + name + '\'' +
-                ", provinces=" + provinces +
-                ", id=" + id +
-                '}';
-    }
 }

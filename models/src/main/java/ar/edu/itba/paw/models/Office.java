@@ -15,7 +15,6 @@ public class Office extends GenericModel<Integer> {
     private String email;
     @Column(name = "name", required = true)
     private String name;
-    private int provinceId;
     @OneToOne(name = "province_id", required = true)
     private Province province;
     @Column(name = "street_number", required = true)
@@ -79,28 +78,5 @@ public class Office extends GenericModel<Integer> {
 
     public void setStaffs(Collection<Staff> staffs) {
         this.staffs = staffs;
-    }
-
-    public int getProvinceId() {
-        return this.provinceId;
-    }
-
-    public void setProvinceId(int provinceId) {
-        this.provinceId = provinceId;
-    }
-
-    @Override
-    public String toString() {
-        return "Office{" +
-                "phone='" + phone + '\'' +
-                ", email='" + email + '\'' +
-                ", name='" + name + '\'' +
-                ", provinceId=" + provinceId +
-                ", province=" + province +
-                ", streetNumber=" + streetNumber +
-                ", street='" + street + '\'' +
-                ", staffs=" + staffs +
-                ", id=" + id +
-                '}';
     }
 }

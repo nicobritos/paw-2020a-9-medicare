@@ -15,12 +15,4 @@ public class Province extends GenericModel<Integer> {
     public void setName(String name) {
         this.name = name;
     }
-
-    @Override
-    public String toString() {
-        return "Province{" +
-                "name='" + name + '\'' +
-                ", id=" + id +
-                '}';
-    }
 }

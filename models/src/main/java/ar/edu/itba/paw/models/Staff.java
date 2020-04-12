@@ -68,17 +68,4 @@ public class Staff extends GenericModel<Integer> {
     public void setStaffSpecialties(Collection<StaffSpecialty> staffSpecialties) {
         this.staffSpecialties = staffSpecialties;
     }
-
-    @Override
-    public String toString() {
-        return "Staff{" +
-                "firstName='" + firstName + '\'' +
-                ", surname='" + surname + '\'' +
-                ", phone='" + phone + '\'' +
-                ", email='" + email + '\'' +
-                ", registrationNumber=" + registrationNumber +
-                ", staffSpecialties=" + staffSpecialties +
-                ", id=" + id +
-                '}';
-    }
 }
