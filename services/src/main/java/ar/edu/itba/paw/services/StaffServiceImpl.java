@@ -17,11 +17,11 @@ public class StaffServiceImpl extends GenericServiceImpl<Staff, Integer> impleme
 
     @Override
     public Collection<Staff> findByStaffSpecialties(Collection<StaffSpecialty> staffSpecialties) {
-        return null;
+        return this.repository.findByStaffSpecialties(staffSpecialties);
     }
 
     @Override
     public Collection<Staff> findByName(String name) {
-        return null;
+        return this.repository.findByName(name);
     }
 }
