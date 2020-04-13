@@ -55,9 +55,9 @@ public abstract class GenericDaoImpl<M extends GenericModel<I>, I> implements Ge
     public M findById(I id) {
         JDBCQueryBuilder queryBuilder = new JDBCSelectQueryBuilder()
                 .selectAll()
-                .from(this.getTableName())
+                .from(this.getTableAlias())
                 .where(new JDBCWhereClauseBuilder()
-                        .where(this.formatColumnFromName(this.getIdColumnName()), Operation.EQ, ":id")
+                        .where(this.formatColumnFromAlias(this.getIdColumnName()), Operation.EQ, ":id")
                 );
 
         MapSqlParameterSource args = new MapSqlParameterSource();
@@ -86,9 +86,9 @@ public abstract class GenericDaoImpl<M extends GenericModel<I>, I> implements Ge
 
         JDBCQueryBuilder queryBuilder = new JDBCSelectQueryBuilder()
                 .selectAll()
-                .from(this.getTableName())
+                .from(this.getTableAlias())
                 .where(new JDBCWhereClauseBuilder()
-                        .in(this.formatColumnFromName(this.getIdColumnName()), idsParameters)
+                        .in(this.formatColumnFromAlias(this.getIdColumnName()), idsParameters)
                 );
 
         MapSqlParameterSource args = new MapSqlParameterSource();
@@ -112,7 +112,7 @@ public abstract class GenericDaoImpl<M extends GenericModel<I>, I> implements Ge
         }
 
         JDBCInsertQueryBuilder queryBuilder = new JDBCInsertQueryBuilder()
-                .into(this.getTableName())
+                .into(this.getTableAlias())
                 .values(columnsArguments);
 
         MapSqlParameterSource parameterSource = new MapSqlParameterSource();
@@ -140,10 +140,10 @@ public abstract class GenericDaoImpl<M extends GenericModel<I>, I> implements Ge
 
         String argumentName = ARGUMENT_PREFIX + "id";
         JDBCQueryBuilder queryBuilder = new JDBCUpdateQueryBuilder()
-                .update(this.getTableName())
+                .update(this.getTableAlias())
                 .values(columnsArguments)
                 .where(new JDBCWhereClauseBuilder()
-                        .where(formatColumnFromName(this.getIdColumnName(), this.getTableName()), Operation.EQ, ":" + argumentName)
+                        .where(formatColumnFromAlias(this.getIdColumnName(), this.getTableAlias()), Operation.EQ, ":" + argumentName)
                 )
                 .returning(JDBCSelectQueryBuilder.ALL);
 
@@ -164,9 +164,9 @@ public abstract class GenericDaoImpl<M extends GenericModel<I>, I> implements Ge
     @Override
     public void remove(I id) {
         JDBCQueryBuilder queryBuilder = new JDBCDeleteQueryBuilder()
-                .from(this.getTableName())
+                .from(this.getTableAlias())
                 .where(new JDBCWhereClauseBuilder()
-                        .where(this.formatColumnFromName(this.getIdColumnName()), Operation.EQ, ":id")
+                        .where(this.formatColumnFromAlias(this.getIdColumnName()), Operation.EQ, ":id")
                 );
 
         MapSqlParameterSource parameterSource = new MapSqlParameterSource();
@@ -179,7 +179,7 @@ public abstract class GenericDaoImpl<M extends GenericModel<I>, I> implements Ge
     public List<M> list() {
         JDBCQueryBuilder queryBuilder = new JDBCSelectQueryBuilder()
                 .selectAll()
-                .from(this.getTableName());
+                .from(this.getTableAlias());
 
         return this.query(queryBuilder.getQueryAsString());
     }
@@ -203,9 +203,9 @@ public abstract class GenericDaoImpl<M extends GenericModel<I>, I> implements Ge
     public List<M> findByField(String columnName, Operation operation, Object value) {
         JDBCQueryBuilder queryBuilder = new JDBCSelectQueryBuilder()
                 .selectAll()
-                .from(this.getTableName())
+                .from(this.getTableAlias())
                 .where(new JDBCWhereClauseBuilder()
-                        .where(this.formatColumnFromName(columnName), operation, ":argument")
+                        .where(this.formatColumnFromAlias(columnName), operation, ":argument")
                 );
 
         MapSqlParameterSource parameterSource = new MapSqlParameterSource();
@@ -217,9 +217,9 @@ public abstract class GenericDaoImpl<M extends GenericModel<I>, I> implements Ge
     protected List<M> findByFieldIgnoreCase(String columnName, Operation operation, String value) {
         JDBCQueryBuilder queryBuilder = new JDBCSelectQueryBuilder()
                 .selectAll()
-                .from(this.getTableName())
+                .from(this.getTableAlias())
                 .where(new JDBCWhereClauseBuilder()
-                        .where(this.formatColumnFromName(columnName), operation, ":argument", ColumnTransformer.LOWER)
+                        .where(this.formatColumnFromAlias(columnName), operation, ":argument", ColumnTransformer.LOWER)
                 );
 
         value = value.toLowerCase();
@@ -242,9 +242,9 @@ public abstract class GenericDaoImpl<M extends GenericModel<I>, I> implements Ge
 
         JDBCQueryBuilder queryBuilder = new JDBCSelectQueryBuilder()
                 .selectAll()
-                .from(this.getTableName())
+                .from(this.getTableAlias())
                 .where(new JDBCWhereClauseBuilder()
-                        .in(this.formatColumnFromName(columnName), parameters.keySet())
+                        .in(this.formatColumnFromAlias(columnName), parameters.keySet())
                 );
 
         MapSqlParameterSource parameterSource = new MapSqlParameterSource();
@@ -305,12 +305,12 @@ public abstract class GenericDaoImpl<M extends GenericModel<I>, I> implements Ge
         return this.getTableName();
     }
 
-    protected String formatColumnFromName(String columnName) {
-        return formatColumnFromName(columnName, this.getTableName());
+    protected String formatColumnFromAlias(String columnName) {
+        return formatColumnFromAlias(columnName, this.getTableAlias());
     }
 
-    protected String formatColumnFromAlias(String columnName) {
-        return formatColumnFromName(columnName, this.getTableAlias());
+    protected String formatColumnFromName(String columnName) {
+        return formatColumnFromAlias(columnName, this.getTableName());
     }
 
     protected String getTableName() {
@@ -365,7 +365,7 @@ public abstract class GenericDaoImpl<M extends GenericModel<I>, I> implements Ge
 
         try {
             try {
-                ReflectionGetterSetter.set(m, "id", resultSet.getObject(formatColumnFromName(this.primaryKeyName, this.tableName)));
+                ReflectionGetterSetter.set(m, "id", resultSet.getObject(formatColumnFromAlias(this.primaryKeyName, this.tableName)));
             } catch (SQLException e) {
                 ReflectionGetterSetter.set(m, "id", resultSet.getObject(this.primaryKeyName));
             }
@@ -378,7 +378,7 @@ public abstract class GenericDaoImpl<M extends GenericModel<I>, I> implements Ge
             Column column = field.getAnnotation(Column.class);
             try {
                 try {
-                    ReflectionGetterSetter.set(m, field, resultSet.getObject(formatColumnFromName(column.name(), this.tableName)));
+                    ReflectionGetterSetter.set(m, field, resultSet.getObject(formatColumnFromAlias(column.name(), this.tableName)));
                 } catch (SQLException e) {
                     ReflectionGetterSetter.set(m, field, resultSet.getObject(column.name()));
                 }
@@ -428,7 +428,7 @@ public abstract class GenericDaoImpl<M extends GenericModel<I>, I> implements Ge
                     .select(relation.otherName())
                     .from(relation.tableName())
                     .where(new JDBCWhereClauseBuilder()
-                            .where(formatColumnFromName(relation.name(), relation.tableName()), Operation.EQ, ":id")
+                            .where(formatColumnFromAlias(relation.name(), relation.tableName()), Operation.EQ, ":id")
                     )
                     .distinct();
             MapSqlParameterSource parameterSource = new MapSqlParameterSource();
@@ -439,7 +439,7 @@ public abstract class GenericDaoImpl<M extends GenericModel<I>, I> implements Ge
                     parameterSource,
                     rs -> {
                         try {
-                            otherIds.add(rs.getObject(formatColumnFromName(relation.otherName(), relation.tableName())));
+                            otherIds.add(rs.getObject(formatColumnFromAlias(relation.otherName(), relation.tableName())));
                         } catch (SQLException e) {
                             otherIds.add(rs.getObject(relation.otherName()));
                         }
@@ -552,7 +552,7 @@ public abstract class GenericDaoImpl<M extends GenericModel<I>, I> implements Ge
 ////                    .select()
 ////                    .from(relation.tableName())
 ////                    .where(new JDBCWhereClauseBuilder()
-////                            .where(formatColumnFromName(relation.name(), relation.tableName()), Operation.EQ, ":id")
+////                            .where(formatColumnFromAlias(relation.name(), relation.tableName()), Operation.EQ, ":id")
 ////                    )
 ////                    .distinct();
 ////            MapSqlParameterSource parameterSource = new MapSqlParameterSource();
@@ -563,7 +563,7 @@ public abstract class GenericDaoImpl<M extends GenericModel<I>, I> implements Ge
 ////                    parameterSource,
 ////                    rs -> {
 ////                        try {
-////                            otherIds.add(rs.getObject(formatColumnFromName(relation.otherName(), relation.tableName())));
+////                            otherIds.add(rs.getObject(formatColumnFromAlias(relation.otherName(), relation.tableName())));
 ////                        } catch (SQLException e) {
 ////                            otherIds.add(rs.getObject(relation.otherName()));
 ////                        }
@@ -598,7 +598,7 @@ public abstract class GenericDaoImpl<M extends GenericModel<I>, I> implements Ge
         GenericModel<Object> otherInstance;
         try {
             try {
-                otherInstance = otherDao.findById(resultSet.getObject(formatColumnFromName(columnName, this.tableName)));
+                otherInstance = otherDao.findById(resultSet.getObject(formatColumnFromAlias(columnName, this.tableName)));
             } catch (SQLException e) {
                 otherInstance = otherDao.findById(resultSet.getObject(columnName));
             }
@@ -612,7 +612,7 @@ public abstract class GenericDaoImpl<M extends GenericModel<I>, I> implements Ge
 
     protected abstract RowMapper<M> getRowMapper();
 
-    protected static String formatColumnFromName(String columnName, String tableName) {
+    protected static String formatColumnFromAlias(String columnName, String tableName) {
         return tableName + "." + columnName;
     }
 
