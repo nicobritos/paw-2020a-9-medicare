@@ -16,13 +16,29 @@ body{
 	position:fixed;
 }
 
-.logo {
+#logo {
 	cursor: pointer;
 	float:left;
 	margin-left:1%;
 	font-weight:100;
 	padding:1%;
 	color:white;
+}
+
+#menu{
+	float:left;
+	margin-left:3%;
+	font-weight:100;
+}
+
+.btnMenu{
+	cursor:pointer;
+	padding:1%;
+	transition:all 0.3s ease-in-out;
+}
+
+.btnMenu:hover{
+	font-weight:bold;
 }
 
 input[type=text], input[type=email], input[type=password], textarea, select{
@@ -87,6 +103,18 @@ input[type=text], input[type=email], input[type=password], textarea, select{
 	margin:0 auto;
 	border-radius:4px;
 }
+
+table {
+  border-collapse: collapse;
+  width: 100%;
+}
+
+th, td {
+  text-align: left;
+  padding: 8px;
+}
+
+tr:nth-child(even) {background-color: #f2f2f2;}
 
 .tableText{
 	text-align:center;
