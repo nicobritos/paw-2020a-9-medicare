@@ -3,14 +3,17 @@ package ar.edu.itba.paw;
 import ar.edu.itba.paw.interfaces.daos.CountryDao;
 import ar.edu.itba.paw.models.Country;
 import ar.edu.itba.paw.services.CountryServiceImpl;
+import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
 
 import java.util.Collections;
+
+import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.any;
 
 @RunWith(MockitoJUnitRunner.class)
 public class ServicesTest
@@ -25,11 +28,19 @@ public class ServicesTest
     private CountryDao countryDao;
 
     @Test
-    public void testCreateCountry(){
+    public void testCreateCountry(){ // Este test no es necesario, solo se lo dejo a modo de ejemplo de como funciona mockito
         Country country = new Country();
         country.setId(ID);
         country.setName(NAME);
         country.setProvinces(Collections.emptyList());
-        Mockito.when(countryDao.create(Mockito.any())).thenReturn(country);
+        when(countryDao.create(any())).thenReturn(country);
+        Country c = new Country();
+        c.setId(ID);
+        c.setName(NAME);
+        c.setProvinces(Collections.emptyList());
+
+        Country ans = countryService.create(c);
+
+        Assert.assertEquals(c.getId(), ans.getId());
     }
 }
