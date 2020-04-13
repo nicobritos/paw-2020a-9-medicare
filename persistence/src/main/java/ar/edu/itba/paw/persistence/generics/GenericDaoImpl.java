@@ -140,7 +140,7 @@ public abstract class GenericDaoImpl<M extends GenericModel<I>, I> implements Ge
                 .update(this.getTableAlias())
                 .values(columnsArguments)
                 .where(new JDBCWhereClauseBuilder()
-                        .where(formatColumnFromAlias(this.getIdColumnName(), this.getTableAlias()), Operation.EQ, ":" + argumentName)
+                        .where(formatColumnFromName(this.getIdColumnName(), this.getTableAlias()), Operation.EQ, ":" + argumentName)
                 )
                 .returning(JDBCSelectQueryBuilder.ALL);
 
@@ -306,11 +306,11 @@ public abstract class GenericDaoImpl<M extends GenericModel<I>, I> implements Ge
     }
 
     protected String formatColumnFromAlias(String columnName) {
-        return formatColumnFromAlias(columnName, this.getTableAlias());
+        return formatColumnFromName(columnName, this.getTableAlias());
     }
 
     protected String formatColumnFromName(String columnName) {
-        return formatColumnFromAlias(columnName, this.getTableName());
+        return formatColumnFromName(columnName, this.getTableName());
     }
 
     protected String getTableName() {
@@ -365,7 +365,7 @@ public abstract class GenericDaoImpl<M extends GenericModel<I>, I> implements Ge
 
         try {
             try {
-                ReflectionGetterSetter.set(m, "id", resultSet.getObject(formatColumnFromAlias(this.primaryKeyName, this.tableName)));
+                ReflectionGetterSetter.set(m, "id", resultSet.getObject(formatColumnFromName(this.primaryKeyName, this.tableName)));
             } catch (SQLException e) {
                 ReflectionGetterSetter.set(m, "id", resultSet.getObject(this.primaryKeyName));
             }
@@ -378,7 +378,7 @@ public abstract class GenericDaoImpl<M extends GenericModel<I>, I> implements Ge
             Column column = field.getAnnotation(Column.class);
             try {
                 try {
-                    ReflectionGetterSetter.set(m, field, resultSet.getObject(formatColumnFromAlias(column.name(), this.tableName)));
+                    ReflectionGetterSetter.set(m, field, resultSet.getObject(formatColumnFromName(column.name(), this.tableName)));
                 } catch (SQLException e) {
                     ReflectionGetterSetter.set(m, field, resultSet.getObject(column.name()));
                 }
@@ -428,7 +428,7 @@ public abstract class GenericDaoImpl<M extends GenericModel<I>, I> implements Ge
                     .select(relation.otherName())
                     .from(relation.tableName())
                     .where(new JDBCWhereClauseBuilder()
-                            .where(formatColumnFromAlias(relation.name(), relation.tableName()), Operation.EQ, ":id")
+                            .where(formatColumnFromName(relation.name(), relation.tableName()), Operation.EQ, ":id")
                     )
                     .distinct();
             MapSqlParameterSource parameterSource = new MapSqlParameterSource();
@@ -439,7 +439,7 @@ public abstract class GenericDaoImpl<M extends GenericModel<I>, I> implements Ge
                     parameterSource,
                     rs -> {
                         try {
-                            otherIds.add(rs.getObject(formatColumnFromAlias(relation.otherName(), relation.tableName())));
+                            otherIds.add(rs.getObject(formatColumnFromName(relation.otherName(), relation.tableName())));
                         } catch (SQLException e) {
                             otherIds.add(rs.getObject(relation.otherName()));
                         }
@@ -598,7 +598,7 @@ public abstract class GenericDaoImpl<M extends GenericModel<I>, I> implements Ge
         GenericModel<Object> otherInstance;
         try {
             try {
-                otherInstance = otherDao.findById(resultSet.getObject(formatColumnFromAlias(columnName, this.tableName)));
+                otherInstance = otherDao.findById(resultSet.getObject(formatColumnFromName(columnName, this.tableName)));
             } catch (SQLException e) {
                 otherInstance = otherDao.findById(resultSet.getObject(columnName));
             }
@@ -612,7 +612,7 @@ public abstract class GenericDaoImpl<M extends GenericModel<I>, I> implements Ge
 
     protected abstract RowMapper<M> getRowMapper();
 
-    protected static String formatColumnFromAlias(String columnName, String tableName) {
+    protected static String formatColumnFromName(String columnName, String tableName) {
         return tableName + "." + columnName;
     }
 
