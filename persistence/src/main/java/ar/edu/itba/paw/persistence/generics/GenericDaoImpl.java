@@ -13,7 +13,6 @@ import org.springframework.jdbc.core.RowCallbackHandler;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
-import sun.plugin.dom.exception.InvalidStateException;
 
 import javax.sql.DataSource;
 import java.lang.reflect.Field;
@@ -254,15 +253,21 @@ public abstract class GenericDaoImpl<M extends GenericModel<I>, I> implements Ge
 
     /**
      * Returns a map associating column name with an argument name and the value in the model
-     * associated with that field
+     * associated with that field. The arguments may be prefixed to avoid name collisions
      * @param model the model
-     * @param prefix a prefix (can be empty)
-     * @return
+     * @param prefix the arguments' prefix (can be empty)
+     * @return the map
      */
     protected Map<String, Pair<String, Object>> getModelColumnsArgumentValue(M model, String prefix) {
         return this.getModelColumnsArgumentValue(model, prefix, false);
     }
 
+    /**
+     * Process a ResultSet (a row returned by the DB) and instantiates the model associated with this DAO.
+     * It sets all its fields using reflection (@link #
+     * @param resultSet
+     * @return
+     */
     protected M hydrate(ResultSet resultSet) {
         M m;
         try {
@@ -374,7 +379,7 @@ public abstract class GenericDaoImpl<M extends GenericModel<I>, I> implements Ge
             ReflectionGetterSetter.iterateValues(model, Column.class, (field, o) -> {
                 Column column = field.getAnnotation(Column.class);
                 if (column.required() && o == null)
-                    throw new InvalidStateException("This field is marked as required but its value is null");
+                    throw new IllegalStateException("This field is marked as required but its value is null");
 
                 map.put(column.name(), new Pair<>(":" + prefix + column.name(), o));
             });
