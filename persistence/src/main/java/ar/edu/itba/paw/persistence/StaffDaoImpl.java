@@ -91,6 +91,9 @@ public class StaffDaoImpl extends GenericSearchableDaoImpl<Staff, Integer> imple
             i++;
         }
 
+        MapSqlParameterSource parameterSource = new MapSqlParameterSource();
+        parameterSource.addValues(parameters);
+
 
         JDBCQueryBuilder queryBuilder = new JDBCSelectQueryBuilder()
                 .selectAll()
@@ -102,14 +105,29 @@ public class StaffDaoImpl extends GenericSearchableDaoImpl<Staff, Integer> imple
                                 specialtyParameters
                         )
                         .and()
-                        .where(this.formatColumnFromName("name"), Operation.LIKE, ":name", ColumnTransformer.LOWER)
+                        .where(this.formatColumnFromName("surname"), Operation.LIKE, ":name", ColumnTransformer.LOWER)
                 )
                 .distinct();
 
-        MapSqlParameterSource parameterSource = new MapSqlParameterSource();
-        parameterSource.addValues(parameters);
+        Collection<Staff> staffs = new LinkedList<>(this.query(queryBuilder.getQueryAsString(), parameterSource));
 
-        return this.query(queryBuilder.getQueryAsString(), parameterSource);
+        queryBuilder = new JDBCSelectQueryBuilder()
+                .selectAll()
+                .from(this.getSpecialtiesTableName())
+                .join(this.getTableName(), "staff_id", "staff_id")
+                .where(new JDBCWhereClauseBuilder()
+                        .in(
+                                formatColumnFromName("specialty_id", this.getSpecialtiesTableName()),
+                                specialtyParameters
+                        )
+                        .and()
+                        .where(this.formatColumnFromName("first_name"), Operation.LIKE, ":name", ColumnTransformer.LOWER)
+                )
+                .distinct();
+
+        staffs.addAll(this.query(queryBuilder.getQueryAsString(), parameterSource));
+
+        return staffs;
     }
 
     @Override
