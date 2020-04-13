@@ -468,7 +468,6 @@ public abstract class GenericDaoImpl<M extends GenericModel<I>, I> implements Ge
     private Map<String, Pair<String, Object>> getModelColumnsArgumentValue(M model, String prefix, boolean checkRequired) {
         Map<String, Pair<String, Object>> map = new HashMap<>();
 
-        // TODO: Save relations (one-many, many-many, one-one)
         // This code is duplicated so as to not be checking another variable in every loop, thus making it more
         // time efficient at the expense of having duplicated code.
         if (checkRequired) {

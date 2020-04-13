@@ -33,6 +33,13 @@ public class StaffDaoImpl extends GenericSearchableDaoImpl<Staff, Integer> imple
     }
 
     @Override
+    public Collection<Staff> findByName(String name) {
+        Collection<Staff> staffs = new LinkedList<>(this.findByField("first_name", name));
+        staffs.addAll(this.findByField("surname", name));
+        return staffs;
+    }
+
+    @Override
     public Collection<Staff> findByStaffSpecialties(Collection<StaffSpecialty> staffSpecialties) {
         if (staffSpecialties.isEmpty())
             return new LinkedList<>();
