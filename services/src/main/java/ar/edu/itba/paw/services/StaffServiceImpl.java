@@ -48,6 +48,6 @@ public class StaffServiceImpl extends GenericServiceImpl<StaffDao, Staff, Intege
 
     @Override
     protected StaffDao getRepository() {
-        return null;
+        return this.repository;
     }
 }
