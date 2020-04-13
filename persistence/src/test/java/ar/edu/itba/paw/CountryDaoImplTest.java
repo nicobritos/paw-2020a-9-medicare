@@ -301,4 +301,42 @@ public class CountryDaoImplTest
         assertEquals(0,JdbcTestUtils.countRowsInTableWhere(jdbcTemplate, COUNTRIES_TABLE, "name = Argentina"));
 
     }
+
+    @Test
+    public void testCountryRemoveById()
+    {
+        // 1. Precondiciones
+        JdbcTestUtils.deleteFromTables(this.jdbcTemplate, COUNTRIES_TABLE);
+        Map<String, Object> map = new HashMap<>();
+        map.put("country_id", COUNTRY_ID);
+        map.put("name", COUNTRY);
+        jdbcInsert.execute(map);
+
+        // 2. Ejercitar
+        this.countryDao.remove(COUNTRY_ID);
+
+        // 3. Postcondiciones
+        assertEquals(0,JdbcTestUtils.countRowsInTable(jdbcTemplate, COUNTRIES_TABLE));
+    }
+
+    @Test
+    public void testCountryRemoveByModel()
+    {
+        // 1. Precondiciones
+        JdbcTestUtils.deleteFromTables(this.jdbcTemplate, COUNTRIES_TABLE);
+        Map<String, Object> map = new HashMap<>();
+        map.put("country_id", COUNTRY_ID);
+        map.put("name", COUNTRY);
+        jdbcInsert.execute(map);
+        Country c = new Country();
+        c.setName(COUNTRY);
+        c.setId(COUNTRY_ID);
+        c.setProvinces(Collections.emptyList());
+
+        // 2. Ejercitar
+        this.countryDao.remove(c);
+
+        // 3. Postcondiciones
+        assertEquals(0,JdbcTestUtils.countRowsInTable(jdbcTemplate, COUNTRIES_TABLE));
+    }
 }
