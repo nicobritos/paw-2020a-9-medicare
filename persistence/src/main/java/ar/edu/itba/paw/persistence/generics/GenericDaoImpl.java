@@ -101,14 +101,14 @@ public abstract class GenericDaoImpl<M extends GenericModel<I>, I> implements Ge
 
     @Override
     public M create(M model) {
-        Map<String, Pair<String, Object>> columnsArgumentValue = this.getModelColumnsArgumentValue(model, ARGUMENT_PREFIX, true);
+        Map<String, Pair<String, Object>> columnsArgumentValue = this.getModelColumnsArgumentValue(model, "", true);
         if (this.customPrimaryKey) {
-            columnsArgumentValue.put(this.getIdColumnName(), new Pair<>(":" + ARGUMENT_PREFIX + this.getIdColumnName(), model.getId()));
+            columnsArgumentValue.put(this.getIdColumnName(), new Pair<>(":" + this.getIdColumnName(), model.getId()));
         }
 
         Map<String, Object> argumentsValues = new HashMap<>();
         for (Entry<String, Pair<String, Object>> columnArgumentValue : columnsArgumentValue.entrySet()) {
-            argumentsValues.put(ARGUMENT_PREFIX + columnArgumentValue.getKey(), columnArgumentValue.getValue().getRight());
+            argumentsValues.put(columnArgumentValue.getKey(), columnArgumentValue.getValue().getRight());
         }
 
         MapSqlParameterSource parameterSource = new MapSqlParameterSource();

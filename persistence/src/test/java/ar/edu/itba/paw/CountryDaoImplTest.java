@@ -14,10 +14,8 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.jdbc.JdbcTestUtils;
 
 import javax.sql.DataSource;
-
 import java.util.Collections;
 
-import static org.junit.Assert.*;
 import static org.junit.Assert.assertEquals;
 
 @RunWith(SpringJUnit4ClassRunner.class)
@@ -45,9 +43,9 @@ public class CountryDaoImplTest
 
     @Before
     public void setUp(){
-        countryDao = new CountryDaoImpl(ds);
-        jdbcTemplate = new JdbcTemplate(ds);
-        jdbcInsert = new SimpleJdbcInsert(ds)
+        this.countryDao = new CountryDaoImpl(this.ds);
+        this.jdbcTemplate = new JdbcTemplate(this.ds);
+        this.jdbcInsert = new SimpleJdbcInsert(this.ds)
                 .withTableName(COUNTRIES_TABLE);
 
     }
@@ -56,16 +54,16 @@ public class CountryDaoImplTest
     public void testCreateCountry()
     {
         // 1. Precondiciones
-        JdbcTestUtils.deleteFromTables(jdbcTemplate, COUNTRIES_TABLE);
+        JdbcTestUtils.deleteFromTables(this.jdbcTemplate, COUNTRIES_TABLE);
         Country c = new Country();
         c.setName(COUNTRY);
         c.setId(COUNTRY_ID);
         c.setProvinces(Collections.emptyList());
 
         // 2. Ejercitar
-        Country country = countryDao.create(c);
+        Country country = this.countryDao.create(c);
 
         // 3. Postcondiciones
-        assertEquals(1, JdbcTestUtils.countRowsInTable(jdbcTemplate, COUNTRIES_TABLE));
+        assertEquals(1, JdbcTestUtils.countRowsInTable(this.jdbcTemplate, COUNTRIES_TABLE));
     }
 }
