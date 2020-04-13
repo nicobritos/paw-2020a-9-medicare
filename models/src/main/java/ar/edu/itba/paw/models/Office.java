@@ -1,8 +1,8 @@
 package ar.edu.itba.paw.models;
 
 import ar.edu.itba.paw.persistenceAnnotations.Column;
+import ar.edu.itba.paw.persistenceAnnotations.ManyToOne;
 import ar.edu.itba.paw.persistenceAnnotations.OneToMany;
-import ar.edu.itba.paw.persistenceAnnotations.OneToOne;
 import ar.edu.itba.paw.persistenceAnnotations.Table;
 
 import java.util.Collection;
@@ -15,7 +15,7 @@ public class Office extends GenericModel<Integer> {
     private String email;
     @Column(name = "name", required = true)
     private String name;
-    @OneToOne(name = "province_id", required = true)
+    @ManyToOne(name = "province_id", required = true)
     private Province province;
     @Column(name = "street_number", required = true)
     private int streetNumber;

@@ -8,6 +8,7 @@ import java.lang.annotation.Target;
 /**
  * This annotation enables a given model's field to be mapped to a column in a database
  * For this to work properly, the model must have been annotated with @Table.
+ * If the field is part of a relation, then it must NOT be annotated with this annotation
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.FIELD)

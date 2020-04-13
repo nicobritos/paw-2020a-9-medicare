@@ -8,6 +8,7 @@ import java.lang.annotation.Target;
 /**
  * This annotation enables a given model's field to be treated as a OneToOne relation in the DB.
  * For this to work properly, the model must have been annotated with @Table.
+ * The {@link Column} annotation is not needed when using this one
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.FIELD)

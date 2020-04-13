@@ -92,16 +92,8 @@ create table system_staff_specialty_staff
 	staff_id integer not null
 		constraint specialty_staff_staff
 			references staff
-				on update restrict on delete cascade,
-	constraint specialty_staff_pk
-		primary key (staff_id, specialty_id)
+				on update restrict on delete cascade
 );
 
 alter table system_staff_specialty_staff owner to postgres;
-
-create unique index specialty_staff_specialty_id_uindex
-	on system_staff_specialty_staff (specialty_id);
-
-create unique index specialty_staff_staff_id_uindex
-	on system_staff_specialty_staff (staff_id);
 

@@ -1,8 +1,6 @@
 package ar.edu.itba.paw.persistence.utils.builder;
 
-import java.util.Collection;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.Map;
 import java.util.Map.Entry;
 
@@ -10,7 +8,6 @@ public class JDBCInsertQueryBuilder extends JDBCQueryBuilder {
     public static final String DEFAULT_COLUMN_VALUE = "DEFAULT";
 
     private Map<String, String> values = new HashMap<>();
-    private Collection<String> returning = new LinkedList<>();
 
     private String table;
 
@@ -33,32 +30,16 @@ public class JDBCInsertQueryBuilder extends JDBCQueryBuilder {
         return this;
     }
 
-    public JDBCInsertQueryBuilder returning(String columnName) {
-        this.returning.add(columnName);
-        return this;
-    }
-
-    public JDBCInsertQueryBuilder returning(Collection<String> columnNames) {
-        this.returning.addAll(columnNames);
-        return this;
+    public String getTable() {
+        return this.table;
     }
 
     @Override
     public String getQueryAsString() {
-        StringBuilder stringBuilder = new StringBuilder("INSERT INTO ");
-        stringBuilder
-                .append(this.table)
-                .append(this.getValuesAsString());
-
-        if (this.returning.size() > 0) {
-            stringBuilder
-                    .append(" RETURNING ")
-                    .append(this.joinStrings(this.returning));
-        }
-
-        stringBuilder.append(";");
-
-        return stringBuilder.toString();
+        return "INSERT INTO " +
+                this.table +
+                this.getValuesAsString() +
+                ";";
     }
 
     protected String getValuesAsString() {
