@@ -132,7 +132,7 @@ public class JDBCWhereClauseBuilder {
     }
 
     public String getClauseAsString() {
-        return this.clause.append(" ").toString();
+        return this.clause.toString() + " ";
     }
 
     @Override
@@ -145,6 +145,9 @@ public class JDBCWhereClauseBuilder {
     }
 
     private JDBCWhereClauseBuilder in(String columnName, Collection<String> paramNames, boolean not) {
+        if (paramNames.isEmpty())
+            return this;
+
         this.clause.append(columnName);
 
         if (not) this.clause.append(" NOT ");

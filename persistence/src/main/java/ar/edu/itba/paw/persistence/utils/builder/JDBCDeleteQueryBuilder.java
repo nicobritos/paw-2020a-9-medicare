@@ -43,6 +43,8 @@ public class JDBCDeleteQueryBuilder extends JDBCQueryBuilder {
             stringBuilder
                     .append(" WHERE ")
                     .append(this.whereClauseBuilder.getClauseAsString());
+        } else {
+            throw new IllegalStateException("No where clause defined. Is this an error?");
         }
 
         stringBuilder.append(";");

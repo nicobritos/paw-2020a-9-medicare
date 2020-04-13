@@ -19,6 +19,12 @@ public abstract class GenericSearchableDaoImpl<M extends GenericModel<I>, I> ext
         super(dataSource, mClass);
     }
 
+    /**
+     * Returns a collection of <M> that have a name similar to the one provided.
+     * The search is not case-sensitive nor exact
+     * @param name the model's name
+     * @return a collection of matched models
+     */
     @Override
     public Collection<M> findByName(String name) {
         return this.findByFieldIgnoreCase("name", Operation.LIKE, name);

@@ -24,6 +24,12 @@ public interface GenericDao<M extends GenericModel<I>, I> {
 
     Collection<M> list();
 
+    /**
+     * Searches for a collection of models that have a columnName equals to the provided object's value
+     * @param columnName the db column name
+     * @param value the column's value
+     * @return a collection of models found
+     */
     Collection<M> findByField(String columnName, Object value);
 
     Class<M> getModelClass();

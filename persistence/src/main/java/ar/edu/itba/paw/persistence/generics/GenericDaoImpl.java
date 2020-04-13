@@ -13,6 +13,7 @@ import org.springframework.jdbc.core.RowCallbackHandler;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
+import sun.plugin.dom.exception.InvalidStateException;
 
 import javax.sql.DataSource;
 import java.lang.reflect.Field;
@@ -28,13 +29,16 @@ import java.util.Map.Entry;
  */
 public abstract class GenericDaoImpl<M extends GenericModel<I>, I> implements GenericDao<M, I> {
     protected NamedParameterJdbcTemplate jdbcTemplate;
-    private String tableName;
     private String primaryKeyName;
     private final Class<M> mClass;
+    private String tableName;
 
     public GenericDaoImpl(DataSource dataSource, Class<M> mClass) {
         this.jdbcTemplate = new NamedParameterJdbcTemplate(dataSource);
         this.mClass = mClass;
+
+        // Get the table's name and primary key's column's name from the annotation that is
+        // (or should be) set in the model's class
         if (mClass.isAnnotationPresent(Table.class)) {
             Table table = mClass.getAnnotation(Table.class);
             this.tableName = table.name();
@@ -52,6 +56,7 @@ public abstract class GenericDaoImpl<M extends GenericModel<I>, I> implements Ge
                 );
 
         MapSqlParameterSource args = new MapSqlParameterSource();
+        // Note that "parameterName" should NOT be preceded by a semicolon (as it is in the query)
         args.addValue("id", id);
 
         List<M> list = this.query(queryBuilder.getQueryAsString(), args);
@@ -60,6 +65,9 @@ public abstract class GenericDaoImpl<M extends GenericModel<I>, I> implements Ge
 
     @Override
     public Collection<M> findByIds(Collection<I> ids) {
+        if (ids.isEmpty())
+            return new LinkedList<>();
+
         Map<String, Object> parameters = new HashMap<>();
         Collection<String> idsParameters = new LinkedList<>();
 
@@ -122,6 +130,12 @@ public abstract class GenericDaoImpl<M extends GenericModel<I>, I> implements Ge
         return this.query(queryBuilder.getQueryAsString());
     }
 
+    /**
+     * Searches for a collection of models that have a columnName equals to the provided object's value
+     * @param columnName the db column name
+     * @param value the column's value
+     * @return a collection of models found
+     */
     @Override
     public List<M> findByField(String columnName, Object value) {
         return this.findByField(columnName, Operation.EQ, value);
@@ -162,6 +176,9 @@ public abstract class GenericDaoImpl<M extends GenericModel<I>, I> implements Ge
     }
 
     protected List<M> findByFieldIn(String columnName, Collection<?> values) {
+        if (values.isEmpty())
+            return new LinkedList<>();
+
         Map<String, Object> parameters = new HashMap<>();
         int i = 0;
         for (Object value : values) {
@@ -183,12 +200,21 @@ public abstract class GenericDaoImpl<M extends GenericModel<I>, I> implements Ge
     }
 
     protected List<M> query(String query) {
-//        System.out.println(query);
         return this.jdbcTemplate.query(query, this.getRowMapper());
     }
 
     protected List<M> query(String query, MapSqlParameterSource args) {
         return this.jdbcTemplate.query(query, args, this.getRowMapper());
+    }
+
+    /**
+     * Runs a query handled by a specific handler
+     * @param query the query
+     * @param args the arguments (can be empty)
+     * @param callbackHandler the ResultSet handler
+     */
+    protected void query(String query, MapSqlParameterSource args, RowCallbackHandler callbackHandler) {
+        this.jdbcTemplate.query(query, args, callbackHandler);
     }
 
     protected M querySingle(String query) {
@@ -201,6 +227,11 @@ public abstract class GenericDaoImpl<M extends GenericModel<I>, I> implements Ge
         return list.size() > 0 ? list.get(0) : null;
     }
 
+    /**
+     * It returns the table name
+     * Can be overwritten to return a table alias
+     * @return the table alias
+     */
     protected String getTableAlias() {
         return this.getTableName();
     }
@@ -221,15 +252,15 @@ public abstract class GenericDaoImpl<M extends GenericModel<I>, I> implements Ge
         return this.primaryKeyName;
     }
 
+    /**
+     * Returns a map associating column name with an argument name and the value in the model
+     * associated with that field
+     * @param model the model
+     * @param prefix a prefix (can be empty)
+     * @return
+     */
     protected Map<String, Pair<String, Object>> getModelColumnsArgumentValue(M model, String prefix) {
-        Map<String, Pair<String, Object>> map = new HashMap<>();
-
-        ReflectionGetterSetter.iterateValues(model, Column.class, (field, o) -> {
-            Column column = field.getAnnotation(Column.class);
-            map.put(column.name(), new Pair<>(":" + prefix + column.name(), o));
-        });
-
-        return map;
+        return this.getModelColumnsArgumentValue(model, prefix, false);
     }
 
     protected M hydrate(ResultSet resultSet) {
@@ -285,7 +316,7 @@ public abstract class GenericDaoImpl<M extends GenericModel<I>, I> implements Ge
             }
 
             GenericDao<? extends GenericModel<Object>, Object> otherDao = DAOManager.getDaoForModel(otherClass);
-            Collection<? extends GenericModel<Object>> otherInstances = otherDao.findByField(relation.joinedName(), m.getId());
+            Collection<? extends GenericModel<Object>> otherInstances = otherDao.findByField(relation.name(), m.getId());
             ReflectionGetterSetter.set(m, field, otherInstances);
         });
         ReflectionGetterSetter.iterateFields(this.mClass, ManyToOne.class, field -> {
@@ -334,11 +365,32 @@ public abstract class GenericDaoImpl<M extends GenericModel<I>, I> implements Ge
         return m;
     }
 
+    private Map<String, Pair<String, Object>> getModelColumnsArgumentValue(M model, String prefix, boolean checkRequired) {
+        Map<String, Pair<String, Object>> map = new HashMap<>();
+
+        // TODO: Save relations (one-many, many-many, one-one)
+        // Separamos para mas performance a costa de codigo duplicado
+        if (checkRequired) {
+            ReflectionGetterSetter.iterateValues(model, Column.class, (field, o) -> {
+                Column column = field.getAnnotation(Column.class);
+                if (column.required() && o == null)
+                    throw new InvalidStateException("This field is marked as required but its value is null");
+
+                map.put(column.name(), new Pair<>(":" + prefix + column.name(), o));
+            });
+        } else {
+            ReflectionGetterSetter.iterateValues(model, Column.class, (field, o) -> {
+                Column column = field.getAnnotation(Column.class);
+                map.put(column.name(), new Pair<>(":" + prefix + column.name(), o));
+            });
+        }
+
+        return map;
+    }
+
     private M createOrUpdate(M model, boolean create) {
         String prefix = "_r_";
-        Map<String, Pair<String, Object>> columnsArgumentValue = this.getModelColumnsArgumentValue(model, prefix);
-
-        if (!create) columnsArgumentValue.remove(this.getIdColumnName());
+        Map<String, Pair<String, Object>> columnsArgumentValue = this.getModelColumnsArgumentValue(model, prefix, true);
 
         Map<String, String> columnsArguments = new HashMap<>();
         Map<String, Object> argumentsValues = new HashMap<>();
@@ -347,20 +399,30 @@ public abstract class GenericDaoImpl<M extends GenericModel<I>, I> implements Ge
             argumentsValues.put(prefix + columnArgumentValue.getKey(), columnArgumentValue.getValue().getRight());
         }
 
-        JDBCQueryBuilder queryBuilder = new JDBCInsertQueryBuilder()
-                .into(this.getTableName())
-                .values(columnsArguments)
-                .returning(JDBCSelectQueryBuilder.ALL);
+        JDBCQueryBuilder queryBuilder;
+        if (create) {
+             queryBuilder = new JDBCInsertQueryBuilder()
+                    .into(this.getTableName())
+                    .values(columnsArguments)
+                    .returning(JDBCSelectQueryBuilder.ALL);
+        } else {
+            String argumentName = prefix + "id";
+
+            queryBuilder = new JDBCUpdateQueryBuilder()
+                    .update(this.getTableName())
+                    .values(columnsArguments)
+                    .where(new JDBCWhereClauseBuilder()
+                            .where(formatColumnFromName(this.getIdColumnName(), this.getTableName()), Operation.EQ, ":" + argumentName)
+                    )
+                    .returning(JDBCSelectQueryBuilder.ALL);
+
+            argumentsValues.put(argumentName, model.getId());
+        }
 
         MapSqlParameterSource parameterSource = new MapSqlParameterSource();
         parameterSource.addValues(argumentsValues);
 
         return this.querySingle(queryBuilder.getQueryAsString(), parameterSource);
-    }
-
-    private void query(String query, MapSqlParameterSource args, RowCallbackHandler callbackHandler) {
-//        System.out.println(query);
-        this.jdbcTemplate.query(query, args, callbackHandler);
     }
 
     private void processOneToOneRelation(ResultSet resultSet, M m, Field field, String columnName) {

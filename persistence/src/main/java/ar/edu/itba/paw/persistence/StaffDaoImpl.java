@@ -34,6 +34,9 @@ public class StaffDaoImpl extends GenericSearchableDaoImpl<Staff, Integer> imple
 
     @Override
     public Collection<Staff> findByStaffSpecialties(Collection<StaffSpecialty> staffSpecialties) {
+        if (staffSpecialties.isEmpty())
+            return new LinkedList<>();
+
         Map<String, Object> parameters = new HashMap<>();
         Collection<String> specialtyParameters = new LinkedList<>();
 
@@ -66,6 +69,9 @@ public class StaffDaoImpl extends GenericSearchableDaoImpl<Staff, Integer> imple
 
     @Override
     public Collection<Staff> findByNameAndStaffSpecialties(String name, Collection<StaffSpecialty> staffSpecialties) {
+        if (staffSpecialties.isEmpty())
+            return new LinkedList<>();
+
         Map<String, Object> parameters = new HashMap<>();
         Collection<String> specialtyParameters = new LinkedList<>();
         parameters.put("name", name.toLowerCase());
@@ -101,6 +107,9 @@ public class StaffDaoImpl extends GenericSearchableDaoImpl<Staff, Integer> imple
 
     @Override
     public Collection<Staff> findByNameOfficeAndStaffSpecialties(String name, Collection<Office> offices, Collection<StaffSpecialty> staffSpecialties) {
+        if (staffSpecialties.isEmpty() && offices.isEmpty())
+            return new LinkedList<>();
+
         Map<String, Object> parameters = new HashMap<>();
         Collection<String> officeParameters = new LinkedList<>();
         Collection<String> specialtyParameters = new LinkedList<>();
