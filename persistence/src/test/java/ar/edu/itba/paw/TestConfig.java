@@ -14,6 +14,10 @@ import javax.sql.DataSource;
 
 @Configuration
 public class TestConfig {
+    private static final String HSQLDB_URL = "jdbc:hsqldb:mem:test;sql.syntax_pgs=true;check_props=true";
+    private static final String HSQLDB_USER = "ha";
+    private static final String HSQLDB_PASS = "";
+
     @Value("classpath:sql/schema.sql")
     private Resource schemaSql;
 
@@ -21,9 +25,9 @@ public class TestConfig {
     public DataSource dataSource(){
         final SimpleDriverDataSource ds = new SimpleDriverDataSource();
         ds.setDriverClass(JDBCDriver.class);
-        ds.setUrl("jdbc:hsqldb:mem:test");
-        ds.setUsername("ha");
-        ds.setPassword("");
+        ds.setUrl(HSQLDB_URL);
+        ds.setUsername(HSQLDB_USER);
+        ds.setPassword(HSQLDB_PASS);
         return ds;
     }
 
