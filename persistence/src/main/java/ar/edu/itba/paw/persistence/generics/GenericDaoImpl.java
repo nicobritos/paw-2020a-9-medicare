@@ -30,14 +30,13 @@ import java.util.Map.Entry;
 public abstract class GenericDaoImpl<M extends GenericModel<I>, I> implements GenericDao<M, I> {
     private static final String ARGUMENT_PREFIX = "_r_";
     protected NamedParameterJdbcTemplate jdbcTemplate;
-    protected DataSource dataSource;
+    private SimpleJdbcInsert jdbcInsert;
+    private boolean customPrimaryKey;
+    private String primaryKeyName;
     private final Class<M> mClass;
     private String tableName;
-    private String primaryKeyName;
-    private boolean customPrimaryKey;
 
     public GenericDaoImpl(DataSource dataSource, Class<M> mClass) {
-        this.dataSource = dataSource;
         this.jdbcTemplate = new NamedParameterJdbcTemplate(dataSource);
         this.mClass = mClass;
 
@@ -48,6 +47,9 @@ public abstract class GenericDaoImpl<M extends GenericModel<I>, I> implements Ge
             this.tableName = table.name();
             this.primaryKeyName = table.primaryKey();
             this.customPrimaryKey = table.customPrimaryKey();
+            this.jdbcInsert = new SimpleJdbcInsert(dataSource).withTableName(this.tableName);
+            if (!this.customPrimaryKey)
+                this.jdbcInsert.usingGeneratedKeyColumns(this.primaryKeyName);
         }
     }
 
@@ -104,28 +106,23 @@ public abstract class GenericDaoImpl<M extends GenericModel<I>, I> implements Ge
             columnsArgumentValue.put(this.getIdColumnName(), new Pair<>(":" + ARGUMENT_PREFIX + this.getIdColumnName(), model.getId()));
         }
 
-        Map<String, String> columnsArguments = new HashMap<>();
         Map<String, Object> argumentsValues = new HashMap<>();
         for (Entry<String, Pair<String, Object>> columnArgumentValue : columnsArgumentValue.entrySet()) {
-            columnsArguments.put(columnArgumentValue.getKey(), columnArgumentValue.getValue().getLeft());
             argumentsValues.put(ARGUMENT_PREFIX + columnArgumentValue.getKey(), columnArgumentValue.getValue().getRight());
         }
-
-        JDBCInsertQueryBuilder queryBuilder = new JDBCInsertQueryBuilder()
-                .into(this.getTableAlias())
-                .values(columnsArguments);
 
         MapSqlParameterSource parameterSource = new MapSqlParameterSource();
         parameterSource.addValues(argumentsValues);
 
-        M newModel = this.insertQuery(queryBuilder, parameterSource);
+        M newModel = this.insertQuery(model, parameterSource);
         this.saveRelations(newModel);
         return newModel;
     }
 
     /**
      * Updates ALL the information inside the model (with the exception of the ID)
-     * @param model
+     * Relations are also updated
+     * @param model the model
      */
     @Override
     public void update(M model) {
@@ -285,14 +282,17 @@ public abstract class GenericDaoImpl<M extends GenericModel<I>, I> implements Ge
      * Workaround to return key with HSQLDB.
      * Note that it runs two queries: it creates the entity, and then it retrieves the full model
      * from the DB. This is done to fill in fields which have default values in the DB
-     * @param insertQueryBuilder the insert query builder, may be replaced to String table
      * @param args the arguments
      * @return the newly inserted model
      */
-    protected M insertQuery(JDBCInsertQueryBuilder insertQueryBuilder, MapSqlParameterSource args) {
-        I id = (I) new SimpleJdbcInsert(this.dataSource)
-                .withTableName(insertQueryBuilder.getTable())
-                .executeAndReturnKey(args);
+    protected M insertQuery(M model, MapSqlParameterSource args) {
+        I id;
+        if (this.customPrimaryKey) {
+            id = (I) this.jdbcInsert.executeAndReturnKey(args);
+        } else {
+            this.jdbcInsert.execute(args);
+            id = model.getId();
+        }
         return this.findById(id);
     }
 
@@ -581,7 +581,7 @@ public abstract class GenericDaoImpl<M extends GenericModel<I>, I> implements Ge
 //            GenericModel<Object> genericModel = (GenericModel<Object>) o;
 //            map.put(relation.name(), new Pair<>(":" + prefix + relation.name(), genericModel.getId()));
 //        });
-//
+
         return model;
     }
 
