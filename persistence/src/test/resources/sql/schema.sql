@@ -19,6 +19,20 @@ create table if not exists system_province
     name varchar(255) not null
 );
 
+create table system_locality
+(
+    province_id integer
+        constraint system_locality_province
+            references system_province
+--             on update restrict on delete restrict,
+        ,
+    name varchar(255) not null,
+    locality_id identity not null
+        constraint system_locality_pk
+            primary key
+);
+
+
 create table if not exists office
 (
     office_id identity not null

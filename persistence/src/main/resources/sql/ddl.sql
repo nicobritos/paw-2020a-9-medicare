@@ -21,6 +21,23 @@ create table system_province
 	name text not null
 );
 
+create table system_locality
+(
+    province_id integer
+        constraint system_locality_province
+            references system_province
+            on update restrict on delete restrict,
+    name text not null,
+    locality_id serial not null
+        constraint system_locality_pk
+            primary key
+);
+
+create unique index system_locality_locality_id_uindex
+    on system_locality (locality_id);
+
+
+
 create table office
 (
 	office_id serial not null
