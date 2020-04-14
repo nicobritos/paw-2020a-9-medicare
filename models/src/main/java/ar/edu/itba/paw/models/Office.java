@@ -21,7 +21,7 @@ public class Office extends GenericModel<Integer> {
     private int streetNumber;
     @Column(name = "street", required = true)
     private String street;
-    @OneToMany(name = "office_id", required = true, className = Staff.class)
+    @OneToMany(name = "office_id", className = Staff.class)
     private JoinedCollection<Staff> staffs = new JoinedCollection<>();
 
     public String getName() {

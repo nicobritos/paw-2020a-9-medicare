@@ -10,7 +10,7 @@ import java.util.Collection;
 public class Country extends GenericModel<String> {
     @Column(name = "name", required = true)
     private String name;
-    @OneToMany(name = "country_id", required = false, className = Province.class)
+    @OneToMany(name = "country_id", required = true, className = Province.class)
     private JoinedCollection<Province> provinces = new JoinedCollection<>();
 
     public String getName() {

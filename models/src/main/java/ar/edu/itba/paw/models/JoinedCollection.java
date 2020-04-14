@@ -2,6 +2,10 @@ package ar.edu.itba.paw.models;
 
 import java.util.Collection;
 
+/**
+ * This class provides a wrapper so that a
+ * @param <M>
+ */
 public class JoinedCollection<M> {
     public static final String _PRIVATE_COLLECTION_NAME = "privateModels";
 
