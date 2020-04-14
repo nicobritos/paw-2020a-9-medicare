@@ -148,6 +148,7 @@ public class StaffDaoImplTest
 
     private Office officeModel() {
         Office o = new Office();
+        o.setId(0);
         o.setName(NAME);
         o.setEmail(EMAIL);
         o.setPhone(PHONE);
@@ -500,7 +501,7 @@ public class StaffDaoImplTest
 
         // 3. Postcondiciones
         assertNotNull(staffs);
-        assertEquals(0, staffs.size());
+        assertEquals(1, staffs.size());
     }
 
     @Test
