@@ -303,7 +303,7 @@ public class CountryDaoImplTest
         insertAnotherCountry();
         Map<String, Object> provinceMap = new HashMap<>();
         provinceMap.put("name", PROVINCE);
-        provinceMap.put("country_id", 1);
+        provinceMap.put("country_id", "BR");
         new SimpleJdbcInsert(ds)
                 .withTableName(PROVINCE_TABLE)
                 .usingGeneratedKeyColumns("province_id")
@@ -318,8 +318,8 @@ public class CountryDaoImplTest
         this.countryDao.update(c);
 
         // 3. Postcondiciones
-        assertEquals(1, JdbcTestUtils.countRowsInTable(jdbcTemplate, COUNTRIES_TABLE));
-        assertEquals(1, JdbcTestUtils.countRowsInTableWhere(jdbcTemplate, PROVINCE_TABLE, "country_id = 0"));
+        assertEquals(2, JdbcTestUtils.countRowsInTable(jdbcTemplate, COUNTRIES_TABLE));
+        assertEquals(1, JdbcTestUtils.countRowsInTableWhere(jdbcTemplate, PROVINCE_TABLE, "country_id = '"+ COUNTRY_ID+"'"));
     }
 
     @Test
