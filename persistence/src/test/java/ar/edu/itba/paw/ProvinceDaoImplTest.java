@@ -53,17 +53,48 @@ public class ProvinceDaoImplTest
                 .withTableName(COUNTRIES_TABLE);
     }
 
+    private void cleanAllTables(){
+        JdbcTestUtils.deleteFromTables(this.jdbcTemplate, PROVINCES_TABLE);
+        JdbcTestUtils.deleteFromTables(this.jdbcTemplate, COUNTRIES_TABLE);
+        this.jdbcTemplate.execute("TRUNCATE SCHEMA PUBLIC RESTART IDENTITY AND COMMIT NO CHECK");
+    }
+
+    private Province provinceModel(){
+        Province p = new Province();
+        p.setName(PROVINCE);
+        p.setId(0);
+        return p;
+    }
+
+    private void insertCountry(){
+        Map<String, Object> map = new HashMap<>();
+        map.put("country_id", COUNTRY_ID);
+        map.put("name", COUNTRY);
+        countryJdbcInsert.execute(map);
+    }
+
+    private void insertProvince(){
+        insertCountry();
+        Map<String, Object> map = new HashMap<>();
+        map.put("country_id", COUNTRY_ID);
+        map.put("name", PROVINCE);
+        provinceJdbcInsert.execute(map);
+    }
+
+    private void insertAnotherProvince() {
+        Map<String, Object> map = new HashMap<>();
+        map.put("country_id", COUNTRY_ID);
+        map.put("name", "Corrientes");
+        provinceJdbcInsert.execute(map);
+    }
+    
     @Test
     public void testCreateProvince()
     {
         // 1. Precondiciones
-        JdbcTestUtils.deleteFromTables(this.jdbcTemplate, PROVINCES_TABLE);
-        JdbcTestUtils.deleteFromTables(this.jdbcTemplate, COUNTRIES_TABLE);
-        this.jdbcTemplate.execute("TRUNCATE SCHEMA PUBLIC RESTART IDENTITY AND COMMIT NO CHECK");
-
-        Province p = new Province();
-        p.setName(PROVINCE);
-        p.setId(0);
+        cleanAllTables();
+        insertCountry();
+        Province p = provinceModel();
 
         // 2. Ejercitar
         Province province = this.provinceDao.create(p);
@@ -78,19 +109,8 @@ public class ProvinceDaoImplTest
     public void testFindProvinceById()
     {
         // 1. Precondiciones
-        JdbcTestUtils.deleteFromTables(this.jdbcTemplate, PROVINCES_TABLE);
-        JdbcTestUtils.deleteFromTables(this.jdbcTemplate, COUNTRIES_TABLE);
-        this.jdbcTemplate.execute("TRUNCATE SCHEMA PUBLIC RESTART IDENTITY AND COMMIT NO CHECK");
-
-        Map<String, Object> map = new HashMap<>();
-        map.put("country_id", COUNTRY_ID);
-        map.put("name", COUNTRY);
-        countryJdbcInsert.execute(map);
-
-        map = new HashMap<>();
-        map.put("country_id", COUNTRY_ID);
-        map.put("name", PROVINCE);
-        provinceJdbcInsert.execute(map);
+        cleanAllTables();
+        insertProvince();
 
         // 2. Ejercitar
         Optional<Province> province = this.provinceDao.findById(0);
@@ -104,10 +124,7 @@ public class ProvinceDaoImplTest
     public void testFindProvinceByIdDoesntExist()
     {
         // 1. Precondiciones
-        JdbcTestUtils.deleteFromTables(this.jdbcTemplate, PROVINCES_TABLE);
-        JdbcTestUtils.deleteFromTables(this.jdbcTemplate, COUNTRIES_TABLE);
-        this.jdbcTemplate.execute("TRUNCATE SCHEMA PUBLIC RESTART IDENTITY AND COMMIT NO CHECK");
-
+        cleanAllTables();
 
         // 2. Ejercitar
         Optional<Province> province = this.provinceDao.findById(0);
@@ -120,17 +137,8 @@ public class ProvinceDaoImplTest
     public void testFindProvinceByField()
     {
         // 1. Precondiciones
-        JdbcTestUtils.deleteFromTables(this.jdbcTemplate, PROVINCES_TABLE);
-        JdbcTestUtils.deleteFromTables(this.jdbcTemplate, COUNTRIES_TABLE);
-        this.jdbcTemplate.execute("TRUNCATE SCHEMA PUBLIC RESTART IDENTITY AND COMMIT NO CHECK");
-        Map<String, Object> map = new HashMap<>();
-        map.put("country_id", COUNTRY_ID);
-        map.put("name", COUNTRY);
-        countryJdbcInsert.execute(map);
-        map = new HashMap<>();
-        map.put("country_id", COUNTRY_ID);
-        map.put("name", PROVINCE);
-        provinceJdbcInsert.execute(map);
+        cleanAllTables();
+        insertProvince();
 
         // 2. Ejercitar
         List<Province> provinces = this.provinceDao.findByField("name", PROVINCE);
@@ -138,16 +146,14 @@ public class ProvinceDaoImplTest
         // 3. Postcondiciones
         assertNotNull(provinces);
         assertFalse(provinces.isEmpty());
-        assertEquals(provinces.get(0).getName(), PROVINCE);
+        assertEquals(PROVINCE, provinces.get(0).getName());
     }
 
     @Test
     public void testFindProvinceByFieldDoesntExist()
     {
         // 1. Precondiciones
-        JdbcTestUtils.deleteFromTables(this.jdbcTemplate, PROVINCES_TABLE);
-        JdbcTestUtils.deleteFromTables(this.jdbcTemplate, COUNTRIES_TABLE);
-        this.jdbcTemplate.execute("TRUNCATE SCHEMA PUBLIC RESTART IDENTITY AND COMMIT NO CHECK");
+        cleanAllTables();
 
         // 2. Ejercitar
         List<Province> provinces = this.provinceDao.findByField("name", PROVINCE);
@@ -161,19 +167,9 @@ public class ProvinceDaoImplTest
     public void testFindProvinceByFieldOp()
     {
         // 1. Precondiciones
-        JdbcTestUtils.deleteFromTables(this.jdbcTemplate, PROVINCES_TABLE);
-        JdbcTestUtils.deleteFromTables(this.jdbcTemplate, COUNTRIES_TABLE);
-        this.jdbcTemplate.execute("TRUNCATE SCHEMA PUBLIC RESTART IDENTITY AND COMMIT NO CHECK");
+        cleanAllTables();
 
-        Map<String, Object> map = new HashMap<>();
-        map.put("country_id", COUNTRY_ID);
-        map.put("name", COUNTRY);
-        countryJdbcInsert.execute(map);
-
-        map = new HashMap<>();
-        map.put("country_id", COUNTRY_ID);
-        map.put("name", PROVINCE);
-        provinceJdbcInsert.execute(map);
+        insertProvince();
 
         // 2. Ejercitar
         List<Province> provinces = this.provinceDao.findByField("name", JDBCWhereClauseBuilder.Operation.EQ, PROVINCE);
@@ -181,16 +177,14 @@ public class ProvinceDaoImplTest
         // 3. Postcondiciones
         assertNotNull(provinces);
         assertFalse(provinces.isEmpty());
-        assertEquals(PROVINCE,  provinces.get(0).getName());
+        assertEquals(PROVINCE, provinces.get(0).getName());
     }
 
     @Test
     public void testFindProvinceByFieldOpDoesntExist()
     {
         // 1. Precondiciones
-        JdbcTestUtils.deleteFromTables(this.jdbcTemplate, PROVINCES_TABLE);
-        JdbcTestUtils.deleteFromTables(this.jdbcTemplate, COUNTRIES_TABLE);
-        this.jdbcTemplate.execute("TRUNCATE SCHEMA PUBLIC RESTART IDENTITY AND COMMIT NO CHECK");
+        cleanAllTables();
 
         // 2. Ejercitar
         List<Province> provinces = this.provinceDao.findByField("name", JDBCWhereClauseBuilder.Operation.EQ, PROVINCE);
@@ -204,22 +198,9 @@ public class ProvinceDaoImplTest
     public void testFindProvincesByIds()
     {
         // 1. Precondiciones
-        JdbcTestUtils.deleteFromTables(this.jdbcTemplate, PROVINCES_TABLE);
-        JdbcTestUtils.deleteFromTables(this.jdbcTemplate, COUNTRIES_TABLE);
-        this.jdbcTemplate.execute("TRUNCATE SCHEMA PUBLIC RESTART IDENTITY AND COMMIT NO CHECK");
-
-        Map<String, Object> map = new HashMap<>();
-        map.put("country_id", COUNTRY_ID);
-        map.put("name", COUNTRY);
-        countryJdbcInsert.execute(map);
-        map = new HashMap<>();
-        map.put("country_id", COUNTRY_ID);
-        map.put("name", PROVINCE);
-        provinceJdbcInsert.execute(map);
-        map = new HashMap<>();
-        map.put("country_id", COUNTRY_ID);
-        map.put("name", "Corrientes");
-        provinceJdbcInsert.execute(map);
+        cleanAllTables();
+        insertProvince();
+        insertAnotherProvince();
 
         // 2. Ejercitar
         Collection<Province> provinces = this.provinceDao.findByIds(Arrays.asList(0, 1));
@@ -236,9 +217,7 @@ public class ProvinceDaoImplTest
     public void testFindProvincesByIdsDoesntExist()
     {
         // 1. Precondiciones
-        JdbcTestUtils.deleteFromTables(this.jdbcTemplate, PROVINCES_TABLE);
-        JdbcTestUtils.deleteFromTables(this.jdbcTemplate, COUNTRIES_TABLE);
-        this.jdbcTemplate.execute("TRUNCATE SCHEMA PUBLIC RESTART IDENTITY AND COMMIT NO CHECK");
+        cleanAllTables();
 
         // 2. Ejercitar
         Collection<Province> provinces = this.provinceDao.findByIds(Arrays.asList(0, 1));
@@ -253,17 +232,8 @@ public class ProvinceDaoImplTest
     public void testFindProvincesByName()
     {
         // 1. Precondiciones
-        JdbcTestUtils.deleteFromTables(this.jdbcTemplate, PROVINCES_TABLE);
-        JdbcTestUtils.deleteFromTables(this.jdbcTemplate, COUNTRIES_TABLE);
-        this.jdbcTemplate.execute("TRUNCATE SCHEMA PUBLIC RESTART IDENTITY AND COMMIT NO CHECK");
-        Map<String, Object> map = new HashMap<>();
-        map.put("country_id", COUNTRY_ID);
-        map.put("name", COUNTRY);
-        countryJdbcInsert.execute(map);
-        map = new HashMap<>();
-        map.put("country_id", COUNTRY_ID);
-        map.put("name", PROVINCE);
-        provinceJdbcInsert.execute(map);
+        cleanAllTables();
+        insertProvince();
 
         // 2. Ejercitar
         Collection<Province> provinces = this.provinceDao.findByName(PROVINCE);
@@ -280,9 +250,7 @@ public class ProvinceDaoImplTest
     public void testFindProvincesByNameDoesntExist()
     {
         // 1. Precondiciones
-        JdbcTestUtils.deleteFromTables(this.jdbcTemplate, PROVINCES_TABLE);
-        JdbcTestUtils.deleteFromTables(this.jdbcTemplate, COUNTRIES_TABLE);
-        this.jdbcTemplate.execute("TRUNCATE SCHEMA PUBLIC RESTART IDENTITY AND COMMIT NO CHECK");
+        cleanAllTables();
 
         // 2. Ejercitar
         Collection<Province> provinces = this.provinceDao.findByName(PROVINCE);
@@ -296,21 +264,9 @@ public class ProvinceDaoImplTest
     public void testProvinceList()
     {
         // 1. Precondiciones
-        JdbcTestUtils.deleteFromTables(this.jdbcTemplate, PROVINCES_TABLE);
-        JdbcTestUtils.deleteFromTables(this.jdbcTemplate, COUNTRIES_TABLE);
-        this.jdbcTemplate.execute("TRUNCATE SCHEMA PUBLIC RESTART IDENTITY AND COMMIT NO CHECK");
-        Map<String, Object> map = new HashMap<>();
-        map.put("country_id", COUNTRY_ID);
-        map.put("name", COUNTRY);
-        countryJdbcInsert.execute(map);
-        map = new HashMap<>();
-        map.put("country_id", COUNTRY_ID);
-        map.put("name", PROVINCE);
-        provinceJdbcInsert.execute(map);
-        map = new HashMap<>();
-        map.put("country_id", COUNTRY_ID);
-        map.put("name", "Corrientes");
-        provinceJdbcInsert.execute(map);
+        cleanAllTables();
+        insertProvince();
+        insertAnotherProvince();
 
         // 2. Ejercitar
         Collection<Province> provinces = this.provinceDao.list();
@@ -324,9 +280,7 @@ public class ProvinceDaoImplTest
     public void testProvincesEmptyList()
     {
         // 1. Precondiciones
-        JdbcTestUtils.deleteFromTables(this.jdbcTemplate, PROVINCES_TABLE);
-        JdbcTestUtils.deleteFromTables(this.jdbcTemplate, COUNTRIES_TABLE);
-        this.jdbcTemplate.execute("TRUNCATE SCHEMA PUBLIC RESTART IDENTITY AND COMMIT NO CHECK");
+        cleanAllTables();
 
         // 2. Ejercitar
         Collection<Province> provinces = this.provinceDao.list();
@@ -340,17 +294,8 @@ public class ProvinceDaoImplTest
     public void testProvinceUpdate()
     {
         // 1. Precondiciones
-        JdbcTestUtils.deleteFromTables(this.jdbcTemplate, PROVINCES_TABLE);
-        JdbcTestUtils.deleteFromTables(this.jdbcTemplate, COUNTRIES_TABLE);
-        this.jdbcTemplate.execute("TRUNCATE SCHEMA PUBLIC RESTART IDENTITY AND COMMIT NO CHECK");
-        Map<String, Object> map = new HashMap<>();
-        map.put("country_id", COUNTRY_ID);
-        map.put("name", COUNTRY);
-        countryJdbcInsert.execute(map);
-        map = new HashMap<>();
-        map.put("country_id", COUNTRY_ID);
-        map.put("name", PROVINCE);
-        provinceJdbcInsert.execute(map);
+        cleanAllTables();
+        insertProvince();
         Province p = new Province();
         p.setId(0);
         p.setName("Corrientes");
@@ -369,17 +314,8 @@ public class ProvinceDaoImplTest
     public void testProvinceRemoveById()
     {
         // 1. Precondiciones
-        JdbcTestUtils.deleteFromTables(this.jdbcTemplate, PROVINCES_TABLE);
-        JdbcTestUtils.deleteFromTables(this.jdbcTemplate, COUNTRIES_TABLE);
-        this.jdbcTemplate.execute("TRUNCATE SCHEMA PUBLIC RESTART IDENTITY AND COMMIT NO CHECK");
-        Map<String, Object> map = new HashMap<>();
-        map.put("country_id", COUNTRY_ID);
-        map.put("name", COUNTRY);
-        countryJdbcInsert.execute(map);
-        map = new HashMap<>();
-        map.put("country_id", COUNTRY_ID);
-        map.put("name", PROVINCE);
-        provinceJdbcInsert.execute(map);
+        cleanAllTables();
+       insertProvince();
 
         // 2. Ejercitar
         this.provinceDao.remove(0);
@@ -392,16 +328,9 @@ public class ProvinceDaoImplTest
     public void testCountryRemoveByModel()
     {
         // 1. Precondiciones
-        JdbcTestUtils.deleteFromTables(this.jdbcTemplate, PROVINCES_TABLE);
-        JdbcTestUtils.deleteFromTables(this.jdbcTemplate, COUNTRIES_TABLE);
-        this.jdbcTemplate.execute("TRUNCATE SCHEMA PUBLIC RESTART IDENTITY AND COMMIT NO CHECK");
-        Map<String, Object> map = new HashMap<>();
-        map.put("country_id", COUNTRY_ID);
-        map.put("name", COUNTRY);
-        countryJdbcInsert.execute(map);
-        Province p = new Province();
-        p.setName(COUNTRY);
-        p.setId(0);
+        cleanAllTables();
+        insertProvince();
+        Province p = provinceModel();
 
         // 2. Ejercitar
         this.provinceDao.remove(p);
