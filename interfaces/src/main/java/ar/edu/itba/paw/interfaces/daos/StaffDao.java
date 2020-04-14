@@ -16,5 +16,7 @@ public interface StaffDao extends GenericSearchableDao<Staff, Integer> {
 
     Collection<Staff> findByOfficeAndStaffSpecialties(Collection<Office> offices, Collection<StaffSpecialty> staffSpecialties);
 
+    Collection<Staff> findByNameAndOffice(String name, Collection<Office> offices);
+
     Collection<Staff> findByOffice(Collection<Office> offices);
 }

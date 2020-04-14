@@ -28,10 +28,18 @@ public interface GenericDao<M extends GenericModel<I>, I> {
     /**
      * Searches for a collection of models that have a columnName equals to the provided object's value
      * @param columnName the db column name
-     * @param value the column's value
+     * @param value the column's value. If it extends GenericModel then its ID will be used
      * @return a collection of models found
      */
     Collection<M> findByField(String columnName, Object value);
+
+    /**
+     * Searches for a collection of models that have a columnName equals to the provided string (case insensitive)
+     * @param columnName the db column name
+     * @param value the column's value
+     * @return a collection of models found
+     */
+    Collection<M> findByFieldIgnoreCase(String columnName, String value);
 
     Class<M> getModelClass();
 }

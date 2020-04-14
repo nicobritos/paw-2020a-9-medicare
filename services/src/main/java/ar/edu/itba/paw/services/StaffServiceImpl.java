@@ -5,14 +5,14 @@ import ar.edu.itba.paw.interfaces.services.StaffService;
 import ar.edu.itba.paw.models.Office;
 import ar.edu.itba.paw.models.Staff;
 import ar.edu.itba.paw.models.StaffSpecialty;
-import ar.edu.itba.paw.services.generics.GenericServiceImpl;
+import ar.edu.itba.paw.services.generics.GenericSearchableServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Collection;
 
 @Service
-public class StaffServiceImpl extends GenericServiceImpl<StaffDao, Staff, Integer> implements StaffService {
+public class StaffServiceImpl extends GenericSearchableServiceImpl<StaffDao, Staff, Integer> implements StaffService {
     @Autowired
     private StaffDao repository;
 
@@ -37,13 +37,25 @@ public class StaffServiceImpl extends GenericServiceImpl<StaffDao, Staff, Intege
     }
 
     @Override
+    public Collection<Staff> findByNameAndOffice(String name, Collection<Office> offices) {
+        return this.repository.findByNameAndOffice(name, offices);
+    }
+
+    @Override
     public Collection<Staff> findByOffice(Collection<Office> offices) {
         return this.repository.findByOffice(offices);
     }
 
     @Override
-    public Collection<Staff> findByName(String name) {
-        return this.repository.findByName(name);
+    public void addStaffSpecialty(Staff staff, StaffSpecialty staffSpecialty) {
+        staff.getStaffSpecialties().add(staffSpecialty);
+        this.repository.update(staff);
+    }
+
+    @Override
+    public void addStaffSpecialties(Staff staff, Collection<StaffSpecialty> staffSpecialties) {
+        staff.getStaffSpecialties().addAll(staffSpecialties);
+        this.repository.update(staff);
     }
 
     @Override

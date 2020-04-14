@@ -26,7 +26,7 @@ import java.util.*;
 import java.util.Map.Entry;
 
 /**
- * This provides a generic DAO abstract class
+ * This provides a generic DAO implementation with lots of useful methods
  * @param <M> the DAO model type
  * @param <I> the Model's id type
  */
@@ -126,8 +126,7 @@ public abstract class GenericDaoImpl<M extends GenericModel<I>, I> implements Ge
     }
 
     /**
-     * Updates ALL the information inside the model (with the exception of the ID)
-     * Relations are also updated
+     * Updates ALL the information inside the model (with the exception of the ID) including relations
      * @param model the model
      */
     @Override
@@ -192,7 +191,7 @@ public abstract class GenericDaoImpl<M extends GenericModel<I>, I> implements Ge
     /**
      * Searches for a collection of models that have a columnName equals to the provided object's value
      * @param columnName the db column name
-     * @param value the column's value
+     * @param value the column's value. If it extends GenericModel then its ID will be used
      * @return a collection of models found
      */
     @Override
@@ -200,11 +199,29 @@ public abstract class GenericDaoImpl<M extends GenericModel<I>, I> implements Ge
         return this.findByField(columnName, Operation.EQ, value);
     }
 
+    /**
+     * Searches for a collection of models that have a columnName equals to the provided string (case insensitive)
+     * @param columnName the db column name
+     * @param value the column's value
+     * @return a collection of models found
+     */
+    @Override
+    public List<M> findByFieldIgnoreCase(String columnName, String value) {
+        return this.findByFieldIgnoreCase(columnName, Operation.EQ, value);
+    }
+
     @Override
     public Class<M> getModelClass() {
         return this.mClass;
     }
 
+    /**
+     * TODO
+     * @param columnName
+     * @param operation
+     * @param value if value is a generic model then it will use its id
+     * @return
+     */
     public List<M> findByField(String columnName, Operation operation, Object value) {
         JDBCQueryBuilder queryBuilder = new JDBCSelectQueryBuilder()
                 .selectAll()
@@ -214,7 +231,11 @@ public abstract class GenericDaoImpl<M extends GenericModel<I>, I> implements Ge
                 );
 
         MapSqlParameterSource parameterSource = new MapSqlParameterSource();
-        parameterSource.addValue("argument", value);
+        if (value instanceof GenericModel) {
+            parameterSource.addValue("argument", ((GenericModel) value).getId());
+        } else {
+            parameterSource.addValue("argument", value);
+        }
 
         return this.selectQuery(queryBuilder.getQueryAsString(), parameterSource);
     }
@@ -241,7 +262,11 @@ public abstract class GenericDaoImpl<M extends GenericModel<I>, I> implements Ge
         Map<String, Object> parameters = new HashMap<>();
         int i = 0;
         for (Object value : values) {
-            parameters.put("_" + i, value);
+            if (value instanceof GenericModel) {
+                parameters.put("_" + i, ((GenericModel) value).getId());
+            } else {
+                parameters.put("_" + i, value);
+            }
             i++;
         }
 
@@ -494,11 +519,11 @@ public abstract class GenericDaoImpl<M extends GenericModel<I>, I> implements Ge
     }
 
     /**
-     * Saves all the relations present in this model that have the fk present in a different table (OneToMany and
-     * ManyToMany). Should be run inside a transaction to avoid race conditions
+     * TODO
+     * Saves all the relations present in this model that have the FK present in a different table (OneToMany and
+     * ManyToMany). Should be run inside a transaction to avoid race conditions or orphans in the DB
      * The model must be present in the database
      * @param model the model
-     * @return the model fetched from the DB
      */
     protected void saveRelations(M model) {
         ReflectionGetterSetter.iterateValues(model, OneToMany.class, true, (field, o) -> {

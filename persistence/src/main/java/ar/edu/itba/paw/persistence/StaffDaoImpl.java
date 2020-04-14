@@ -20,7 +20,6 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 @Repository
 public class StaffDaoImpl extends GenericSearchableDaoImpl<Staff, Integer> implements StaffDao {
@@ -186,8 +185,57 @@ public class StaffDaoImpl extends GenericSearchableDaoImpl<Staff, Integer> imple
     }
 
     @Override
+    public Collection<Staff> findByNameAndOffice(String name, Collection<Office> offices) {
+        if (offices.isEmpty() && name.isEmpty())
+            return new LinkedList<>();
+
+        Map<String, Object> parameters = new HashMap<>();
+        Collection<String> officeParameters = new LinkedList<>();
+
+        int i = 0;
+        for (Office office : offices) {
+            String parameter = "_office_" + i;
+            parameters.put(parameter, office.getId());
+            officeParameters.add(":" + parameter);
+            i++;
+        }
+
+
+        JDBCWhereClauseBuilder whereClauseBuilder = new JDBCWhereClauseBuilder()
+                .in(
+                        formatColumnFromName("office_id", this.getTableAlias()),
+                        officeParameters
+                );
+
+        if (!name.isEmpty()) {
+            name = name.toLowerCase();
+            parameters.put("firstName", name);
+            parameters.put("surname", name);
+
+            whereClauseBuilder
+                    .and()
+                    .where(new JDBCWhereClauseBuilder()
+                            .where(this.formatColumnFromName("surname"), Operation.LIKE, ":surname", ColumnTransformer.LOWER)
+                            .or()
+                            .where(this.formatColumnFromName("first_name"), Operation.LIKE, ":firstName", ColumnTransformer.LOWER)
+                    );
+        }
+
+        JDBCQueryBuilder queryBuilder = new JDBCSelectQueryBuilder()
+                .selectAll()
+                .from(this.getTableAlias())
+                .where(whereClauseBuilder)
+                .distinct();
+
+        MapSqlParameterSource parameterSource = new MapSqlParameterSource();
+        parameterSource.addValues(parameters);
+
+        return this.selectQuery(queryBuilder.getQueryAsString(), parameterSource);
+    }
+
+    @Override
     public Collection<Staff> findByOffice(Collection<Office> offices) {
-        return this.findByFieldIn("office_id", offices.stream().map(Office::getId).collect(Collectors.toList()));
+        return this.findByFieldIn("office_id", offices);
     }
 
     @Override
