@@ -7,8 +7,6 @@
         <%@ include file = "header.jsp" %>
         <%@ include file = "navbar.jsp" %>
         <br>
-        <h2>Hello MediCare!</h2>
-        <br>
         <div style="overflow-x:auto;">
             <table>
                 <tr>
