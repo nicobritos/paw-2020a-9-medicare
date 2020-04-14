@@ -24,12 +24,6 @@ import static org.junit.Assert.*;
 @ContextConfiguration(classes = TestConfig.class)
 public class CountryDaoImplTest
 {
-    private static final String NAME = "testName";
-    private static final String STREET = "Av 9 de Julio";
-    private static final String PROVINCE = "Buenos Aires";
-    private static final String PHONE = "1234567890";
-    private static final String EMAIL = "test@test.com";
-    private static final int STREET_NUMBER = 123;
     private static final String COUNTRY = "Argentina";
     private static final String COUNTRY_ID = "AR";
 
