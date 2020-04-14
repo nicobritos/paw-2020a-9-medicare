@@ -62,43 +62,87 @@ public class OfficeDaoImplTest
         this.countryJdbcInsert = new SimpleJdbcInsert(this.ds)
                 .withTableName(COUNTRY_TABLE);
     }
-
-    @Test
-    public void testCreateOffice()
-    {
-        // 1. Precondiciones
-            // Vaciar tablas
+    
+    private void cleanAllTables(){
         JdbcTestUtils.deleteFromTables(this.jdbcTemplate, OFFICE_TABLE);
         JdbcTestUtils.deleteFromTables(this.jdbcTemplate, PROVINCE_TABLE);
         JdbcTestUtils.deleteFromTables(this.jdbcTemplate, COUNTRY_TABLE);
         this.jdbcTemplate.execute("TRUNCATE SCHEMA PUBLIC RESTART IDENTITY AND COMMIT NO CHECK");
+    }
 
-            // Insertar pais
+    private void insertProvince(){
+        // Insertar pais
         Map<String, Object> countryMap = new HashMap<>();
         countryMap.put("name", COUNTRY);
         countryMap.put("country_id", COUNTRY_ID);
         countryJdbcInsert.execute(countryMap);
 
-            // Insertar provincia
+        // Insertar provincia
         Map<String, Object> provinceMap = new HashMap<>();
         provinceMap.put("name", PROVINCE);
         provinceMap.put("country_id", COUNTRY_ID);
         provinceJdbcInsert.execute(provinceMap);
+    }
 
-            // Modelo de la provincia insertada
+    private void insertOffice(){
+        insertProvince();
+
+        Map<String, Object> officeMap = new HashMap<>();
+        officeMap.put("name", NAME);
+        officeMap.put("email", EMAIL);
+        officeMap.put("phone", PHONE);
+        officeMap.put("province_id", 0); // Identity de HSQLDB empieza en 0
+        officeMap.put("street", STREET);
+        officeMap.put("street_number", STREET_NUMBER);
+        officeJdbcInsert.execute(officeMap);
+    }
+
+    private void insertAnotherOffice(){
+        Map<String, Object> officeMap = new HashMap<>();
+        officeMap.put("name", NAME + "_1");
+        officeMap.put("email", EMAIL);
+        officeMap.put("phone", PHONE);
+        officeMap.put("province_id", 0); // Identity de HSQLDB empieza en 0
+        officeMap.put("street", STREET);
+        officeMap.put("street_number", STREET_NUMBER);
+        officeJdbcInsert.execute(officeMap);
+    }
+
+    private Country countryModel(){
+        Country c = new Country();
+        c.setName(COUNTRY);
+        c.setId(COUNTRY_ID);
+        c.setProvinces(Collections.singletonList(provinceModel()));
+        return c;
+    }
+
+    private Province provinceModel(){
         Province p = new Province();
         p.setName(PROVINCE);
         p.setId(0); // Identity de HSQLDB empieza en 0
+        return p;
+    }
 
-            // Modelo de la oficina a crear
+    private Office officeModel(){
         Office o = new Office();
+        o.setId(0);
         o.setName(NAME);
         o.setEmail(EMAIL);
         o.setPhone(PHONE);
-        o.setProvince(p);
+        o.setProvince(provinceModel());
         o.setStaffs(Collections.emptyList());
         o.setStreet(STREET);
         o.setStreetNumber(STREET_NUMBER);
+        return o;
+    }
+
+    @Test
+    public void testCreateOffice()
+    {
+        // 1. Precondiciones
+        cleanAllTables();
+        insertProvince();
+        Office o = officeModel();
 
         // 2. Ejercitar
         Office office = this.officeDao.create(o);
@@ -112,33 +156,8 @@ public class OfficeDaoImplTest
     @Test
     public void testFindById(){
         // 1. Precondiciones
-            // Vaciar tablas
-        JdbcTestUtils.deleteFromTables(this.jdbcTemplate, OFFICE_TABLE);
-        JdbcTestUtils.deleteFromTables(this.jdbcTemplate, PROVINCE_TABLE);
-        JdbcTestUtils.deleteFromTables(this.jdbcTemplate, COUNTRY_TABLE);
-        this.jdbcTemplate.execute("TRUNCATE SCHEMA PUBLIC RESTART IDENTITY AND COMMIT NO CHECK");
-
-            // Insertar pais
-        Map<String, Object> countryMap = new HashMap<>();
-        countryMap.put("name", COUNTRY);
-        countryMap.put("country_id", COUNTRY_ID);
-        countryJdbcInsert.execute(countryMap);
-
-            // Insertar provincia
-        Map<String, Object> provinceMap = new HashMap<>();
-        provinceMap.put("name", PROVINCE);
-        provinceMap.put("country_id", COUNTRY_ID);
-        provinceJdbcInsert.execute(provinceMap);
-
-            // Insertar oficina
-        Map<String, Object> officeMap = new HashMap<>();
-        officeMap.put("name", NAME);
-        officeMap.put("email", EMAIL);
-        officeMap.put("phone", PHONE);
-        officeMap.put("province_id", 0); // Identity de HSQLDB empieza en 0
-        officeMap.put("street", STREET);
-        officeMap.put("street_number", STREET_NUMBER);
-        officeJdbcInsert.execute(officeMap);
+        cleanAllTables();
+        insertOffice();
 
         // 2. Ejercitar
         Optional<Office> maybeOffice = officeDao.findById(0); // Identity de HSQLDB empieza en 0
@@ -152,10 +171,7 @@ public class OfficeDaoImplTest
     @Test
     public void testFindByIdDoesntExist(){
         // 1. Precondiciones
-        JdbcTestUtils.deleteFromTables(this.jdbcTemplate, OFFICE_TABLE);
-        JdbcTestUtils.deleteFromTables(this.jdbcTemplate, PROVINCE_TABLE);
-        JdbcTestUtils.deleteFromTables(this.jdbcTemplate, COUNTRY_TABLE);
-        this.jdbcTemplate.execute("TRUNCATE SCHEMA PUBLIC RESTART IDENTITY AND COMMIT NO CHECK");
+        cleanAllTables();
 
         // 2. Ejercitar
         Optional<Office> maybeOffice = officeDao.findById(0); // Identity de HSQLDB empieza en 0
@@ -167,43 +183,9 @@ public class OfficeDaoImplTest
     @Test
     public void testFindByIds(){
         // 1. Precondiciones
-        // Vaciar tablas
-        JdbcTestUtils.deleteFromTables(this.jdbcTemplate, OFFICE_TABLE);
-        JdbcTestUtils.deleteFromTables(this.jdbcTemplate, PROVINCE_TABLE);
-        JdbcTestUtils.deleteFromTables(this.jdbcTemplate, COUNTRY_TABLE);
-        this.jdbcTemplate.execute("TRUNCATE SCHEMA PUBLIC RESTART IDENTITY AND COMMIT NO CHECK");
-
-        // Insertar pais
-        Map<String, Object> countryMap = new HashMap<>();
-        countryMap.put("name", COUNTRY);
-        countryMap.put("country_id", COUNTRY_ID);
-        countryJdbcInsert.execute(countryMap);
-
-        // Insertar provincia
-        Map<String, Object> provinceMap = new HashMap<>();
-        provinceMap.put("name", PROVINCE);
-        provinceMap.put("country_id", COUNTRY_ID);
-        provinceJdbcInsert.execute(provinceMap);
-
-        // Insertar oficina
-        Map<String, Object> officeMap = new HashMap<>();
-        officeMap.put("name", NAME);
-        officeMap.put("email", EMAIL);
-        officeMap.put("phone", PHONE);
-        officeMap.put("province_id", 0); // Identity de HSQLDB empieza en 0
-        officeMap.put("street", STREET);
-        officeMap.put("street_number", STREET_NUMBER);
-        officeJdbcInsert.execute(officeMap);
-
-        // Insertar oficina 2
-        officeMap = new HashMap<>();
-        officeMap.put("name", NAME + "_1");
-        officeMap.put("email", EMAIL);
-        officeMap.put("phone", PHONE);
-        officeMap.put("province_id", 0); // Identity de HSQLDB empieza en 0
-        officeMap.put("street", STREET);
-        officeMap.put("street_number", STREET_NUMBER);
-        officeJdbcInsert.execute(officeMap);
+        cleanAllTables();
+        insertOffice();
+        insertAnotherOffice();
 
         // 2. Ejercitar
         Collection<Office> offices = officeDao.findByIds(Arrays.asList(0,1,2)); // Identity de HSQLDB empieza en 0
@@ -216,10 +198,7 @@ public class OfficeDaoImplTest
     @Test
     public void testFindByIdsDoesntExist(){
         // 1. Precondiciones
-        JdbcTestUtils.deleteFromTables(this.jdbcTemplate, OFFICE_TABLE);
-        JdbcTestUtils.deleteFromTables(this.jdbcTemplate, PROVINCE_TABLE);
-        JdbcTestUtils.deleteFromTables(this.jdbcTemplate, COUNTRY_TABLE);
-        this.jdbcTemplate.execute("TRUNCATE SCHEMA PUBLIC RESTART IDENTITY AND COMMIT NO CHECK");
+        cleanAllTables();
 
         // 2. Ejercitar
         Collection<Office> offices = officeDao.findByIds(Arrays.asList(0,1,2)); // Identity de HSQLDB empieza en 0
@@ -232,43 +211,9 @@ public class OfficeDaoImplTest
     @Test
     public void testFindByField(){
         // 1. Precondiciones
-        // Vaciar tablas
-        JdbcTestUtils.deleteFromTables(this.jdbcTemplate, OFFICE_TABLE);
-        JdbcTestUtils.deleteFromTables(this.jdbcTemplate, PROVINCE_TABLE);
-        JdbcTestUtils.deleteFromTables(this.jdbcTemplate, COUNTRY_TABLE);
-        this.jdbcTemplate.execute("TRUNCATE SCHEMA PUBLIC RESTART IDENTITY AND COMMIT NO CHECK");
-
-        // Insertar pais
-        Map<String, Object> countryMap = new HashMap<>();
-        countryMap.put("name", COUNTRY);
-        countryMap.put("country_id", COUNTRY_ID);
-        countryJdbcInsert.execute(countryMap);
-
-        // Insertar provincia
-        Map<String, Object> provinceMap = new HashMap<>();
-        provinceMap.put("name", PROVINCE);
-        provinceMap.put("country_id", COUNTRY_ID);
-        provinceJdbcInsert.execute(provinceMap);
-
-        // Insertar oficina
-        Map<String, Object> officeMap = new HashMap<>();
-        officeMap.put("name", NAME);
-        officeMap.put("email", EMAIL);
-        officeMap.put("phone", PHONE);
-        officeMap.put("province_id", 0); // Identity de HSQLDB empieza en 0
-        officeMap.put("street", STREET);
-        officeMap.put("street_number", STREET_NUMBER);
-        officeJdbcInsert.execute(officeMap);
-
-        // Insertar oficina 2
-        officeMap = new HashMap<>();
-        officeMap.put("name", NAME + "_1");
-        officeMap.put("email", EMAIL);
-        officeMap.put("phone", PHONE);
-        officeMap.put("province_id", 0); // Identity de HSQLDB empieza en 0
-        officeMap.put("street", STREET);
-        officeMap.put("street_number", STREET_NUMBER);
-        officeJdbcInsert.execute(officeMap);
+        cleanAllTables();
+        insertOffice();
+        insertAnotherOffice();
 
         // 2. Ejercitar
         Collection<Office> offices = officeDao.findByField("email", EMAIL);
@@ -281,10 +226,7 @@ public class OfficeDaoImplTest
     @Test
     public void testFindByFieldDoesntExist(){
         // 1. Precondiciones
-        JdbcTestUtils.deleteFromTables(this.jdbcTemplate, OFFICE_TABLE);
-        JdbcTestUtils.deleteFromTables(this.jdbcTemplate, PROVINCE_TABLE);
-        JdbcTestUtils.deleteFromTables(this.jdbcTemplate, COUNTRY_TABLE);
-        this.jdbcTemplate.execute("TRUNCATE SCHEMA PUBLIC RESTART IDENTITY AND COMMIT NO CHECK");
+        cleanAllTables();
 
         // 2. Ejercitar
         Collection<Office> offices = officeDao.findByField("email", EMAIL);
@@ -298,42 +240,9 @@ public class OfficeDaoImplTest
     public void testFindByFieldOp(){
         // 1. Precondiciones
         // Vaciar tablas
-        JdbcTestUtils.deleteFromTables(this.jdbcTemplate, OFFICE_TABLE);
-        JdbcTestUtils.deleteFromTables(this.jdbcTemplate, PROVINCE_TABLE);
-        JdbcTestUtils.deleteFromTables(this.jdbcTemplate, COUNTRY_TABLE);
-        this.jdbcTemplate.execute("TRUNCATE SCHEMA PUBLIC RESTART IDENTITY AND COMMIT NO CHECK");
-
-        // Insertar pais
-        Map<String, Object> countryMap = new HashMap<>();
-        countryMap.put("name", COUNTRY);
-        countryMap.put("country_id", COUNTRY_ID);
-        countryJdbcInsert.execute(countryMap);
-
-        // Insertar provincia
-        Map<String, Object> provinceMap = new HashMap<>();
-        provinceMap.put("name", PROVINCE);
-        provinceMap.put("country_id", COUNTRY_ID);
-        provinceJdbcInsert.execute(provinceMap);
-
-        // Insertar oficina
-        Map<String, Object> officeMap = new HashMap<>();
-        officeMap.put("name", NAME);
-        officeMap.put("email", EMAIL);
-        officeMap.put("phone", PHONE);
-        officeMap.put("province_id", 0); // Identity de HSQLDB empieza en 0
-        officeMap.put("street", STREET);
-        officeMap.put("street_number", STREET_NUMBER);
-        officeJdbcInsert.execute(officeMap);
-
-        // Insertar oficina 2
-        officeMap = new HashMap<>();
-        officeMap.put("name", NAME + "_1");
-        officeMap.put("email", EMAIL);
-        officeMap.put("phone", PHONE);
-        officeMap.put("province_id", 0); // Identity de HSQLDB empieza en 0
-        officeMap.put("street", STREET);
-        officeMap.put("street_number", STREET_NUMBER);
-        officeJdbcInsert.execute(officeMap);
+        cleanAllTables();
+        insertOffice();
+        insertAnotherOffice();
 
         // 2. Ejercitar
         Collection<Office> offices = officeDao.findByField("office_id", JDBCWhereClauseBuilder.Operation.LEQ, 1);
@@ -346,10 +255,7 @@ public class OfficeDaoImplTest
     @Test
     public void testFindByFieldOpDoesntExist(){
         // 1. Precondiciones
-        JdbcTestUtils.deleteFromTables(this.jdbcTemplate, OFFICE_TABLE);
-        JdbcTestUtils.deleteFromTables(this.jdbcTemplate, PROVINCE_TABLE);
-        JdbcTestUtils.deleteFromTables(this.jdbcTemplate, COUNTRY_TABLE);
-        this.jdbcTemplate.execute("TRUNCATE SCHEMA PUBLIC RESTART IDENTITY AND COMMIT NO CHECK");
+        cleanAllTables();
 
         // 2. Ejercitar
         Collection<Office> offices = officeDao.findByField("office_id", JDBCWhereClauseBuilder.Operation.LEQ, 1);
@@ -362,43 +268,9 @@ public class OfficeDaoImplTest
     @Test
     public void testFindByName(){
         // 1. Precondiciones
-        // Vaciar tablas
-        JdbcTestUtils.deleteFromTables(this.jdbcTemplate, OFFICE_TABLE);
-        JdbcTestUtils.deleteFromTables(this.jdbcTemplate, PROVINCE_TABLE);
-        JdbcTestUtils.deleteFromTables(this.jdbcTemplate, COUNTRY_TABLE);
-        this.jdbcTemplate.execute("TRUNCATE SCHEMA PUBLIC RESTART IDENTITY AND COMMIT NO CHECK");
-
-        // Insertar pais
-        Map<String, Object> countryMap = new HashMap<>();
-        countryMap.put("name", COUNTRY);
-        countryMap.put("country_id", COUNTRY_ID);
-        countryJdbcInsert.execute(countryMap);
-
-        // Insertar provincia
-        Map<String, Object> provinceMap = new HashMap<>();
-        provinceMap.put("name", PROVINCE);
-        provinceMap.put("country_id", COUNTRY_ID);
-        provinceJdbcInsert.execute(provinceMap);
-
-        // Insertar oficina
-        Map<String, Object> officeMap = new HashMap<>();
-        officeMap.put("name", NAME);
-        officeMap.put("email", EMAIL);
-        officeMap.put("phone", PHONE);
-        officeMap.put("province_id", 0); // Identity de HSQLDB empieza en 0
-        officeMap.put("street", STREET);
-        officeMap.put("street_number", STREET_NUMBER);
-        officeJdbcInsert.execute(officeMap);
-
-        // Insertar oficina 2
-        officeMap = new HashMap<>();
-        officeMap.put("name", NAME + "_1");
-        officeMap.put("email", EMAIL);
-        officeMap.put("phone", PHONE);
-        officeMap.put("province_id", 0); // Identity de HSQLDB empieza en 0
-        officeMap.put("street", STREET);
-        officeMap.put("street_number", STREET_NUMBER);
-        officeJdbcInsert.execute(officeMap);
+        cleanAllTables();
+        insertOffice();
+        insertAnotherOffice();
 
         // 2. Ejercitar
         Collection<Office> offices = officeDao.findByName(NAME);
@@ -411,10 +283,7 @@ public class OfficeDaoImplTest
     @Test
     public void testFindByNameDoesntExist(){
         // 1. Precondiciones
-        JdbcTestUtils.deleteFromTables(this.jdbcTemplate, OFFICE_TABLE);
-        JdbcTestUtils.deleteFromTables(this.jdbcTemplate, PROVINCE_TABLE);
-        JdbcTestUtils.deleteFromTables(this.jdbcTemplate, COUNTRY_TABLE);
-        this.jdbcTemplate.execute("TRUNCATE SCHEMA PUBLIC RESTART IDENTITY AND COMMIT NO CHECK");
+        cleanAllTables();
 
         // 2. Ejercitar
         Collection<Office> offices = officeDao.findByName(NAME);
@@ -428,42 +297,9 @@ public class OfficeDaoImplTest
     public void testList(){
         // 1. Precondiciones
         // Vaciar tablas
-        JdbcTestUtils.deleteFromTables(this.jdbcTemplate, OFFICE_TABLE);
-        JdbcTestUtils.deleteFromTables(this.jdbcTemplate, PROVINCE_TABLE);
-        JdbcTestUtils.deleteFromTables(this.jdbcTemplate, COUNTRY_TABLE);
-        this.jdbcTemplate.execute("TRUNCATE SCHEMA PUBLIC RESTART IDENTITY AND COMMIT NO CHECK");
-
-        // Insertar pais
-        Map<String, Object> countryMap = new HashMap<>();
-        countryMap.put("name", COUNTRY);
-        countryMap.put("country_id", COUNTRY_ID);
-        countryJdbcInsert.execute(countryMap);
-
-        // Insertar provincia
-        Map<String, Object> provinceMap = new HashMap<>();
-        provinceMap.put("name", PROVINCE);
-        provinceMap.put("country_id", COUNTRY_ID);
-        provinceJdbcInsert.execute(provinceMap);
-
-        // Insertar oficina
-        Map<String, Object> officeMap = new HashMap<>();
-        officeMap.put("name", NAME);
-        officeMap.put("email", EMAIL);
-        officeMap.put("phone", PHONE);
-        officeMap.put("province_id", 0); // Identity de HSQLDB empieza en 0
-        officeMap.put("street", STREET);
-        officeMap.put("street_number", STREET_NUMBER);
-        officeJdbcInsert.execute(officeMap);
-
-        // Insertar oficina 2
-        officeMap = new HashMap<>();
-        officeMap.put("name", NAME + "_1");
-        officeMap.put("email", EMAIL);
-        officeMap.put("phone", PHONE);
-        officeMap.put("province_id", 0); // Identity de HSQLDB empieza en 0
-        officeMap.put("street", STREET);
-        officeMap.put("street_number", STREET_NUMBER);
-        officeJdbcInsert.execute(officeMap);
+        cleanAllTables();
+        insertOffice();
+        insertAnotherOffice();
 
         // 2. Ejercitar
         Collection<Office> offices = officeDao.list();
@@ -476,10 +312,7 @@ public class OfficeDaoImplTest
     @Test
     public void testEmptyList(){
         // 1. Precondiciones
-        JdbcTestUtils.deleteFromTables(this.jdbcTemplate, OFFICE_TABLE);
-        JdbcTestUtils.deleteFromTables(this.jdbcTemplate, PROVINCE_TABLE);
-        JdbcTestUtils.deleteFromTables(this.jdbcTemplate, COUNTRY_TABLE);
-        this.jdbcTemplate.execute("TRUNCATE SCHEMA PUBLIC RESTART IDENTITY AND COMMIT NO CHECK");
+        cleanAllTables();
 
         // 2. Ejercitar
         Collection<Office> offices = officeDao.list();
@@ -492,48 +325,24 @@ public class OfficeDaoImplTest
     @Test
     public void testFindByCountry(){
         // 1. Precondiciones
-        // Vaciar tablas
-        JdbcTestUtils.deleteFromTables(this.jdbcTemplate, OFFICE_TABLE);
-        JdbcTestUtils.deleteFromTables(this.jdbcTemplate, PROVINCE_TABLE);
-        JdbcTestUtils.deleteFromTables(this.jdbcTemplate, COUNTRY_TABLE);
-        this.jdbcTemplate.execute("TRUNCATE SCHEMA PUBLIC RESTART IDENTITY AND COMMIT NO CHECK");
+        cleanAllTables();
 
-        // Insertar pais
-        Map<String, Object> countryMap = new HashMap<>();
-        countryMap.put("name", COUNTRY);
-        countryMap.put("country_id", COUNTRY_ID);
-        countryJdbcInsert.execute(countryMap);
+        insertOffice();
 
         // Insertar pais 2
-        countryMap = new HashMap<>();
+        Map<String, Object> countryMap = new HashMap<>();
         countryMap.put("name", COUNTRY + "_1");
         countryMap.put("country_id", "C1");
         countryJdbcInsert.execute(countryMap);
 
-        // Insertar provincia
-        Map<String, Object> provinceMap = new HashMap<>();
-        provinceMap.put("name", PROVINCE);
-        provinceMap.put("country_id", COUNTRY_ID);
-        provinceJdbcInsert.execute(provinceMap);
-
         // Insertar provincia 2
-        provinceMap = new HashMap<>();
+        Map<String, Object> provinceMap = new HashMap<>();
         provinceMap.put("name", PROVINCE + "_1");
         provinceMap.put("country_id", "C1");
         provinceJdbcInsert.execute(provinceMap);
 
-        // Insertar oficina
-        Map<String, Object> officeMap = new HashMap<>();
-        officeMap.put("name", NAME);
-        officeMap.put("email", EMAIL);
-        officeMap.put("phone", PHONE);
-        officeMap.put("province_id", 0); // Identity de HSQLDB empieza en 0
-        officeMap.put("street", STREET);
-        officeMap.put("street_number", STREET_NUMBER);
-        officeJdbcInsert.execute(officeMap);
-
         // Insertar oficina 2
-        officeMap = new HashMap<>();
+        Map<String, Object> officeMap = new HashMap<>();
         officeMap.put("name", NAME + "_1");
         officeMap.put("email", EMAIL);
         officeMap.put("phone", PHONE);
@@ -542,16 +351,7 @@ public class OfficeDaoImplTest
         officeMap.put("street_number", STREET_NUMBER);
         officeJdbcInsert.execute(officeMap);
 
-        //Crear Province modelo
-        Province p = new Province();
-        p.setId(0);
-        p.setName(PROVINCE);
-
-        //Crear Country modelo
-        Country c = new Country();
-        c.setName(COUNTRY);
-        c.setId(COUNTRY_ID);
-        c.setProvinces(Collections.singletonList(p));
+        Country c = countryModel();
 
         // 2. Ejercitar
         Collection<Office> offices = officeDao.findByCountry(c);
@@ -564,21 +364,10 @@ public class OfficeDaoImplTest
     @Test
     public void testFindByCountryDoesntExists(){
         // 1. Precondiciones
-        JdbcTestUtils.deleteFromTables(this.jdbcTemplate, OFFICE_TABLE);
-        JdbcTestUtils.deleteFromTables(this.jdbcTemplate, PROVINCE_TABLE);
-        JdbcTestUtils.deleteFromTables(this.jdbcTemplate, COUNTRY_TABLE);
-        this.jdbcTemplate.execute("TRUNCATE SCHEMA PUBLIC RESTART IDENTITY AND COMMIT NO CHECK");
-
-        //Crear Province modelo
-        Province p = new Province();
-        p.setId(0);
-        p.setName(PROVINCE);
+        cleanAllTables();
 
         //Crear Country modelo
-        Country c = new Country();
-        c.setName(COUNTRY);
-        c.setId(COUNTRY_ID);
-        c.setProvinces(Collections.singletonList(p));
+        Country c = countryModel();
 
         // 2. Ejercitar
         Collection<Office> offices = officeDao.findByCountry(c);
@@ -591,55 +380,9 @@ public class OfficeDaoImplTest
     @Test
     public void testRemoveById(){
         // 1. Precondiciones
-        // Vaciar tablas
-        JdbcTestUtils.deleteFromTables(this.jdbcTemplate, OFFICE_TABLE);
-        JdbcTestUtils.deleteFromTables(this.jdbcTemplate, PROVINCE_TABLE);
-        JdbcTestUtils.deleteFromTables(this.jdbcTemplate, COUNTRY_TABLE);
-        this.jdbcTemplate.execute("TRUNCATE SCHEMA PUBLIC RESTART IDENTITY AND COMMIT NO CHECK");
-
-        // Insertar pais
-        Map<String, Object> countryMap = new HashMap<>();
-        countryMap.put("name", COUNTRY);
-        countryMap.put("country_id", COUNTRY_ID);
-        countryJdbcInsert.execute(countryMap);
-
-        // Insertar pais 2
-        countryMap = new HashMap<>();
-        countryMap.put("name", COUNTRY + "_1");
-        countryMap.put("country_id", "C1");
-        countryJdbcInsert.execute(countryMap);
-
-        // Insertar provincia
-        Map<String, Object> provinceMap = new HashMap<>();
-        provinceMap.put("name", PROVINCE);
-        provinceMap.put("country_id", COUNTRY_ID);
-        provinceJdbcInsert.execute(provinceMap);
-
-        // Insertar provincia 2
-        provinceMap = new HashMap<>();
-        provinceMap.put("name", PROVINCE + "_1");
-        provinceMap.put("country_id", "C1");
-        provinceJdbcInsert.execute(provinceMap);
-
-        // Insertar oficina
-        Map<String, Object> officeMap = new HashMap<>();
-        officeMap.put("name", NAME);
-        officeMap.put("email", EMAIL);
-        officeMap.put("phone", PHONE);
-        officeMap.put("province_id", 0); // Identity de HSQLDB empieza en 0
-        officeMap.put("street", STREET);
-        officeMap.put("street_number", STREET_NUMBER);
-        officeJdbcInsert.execute(officeMap);
-
-        // Insertar oficina 2
-        officeMap = new HashMap<>();
-        officeMap.put("name", NAME + "_1");
-        officeMap.put("email", EMAIL);
-        officeMap.put("phone", PHONE);
-        officeMap.put("province_id", 1); // Identity de HSQLDB empieza en 0
-        officeMap.put("street", STREET);
-        officeMap.put("street_number", STREET_NUMBER);
-        officeJdbcInsert.execute(officeMap);
+        cleanAllTables();
+        insertOffice();
+        insertAnotherOffice();
 
         // 2. Ejercitar
         officeDao.remove(0);
@@ -651,74 +394,12 @@ public class OfficeDaoImplTest
     @Test
     public void testRemoveByModel(){
         // 1. Precondiciones
-        // Vaciar tablas
-        JdbcTestUtils.deleteFromTables(this.jdbcTemplate, OFFICE_TABLE);
-        JdbcTestUtils.deleteFromTables(this.jdbcTemplate, PROVINCE_TABLE);
-        JdbcTestUtils.deleteFromTables(this.jdbcTemplate, COUNTRY_TABLE);
-        this.jdbcTemplate.execute("TRUNCATE SCHEMA PUBLIC RESTART IDENTITY AND COMMIT NO CHECK");
-
-        // Insertar pais
-        Map<String, Object> countryMap = new HashMap<>();
-        countryMap.put("name", COUNTRY);
-        countryMap.put("country_id", COUNTRY_ID);
-        countryJdbcInsert.execute(countryMap);
-
-        // Insertar pais 2
-        countryMap = new HashMap<>();
-        countryMap.put("name", COUNTRY + "_1");
-        countryMap.put("country_id", "C1");
-        countryJdbcInsert.execute(countryMap);
-
-        // Insertar provincia
-        Map<String, Object> provinceMap = new HashMap<>();
-        provinceMap.put("name", PROVINCE);
-        provinceMap.put("country_id", COUNTRY_ID);
-        provinceJdbcInsert.execute(provinceMap);
-
-        // Insertar provincia 2
-        provinceMap = new HashMap<>();
-        provinceMap.put("name", PROVINCE + "_1");
-        provinceMap.put("country_id", "C1");
-        provinceJdbcInsert.execute(provinceMap);
-
-        // Insertar oficina
-        Map<String, Object> officeMap = new HashMap<>();
-        officeMap.put("name", NAME);
-        officeMap.put("email", EMAIL);
-        officeMap.put("phone", PHONE);
-        officeMap.put("province_id", 0); // Identity de HSQLDB empieza en 0
-        officeMap.put("street", STREET);
-        officeMap.put("street_number", STREET_NUMBER);
-        officeJdbcInsert.execute(officeMap);
-
-        // Insertar oficina 2
-        officeMap = new HashMap<>();
-        officeMap.put("name", NAME + "_1");
-        officeMap.put("email", EMAIL);
-        officeMap.put("phone", PHONE);
-        officeMap.put("province_id", 1); // Identity de HSQLDB empieza en 0
-        officeMap.put("street", STREET);
-        officeMap.put("street_number", STREET_NUMBER);
-        officeJdbcInsert.execute(officeMap);
-
-        // Modelo de la provincia insertada
-        Province p = new Province();
-        p.setName(PROVINCE);
-        p.setId(0); // Identity de HSQLDB empieza en 0
-
-        // Modelo de la oficina a crear
-        Office o = new Office();
-        o.setId(0);
-        o.setName(NAME);
-        o.setEmail(EMAIL);
-        o.setPhone(PHONE);
-        o.setProvince(p);
-        o.setStaffs(Collections.emptyList());
-        o.setStreet(STREET);
-        o.setStreetNumber(STREET_NUMBER);
+        cleanAllTables();
+        insertOffice();
+        insertAnotherOffice();
 
         // 2. Ejercitar
-        officeDao.remove(o);
+        officeDao.remove(officeModel());
 
         // 3. Postcondiciones
         assertEquals(1, JdbcTestUtils.countRowsInTable(this.jdbcTemplate, OFFICE_TABLE));
@@ -727,49 +408,12 @@ public class OfficeDaoImplTest
     @Test
     public void testUpdate(){
         // 1. Precondiciones
-        // Vaciar tablas
-        JdbcTestUtils.deleteFromTables(this.jdbcTemplate, OFFICE_TABLE);
-        JdbcTestUtils.deleteFromTables(this.jdbcTemplate, PROVINCE_TABLE);
-        JdbcTestUtils.deleteFromTables(this.jdbcTemplate, COUNTRY_TABLE);
-        this.jdbcTemplate.execute("TRUNCATE SCHEMA PUBLIC RESTART IDENTITY AND COMMIT NO CHECK");
-
-        // Insertar pais
-        Map<String, Object> countryMap = new HashMap<>();
-        countryMap.put("name", COUNTRY);
-        countryMap.put("country_id", COUNTRY_ID);
-        countryJdbcInsert.execute(countryMap);
-
-        // Insertar provincia
-        Map<String, Object> provinceMap = new HashMap<>();
-        provinceMap.put("name", PROVINCE);
-        provinceMap.put("country_id", COUNTRY_ID);
-        provinceJdbcInsert.execute(provinceMap);
-
-        // Insertar oficina
-        Map<String, Object> officeMap = new HashMap<>();
-        officeMap.put("name", NAME);
-        officeMap.put("email", EMAIL);
-        officeMap.put("phone", PHONE);
-        officeMap.put("province_id", 0); // Identity de HSQLDB empieza en 0
-        officeMap.put("street", STREET);
-        officeMap.put("street_number", STREET_NUMBER);
-        officeJdbcInsert.execute(officeMap);
-
-        // Modelo de la provincia insertada
-        Province p = new Province();
-        p.setName(PROVINCE);
-        p.setId(0); // Identity de HSQLDB empieza en 0
+        cleanAllTables();
+        insertOffice();
 
         // Modelo de la oficina a crear
-        Office o = new Office();
-        o.setId(0);
+        Office o = officeModel();
         o.setName(NAME + " (updated)");
-        o.setEmail(EMAIL);
-        o.setPhone(PHONE);
-        o.setProvince(p);
-        o.setStaffs(Collections.emptyList());
-        o.setStreet(STREET);
-        o.setStreetNumber(STREET_NUMBER);
 
         // 2. Ejercitar
         officeDao.update(o);

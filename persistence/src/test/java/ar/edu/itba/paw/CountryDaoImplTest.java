@@ -42,18 +42,40 @@ public class CountryDaoImplTest
         this.jdbcTemplate = new JdbcTemplate(this.ds);
         this.jdbcInsert = new SimpleJdbcInsert(this.ds)
                 .withTableName(COUNTRIES_TABLE);
+    }
 
+    private void cleanAllTables(){
+        JdbcTestUtils.deleteFromTables(this.jdbcTemplate, COUNTRIES_TABLE);
+    }
+
+    private Country countryModel(){
+        Country c = new Country();
+        c.setName(COUNTRY);
+        c.setId(COUNTRY_ID);
+        c.setProvinces(Collections.emptyList());
+        return c;
+    }
+
+    private void insertCountry() {
+        Map<String, Object> map = new HashMap<>();
+        map.put("country_id", COUNTRY_ID);
+        map.put("name", COUNTRY);
+        jdbcInsert.execute(map);
+    }
+
+    private void insertAnotherCountry() {
+        Map<String, Object> map = new HashMap<>();
+        map.put("country_id", "BR");
+        map.put("name", "Brasil");
+        jdbcInsert.execute(map);
     }
 
     @Test
     public void testCreateCountry()
     {
         // 1. Precondiciones
-        JdbcTestUtils.deleteFromTables(this.jdbcTemplate, COUNTRIES_TABLE);
-        Country c = new Country();
-        c.setName(COUNTRY);
-        c.setId(COUNTRY_ID);
-        c.setProvinces(Collections.emptyList());
+        cleanAllTables();
+        Country c = countryModel();
 
         // 2. Ejercitar
         Country country = this.countryDao.create(c);
@@ -69,11 +91,8 @@ public class CountryDaoImplTest
     public void testFindCountryById()
     {
         // 1. Precondiciones
-        JdbcTestUtils.deleteFromTables(this.jdbcTemplate, COUNTRIES_TABLE);
-        Map<String, Object> map = new HashMap<>();
-        map.put("country_id", COUNTRY_ID);
-        map.put("name", COUNTRY);
-        jdbcInsert.execute(map);
+        cleanAllTables();
+        insertCountry();
 
         // 2. Ejercitar
         Optional<Country> country = this.countryDao.findById(COUNTRY_ID);
@@ -87,8 +106,8 @@ public class CountryDaoImplTest
     public void testFindCountryByIdDoesntExist()
     {
         // 1. Precondiciones
-        JdbcTestUtils.deleteFromTables(this.jdbcTemplate, COUNTRIES_TABLE);
-
+        cleanAllTables();
+        
         // 2. Ejercitar
         Optional<Country> country = this.countryDao.findById(COUNTRY_ID);
 
@@ -100,11 +119,8 @@ public class CountryDaoImplTest
     public void testFindCountryByField()
     {
         // 1. Precondiciones
-        JdbcTestUtils.deleteFromTables(this.jdbcTemplate, COUNTRIES_TABLE);
-        Map<String, Object> map = new HashMap<>();
-        map.put("country_id", COUNTRY_ID);
-        map.put("name", COUNTRY);
-        jdbcInsert.execute(map);
+        cleanAllTables();
+        insertCountry();
 
         // 2. Ejercitar
         List<Country> countries = this.countryDao.findByField("name", COUNTRY);
@@ -112,14 +128,14 @@ public class CountryDaoImplTest
         // 3. Postcondiciones
         assertNotNull(countries);
         assertFalse(countries.isEmpty());
-        assertEquals(countries.get(0).getId(), COUNTRY_ID);
+        assertEquals(COUNTRY_ID, countries.get(0).getId());
     }
 
     @Test
     public void testFindCountryByFieldDoesntExist()
     {
         // 1. Precondiciones
-        JdbcTestUtils.deleteFromTables(this.jdbcTemplate, COUNTRIES_TABLE);
+        cleanAllTables();
 
         // 2. Ejercitar
         List<Country> countries = this.countryDao.findByField("name", COUNTRY);
@@ -133,11 +149,8 @@ public class CountryDaoImplTest
     public void testFindCountryByFieldOp()
     {
         // 1. Precondiciones
-        JdbcTestUtils.deleteFromTables(this.jdbcTemplate, COUNTRIES_TABLE);
-        Map<String, Object> map = new HashMap<>();
-        map.put("country_id", COUNTRY_ID);
-        map.put("name", COUNTRY);
-        jdbcInsert.execute(map);
+        cleanAllTables();
+        insertCountry();
 
         // 2. Ejercitar
         List<Country> countries = this.countryDao.findByField("name", JDBCWhereClauseBuilder.Operation.EQ, COUNTRY);
@@ -145,16 +158,14 @@ public class CountryDaoImplTest
         // 3. Postcondiciones
         assertNotNull(countries);
         assertFalse(countries.isEmpty());
-        assertEquals(countries.get(0).getId(), COUNTRY_ID);
+        assertEquals(COUNTRY_ID, countries.get(0).getId());
     }
 
     @Test
     public void testFindCountryByFieldOpDoesntExist()
     {
         // 1. Precondiciones
-        JdbcTestUtils.deleteFromTables(this.jdbcTemplate, COUNTRIES_TABLE);
-
-        // 2. Ejercitar
+        cleanAllTables();// 2. Ejercitar
         List<Country> countries = this.countryDao.findByField("name", JDBCWhereClauseBuilder.Operation.EQ, COUNTRY);
 
         // 3. Postcondiciones
@@ -166,15 +177,9 @@ public class CountryDaoImplTest
     public void testFindCountryByIds()
     {
         // 1. Precondiciones
-        JdbcTestUtils.deleteFromTables(this.jdbcTemplate, COUNTRIES_TABLE);
-        Map<String, Object> map = new HashMap<>();
-        map.put("country_id", COUNTRY_ID);
-        map.put("name", COUNTRY);
-        jdbcInsert.execute(map);
-        map = new HashMap<>();
-        map.put("country_id", "BR");
-        map.put("name", "Brasil");
-        jdbcInsert.execute(map);
+        cleanAllTables();
+        insertCountry();
+        insertAnotherCountry();
 
         // 2. Ejercitar
         Collection<Country> countries = this.countryDao.findByIds(Arrays.asList(COUNTRY_ID, "BR"));
@@ -191,9 +196,7 @@ public class CountryDaoImplTest
     public void testFindCountryByIdsDoesntExist()
     {
         // 1. Precondiciones
-        JdbcTestUtils.deleteFromTables(this.jdbcTemplate, COUNTRIES_TABLE);
-
-        // 2. Ejercitar
+        cleanAllTables();// 2. Ejercitar
         Collection<Country> countries = this.countryDao.findByIds(Arrays.asList(COUNTRY, "BR"));
 
         // 3. Postcondiciones
@@ -206,11 +209,8 @@ public class CountryDaoImplTest
     public void testFindCountryByName()
     {
         // 1. Precondiciones
-        JdbcTestUtils.deleteFromTables(this.jdbcTemplate, COUNTRIES_TABLE);
-        Map<String, Object> map = new HashMap<>();
-        map.put("country_id", COUNTRY_ID);
-        map.put("name", COUNTRY);
-        jdbcInsert.execute(map);
+        cleanAllTables();
+        insertCountry();
 
         // 2. Ejercitar
         Collection<Country> countries = this.countryDao.findByName(COUNTRY);
@@ -227,9 +227,7 @@ public class CountryDaoImplTest
     public void testFindCountryByNameDoesntExist()
     {
         // 1. Precondiciones
-        JdbcTestUtils.deleteFromTables(this.jdbcTemplate, COUNTRIES_TABLE);
-
-        // 2. Ejercitar
+        cleanAllTables();// 2. Ejercitar
         Collection<Country> countries = this.countryDao.findByName(COUNTRY);
 
         // 3. Postcondiciones
@@ -241,15 +239,9 @@ public class CountryDaoImplTest
     public void testCountryList()
     {
         // 1. Precondiciones
-        JdbcTestUtils.deleteFromTables(this.jdbcTemplate, COUNTRIES_TABLE);
-        Map<String, Object> map = new HashMap<>();
-        map.put("country_id", COUNTRY_ID);
-        map.put("name", COUNTRY);
-        jdbcInsert.execute(map);
-        map = new HashMap<>();
-        map.put("country_id", "BR");
-        map.put("name", "Brasil");
-        jdbcInsert.execute(map);
+        cleanAllTables();
+        insertCountry();
+        insertAnotherCountry();
 
         // 2. Ejercitar
         Collection<Country> countries = this.countryDao.list();
@@ -263,9 +255,7 @@ public class CountryDaoImplTest
     public void testCountryEmptyList()
     {
         // 1. Precondiciones
-        JdbcTestUtils.deleteFromTables(this.jdbcTemplate, COUNTRIES_TABLE);
-
-        // 2. Ejercitar
+        cleanAllTables();// 2. Ejercitar
         Collection<Country> countries = this.countryDao.list();
 
         // 3. Postcondiciones
@@ -277,11 +267,8 @@ public class CountryDaoImplTest
     public void testCountryUpdate()
     {
         // 1. Precondiciones
-        JdbcTestUtils.deleteFromTables(this.jdbcTemplate, COUNTRIES_TABLE);
-        Map<String, Object> map = new HashMap<>();
-        map.put("country_id", COUNTRY_ID);
-        map.put("name", COUNTRY);
-        jdbcInsert.execute(map);
+        cleanAllTables();
+        insertCountry();
         Country c = new Country();
         c.setId("AR");
         c.setName("Armenia");
@@ -301,11 +288,8 @@ public class CountryDaoImplTest
     public void testCountryRemoveById()
     {
         // 1. Precondiciones
-        JdbcTestUtils.deleteFromTables(this.jdbcTemplate, COUNTRIES_TABLE);
-        Map<String, Object> map = new HashMap<>();
-        map.put("country_id", COUNTRY_ID);
-        map.put("name", COUNTRY);
-        jdbcInsert.execute(map);
+        cleanAllTables();
+        insertCountry();
 
         // 2. Ejercitar
         this.countryDao.remove(COUNTRY_ID);
@@ -318,15 +302,9 @@ public class CountryDaoImplTest
     public void testCountryRemoveByModel()
     {
         // 1. Precondiciones
-        JdbcTestUtils.deleteFromTables(this.jdbcTemplate, COUNTRIES_TABLE);
-        Map<String, Object> map = new HashMap<>();
-        map.put("country_id", COUNTRY_ID);
-        map.put("name", COUNTRY);
-        jdbcInsert.execute(map);
-        Country c = new Country();
-        c.setName(COUNTRY);
-        c.setId(COUNTRY_ID);
-        c.setProvinces(Collections.emptyList());
+        cleanAllTables();
+        insertCountry();
+        Country c = countryModel();
 
         // 2. Ejercitar
         this.countryDao.remove(c);
