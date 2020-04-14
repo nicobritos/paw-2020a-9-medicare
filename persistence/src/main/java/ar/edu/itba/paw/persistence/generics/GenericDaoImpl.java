@@ -786,4 +786,11 @@ public abstract class GenericDaoImpl<M extends GenericModel<I>, I> implements Ge
         }
         return null;
     }
+
+    protected static <M extends GenericModel<I>, I> String getPrimaryKeyNameFromModel(Class<M> mClass) {
+        if (mClass.isAnnotationPresent(Table.class)) {
+            return mClass.getAnnotation(Table.class).primaryKey();
+        }
+        return null;
+    }
 }

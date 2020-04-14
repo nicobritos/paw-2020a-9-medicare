@@ -13,6 +13,7 @@ import javax.sql.DataSource;
 public class StaffSpecialtyDaoImpl extends GenericSearchableDaoImpl<StaffSpecialty, Integer> implements StaffSpecialtyDao {
     private final RowMapper<StaffSpecialty> rowMapper = (resultSet, rowNum) -> this.hydrate(resultSet);
     public static final String TABLE_NAME = getTableNameFromModel(StaffSpecialty.class);
+    public static final String PRIMARY_KEY_NAME = getPrimaryKeyNameFromModel(StaffSpecialty.class);
 
     @Autowired
     public StaffSpecialtyDaoImpl(DataSource dataSource) {
@@ -21,6 +22,6 @@ public class StaffSpecialtyDaoImpl extends GenericSearchableDaoImpl<StaffSpecial
 
     @Override
     protected RowMapper<StaffSpecialty> getRowMapper() {
-        return rowMapper;
+        return this.rowMapper;
     }
 }

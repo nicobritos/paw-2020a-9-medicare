@@ -21,6 +21,7 @@ import java.util.Collection;
 public class ProvinceDaoImpl extends GenericSearchableDaoImpl<Province, Integer> implements ProvinceDao {
     private final RowMapper<Province> rowMapper = (resultSet, rowNum) -> this.hydrate(resultSet);
     public static final String TABLE_NAME = getTableNameFromModel(Province.class);
+    public static final String PRIMARY_KEY_NAME = getPrimaryKeyNameFromModel(Province.class);
 
     @Autowired
     public ProvinceDaoImpl(DataSource dataSource) {
@@ -52,6 +53,6 @@ public class ProvinceDaoImpl extends GenericSearchableDaoImpl<Province, Integer>
 
     @Override
     protected RowMapper<Province> getRowMapper() {
-        return rowMapper;
+        return this.rowMapper;
     }
 }

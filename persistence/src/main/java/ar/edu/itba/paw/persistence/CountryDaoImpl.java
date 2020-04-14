@@ -13,6 +13,7 @@ import javax.sql.DataSource;
 public class CountryDaoImpl extends GenericSearchableDaoImpl<Country, String> implements CountryDao {
     private final RowMapper<Country> rowMapper = (resultSet, rowNum) -> this.hydrate(resultSet);
     public static final String TABLE_NAME = getTableNameFromModel(Country.class);
+    public static final String PRIMARY_KEY_NAME = getPrimaryKeyNameFromModel(Country.class);
 
     @Autowired
     public CountryDaoImpl(DataSource dataSource) {

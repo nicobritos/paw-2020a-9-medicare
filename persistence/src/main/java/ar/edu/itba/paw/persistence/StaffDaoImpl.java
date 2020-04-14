@@ -25,6 +25,7 @@ import java.util.Map;
 public class StaffDaoImpl extends GenericSearchableDaoImpl<Staff, Integer> implements StaffDao {
     private final RowMapper<Staff> rowMapper = (resultSet, rowNum) -> this.hydrate(resultSet);
     public static final String TABLE_NAME = getTableNameFromModel(Staff.class);
+    public static final String PRIMARY_KEY_NAME = getPrimaryKeyNameFromModel(Staff.class);
 
     @Autowired
     public StaffDaoImpl(DataSource dataSource) {
@@ -245,9 +246,5 @@ public class StaffDaoImpl extends GenericSearchableDaoImpl<Staff, Integer> imple
 
     private String getSpecialtiesIntermediateTableName() {
         return "system_staff_specialty_staff";
-    }
-
-    private String getSpecialtiesTableName() {
-        return StaffSpecialtyDaoImpl.TABLE_NAME;
     }
 }
