@@ -99,12 +99,14 @@ public class JDBCWhereClauseBuilder {
     }
 
     public JDBCWhereClauseBuilder and() {
-        this.clause.append(" AND ");
+        if (this.clause.length() > 0)
+            this.clause.append(" AND ");
         return this;
     }
 
     public JDBCWhereClauseBuilder or() {
-        this.clause.append(" OR ");
+        if (this.clause.length() > 0)
+            this.clause.append(" OR ");
         return this;
     }
 
