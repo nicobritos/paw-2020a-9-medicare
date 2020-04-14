@@ -64,9 +64,6 @@ public class OfficeDaoImplTest
     }
     
     private void cleanAllTables(){
-        JdbcTestUtils.deleteFromTables(this.jdbcTemplate, OFFICE_TABLE);
-        JdbcTestUtils.deleteFromTables(this.jdbcTemplate, PROVINCE_TABLE);
-        JdbcTestUtils.deleteFromTables(this.jdbcTemplate, COUNTRY_TABLE);
         this.jdbcTemplate.execute("TRUNCATE SCHEMA PUBLIC RESTART IDENTITY AND COMMIT NO CHECK");
     }
 

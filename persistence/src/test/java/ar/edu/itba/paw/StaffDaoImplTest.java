@@ -61,12 +61,6 @@ public class StaffDaoImplTest
     private DataSource ds;
 
     private void cleanAllTables(){
-        JdbcTestUtils.deleteFromTables(this.jdbcTemplate, SPECIALTY_STAFF_TABLE);
-        JdbcTestUtils.deleteFromTables(this.jdbcTemplate, SPECIALTY_TABLE);
-        JdbcTestUtils.deleteFromTables(this.jdbcTemplate, STAFF_TABLE);
-        JdbcTestUtils.deleteFromTables(this.jdbcTemplate, OFFICE_TABLE);
-        JdbcTestUtils.deleteFromTables(this.jdbcTemplate, PROVINCE_TABLE);
-        JdbcTestUtils.deleteFromTables(this.jdbcTemplate, COUNTRY_TABLE);
         this.jdbcTemplate.execute("TRUNCATE SCHEMA PUBLIC RESTART IDENTITY AND COMMIT NO CHECK");
     }
 

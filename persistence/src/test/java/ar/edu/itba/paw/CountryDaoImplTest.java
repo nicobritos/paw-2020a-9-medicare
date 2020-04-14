@@ -45,7 +45,7 @@ public class CountryDaoImplTest
     }
 
     private void cleanAllTables(){
-        JdbcTestUtils.deleteFromTables(this.jdbcTemplate, COUNTRIES_TABLE);
+        this.jdbcTemplate.execute("TRUNCATE SCHEMA PUBLIC RESTART IDENTITY AND COMMIT NO CHECK");
     }
 
     private Country countryModel(){

@@ -15,7 +15,6 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.jdbc.JdbcTestUtils;
 
 import javax.sql.DataSource;
-
 import java.util.*;
 
 import static org.junit.Assert.*;
@@ -44,7 +43,6 @@ public class StaffSpecialityDaoImplTest {
     }
 
     private void cleanAllTables() {
-        JdbcTestUtils.deleteFromTables(this.jdbcTemplate, SPECIALTIES_TABLE);
         this.jdbcTemplate.execute("TRUNCATE SCHEMA PUBLIC RESTART IDENTITY AND COMMIT NO CHECK");
     }
 

@@ -1,6 +1,5 @@
 package ar.edu.itba.paw;
 
-import ar.edu.itba.paw.models.Country;
 import ar.edu.itba.paw.models.Province;
 import ar.edu.itba.paw.persistence.ProvinceDaoImpl;
 import ar.edu.itba.paw.persistence.utils.builder.JDBCWhereClauseBuilder;
@@ -54,8 +53,6 @@ public class ProvinceDaoImplTest
     }
 
     private void cleanAllTables(){
-        JdbcTestUtils.deleteFromTables(this.jdbcTemplate, PROVINCES_TABLE);
-        JdbcTestUtils.deleteFromTables(this.jdbcTemplate, COUNTRIES_TABLE);
         this.jdbcTemplate.execute("TRUNCATE SCHEMA PUBLIC RESTART IDENTITY AND COMMIT NO CHECK");
     }
 
