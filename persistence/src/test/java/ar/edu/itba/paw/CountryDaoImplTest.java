@@ -312,8 +312,8 @@ public class CountryDaoImplTest
         provinceJdbcInsert.execute(provinceMap);
 
         Country c = new Country();
-        c.setId("AR");
-        c.setName("Argentina");
+        c.setId(COUNTRY_ID);
+        c.setName(COUNTRY);
         c.setProvinces(Collections.singletonList(provinceModel()));
 
         // 2. Ejercitar
