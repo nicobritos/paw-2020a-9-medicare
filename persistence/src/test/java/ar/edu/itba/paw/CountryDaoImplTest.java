@@ -35,6 +35,7 @@ public class CountryDaoImplTest
     private CountryDaoImpl countryDao;
     private JdbcTemplate jdbcTemplate;
     private SimpleJdbcInsert jdbcInsert;
+    private SimpleJdbcInsert provinceJdbcInsert;
 
     @Autowired
     private DataSource ds;
@@ -45,6 +46,10 @@ public class CountryDaoImplTest
         this.jdbcTemplate = new JdbcTemplate(this.ds);
         this.jdbcInsert = new SimpleJdbcInsert(this.ds)
                 .withTableName(COUNTRIES_TABLE);
+        this.provinceJdbcInsert = new SimpleJdbcInsert(this.ds)
+                .withTableName(PROVINCE_TABLE)
+                .usingGeneratedKeyColumns("province_id");
+
     }
 
     private void cleanAllTables(){
@@ -304,10 +309,7 @@ public class CountryDaoImplTest
         Map<String, Object> provinceMap = new HashMap<>();
         provinceMap.put("name", PROVINCE);
         provinceMap.put("country_id", "BR");
-        new SimpleJdbcInsert(ds)
-                .withTableName(PROVINCE_TABLE)
-                .usingGeneratedKeyColumns("province_id")
-                .execute(provinceMap);
+        provinceJdbcInsert.execute(provinceMap);
 
         Country c = new Country();
         c.setId("AR");
@@ -319,7 +321,7 @@ public class CountryDaoImplTest
 
         // 3. Postcondiciones
         assertEquals(2, JdbcTestUtils.countRowsInTable(jdbcTemplate, COUNTRIES_TABLE));
-        assertEquals(1, JdbcTestUtils.countRowsInTableWhere(jdbcTemplate, PROVINCE_TABLE, "country_id = '"+ COUNTRY_ID+"'"));
+        assertEquals(1, JdbcTestUtils.countRowsInTableWhere(jdbcTemplate, PROVINCE_TABLE, "country_id = '"+ COUNTRY_ID +"'"));
     }
 
     @Test
