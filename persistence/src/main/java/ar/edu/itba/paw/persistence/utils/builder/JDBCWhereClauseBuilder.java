@@ -57,6 +57,14 @@ public class JDBCWhereClauseBuilder {
 
     private StringBuilder clause = new StringBuilder();
 
+    public JDBCWhereClauseBuilder where(JDBCWhereClauseBuilder whereClauseBuilder) {
+        this.clause
+                .append(" (")
+                .append(whereClauseBuilder.toString())
+                .append(") ");
+        return this;
+    }
+
     public JDBCWhereClauseBuilder where(String columnName, Operation operation, String paramName) {
         return this.where(columnName, operation, paramName, null);
     }
