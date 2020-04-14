@@ -1,6 +1,8 @@
 package ar.edu.itba.paw.persistence.utils.builder;
 
 import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
@@ -58,15 +60,15 @@ public class JDBCUpdateQueryBuilder extends JDBCQueryBuilder {
     }
 
     protected String getValuesAsString() {
-        StringBuilder keyStringBuilder = new StringBuilder();
-        StringBuilder valueStringBuilder = new StringBuilder();
+        List<String> keys = new LinkedList<>();
+        List<String> values = new LinkedList<>();
 
         for (Entry<String, String> pair : this.values.entrySet()) {
-            keyStringBuilder.append(pair.getKey());
-            valueStringBuilder.append(pair.getValue());
+            keys.add(pair.getKey());
+            values.add(pair.getValue());
         }
 
-        return " (" + keyStringBuilder.toString() + ") = (" + valueStringBuilder.toString() + ") ";
+        return " (" + this.joinStrings(keys) + ") = (" + this.joinStrings(values) + ") ";
     }
 
     @Override

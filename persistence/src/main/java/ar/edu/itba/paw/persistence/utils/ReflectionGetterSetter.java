@@ -11,6 +11,13 @@ import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
+/**
+ * This class provides methods to access and manipulate instance's fields via reflection invoking its public
+ * getters and setters. It can also get fields that are marked as private without any getter associated with it.
+ * Its usage is discouraged in most cases as it is difficult to understand and provides a , but it allows for really great abstraction and generalization,
+ * specially when instantiating models from data saved in the DB without having to implement each method in each
+ * specific DAO.
+ */
 public abstract class ReflectionGetterSetter {
     public static Map<String, ?> listValues(Object object) {
         Map<String, Object> map = new HashMap<>();

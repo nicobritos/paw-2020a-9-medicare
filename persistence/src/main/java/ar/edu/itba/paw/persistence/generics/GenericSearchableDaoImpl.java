@@ -21,7 +21,8 @@ public abstract class GenericSearchableDaoImpl<M extends GenericModel<I>, I> ext
 
     /**
      * Returns a collection of <M> that have a name similar to the one provided.
-     * The search is not case-sensitive nor exact
+     * The search is not case-sensitive nor exact.
+     * By default, runs a query against a column name = "name". If it doesn't exist, it will throw an SQLException
      * @param name the model's name
      * @return a collection of matched models
      */
