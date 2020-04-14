@@ -1,4 +1,4 @@
 <div class="header">
-	<span id="logo">MediCare</span>
-	<span class="btnMenu">Buscar médicos</span>
+	<a href="<c:url value="/"/>"><span id="logo">MediCare</span></a>
+	<a href="<c:url value="/"/> "><span class="btnMenu">Buscar médicos</span></a>
 </div>
