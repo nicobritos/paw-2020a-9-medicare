@@ -1,8 +1,8 @@
 package ar.edu.itba.paw.persistence.utils;
 
 public class Pair<T, R> {
-    private T left;
-    private R right;
+    private final R right;
+    private final T left;
 
     public Pair(T left, R right) {
         this.left = left;
@@ -15,10 +15,5 @@ public class Pair<T, R> {
 
     public R getRight() {
         return this.right;
-    }
-
-    @Override
-    public String toString() {
-        return "{"+ left + ", " + right + '}';
     }
 }

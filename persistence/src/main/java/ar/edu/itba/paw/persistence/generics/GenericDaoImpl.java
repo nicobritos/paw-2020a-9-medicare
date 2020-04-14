@@ -597,14 +597,6 @@ public abstract class GenericDaoImpl<M extends GenericModel<I>, I> implements Ge
                 throw new IllegalStateException("This field is marked as required but its value is null");
             }
 
-            Class<? extends GenericModel<Object>> otherClass;
-            try {
-                otherClass = (Class<? extends GenericModel<Object>>) relation.className();
-            } catch (ClassCastException e) {
-                // TODO
-                throw new RuntimeException(e);
-            }
-
             Collection<GenericModel<Object>> previousModels;
             try {
                 previousModels = (Collection<GenericModel<Object>>) ReflectionGetterSetter.get(
