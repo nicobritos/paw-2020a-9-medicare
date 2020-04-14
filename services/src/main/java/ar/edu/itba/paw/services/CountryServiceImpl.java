@@ -3,9 +3,12 @@ package ar.edu.itba.paw.services;
 import ar.edu.itba.paw.interfaces.daos.CountryDao;
 import ar.edu.itba.paw.interfaces.services.CountryService;
 import ar.edu.itba.paw.models.Country;
+import ar.edu.itba.paw.models.Province;
 import ar.edu.itba.paw.services.generics.GenericSearchableServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.util.Collection;
 
 @Service
 public class CountryServiceImpl extends GenericSearchableServiceImpl<CountryDao, Country,String> implements CountryService {
@@ -15,5 +18,17 @@ public class CountryServiceImpl extends GenericSearchableServiceImpl<CountryDao,
     @Override
     protected CountryDao getRepository() {
         return this.repository;
+    }
+
+    @Override
+    public void addProvince(Country country, Province province) {
+        country.getProvinces().add(province);
+        this.repository.update(country);
+    }
+
+    @Override
+    public void addProvinces(Country country, Collection<Province> provinces) {
+        country.getProvinces().addAll(provinces);
+        this.repository.update(country);
     }
 }

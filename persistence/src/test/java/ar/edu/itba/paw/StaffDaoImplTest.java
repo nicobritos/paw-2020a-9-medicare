@@ -75,13 +75,13 @@ public class StaffDaoImplTest
         Map<String, Object> countryMap = new HashMap<>();
         countryMap.put("name", COUNTRY);
         countryMap.put("country_id", COUNTRY_ID);
-        countryJdbcInsert.execute(countryMap);
+        this.countryJdbcInsert.execute(countryMap);
 
         // Insertar provincia
         Map<String, Object> provinceMap = new HashMap<>();
         provinceMap.put("name", PROVINCE);
         provinceMap.put("country_id", COUNTRY_ID);
-        provinceJdbcInsert.execute(provinceMap);
+        this.provinceJdbcInsert.execute(provinceMap);
 
         // Insertar oficina
         Map<String, Object> officeMap = new HashMap<>();
@@ -91,11 +91,11 @@ public class StaffDaoImplTest
         officeMap.put("province_id", 0); // Identity de HSQLDB empieza en 0
         officeMap.put("street", STREET);
         officeMap.put("street_number", STREET_NUMBER);
-        officeJdbcInsert.execute(officeMap);
+        this.officeJdbcInsert.execute(officeMap);
     }
 
     private void insertStaff(){
-        insertOffice();
+        this.insertOffice();
 
         Map<String, Object> staffMap = new HashMap<>();
         staffMap.put("office_id", 0);
@@ -104,16 +104,16 @@ public class StaffDaoImplTest
         staffMap.put("email", EMAIL);
         staffMap.put("phone", PHONE);
         staffMap.put("registration_number", REGISTRATION_NUMBER); // Identity de HSQLDB empieza en 0
-        staffJdbcInsert.execute(staffMap);
+        this.staffJdbcInsert.execute(staffMap);
 
         Map<String, Object> staffSpecialtyMap = new HashMap<>();
         staffSpecialtyMap.put("name", SPECIALTY);
-        staffSpecialtyInsert.execute(staffSpecialtyMap);
+        this.staffSpecialtyInsert.execute(staffSpecialtyMap);
 
         Map<String, Object> staffSpecialtyStaffMap = new HashMap<>();
         staffSpecialtyStaffMap.put("specialty_id", 0);
         staffSpecialtyStaffMap.put("staff_id", 0);
-        staffSpecialtyStaffInsert.execute(staffSpecialtyStaffMap);
+        this.staffSpecialtyStaffInsert.execute(staffSpecialtyStaffMap);
     }
 
     private void insertAnotherStaff(){
@@ -124,7 +124,7 @@ public class StaffDaoImplTest
         staffMap.put("email", EMAIL);
         staffMap.put("phone", PHONE);
         staffMap.put("registration_number", REGISTRATION_NUMBER); // Identity de HSQLDB empieza en 0
-        staffJdbcInsert.execute(staffMap);
+        this.staffJdbcInsert.execute(staffMap);
     }
 
     private Staff staffModel() {
@@ -135,7 +135,7 @@ public class StaffDaoImplTest
         s.setPhone(PHONE);
         s.setRegistrationNumber(REGISTRATION_NUMBER);
         s.setId(0);
-        s.setStaffSpecialties(Collections.singletonList(staffSpecialtyModel()));
+        s.setStaffSpecialties(Collections.singletonList(this.staffSpecialtyModel()));
         return s;
     }
 
@@ -152,8 +152,8 @@ public class StaffDaoImplTest
         o.setName(NAME);
         o.setEmail(EMAIL);
         o.setPhone(PHONE);
-        o.setProvince(provinceModel());
-        o.setStaffs(Collections.singletonList(staffModel()));
+        o.setProvince(this.provinceModel());
+        o.setStaffs(Collections.singletonList(this.staffModel()));
         o.setStreet(STREET);
         o.setStreetNumber(STREET_NUMBER);
         return o;
@@ -193,11 +193,11 @@ public class StaffDaoImplTest
     {
         // 1. Precondiciones
         // Vaciar tablas
-        cleanAllTables();
+        this.cleanAllTables();
 
-        insertOffice();
+        this.insertOffice();
 
-        Staff s = staffModel();
+        Staff s = this.staffModel();
 
         // 2. Ejercitar
         Staff staff = this.staffDao.create(s);
@@ -211,11 +211,11 @@ public class StaffDaoImplTest
     @Test
     public void testFindById(){
         // 1. Precondiciones
-        cleanAllTables();
-        insertStaff();
+        this.cleanAllTables();
+        this.insertStaff();
 
         // 2. Ejercitar
-        Optional<Staff> maybeStaff = staffDao.findById(0); // Identity de HSQLDB empieza en 0
+        Optional<Staff> maybeStaff = this.staffDao.findById(0); // Identity de HSQLDB empieza en 0
 
         // 3. Postcondiciones
         assertTrue(maybeStaff.isPresent());
@@ -226,10 +226,10 @@ public class StaffDaoImplTest
     @Test
     public void testFindByIdDoesntExist(){
         // 1. Precondiciones
-        cleanAllTables();
+        this.cleanAllTables();
 
         // 2. Ejercitar
-        Optional<Staff> maybeStaff = staffDao.findById(0); // Identity de HSQLDB empieza en 0
+        Optional<Staff> maybeStaff = this.staffDao.findById(0); // Identity de HSQLDB empieza en 0
 
         // 3. Postcondiciones
         assertFalse(maybeStaff.isPresent());
@@ -239,13 +239,13 @@ public class StaffDaoImplTest
     public void testFindByIds(){
         // 1. Precondiciones
         // Vaciar tablas
-        cleanAllTables();
+        this.cleanAllTables();
 
-        insertStaff();
-        insertAnotherStaff();
+        this.insertStaff();
+        this.insertAnotherStaff();
 
         // 2. Ejercitar
-        Collection<Staff> staffs = staffDao.findByIds(Arrays.asList(0,1,2)); // Identity de HSQLDB empieza en 0
+        Collection<Staff> staffs = this.staffDao.findByIds(Arrays.asList(0,1,2)); // Identity de HSQLDB empieza en 0
 
         // 3. Postcondiciones
         assertNotNull(staffs);
@@ -255,10 +255,10 @@ public class StaffDaoImplTest
     @Test
     public void testFindByIdsDoesntExist(){
         // 1. Precondiciones
-        cleanAllTables();
+        this.cleanAllTables();
 
         // 2. Ejercitar
-        Collection<Staff> staffs = staffDao.findByIds(Arrays.asList(0,1,2)); // Identity de HSQLDB empieza en 0
+        Collection<Staff> staffs = this.staffDao.findByIds(Arrays.asList(0,1,2)); // Identity de HSQLDB empieza en 0
 
         // 3. Postcondiciones
         assertNotNull(staffs);
@@ -268,13 +268,13 @@ public class StaffDaoImplTest
     @Test
     public void testFindByField(){
         // 1. Precondiciones
-        cleanAllTables();
+        this.cleanAllTables();
 
-       insertStaff();
-       insertAnotherStaff();
+        this.insertStaff();
+        this.insertAnotherStaff();
 
         // 2. Ejercitar
-        Collection<Staff> staffs = staffDao.findByField("email", EMAIL);
+        Collection<Staff> staffs = this.staffDao.findByField("email", EMAIL);
 
         // 3. Postcondiciones
         assertNotNull(staffs);
@@ -284,10 +284,10 @@ public class StaffDaoImplTest
     @Test
     public void testFindByFieldDoesntExist(){
         // 1. Precondiciones
-        cleanAllTables();
+        this.cleanAllTables();
 
         // 2. Ejercitar
-        Collection<Staff> staffs = staffDao.findByField("email", EMAIL);
+        Collection<Staff> staffs = this.staffDao.findByField("email", EMAIL);
 
         // 3. Postcondiciones
         assertNotNull(staffs);
@@ -297,13 +297,13 @@ public class StaffDaoImplTest
     @Test
     public void testFindByFieldOp(){
         // 1. Precondiciones
-        cleanAllTables();
+        this.cleanAllTables();
 
-        insertStaff();
-        insertAnotherStaff();
+        this.insertStaff();
+        this.insertAnotherStaff();
 
         // 2. Ejercitar
-        Collection<Staff> staffs = staffDao.findByField("staff_id", JDBCWhereClauseBuilder.Operation.GEQ, 1);
+        Collection<Staff> staffs = this.staffDao.findByField("staff_id", JDBCWhereClauseBuilder.Operation.GEQ, 1);
 
         // 3. Postcondiciones
         assertNotNull(staffs);
@@ -313,10 +313,10 @@ public class StaffDaoImplTest
     @Test
     public void testFindByFieldOpDoesntExist(){
         // 1. Precondiciones
-        cleanAllTables();
+        this.cleanAllTables();
 
         // 2. Ejercitar
-        Collection<Staff> staffs = staffDao.findByField("staff_id", JDBCWhereClauseBuilder.Operation.GEQ, 1);
+        Collection<Staff> staffs = this.staffDao.findByField("staff_id", JDBCWhereClauseBuilder.Operation.GEQ, 1);
 
         // 3. Postcondiciones
         assertNotNull(staffs);
@@ -326,13 +326,13 @@ public class StaffDaoImplTest
     @Test
     public void testFindByName(){
         // 1. Precondiciones
-        cleanAllTables();
+        this.cleanAllTables();
 
-        insertStaff();
-        insertAnotherStaff();
+        this.insertStaff();
+        this.insertAnotherStaff();
 
         // 2. Ejercitar
-        Collection<Staff> staffs = staffDao.findByName(NAME);
+        Collection<Staff> staffs = this.staffDao.findByName(NAME);
 
         // 3. Postcondiciones
         assertNotNull(staffs);
@@ -342,10 +342,10 @@ public class StaffDaoImplTest
     @Test
     public void testFindByNameDoesntExist(){
         // 1. Precondiciones
-        cleanAllTables();
+        this.cleanAllTables();
 
         // 2. Ejercitar
-        Collection<Staff> staffs = staffDao.findByName(NAME);
+        Collection<Staff> staffs = this.staffDao.findByName(NAME);
 
         // 3. Postcondiciones
         assertNotNull(staffs);
@@ -355,12 +355,12 @@ public class StaffDaoImplTest
     @Test
     public void testList(){
         // 1. Precondiciones
-        cleanAllTables();
-        insertStaff();
-        insertAnotherStaff();
+        this.cleanAllTables();
+        this.insertStaff();
+        this.insertAnotherStaff();
 
         // 2. Ejercitar
-        Collection<Staff> staffs = staffDao.list();
+        Collection<Staff> staffs = this.staffDao.list();
 
         // 3. Postcondiciones
         assertNotNull(staffs);
@@ -370,10 +370,10 @@ public class StaffDaoImplTest
     @Test
     public void testEmptyList(){
         // 1. Precondiciones
-        cleanAllTables();
+        this.cleanAllTables();
 
         // 2. Ejercitar
-        Collection<Staff> staffs = staffDao.list();
+        Collection<Staff> staffs = this.staffDao.list();
 
         // 3. Postcondiciones
         assertNotNull(staffs);
@@ -383,13 +383,13 @@ public class StaffDaoImplTest
     @Test
     public void testRemoveById(){
         // 1. Precondiciones
-        cleanAllTables();
-        insertStaff();
-        insertAnotherStaff();
+        this.cleanAllTables();
+        this.insertStaff();
+        this.insertAnotherStaff();
         JdbcTestUtils.deleteFromTables(this.jdbcTemplate, SPECIALTY_STAFF_TABLE); // Borro el speciality linkeado al staff a borrar
 
         // 2. Ejercitar
-        staffDao.remove(0);
+        this.staffDao.remove(0);
 
         // 3. Postcondiciones
         assertEquals(1, JdbcTestUtils.countRowsInTable(this.jdbcTemplate, STAFF_TABLE));
@@ -398,16 +398,16 @@ public class StaffDaoImplTest
     @Test
     public void testRemoveByModel(){
         // 1. Precondiciones
-        cleanAllTables();
-        insertStaff();
-        insertAnotherStaff();
+        this.cleanAllTables();
+        this.insertStaff();
+        this.insertAnotherStaff();
         JdbcTestUtils.deleteFromTables(this.jdbcTemplate, SPECIALTY_STAFF_TABLE); // Borro el speciality linkeado al staff a borrar
 
         // Modelo de la oficina a crear
-        Staff s = staffModel();
+        Staff s = this.staffModel();
 
         // 2. Ejercitar
-        staffDao.remove(s);
+        this.staffDao.remove(s);
 
         // 3. Postcondiciones
         assertEquals(1, JdbcTestUtils.countRowsInTable(this.jdbcTemplate, STAFF_TABLE));
@@ -416,32 +416,32 @@ public class StaffDaoImplTest
     @Test
     public void testUpdate(){
         // 1. Precondiciones
-        cleanAllTables();
+        this.cleanAllTables();
 
-        insertStaff();
+        this.insertStaff();
 
-        Staff s = staffModel();
+        Staff s = this.staffModel();
         s.setFirstName(NAME + " (updated)");
 
         // 2. Ejercitar
-        staffDao.update(s);
+        this.staffDao.update(s);
 
         // 3. Postcondiciones
         assertEquals(1, JdbcTestUtils.countRowsInTable(this.jdbcTemplate, STAFF_TABLE));
-        assertEquals(1, JdbcTestUtils.countRowsInTableWhere(jdbcTemplate, STAFF_TABLE, "first_name = '" + NAME + " (updated)'"));
-        assertEquals(0, JdbcTestUtils.countRowsInTableWhere(jdbcTemplate, STAFF_TABLE, "first_name = '" + NAME + "'"));
+        assertEquals(1, JdbcTestUtils.countRowsInTableWhere(this.jdbcTemplate, STAFF_TABLE, "first_name = '" + NAME + " (updated)'"));
+        assertEquals(0, JdbcTestUtils.countRowsInTableWhere(this.jdbcTemplate, STAFF_TABLE, "first_name = '" + NAME + "'"));
 
     }
 
     @Test
     public void testFindByNameAndStaffSpecialties(){
         // 1. Precondiciones
-        cleanAllTables();
-        insertStaff();
-        insertAnotherStaff();
+        this.cleanAllTables();
+        this.insertStaff();
+        this.insertAnotherStaff();
 
         // 2. Ejercitar
-        Collection<Staff> staffs = staffDao.findByNameAndStaffSpecialties(NAME, Collections.singletonList(staffSpecialtyModel()));
+        Collection<Staff> staffs = this.staffDao.findByNameAndStaffSpecialties(NAME, Collections.singletonList(this.staffSpecialtyModel()));
 
         // 3. Postcondiciones
         assertNotNull(staffs);
@@ -451,10 +451,10 @@ public class StaffDaoImplTest
     @Test
     public void testFindByNameAndStaffSpecialtiesDoesntExist(){
         // 1. Precondiciones
-        cleanAllTables();
+        this.cleanAllTables();
 
         // 2. Ejercitar
-        Collection<Staff> staffs = staffDao.findByNameAndStaffSpecialties(NAME, Collections.singletonList(staffSpecialtyModel()));
+        Collection<Staff> staffs = this.staffDao.findByNameAndStaffSpecialties(NAME, Collections.singletonList(this.staffSpecialtyModel()));
 
         // 3. Postcondiciones
         assertNotNull(staffs);
@@ -464,12 +464,12 @@ public class StaffDaoImplTest
     @Test
     public void testFindByNameOfficeAndStaffSpecialties(){
         // 1. Precondiciones
-        cleanAllTables();
-        insertStaff();
-        insertAnotherStaff();
+        this.cleanAllTables();
+        this.insertStaff();
+        this.insertAnotherStaff();
 
         // 2. Ejercitar
-        Collection<Staff> staffs = staffDao.findByNameOfficeAndStaffSpecialties(NAME, Collections.singletonList(officeModel()), Collections.singletonList(staffSpecialtyModel()));
+        Collection<Staff> staffs = this.staffDao.findByNameOfficeAndStaffSpecialties(NAME, Collections.singletonList(this.officeModel()), Collections.singletonList(this.staffSpecialtyModel()));
 
         // 3. Postcondiciones
         assertNotNull(staffs);
@@ -479,10 +479,10 @@ public class StaffDaoImplTest
     @Test
     public void testFindByNameOfficeAndStaffSpecialitiesDoesntExist(){
         // 1. Precondiciones
-        cleanAllTables();
+        this.cleanAllTables();
 
         // 2. Ejercitar
-        Collection<Staff> staffs = staffDao.findByNameOfficeAndStaffSpecialties(NAME, Collections.singletonList(officeModel()), Collections.singletonList(staffSpecialtyModel()));
+        Collection<Staff> staffs = this.staffDao.findByNameOfficeAndStaffSpecialties(NAME, Collections.singletonList(this.officeModel()), Collections.singletonList(this.staffSpecialtyModel()));
 
         // 3. Postcondiciones
         assertNotNull(staffs);
@@ -492,12 +492,12 @@ public class StaffDaoImplTest
     @Test
     public void testFindByOfficeAndStaffSpecialties(){
         // 1. Precondiciones
-        cleanAllTables();
-        insertStaff();
-        insertAnotherStaff();
+        this.cleanAllTables();
+        this.insertStaff();
+        this.insertAnotherStaff();
 
         // 2. Ejercitar
-        Collection<Staff> staffs = staffDao.findByOfficeAndStaffSpecialties(Collections.singletonList(officeModel()), Collections.singletonList(staffSpecialtyModel()));
+        Collection<Staff> staffs = this.staffDao.findByOfficeAndStaffSpecialties(Collections.singletonList(this.officeModel()), Collections.singletonList(this.staffSpecialtyModel()));
 
         // 3. Postcondiciones
         assertNotNull(staffs);
@@ -507,10 +507,10 @@ public class StaffDaoImplTest
     @Test
     public void testFindByOfficeAndStaffSpecialitiesDoesntExist(){
         // 1. Precondiciones
-        cleanAllTables();
+        this.cleanAllTables();
 
         // 2. Ejercitar
-        Collection<Staff> staffs = staffDao.findByOfficeAndStaffSpecialties(Collections.singletonList(officeModel()), Collections.singletonList(staffSpecialtyModel()));
+        Collection<Staff> staffs = this.staffDao.findByOfficeAndStaffSpecialties(Collections.singletonList(this.officeModel()), Collections.singletonList(this.staffSpecialtyModel()));
 
         // 3. Postcondiciones
         assertNotNull(staffs);
@@ -520,12 +520,12 @@ public class StaffDaoImplTest
     @Test
     public void testFindByStaffSpecialties(){
         // 1. Precondiciones
-        cleanAllTables();
-        insertStaff();
-        insertAnotherStaff();
+        this.cleanAllTables();
+        this.insertStaff();
+        this.insertAnotherStaff();
 
         // 2. Ejercitar
-        Collection<Staff> staffs = staffDao.findByStaffSpecialties(Collections.singletonList(staffSpecialtyModel()));
+        Collection<Staff> staffs = this.staffDao.findByStaffSpecialties(Collections.singletonList(this.staffSpecialtyModel()));
 
         // 3. Postcondiciones
         assertNotNull(staffs);
@@ -535,10 +535,10 @@ public class StaffDaoImplTest
     @Test
     public void testFindByStaffSpecialitiesDoesntExist(){
         // 1. Precondiciones
-        cleanAllTables();
+        this.cleanAllTables();
 
         // 2. Ejercitar
-        Collection<Staff> staffs = staffDao.findByStaffSpecialties(Collections.singletonList(staffSpecialtyModel()));
+        Collection<Staff> staffs = this.staffDao.findByStaffSpecialties(Collections.singletonList(this.staffSpecialtyModel()));
 
         // 3. Postcondiciones
         assertNotNull(staffs);
