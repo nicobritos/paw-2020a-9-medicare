@@ -506,6 +506,7 @@ public abstract class GenericDaoImpl<M extends GenericModel<I>, I> implements Ge
 
             JoinedCollection<GenericModel<Object>> collection = new JoinedCollection<>();
             collection.setModels((Collection<GenericModel<Object>>) otherInstances);
+            System.out.println(otherInstances == otherInstancesCopy);
             try {
                 ReflectionGetterSetter.set(collection, JoinedCollection._PRIVATE_COLLECTION_NAME, otherInstancesCopy);
             } catch (NoSuchFieldException e) {
@@ -549,7 +550,7 @@ public abstract class GenericDaoImpl<M extends GenericModel<I>, I> implements Ge
                         JoinedCollection._PRIVATE_COLLECTION_NAME
                 );
                 if (previousModels == null)
-                    previousModels = joinedCollectionGenericModel.getModels();
+                    previousModels = new LinkedList<>();
             } catch (NoSuchFieldException e) {
                 // TODO
                 e.printStackTrace();
@@ -563,15 +564,15 @@ public abstract class GenericDaoImpl<M extends GenericModel<I>, I> implements Ge
             int i = 0;
             for (GenericModel<Object> genericModel : joinedCollectionGenericModel.getModels()) {
                 if (!previousModels.contains(genericModel)) {
-                    removedParameterSource.addValue("_removed_" + i, genericModel.getId());
-                    removedArguments.add(":_removed_" + i);
+                    addedParameterSource.addValue("_added_" + i, genericModel.getId());
+                    addedArguments.add(":_added_" + i);
                 }
             }
             i = 0;
             for (GenericModel<Object> genericModel : previousModels) {
                 if (!joinedCollectionGenericModel.getModels().contains(genericModel)) {
-                    addedParameterSource.addValue("_added_" + i, genericModel.getId());
-                    addedArguments.add(":_added_" + i);
+                    removedParameterSource.addValue("_removed_" + i, genericModel.getId());
+                    removedArguments.add(":_removed_" + i);
                 }
             }
 
@@ -629,7 +630,7 @@ public abstract class GenericDaoImpl<M extends GenericModel<I>, I> implements Ge
                         JoinedCollection._PRIVATE_COLLECTION_NAME
                 );
                 if (previousModels == null)
-                    previousModels = joinedCollectionGenericModel.getModels();
+                    previousModels = new LinkedList<>();
             } catch (NoSuchFieldException e) {
                 // TODO
                 e.printStackTrace();
@@ -639,8 +640,8 @@ public abstract class GenericDaoImpl<M extends GenericModel<I>, I> implements Ge
             MapSqlParameterSource removedParameterSource = new MapSqlParameterSource();
             Collection<String> removedArguments = new LinkedList<>();
             int i = 0;
-            for (GenericModel<Object> genericModel : joinedCollectionGenericModel.getModels()) {
-                if (!previousModels.contains(genericModel)) {
+            for (GenericModel<Object> genericModel : previousModels) {
+                if (!joinedCollectionGenericModel.getModels().contains(genericModel)) {
                     removedParameterSource.addValue("_removed_" + i, genericModel.getId());
                     removedArguments.add(":_removed_" + i);
                 }
@@ -658,8 +659,8 @@ public abstract class GenericDaoImpl<M extends GenericModel<I>, I> implements Ge
             }
 
             i = 0;
-            for (GenericModel<Object> genericModel : previousModels) {
-                if (!joinedCollectionGenericModel.getModels().contains(genericModel)) {
+            for (GenericModel<Object> genericModel : joinedCollectionGenericModel.getModels()) {
+                if (!previousModels.contains(genericModel)) {
                     MapSqlParameterSource addedParameterSource = new MapSqlParameterSource();
                     Map<String, String> addedColumnNamesArguments = new HashMap<>();
 
