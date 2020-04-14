@@ -131,10 +131,14 @@ public abstract class ReflectionGetterSetter {
         try {
             if (direct) {
                 boolean accessible = field.isAccessible();
-                field.setAccessible(true);
-                Object value = field.get(object);
-                field.setAccessible(accessible);
-                return value;
+                if (accessible) {
+                    return field.get(object);
+                } else {
+                    field.setAccessible(true);
+                    Object value = field.get(object);
+                    field.setAccessible(accessible);
+                    return value;
+                }
             } else {
                 PropertyDescriptor propertyDescriptor = new PropertyDescriptor(field.getName(), object.getClass());
                 return propertyDescriptor.getReadMethod().invoke(object);
