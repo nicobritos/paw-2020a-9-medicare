@@ -181,6 +181,11 @@ public class JDBCSelectQueryBuilder extends JDBCQueryBuilder {
         return stringBuilder.toString();
     }
 
+    @Override
+    protected String getTable() {
+        return this.table;
+    }
+
     private String joinColumns() {
         return this.columns.stream().map(s -> this.alias + "." + s).collect(Collectors.joining(","));
     }

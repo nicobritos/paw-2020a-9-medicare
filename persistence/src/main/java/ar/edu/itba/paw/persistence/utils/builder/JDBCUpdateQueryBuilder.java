@@ -1,8 +1,6 @@
 package ar.edu.itba.paw.persistence.utils.builder;
 
-import java.util.Collection;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.Map;
 import java.util.Map.Entry;
 
@@ -10,7 +8,6 @@ public class JDBCUpdateQueryBuilder extends JDBCQueryBuilder {
     public static final String DEFAULT_COLUMN_VALUE = "DEFAULT";
 
     private Map<String, String> values = new HashMap<>();
-    private Collection<String> returning = new LinkedList<>();
 
     private JDBCWhereClauseBuilder whereClauseBuilder;
     private String table;
@@ -39,16 +36,6 @@ public class JDBCUpdateQueryBuilder extends JDBCQueryBuilder {
         return this;
     }
 
-    public JDBCUpdateQueryBuilder returning(String columnName) {
-        this.returning.add(columnName);
-        return this;
-    }
-
-    public JDBCUpdateQueryBuilder returning(Collection<String> columnNames) {
-        this.returning.addAll(columnNames);
-        return this;
-    }
-
     @Override
     public String getQueryAsString() {
         StringBuilder stringBuilder = new StringBuilder("UPDATE ");
@@ -63,12 +50,6 @@ public class JDBCUpdateQueryBuilder extends JDBCQueryBuilder {
                     .append(this.whereClauseBuilder.getClauseAsString());
         } else {
             throw new IllegalStateException("No where clause defined. Is this an error?");
-        }
-
-        if (this.returning.size() > 0) {
-            stringBuilder
-                    .append(" RETURNING ")
-                    .append(this.joinStrings(this.returning));
         }
 
         stringBuilder.append(";");
@@ -86,5 +67,10 @@ public class JDBCUpdateQueryBuilder extends JDBCQueryBuilder {
         }
 
         return " (" + keyStringBuilder.toString() + ") = (" + valueStringBuilder.toString() + ") ";
+    }
+
+    @Override
+    protected String getTable() {
+        return this.table;
     }
 }

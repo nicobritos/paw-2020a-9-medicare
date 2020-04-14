@@ -82,10 +82,11 @@ public class CountryDaoImplTest
         jdbcInsert.execute(map);
 
         // 2. Ejercitar
-        Country country = this.countryDao.findById(COUNTRY_ID);
+        Optional<Country> country = this.countryDao.findById(COUNTRY_ID);
 
         // 3. Postcondiciones
-        assertEquals(COUNTRY, country.getName());
+        assertNotNull(country.orElse(null));
+        assertEquals(COUNTRY, country.get().getName());
     }
 
     @Test
@@ -95,10 +96,10 @@ public class CountryDaoImplTest
         JdbcTestUtils.deleteFromTables(this.jdbcTemplate, COUNTRIES_TABLE);
 
         // 2. Ejercitar
-        Country country = this.countryDao.findById(COUNTRY_ID);
+        Optional<Country> country = this.countryDao.findById(COUNTRY_ID);
 
         // 3. Postcondiciones
-        assertNull(country);
+        assertNull(country.orElse(null));
     }
 
     @Test
@@ -297,8 +298,8 @@ public class CountryDaoImplTest
 
         // 3. Postcondiciones
         assertEquals(1,JdbcTestUtils.countRowsInTable(jdbcTemplate, COUNTRIES_TABLE));
-        assertEquals(1,JdbcTestUtils.countRowsInTableWhere(jdbcTemplate, COUNTRIES_TABLE, "name = Armenia"));
-        assertEquals(0,JdbcTestUtils.countRowsInTableWhere(jdbcTemplate, COUNTRIES_TABLE, "name = Argentina"));
+        assertEquals(1,JdbcTestUtils.countRowsInTableWhere(jdbcTemplate, COUNTRIES_TABLE, "name = 'Armenia'"));
+        assertEquals(0,JdbcTestUtils.countRowsInTableWhere(jdbcTemplate, COUNTRIES_TABLE, "name = 'Argentina'"));
 
     }
 

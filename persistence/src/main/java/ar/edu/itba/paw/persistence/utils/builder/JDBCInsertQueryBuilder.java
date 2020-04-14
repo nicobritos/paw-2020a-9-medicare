@@ -30,16 +30,17 @@ public class JDBCInsertQueryBuilder extends JDBCQueryBuilder {
         return this;
     }
 
-    public String getTable() {
-        return this.table;
-    }
-
     @Override
     public String getQueryAsString() {
         return "INSERT INTO " +
                 this.table +
                 this.getValuesAsString() +
                 ";";
+    }
+
+    @Override
+    protected String getTable() {
+        return this.table;
     }
 
     protected String getValuesAsString() {

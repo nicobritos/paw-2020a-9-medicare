@@ -12,51 +12,50 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 
 public abstract class ReflectionGetterSetter {
-
-    public static Map<String, ?> listValues(Object model) {
+    public static Map<String, ?> listValues(Object object) {
         Map<String, Object> map = new HashMap<>();
 
-        for (Field field : model.getClass().getDeclaredFields()) {
-            map.put(field.getName(), get(model, field));
+        for (Field field : object.getClass().getDeclaredFields()) {
+            map.put(field.getName(), get(object, field));
         }
         // We also need parent
-        for (Field field : model.getClass().getSuperclass().getDeclaredFields()) {
-            map.put(field.getName(), get(model, field));
+        for (Field field : object.getClass().getSuperclass().getDeclaredFields()) {
+            map.put(field.getName(), get(object, field));
         }
 
         return map;
     }
 
-    public static Map<String, ?> listValues(Object model, Class<? extends Annotation> annotationClass) {
+    public static Map<String, ?> listValues(Object object, Class<? extends Annotation> annotationClass) {
         Map<String, Object> map = new HashMap<>();
 
-        for (Field field : model.getClass().getDeclaredFields()) {
+        for (Field field : object.getClass().getDeclaredFields()) {
             if (field.isAnnotationPresent(annotationClass)) {
-                map.put(field.getName(), get(model, field));
+                map.put(field.getName(), get(object, field));
             }
         }
         // We also need parent
-        for (Field field : model.getClass().getSuperclass().getDeclaredFields()) {
+        for (Field field : object.getClass().getSuperclass().getDeclaredFields()) {
             if (field.isAnnotationPresent(annotationClass)) {
-                map.put(field.getName(), get(model, field));
+                map.put(field.getName(), get(object, field));
             }
         }
 
         return map;
     }
 
-    public static <T extends Annotation> Map<String, ?> listValues(Object model, Class<T> annotationClass, Function<Field, String> mapper) {
+    public static <T extends Annotation> Map<String, ?> listValues(Object object, Class<T> annotationClass, Function<Field, String> mapper) {
         Map<String, Object> map = new HashMap<>();
 
-        for (Field field : model.getClass().getDeclaredFields()) {
+        for (Field field : object.getClass().getDeclaredFields()) {
             if (field.isAnnotationPresent(annotationClass)) {
-                map.put(mapper.apply(field), get(model, field));
+                map.put(mapper.apply(field), get(object, field));
             }
         }
         // We also need parent
-        for (Field field : model.getClass().getSuperclass().getDeclaredFields()) {
+        for (Field field : object.getClass().getSuperclass().getDeclaredFields()) {
             if (field.isAnnotationPresent(annotationClass)) {
-                map.put(mapper.apply(field), get(model, field));
+                map.put(mapper.apply(field), get(object, field));
             }
         }
 
@@ -77,32 +76,36 @@ public abstract class ReflectionGetterSetter {
         }
     }
 
-    public static <T extends Annotation> void iterateValues(Object model, Class<T> annotationClass, BiConsumer<Field, Object> consumer) {
-        for (Field field : model.getClass().getDeclaredFields()) {
+    public static <T extends Annotation> void iterateValues(Object object, Class<T> annotationClass, BiConsumer<Field, Object> consumer) {
+        iterateValues(object, annotationClass, false, consumer);
+    }
+
+    public static <T extends Annotation> void iterateValues(Object object, Class<T> annotationClass, boolean directAccess, BiConsumer<Field, Object> consumer) {
+        for (Field field : object.getClass().getDeclaredFields()) {
             if (field.isAnnotationPresent(annotationClass)) {
-                consumer.accept(field, get(model, field));
+                consumer.accept(field, get(object, field, directAccess));
             }
         }
         // We also need parent
-        for (Field field : model.getClass().getSuperclass().getDeclaredFields()) {
+        for (Field field : object.getClass().getSuperclass().getDeclaredFields()) {
             if (field.isAnnotationPresent(annotationClass)) {
-                consumer.accept(field, get(model, field));
+                consumer.accept(field, get(object, field, directAccess));
             }
         }
     }
 
-    public static Object get(Object model, String fieldName) throws NoSuchFieldException {
-        return get(model, getFieldByName(fieldName, model.getClass()));
+    public static Object get(Object object, String fieldName) throws NoSuchFieldException {
+        return get(object, getFieldByName(fieldName, object.getClass()), false);
     }
 
-    public static void set(Object model, String fieldName, Object data) throws NoSuchFieldException {
-        set(model, getFieldByName(fieldName, model.getClass()), data);
+    public static void set(Object object, String fieldName, Object data) throws NoSuchFieldException {
+        set(object, getFieldByName(fieldName, object.getClass()), data);
     }
 
-    public static void set(Object model, Field field, Object data) {
+    public static void set(Object object, Field field, Object data) {
         try {
-            PropertyDescriptor propertyDescriptor = new PropertyDescriptor(field.getName(), model.getClass());
-            propertyDescriptor.getWriteMethod().invoke(model, data);
+            PropertyDescriptor propertyDescriptor = new PropertyDescriptor(field.getName(), object.getClass());
+            propertyDescriptor.getWriteMethod().invoke(object, data);
         } catch (IntrospectionException e) {
             // TODO
         } catch (IllegalAccessException e) {
@@ -120,10 +123,22 @@ public abstract class ReflectionGetterSetter {
         }
     }
 
-    private static Object get(Object model, Field field) {
+    private static Object get(Object object, Field field) {
+        return get(object, field, false);
+    }
+
+    private static Object get(Object object, Field field, boolean direct) {
         try {
-            PropertyDescriptor propertyDescriptor = new PropertyDescriptor(field.getName(), model.getClass());
-            return propertyDescriptor.getReadMethod().invoke(model);
+            if (direct) {
+                boolean accessible = field.isAccessible();
+                field.setAccessible(true);
+                Object value = field.get(object);
+                field.setAccessible(accessible);
+                return value;
+            } else {
+                PropertyDescriptor propertyDescriptor = new PropertyDescriptor(field.getName(), object.getClass());
+                return propertyDescriptor.getReadMethod().invoke(object);
+            }
         } catch (IntrospectionException e) {
             // TODO
         } catch (IllegalAccessException e) {

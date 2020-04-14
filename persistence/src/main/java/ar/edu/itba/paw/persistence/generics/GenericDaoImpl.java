@@ -2,6 +2,7 @@ package ar.edu.itba.paw.persistence.generics;
 
 import ar.edu.itba.paw.interfaces.daos.generic.GenericDao;
 import ar.edu.itba.paw.models.GenericModel;
+import ar.edu.itba.paw.models.JoinedCollection;
 import ar.edu.itba.paw.persistence.utils.DAOManager;
 import ar.edu.itba.paw.persistence.utils.Pair;
 import ar.edu.itba.paw.persistence.utils.ReflectionGetterSetter;
@@ -14,6 +15,8 @@ import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
+import org.springframework.jdbc.datasource.DataSourceTransactionManager;
+import org.springframework.transaction.support.TransactionTemplate;
 
 import javax.sql.DataSource;
 import java.lang.reflect.Field;
@@ -29,6 +32,7 @@ import java.util.Map.Entry;
  */
 public abstract class GenericDaoImpl<M extends GenericModel<I>, I> implements GenericDao<M, I> {
     private static final String ARGUMENT_PREFIX = "_r_";
+    protected TransactionTemplate transactionTemplate;
     protected NamedParameterJdbcTemplate jdbcTemplate;
     private SimpleJdbcInsert jdbcInsert;
     private boolean customPrimaryKey;
@@ -37,6 +41,7 @@ public abstract class GenericDaoImpl<M extends GenericModel<I>, I> implements Ge
     private String tableName;
 
     public GenericDaoImpl(DataSource dataSource, Class<M> mClass) {
+        this.transactionTemplate = new TransactionTemplate(new DataSourceTransactionManager(dataSource));
         this.jdbcTemplate = new NamedParameterJdbcTemplate(dataSource);
         this.mClass = mClass;
 
@@ -54,7 +59,7 @@ public abstract class GenericDaoImpl<M extends GenericModel<I>, I> implements Ge
     }
 
     @Override
-    public M findById(I id) {
+    public Optional<M> findById(I id) {
         JDBCQueryBuilder queryBuilder = new JDBCSelectQueryBuilder()
                 .selectAll()
                 .from(this.getTableAlias())
@@ -66,8 +71,7 @@ public abstract class GenericDaoImpl<M extends GenericModel<I>, I> implements Ge
         // Note that "parameterName" should NOT be preceded by a semicolon (as it is in the query)
         args.addValue("id", id);
 
-        List<M> list = this.query(queryBuilder.getQueryAsString(), args);
-        return list.size() > 0 ? list.get(0) : null;
+        return this.selectQuerySingle(queryBuilder.getQueryAsString(), args);
     }
 
     @Override
@@ -96,7 +100,7 @@ public abstract class GenericDaoImpl<M extends GenericModel<I>, I> implements Ge
         MapSqlParameterSource args = new MapSqlParameterSource();
         args.addValues(parameters);
 
-        return this.query(queryBuilder.getQueryAsString(), args);
+        return this.selectQuery(queryBuilder.getQueryAsString(), args);
     }
 
     @Override
@@ -114,9 +118,11 @@ public abstract class GenericDaoImpl<M extends GenericModel<I>, I> implements Ge
         MapSqlParameterSource parameterSource = new MapSqlParameterSource();
         parameterSource.addValues(argumentsValues);
 
-        M newModel = this.insertQuery(model, parameterSource);
-        this.saveRelations(newModel);
-        return newModel;
+        return this.transactionTemplate.execute(transactionStatus -> {
+            M newModel = this.insertQuery(model, parameterSource);
+            this.saveRelations(newModel);
+            return this.findById(newModel.getId());
+        }).get();
     }
 
     /**
@@ -141,16 +147,18 @@ public abstract class GenericDaoImpl<M extends GenericModel<I>, I> implements Ge
                 .values(columnsArguments)
                 .where(new JDBCWhereClauseBuilder()
                         .where(formatColumnFromName(this.getIdColumnName(), this.getTableAlias()), Operation.EQ, ":" + argumentName)
-                )
-                .returning(JDBCSelectQueryBuilder.ALL);
+                );
 
         argumentsValues.put(argumentName, model.getId());
 
         MapSqlParameterSource parameterSource = new MapSqlParameterSource();
         parameterSource.addValues(argumentsValues);
 
-        this.querySingle(queryBuilder.getQueryAsString(), parameterSource);
-        this.saveRelations(model);
+        this.transactionTemplate.execute(transactionStatus -> {
+            this.updateQuery(queryBuilder.getQueryAsString(), parameterSource);
+            this.saveRelations(model);
+            return null;
+        });
     }
 
     @Override
@@ -169,7 +177,7 @@ public abstract class GenericDaoImpl<M extends GenericModel<I>, I> implements Ge
         MapSqlParameterSource parameterSource = new MapSqlParameterSource();
         parameterSource.addValue("id", id);
 
-        this.query(queryBuilder.getQueryAsString(), parameterSource);
+        this.updateQuery(queryBuilder.getQueryAsString(), parameterSource);
     }
 
     @Override
@@ -178,7 +186,7 @@ public abstract class GenericDaoImpl<M extends GenericModel<I>, I> implements Ge
                 .selectAll()
                 .from(this.getTableAlias());
 
-        return this.query(queryBuilder.getQueryAsString());
+        return this.selectQuery(queryBuilder.getQueryAsString());
     }
 
     /**
@@ -208,7 +216,7 @@ public abstract class GenericDaoImpl<M extends GenericModel<I>, I> implements Ge
         MapSqlParameterSource parameterSource = new MapSqlParameterSource();
         parameterSource.addValue("argument", value);
 
-        return this.query(queryBuilder.getQueryAsString(), parameterSource);
+        return this.selectQuery(queryBuilder.getQueryAsString(), parameterSource);
     }
 
     protected List<M> findByFieldIgnoreCase(String columnName, Operation operation, String value) {
@@ -223,7 +231,7 @@ public abstract class GenericDaoImpl<M extends GenericModel<I>, I> implements Ge
         MapSqlParameterSource parameterSource = new MapSqlParameterSource();
         parameterSource.addValue("argument", value);
 
-        return this.query(queryBuilder.getQueryAsString(), parameterSource);
+        return this.selectQuery(queryBuilder.getQueryAsString(), parameterSource);
     }
 
     protected List<M> findByFieldIn(String columnName, Collection<?> values) {
@@ -247,14 +255,14 @@ public abstract class GenericDaoImpl<M extends GenericModel<I>, I> implements Ge
         MapSqlParameterSource parameterSource = new MapSqlParameterSource();
         parameterSource.addValues(parameters);
 
-        return this.query(queryBuilder.getQueryAsString(), parameterSource);
+        return this.selectQuery(queryBuilder.getQueryAsString(), parameterSource);
     }
 
-    protected List<M> query(String query) {
+    protected List<M> selectQuery(String query) {
         return this.jdbcTemplate.query(query, this.getRowMapper());
     }
 
-    protected List<M> query(String query, MapSqlParameterSource args) {
+    protected List<M> selectQuery(String query, MapSqlParameterSource args) {
         return this.jdbcTemplate.query(query, args, this.getRowMapper());
     }
 
@@ -264,18 +272,27 @@ public abstract class GenericDaoImpl<M extends GenericModel<I>, I> implements Ge
      * @param args the arguments (can be empty)
      * @param callbackHandler the ResultSet handler
      */
-    protected void query(String query, MapSqlParameterSource args, RowCallbackHandler callbackHandler) {
+    protected void selectQuery(String query, MapSqlParameterSource args, RowCallbackHandler callbackHandler) {
         this.jdbcTemplate.query(query, args, callbackHandler);
     }
 
-    protected M querySingle(String query) {
-        List<M> list = this.jdbcTemplate.query(query, this.getRowMapper());
-        return list.size() > 0 ? list.get(0) : null;
+    /**
+     * Runs an Insert/Update/Delete query
+     * @param query the query
+     * @param args the arguments
+     */
+    protected void updateQuery(String query, MapSqlParameterSource args) {
+        this.jdbcTemplate.update(query, args);
     }
 
-    protected M querySingle(String query, MapSqlParameterSource args) {
+    protected Optional<M> selectQuerySingle(String query) {
+        List<M> list = this.jdbcTemplate.query(query, this.getRowMapper());
+        return list.size() > 0 ? Optional.of(list.get(0)) : Optional.empty();
+    }
+
+    protected Optional<M> selectQuerySingle(String query, MapSqlParameterSource args) {
         List<M> list = this.jdbcTemplate.query(query, args, this.getRowMapper());
-        return list.size() > 0 ? list.get(0) : null;
+        return list.size() > 0 ? Optional.of(list.get(0)) : Optional.empty();
     }
 
     /**
@@ -293,7 +310,7 @@ public abstract class GenericDaoImpl<M extends GenericModel<I>, I> implements Ge
             this.jdbcInsert.execute(args);
             id = model.getId();
         }
-        return this.findById(id);
+        return this.findById(id).get();
     }
 
     /**
@@ -403,17 +420,28 @@ public abstract class GenericDaoImpl<M extends GenericModel<I>, I> implements Ge
                 throw new RuntimeException(e);
             }
 
+
             GenericDao<? extends GenericModel<Object>, Object> otherDao = DAOManager.getDaoForModel(otherClass);
             Collection<? extends GenericModel<Object>> otherInstances = otherDao.findByField(relation.name(), m.getId());
+            Collection<? extends GenericModel<Object>> otherInstancesCopy = new LinkedList<>(otherInstances);
+
+            JoinedCollection<GenericModel<Object>> collection = new JoinedCollection<>();
+            collection.setModels((Collection<GenericModel<Object>>) otherInstances);
+            try {
+                ReflectionGetterSetter.set(collection, JoinedCollection._PRIVATE_COLLECTION_NAME, otherInstancesCopy);
+            } catch (NoSuchFieldException e) {
+                // TODO
+                e.printStackTrace();
+            }
             ReflectionGetterSetter.set(m, field, otherInstances);
         });
         ReflectionGetterSetter.iterateFields(this.mClass, ManyToOne.class, field -> {
-            // This is similar to processing a OneToMany relation
+            // This is similar to processing a OneToOne relation
             ManyToOne relation = field.getAnnotation(ManyToOne.class);
             this.processOneToOneRelation(resultSet, m, field, relation.name());
         });
         ReflectionGetterSetter.iterateFields(this.mClass, ManyToMany.class, field -> {
-            // This is similar to processing a OneToMany relation but with IDs set in a different table
+            // This is similar to processing a OneToMany relation but with IDs present in a different table
             ManyToMany relation = field.getAnnotation(ManyToMany.class);
             Class<? extends GenericModel<Object>> otherClass;
             try {
@@ -434,7 +462,7 @@ public abstract class GenericDaoImpl<M extends GenericModel<I>, I> implements Ge
             MapSqlParameterSource parameterSource = new MapSqlParameterSource();
             parameterSource.addValue("id", m.getId());
             Collection<Object> otherIds = new LinkedList<>();
-            this.query(
+            this.selectQuery(
                     queryBuilder.getQueryAsString(),
                     parameterSource,
                     rs -> {
@@ -448,10 +476,199 @@ public abstract class GenericDaoImpl<M extends GenericModel<I>, I> implements Ge
 
             GenericDao<? extends GenericModel<Object>, Object> otherDao = DAOManager.getDaoForModel(otherClass);
             Collection<? extends GenericModel<Object>> otherInstances = otherDao.findByIds(otherIds);
+            Collection<? extends GenericModel<Object>> otherInstancesCopy = new LinkedList<>(otherInstances);
+
+            JoinedCollection<GenericModel<Object>> collection = new JoinedCollection<>();
+            collection.setModels((Collection<GenericModel<Object>>) otherInstances);
+            try {
+                ReflectionGetterSetter.set(collection, JoinedCollection._PRIVATE_COLLECTION_NAME, otherInstancesCopy);
+            } catch (NoSuchFieldException e) {
+                // TODO
+                e.printStackTrace();
+            }
             ReflectionGetterSetter.set(m, field, otherInstances);
         });
 
         return m;
+    }
+
+    /**
+     * Saves all the relations present in this model that have the fk present in a different table (OneToMany and
+     * ManyToMany). Should be run inside a transaction to avoid race conditions
+     * The model must be present in the database
+     * @param model the model
+     * @return the model fetched from the DB
+     */
+    protected void saveRelations(M model) {
+        ReflectionGetterSetter.iterateValues(model, OneToMany.class, true, (field, o) -> {
+            OneToMany relation = field.getAnnotation(OneToMany.class);
+
+            JoinedCollection<GenericModel<Object>> joinedCollectionGenericModel = (JoinedCollection<GenericModel<Object>>) o;
+            if (relation.required() && (o == null || joinedCollectionGenericModel.getModels().isEmpty())) {
+                throw new IllegalStateException("This field is marked as required but its value is null or empty");
+            }
+
+            Class<? extends GenericModel<Object>> otherClass;
+            try {
+                otherClass = (Class<? extends GenericModel<Object>>) relation.className();
+            } catch (ClassCastException e) {
+                // TODO
+                throw new RuntimeException(e);
+            }
+
+            Collection<GenericModel<Object>> previousModels;
+            try {
+                previousModels = (Collection<GenericModel<Object>>) ReflectionGetterSetter.get(
+                        joinedCollectionGenericModel,
+                        JoinedCollection._PRIVATE_COLLECTION_NAME
+                );
+                if (previousModels == null)
+                    previousModels = joinedCollectionGenericModel.getModels();
+            } catch (NoSuchFieldException e) {
+                // TODO
+                e.printStackTrace();
+                throw new RuntimeException(e);
+            }
+
+            MapSqlParameterSource removedParameterSource = new MapSqlParameterSource();
+            Collection<String> removedArguments = new LinkedList<>();
+            MapSqlParameterSource addedParameterSource = new MapSqlParameterSource();
+            Collection<String> addedArguments = new LinkedList<>();
+            int i = 0;
+            for (GenericModel<Object> genericModel : joinedCollectionGenericModel.getModels()) {
+                if (!previousModels.contains(genericModel)) {
+                    removedParameterSource.addValue("_removed_" + i, genericModel.getId());
+                    removedArguments.add(":_removed_" + i);
+                }
+            }
+            i = 0;
+            for (GenericModel<Object> genericModel : previousModels) {
+                if (!joinedCollectionGenericModel.getModels().contains(genericModel)) {
+                    addedParameterSource.addValue("_added_" + i, genericModel.getId());
+                    addedArguments.add(":_added_" + i);
+                }
+            }
+
+            if (removedArguments.size() == 0 && addedArguments.size() == 0)
+                return;
+
+            Table otherTable = otherClass.getAnnotation(Table.class);
+            // Process removedModels
+            if (removedArguments.size() > 0) {
+                removedParameterSource.addValue("null", null);
+                JDBCUpdateQueryBuilder updateQueryBuilder = new JDBCUpdateQueryBuilder()
+                        .update(otherTable.name())
+                        .value(relation.name(), ":null")
+                        .where(new JDBCWhereClauseBuilder()
+                                .in(otherTable.primaryKey(), removedArguments)
+                        );
+                this.updateQuery(updateQueryBuilder.getQueryAsString(), removedParameterSource);
+            }
+            // Process addedModels
+            if (addedArguments.size() > 0) {
+                addedParameterSource.addValue("id", model.getId());
+                JDBCUpdateQueryBuilder updateQueryBuilder = new JDBCUpdateQueryBuilder()
+                        .update(otherTable.name())
+                        .value(relation.name(), ":id")
+                        .where(new JDBCWhereClauseBuilder()
+                                .in(otherTable.primaryKey(), addedArguments)
+                        );
+                this.updateQuery(updateQueryBuilder.getQueryAsString(), addedParameterSource);
+            }
+
+            try {
+                ReflectionGetterSetter.set(
+                        joinedCollectionGenericModel,
+                        JoinedCollection._PRIVATE_COLLECTION_NAME,
+                        new LinkedList<>(joinedCollectionGenericModel.getModels())
+                );
+            } catch (NoSuchFieldException e) {
+                // TODO
+                e.printStackTrace();
+                throw new RuntimeException(e);
+            }
+        });
+        ReflectionGetterSetter.iterateValues(model, ManyToMany.class, (field, o) -> {
+            ManyToMany relation = field.getAnnotation(ManyToMany.class);
+
+            JoinedCollection<GenericModel<Object>> joinedCollectionGenericModel = (JoinedCollection<GenericModel<Object>>) o;
+            if (relation.required() && (o == null || joinedCollectionGenericModel.getModels().isEmpty())) {
+                throw new IllegalStateException("This field is marked as required but its value is null");
+            }
+
+            Class<? extends GenericModel<Object>> otherClass;
+            try {
+                otherClass = (Class<? extends GenericModel<Object>>) relation.className();
+            } catch (ClassCastException e) {
+                // TODO
+                throw new RuntimeException(e);
+            }
+
+            Collection<GenericModel<Object>> previousModels;
+            try {
+                previousModels = (Collection<GenericModel<Object>>) ReflectionGetterSetter.get(
+                        joinedCollectionGenericModel,
+                        JoinedCollection._PRIVATE_COLLECTION_NAME
+                );
+                if (previousModels == null)
+                    previousModels = joinedCollectionGenericModel.getModels();
+            } catch (NoSuchFieldException e) {
+                // TODO
+                e.printStackTrace();
+                throw new RuntimeException(e);
+            }
+
+            MapSqlParameterSource removedParameterSource = new MapSqlParameterSource();
+            Collection<String> removedArguments = new LinkedList<>();
+            int i = 0;
+            for (GenericModel<Object> genericModel : joinedCollectionGenericModel.getModels()) {
+                if (!previousModels.contains(genericModel)) {
+                    removedParameterSource.addValue("_removed_" + i, genericModel.getId());
+                    removedArguments.add(":_removed_" + i);
+                }
+            }
+
+            // Process removedModels
+            if (removedArguments.size() > 0) {
+                removedParameterSource.addValue("null", null);
+                JDBCDeleteQueryBuilder deleteQueryBuilder = new JDBCDeleteQueryBuilder()
+                        .from(relation.tableName())
+                        .where(new JDBCWhereClauseBuilder()
+                                .in(relation.otherName(), removedArguments)
+                        );
+                this.updateQuery(deleteQueryBuilder.getQueryAsString(), removedParameterSource);
+            }
+
+            i = 0;
+            for (GenericModel<Object> genericModel : previousModels) {
+                if (!joinedCollectionGenericModel.getModels().contains(genericModel)) {
+                    MapSqlParameterSource addedParameterSource = new MapSqlParameterSource();
+                    Map<String, String> addedColumnNamesArguments = new HashMap<>();
+
+                    addedParameterSource.addValue("_added_my_id_" + i, model.getId());
+                    addedParameterSource.addValue("_added_other_id_" + i, genericModel.getId());
+                    addedColumnNamesArguments.put(relation.name(), ":_added_my_id_" + i);
+                    addedColumnNamesArguments.put(relation.otherName(), ":_added_other_id_" + i);
+
+                    JDBCInsertQueryBuilder insertQueryBuilder = new JDBCInsertQueryBuilder()
+                            .into(relation.tableName())
+                            .values(addedColumnNamesArguments);
+                    this.updateQuery(insertQueryBuilder.getQueryAsString(), addedParameterSource);
+                }
+            }
+
+            try {
+                ReflectionGetterSetter.set(
+                        joinedCollectionGenericModel,
+                        JoinedCollection._PRIVATE_COLLECTION_NAME,
+                        new LinkedList<>(joinedCollectionGenericModel.getModels())
+                );
+            } catch (NoSuchFieldException e) {
+                // TODO
+                e.printStackTrace();
+                throw new RuntimeException(e);
+            }
+        });
     }
 
     /**
@@ -465,7 +682,7 @@ public abstract class GenericDaoImpl<M extends GenericModel<I>, I> implements Ge
      *                     set to true and the model has a null value associated with that field
      * @return the map
      */
-    private Map<String, Pair<String, Object>> getModelColumnsArgumentValue(M model, String prefix, boolean checkRequired) {
+    protected Map<String, Pair<String, Object>> getModelColumnsArgumentValue(M model, String prefix, boolean checkRequired) {
         Map<String, Pair<String, Object>> map = new HashMap<>();
 
         // This code is duplicated so as to not be checking another variable in every loop, thus making it more
@@ -514,76 +731,6 @@ public abstract class GenericDaoImpl<M extends GenericModel<I>, I> implements Ge
         return map;
     }
 
-    /**
-     * Saves all the relations present in this model that have the fk present in a different table (OneToMany and
-     * ManyToMany).
-     * The model must be present in the database
-     * @param model the model
-     * @return the model fetched from the DB
-     */
-    protected M saveRelations(M model) {
-//        ReflectionGetterSetter.iterateValues(model, OneToMany.class, (field, o) -> {
-//            OneToMany relation = field.getAnnotation(OneToMany.class);
-//
-//            Collection<GenericModel<Object>> genericModels = null;
-//            if (relation.required() && (o == null || (genericModels = (Collection<GenericModel<Object>>) o).isEmpty())) {
-//                throw new IllegalStateException("This field is marked as required but its value is null");
-//            } else {
-//                genericModels = (Collection<GenericModel<Object>>) o;
-//            }
-//
-//            Class<? extends GenericModel<Object>> otherClass;
-//            try {
-//                otherClass = (Class<? extends GenericModel<Object>>) relation.className();
-//            } catch (ClassCastException e) {
-//                // TODO
-//                throw new RuntimeException(e);
-//            }
-//            GenericDao<? extends GenericModel<Object>, Object> otherDao = DAOManager.getDaoForModel(otherClass);
-//            Table otherTable = otherClass.getAnnotation(Table.class);
-//
-////            // The other element's IDs are in a different table
-////            JDBCInsertQueryBuilder queryBuilder = new JDBCInsertQueryBuilder()
-////                    .into(otherTable.name())
-////                    .
-//
-////            JDBCSelectQueryBuilder queryBuilder = new JDBCSelectQueryBuilder()
-////                    .select()
-////                    .from(relation.tableName())
-////                    .where(new JDBCWhereClauseBuilder()
-////                            .where(formatColumnFromAlias(relation.name(), relation.tableName()), Operation.EQ, ":id")
-////                    )
-////                    .distinct();
-////            MapSqlParameterSource parameterSource = new MapSqlParameterSource();
-////            parameterSource.addValue("id", m.getId());
-////            Collection<Object> otherIds = new LinkedList<>();
-////            this.query(
-////                    queryBuilder.getQueryAsString(),
-////                    parameterSource,
-////                    rs -> {
-////                        try {
-////                            otherIds.add(rs.getObject(formatColumnFromAlias(relation.otherName(), relation.tableName())));
-////                        } catch (SQLException e) {
-////                            otherIds.add(rs.getObject(relation.otherName()));
-////                        }
-////                    }
-////            );
-//
-//
-//            map.put(relation.name(), new Pair<>(":" + prefix + relation.name(), genericModel.getId()));
-//        });
-//        ReflectionGetterSetter.iterateValues(model, ManyToMany.class, (field, o) -> {
-//            ManyToMany relation = field.getAnnotation(ManyToMany.class);
-//            if (relation.required() && o == null)
-//                throw new IllegalStateException("This field is marked as required but its value is null");
-//
-//            GenericModel<Object> genericModel = (GenericModel<Object>) o;
-//            map.put(relation.name(), new Pair<>(":" + prefix + relation.name(), genericModel.getId()));
-//        });
-
-        return model;
-    }
-
     private void processOneToOneRelation(ResultSet resultSet, M m, Field field, String columnName) {
         Class<? extends GenericModel<Object>> otherClass;
         try {
@@ -597,9 +744,9 @@ public abstract class GenericDaoImpl<M extends GenericModel<I>, I> implements Ge
         GenericModel<Object> otherInstance;
         try {
             try {
-                otherInstance = otherDao.findById(resultSet.getObject(formatColumnFromName(columnName, this.tableName)));
+                otherInstance = otherDao.findById(resultSet.getObject(formatColumnFromName(columnName, this.tableName))).orElse(null);
             } catch (SQLException e) {
-                otherInstance = otherDao.findById(resultSet.getObject(columnName));
+                otherInstance = otherDao.findById(resultSet.getObject(columnName)).orElse(null);
             }
 
             ReflectionGetterSetter.set(m, field, otherInstance);

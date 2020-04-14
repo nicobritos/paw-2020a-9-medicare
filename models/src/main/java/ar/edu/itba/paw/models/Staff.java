@@ -19,7 +19,7 @@ public class Staff extends GenericModel<Integer> {
     @Column(name = "registration_number", required = true)
     private int registrationNumber;
     @ManyToMany(name = "staff_id", otherName = "specialty_id", tableName = "system_staff_specialty_staff", className = StaffSpecialty.class)
-    private Collection<StaffSpecialty> staffSpecialties;
+    private JoinedCollection<StaffSpecialty> staffSpecialties = new JoinedCollection<>();
 
     public String getFirstName() {
         return this.firstName;
@@ -62,10 +62,10 @@ public class Staff extends GenericModel<Integer> {
     }
 
     public Collection<StaffSpecialty> getStaffSpecialties() {
-        return this.staffSpecialties;
+        return this.staffSpecialties.getModels();
     }
 
     public void setStaffSpecialties(Collection<StaffSpecialty> staffSpecialties) {
-        this.staffSpecialties = staffSpecialties;
+        this.staffSpecialties.setModels(staffSpecialties);
     }
 }

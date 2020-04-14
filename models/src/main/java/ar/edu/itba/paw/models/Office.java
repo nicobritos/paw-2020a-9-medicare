@@ -22,7 +22,7 @@ public class Office extends GenericModel<Integer> {
     @Column(name = "street", required = true)
     private String street;
     @OneToMany(name = "office_id", required = true, className = Staff.class)
-    private Collection<Staff> staffs;
+    private JoinedCollection<Staff> staffs = new JoinedCollection<>();
 
     public String getName() {
         return this.name;
@@ -73,10 +73,10 @@ public class Office extends GenericModel<Integer> {
     }
 
     public Collection<Staff> getStaffs() {
-        return this.staffs;
+        return this.staffs.getModels();
     }
 
     public void setStaffs(Collection<Staff> staffs) {
-        this.staffs = staffs;
+        this.staffs.setModels(staffs);
     }
 }

@@ -21,6 +21,6 @@ public class CountryDaoImpl extends GenericSearchableDaoImpl<Country, String> im
 
     @Override
     protected RowMapper<Country> getRowMapper() {
-        return rowMapper;
+        return this.rowMapper;
     }
 }

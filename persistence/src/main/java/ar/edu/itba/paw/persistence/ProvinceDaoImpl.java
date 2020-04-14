@@ -47,7 +47,7 @@ public class ProvinceDaoImpl extends GenericSearchableDaoImpl<Province, Integer>
         parameterSource.addValue("country", country.getId());
         parameterSource.addValue("name", name);
 
-        return this.query(queryBuilder.getQueryAsString(), parameterSource);
+        return this.selectQuery(queryBuilder.getQueryAsString(), parameterSource);
     }
 
     @Override

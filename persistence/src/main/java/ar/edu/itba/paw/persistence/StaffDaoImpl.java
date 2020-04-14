@@ -71,7 +71,7 @@ public class StaffDaoImpl extends GenericSearchableDaoImpl<Staff, Integer> imple
         MapSqlParameterSource parameterSource = new MapSqlParameterSource();
         parameterSource.addValues(parameters);
 
-        return this.query(queryBuilder.getQueryAsString(), parameterSource);
+        return this.selectQuery(queryBuilder.getQueryAsString(), parameterSource);
     }
 
     @Override
@@ -109,7 +109,7 @@ public class StaffDaoImpl extends GenericSearchableDaoImpl<Staff, Integer> imple
                 )
                 .distinct();
 
-        Collection<Staff> staffs = new LinkedList<>(this.query(queryBuilder.getQueryAsString(), parameterSource));
+        Collection<Staff> staffs = new LinkedList<>(this.selectQuery(queryBuilder.getQueryAsString(), parameterSource));
 
         queryBuilder = new JDBCSelectQueryBuilder()
                 .selectAll()
@@ -125,7 +125,7 @@ public class StaffDaoImpl extends GenericSearchableDaoImpl<Staff, Integer> imple
                 )
                 .distinct();
 
-        staffs.addAll(this.query(queryBuilder.getQueryAsString(), parameterSource));
+        staffs.addAll(this.selectQuery(queryBuilder.getQueryAsString(), parameterSource));
 
         return staffs;
     }
@@ -185,7 +185,7 @@ public class StaffDaoImpl extends GenericSearchableDaoImpl<Staff, Integer> imple
         MapSqlParameterSource parameterSource = new MapSqlParameterSource();
         parameterSource.addValues(parameters);
 
-        return this.query(queryBuilder.getQueryAsString(), parameterSource);
+        return this.selectQuery(queryBuilder.getQueryAsString(), parameterSource);
     }
 
     @Override
@@ -200,7 +200,7 @@ public class StaffDaoImpl extends GenericSearchableDaoImpl<Staff, Integer> imple
 
     @Override
     protected RowMapper<Staff> getRowMapper() {
-        return rowMapper;
+        return this.rowMapper;
     }
 
     private String getSpecialtiesTableName() {

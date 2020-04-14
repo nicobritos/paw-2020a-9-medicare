@@ -51,4 +51,9 @@ public class JDBCDeleteQueryBuilder extends JDBCQueryBuilder {
 
         return stringBuilder.toString();
     }
+
+    @Override
+    protected String getTable() {
+        return this.table;
+    }
 }

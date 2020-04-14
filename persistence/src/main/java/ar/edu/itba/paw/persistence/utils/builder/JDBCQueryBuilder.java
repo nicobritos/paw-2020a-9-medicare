@@ -13,4 +13,6 @@ public abstract class JDBCQueryBuilder {
     protected String joinStrings(Collection<String> strings) {
         return String.join(",", strings);
     }
+
+    protected abstract String getTable();
 }
