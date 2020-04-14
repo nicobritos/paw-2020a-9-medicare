@@ -3,6 +3,7 @@ package ar.edu.itba.paw;
 import ar.edu.itba.paw.models.Office;
 import ar.edu.itba.paw.models.Province;
 import ar.edu.itba.paw.models.Staff;
+import ar.edu.itba.paw.models.StaffSpecialty;
 import ar.edu.itba.paw.persistence.StaffDaoImpl;
 import ar.edu.itba.paw.persistence.utils.builder.JDBCWhereClauseBuilder;
 import org.junit.Before;
@@ -37,16 +38,20 @@ public class StaffDaoImplTest
     private static final String NAME = "Juan";
     private static final String SURNAME = "Perez";
     private static final int REGISTRATION_NUMBER = 123;
+    private static final String SPECIALTY = "Oftalmologo";
 
-
+    private static final String SPECIALTY_TABLE = "system_staff_specialty";
     private static final String STAFF_TABLE = "staff";
     private static final String OFFICE_TABLE = "office";
     private static final String PROVINCE_TABLE = "system_province";
     private static final String COUNTRY_TABLE = "system_country";
+    private static final String SPECIALTY_STAFF_TABLE = "system_staff_specialty_staff";
 
 
     private StaffDaoImpl staffDao;
     private JdbcTemplate jdbcTemplate;
+    private SimpleJdbcInsert staffSpecialtyStaffInsert;
+    private SimpleJdbcInsert staffSpecialtyInsert;
     private SimpleJdbcInsert staffJdbcInsert;
     private SimpleJdbcInsert officeJdbcInsert;
     private SimpleJdbcInsert provinceJdbcInsert;
@@ -56,6 +61,8 @@ public class StaffDaoImplTest
     private DataSource ds;
 
     private void cleanAllTables(){
+        JdbcTestUtils.deleteFromTables(this.jdbcTemplate, SPECIALTY_STAFF_TABLE);
+        JdbcTestUtils.deleteFromTables(this.jdbcTemplate, SPECIALTY_TABLE);
         JdbcTestUtils.deleteFromTables(this.jdbcTemplate, STAFF_TABLE);
         JdbcTestUtils.deleteFromTables(this.jdbcTemplate, OFFICE_TABLE);
         JdbcTestUtils.deleteFromTables(this.jdbcTemplate, PROVINCE_TABLE);
@@ -98,6 +105,15 @@ public class StaffDaoImplTest
         staffMap.put("phone", PHONE);
         staffMap.put("registration_number", REGISTRATION_NUMBER); // Identity de HSQLDB empieza en 0
         staffJdbcInsert.execute(staffMap);
+
+        Map<String, Object> staffSpecialtyMap = new HashMap<>();
+        staffSpecialtyMap.put("name", SPECIALTY);
+        staffSpecialtyInsert.execute(staffSpecialtyMap);
+
+        Map<String, Object> staffSpecialtyStaffMap = new HashMap<>();
+        staffSpecialtyStaffMap.put("specialty_id", 0);
+        staffSpecialtyStaffMap.put("staff_id", 0);
+        staffSpecialtyStaffInsert.execute(staffSpecialtyStaffMap);
     }
 
     private void insertAnotherStaff(){
@@ -119,8 +135,15 @@ public class StaffDaoImplTest
         s.setPhone(PHONE);
         s.setRegistrationNumber(REGISTRATION_NUMBER);
         s.setId(0);
-        s.setStaffSpecialties(Collections.emptyList());
+        s.setStaffSpecialties(Collections.singletonList(staffSpecialtyModel()));
         return s;
+    }
+
+    private StaffSpecialty staffSpecialtyModel() {
+        StaffSpecialty ss = new StaffSpecialty();
+        ss.setName(SPECIALTY);
+        ss.setId(0);
+        return ss;
     }
 
     private Office officeModel() {
@@ -129,7 +152,7 @@ public class StaffDaoImplTest
         o.setEmail(EMAIL);
         o.setPhone(PHONE);
         o.setProvince(provinceModel());
-        o.setStaffs(Collections.emptyList());
+        o.setStaffs(Collections.singletonList(staffModel()));
         o.setStreet(STREET);
         o.setStreetNumber(STREET_NUMBER);
         return o;
@@ -146,6 +169,11 @@ public class StaffDaoImplTest
     public void setUp(){
         this.staffDao = new StaffDaoImpl(this.ds);
         this.jdbcTemplate = new JdbcTemplate(this.ds);
+        this.staffSpecialtyStaffInsert = new SimpleJdbcInsert(this.ds)
+                .withTableName(SPECIALTY_STAFF_TABLE);
+        this.staffSpecialtyInsert = new SimpleJdbcInsert(this.ds)
+                .withTableName(SPECIALTY_TABLE)
+                .usingGeneratedKeyColumns("specialty_id");
         this.staffJdbcInsert = new SimpleJdbcInsert(this.ds)
                 .withTableName(STAFF_TABLE)
                 .usingGeneratedKeyColumns("staff_id");
@@ -357,6 +385,7 @@ public class StaffDaoImplTest
         cleanAllTables();
         insertStaff();
         insertAnotherStaff();
+        JdbcTestUtils.deleteFromTables(this.jdbcTemplate, SPECIALTY_STAFF_TABLE); // Borro el speciality linkeado al staff a borrar
 
         // 2. Ejercitar
         staffDao.remove(0);
@@ -371,6 +400,7 @@ public class StaffDaoImplTest
         cleanAllTables();
         insertStaff();
         insertAnotherStaff();
+        JdbcTestUtils.deleteFromTables(this.jdbcTemplate, SPECIALTY_STAFF_TABLE); // Borro el speciality linkeado al staff a borrar
 
         // Modelo de la oficina a crear
         Staff s = staffModel();
@@ -410,7 +440,7 @@ public class StaffDaoImplTest
         insertAnotherStaff();
 
         // 2. Ejercitar
-        Collection<Staff> staffs = staffDao.findByNameAndStaffSpecialties(NAME, Collections.emptyList());
+        Collection<Staff> staffs = staffDao.findByNameAndStaffSpecialties(NAME, Collections.singletonList(staffSpecialtyModel()));
 
         // 3. Postcondiciones
         assertNotNull(staffs);
@@ -423,7 +453,7 @@ public class StaffDaoImplTest
         cleanAllTables();
 
         // 2. Ejercitar
-        Collection<Staff> staffs = staffDao.findByNameAndStaffSpecialties(NAME, Collections.emptyList());
+        Collection<Staff> staffs = staffDao.findByNameAndStaffSpecialties(NAME, Collections.singletonList(staffSpecialtyModel()));
 
         // 3. Postcondiciones
         assertNotNull(staffs);
@@ -438,7 +468,7 @@ public class StaffDaoImplTest
         insertAnotherStaff();
 
         // 2. Ejercitar
-        Collection<Staff> staffs = staffDao.findByNameOfficeAndStaffSpecialties(NAME, Collections.singletonList(officeModel()), Collections.emptyList());
+        Collection<Staff> staffs = staffDao.findByNameOfficeAndStaffSpecialties(NAME, Collections.singletonList(officeModel()), Collections.singletonList(staffSpecialtyModel()));
 
         // 3. Postcondiciones
         assertNotNull(staffs);
@@ -451,7 +481,7 @@ public class StaffDaoImplTest
         cleanAllTables();
 
         // 2. Ejercitar
-        Collection<Staff> staffs = staffDao.findByNameOfficeAndStaffSpecialties(NAME, Collections.singletonList(officeModel()), Collections.emptyList());
+        Collection<Staff> staffs = staffDao.findByNameOfficeAndStaffSpecialties(NAME, Collections.singletonList(officeModel()), Collections.singletonList(staffSpecialtyModel()));
 
         // 3. Postcondiciones
         assertNotNull(staffs);
@@ -466,7 +496,7 @@ public class StaffDaoImplTest
         insertAnotherStaff();
 
         // 2. Ejercitar
-        Collection<Staff> staffs = staffDao.findByOfficeAndStaffSpecialties(Collections.singletonList(officeModel()), Collections.emptyList());
+        Collection<Staff> staffs = staffDao.findByOfficeAndStaffSpecialties(Collections.singletonList(officeModel()), Collections.singletonList(staffSpecialtyModel()));
 
         // 3. Postcondiciones
         assertNotNull(staffs);
@@ -479,7 +509,7 @@ public class StaffDaoImplTest
         cleanAllTables();
 
         // 2. Ejercitar
-        Collection<Staff> staffs = staffDao.findByOfficeAndStaffSpecialties(Collections.singletonList(officeModel()), Collections.emptyList());
+        Collection<Staff> staffs = staffDao.findByOfficeAndStaffSpecialties(Collections.singletonList(officeModel()), Collections.singletonList(staffSpecialtyModel()));
 
         // 3. Postcondiciones
         assertNotNull(staffs);
@@ -494,11 +524,11 @@ public class StaffDaoImplTest
         insertAnotherStaff();
 
         // 2. Ejercitar
-        Collection<Staff> staffs = staffDao.findByStaffSpecialties(Collections.emptyList());
+        Collection<Staff> staffs = staffDao.findByStaffSpecialties(Collections.singletonList(staffSpecialtyModel()));
 
         // 3. Postcondiciones
         assertNotNull(staffs);
-        assertEquals(2, staffs.size());
+        assertEquals(1, staffs.size());
     }
 
     @Test
@@ -507,7 +537,7 @@ public class StaffDaoImplTest
         cleanAllTables();
 
         // 2. Ejercitar
-        Collection<Staff> staffs = staffDao.findByStaffSpecialties(Collections.emptyList());
+        Collection<Staff> staffs = staffDao.findByStaffSpecialties(Collections.singletonList(staffSpecialtyModel()));
 
         // 3. Postcondiciones
         assertNotNull(staffs);
