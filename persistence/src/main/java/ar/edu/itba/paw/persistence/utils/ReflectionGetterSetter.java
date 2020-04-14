@@ -14,9 +14,12 @@ import java.util.function.Function;
 /**
  * This class provides methods to access and manipulate instance's fields via reflection invoking its public
  * getters and setters. It can also get fields that are marked as private without any getter associated with it.
- * Its usage is discouraged in most cases as it is difficult to understand and provides a , but it allows for really great abstraction and generalization,
- * specially when instantiating models from data saved in the DB without having to implement each method in each
- * specific DAO.
+ *
+ * Its usage is discouraged in most cases as it is difficult to understand and it gives the sensation of working by
+ * magic, but it allows for really great abstraction and generalization, specially when instantiating models from data
+ * saved in the DB without having to implement each method in each specific DAO, let alone using hydration.
+ *
+ * Every method access an object fields and its parents
  */
 public abstract class ReflectionGetterSetter {
     public static Map<String, ?> listValues(Object object) {
@@ -134,6 +137,12 @@ public abstract class ReflectionGetterSetter {
         return get(object, field, false);
     }
 
+    /**
+     * @param object the object owning the field
+     * @param field the field
+     * @param direct whether the access method should be directly by its field or using getters
+     * @return the value associated with the field
+     */
     private static Object get(Object object, Field field, boolean direct) {
         try {
             if (direct) {
