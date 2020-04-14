@@ -71,6 +71,7 @@ public class OfficeDaoImplTest
         JdbcTestUtils.deleteFromTables(this.jdbcTemplate, OFFICE_TABLE);
         JdbcTestUtils.deleteFromTables(this.jdbcTemplate, PROVINCE_TABLE);
         JdbcTestUtils.deleteFromTables(this.jdbcTemplate, COUNTRY_TABLE);
+        this.jdbcTemplate.execute("TRUNCATE SCHEMA PUBLIC RESTART IDENTITY AND COMMIT NO CHECK");
 
             // Insertar pais
         Map<String, Object> countryMap = new HashMap<>();
@@ -115,6 +116,7 @@ public class OfficeDaoImplTest
         JdbcTestUtils.deleteFromTables(this.jdbcTemplate, OFFICE_TABLE);
         JdbcTestUtils.deleteFromTables(this.jdbcTemplate, PROVINCE_TABLE);
         JdbcTestUtils.deleteFromTables(this.jdbcTemplate, COUNTRY_TABLE);
+        this.jdbcTemplate.execute("TRUNCATE SCHEMA PUBLIC RESTART IDENTITY AND COMMIT NO CHECK");
 
             // Insertar pais
         Map<String, Object> countryMap = new HashMap<>();
@@ -153,6 +155,7 @@ public class OfficeDaoImplTest
         JdbcTestUtils.deleteFromTables(this.jdbcTemplate, OFFICE_TABLE);
         JdbcTestUtils.deleteFromTables(this.jdbcTemplate, PROVINCE_TABLE);
         JdbcTestUtils.deleteFromTables(this.jdbcTemplate, COUNTRY_TABLE);
+        this.jdbcTemplate.execute("TRUNCATE SCHEMA PUBLIC RESTART IDENTITY AND COMMIT NO CHECK");
 
         // 2. Ejercitar
         Optional<Office> maybeOffice = officeDao.findById(0); // Identity de HSQLDB empieza en 0
@@ -168,6 +171,7 @@ public class OfficeDaoImplTest
         JdbcTestUtils.deleteFromTables(this.jdbcTemplate, OFFICE_TABLE);
         JdbcTestUtils.deleteFromTables(this.jdbcTemplate, PROVINCE_TABLE);
         JdbcTestUtils.deleteFromTables(this.jdbcTemplate, COUNTRY_TABLE);
+        this.jdbcTemplate.execute("TRUNCATE SCHEMA PUBLIC RESTART IDENTITY AND COMMIT NO CHECK");
 
         // Insertar pais
         Map<String, Object> countryMap = new HashMap<>();
@@ -215,6 +219,7 @@ public class OfficeDaoImplTest
         JdbcTestUtils.deleteFromTables(this.jdbcTemplate, OFFICE_TABLE);
         JdbcTestUtils.deleteFromTables(this.jdbcTemplate, PROVINCE_TABLE);
         JdbcTestUtils.deleteFromTables(this.jdbcTemplate, COUNTRY_TABLE);
+        this.jdbcTemplate.execute("TRUNCATE SCHEMA PUBLIC RESTART IDENTITY AND COMMIT NO CHECK");
 
         // 2. Ejercitar
         Collection<Office> offices = officeDao.findByIds(Arrays.asList(0,1,2)); // Identity de HSQLDB empieza en 0
@@ -231,6 +236,7 @@ public class OfficeDaoImplTest
         JdbcTestUtils.deleteFromTables(this.jdbcTemplate, OFFICE_TABLE);
         JdbcTestUtils.deleteFromTables(this.jdbcTemplate, PROVINCE_TABLE);
         JdbcTestUtils.deleteFromTables(this.jdbcTemplate, COUNTRY_TABLE);
+        this.jdbcTemplate.execute("TRUNCATE SCHEMA PUBLIC RESTART IDENTITY AND COMMIT NO CHECK");
 
         // Insertar pais
         Map<String, Object> countryMap = new HashMap<>();
@@ -278,6 +284,7 @@ public class OfficeDaoImplTest
         JdbcTestUtils.deleteFromTables(this.jdbcTemplate, OFFICE_TABLE);
         JdbcTestUtils.deleteFromTables(this.jdbcTemplate, PROVINCE_TABLE);
         JdbcTestUtils.deleteFromTables(this.jdbcTemplate, COUNTRY_TABLE);
+        this.jdbcTemplate.execute("TRUNCATE SCHEMA PUBLIC RESTART IDENTITY AND COMMIT NO CHECK");
 
         // 2. Ejercitar
         Collection<Office> offices = officeDao.findByField("email", EMAIL);
@@ -294,6 +301,7 @@ public class OfficeDaoImplTest
         JdbcTestUtils.deleteFromTables(this.jdbcTemplate, OFFICE_TABLE);
         JdbcTestUtils.deleteFromTables(this.jdbcTemplate, PROVINCE_TABLE);
         JdbcTestUtils.deleteFromTables(this.jdbcTemplate, COUNTRY_TABLE);
+        this.jdbcTemplate.execute("TRUNCATE SCHEMA PUBLIC RESTART IDENTITY AND COMMIT NO CHECK");
 
         // Insertar pais
         Map<String, Object> countryMap = new HashMap<>();
@@ -341,6 +349,7 @@ public class OfficeDaoImplTest
         JdbcTestUtils.deleteFromTables(this.jdbcTemplate, OFFICE_TABLE);
         JdbcTestUtils.deleteFromTables(this.jdbcTemplate, PROVINCE_TABLE);
         JdbcTestUtils.deleteFromTables(this.jdbcTemplate, COUNTRY_TABLE);
+        this.jdbcTemplate.execute("TRUNCATE SCHEMA PUBLIC RESTART IDENTITY AND COMMIT NO CHECK");
 
         // 2. Ejercitar
         Collection<Office> offices = officeDao.findByField("office_id", JDBCWhereClauseBuilder.Operation.LEQ, 1);
@@ -357,6 +366,7 @@ public class OfficeDaoImplTest
         JdbcTestUtils.deleteFromTables(this.jdbcTemplate, OFFICE_TABLE);
         JdbcTestUtils.deleteFromTables(this.jdbcTemplate, PROVINCE_TABLE);
         JdbcTestUtils.deleteFromTables(this.jdbcTemplate, COUNTRY_TABLE);
+        this.jdbcTemplate.execute("TRUNCATE SCHEMA PUBLIC RESTART IDENTITY AND COMMIT NO CHECK");
 
         // Insertar pais
         Map<String, Object> countryMap = new HashMap<>();
@@ -404,6 +414,7 @@ public class OfficeDaoImplTest
         JdbcTestUtils.deleteFromTables(this.jdbcTemplate, OFFICE_TABLE);
         JdbcTestUtils.deleteFromTables(this.jdbcTemplate, PROVINCE_TABLE);
         JdbcTestUtils.deleteFromTables(this.jdbcTemplate, COUNTRY_TABLE);
+        this.jdbcTemplate.execute("TRUNCATE SCHEMA PUBLIC RESTART IDENTITY AND COMMIT NO CHECK");
 
         // 2. Ejercitar
         Collection<Office> offices = officeDao.findByName(NAME);
@@ -420,6 +431,7 @@ public class OfficeDaoImplTest
         JdbcTestUtils.deleteFromTables(this.jdbcTemplate, OFFICE_TABLE);
         JdbcTestUtils.deleteFromTables(this.jdbcTemplate, PROVINCE_TABLE);
         JdbcTestUtils.deleteFromTables(this.jdbcTemplate, COUNTRY_TABLE);
+        this.jdbcTemplate.execute("TRUNCATE SCHEMA PUBLIC RESTART IDENTITY AND COMMIT NO CHECK");
 
         // Insertar pais
         Map<String, Object> countryMap = new HashMap<>();
@@ -467,6 +479,7 @@ public class OfficeDaoImplTest
         JdbcTestUtils.deleteFromTables(this.jdbcTemplate, OFFICE_TABLE);
         JdbcTestUtils.deleteFromTables(this.jdbcTemplate, PROVINCE_TABLE);
         JdbcTestUtils.deleteFromTables(this.jdbcTemplate, COUNTRY_TABLE);
+        this.jdbcTemplate.execute("TRUNCATE SCHEMA PUBLIC RESTART IDENTITY AND COMMIT NO CHECK");
 
         // 2. Ejercitar
         Collection<Office> offices = officeDao.list();
@@ -483,6 +496,7 @@ public class OfficeDaoImplTest
         JdbcTestUtils.deleteFromTables(this.jdbcTemplate, OFFICE_TABLE);
         JdbcTestUtils.deleteFromTables(this.jdbcTemplate, PROVINCE_TABLE);
         JdbcTestUtils.deleteFromTables(this.jdbcTemplate, COUNTRY_TABLE);
+        this.jdbcTemplate.execute("TRUNCATE SCHEMA PUBLIC RESTART IDENTITY AND COMMIT NO CHECK");
 
         // Insertar pais
         Map<String, Object> countryMap = new HashMap<>();
@@ -553,6 +567,7 @@ public class OfficeDaoImplTest
         JdbcTestUtils.deleteFromTables(this.jdbcTemplate, OFFICE_TABLE);
         JdbcTestUtils.deleteFromTables(this.jdbcTemplate, PROVINCE_TABLE);
         JdbcTestUtils.deleteFromTables(this.jdbcTemplate, COUNTRY_TABLE);
+        this.jdbcTemplate.execute("TRUNCATE SCHEMA PUBLIC RESTART IDENTITY AND COMMIT NO CHECK");
 
         //Crear Province modelo
         Province p = new Province();
@@ -580,6 +595,7 @@ public class OfficeDaoImplTest
         JdbcTestUtils.deleteFromTables(this.jdbcTemplate, OFFICE_TABLE);
         JdbcTestUtils.deleteFromTables(this.jdbcTemplate, PROVINCE_TABLE);
         JdbcTestUtils.deleteFromTables(this.jdbcTemplate, COUNTRY_TABLE);
+        this.jdbcTemplate.execute("TRUNCATE SCHEMA PUBLIC RESTART IDENTITY AND COMMIT NO CHECK");
 
         // Insertar pais
         Map<String, Object> countryMap = new HashMap<>();
@@ -639,6 +655,7 @@ public class OfficeDaoImplTest
         JdbcTestUtils.deleteFromTables(this.jdbcTemplate, OFFICE_TABLE);
         JdbcTestUtils.deleteFromTables(this.jdbcTemplate, PROVINCE_TABLE);
         JdbcTestUtils.deleteFromTables(this.jdbcTemplate, COUNTRY_TABLE);
+        this.jdbcTemplate.execute("TRUNCATE SCHEMA PUBLIC RESTART IDENTITY AND COMMIT NO CHECK");
 
         // Insertar pais
         Map<String, Object> countryMap = new HashMap<>();
@@ -691,6 +708,7 @@ public class OfficeDaoImplTest
 
         // Modelo de la oficina a crear
         Office o = new Office();
+        o.setId(0);
         o.setName(NAME);
         o.setEmail(EMAIL);
         o.setPhone(PHONE);
@@ -713,6 +731,7 @@ public class OfficeDaoImplTest
         JdbcTestUtils.deleteFromTables(this.jdbcTemplate, OFFICE_TABLE);
         JdbcTestUtils.deleteFromTables(this.jdbcTemplate, PROVINCE_TABLE);
         JdbcTestUtils.deleteFromTables(this.jdbcTemplate, COUNTRY_TABLE);
+        this.jdbcTemplate.execute("TRUNCATE SCHEMA PUBLIC RESTART IDENTITY AND COMMIT NO CHECK");
 
         // Insertar pais
         Map<String, Object> countryMap = new HashMap<>();
@@ -743,6 +762,7 @@ public class OfficeDaoImplTest
 
         // Modelo de la oficina a crear
         Office o = new Office();
+        o.setId(0);
         o.setName(NAME + " (updated)");
         o.setEmail(EMAIL);
         o.setPhone(PHONE);
@@ -756,8 +776,8 @@ public class OfficeDaoImplTest
 
         // 3. Postcondiciones
         assertEquals(1, JdbcTestUtils.countRowsInTable(this.jdbcTemplate, OFFICE_TABLE));
-        assertEquals(1, JdbcTestUtils.countRowsInTableWhere(jdbcTemplate, OFFICE_TABLE, "name = " + NAME + " (updated)"));
-        assertEquals(0, JdbcTestUtils.countRowsInTableWhere(jdbcTemplate, OFFICE_TABLE, "name = " + NAME));
+        assertEquals(1, JdbcTestUtils.countRowsInTableWhere(jdbcTemplate, OFFICE_TABLE, "name = '" + NAME + " (updated)'"));
+        assertEquals(0, JdbcTestUtils.countRowsInTableWhere(jdbcTemplate, OFFICE_TABLE, "name = '" + NAME + "'"));
 
     }
 }
