@@ -1,10 +1,8 @@
 package ar.edu.itba.paw;
 
-import ar.edu.itba.paw.models.Country;
 import ar.edu.itba.paw.models.Office;
 import ar.edu.itba.paw.models.Province;
 import ar.edu.itba.paw.models.Staff;
-import ar.edu.itba.paw.persistence.OfficeDaoImpl;
 import ar.edu.itba.paw.persistence.StaffDaoImpl;
 import ar.edu.itba.paw.persistence.utils.builder.JDBCWhereClauseBuilder;
 import org.junit.Before;
@@ -472,7 +470,7 @@ public class StaffDaoImplTest
 
         // 3. Postcondiciones
         assertNotNull(staffs);
-        assertEquals(2, staffs.size());
+        assertEquals(0, staffs.size());
     }
 
     @Test

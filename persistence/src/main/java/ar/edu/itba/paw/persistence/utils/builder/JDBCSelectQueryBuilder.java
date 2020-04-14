@@ -57,12 +57,12 @@ public class JDBCSelectQueryBuilder extends JDBCQueryBuilder {
 
     private JDBCWhereClauseBuilder whereClauseBuilder;
     private OrderCriteria orderCriteria;
+    private boolean selectAll;
     private boolean distinct;
     private String orderBy;
     private String table;
     private String alias;
     private int limit;
-    private boolean selectAll;
 
     public JDBCSelectQueryBuilder selectAll() {
         this.selectAll = true;
@@ -101,12 +101,11 @@ public class JDBCSelectQueryBuilder extends JDBCQueryBuilder {
                 " JOIN " +
                 table +
                 " ON " +
-                columnLeft +
+                this.alias + "." + columnLeft +
                 operation.getOperation() +
-                columnRight;
+                table + "." + columnRight;
 
         this.joins.add(string);
-
         return this;
     }
 

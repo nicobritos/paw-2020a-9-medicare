@@ -55,14 +55,13 @@ public class StaffDaoImpl extends GenericSearchableDaoImpl<Staff, Integer> imple
             i++;
         }
 
-
         JDBCQueryBuilder queryBuilder = new JDBCSelectQueryBuilder()
                 .selectAll()
-                .from(this.getSpecialtiesTableName())
-                .join(this.getTableName(), "staff_id", "staff_id")
+                .from(this.getTableAlias())
+                .join(this.getSpecialtiesIntermediateTableName(), "staff_id", "staff_id")
                 .where(new JDBCWhereClauseBuilder()
                         .in(
-                                formatColumnFromName("specialty_id", this.getSpecialtiesTableName()),
+                                formatColumnFromName("specialty_id", this.getSpecialtiesIntermediateTableName()),
                                 specialtyParameters
                         )
                 )
@@ -76,12 +75,14 @@ public class StaffDaoImpl extends GenericSearchableDaoImpl<Staff, Integer> imple
 
     @Override
     public Collection<Staff> findByNameAndStaffSpecialties(String name, Collection<StaffSpecialty> staffSpecialties) {
-        if (staffSpecialties.isEmpty())
+        if (staffSpecialties.isEmpty() && name.isEmpty())
             return new LinkedList<>();
 
         Map<String, Object> parameters = new HashMap<>();
         Collection<String> specialtyParameters = new LinkedList<>();
-        parameters.put("name", name.toLowerCase());
+        name = name.toLowerCase();
+        parameters.put("firstName", name);
+        parameters.put("surname", name);
 
         int i = 0;
         for (StaffSpecialty staffSpecialty : staffSpecialties) {
@@ -97,42 +98,28 @@ public class StaffDaoImpl extends GenericSearchableDaoImpl<Staff, Integer> imple
 
         JDBCQueryBuilder queryBuilder = new JDBCSelectQueryBuilder()
                 .selectAll()
-                .from(this.getSpecialtiesTableName())
-                .join(this.getTableName(), "staff_id", "staff_id")
+                .from(this.getTableAlias())
+                .join(this.getSpecialtiesIntermediateTableName(), "staff_id", "staff_id")
                 .where(new JDBCWhereClauseBuilder()
                         .in(
-                                formatColumnFromName("specialty_id", this.getSpecialtiesTableName()),
+                                formatColumnFromName("specialty_id", this.getSpecialtiesIntermediateTableName()),
                                 specialtyParameters
                         )
                         .and()
-                        .where(this.formatColumnFromName("surname"), Operation.LIKE, ":name", ColumnTransformer.LOWER)
-                )
-                .distinct();
-
-        Collection<Staff> staffs = new LinkedList<>(this.selectQuery(queryBuilder.getQueryAsString(), parameterSource));
-
-        queryBuilder = new JDBCSelectQueryBuilder()
-                .selectAll()
-                .from(this.getSpecialtiesTableName())
-                .join(this.getTableName(), "staff_id", "staff_id")
-                .where(new JDBCWhereClauseBuilder()
-                        .in(
-                                formatColumnFromName("specialty_id", this.getSpecialtiesTableName()),
-                                specialtyParameters
+                        .where(new JDBCWhereClauseBuilder()
+                                .where(this.formatColumnFromName("surname"), Operation.LIKE, ":surname", ColumnTransformer.LOWER)
+                                .or()
+                                .where(this.formatColumnFromName("first_name"), Operation.LIKE, ":firstName", ColumnTransformer.LOWER)
                         )
-                        .and()
-                        .where(this.formatColumnFromName("first_name"), Operation.LIKE, ":name", ColumnTransformer.LOWER)
                 )
                 .distinct();
 
-        staffs.addAll(this.selectQuery(queryBuilder.getQueryAsString(), parameterSource));
-
-        return staffs;
+        return new LinkedList<>(this.selectQuery(queryBuilder.getQueryAsString(), parameterSource));
     }
 
     @Override
     public Collection<Staff> findByNameOfficeAndStaffSpecialties(String name, Collection<Office> offices, Collection<StaffSpecialty> staffSpecialties) {
-        if (staffSpecialties.isEmpty() && offices.isEmpty())
+        if (staffSpecialties.isEmpty() && offices.isEmpty() && name.isEmpty())
             return new LinkedList<>();
 
         Map<String, Object> parameters = new HashMap<>();
@@ -155,30 +142,35 @@ public class StaffDaoImpl extends GenericSearchableDaoImpl<Staff, Integer> imple
             i++;
         }
 
-
-        JDBCWhereClauseBuilder whereClauseBuilder = new JDBCWhereClauseBuilder();
-        whereClauseBuilder
+        JDBCWhereClauseBuilder whereClauseBuilder = new JDBCWhereClauseBuilder()
                 .in(
-                        formatColumnFromName("specialty_id", this.getSpecialtiesTableName()),
+                        formatColumnFromName("specialty_id", this.getSpecialtiesIntermediateTableName()),
                         specialtyParameters
                 )
                 .and()
                 .in(
-                        formatColumnFromName("office_id", this.getSpecialtiesTableName()),
+                        formatColumnFromName("office_id", this.getTableAlias()),
                         officeParameters
                 );
 
-        if (name != null && !name.isEmpty()) {
-            parameters.put("name", name.toLowerCase());
+        if (!name.isEmpty()) {
+            name = name.toLowerCase();
+            parameters.put("firstName", name);
+            parameters.put("surname", name);
+
             whereClauseBuilder
-                    .and()
-                    .where(this.formatColumnFromName("name"), Operation.LIKE, ":name", ColumnTransformer.LOWER);
+                .and()
+                .where(new JDBCWhereClauseBuilder()
+                        .where(this.formatColumnFromName("surname"), Operation.LIKE, ":surname", ColumnTransformer.LOWER)
+                        .or()
+                        .where(this.formatColumnFromName("first_name"), Operation.LIKE, ":firstName", ColumnTransformer.LOWER)
+                );
         }
 
         JDBCQueryBuilder queryBuilder = new JDBCSelectQueryBuilder()
                 .selectAll()
-                .from(this.getSpecialtiesTableName())
-                .join(this.getTableName(), "staff_id", "staff_id")
+                .from(this.getTableAlias())
+                .join(this.getSpecialtiesIntermediateTableName(), "staff_id", "staff_id")
                 .where(whereClauseBuilder)
                 .distinct();
 
@@ -201,6 +193,10 @@ public class StaffDaoImpl extends GenericSearchableDaoImpl<Staff, Integer> imple
     @Override
     protected RowMapper<Staff> getRowMapper() {
         return this.rowMapper;
+    }
+
+    private String getSpecialtiesIntermediateTableName() {
+        return "system_staff_specialty_staff";
     }
 
     private String getSpecialtiesTableName() {

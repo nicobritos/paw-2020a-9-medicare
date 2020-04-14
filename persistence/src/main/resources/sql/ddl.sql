@@ -6,8 +6,6 @@ create table system_country
 	name text not null
 );
 
-alter table system_country owner to postgres;
-
 create unique index system_country_country_id_uindex
 	on system_country (country_id);
 
@@ -16,14 +14,12 @@ create table system_province
 	province_id serial not null
 		constraint system_province_pk
 			primary key,
-	country_id varchar(2) not null
+	country_id varchar(2)
 		constraint system_province_country
 			references system_country
 				on update restrict on delete cascade,
 	name text not null
 );
-
-alter table system_province owner to postgres;
 
 create table office
 (
@@ -32,7 +28,7 @@ create table office
 			primary key,
 	name text not null,
 	street text,
-	province_id integer not null
+	province_id integer
 		constraint office_province_id
 			references system_province
 				on update restrict on delete restrict,
@@ -40,8 +36,6 @@ create table office
 	email text,
 	street_number integer not null
 );
-
-alter table office owner to postgres;
 
 create unique index office_office_id_uindex
 	on office (office_id);
@@ -54,7 +48,7 @@ create table staff
 	staff_id serial not null
 		constraint staff_pk
 			primary key,
-	office_id integer not null
+	office_id integer
 		constraint staff_office
 			references office
 				on update restrict on delete cascade,
@@ -64,8 +58,6 @@ create table staff
 	email text,
 	registration_number integer not null
 );
-
-alter table staff owner to postgres;
 
 create unique index staff_staff_id_uindex
 	on staff (staff_id);
@@ -77,8 +69,6 @@ create table system_staff_specialty
 			primary key,
 	name text not null
 );
-
-alter table system_staff_specialty owner to postgres;
 
 create unique index specialty_specialty_id_uindex
 	on system_staff_specialty (specialty_id);
@@ -94,6 +84,4 @@ create table system_staff_specialty_staff
 			references staff
 				on update restrict on delete cascade
 );
-
-alter table system_staff_specialty_staff owner to postgres;
 

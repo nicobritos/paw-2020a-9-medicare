@@ -11,7 +11,7 @@ create table if not exists system_province
     province_id identity not null
         constraint system_province_pk
             primary key,
-    country_id varchar(2) not null
+    country_id varchar(2)
         constraint system_province_country
             references system_country
 --             on update restrict on delete cascade
@@ -26,7 +26,7 @@ create table if not exists office
             primary key,
     name varchar(255) not null,
     street varchar(255),
-    province_id integer not null
+    province_id integer
         constraint office_province_id
             references system_province
 --             on update restrict on delete restrict
@@ -41,7 +41,7 @@ create table if not exists staff
     staff_id identity not null
         constraint staff_pk
             primary key,
-    office_id integer not null
+    office_id integer
         constraint staff_office
             references office
 --             on update restrict on delete cascade

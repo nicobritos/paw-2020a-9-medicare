@@ -589,7 +589,7 @@ public abstract class GenericDaoImpl<M extends GenericModel<I>, I> implements Ge
                 throw new RuntimeException(e);
             }
         });
-        ReflectionGetterSetter.iterateValues(model, ManyToMany.class, (field, o) -> {
+        ReflectionGetterSetter.iterateValues(model, ManyToMany.class, true, (field, o) -> {
             ManyToMany relation = field.getAnnotation(ManyToMany.class);
 
             JoinedCollection<GenericModel<Object>> joinedCollectionGenericModel = (JoinedCollection<GenericModel<Object>>) o;
