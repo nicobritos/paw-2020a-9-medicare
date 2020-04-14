@@ -23,7 +23,7 @@ public class MedicListController {
     @Autowired
     StaffSpecialtyService specialityService;
 
-    @RequestMapping(value = "/")
+    @RequestMapping(value = "/mediclist")
     public ModelAndView medicsList(@RequestParam(value = "name",required = false)String name,@RequestParam(value = "specialties",required = false) String specialties){
         //get modelandview from index.jsp
         final ModelAndView mav = new ModelAndView("index");

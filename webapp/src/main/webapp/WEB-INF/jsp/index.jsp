@@ -2,6 +2,7 @@
 <html>
     <head>
         <%@ include file = "head.jsp" %>
+        <link rel="stylesheet" type="text/css" href="<c:url value="/css/styles.css"/>">
     </head>
     <body>
         <%@ include file = "header.jsp" %>

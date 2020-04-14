@@ -19,6 +19,6 @@
 		let specialties = id >= 0 ? "specialties=" + id : "";
 		let connector = id>=0 && name ? "&&" : "";
 		let querySelector = id>=0 || name ? "?" : "";
-		location.href = "<c:url value="/"/>" + querySelector + name + connector + specialties;
+		location.href = "<c:url value="/mediclist"/>" + querySelector + name + connector + specialties;
 	};
 </script>
