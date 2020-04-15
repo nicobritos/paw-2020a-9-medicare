@@ -64,8 +64,4 @@ public class Staff extends GenericModel<Integer> {
     public Collection<StaffSpecialty> getStaffSpecialties() {
         return this.staffSpecialties.getModels();
     }
-
-    public void setStaffSpecialties(Collection<StaffSpecialty> staffSpecialties) {
-        this.staffSpecialties.setModels(staffSpecialties);
-    }
 }

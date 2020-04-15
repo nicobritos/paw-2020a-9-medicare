@@ -2,7 +2,9 @@ package ar.edu.itba.paw.persistence;
 
 import ar.edu.itba.paw.interfaces.daos.OfficeDao;
 import ar.edu.itba.paw.models.Country;
+import ar.edu.itba.paw.models.Locality;
 import ar.edu.itba.paw.models.Office;
+import ar.edu.itba.paw.models.Province;
 import ar.edu.itba.paw.persistence.generics.GenericSearchableDaoImpl;
 import ar.edu.itba.paw.persistence.utils.builder.JDBCQueryBuilder;
 import ar.edu.itba.paw.persistence.utils.builder.JDBCSelectQueryBuilder;
@@ -32,6 +34,7 @@ public class OfficeDaoImpl extends GenericSearchableDaoImpl<Office, Integer> imp
         JDBCQueryBuilder queryBuilder = new JDBCSelectQueryBuilder()
                 .selectAll()
                 .from(this.getTableAlias())
+                .join(LocalityDaoImpl.TABLE_NAME, "locality_id",  LocalityDaoImpl.PRIMARY_KEY_NAME)
                 .join(ProvinceDaoImpl.TABLE_NAME, "province_id",  ProvinceDaoImpl.PRIMARY_KEY_NAME)
                 .where(new JDBCWhereClauseBuilder()
                         .where("country_id", Operation.EQ, ":country_id")
@@ -42,6 +45,28 @@ public class OfficeDaoImpl extends GenericSearchableDaoImpl<Office, Integer> imp
         parameterSource.addValue("country_id", country.getId());
 
         return this.selectQuery(queryBuilder.getQueryAsString(), parameterSource);
+    }
+
+    @Override
+    public Collection<Office> findByProvince(Province province) {
+        JDBCQueryBuilder queryBuilder = new JDBCSelectQueryBuilder()
+                .selectAll()
+                .from(this.getTableAlias())
+                .join(LocalityDaoImpl.TABLE_NAME, "locality_id",  LocalityDaoImpl.PRIMARY_KEY_NAME)
+                .where(new JDBCWhereClauseBuilder()
+                        .where("province_id", Operation.EQ, ":province_id")
+                )
+                .distinct();
+
+        MapSqlParameterSource parameterSource = new MapSqlParameterSource();
+        parameterSource.addValue("province_id", province.getId());
+
+        return this.selectQuery(queryBuilder.getQueryAsString(), parameterSource);
+    }
+
+    @Override
+    public Collection<Office> findByLocality(Locality locality) {
+        return this.findByField("locality_id", locality);
     }
 
     @Override
