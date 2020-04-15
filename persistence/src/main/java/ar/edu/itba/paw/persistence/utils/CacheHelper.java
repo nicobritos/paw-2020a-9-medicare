@@ -18,7 +18,20 @@ public class CacheHelper {
         cacheManager.init();
     }
 
-    public static synchronized <M extends GenericModel<M, I>, I> int getSize(Class<M> mClass) {
+    public static synchronized <M extends GenericModel<M, I>, I> void clean(Class<M> mClass, Class<I> iClass){
+        cacheManager.removeCache(mClass.getName());
+        sizes.put(mClass, 0);
+        cacheManager.createCache(
+                mClass.getName(),
+                CacheConfigurationBuilder.newCacheConfigurationBuilder(
+                        iClass,
+                        mClass,
+                        ResourcePoolsBuilder.heap(500)
+                )
+        );
+    }
+
+        public static synchronized <M extends GenericModel<M, I>, I> int getSize(Class<M> mClass) {
         return sizes.getOrDefault(mClass, 0);
     }
 

@@ -24,8 +24,8 @@ import static org.junit.Assert.*;
 @ContextConfiguration(classes = TestConfig.class)
 public class LocalityDaoImplTest
 {
-    private static final String LOCALITY = "Buenos Aires";
-    private static final String PROVINCE = "Argentina";
+    private static final String LOCALITY = "Capital Federal";
+    private static final String PROVINCE = "Buenos Aires";
 
     private static final String LOCALITIES_TABLE = "system_locality";
     private static final String PROVINCES_TABLE = "system_province";
