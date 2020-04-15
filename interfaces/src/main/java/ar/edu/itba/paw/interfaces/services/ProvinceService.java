@@ -18,7 +18,7 @@ public interface ProvinceService extends GenericService<Province, Integer> {
      */
     Collection<Province> findByCountryAndName(Country country, String name);
 
-    void addLocality(Province province, Locality locality);
-
-    void addLocalities(Province province, Collection<Locality> localities);
+//    void addLocality(Province province, Locality locality);
+//
+//    void addLocalities(Province province, Collection<Locality> localities);
 }

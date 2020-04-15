@@ -19,7 +19,7 @@ create table if not exists system_province
     name varchar(255) not null
 );
 
-create table system_locality
+create table if not exists system_locality
 (
     province_id integer
         constraint system_locality_province

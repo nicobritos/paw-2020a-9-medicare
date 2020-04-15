@@ -32,12 +32,10 @@ public class ServicesTest
         Country country = new Country();
         country.setId(ID);
         country.setName(NAME);
-        country.setProvinces(Collections.emptyList());
         when(countryDao.create(any())).thenReturn(country);
         Country c = new Country();
         c.setId(ID);
         c.setName(NAME);
-        c.setProvinces(Collections.emptyList());
 
         Country ans = countryService.create(c);
 

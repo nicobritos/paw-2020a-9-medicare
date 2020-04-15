@@ -1,7 +1,6 @@
 package ar.edu.itba.paw;
 
 import ar.edu.itba.paw.models.Country;
-import ar.edu.itba.paw.models.Province;
 import ar.edu.itba.paw.persistence.CountryDaoImpl;
 import ar.edu.itba.paw.persistence.utils.builder.JDBCWhereClauseBuilder;
 import org.junit.Before;
@@ -30,12 +29,10 @@ public class CountryDaoImplTest
     private static final String PROVINCE = "Buenos Aires";
 
     private static final String COUNTRIES_TABLE = "system_country";
-    private static final String PROVINCE_TABLE = "system_province";
 
     private CountryDaoImpl countryDao;
     private JdbcTemplate jdbcTemplate;
     private SimpleJdbcInsert jdbcInsert;
-    private SimpleJdbcInsert provinceJdbcInsert;
 
     @Autowired
     private DataSource ds;
@@ -46,10 +43,6 @@ public class CountryDaoImplTest
         this.jdbcTemplate = new JdbcTemplate(this.ds);
         this.jdbcInsert = new SimpleJdbcInsert(this.ds)
                 .withTableName(COUNTRIES_TABLE);
-        this.provinceJdbcInsert = new SimpleJdbcInsert(this.ds)
-                .withTableName(PROVINCE_TABLE)
-                .usingGeneratedKeyColumns("province_id");
-
     }
 
     private void cleanAllTables(){
@@ -60,15 +53,7 @@ public class CountryDaoImplTest
         Country c = new Country();
         c.setName(COUNTRY);
         c.setId(COUNTRY_ID);
-        c.setProvinces(Collections.emptyList());
         return c;
-    }
-
-    private Province provinceModel() {
-        Province p = new Province();
-        p.setId(0);
-        p.setName(PROVINCE);
-        return p;
     }
 
     private void insertCountry() {
@@ -287,7 +272,6 @@ public class CountryDaoImplTest
         Country c = new Country();
         c.setId("AR");
         c.setName("Armenia");
-        c.setProvinces(Collections.emptyList());
 
         // 2. Ejercitar
         this.countryDao.update(c);
@@ -297,31 +281,6 @@ public class CountryDaoImplTest
         assertEquals(1,JdbcTestUtils.countRowsInTableWhere(jdbcTemplate, COUNTRIES_TABLE, "name = 'Armenia'"));
         assertEquals(0,JdbcTestUtils.countRowsInTableWhere(jdbcTemplate, COUNTRIES_TABLE, "name = '"+ COUNTRY +"'"));
 
-    }
-
-    @Test
-    public void testCountryUpdateProvinces()
-    {
-        // 1. Precondiciones
-        cleanAllTables();
-        insertCountry();
-        insertAnotherCountry();
-        Map<String, Object> provinceMap = new HashMap<>();
-        provinceMap.put("name", PROVINCE);
-        provinceMap.put("country_id", "BR");
-        provinceJdbcInsert.execute(provinceMap);
-
-        Country c = new Country();
-        c.setId(COUNTRY_ID);
-        c.setName(COUNTRY);
-        c.setProvinces(Collections.singletonList(provinceModel()));
-
-        // 2. Ejercitar
-        this.countryDao.update(c);
-
-        // 3. Postcondiciones
-        assertEquals(2, JdbcTestUtils.countRowsInTable(jdbcTemplate, COUNTRIES_TABLE));
-        assertEquals(1, JdbcTestUtils.countRowsInTableWhere(jdbcTemplate, PROVINCE_TABLE, "country_id = '"+ COUNTRY_ID +"'"));
     }
 
     @Test
