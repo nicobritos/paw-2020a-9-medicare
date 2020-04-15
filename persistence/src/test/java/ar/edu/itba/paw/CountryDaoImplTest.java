@@ -1,6 +1,7 @@
 package ar.edu.itba.paw;
 
 import ar.edu.itba.paw.models.Country;
+import ar.edu.itba.paw.models.Province;
 import ar.edu.itba.paw.persistence.CountryDaoImpl;
 import ar.edu.itba.paw.persistence.utils.builder.JDBCWhereClauseBuilder;
 import org.junit.Before;
@@ -29,10 +30,12 @@ public class CountryDaoImplTest
     private static final String PROVINCE = "Buenos Aires";
 
     private static final String COUNTRIES_TABLE = "system_country";
+    private static final String PROVINCES_TABLE = "system_province";
 
     private CountryDaoImpl countryDao;
     private JdbcTemplate jdbcTemplate;
     private SimpleJdbcInsert jdbcInsert;
+    private SimpleJdbcInsert provinceJdbcInsert;
 
     @Autowired
     private DataSource ds;
@@ -43,10 +46,20 @@ public class CountryDaoImplTest
         this.jdbcTemplate = new JdbcTemplate(this.ds);
         this.jdbcInsert = new SimpleJdbcInsert(this.ds)
                 .withTableName(COUNTRIES_TABLE);
+        this.provinceJdbcInsert = new SimpleJdbcInsert(this.ds)
+                .withTableName(PROVINCES_TABLE)
+                .usingGeneratedKeyColumns("province_id");
     }
 
     private void cleanAllTables(){
         this.jdbcTemplate.execute("TRUNCATE SCHEMA PUBLIC RESTART IDENTITY AND COMMIT NO CHECK");
+    }
+
+    private Province provinceModel(){
+        Province p = new Province();
+        p.setName(PROVINCE);
+        p.setId(0);
+        return p;
     }
 
     private Country countryModel(){
@@ -310,5 +323,29 @@ public class CountryDaoImplTest
 
         // 3. Postcondiciones
         assertEquals(0,JdbcTestUtils.countRowsInTable(jdbcTemplate, COUNTRIES_TABLE));
+    }
+
+    @Test
+    public void testCountryUpdateProvinces(){
+        // 1. Precondiciones
+        cleanAllTables();
+        insertCountry();
+        insertAnotherCountry();
+        Map<String, Object> provinceMap = new HashMap<>();
+        provinceMap.put("name", PROVINCE);
+        provinceMap.put("country_id", "BR");
+        provinceJdbcInsert.execute(provinceMap);
+
+        Country c = new Country();
+        c.setId("AR");
+        c.setName("Argentina");
+        c.getProvinces().add(provinceModel());
+
+        // 2. Ejercitar
+        this.countryDao.update(c);
+
+        // 3. Postcondiciones
+        assertEquals(2,JdbcTestUtils.countRowsInTable(jdbcTemplate, COUNTRIES_TABLE));
+        assertEquals(1,JdbcTestUtils.countRowsInTableWhere(jdbcTemplate, PROVINCES_TABLE, "country_id = '" + COUNTRY_ID + "'"));
     }
 }
