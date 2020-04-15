@@ -179,7 +179,7 @@ public class CacheHelper {
                 CacheConfigurationBuilder.newCacheConfigurationBuilder(
                         iClass,
                         mClass,
-                        ResourcePoolsBuilder.heap(50)
+                        ResourcePoolsBuilder.heap(300)
                 )
         );
         cacheMap.put(mClass.getName(), cache);
