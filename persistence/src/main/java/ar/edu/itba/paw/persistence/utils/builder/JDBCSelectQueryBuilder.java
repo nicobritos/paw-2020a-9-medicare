@@ -152,7 +152,7 @@ public class JDBCSelectQueryBuilder extends JDBCQueryBuilder {
                 .append(this.table);
 
         if (this.joins.size() > 0) {
-            stringBuilder.append(this.joinStrings(this.joins));
+            stringBuilder.append(this.joinStrings(this.joins, " "));
         }
 
         if (this.whereClauseBuilder != null) {
