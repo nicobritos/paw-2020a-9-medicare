@@ -139,7 +139,6 @@ public class OfficeDaoImplTest
         o.setPhone(PHONE);
         o.setLocality(localityModel());
         o.setStreet(STREET);
-        o.setStreetNumber(STREET_NUMBER);
         return o;
     }
 

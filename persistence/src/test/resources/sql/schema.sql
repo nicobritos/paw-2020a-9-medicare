@@ -46,8 +46,7 @@ create table if not exists office
 --             on update restrict on delete restrict
 ,
     phone varchar(255),
-    email varchar(255),
-    street_number integer not null
+    email varchar(255)
 );
 
 create table if not exists staff

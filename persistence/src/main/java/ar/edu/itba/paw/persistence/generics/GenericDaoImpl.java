@@ -330,7 +330,6 @@ public abstract class GenericDaoImpl<M extends GenericModel<I>, I> implements Ge
     protected M insertQuery(M model, MapSqlParameterSource args) {
         I id;
         if (!this.customPrimaryKey) {
-            System.out.println(args.getValues());
             id = (I) this.jdbcInsert.executeAndReturnKey(args);
         } else {
             this.jdbcInsert.execute(args);

@@ -17,8 +17,6 @@ public class Office extends GenericModel<Integer> {
     private String name;
     @ManyToOne(name = "locality_id", required = true)
     private Locality locality;
-    @Column(name = "street_number", required = true)
-    private int streetNumber;
     @Column(name = "street", required = true)
     private String street;
     @OneToMany(name = "office_id", className = Staff.class)
@@ -62,14 +60,6 @@ public class Office extends GenericModel<Integer> {
 
     public void setLocality(Locality locality) {
         this.locality = locality;
-    }
-
-    public int getStreetNumber() {
-        return this.streetNumber;
-    }
-
-    public void setStreetNumber(int streetNumber) {
-        this.streetNumber = streetNumber;
     }
 
     public Collection<Staff> getStaffs() {

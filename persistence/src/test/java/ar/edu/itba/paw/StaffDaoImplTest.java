@@ -1,6 +1,9 @@
 package ar.edu.itba.paw;
 
-import ar.edu.itba.paw.models.*;
+import ar.edu.itba.paw.models.Locality;
+import ar.edu.itba.paw.models.Office;
+import ar.edu.itba.paw.models.Staff;
+import ar.edu.itba.paw.models.StaffSpecialty;
 import ar.edu.itba.paw.persistence.StaffDaoImpl;
 import ar.edu.itba.paw.persistence.utils.builder.JDBCWhereClauseBuilder;
 import org.junit.Before;
@@ -145,7 +148,6 @@ public class StaffDaoImplTest
         o.setPhone(PHONE);
         o.setLocality(this.localityModel());
         o.setStreet(STREET);
-        o.setStreetNumber(STREET_NUMBER);
         return o;
     }
 
