@@ -84,26 +84,42 @@ public class JDBCSelectQueryBuilder extends JDBCQueryBuilder {
         return this;
     }
 
-    public JDBCSelectQueryBuilder join(String table, String columnLeft, String columnRight) {
-        return this.join(table, columnLeft, Operation.EQ, columnRight, JoinType.INNER);
+    public JDBCSelectQueryBuilder join(String columnLeft, String tableRight, String columnRight) {
+        return this.join(columnLeft, Operation.EQ, tableRight, columnRight, JoinType.INNER);
     }
 
-    public JDBCSelectQueryBuilder join(String table, String columnLeft, String columnRight, JoinType joinType) {
-        return this.join(table, columnLeft, Operation.EQ, columnRight, joinType);
+    public JDBCSelectQueryBuilder join(String columnLeft, String tableRight, String columnRight, JoinType joinType) {
+        return this.join(columnLeft, Operation.EQ, tableRight, columnRight, joinType);
     }
 
-    public JDBCSelectQueryBuilder join(String table, String columnLeft, JDBCWhereClauseBuilder.Operation operation, String columnRight) {
-        return this.join(table, columnLeft, operation, columnRight, JoinType.INNER);
+    public JDBCSelectQueryBuilder join(String columnLeft, Operation operation, String tableRight, String columnRight) {
+        return this.join(columnLeft, operation, tableRight, columnRight, JoinType.INNER);
     }
 
-    public JDBCSelectQueryBuilder join(String table, String columnLeft, JDBCWhereClauseBuilder.Operation operation, String columnRight, JoinType joinType) {
+    public JDBCSelectQueryBuilder join(String columnLeft, Operation operation, String tableRight, String columnRight, JoinType joinType) {
+        return this.join(this.alias, columnLeft, operation, tableRight, columnRight, joinType);
+    }
+
+    public JDBCSelectQueryBuilder join(String tableLeft, String columnLeft, String tableRight, String columnRight) {
+        return this.join(tableLeft, columnLeft, Operation.EQ, tableRight, columnRight, JoinType.INNER);
+    }
+
+    public JDBCSelectQueryBuilder join(String tableLeft, String columnLeft, String tableRight, String columnRight, JoinType joinType) {
+        return this.join(tableLeft, columnLeft, Operation.EQ, tableRight, columnRight, joinType);
+    }
+
+    public JDBCSelectQueryBuilder join(String tableLeft, String columnLeft, Operation operation, String tableRight, String columnRight) {
+        return this.join(tableLeft, columnLeft, operation, tableRight, columnRight, JoinType.INNER);
+    }
+
+    public JDBCSelectQueryBuilder join(String tableLeft, String columnLeft, Operation operation, String tableRight, String columnRight, JoinType joinType) {
         String string = joinType.getJoinType() +
                 " JOIN " +
-                table +
+                tableRight +
                 " ON " +
-                this.alias + "." + columnLeft +
+                tableLeft + "." + columnLeft +
                 operation.getOperation() +
-                table + "." + columnRight;
+                tableRight + "." + columnRight;
 
         this.joins.add(string);
         return this;

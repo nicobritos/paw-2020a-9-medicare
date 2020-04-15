@@ -58,7 +58,7 @@ public class StaffDaoImpl extends GenericSearchableDaoImpl<Staff, Integer> imple
         JDBCQueryBuilder queryBuilder = new JDBCSelectQueryBuilder()
                 .selectAll()
                 .from(this.getTableAlias())
-                .join(this.getSpecialtiesIntermediateTableName(), "staff_id", "staff_id")
+                .join("staff_id", this.getSpecialtiesIntermediateTableName(), "staff_id")
                 .where(new JDBCWhereClauseBuilder()
                         .in(
                                 formatColumnFromName("specialty_id", this.getSpecialtiesIntermediateTableName()),
@@ -99,7 +99,7 @@ public class StaffDaoImpl extends GenericSearchableDaoImpl<Staff, Integer> imple
         JDBCQueryBuilder queryBuilder = new JDBCSelectQueryBuilder()
                 .selectAll()
                 .from(this.getTableAlias())
-                .join(this.getSpecialtiesIntermediateTableName(), "staff_id", "staff_id")
+                .join("staff_id", this.getSpecialtiesIntermediateTableName(), "staff_id")
                 .where(new JDBCWhereClauseBuilder()
                         .in(
                                 formatColumnFromName("specialty_id", this.getSpecialtiesIntermediateTableName()),
@@ -170,7 +170,7 @@ public class StaffDaoImpl extends GenericSearchableDaoImpl<Staff, Integer> imple
         JDBCQueryBuilder queryBuilder = new JDBCSelectQueryBuilder()
                 .selectAll()
                 .from(this.getTableAlias())
-                .join(this.getSpecialtiesIntermediateTableName(), "staff_id", "staff_id")
+                .join("staff_id", this.getSpecialtiesIntermediateTableName(), "staff_id")
                 .where(whereClauseBuilder)
                 .distinct();
 
