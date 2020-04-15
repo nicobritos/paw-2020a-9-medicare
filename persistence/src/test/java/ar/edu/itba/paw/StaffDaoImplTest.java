@@ -1,9 +1,6 @@
 package ar.edu.itba.paw;
 
-import ar.edu.itba.paw.models.Office;
-import ar.edu.itba.paw.models.Province;
-import ar.edu.itba.paw.models.Staff;
-import ar.edu.itba.paw.models.StaffSpecialty;
+import ar.edu.itba.paw.models.*;
 import ar.edu.itba.paw.persistence.StaffDaoImpl;
 import ar.edu.itba.paw.persistence.utils.builder.JDBCWhereClauseBuilder;
 import org.junit.Before;
@@ -30,6 +27,7 @@ public class StaffDaoImplTest
     private static final String OFFICE_NAME = "Hospital Nacional";
     private static final String STREET = "Av 9 de Julio";
     private static final String PROVINCE = "Buenos Aires";
+    private static final String LOCALITY = "Capital Federal";
     private static final String PHONE = "1234567890";
     private static final String EMAIL = "test@test.com";
     private static final int STREET_NUMBER = 123;
@@ -129,7 +127,6 @@ public class StaffDaoImplTest
         s.setPhone(PHONE);
         s.setRegistrationNumber(REGISTRATION_NUMBER);
         s.setId(0);
-        s.setStaffSpecialties(Collections.singletonList(this.staffSpecialtyModel()));
         return s;
     }
 
@@ -146,18 +143,17 @@ public class StaffDaoImplTest
         o.setName(NAME);
         o.setEmail(EMAIL);
         o.setPhone(PHONE);
-        o.setProvince(this.provinceModel());
-        o.setStaffs(Collections.singletonList(this.staffModel()));
+        o.setLocality(this.localityModel());
         o.setStreet(STREET);
         o.setStreetNumber(STREET_NUMBER);
         return o;
     }
 
-    private Province provinceModel() {
-        Province p = new Province();
-        p.setName(PROVINCE);
-        p.setId(0); // Identity de HSQLDB empieza en 0
-        return p;
+    private Locality localityModel() {
+        Locality l = new Locality();
+        l.setName(LOCALITY);
+        l.setId(0); // Identity de HSQLDB empieza en 0
+        return l;
     }
 
     @Before

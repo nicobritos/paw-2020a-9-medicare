@@ -1,8 +1,8 @@
 package ar.edu.itba.paw;
 
 import ar.edu.itba.paw.models.Country;
+import ar.edu.itba.paw.models.Locality;
 import ar.edu.itba.paw.models.Office;
-import ar.edu.itba.paw.models.Province;
 import ar.edu.itba.paw.persistence.OfficeDaoImpl;
 import ar.edu.itba.paw.persistence.utils.builder.JDBCWhereClauseBuilder;
 import org.junit.Before;
@@ -29,13 +29,16 @@ public class OfficeDaoImplTest
     private static final String NAME = "Hospital Nacional";
     private static final String STREET = "Av 9 de Julio";
     private static final String PROVINCE = "Buenos Aires";
+    private static final String LOCALITY = "Capital Federal";
     private static final String PHONE = "1234567890";
     private static final String EMAIL = "test@test.com";
     private static final int STREET_NUMBER = 123;
     private static final String COUNTRY = "Argentina";
     private static final String COUNTRY_ID = "AR";
 
+
     private static final String OFFICE_TABLE = "office";
+    private static final String LOCALITY_TABLE = "system_locality";
     private static final String PROVINCE_TABLE = "system_province";
     private static final String COUNTRY_TABLE = "system_country";
 
@@ -43,6 +46,7 @@ public class OfficeDaoImplTest
     private OfficeDaoImpl officeDao;
     private JdbcTemplate jdbcTemplate;
     private SimpleJdbcInsert officeJdbcInsert;
+    private SimpleJdbcInsert localityJdbcInsert;
     private SimpleJdbcInsert provinceJdbcInsert;
     private SimpleJdbcInsert countryJdbcInsert;
 
@@ -56,6 +60,9 @@ public class OfficeDaoImplTest
         this.officeJdbcInsert = new SimpleJdbcInsert(this.ds)
                 .withTableName(OFFICE_TABLE)
                 .usingGeneratedKeyColumns("office_id");
+        this.localityJdbcInsert = new SimpleJdbcInsert(this.ds)
+                .withTableName(LOCALITY_TABLE)
+                .usingGeneratedKeyColumns("locality_id");
         this.provinceJdbcInsert = new SimpleJdbcInsert(this.ds)
                 .withTableName(PROVINCE_TABLE)
                 .usingGeneratedKeyColumns("province_id");
@@ -67,7 +74,7 @@ public class OfficeDaoImplTest
         this.jdbcTemplate.execute("TRUNCATE SCHEMA PUBLIC RESTART IDENTITY AND COMMIT NO CHECK");
     }
 
-    private void insertProvince(){
+    private void insertLocality(){
         // Insertar pais
         Map<String, Object> countryMap = new HashMap<>();
         countryMap.put("name", COUNTRY);
@@ -79,16 +86,21 @@ public class OfficeDaoImplTest
         provinceMap.put("name", PROVINCE);
         provinceMap.put("country_id", COUNTRY_ID);
         provinceJdbcInsert.execute(provinceMap);
+
+        Map<String, Object> localityMap = new HashMap<>();
+        localityMap.put("name", LOCALITY);
+        localityMap.put("province_id", 0);
+        localityJdbcInsert.execute(localityMap);
     }
 
     private void insertOffice(){
-        insertProvince();
+        insertLocality();
 
         Map<String, Object> officeMap = new HashMap<>();
         officeMap.put("name", NAME);
         officeMap.put("email", EMAIL);
         officeMap.put("phone", PHONE);
-        officeMap.put("province_id", 0); // Identity de HSQLDB empieza en 0
+        officeMap.put("locality_id", 0); // Identity de HSQLDB empieza en 0
         officeMap.put("street", STREET);
         officeMap.put("street_number", STREET_NUMBER);
         officeJdbcInsert.execute(officeMap);
@@ -99,7 +111,7 @@ public class OfficeDaoImplTest
         officeMap.put("name", NAME + "_1");
         officeMap.put("email", EMAIL);
         officeMap.put("phone", PHONE);
-        officeMap.put("province_id", 0); // Identity de HSQLDB empieza en 0
+        officeMap.put("locality_id", 0); // Identity de HSQLDB empieza en 0
         officeMap.put("street", STREET);
         officeMap.put("street_number", STREET_NUMBER);
         officeJdbcInsert.execute(officeMap);
@@ -109,15 +121,14 @@ public class OfficeDaoImplTest
         Country c = new Country();
         c.setName(COUNTRY);
         c.setId(COUNTRY_ID);
-        c.setProvinces(Collections.singletonList(provinceModel()));
         return c;
     }
 
-    private Province provinceModel(){
-        Province p = new Province();
-        p.setName(PROVINCE);
-        p.setId(0); // Identity de HSQLDB empieza en 0
-        return p;
+    private Locality localityModel(){
+        Locality l = new Locality();
+        l.setName(LOCALITY);
+        l.setId(0); // Identity de HSQLDB empieza en 0
+        return l;
     }
 
     private Office officeModel(){
@@ -126,8 +137,7 @@ public class OfficeDaoImplTest
         o.setName(NAME);
         o.setEmail(EMAIL);
         o.setPhone(PHONE);
-        o.setProvince(provinceModel());
-        o.setStaffs(Collections.emptyList());
+        o.setLocality(localityModel());
         o.setStreet(STREET);
         o.setStreetNumber(STREET_NUMBER);
         return o;
@@ -138,7 +148,7 @@ public class OfficeDaoImplTest
     {
         // 1. Precondiciones
         cleanAllTables();
-        insertProvince();
+        insertLocality();
         Office o = officeModel();
 
         // 2. Ejercitar

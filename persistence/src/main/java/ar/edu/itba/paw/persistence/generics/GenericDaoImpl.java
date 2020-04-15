@@ -452,14 +452,13 @@ public abstract class GenericDaoImpl<M extends GenericModel<I>, I> implements Ge
             Collection<? extends GenericModel<Object>> otherInstancesCopy = new LinkedList<>(otherInstances);
 
             JoinedCollection<GenericModel<Object>> collection = new JoinedCollection<>();
-            collection.setModels((Collection<GenericModel<Object>>) otherInstances);
             try {
+                ReflectionGetterSetter.set(collection, JoinedCollection._PUBLIC_COLLECTION_NAME, otherInstances);
                 ReflectionGetterSetter.set(collection, JoinedCollection._PRIVATE_COLLECTION_NAME, otherInstancesCopy);
             } catch (NoSuchFieldException e) {
                 // TODO
                 e.printStackTrace();
             }
-            ReflectionGetterSetter.set(m, field, otherInstances);
         });
         ReflectionGetterSetter.iterateFields(this.mClass, ManyToOne.class, field -> {
             // This is similar to processing a OneToOne relation
@@ -505,15 +504,13 @@ public abstract class GenericDaoImpl<M extends GenericModel<I>, I> implements Ge
             Collection<? extends GenericModel<Object>> otherInstancesCopy = new LinkedList<>(otherInstances);
 
             JoinedCollection<GenericModel<Object>> collection = new JoinedCollection<>();
-            collection.setModels((Collection<GenericModel<Object>>) otherInstances);
-            System.out.println(otherInstances == otherInstancesCopy);
             try {
+                ReflectionGetterSetter.set(collection, JoinedCollection._PUBLIC_COLLECTION_NAME, otherInstances);
                 ReflectionGetterSetter.set(collection, JoinedCollection._PRIVATE_COLLECTION_NAME, otherInstancesCopy);
             } catch (NoSuchFieldException e) {
                 // TODO
                 e.printStackTrace();
             }
-            ReflectionGetterSetter.set(m, field, otherInstances);
         });
 
         return m;

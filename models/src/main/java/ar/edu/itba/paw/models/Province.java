@@ -24,8 +24,4 @@ public class Province extends GenericModel<Integer> {
     public Collection<Locality> getLocalities() {
         return this.localities.getModels();
     }
-
-    public void setLocalities(Collection<Locality> localities) {
-        this.localities.setModels(localities);
-    }
 }

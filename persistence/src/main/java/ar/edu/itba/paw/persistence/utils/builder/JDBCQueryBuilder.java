@@ -11,7 +11,11 @@ public abstract class JDBCQueryBuilder {
     public abstract String getQueryAsString();
 
     protected String joinStrings(Collection<String> strings) {
-        return String.join(",", strings);
+        return this.joinStrings(strings, ",");
+    }
+
+    protected String joinStrings(Collection<String> strings, String delimiter) {
+        return String.join(delimiter, strings);
     }
 
     protected abstract String getTable();

@@ -24,8 +24,4 @@ public class Country extends GenericModel<String> {
     public Collection<Province> getProvinces() {
         return this.provinces.getModels();
     }
-
-    public void setProvinces(Collection<Province> provinces) {
-        this.provinces.setModels(provinces);
-    }
 }

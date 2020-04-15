@@ -1,6 +1,7 @@
 package ar.edu.itba.paw.models;
 
 import java.util.Collection;
+import java.util.LinkedList;
 
 /**
  * This class provides a wrapper so that a DAO can keep track of the models added or removed
@@ -15,15 +16,12 @@ public class JoinedCollection<M> {
      * {@link #privateModels}
      */
     public static final String _PRIVATE_COLLECTION_NAME = "privateModels";
+    public static final String _PUBLIC_COLLECTION_NAME = "models";
 
-    private Collection<M> privateModels;
-    private Collection<M> models;
+    private Collection<M> privateModels = new LinkedList<>();
+    private Collection<M> models = new LinkedList<>();
 
     public Collection<M> getModels() {
         return this.models;
-    }
-
-    public void setModels(Collection<M> models) {
-        this.models = models;
     }
 }

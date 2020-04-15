@@ -36,8 +36,6 @@ create table system_locality
 create unique index system_locality_locality_id_uindex
     on system_locality (locality_id);
 
-
-
 create table office
 (
 	office_id serial not null
@@ -45,9 +43,9 @@ create table office
 			primary key,
 	name text not null,
 	street text,
-	province_id integer
-		constraint office_province_id
-			references system_province
+	locality_id integer
+		constraint office_locality_id
+			references system_locality
 				on update restrict on delete restrict,
 	phone text,
 	email text,
