@@ -64,4 +64,11 @@ public class Staff extends GenericModel<Integer> {
     public Collection<StaffSpecialty> getStaffSpecialties() {
         return this.staffSpecialties.getModels();
     }
+
+    @Override
+    public String toString() {
+        return "Staff{" +
+                "staffSpecialties=" + staffSpecialties.getModels().size() +
+                '}';
+    }
 }

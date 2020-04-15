@@ -108,14 +108,37 @@ public abstract class ReflectionGetterSetter {
         return get(object, getFieldByName(fieldName, object.getClass()), false);
     }
 
-    public static void set(Object object, String fieldName, Object data) throws NoSuchFieldException {
-        set(object, getFieldByName(fieldName, object.getClass()), data);
+    public static Object get(Object object, String fieldName, boolean direct) throws NoSuchFieldException {
+        return get(object, getFieldByName(fieldName, object.getClass()), direct);
     }
 
-    public static void set(Object object, Field field, Object data) {
+    public static void set(Object object, String fieldName, Object data) throws NoSuchFieldException {
+        set(object, getFieldByName(fieldName, object.getClass()), data, false);
+    }
+
+    public static void set(Object object, String fieldName, Object data, boolean direct) throws NoSuchFieldException {
+        set(object, getFieldByName(fieldName, object.getClass()), data, direct);
+    }
+
+    public static void set(Object object, Field field, Object value) {
+        set(object, field, value, false);
+    }
+
+    public static void set(Object object, Field field, Object value, boolean direct) {
         try {
-            PropertyDescriptor propertyDescriptor = new PropertyDescriptor(field.getName(), object.getClass());
-            propertyDescriptor.getWriteMethod().invoke(object, data);
+            if (direct) {
+                boolean accessible = field.isAccessible();
+                if (accessible) {
+                    field.set(object, value);
+                } else {
+                    field.setAccessible(true);
+                    field.set(object, value);
+                    field.setAccessible(accessible);
+                }
+            } else {
+                PropertyDescriptor propertyDescriptor = new PropertyDescriptor(field.getName(), object.getClass());
+                propertyDescriptor.getWriteMethod().invoke(object, value);
+            }
         } catch (IntrospectionException e) {
             // TODO
         } catch (IllegalAccessException e) {

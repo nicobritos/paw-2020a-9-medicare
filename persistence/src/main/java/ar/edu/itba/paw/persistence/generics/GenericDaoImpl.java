@@ -452,12 +452,13 @@ public abstract class GenericDaoImpl<M extends GenericModel<I>, I> implements Ge
 
             JoinedCollection<GenericModel<Object>> collection = new JoinedCollection<>();
             try {
-                ReflectionGetterSetter.set(collection, JoinedCollection._PUBLIC_COLLECTION_NAME, otherInstances);
-                ReflectionGetterSetter.set(collection, JoinedCollection._PRIVATE_COLLECTION_NAME, otherInstancesCopy);
+                ReflectionGetterSetter.set(collection, JoinedCollection._PUBLIC_COLLECTION_NAME, otherInstances, true);
+                ReflectionGetterSetter.set(collection, JoinedCollection._PRIVATE_COLLECTION_NAME, otherInstancesCopy, true);
             } catch (NoSuchFieldException e) {
                 // TODO
                 e.printStackTrace();
             }
+            ReflectionGetterSetter.set(m, field, collection, true);
         });
         ReflectionGetterSetter.iterateFields(this.mClass, ManyToOne.class, field -> {
             // This is similar to processing a OneToOne relation
@@ -504,12 +505,13 @@ public abstract class GenericDaoImpl<M extends GenericModel<I>, I> implements Ge
 
             JoinedCollection<GenericModel<Object>> collection = new JoinedCollection<>();
             try {
-                ReflectionGetterSetter.set(collection, JoinedCollection._PUBLIC_COLLECTION_NAME, otherInstances);
-                ReflectionGetterSetter.set(collection, JoinedCollection._PRIVATE_COLLECTION_NAME, otherInstancesCopy);
+                ReflectionGetterSetter.set(collection, JoinedCollection._PUBLIC_COLLECTION_NAME, otherInstances, true);
+                ReflectionGetterSetter.set(collection, JoinedCollection._PRIVATE_COLLECTION_NAME, otherInstancesCopy, true);
             } catch (NoSuchFieldException e) {
                 // TODO
                 e.printStackTrace();
             }
+            ReflectionGetterSetter.set(m, field, collection, true);
         });
 
         return m;
@@ -543,7 +545,8 @@ public abstract class GenericDaoImpl<M extends GenericModel<I>, I> implements Ge
             try {
                 previousModels = (Collection<GenericModel<Object>>) ReflectionGetterSetter.get(
                         joinedCollectionGenericModel,
-                        JoinedCollection._PRIVATE_COLLECTION_NAME
+                        JoinedCollection._PRIVATE_COLLECTION_NAME,
+                        true
                 );
                 if (previousModels == null)
                     previousModels = new LinkedList<>();
@@ -603,7 +606,8 @@ public abstract class GenericDaoImpl<M extends GenericModel<I>, I> implements Ge
                 ReflectionGetterSetter.set(
                         joinedCollectionGenericModel,
                         JoinedCollection._PRIVATE_COLLECTION_NAME,
-                        new LinkedList<>(joinedCollectionGenericModel.getModels())
+                        new LinkedList<>(joinedCollectionGenericModel.getModels()),
+                        true
                 );
             } catch (NoSuchFieldException e) {
                 // TODO
@@ -623,7 +627,8 @@ public abstract class GenericDaoImpl<M extends GenericModel<I>, I> implements Ge
             try {
                 previousModels = (Collection<GenericModel<Object>>) ReflectionGetterSetter.get(
                         joinedCollectionGenericModel,
-                        JoinedCollection._PRIVATE_COLLECTION_NAME
+                        JoinedCollection._PRIVATE_COLLECTION_NAME,
+                        true
                 );
                 if (previousModels == null)
                     previousModels = new LinkedList<>();
@@ -676,7 +681,8 @@ public abstract class GenericDaoImpl<M extends GenericModel<I>, I> implements Ge
                 ReflectionGetterSetter.set(
                         joinedCollectionGenericModel,
                         JoinedCollection._PRIVATE_COLLECTION_NAME,
-                        new LinkedList<>(joinedCollectionGenericModel.getModels())
+                        new LinkedList<>(joinedCollectionGenericModel.getModels()),
+                        true
                 );
             } catch (NoSuchFieldException e) {
                 // TODO
