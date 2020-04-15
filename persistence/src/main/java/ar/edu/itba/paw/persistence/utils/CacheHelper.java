@@ -6,36 +6,43 @@ import org.ehcache.CacheManager;
 import org.ehcache.config.builders.CacheConfigurationBuilder;
 import org.ehcache.config.builders.CacheManagerBuilder;
 import org.ehcache.config.builders.ResourcePoolsBuilder;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import java.util.*;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
+@Component
 public class CacheHelper {
+    private static final String CACHED_MODEL_FIELD_NAME = "cached";
     private static final CacheManager cacheManager = CacheManagerBuilder.newCacheManagerBuilder().build();
-    private static final Map<Class<?>, Integer> sizes = new HashMap<>();
-    static {
-        cacheManager.init();
+    private static final Map<String, Cache<?, ?>> cacheMap = new HashMap<>();
+    private static final Map<String, Integer> sizes = new HashMap<>();
+    public static boolean cacheEnabled;
+
+    @Autowired
+    private void setCacheEnabled(boolean isCacheEnabled) {
+        if (isCacheEnabled) {
+            cacheManager.init();
+        }
+        cacheEnabled = isCacheEnabled;
     }
 
-    public static synchronized <M extends GenericModel<M, I>, I> void clean(Class<M> mClass, Class<I> iClass){
-        cacheManager.removeCache(mClass.getName());
-        sizes.put(mClass, 0);
-        cacheManager.createCache(
-                mClass.getName(),
-                CacheConfigurationBuilder.newCacheConfigurationBuilder(
-                        iClass,
-                        mClass,
-                        ResourcePoolsBuilder.heap(500)
-                )
-        );
+    public static synchronized <M extends GenericModel<M, I>, I> void clean() {
+        for (Cache<?, ?> cache : cacheMap.values()) {
+            cache.clear();
+        }
     }
 
-        public static synchronized <M extends GenericModel<M, I>, I> int getSize(Class<M> mClass) {
-        return sizes.getOrDefault(mClass, 0);
+    public static synchronized <M extends GenericModel<M, I>, I> int getSize(Class<M> mClass) {
+        return sizes.getOrDefault(mClass.getName(), 0);
     }
 
     public static synchronized <M extends GenericModel<M, I>, I> boolean containsAllInstances(Class<M> mClass, Class<I> iClass) {
+        if (!cacheEnabled)
+            return false;
+
         Cache<I, M> cache = cacheManager.getCache(mClass.getName(), iClass, mClass);
         if (cache == null)
             return false;
@@ -44,22 +51,35 @@ public class CacheHelper {
         for (Cache.Entry<I, M> entry : cache) {
             currentSize++;
         }
-        return currentSize == sizes.get(mClass);
+        return currentSize == sizes.get(mClass.getName());
     }
 
     public static synchronized <M extends GenericModel<M, I>, I> M get(Class<M> mClass, Class<I> iClass, I key) {
+        if (!cacheEnabled)
+            return null;
+
         Cache<I, M> cache = cacheManager.getCache(mClass.getName(), iClass, mClass);
         if (cache == null) {
             createCache(mClass, iClass);
             return null;
         }
+
         M model = cache.get(key);
-        if (model != null)
-            return model.copy();
-        return null;
+        if (model != null) {
+            model = model.copy();
+
+            try {
+                ReflectionGetterSetter.set(model, CACHED_MODEL_FIELD_NAME, true, true);
+            } catch (NoSuchFieldException ignored) {
+            }
+        }
+        return model;
     }
 
     public static synchronized <M extends GenericModel<M, I>, I> List<M> getAll(Class<M> mClass, Class<I> iClass) {
+        if (!cacheEnabled)
+            return new LinkedList<>();
+
         Cache<I, M> cache = cacheManager.getCache(mClass.getName(), iClass, mClass);
         if (cache == null) {
             createCache(mClass, iClass);
@@ -67,12 +87,22 @@ public class CacheHelper {
         }
         List<M> models = new LinkedList<>();
         for (Cache.Entry<I, M> entry : cache) {
-            models.add(entry.getValue().copy());
+            M model = entry.getValue().copy();
+
+            try {
+                ReflectionGetterSetter.set(model, CACHED_MODEL_FIELD_NAME, true, true);
+            } catch (NoSuchFieldException ignored) {
+            }
+
+            models.add(model);
         }
         return models;
     }
 
     public static synchronized <M extends GenericModel<M, I>, I> List<M> filter(Class<M> mClass, Class<I> iClass, Predicate<M> mPredicate) {
+        if (!cacheEnabled)
+            return new LinkedList<>();
+
         Cache<I, M> cache = cacheManager.getCache(mClass.getName(), iClass, mClass);
         if (cache == null) {
             createCache(mClass, iClass);
@@ -82,7 +112,14 @@ public class CacheHelper {
         List<M> models = new LinkedList<>();
         for (Cache.Entry<I, M> entry : cache) {
             if (mPredicate.test(entry.getValue())) {
-                models.add(entry.getValue().copy());
+                M model = entry.getValue().copy();
+
+                try {
+                    ReflectionGetterSetter.set(model, CACHED_MODEL_FIELD_NAME, true, true);
+                } catch (NoSuchFieldException ignored) {
+                }
+
+                models.add(model);
             }
         }
 
@@ -90,46 +127,62 @@ public class CacheHelper {
     }
 
     public static synchronized <M extends GenericModel<M, I>, I> void remove(Class<M> mClass, Class<I> iClass, I id) {
+        if (!cacheEnabled)
+            return;
+
         Cache<I, M> cache = cacheManager.getCache(mClass.getName(), iClass, mClass);
         if (cache != null && cache.containsKey(id)) {
             cache.remove(id);
-            sizes.put(mClass, sizes.get(mClass) - 1);
+            sizes.put(mClass.getName(), sizes.get(mClass.getName()) - 1);
         }
     }
 
     public static synchronized <M extends GenericModel<M, I>, I> void set(Class<M> mClass, Class<I> iClass, M model) {
+        if (!cacheEnabled)
+            return;
+
         Cache<I, M> cache = cacheManager.getCache(mClass.getName(), iClass, mClass);
-        if (cache == null)
+        if (cache == null) {
             cache = createCache(mClass, iClass);
+        }
+
         cache.put(model.getId(), model);
     }
 
     public static synchronized <M extends GenericModel<M, I>, I> void set(Class<M> mClass, Class<I> iClass, Collection<M> models) {
+        if (!cacheEnabled)
+            return;
+
         Cache<I, M> cache = cacheManager.getCache(mClass.getName(), iClass, mClass);
         if (cache == null) {
             cache = createCache(mClass, iClass);
             cache.putAll(models.stream().collect(Collectors.toMap(GenericModel::getId, m -> m)));
-            sizes.put(mClass, models.size());
+            sizes.put(mClass.getName(), models.size());
         } else {
-            int size = sizes.get(mClass);
+            int size = sizes.get(mClass.getName());
             for (M model : models) {
                 if (!cache.containsKey(model.getId()))
                     size++;
                 cache.put(model.getId(), model);
             }
-            sizes.put(mClass, size);
+            sizes.put(mClass.getName(), size);
         }
     }
 
     private static synchronized <M extends GenericModel<M, I>, I> Cache<I, M> createCache(Class<M> mClass, Class<I> iClass) {
-        sizes.put(mClass, 0);
-        return cacheManager.createCache(
+        if (!cacheEnabled)
+            return null;
+
+        sizes.put(mClass.getName(), 0);
+        Cache<I, M> cache = cacheManager.createCache(
                 mClass.getName(),
                 CacheConfigurationBuilder.newCacheConfigurationBuilder(
                         iClass,
                         mClass,
-                        ResourcePoolsBuilder.heap(500)
+                        ResourcePoolsBuilder.heap(50)
                 )
         );
+        cacheMap.put(mClass.getName(), cache);
+        return cache;
     }
 }

@@ -26,13 +26,12 @@ public abstract class ReflectionGetterSetter {
     public static Map<String, ?> listValues(Object object) {
         Map<String, Object> map = new HashMap<>();
 
-        for (Field field : object.getClass().getDeclaredFields()) {
-            map.put(field.getName(), get(object, field));
-        }
-        // We also need parent
-        for (Field field : object.getClass().getSuperclass().getDeclaredFields()) {
-            map.put(field.getName(), get(object, field));
-        }
+        Class<?> c = object.getClass();
+        do {
+            for (Field field : c.getDeclaredFields()) {
+                map.put(field.getName(), get(object, field));
+            }
+        } while ((c = c.getSuperclass()) != Object.class && c != null);
 
         return map;
     }
@@ -40,17 +39,14 @@ public abstract class ReflectionGetterSetter {
     public static Map<String, ?> listValues(Object object, Class<? extends Annotation> annotationClass) {
         Map<String, Object> map = new HashMap<>();
 
-        for (Field field : object.getClass().getDeclaredFields()) {
-            if (field.isAnnotationPresent(annotationClass)) {
-                map.put(field.getName(), get(object, field));
+        Class<?> c = object.getClass();
+        do {
+            for (Field field : c.getDeclaredFields()) {
+                if (field.isAnnotationPresent(annotationClass)) {
+                    map.put(field.getName(), get(object, field));
+                }
             }
-        }
-        // We also need parent
-        for (Field field : object.getClass().getSuperclass().getDeclaredFields()) {
-            if (field.isAnnotationPresent(annotationClass)) {
-                map.put(field.getName(), get(object, field));
-            }
-        }
+        } while ((c = c.getSuperclass()) != Object.class && c != null);
 
         return map;
     }
@@ -58,33 +54,27 @@ public abstract class ReflectionGetterSetter {
     public static <T extends Annotation> Map<String, ?> listValues(Object object, Class<T> annotationClass, Function<Field, String> mapper) {
         Map<String, Object> map = new HashMap<>();
 
-        for (Field field : object.getClass().getDeclaredFields()) {
-            if (field.isAnnotationPresent(annotationClass)) {
-                map.put(mapper.apply(field), get(object, field));
+        Class<?> c = object.getClass();
+        do {
+            for (Field field : c.getDeclaredFields()) {
+                if (field.isAnnotationPresent(annotationClass)) {
+                    map.put(mapper.apply(field), get(object, field));
+                }
             }
-        }
-        // We also need parent
-        for (Field field : object.getClass().getSuperclass().getDeclaredFields()) {
-            if (field.isAnnotationPresent(annotationClass)) {
-                map.put(mapper.apply(field), get(object, field));
-            }
-        }
+        } while ((c = c.getSuperclass()) != Object.class && c != null);
 
         return map;
     }
 
     public static <T extends Annotation> void iterateFields(Class<?> mClass, Class<T> annotationClass, Consumer<Field> consumer) {
-        for (Field field : mClass.getDeclaredFields()) {
-            if (field.isAnnotationPresent(annotationClass)) {
-                consumer.accept(field);
+        Class<?> c = mClass;
+        do {
+            for (Field field : c.getDeclaredFields()) {
+                if (field.isAnnotationPresent(annotationClass)) {
+                    consumer.accept(field);
+                }
             }
-        }
-        // We also need parent
-        for (Field field : mClass.getSuperclass().getDeclaredFields()) {
-            if (field.isAnnotationPresent(annotationClass)) {
-                consumer.accept(field);
-            }
-        }
+        } while ((c = c.getSuperclass()) != Object.class && c != null);
     }
 
     public static <T extends Annotation> void iterateValues(Object object, Class<T> annotationClass, BiConsumer<Field, Object> consumer) {
@@ -92,31 +82,26 @@ public abstract class ReflectionGetterSetter {
     }
 
     public static <T extends Annotation> void iterateValues(Object object, Class<T> annotationClass, boolean directAccess, BiConsumer<Field, Object> consumer) {
-        for (Field field : object.getClass().getDeclaredFields()) {
-            if (field.isAnnotationPresent(annotationClass)) {
-                consumer.accept(field, get(object, field, directAccess));
+        Class<?> c = object.getClass();
+        do {
+            for (Field field : c.getDeclaredFields()) {
+                if (field.isAnnotationPresent(annotationClass)) {
+                    consumer.accept(field, get(object, field, directAccess));
+                }
             }
-        }
-        // We also need parent
-        for (Field field : object.getClass().getSuperclass().getDeclaredFields()) {
-            if (field.isAnnotationPresent(annotationClass)) {
-                consumer.accept(field, get(object, field, directAccess));
-            }
-        }
+        } while ((c = c.getSuperclass()) != Object.class && c != null);
     }
 
     public static <T extends Annotation> Object getValueAnnotatedWith(Object object, Class<T> annotationClass, Predicate<T> checkAnnotation) {
-        for (Field field : object.getClass().getDeclaredFields()) {
-            if (field.isAnnotationPresent(annotationClass) && checkAnnotation.test(field.getAnnotation(annotationClass))) {
-                return get(object, field);
+        Class<?> c = object.getClass();
+        do {
+            for (Field field : c.getDeclaredFields()) {
+                if (field.isAnnotationPresent(annotationClass) && checkAnnotation.test(field.getAnnotation(annotationClass))) {
+                    return get(object, field);
+                }
             }
-        }
-        // We also need parent
-        for (Field field : object.getClass().getSuperclass().getDeclaredFields()) {
-            if (field.isAnnotationPresent(annotationClass)) {
-                return get(object, field);
-            }
-        }
+        } while ((c = c.getSuperclass()) != Object.class && c != null);
+
         return null;
     }
 
@@ -165,11 +150,14 @@ public abstract class ReflectionGetterSetter {
     }
 
     private static Field getFieldByName(String fieldName, Class<?> className) throws NoSuchFieldException {
-        try {
-            return className.getDeclaredField(fieldName);
-        } catch (NoSuchFieldException e) {
-            return className.getSuperclass().getDeclaredField(fieldName);
-        }
+        Class<?> c = className;
+        do {
+            try {
+                return c.getDeclaredField(fieldName);
+            } catch (NoSuchFieldException ignored) {
+            }
+        } while ((c = c.getSuperclass()) != Object.class && c != null);
+        return null;
     }
 
     private static Object get(Object object, Field field) {

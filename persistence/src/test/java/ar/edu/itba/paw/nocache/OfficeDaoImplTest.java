@@ -1,4 +1,4 @@
-package ar.edu.itba.paw;
+package ar.edu.itba.paw.nocache;
 
 import ar.edu.itba.paw.models.Country;
 import ar.edu.itba.paw.models.Locality;
@@ -36,12 +36,10 @@ public class OfficeDaoImplTest
     private static final String COUNTRY = "Argentina";
     private static final String COUNTRY_ID = "AR";
 
-
     private static final String OFFICE_TABLE = "office";
     private static final String LOCALITY_TABLE = "system_locality";
     private static final String PROVINCE_TABLE = "system_province";
     private static final String COUNTRY_TABLE = "system_country";
-
 
     private OfficeDaoImpl officeDao;
     private JdbcTemplate jdbcTemplate;

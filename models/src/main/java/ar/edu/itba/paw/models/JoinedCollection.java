@@ -10,7 +10,7 @@ import java.util.LinkedList;
  * relation field, this is the easiest and fastest to implement method.
  * @param <M> the model type
  */
-public class JoinedCollection<M> implements Copiable<JoinedCollection<M>> {
+public class JoinedCollection<M> extends Cacheable<JoinedCollection<M>> {
     /**
      * This provides the field name to be able to access "privateModels" via reflections
      * {@link #privateModels}

@@ -1,4 +1,4 @@
-package ar.edu.itba.paw;
+package ar.edu.itba.paw.nocache;
 
 import ar.edu.itba.paw.models.Province;
 import ar.edu.itba.paw.persistence.ProvinceDaoImpl;
@@ -30,8 +30,6 @@ public class ProvinceDaoImplTest
 
     private static final String PROVINCES_TABLE = "system_province";
     private static final String COUNTRIES_TABLE = "system_country";
-
-
 
     private ProvinceDaoImpl provinceDao;
     private JdbcTemplate jdbcTemplate;

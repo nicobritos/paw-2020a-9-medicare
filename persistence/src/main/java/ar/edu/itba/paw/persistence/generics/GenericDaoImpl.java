@@ -36,9 +36,9 @@ public abstract class GenericDaoImpl<M extends GenericModel<M, I>, I> implements
     private static final String ARGUMENT_PREFIX = "_r_";
     protected TransactionTemplate transactionTemplate;
     protected NamedParameterJdbcTemplate jdbcTemplate;
-    private volatile boolean haveBeenListed;
     private SimpleJdbcInsert jdbcInsert;
     private boolean customPrimaryKey;
+    private boolean haveBeenListed;
     private String primaryKeyName;
     private final Class<M> mClass;
     private final Class<I> iClass;
@@ -213,14 +213,31 @@ public abstract class GenericDaoImpl<M extends GenericModel<M, I>, I> implements
     @Override
     public List<M> list() {
         List<M> previousModels = this.listFromCache();
-        if (previousModels != null)
+        if (this.haveBeenListed && this.cacheContainsAllInstances()) {
             return previousModels;
+        }
 
-        JDBCQueryBuilder queryBuilder = new JDBCSelectQueryBuilder()
+        JDBCSelectQueryBuilder queryBuilder = new JDBCSelectQueryBuilder()
                 .selectAll()
                 .from(this.getTableAlias());
 
-        List<M> models = this.selectQuery(queryBuilder.getQueryAsString());
+        MapSqlParameterSource parameterSource = new MapSqlParameterSource();
+        if (!previousModels.isEmpty()) {
+            List<String> arguments = new LinkedList<>();
+            int i = 0;
+            for (M m : previousModels) {
+                String prefix = "_id_" + i;
+                arguments.add(":" + prefix);
+                parameterSource.addValue(prefix, m.getId());
+                i++;
+            }
+
+            queryBuilder.where(new JDBCWhereClauseBuilder()
+                    .notIn(this.formatColumnFromAlias(this.getIdColumnName()), arguments)
+            );
+        }
+
+        List<M> models = this.selectQuery(queryBuilder.getQueryAsString(), parameterSource);
         this.setToCache(models);
         this.haveBeenListed = true;
         return models;
@@ -819,14 +836,12 @@ public abstract class GenericDaoImpl<M extends GenericModel<M, I>, I> implements
         CacheHelper.remove(this.mClass, this.iClass, id);
     }
 
+    private synchronized boolean cacheContainsAllInstances() {
+        return CacheHelper.containsAllInstances(this.mClass, this.iClass);
+    }
+
     private synchronized List<M> listFromCache() {
-        if (!this.haveBeenListed || !CacheHelper.containsAllInstances(this.mClass, this.iClass))
-            return null;
-        List<M> models = CacheHelper.getAll(this.mClass, this.iClass);
-        // TODO: Workaround to race conditions (specially GC), not best
-        if (!CacheHelper.containsAllInstances(this.mClass, this.iClass))
-            return null;
-        return models;
+        return CacheHelper.getAll(this.mClass, this.iClass);
     }
 
     private synchronized List<M> filterFromCache(String columnName, Operation operation, Object value) {
@@ -838,7 +853,6 @@ public abstract class GenericDaoImpl<M extends GenericModel<M, I>, I> implements
             return operation.operate(mValue, value);
         });
 
-        // TODO: Workaround to race conditions (specially GC), not best
         if (!CacheHelper.containsAllInstances(this.mClass, this.iClass))
             return null;
         return models;

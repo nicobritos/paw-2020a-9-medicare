@@ -1,4 +1,4 @@
-package ar.edu.itba.paw;
+package ar.edu.itba.paw.nocache;
 
 import ar.edu.itba.paw.models.Locality;
 import ar.edu.itba.paw.models.Office;
@@ -47,7 +47,6 @@ public class StaffDaoImplTest
     private static final String PROVINCE_TABLE = "system_province";
     private static final String COUNTRY_TABLE = "system_country";
     private static final String SPECIALTY_STAFF_TABLE = "system_staff_specialty_staff";
-
 
     private StaffDaoImpl staffDao;
     private JdbcTemplate jdbcTemplate;
