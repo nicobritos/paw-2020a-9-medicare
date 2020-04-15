@@ -2,12 +2,11 @@
 <html>
     <head>
         <%@ include file = "head.jsp" %>
+        <link rel="stylesheet" type="text/css" href="<c:url value="/css/styles.css"/>">
     </head>
     <body>
         <%@ include file = "header.jsp" %>
         <%@ include file = "navbar.jsp" %>
-        <br>
-        <h2>Hello ${greeting}!</h2>
         <br>
         <div style="overflow-x:auto;">
             <table>
@@ -17,24 +16,18 @@
                     <th>Correo electrónico</th>
                     <th>Teléfono</th>
                 </tr>
-                <tr>
-                    <td>Lorem ipsum</td>
-                    <td>Lorem ipsum</td>
-                    <td>Lorem ipsum</td>
-                    <td>Lorem ipsum</td>
-                </tr>
-                <tr>
-                    <td>Lorem ipsum</td>
-                    <td>Lorem ipsum</td>
-                    <td>Lorem ipsum</td>
-                    <td>Lorem ipsum</td>
-                </tr>
-                <tr>
-                    <td>Lorem ipsum</td>
-                    <td>Lorem ipsum</td>
-                    <td>Lorem ipsum</td>
-                    <td>Lorem ipsum</td>
-                </tr>
+                <c:forEach var="member" items="${staff}">
+                    <tr>
+                        <td><c:out value="${member.surname}"/>, <c:out value="${member.firstName}"/></td>
+                        <td>
+                            <c:forEach var="specialty" items="${member.staffSpecialties}">
+                                <c:out value="${specialty.name}"/>
+                            </c:forEach>
+                        </td>
+                        <td><c:out value="${member.email}"/></td>
+                        <td><c:out value="${member.phone}"/></td>
+                    </tr>
+                </c:forEach>
             </table>
         </div>
     </body>
