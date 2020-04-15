@@ -7,7 +7,7 @@
 			<option value="<c:out value="${specialty.id}"/>"><c:out value="${specialty.name}"/></option>
 		</c:forEach>
 	</select>
-	<button type="button" class="btn btn-secondary" id="filtrarBtn">Filtrar</button>
+	<button type="button" class="btn btn-info" id="filtrarBtn">Filtrar</button>
 </div>
 <script>
 	let filtrarBtn = document.getElementById("filtrarBtn");

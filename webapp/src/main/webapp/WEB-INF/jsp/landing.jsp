@@ -9,7 +9,7 @@
         <div class="container d-flex flex-column justify-content-center align-items-center with-logo">
             <h1 class="display-1">MediCare</h1>
             <h4>Encuentra médicos de forma rápida y fácil</h4>
-            <a href="<c:url value="/mediclist"/>" class="btn btn-secondary" style="margin:50px;">Buscar médicos</a>
+            <a href="<c:url value="/mediclist"/>" class="btn btn-info" style="margin:50px;">Buscar médicos</a>
         </div>
     </div>
 </body>
