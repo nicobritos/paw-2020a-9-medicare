@@ -10,6 +10,7 @@ import java.util.Map;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Function;
+import java.util.function.Predicate;
 
 /**
  * This class provides methods to access and manipulate instance's fields via reflection invoking its public
@@ -102,6 +103,21 @@ public abstract class ReflectionGetterSetter {
                 consumer.accept(field, get(object, field, directAccess));
             }
         }
+    }
+
+    public static <T extends Annotation> Object getValueAnnotatedWith(Object object, Class<T> annotationClass, Predicate<T> checkAnnotation) {
+        for (Field field : object.getClass().getDeclaredFields()) {
+            if (field.isAnnotationPresent(annotationClass) && checkAnnotation.test(field.getAnnotation(annotationClass))) {
+                return get(object, field);
+            }
+        }
+        // We also need parent
+        for (Field field : object.getClass().getSuperclass().getDeclaredFields()) {
+            if (field.isAnnotationPresent(annotationClass)) {
+                return get(object, field);
+            }
+        }
+        return null;
     }
 
     public static Object get(Object object, String fieldName) throws NoSuchFieldException {

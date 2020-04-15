@@ -4,7 +4,7 @@ package ar.edu.itba.paw.models;
  * This class provides a generic implementation of a model.
  * @param <I>
  */
-public abstract class GenericModel<I> {
+public abstract class GenericModel<M, I> implements Copiable<M> {
     protected I id;
 
     public I getId() {

@@ -58,16 +58,7 @@ public class MedicListController {
             }
         }
 
-        // make sure jsp doesnt receive null, instead receive empty list
-        if(staffList == null){
-            staffList = new ArrayList<>(0);
-        }
-
-        //get all specialties and make sure its at least an empty list
         Collection<StaffSpecialty> specialtiesList = this.specialityService.list();
-        if(specialtiesList == null){
-            staffList = new ArrayList<>(0);
-        }
 
         // pass objects to model and view
         mav.addObject("staff", staffList);

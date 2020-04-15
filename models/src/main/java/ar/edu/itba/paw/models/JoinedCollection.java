@@ -10,7 +10,7 @@ import java.util.LinkedList;
  * relation field, this is the easiest and fastest to implement method.
  * @param <M> the model type
  */
-public class JoinedCollection<M> {
+public class JoinedCollection<M> implements Copiable<JoinedCollection<M>> {
     /**
      * This provides the field name to be able to access "privateModels" via reflections
      * {@link #privateModels}
@@ -23,5 +23,14 @@ public class JoinedCollection<M> {
 
     public Collection<M> getModels() {
         return this.models;
+    }
+
+    // TODO necesary deep copy?
+    @Override
+    public JoinedCollection<M> copy() {
+        JoinedCollection<M> joinedCollection = new JoinedCollection<>();
+        joinedCollection.privateModels = new LinkedList<>(this.privateModels);
+        joinedCollection.models = new LinkedList<>(this.models);
+        return joinedCollection;
     }
 }

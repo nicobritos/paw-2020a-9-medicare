@@ -29,7 +29,7 @@ public class StaffDaoImpl extends GenericSearchableDaoImpl<Staff, Integer> imple
 
     @Autowired
     public StaffDaoImpl(DataSource dataSource) {
-        super(dataSource, Staff.class);
+        super(dataSource, Staff.class, Integer.class);
     }
 
     @Override

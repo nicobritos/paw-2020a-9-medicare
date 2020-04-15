@@ -10,7 +10,7 @@ import java.util.Optional;
  * @param <M> the DAO model type
  * @param <I> the Model's id type
  */
-public interface GenericDao<M extends GenericModel<I>, I> {
+public interface GenericDao<M extends GenericModel<M, I>, I> {
     Optional<M> findById(I id);
 
     Collection<M> findByIds(Collection<I> ids);

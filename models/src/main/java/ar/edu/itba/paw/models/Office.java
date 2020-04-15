@@ -8,7 +8,7 @@ import ar.edu.itba.paw.persistenceAnnotations.Table;
 import java.util.Collection;
 
 @Table(name = "office", primaryKey = "office_id")
-public class Office extends GenericModel<Integer> {
+public class Office extends GenericModel<Office, Integer> {
     @Column(name = "phone")
     private String phone;
     @Column(name = "email")
@@ -64,5 +64,18 @@ public class Office extends GenericModel<Integer> {
 
     public Collection<Staff> getStaffs() {
         return this.staffs.getModels();
+    }
+
+    @Override
+    public Office copy() {
+        Office office = new Office();
+        office.email = this.email;
+        office.locality = this.locality.copy();
+        office.name = this.name;
+        office.phone = this.phone;
+        office.street = this.street;
+        office.id = this.id;
+        office.staffs = this.staffs.copy();
+        return office;
     }
 }

@@ -7,7 +7,7 @@ import ar.edu.itba.paw.persistenceAnnotations.Table;
 import java.util.Collection;
 
 @Table(name = "staff", primaryKey = "staff_id")
-public class Staff extends GenericModel<Integer> {
+public class Staff extends GenericModel<Staff, Integer> {
     @Column(name = "first_name", required = true)
     private String firstName;
     @Column(name = "surname", required = true)
@@ -16,7 +16,7 @@ public class Staff extends GenericModel<Integer> {
     private String phone;
     @Column(name = "email")
     private String email;
-    @Column(name = "registration_number", required = true)
+    @Column(name = "registration_number")
     private Integer registrationNumber;
     @ManyToMany(name = "staff_id", otherName = "specialty_id", tableName = "system_staff_specialty_staff", className = StaffSpecialty.class)
     private JoinedCollection<StaffSpecialty> staffSpecialties = new JoinedCollection<>();
@@ -66,9 +66,15 @@ public class Staff extends GenericModel<Integer> {
     }
 
     @Override
-    public String toString() {
-        return "Staff{" +
-                "staffSpecialties=" + staffSpecialties.getModels().size() +
-                '}';
+    public Staff copy() {
+        Staff staff = new Staff();
+        staff.email = this.email;
+        staff.firstName = this.firstName;
+        staff.surname = this.surname;
+        staff.phone = this.phone;
+        staff.registrationNumber = this.registrationNumber;
+        staff.staffSpecialties = this.staffSpecialties.copy();
+        staff.id = this.id;
+        return staff;
     }
 }

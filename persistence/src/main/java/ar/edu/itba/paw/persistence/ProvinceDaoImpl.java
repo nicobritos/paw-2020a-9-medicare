@@ -25,7 +25,7 @@ public class ProvinceDaoImpl extends GenericSearchableDaoImpl<Province, Integer>
 
     @Autowired
     public ProvinceDaoImpl(DataSource dataSource) {
-        super(dataSource, Province.class);
+        super(dataSource, Province.class, Integer.class);
     }
 
     @Override
