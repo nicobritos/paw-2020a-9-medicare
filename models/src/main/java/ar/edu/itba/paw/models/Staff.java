@@ -16,7 +16,7 @@ public class Staff extends GenericModel<Integer> {
     private String phone;
     @Column(name = "email")
     private String email;
-    @Column(name = "registration_number", required = true)
+    @Column(name = "registration_number")
     private Integer registrationNumber;
     @ManyToMany(name = "staff_id", otherName = "specialty_id", tableName = "system_staff_specialty_staff", className = StaffSpecialty.class)
     private JoinedCollection<StaffSpecialty> staffSpecialties = new JoinedCollection<>();

@@ -63,7 +63,7 @@ create table if not exists staff
     surname varchar(255) not null,
     phone varchar(255),
     email varchar(255),
-    registration_number integer not null
+    registration_number integer
 );
 
 create table if not exists system_staff_specialty
