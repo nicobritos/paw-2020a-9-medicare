@@ -113,8 +113,8 @@ public class StaffDaoImplTest
     private void insertAnotherStaff(){
         Map<String, Object> staffMap = new HashMap<>();
         staffMap.put("office_id", 0);
-        staffMap.put("first_name", NAME + "_1");
-        staffMap.put("surname", SURNAME + "_1");
+        staffMap.put("first_name", "Speedy");
+        staffMap.put("surname", "Gonzalez");
         staffMap.put("email", EMAIL);
         staffMap.put("phone", PHONE);
         staffMap.put("registration_number", REGISTRATION_NUMBER); // Identity de HSQLDB empieza en 0
@@ -337,6 +337,35 @@ public class StaffDaoImplTest
 
         // 2. Ejercitar
         Collection<Staff> staffs = this.staffDao.findByName(NAME);
+
+        // 3. Postcondiciones
+        assertNotNull(staffs);
+        assertTrue(staffs.isEmpty());
+    }
+
+    @Test
+    public void testFindBySurname(){
+        // 1. Precondiciones
+        this.cleanAllTables();
+
+        this.insertStaff();
+        this.insertAnotherStaff();
+
+        // 2. Ejercitar
+        Collection<Staff> staffs = this.staffDao.findBySurname(SURNAME);
+
+        // 3. Postcondiciones
+        assertNotNull(staffs);
+        assertEquals(1, staffs.size());
+    }
+
+    @Test
+    public void testFindBySurnnameDoesntExist(){
+        // 1. Precondiciones
+        this.cleanAllTables();
+
+        // 2. Ejercitar
+        Collection<Staff> staffs = this.staffDao.findBySurname(SURNAME);
 
         // 3. Postcondiciones
         assertNotNull(staffs);

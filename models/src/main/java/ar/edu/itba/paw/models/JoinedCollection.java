@@ -2,6 +2,7 @@ package ar.edu.itba.paw.models;
 
 import java.util.Collection;
 import java.util.LinkedList;
+import java.util.Objects;
 
 /**
  * This class provides a wrapper so that a DAO can keep track of the models added or removed
@@ -32,5 +33,19 @@ public class JoinedCollection<M> extends Cacheable<JoinedCollection<M>> {
         joinedCollection.privateModels = new LinkedList<>(this.privateModels);
         joinedCollection.models = new LinkedList<>(this.models);
         return joinedCollection;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        JoinedCollection<?> that = (JoinedCollection<?>) o;
+        return Objects.equals(privateModels, that.privateModels) &&
+                Objects.equals(models, that.models);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(privateModels, models);
     }
 }

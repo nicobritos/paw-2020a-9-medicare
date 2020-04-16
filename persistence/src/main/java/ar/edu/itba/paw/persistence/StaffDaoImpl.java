@@ -16,10 +16,7 @@ import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.stereotype.Repository;
 
 import javax.sql.DataSource;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.Map;
+import java.util.*;
 
 @Repository
 public class StaffDaoImpl extends GenericSearchableDaoImpl<Staff, Integer> implements StaffDao {
@@ -33,10 +30,14 @@ public class StaffDaoImpl extends GenericSearchableDaoImpl<Staff, Integer> imple
     }
 
     @Override
+    public Collection<Staff> findBySurname(String surname) {
+        return new LinkedList<>(this.findByFieldIgnoreCase("surname", Operation.LIKE, '%' + surname + '%'));
+    }
+
+    @Override
     public Collection<Staff> findByName(String name) {
-        Collection<Staff> staffs = new LinkedList<>(this.findByField("first_name", name));
-        staffs.addAll(this.findByField("surname", name));
-        return staffs;
+        return new LinkedList<>(this.findByFieldIgnoreCase("first_name", Operation.LIKE, '%' + name + '%'));
+
     }
 
     @Override
@@ -74,6 +75,33 @@ public class StaffDaoImpl extends GenericSearchableDaoImpl<Staff, Integer> imple
     }
 
     @Override
+    public Collection<Staff> findByNameAndSurname(String name, String surname) {
+        if (name.isEmpty() && surname.isEmpty())
+            return new LinkedList<>();
+
+        Map<String, Object> parameters = new HashMap<>();
+        name = name.toLowerCase();
+        surname = surname.toLowerCase();
+        parameters.put("firstName", '%' + name + '%');
+        parameters.put("surname", '%' + surname + '%');
+
+        MapSqlParameterSource parameterSource = new MapSqlParameterSource();
+        parameterSource.addValues(parameters);
+
+        JDBCQueryBuilder queryBuilder = new JDBCSelectQueryBuilder()
+                .selectAll()
+                .from(this.getTableAlias())
+                .where(new JDBCWhereClauseBuilder()
+                        .where(this.formatColumnFromName("surname"), Operation.LIKE, ":surname", ColumnTransformer.LOWER)
+                        .and()
+                        .where(this.formatColumnFromName("first_name"), Operation.LIKE, ":firstName", ColumnTransformer.LOWER)
+                )
+                .distinct();
+
+        return new LinkedList<>(this.selectQuery(queryBuilder.getQueryAsString(), parameterSource));
+    }
+
+    @Override
     public Collection<Staff> findByNameAndStaffSpecialties(String name, Collection<StaffSpecialty> staffSpecialties) {
         if (staffSpecialties.isEmpty() && name.isEmpty())
             return new LinkedList<>();
@@ -81,8 +109,94 @@ public class StaffDaoImpl extends GenericSearchableDaoImpl<Staff, Integer> imple
         Map<String, Object> parameters = new HashMap<>();
         Collection<String> specialtyParameters = new LinkedList<>();
         name = name.toLowerCase();
-        parameters.put("firstName", name);
-        parameters.put("surname", name);
+        parameters.put("firstName", '%' + name + '%');
+
+        int i = 0;
+        for (StaffSpecialty staffSpecialty : staffSpecialties) {
+            String parameter = "_specialty_" + i;
+            parameters.put(parameter, staffSpecialty.getId());
+            specialtyParameters.add(":" + parameter);
+            i++;
+        }
+
+        MapSqlParameterSource parameterSource = new MapSqlParameterSource();
+        parameterSource.addValues(parameters);
+
+
+        JDBCQueryBuilder queryBuilder = new JDBCSelectQueryBuilder()
+                .selectAll()
+                .from(this.getTableAlias())
+                .join("staff_id", this.getSpecialtiesIntermediateTableName(), "staff_id")
+                .where(new JDBCWhereClauseBuilder()
+                        .in(
+                                formatColumnFromName("specialty_id", this.getSpecialtiesIntermediateTableName()),
+                                specialtyParameters
+                        )
+                        .and()
+                        .where(new JDBCWhereClauseBuilder()
+                                .where(this.formatColumnFromName("first_name"), Operation.LIKE, ":firstName", ColumnTransformer.LOWER)
+                        )
+                )
+                .distinct();
+
+        return new LinkedList<>(this.selectQuery(queryBuilder.getQueryAsString(), parameterSource));
+    }
+
+    @Override
+    public Collection<Staff> findBySurnameAndOffice(String surname, Collection<Office> offices) {
+        if (offices.isEmpty() && surname.isEmpty())
+            return new LinkedList<>();
+
+        Map<String, Object> parameters = new HashMap<>();
+        Collection<String> officeParameters = new LinkedList<>();
+
+        int i = 0;
+        for (Office office : offices) {
+            String parameter = "_office_" + i;
+            parameters.put(parameter, office.getId());
+            officeParameters.add(":" + parameter);
+            i++;
+        }
+
+
+        JDBCWhereClauseBuilder whereClauseBuilder = new JDBCWhereClauseBuilder()
+                .in(
+                        formatColumnFromName("office_id", this.getTableAlias()),
+                        officeParameters
+                );
+
+        if (!surname.isEmpty()) {
+            surname = surname.toLowerCase();
+            parameters.put("surname", '%' + surname + '%');
+
+            whereClauseBuilder
+                    .and()
+                    .where(new JDBCWhereClauseBuilder()
+                            .where(this.formatColumnFromName("surname"), Operation.LIKE, ":surname", ColumnTransformer.LOWER)
+                    );
+        }
+
+        JDBCQueryBuilder queryBuilder = new JDBCSelectQueryBuilder()
+                .selectAll()
+                .from(this.getTableAlias())
+                .where(whereClauseBuilder)
+                .distinct();
+
+        MapSqlParameterSource parameterSource = new MapSqlParameterSource();
+        parameterSource.addValues(parameters);
+
+        return this.selectQuery(queryBuilder.getQueryAsString(), parameterSource);
+    }
+
+    @Override
+    public Collection<Staff> findBySurnameAndStaffSpecialties(String surname, Collection<StaffSpecialty> staffSpecialties) {
+        if (staffSpecialties.isEmpty() && surname.isEmpty())
+            return new LinkedList<>();
+
+        Map<String, Object> parameters = new HashMap<>();
+        Collection<String> specialtyParameters = new LinkedList<>();
+        surname = surname.toLowerCase();
+        parameters.put("surname", '%' + surname + '%');
 
         int i = 0;
         for (StaffSpecialty staffSpecialty : staffSpecialties) {
@@ -108,8 +222,56 @@ public class StaffDaoImpl extends GenericSearchableDaoImpl<Staff, Integer> imple
                         .and()
                         .where(new JDBCWhereClauseBuilder()
                                 .where(this.formatColumnFromName("surname"), Operation.LIKE, ":surname", ColumnTransformer.LOWER)
-                                .or()
+                        )
+                )
+                .distinct();
+
+        return new LinkedList<>(this.selectQuery(queryBuilder.getQueryAsString(), parameterSource));    }
+
+    @Override
+    public Collection<Staff> findByNameOfficeAndStaffSpecialties(String name, Collection<Office> offices, Collection<StaffSpecialty> staffSpecialties) {
+        return findByNameSurnameOfficeAndStaffSpecialities(name, "", offices, staffSpecialties);
+    }
+
+    @Override
+    public Collection<Staff> findByNameSurnameAndStaffSpecialties(String name, String surname, Collection<StaffSpecialty> staffSpecialties) {
+        if (staffSpecialties.isEmpty() && name.isEmpty())
+            return new LinkedList<>();
+
+        Map<String, Object> parameters = new HashMap<>();
+        Collection<String> specialtyParameters = new LinkedList<>();
+        name = name.toLowerCase();
+        surname = surname.toLowerCase();
+        parameters.put("firstName", '%' + name + '%');
+        parameters.put("surname", '%' + surname + '%');
+
+        int i = 0;
+        for (StaffSpecialty staffSpecialty : staffSpecialties) {
+            String parameter = "_specialty_" + i;
+            parameters.put(parameter, staffSpecialty.getId());
+            specialtyParameters.add(":" + parameter);
+            i++;
+        }
+
+        MapSqlParameterSource parameterSource = new MapSqlParameterSource();
+        parameterSource.addValues(parameters);
+
+
+        JDBCQueryBuilder queryBuilder = new JDBCSelectQueryBuilder()
+                .selectAll()
+                .from(this.getTableAlias())
+                .join("staff_id", this.getSpecialtiesIntermediateTableName(), "staff_id")
+                .where(new JDBCWhereClauseBuilder()
+                        .in(
+                                formatColumnFromName("specialty_id", this.getSpecialtiesIntermediateTableName()),
+                                specialtyParameters
+                        )
+                        .and()
+                        .where(new JDBCWhereClauseBuilder()
                                 .where(this.formatColumnFromName("first_name"), Operation.LIKE, ":firstName", ColumnTransformer.LOWER)
+                                .and()
+                                .where(this.formatColumnFromName("surname"), Operation.LIKE, ":surname", ColumnTransformer.LOWER)
+
                         )
                 )
                 .distinct();
@@ -118,8 +280,60 @@ public class StaffDaoImpl extends GenericSearchableDaoImpl<Staff, Integer> imple
     }
 
     @Override
-    public Collection<Staff> findByNameOfficeAndStaffSpecialties(String name, Collection<Office> offices, Collection<StaffSpecialty> staffSpecialties) {
-        if (staffSpecialties.isEmpty() && offices.isEmpty() && name.isEmpty())
+    public Collection<Staff> findByNameSurnameAndOffice(String name, String surname, Collection<Office> offices) {
+        if (offices.isEmpty() && name.isEmpty())
+            return new LinkedList<>();
+
+        Map<String, Object> parameters = new HashMap<>();
+        Collection<String> officeParameters = new LinkedList<>();
+
+        int i = 0;
+        for (Office office : offices) {
+            String parameter = "_office_" + i;
+            parameters.put(parameter, office.getId());
+            officeParameters.add(":" + parameter);
+            i++;
+        }
+
+
+        JDBCWhereClauseBuilder whereClauseBuilder = new JDBCWhereClauseBuilder()
+                .in(
+                        formatColumnFromName("office_id", this.getTableAlias()),
+                        officeParameters
+                );
+
+        if (!name.isEmpty()) {
+            name = name.toLowerCase();
+            surname = surname.toLowerCase();
+            parameters.put("firstName", '%' + name + '%');
+            parameters.put("surname", '%' + surname + '%');
+
+
+            whereClauseBuilder
+                    .and()
+                    .where(new JDBCWhereClauseBuilder()
+                            .where(this.formatColumnFromName("first_name"), Operation.LIKE, ":firstName", ColumnTransformer.LOWER)
+                            .and()
+                            .where(this.formatColumnFromName("surname"), Operation.LIKE, ":surname", ColumnTransformer.LOWER)
+
+                    );
+        }
+
+        JDBCQueryBuilder queryBuilder = new JDBCSelectQueryBuilder()
+                .selectAll()
+                .from(this.getTableAlias())
+                .where(whereClauseBuilder)
+                .distinct();
+
+        MapSqlParameterSource parameterSource = new MapSqlParameterSource();
+        parameterSource.addValues(parameters);
+
+        return this.selectQuery(queryBuilder.getQueryAsString(), parameterSource);
+    }
+
+    @Override
+    public Collection<Staff> findByNameSurnameOfficeAndStaffSpecialities(String name, String surname, Collection<Office> offices, Collection<StaffSpecialty> staffSpecialties) {
+        if (staffSpecialties.isEmpty() && offices.isEmpty() && name.isEmpty() && surname.isEmpty())
             return new LinkedList<>();
 
         Map<String, Object> parameters = new HashMap<>();
@@ -155,16 +369,17 @@ public class StaffDaoImpl extends GenericSearchableDaoImpl<Staff, Integer> imple
 
         if (!name.isEmpty()) {
             name = name.toLowerCase();
-            parameters.put("firstName", name);
-            parameters.put("surname", name);
+            surname = surname.toLowerCase();
+            parameters.put("firstName", '%' + name + '%');
+            parameters.put("surname", '%' + surname + '%');
 
             whereClauseBuilder
-                .and()
-                .where(new JDBCWhereClauseBuilder()
-                        .where(this.formatColumnFromName("surname"), Operation.LIKE, ":surname", ColumnTransformer.LOWER)
-                        .or()
-                        .where(this.formatColumnFromName("first_name"), Operation.LIKE, ":firstName", ColumnTransformer.LOWER)
-                );
+                    .and()
+                    .where(new JDBCWhereClauseBuilder()
+                            .where(this.formatColumnFromName("surname"), Operation.LIKE, ":surname", ColumnTransformer.LOWER)
+                            .and()
+                            .where(this.formatColumnFromName("first_name"), Operation.LIKE, ":firstName", ColumnTransformer.LOWER)
+                    );
         }
 
         JDBCQueryBuilder queryBuilder = new JDBCSelectQueryBuilder()
@@ -183,6 +398,11 @@ public class StaffDaoImpl extends GenericSearchableDaoImpl<Staff, Integer> imple
     @Override
     public Collection<Staff> findByOfficeAndStaffSpecialties(Collection<Office> offices, Collection<StaffSpecialty> staffSpecialties) {
         return this.findByNameOfficeAndStaffSpecialties("", offices, staffSpecialties);
+    }
+
+    @Override
+    public Collection<Staff> findBySurnameOfficeAndStaffSpecialties(String surname, Collection<Office> offices, Collection<StaffSpecialty> staffSpecialties) {
+        return findByNameSurnameOfficeAndStaffSpecialities("", surname, offices, staffSpecialties);
     }
 
     @Override
@@ -210,14 +430,11 @@ public class StaffDaoImpl extends GenericSearchableDaoImpl<Staff, Integer> imple
 
         if (!name.isEmpty()) {
             name = name.toLowerCase();
-            parameters.put("firstName", name);
-            parameters.put("surname", name);
+            parameters.put("firstName", '%' + name + '%');
 
             whereClauseBuilder
                     .and()
                     .where(new JDBCWhereClauseBuilder()
-                            .where(this.formatColumnFromName("surname"), Operation.LIKE, ":surname", ColumnTransformer.LOWER)
-                            .or()
                             .where(this.formatColumnFromName("first_name"), Operation.LIKE, ":firstName", ColumnTransformer.LOWER)
                     );
         }
