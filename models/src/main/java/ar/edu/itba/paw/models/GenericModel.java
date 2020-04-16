@@ -20,13 +20,13 @@ public abstract class GenericModel<M, I> extends Cacheable<M> {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (o == null || this.getClass() != o.getClass()) return false;
         GenericModel<?, ?> that = (GenericModel<?, ?>) o;
-        return id.equals(that.id);
+        return this.id.equals(that.id);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id);
+        return Objects.hash(this.id);
     }
 }
