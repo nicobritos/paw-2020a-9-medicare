@@ -85,8 +85,8 @@ public class StaffDaoImpl extends GenericSearchableDaoImpl<Staff, Integer> imple
         Map<String, Object> parameters = new HashMap<>();
         name = name.toLowerCase();
         surname = surname.toLowerCase();
-        parameters.put("firstName", name);
-        parameters.put("surname", surname);
+        parameters.put("firstName", '%' + name + '%');
+        parameters.put("surname", '%' + surname + '%');
 
         MapSqlParameterSource parameterSource = new MapSqlParameterSource();
         parameterSource.addValues(parameters);
@@ -112,8 +112,7 @@ public class StaffDaoImpl extends GenericSearchableDaoImpl<Staff, Integer> imple
         Map<String, Object> parameters = new HashMap<>();
         Collection<String> specialtyParameters = new LinkedList<>();
         name = name.toLowerCase();
-        parameters.put("firstName", name);
-
+        parameters.put("firstName", '%' + name + '%');
         int i = 0;
         for (StaffSpecialty staffSpecialty : staffSpecialties) {
             String parameter = "_specialty_" + i;
@@ -170,7 +169,7 @@ public class StaffDaoImpl extends GenericSearchableDaoImpl<Staff, Integer> imple
 
         if (!surname.isEmpty()) {
             surname = surname.toLowerCase();
-            parameters.put("surname", surname);
+            parameters.put("surname", '%' + surname + '%');
 
             whereClauseBuilder
                     .and()
@@ -199,7 +198,7 @@ public class StaffDaoImpl extends GenericSearchableDaoImpl<Staff, Integer> imple
         Map<String, Object> parameters = new HashMap<>();
         Collection<String> specialtyParameters = new LinkedList<>();
         surname = surname.toLowerCase();
-        parameters.put("surname", surname);
+        parameters.put("surname", '%' + surname + '%');
 
         int i = 0;
         for (StaffSpecialty staffSpecialty : staffSpecialties) {
@@ -245,8 +244,8 @@ public class StaffDaoImpl extends GenericSearchableDaoImpl<Staff, Integer> imple
         Collection<String> specialtyParameters = new LinkedList<>();
         name = name.toLowerCase();
         surname = surname.toLowerCase();
-        parameters.put("firstName", name);
-        parameters.put("surname", surname);
+        parameters.put("firstName", '%' + name + '%');
+        parameters.put("surname", '%' + surname + '%');
 
         int i = 0;
         for (StaffSpecialty staffSpecialty : staffSpecialties) {
@@ -308,8 +307,8 @@ public class StaffDaoImpl extends GenericSearchableDaoImpl<Staff, Integer> imple
         if (!name.isEmpty()) {
             name = name.toLowerCase();
             surname = surname.toLowerCase();
-            parameters.put("firstName", name);
-            parameters.put("surname", surname);
+            parameters.put("firstName", '%' + name + '%');
+            parameters.put("surname", '%' + surname + '%');
 
 
             whereClauseBuilder
@@ -373,8 +372,8 @@ public class StaffDaoImpl extends GenericSearchableDaoImpl<Staff, Integer> imple
         if (!name.isEmpty()) {
             name = name.toLowerCase();
             surname = surname.toLowerCase();
-            parameters.put("firstName", name);
-            parameters.put("surname", surname);
+            parameters.put("firstName", '%' + name + '%');
+            parameters.put("surname", '%' + surname + '%');
 
             whereClauseBuilder
                     .and()
@@ -433,7 +432,7 @@ public class StaffDaoImpl extends GenericSearchableDaoImpl<Staff, Integer> imple
 
         if (!name.isEmpty()) {
             name = name.toLowerCase();
-            parameters.put("firstName", name);
+            parameters.put("firstName", '%' + name + '%');
 
             whereClauseBuilder
                     .and()
