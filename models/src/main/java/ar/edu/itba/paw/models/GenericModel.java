@@ -21,7 +21,7 @@ public abstract class GenericModel<M, I> extends Cacheable<M> {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        GenericModel<?> that = (GenericModel<?>) o;
+        GenericModel<?, ?> that = (GenericModel<?, ?>) o;
         return id.equals(that.id);
     }
 
