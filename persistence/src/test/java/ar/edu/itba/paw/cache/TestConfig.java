@@ -19,6 +19,7 @@ public class TestConfig {
     private static final String HSQLDB_URL = "jdbc:hsqldb:mem:test;sql.syntax_pgs=true;check_props=true";
     private static final String HSQLDB_USER = "ha";
     private static final String HSQLDB_PASS = "";
+    private static final int CACHE_SIZE = 500;
 
     @Value("classpath:sql/schema.sql")
     private Resource schemaSql;
@@ -43,6 +44,11 @@ public class TestConfig {
     @Bean
     public boolean isCacheEnabled(){
         return true;
+    }
+
+    @Bean
+    public int cacheSize() {
+        return CACHE_SIZE;
     }
 
     private DataSourceInitializer dataSourceInitializer(){

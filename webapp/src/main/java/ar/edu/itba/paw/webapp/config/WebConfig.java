@@ -19,6 +19,7 @@ public class WebConfig {
     protected static final String DB_USER = "paw-2020a-9";
     protected static final String DB_PASSWORD = "N4wC7cmxe";
     protected static final boolean CACHE_ENABLED = true;
+    protected static final int CACHE_SIZE = 500;
 
     @Bean
     public ViewResolver viewResolver() {
@@ -46,5 +47,10 @@ public class WebConfig {
     @Bean
     public boolean isCacheEnabled() {
         return CACHE_ENABLED;
+    }
+
+    @Bean
+    public int cacheSize() {
+        return CACHE_SIZE;
     }
 }

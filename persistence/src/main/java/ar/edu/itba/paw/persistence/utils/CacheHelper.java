@@ -20,11 +20,13 @@ public class CacheHelper {
     private static final Map<String, Cache<?, ?>> cacheMap = new HashMap<>();
     private static final Map<String, Integer> sizes = new HashMap<>();
     public static boolean cacheEnabled;
+    public static int cacheSize;
 
     @Autowired
-    private void setCacheEnabled(boolean isCacheEnabled) {
+    private void setCacheEnabled(boolean isCacheEnabled, int cacheSize) {
         if (isCacheEnabled) {
             cacheManager.init();
+            CacheHelper.cacheSize = cacheSize;
         }
         cacheEnabled = isCacheEnabled;
     }
@@ -179,7 +181,7 @@ public class CacheHelper {
                 CacheConfigurationBuilder.newCacheConfigurationBuilder(
                         iClass,
                         mClass,
-                        ResourcePoolsBuilder.heap(300)
+                        ResourcePoolsBuilder.heap(cacheSize)
                 )
         );
         cacheMap.put(mClass.getName(), cache);

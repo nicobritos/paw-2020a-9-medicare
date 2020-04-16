@@ -45,6 +45,11 @@ public class TestConfig {
         return false;
     }
 
+    @Bean
+    public int cacheSize() {
+        return 0;
+    }
+
     private DataSourceInitializer dataSourceInitializer(){
         DataSourceInitializer dsi = new DataSourceInitializer();
         dsi.setDataSource(dataSource());
