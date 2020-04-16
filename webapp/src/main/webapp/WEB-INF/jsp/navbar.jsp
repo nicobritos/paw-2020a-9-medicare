@@ -1,5 +1,6 @@
 <div id="navbar">
-	<input id="txtSearch" class="form-control d-inline" type="search" placeholder="Buscá por nombre...">
+	<input id="txtSearchName" class="form-control d-inline" type="search" placeholder="Buscá por nombre...">
+	<input id="txtSearchSurname" class="form-control d-inline" type="search" placeholder="Buscá por apellido...">
 	<select id="selEspecialidad" class="form-control d-inline">
 	    <option value="-1" disabled selected>Especialidad</option>
 		<option value="-1">Cualquiera</option>
@@ -12,13 +13,16 @@
 <script>
 	let filtrarBtn = document.getElementById("filtrarBtn");
 	let selEspecialidad = document.getElementById("selEspecialidad");
-	let txtSearch = document.getElementById("txtSearch");
+	let txtSearchName = document.getElementById("txtSearchName");
+	let txtSearchSurname = document.getElementById("txtSearchSurname");
 	filtrarBtn.onclick = ()=>{
 		let id = selEspecialidad.options[selEspecialidad.selectedIndex].value;
-		let name = txtSearch.value ? "name=" + txtSearch.value : "";
+		let name = txtSearchName.value ? "name=" + txtSearchName.value : "";
+		let surname = txtSearchSurname.value ? "surname=" + txtSearchSurname.value : "";
 		let specialties = id >= 0 ? "specialties=" + id : "";
-		let connector = id>=0 && name ? "&&" : "";
-		let querySelector = id>=0 || name ? "?" : "";
-		location.href = "<c:url value="/mediclist"/>" + querySelector + name + connector + specialties;
+		let nameSurnameConnector = name && surname ? "&&" : "";
+		let specialtiesConnector = id>=0 && (name || surname) ? "&&" : "";
+		let querySelector = (id>=0 || name || surname) ? "?" : "";
+		location.href = "<c:url value="/mediclist"/>" + querySelector + name + nameSurnameConnector + surname + specialtiesConnector + specialties;
 	};
 </script>

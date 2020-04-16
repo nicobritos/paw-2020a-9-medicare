@@ -24,7 +24,7 @@ public class MedicListController {
     StaffSpecialtyService specialityService;
 
     @RequestMapping(value = "/mediclist")
-    public ModelAndView medicsList(@RequestParam(value = "name",required = false)String name,@RequestParam(value = "specialties",required = false) String specialties){
+    public ModelAndView medicsList(@RequestParam(value = "name",required = false)String name, @RequestParam(value = "surname",required = false)String surname, @RequestParam(value = "specialties",required = false) String specialties){
         //get modelandview from index.jsp
         final ModelAndView mav = new ModelAndView("index");
         //staff variable that will be passed to the jsp
@@ -45,16 +45,35 @@ public class MedicListController {
             }
             //if name is not a parameter search only specialties else search for both
             if(name!=null){
-                staffList = this.staffService.findByNameAndStaffSpecialties(name,searchedSpecialties);
+                if(surname != null){
+                    staffList = this.staffService.findByNameSurnameAndStaffSpecialties(name, surname, searchedSpecialties);
+                }
+                else {
+                    staffList = this.staffService.findByNameAndStaffSpecialties(name, searchedSpecialties);
+                }
             }else{
-                staffList = this.staffService.findByStaffSpecialties(searchedSpecialties);
+                if(surname != null){
+                    staffList = this.staffService.findBySurnameAndStaffSpecialties(surname, searchedSpecialties);
+                }
+                else {
+                    staffList = this.staffService.findByStaffSpecialties(searchedSpecialties);
+                }
             }
         }
         else{
             if(name != null){
-                staffList = this.staffService.findByName(name);
+                if(surname != null){
+                    staffList = this.staffService.findByNameAndSurname(name, surname);
+                }
+                else {
+                    staffList = this.staffService.findByName(name);
+                }
             }else{
-                staffList = this.staffService.list();
+                if(surname != null){
+                    staffList = this.staffService.findBySurname(surname);
+                } else {
+                    staffList = this.staffService.list();
+                }
             }
         }
 
