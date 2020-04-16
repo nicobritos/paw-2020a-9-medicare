@@ -11,7 +11,7 @@
         <div style="overflow-x:auto;">
             <table>
                 <tr>
-                    <th>Nombre</th>
+                    <th>Apellido, Nombre</th>
                     <th>Especialidad</th>
                     <th>Correo electrónico</th>
                     <th>Teléfono</th>
