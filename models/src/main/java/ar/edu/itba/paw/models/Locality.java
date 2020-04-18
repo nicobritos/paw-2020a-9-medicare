@@ -22,4 +22,9 @@ public class Locality extends GenericModel<Locality, Integer> {
     public Province getProvince() {
         return this.province;
     }
+
+    @Override
+    protected boolean isSameInstance(Object o) {
+        return o instanceof Locality;
+    }
 }

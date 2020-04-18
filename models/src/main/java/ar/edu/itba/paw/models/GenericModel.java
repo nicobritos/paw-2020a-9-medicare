@@ -6,7 +6,7 @@ import java.util.Objects;
  * This class provides a generic implementation of a model.
  * @param <I>
  */
-public abstract class GenericModel<M, I> extends Cacheable<M> {
+public abstract class GenericModel<M, I> extends Cacheable {
     protected I id;
 
     public I getId() {
@@ -20,13 +20,14 @@ public abstract class GenericModel<M, I> extends Cacheable<M> {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (o == null || this.getClass() != o.getClass()) return false;
-        GenericModel<?, ?> that = (GenericModel<?, ?>) o;
-        return this.id.equals(that.id);
+        if (!this.isSameInstance(o)) return false;
+        return this.getId().equals(((GenericModel<?, Object>) o).getId());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(this.id);
+        return Objects.hash(this.getId());
     }
+
+    protected abstract boolean isSameInstance(Object o);
 }

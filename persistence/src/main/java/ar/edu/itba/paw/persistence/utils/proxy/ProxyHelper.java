@@ -1,9 +1,10 @@
 package ar.edu.itba.paw.persistence.utils.proxy;
 
 import ar.edu.itba.paw.models.GenericModel;
-import org.springframework.aop.Advisor;
-import org.springframework.aop.framework.ProxyFactory;
 import org.springframework.beans.BeanUtils;
+import org.springframework.cglib.proxy.Callback;
+import org.springframework.cglib.proxy.Enhancer;
+import org.springframework.cglib.proxy.MethodInterceptor;
 
 import java.beans.PropertyDescriptor;
 import java.lang.reflect.Field;
@@ -16,46 +17,35 @@ public abstract class ProxyHelper {
         if (!isProxied(instance))
             return null;
 
+        Enhancer enhancer = new Enhancer();
         ProxiedModel<M, I> proxiedModel = new ProxiedModel<>(getAsProxiedModel(instance));
-        ProxyFactory factory = new ProxyFactory(proxiedModel.getTarget());
-        factory.addAdvice(proxiedModel);
-        return (M) factory.getProxy();
+        enhancer.setSuperclass(proxiedModel.getTarget().getClass());
+        enhancer.setCallback(proxiedModel.getMethodInterceptor());
+        return (M) enhancer.create();
     }
 
     public static <M extends GenericModel<M, I>, I> M createInstance(M instance) {
-        ProxyFactory factory = new ProxyFactory(instance);
-        factory.addAdvice(new ProxiedModel<>(instance));
-        return (M) factory.getProxy();
+        if (isProxied(instance))
+            return copyInstance(instance);
+
+        Enhancer enhancer = new Enhancer();
+        enhancer.setSuperclass(instance.getClass());
+        ProxiedModel<M, I> proxiedModel = new ProxiedModel<>(instance);
+        enhancer.setCallback(proxiedModel.getMethodInterceptor());
+        return (M) enhancer.create();
     }
 
     public static <M extends GenericModel<M, I>, I> Set<GenericModel<Object, Object>> getPreviousCollection(M model, Field field) {
-        Set<GenericModel<Object, Object>> collection;
-
-        try {
-            PropertyDescriptor propertyDescriptor = BeanUtils.getPropertyDescriptor(model.getClass(), "advisors");
-            if (propertyDescriptor != null) {
-                collection = ((ProxiedModelCollection) (((Advisor[]) propertyDescriptor.getReadMethod().invoke(model))[0].getAdvice())).getPreviousModels(field);
-                if (collection != null) {
-                    return collection;
-                }
-            }
-
-            return new HashSet<>();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        ProxiedModel<M, I> proxiedModel = getAsProxiedModel(model);
+        if (proxiedModel != null)
+            return proxiedModel.getPreviousModels(field);
         return new HashSet<>();
     }
 
     public static <M extends GenericModel<M, I>, I> void setPreviousCollection(M model, Field field, Set<GenericModel<Object, Object>> models) {
-        try {
-            PropertyDescriptor propertyDescriptor = BeanUtils.getPropertyDescriptor(model.getClass(), "advisors");
-            if (propertyDescriptor != null) {
-                ((ProxiedModelCollection) (((Advisor[]) propertyDescriptor.getReadMethod().invoke(model))[0].getAdvice())).setPreviousCollection(field, models);
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        ProxiedModel<M, I> proxiedModel = getAsProxiedModel(model);
+        if (proxiedModel != null)
+            proxiedModel.setPreviousCollection(field, models);
     }
 
     public static <M extends GenericModel<M, I>, I> void setField(M model, Field field, Object value) {
@@ -66,18 +56,25 @@ public abstract class ProxyHelper {
     }
 
     public static <M extends GenericModel<M, I>, I> boolean isProxied(M model) {
-        return BeanUtils.getPropertyDescriptor(model.getClass(), "advisors") != null;
+        PropertyDescriptor propertyDescriptor = BeanUtils.getPropertyDescriptor(model.getClass(), "callbacks");
+        return propertyDescriptor != null && propertyDescriptor.getReadMethod() != null;
     }
 
     private static <M extends GenericModel<M, I>, I> ProxiedModel<M, I> getAsProxiedModel(M proxiedModel) {
         try {
-            PropertyDescriptor propertyDescriptor = BeanUtils.getPropertyDescriptor(proxiedModel.getClass(), "advisors");
+            PropertyDescriptor propertyDescriptor = BeanUtils.getPropertyDescriptor(proxiedModel.getClass(), "callbacks");
             if (propertyDescriptor == null)
                 return null;
 
-            return (ProxiedModel<M, I>) ((Advisor[]) propertyDescriptor.getReadMethod().invoke(proxiedModel))[0].getAdvice();
+            MethodInterceptor methodInterceptor = ((MethodInterceptor) ((Callback[]) propertyDescriptor.getReadMethod().invoke(proxiedModel))[0]);
+            try {
+                return (ProxiedModel<M, I>) methodInterceptor.intercept(null, null, null, null);
+            } catch (Throwable e) {
+                e.printStackTrace();
+            }
         } catch (IllegalAccessException | InvocationTargetException e) {
             return null;
         }
+        return null;
     }
 }

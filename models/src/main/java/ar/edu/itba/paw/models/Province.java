@@ -32,4 +32,9 @@ public class Province extends GenericModel<Province, Integer> {
     public Country getCountry() {
         return this.country;
     }
+
+    @Override
+    protected boolean isSameInstance(Object o) {
+        return o instanceof Province;
+    }
 }

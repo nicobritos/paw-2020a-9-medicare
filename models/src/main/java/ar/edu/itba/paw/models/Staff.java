@@ -72,4 +72,9 @@ public class Staff extends GenericModel<Staff, Integer> {
     public Office getOffice() {
         return this.office;
     }
+
+    @Override
+    protected boolean isSameInstance(Object o) {
+        return o instanceof Staff;
+    }
 }
