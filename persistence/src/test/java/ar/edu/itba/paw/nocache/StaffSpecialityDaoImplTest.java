@@ -1,4 +1,4 @@
-package ar.edu.itba.paw;
+package ar.edu.itba.paw.nocache;
 
 import ar.edu.itba.paw.models.StaffSpecialty;
 import ar.edu.itba.paw.persistence.StaffSpecialtyDaoImpl;
@@ -288,7 +288,7 @@ public class StaffSpecialityDaoImplTest {
         // 1. Precondiciones
         cleanAllTables();
         insertStaffSpeciality();
-        StaffSpecialty s = staffSpecialtyModel();
+        StaffSpecialty s = this.staffSpecialtyDao.findById(staffSpecialtyModel().getId()).get();
         s.setName(STAFF_SPECIALTY + " (updated)");
 
         // 2. Ejercitar

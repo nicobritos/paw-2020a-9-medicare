@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Collection;
+import java.util.Set;
 
 @Service
 public class OfficeServiceImpl extends GenericSearchableServiceImpl<OfficeDao, Office, Integer> implements OfficeService {
@@ -15,17 +16,17 @@ public class OfficeServiceImpl extends GenericSearchableServiceImpl<OfficeDao, O
     private OfficeDao repository;
 
     @Override
-    public Collection<Office> findByCountry(Country country) {
+    public Set<Office> findByCountry(Country country) {
         return this.repository.findByCountry(country);
     }
 
     @Override
-    public Collection<Office> findByProvince(Province province) {
+    public Set<Office> findByProvince(Province province) {
         return this.repository.findByProvince(province);
     }
 
     @Override
-    public Collection<Office> findByLocality(Locality locality) {
+    public Set<Office> findByLocality(Locality locality) {
         return this.findByLocality(locality);
     }
 

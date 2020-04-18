@@ -4,16 +4,17 @@ import ar.edu.itba.paw.models.GenericModel;
 
 import java.util.Collection;
 import java.util.Optional;
+import java.util.Set;
 
 /**
  * This provides a generic DAO interface
  * @param <M> the DAO model type
  * @param <I> the Model's id type
  */
-public interface GenericDao<M extends GenericModel<I>, I> {
+public interface GenericDao<M extends GenericModel<M, I>, I> {
     Optional<M> findById(I id);
 
-    Collection<M> findByIds(Collection<I> ids);
+    Set<M> findByIds(Collection<I> ids);
 
     M create(M model);
 
@@ -23,7 +24,7 @@ public interface GenericDao<M extends GenericModel<I>, I> {
 
     void remove(I id);
 
-    Collection<M> list();
+    Set<M> list();
 
     /**
      * Searches for a collection of models that have a columnName equals to the provided object's value
@@ -31,7 +32,7 @@ public interface GenericDao<M extends GenericModel<I>, I> {
      * @param value the column's value. If it extends GenericModel then its ID will be used
      * @return a collection of models found
      */
-    Collection<M> findByField(String columnName, Object value);
+    Set<M> findByField(String columnName, Object value);
 
     /**
      * Searches for a collection of models that have a columnName equals to the provided string (case insensitive)
@@ -39,7 +40,7 @@ public interface GenericDao<M extends GenericModel<I>, I> {
      * @param value the column's value
      * @return a collection of models found
      */
-    Collection<M> findByFieldIgnoreCase(String columnName, String value);
+    Set<M> findByFieldIgnoreCase(String columnName, String value);
 
     Class<M> getModelClass();
 }

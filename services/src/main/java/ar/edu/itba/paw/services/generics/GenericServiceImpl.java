@@ -12,7 +12,7 @@ import java.util.Optional;
  * @param <M> the Service model type
  * @param <I> the Model's id type
  */
-public abstract class GenericServiceImpl<DAO extends GenericSearchableDao<M, I>, M extends GenericModel<I>, I> implements GenericService<M, I> {
+public abstract class GenericServiceImpl<DAO extends GenericSearchableDao<M, I>, M extends GenericModel<M, I>, I> implements GenericService<M, I> {
     @Override
     public Optional<M> findById(I id) {
         return this.getRepository().findById(id);

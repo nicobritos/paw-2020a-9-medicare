@@ -1,8 +1,9 @@
-package ar.edu.itba.paw;
+package ar.edu.itba.paw.cache;
 
 import ar.edu.itba.paw.models.Locality;
 import ar.edu.itba.paw.persistence.LocalityDaoImpl;
 import ar.edu.itba.paw.persistence.utils.builder.JDBCWhereClauseBuilder;
+import ar.edu.itba.paw.persistence.utils.cache.CacheHelper;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -24,8 +25,8 @@ import static org.junit.Assert.*;
 @ContextConfiguration(classes = TestConfig.class)
 public class LocalityDaoImplTest
 {
-    private static final String LOCALITY = "Buenos Aires";
-    private static final String PROVINCE = "Argentina";
+    private static final String LOCALITY = "Capital Federal";
+    private static final String PROVINCE = "Buenos Aires";
 
     private static final String LOCALITIES_TABLE = "system_locality";
     private static final String PROVINCES_TABLE = "system_province";
@@ -54,6 +55,7 @@ public class LocalityDaoImplTest
 
     private void cleanAllTables(){
         this.jdbcTemplate.execute("TRUNCATE SCHEMA PUBLIC RESTART IDENTITY AND COMMIT NO CHECK");
+        CacheHelper.clean();
     }
 
     private Locality localityModel(){
@@ -138,12 +140,12 @@ public class LocalityDaoImplTest
         insertLocality();
 
         // 2. Ejercitar
-        List<Locality> localitys = this.localityDao.findByField("name", LOCALITY);
+        Set<Locality> localitys = this.localityDao.findByField("name", LOCALITY);
 
         // 3. Postcondiciones
         assertNotNull(localitys);
         assertFalse(localitys.isEmpty());
-        assertEquals(LOCALITY, localitys.get(0).getName());
+        assertEquals(LOCALITY, localitys.stream().findFirst().get().getName());
     }
 
     @Test
@@ -153,7 +155,7 @@ public class LocalityDaoImplTest
         cleanAllTables();
 
         // 2. Ejercitar
-        List<Locality> localitys = this.localityDao.findByField("name", LOCALITY);
+        Set<Locality> localitys = this.localityDao.findByField("name", LOCALITY);
 
         // 3. Postcondiciones
         assertNotNull(localitys);
@@ -169,12 +171,12 @@ public class LocalityDaoImplTest
         insertLocality();
 
         // 2. Ejercitar
-        List<Locality> localitys = this.localityDao.findByField("name", JDBCWhereClauseBuilder.Operation.EQ, LOCALITY);
+        Set<Locality> localitys = this.localityDao.findByField("name", JDBCWhereClauseBuilder.Operation.EQ, LOCALITY);
 
         // 3. Postcondiciones
         assertNotNull(localitys);
         assertFalse(localitys.isEmpty());
-        assertEquals(LOCALITY, localitys.get(0).getName());
+        assertEquals(LOCALITY, localitys.stream().findFirst().get().getName());
     }
 
     @Test
@@ -184,7 +186,7 @@ public class LocalityDaoImplTest
         cleanAllTables();
 
         // 2. Ejercitar
-        List<Locality> localitys = this.localityDao.findByField("name", JDBCWhereClauseBuilder.Operation.EQ, LOCALITY);
+        Set<Locality> localitys = this.localityDao.findByField("name", JDBCWhereClauseBuilder.Operation.EQ, LOCALITY);
 
         // 3. Postcondiciones
         assertNotNull(localitys);
@@ -293,8 +295,7 @@ public class LocalityDaoImplTest
         // 1. Precondiciones
         cleanAllTables();
         insertLocality();
-        Locality p = new Locality();
-        p.setId(0);
+        Locality p = this.localityDao.findById(0).get();
         p.setName("Palermo");
 
         // 2. Ejercitar

@@ -24,4 +24,8 @@ public @interface OneToOne {
      * @return if this field is required
      */
     boolean required() default false;
+
+    boolean lazy() default true;
+
+    boolean inverse() default false;
 }

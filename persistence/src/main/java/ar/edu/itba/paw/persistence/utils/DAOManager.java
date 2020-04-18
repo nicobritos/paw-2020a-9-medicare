@@ -1,7 +1,6 @@
 package ar.edu.itba.paw.persistence.utils;
 
 import ar.edu.itba.paw.interfaces.daos.generic.GenericDao;
-import ar.edu.itba.paw.models.GenericModel;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -30,7 +29,7 @@ public class DAOManager {
         }
     }
 
-    public static <DAO extends GenericDao<M, I>, M extends GenericModel<I>, I> DAO getDaoForModel(Class<M> mClass) {
+    public static <DAO extends GenericDao<?, I>, I> DAO getDaoForModel(Class<?> mClass) {
         return (DAO) daosMap.get(mClass);
     }
 }

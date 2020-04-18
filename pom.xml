@@ -15,6 +15,7 @@
     <org.postgresql.version>42.2.5</org.postgresql.version>
     <org.hsqldb.version>2.3.1</org.hsqldb.version>
     <org.mockito.version>3.3.3</org.mockito.version>
+    <org.ehcache.version>3.8.1</org.ehcache.version>
   </properties>
 
   <dependencyManagement>
@@ -61,6 +62,12 @@
         <groupId>org.postgresql</groupId>
         <artifactId>postgresql</artifactId>
         <version>${org.postgresql.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.ehcache</groupId>
+        <artifactId>ehcache</artifactId>
+        <version>${org.ehcache.version}</version>
       </dependency>
 
       <dependency>

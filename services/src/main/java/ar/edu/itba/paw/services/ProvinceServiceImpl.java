@@ -9,7 +9,7 @@ import ar.edu.itba.paw.services.generics.GenericServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.Collection;
+import java.util.Set;
 
 @Service
 public class ProvinceServiceImpl extends GenericServiceImpl<ProvinceDao, Province, Integer> implements ProvinceService {
@@ -17,12 +17,12 @@ public class ProvinceServiceImpl extends GenericServiceImpl<ProvinceDao, Provinc
     private ProvinceDao repository;
 
     @Override
-    public Collection<Province> findByCountry(Country country) {
+    public Set<Province> findByCountry(Country country) {
         return this.repository.findByCountry(country);
     }
 
     @Override
-    public Collection<Province> findByCountryAndName(Country country, String name) {
+    public Set<Province> findByCountryAndName(Country country, String name) {
         return this.repository.findByCountryAndName(country, name);
     }
 
@@ -33,7 +33,7 @@ public class ProvinceServiceImpl extends GenericServiceImpl<ProvinceDao, Provinc
     }
 
     @Override
-    public void addLocalities(Province province, Collection<Locality> localities) {
+    public void addLocalities(Province province, Set<Locality> localities) {
         province.getLocalities().addAll(localities);
         this.repository.update(province);
     }

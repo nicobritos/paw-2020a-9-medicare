@@ -2,26 +2,33 @@ package ar.edu.itba.paw.persistence.utils.builder;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.function.BiPredicate;
 import java.util.stream.Collectors;
 
 public class JDBCWhereClauseBuilder {
     public enum Operation {
-        EQ(" = "),
-        NEQ(" <> "),
-        LT(" < "),
-        LEQ(" <= "),
-        GT(" > "),
-        GEQ(" >= "),
-        LIKE(" LIKE ");
+        EQ(" = ", (o1, o2) -> (o1 == null && o2 == null) || (o1 != null && o1.equals(o2))),
+        NEQ(" <> ", (o1, o2) -> (o1 == null && o2 != null) || (o1 != null && !o1.equals(o2))),
+        LT(" < ", (o1, o2) -> Double.compare((Double) o1, (Double) o2) < 0),
+        LEQ(" <= ", (o1, o2) -> Double.compare((Double) o1, (Double) o2) <= 0),
+        GT(" > ", (o1, o2) -> Double.compare((Double) o1, (Double) o2) > 0),
+        GEQ(" >= ", (o1, o2) -> Double.compare((Double) o1, (Double) o2) >= 0),
+        LIKE(" LIKE ", (o1, o2) -> o1.toString().equals(o2.toString()));
 
         private String operation;
+        private BiPredicate<Object, Object> predicate;
 
-        Operation(String operation) {
+        Operation(String operation, BiPredicate<Object, Object> predicate) {
             this.operation = operation;
+            this.predicate = predicate;
         }
 
         public String getOperation() {
             return this.operation;
+        }
+
+        public boolean operate(Object o1, Object o2) {
+            return this.predicate.test(o1, o2);
         }
 
         @Override

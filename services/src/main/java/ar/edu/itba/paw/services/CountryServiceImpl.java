@@ -8,7 +8,7 @@ import ar.edu.itba.paw.services.generics.GenericSearchableServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.Collection;
+import java.util.Set;
 
 @Service
 public class CountryServiceImpl extends GenericSearchableServiceImpl<CountryDao, Country,String> implements CountryService {
@@ -27,7 +27,7 @@ public class CountryServiceImpl extends GenericSearchableServiceImpl<CountryDao,
     }
 
     @Override
-    public void addProvinces(Country country, Collection<Province> provinces) {
+    public void addProvinces(Country country, Set<Province> provinces) {
         country.getProvinces().addAll(provinces);
         this.repository.update(country);
     }

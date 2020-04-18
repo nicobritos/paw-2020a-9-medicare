@@ -5,40 +5,38 @@ import ar.edu.itba.paw.models.Office;
 import ar.edu.itba.paw.models.Staff;
 import ar.edu.itba.paw.models.StaffSpecialty;
 
-import java.util.Collection;
+import java.util.Set;
 
 public interface StaffService extends GenericSearchableService<Staff, Integer> {
-    Collection<Staff> findBySurname(String surname);
+    Set<Staff> findBySurname(String surname);
 
-    Collection<Staff> findByOffice(Collection<Office> offices);
+    Set<Staff> findByOffice(Set<Office> offices);
 
-    Collection<Staff> findByStaffSpecialties(Collection<StaffSpecialty> staffSpecialties);
+    Set<Staff> findByStaffSpecialties(Set<StaffSpecialty> staffSpecialties);
 
-    Collection<Staff> findByNameAndSurname(String name, String surname);
+    Set<Staff> findByNameAndSurname(String name, String surname);
 
-    Collection<Staff> findByNameAndOffice(String name, Collection<Office> offices);
+    Set<Staff> findByNameAndOffice(String name, Set<Office> offices);
 
-    Collection<Staff> findByNameAndStaffSpecialties(String name, Collection<StaffSpecialty> staffSpecialties);
+    Set<Staff> findByNameAndStaffSpecialties(String name, Set<StaffSpecialty> staffSpecialties);
 
-    Collection<Staff> findBySurnameAndOffice(String surname, Collection<Office> offices);
+    Set<Staff> findBySurnameAndOffice(String surname, Set<Office> offices);
 
-    Collection<Staff> findBySurnameAndStaffSpecialties(String surname, Collection<StaffSpecialty> staffSpecialties);
+    Set<Staff> findBySurnameAndStaffSpecialties(String surname, Set<StaffSpecialty> staffSpecialties);
 
-    Collection<Staff> findByOfficeAndStaffSpecialties(Collection<Office> offices, Collection<StaffSpecialty> staffSpecialties);
+    Set<Staff> findByOfficeAndStaffSpecialties(Set<Office> offices, Set<StaffSpecialty> staffSpecialties);
 
-    Collection<Staff> findBySurnameOfficeAndStaffSpecialties(String surname, Collection<Office> offices, Collection<StaffSpecialty> staffSpecialties);
+    Set<Staff> findBySurnameOfficeAndStaffSpecialties(String surname, Set<Office> offices, Set<StaffSpecialty> staffSpecialties);
 
-    Collection<Staff> findByNameOfficeAndStaffSpecialties(String name, Collection<Office> offices, Collection<StaffSpecialty> staffSpecialties);
+    Set<Staff> findByNameOfficeAndStaffSpecialties(String name, Set<Office> offices, Set<StaffSpecialty> staffSpecialties);
 
-    Collection<Staff> findByNameSurnameAndStaffSpecialties(String name, String surname, Collection<StaffSpecialty> staffSpecialties);
+    Set<Staff> findByNameSurnameAndStaffSpecialties(String name, String surname, Set<StaffSpecialty> staffSpecialties);
 
-    Collection<Staff> findByNameSurnameAndOffice(String name, String surname, Collection<Office> offices);
+    Set<Staff> findByNameSurnameAndOffice(String name, String surname, Set<Office> offices);
 
-    Collection<Staff> findByNameSurnameOfficeAndStaffSpecialities(String name, String surname, Collection<Office> offices, Collection<StaffSpecialty> staffSpecialties);
+    Set<Staff> findByNameSurnameOfficeAndStaffSpecialities(String name, String surname, Set<Office> offices, Set<StaffSpecialty> staffSpecialties);
 
     void addStaffSpecialty(Staff staff, StaffSpecialty staffSpecialty);
 
-    void addStaffSpecialties(Staff staff, Collection<StaffSpecialty> staffSpecialties);
-
-
+    void addStaffSpecialties(Staff staff, Set<StaffSpecialty> staffSpecialties);
 }
