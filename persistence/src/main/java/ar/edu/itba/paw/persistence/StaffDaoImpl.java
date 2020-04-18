@@ -46,7 +46,7 @@ public class StaffDaoImpl extends GenericSearchableDaoImpl<Staff, Integer> imple
         if (staffSpecialties.isEmpty())
             return new HashSet<>();
 
-        FilteredCachedCollection<Staff> cachedCollection = this.filterCollection("", "", staffSpecialties, new LinkedList<>());
+        FilteredCachedCollection<Staff> cachedCollection = this.filterCache("", "", staffSpecialties, new LinkedList<>());
         if (this.isCacheComplete(cachedCollection)) {
             return cachedCollection.getCollectionAsSet();
         }
@@ -78,7 +78,7 @@ public class StaffDaoImpl extends GenericSearchableDaoImpl<Staff, Integer> imple
 
         name = name.toLowerCase();
         surname = surname.toLowerCase();
-        FilteredCachedCollection<Staff> cachedCollection = this.filterCollection(name, surname, new LinkedList<>(), new LinkedList<>());
+        FilteredCachedCollection<Staff> cachedCollection = this.filterCache(name, surname, new LinkedList<>(), new LinkedList<>());
         if (this.isCacheComplete(cachedCollection)) {
             return cachedCollection.getCollectionAsSet();
         }
@@ -113,7 +113,7 @@ public class StaffDaoImpl extends GenericSearchableDaoImpl<Staff, Integer> imple
             return new HashSet<>();
 
         name = name.toLowerCase();
-        FilteredCachedCollection<Staff> cachedCollection = this.filterCollection(name, "", staffSpecialties, new LinkedList<>());
+        FilteredCachedCollection<Staff> cachedCollection = this.filterCache(name, "", staffSpecialties, new LinkedList<>());
         if (this.isCacheComplete(cachedCollection)) {
             return cachedCollection.getCollectionAsSet();
         }
@@ -147,7 +147,7 @@ public class StaffDaoImpl extends GenericSearchableDaoImpl<Staff, Integer> imple
             return new HashSet<>();
 
         surname = surname.toLowerCase();
-        FilteredCachedCollection<Staff> cachedCollection = this.filterCollection("", surname, new LinkedList<>(), offices);
+        FilteredCachedCollection<Staff> cachedCollection = this.filterCache("", surname, new LinkedList<>(), offices);
         if (this.isCacheComplete(cachedCollection)) {
             return cachedCollection.getCollectionAsSet();
         }
@@ -179,7 +179,7 @@ public class StaffDaoImpl extends GenericSearchableDaoImpl<Staff, Integer> imple
             return new HashSet<>();
 
         surname = surname.toLowerCase();
-        FilteredCachedCollection<Staff> cachedCollection = this.filterCollection("", surname, staffSpecialties, new LinkedList<>());
+        FilteredCachedCollection<Staff> cachedCollection = this.filterCache("", surname, staffSpecialties, new LinkedList<>());
         if (this.isCacheComplete(cachedCollection)) {
             return cachedCollection.getCollectionAsSet();
         }
@@ -219,7 +219,7 @@ public class StaffDaoImpl extends GenericSearchableDaoImpl<Staff, Integer> imple
 
         name = name.toLowerCase();
         surname = surname.toLowerCase();
-        FilteredCachedCollection<Staff> cachedCollection = this.filterCollection(name, surname, staffSpecialties, new LinkedList<>());
+        FilteredCachedCollection<Staff> cachedCollection = this.filterCache(name, surname, staffSpecialties, new LinkedList<>());
         if (this.isCacheComplete(cachedCollection)) {
             return cachedCollection.getCollectionAsSet();
         }
@@ -255,7 +255,7 @@ public class StaffDaoImpl extends GenericSearchableDaoImpl<Staff, Integer> imple
 
         name = name.toLowerCase();
         surname = surname.toLowerCase();
-        FilteredCachedCollection<Staff> cachedCollection = this.filterCollection(name, surname, new LinkedList<>(), offices);
+        FilteredCachedCollection<Staff> cachedCollection = this.filterCache(name, surname, new LinkedList<>(), offices);
         if (this.isCacheComplete(cachedCollection)) {
             return cachedCollection.getCollectionAsSet();
         }
@@ -291,7 +291,7 @@ public class StaffDaoImpl extends GenericSearchableDaoImpl<Staff, Integer> imple
 
         name = name.toLowerCase();
         surname = surname.toLowerCase();
-        FilteredCachedCollection<Staff> cachedCollection = this.filterCollection(name, surname, staffSpecialties, offices);
+        FilteredCachedCollection<Staff> cachedCollection = this.filterCache(name, surname, staffSpecialties, offices);
         if (this.isCacheComplete(cachedCollection)) {
             return cachedCollection.getCollectionAsSet();
         }
@@ -337,7 +337,7 @@ public class StaffDaoImpl extends GenericSearchableDaoImpl<Staff, Integer> imple
             return new HashSet<>();
 
         name = name.toLowerCase();
-        FilteredCachedCollection<Staff> cachedCollection = this.filterCollection(name, "", new LinkedList<>(), offices);
+        FilteredCachedCollection<Staff> cachedCollection = this.filterCache(name, "", new LinkedList<>(), offices);
         if (this.isCacheComplete(cachedCollection)) {
             return cachedCollection.getCollectionAsSet();
         }
@@ -434,7 +434,7 @@ public class StaffDaoImpl extends GenericSearchableDaoImpl<Staff, Integer> imple
                 .where(this.formatColumnFromName("surname"), Operation.LIKE, ":surname", ColumnTransformer.LOWER);
     }
 
-    private FilteredCachedCollection<Staff> filterCollection(String name, String surname, Collection<StaffSpecialty> staffSpecialties, Collection<Office> offices) {
+    private FilteredCachedCollection<Staff> filterCache(String name, String surname, Collection<StaffSpecialty> staffSpecialties, Collection<Office> offices) {
         if (!name.isEmpty()) {
             if (!surname.isEmpty()) {
                 if (!staffSpecialties.isEmpty()) {

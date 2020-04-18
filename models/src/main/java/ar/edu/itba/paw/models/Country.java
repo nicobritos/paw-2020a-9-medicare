@@ -25,4 +25,9 @@ public class Country extends GenericModel<Country, String> {
     public Set<Province> getProvinces() {
         return this.provinces;
     }
+
+    @Override
+    protected boolean isSameInstance(Object o) {
+        return o instanceof Country;
+    }
 }
