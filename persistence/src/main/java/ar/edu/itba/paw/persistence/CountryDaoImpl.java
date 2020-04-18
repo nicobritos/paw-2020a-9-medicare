@@ -17,7 +17,7 @@ public class CountryDaoImpl extends GenericSearchableDaoImpl<Country, String> im
 
     @Autowired
     public CountryDaoImpl(DataSource dataSource) {
-        super(dataSource, Country.class);
+        super(dataSource, Country.class, String.class);
     }
 
     @Override

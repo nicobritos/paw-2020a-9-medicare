@@ -1,4 +1,4 @@
-package ar.edu.itba.paw;
+package ar.edu.itba.paw.cache;
 
 import ar.edu.itba.paw.models.Locality;
 import ar.edu.itba.paw.models.Office;
@@ -6,6 +6,7 @@ import ar.edu.itba.paw.models.Staff;
 import ar.edu.itba.paw.models.StaffSpecialty;
 import ar.edu.itba.paw.persistence.StaffDaoImpl;
 import ar.edu.itba.paw.persistence.utils.builder.JDBCWhereClauseBuilder;
+import ar.edu.itba.paw.persistence.utils.cache.CacheHelper;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -63,6 +64,7 @@ public class StaffDaoImplTest
 
     private void cleanAllTables(){
         this.jdbcTemplate.execute("TRUNCATE SCHEMA PUBLIC RESTART IDENTITY AND COMMIT NO CHECK");
+        CacheHelper.clean();
     }
 
     private void insertOffice(){
@@ -441,7 +443,7 @@ public class StaffDaoImplTest
 
         this.insertStaff();
 
-        Staff s = this.staffModel();
+        Staff s = this.staffDao.findById(this.staffModel().getId()).get();
         s.setFirstName(NAME + " (updated)");
 
         // 2. Ejercitar

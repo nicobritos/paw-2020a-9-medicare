@@ -1,4 +1,4 @@
-package ar.edu.itba.paw;
+package ar.edu.itba.paw.nocache;
 
 import org.hsqldb.jdbc.JDBCDriver;
 import org.springframework.beans.factory.annotation.Value;
@@ -38,6 +38,16 @@ public class TestConfig {
         ResourceDatabasePopulator populator = new ResourceDatabasePopulator();
         populator.addScript(schemaSql);
         return populator;
+    }
+
+    @Bean
+    public boolean isCacheEnabled(){
+        return false;
+    }
+
+    @Bean
+    public int cacheSize() {
+        return 0;
     }
 
     private DataSourceInitializer dataSourceInitializer(){

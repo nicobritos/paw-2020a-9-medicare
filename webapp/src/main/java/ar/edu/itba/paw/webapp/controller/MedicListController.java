@@ -10,13 +10,13 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
 
-import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
 
 
 @Controller
 public class MedicListController {
-
     @Autowired
     StaffService staffService;
 
@@ -32,7 +32,7 @@ public class MedicListController {
         //check if specialties parameter was set
         if(specialties!=null){
             // create a list that will be passed to search
-            ArrayList<StaffSpecialty> searchedSpecialties = new ArrayList<>();
+            Set<StaffSpecialty> searchedSpecialties = new HashSet<>();
             // split strings to get all specialties used in search
             // and create the search parameter
             for(String s:specialties.split(",")){
@@ -77,16 +77,7 @@ public class MedicListController {
             }
         }
 
-        // make sure jsp doesnt receive null, instead receive empty list
-        if(staffList == null){
-            staffList = new ArrayList<>(0);
-        }
-
-        //get all specialties and make sure its at least an empty list
         Collection<StaffSpecialty> specialtiesList = this.specialityService.list();
-        if(specialtiesList == null){
-            staffList = new ArrayList<>(0);
-        }
 
         // pass objects to model and view
         mav.addObject("staff", staffList);

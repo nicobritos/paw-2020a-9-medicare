@@ -10,7 +10,7 @@ import java.util.Optional;
  * @param <M> the Service model type
  * @param <I> the Model's id type
  */
-public interface GenericService<M extends GenericModel<I>, I> {
+public interface GenericService<M extends GenericModel<M, I>, I> {
     Optional<M> findById(I id);
 
     Collection<M> findByIds(Collection<I> ids);

@@ -5,10 +5,11 @@ import ar.edu.itba.paw.persistenceAnnotations.ManyToOne;
 import ar.edu.itba.paw.persistenceAnnotations.OneToMany;
 import ar.edu.itba.paw.persistenceAnnotations.Table;
 
-import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
 
 @Table(name = "office", primaryKey = "office_id")
-public class Office extends GenericModel<Integer> {
+public class Office extends GenericModel<Office, Integer> {
     @Column(name = "phone")
     private String phone;
     @Column(name = "email")
@@ -20,7 +21,7 @@ public class Office extends GenericModel<Integer> {
     @Column(name = "street", required = true)
     private String street;
     @OneToMany(name = "office_id", className = Staff.class)
-    private JoinedCollection<Staff> staffs = new JoinedCollection<>();
+    private Set<Staff> staffs = new HashSet<>();
 
     public String getName() {
         return this.name;
@@ -62,7 +63,7 @@ public class Office extends GenericModel<Integer> {
         this.locality = locality;
     }
 
-    public Collection<Staff> getStaffs() {
-        return this.staffs.getModels();
+    public Set<Staff> getStaffs() {
+        return this.staffs;
     }
 }

@@ -17,7 +17,7 @@ public class StaffSpecialtyDaoImpl extends GenericSearchableDaoImpl<StaffSpecial
 
     @Autowired
     public StaffSpecialtyDaoImpl(DataSource dataSource) {
-        super(dataSource, StaffSpecialty.class);
+        super(dataSource, StaffSpecialty.class, Integer.class);
     }
 
     @Override
