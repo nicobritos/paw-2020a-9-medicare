@@ -16,10 +16,7 @@ import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.stereotype.Repository;
 
 import javax.sql.DataSource;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.Map;
+import java.util.*;
 
 @Repository
 public class StaffDaoImpl extends GenericSearchableDaoImpl<Staff, Integer> implements StaffDao {
@@ -33,23 +30,22 @@ public class StaffDaoImpl extends GenericSearchableDaoImpl<Staff, Integer> imple
     }
 
     @Override
-    public Collection<Staff> findBySurname(String surname) {
-        return new LinkedList<>(this.findByFieldIgnoreCase("surname", Operation.LIKE, surname));
+    public Set<Staff> findBySurname(String surname) {
+        return this.findByFieldIgnoreCase("surname", Operation.LIKE, surname);
     }
 
     @Override
-    public Collection<Staff> findByName(String name) {
-        return new LinkedList<>(this.findByFieldIgnoreCase("first_name", Operation.LIKE, name));
-
+    public Set<Staff> findByName(String name) {
+        return this.findByFieldIgnoreCase("first_name", Operation.LIKE, name);
     }
 
     @Override
-    public Collection<Staff> findByStaffSpecialties(Collection<StaffSpecialty> staffSpecialties) {
+    public Set<Staff> findByStaffSpecialties(Collection<StaffSpecialty> staffSpecialties) {
         if (staffSpecialties.isEmpty())
-            return new LinkedList<>();
+            return new HashSet<>();
 
         Map<String, Object> parameters = new HashMap<>();
-        Collection<String> specialtyParameters = new LinkedList<>();
+        Collection<String> specialtyParameters = new HashSet<>();
 
         int i = 0;
         for (StaffSpecialty staffSpecialty : staffSpecialties) {
@@ -78,9 +74,9 @@ public class StaffDaoImpl extends GenericSearchableDaoImpl<Staff, Integer> imple
     }
 
     @Override
-    public Collection<Staff> findByNameAndSurname(String name, String surname) {
+    public Set<Staff> findByNameAndSurname(String name, String surname) {
         if (name.isEmpty() && surname.isEmpty())
-            return new LinkedList<>();
+            return new HashSet<>();
 
         Map<String, Object> parameters = new HashMap<>();
         name = name.toLowerCase();
@@ -101,16 +97,16 @@ public class StaffDaoImpl extends GenericSearchableDaoImpl<Staff, Integer> imple
                 )
                 .distinct();
 
-        return new LinkedList<>(this.selectQuery(queryBuilder.getQueryAsString(), parameterSource));
+        return this.selectQuery(queryBuilder.getQueryAsString(), parameterSource);
     }
 
     @Override
-    public Collection<Staff> findByNameAndStaffSpecialties(String name, Collection<StaffSpecialty> staffSpecialties) {
+    public Set<Staff> findByNameAndStaffSpecialties(String name, Collection<StaffSpecialty> staffSpecialties) {
         if (staffSpecialties.isEmpty() && name.isEmpty())
-            return new LinkedList<>();
+            return new HashSet<>();
 
         Map<String, Object> parameters = new HashMap<>();
-        Collection<String> specialtyParameters = new LinkedList<>();
+        Collection<String> specialtyParameters = new HashSet<>();
         name = name.toLowerCase();
         parameters.put("firstName", '%' + name + '%');
         int i = 0;
@@ -141,16 +137,16 @@ public class StaffDaoImpl extends GenericSearchableDaoImpl<Staff, Integer> imple
                 )
                 .distinct();
 
-        return new LinkedList<>(this.selectQuery(queryBuilder.getQueryAsString(), parameterSource));
+        return this.selectQuery(queryBuilder.getQueryAsString(), parameterSource);
     }
 
     @Override
-    public Collection<Staff> findBySurnameAndOffice(String surname, Collection<Office> offices) {
+    public Set<Staff> findBySurnameAndOffice(String surname, Collection<Office> offices) {
         if (offices.isEmpty() && surname.isEmpty())
-            return new LinkedList<>();
+            return new HashSet<>();
 
         Map<String, Object> parameters = new HashMap<>();
-        Collection<String> officeParameters = new LinkedList<>();
+        Collection<String> officeParameters = new HashSet<>();
 
         int i = 0;
         for (Office office : offices) {
@@ -191,9 +187,9 @@ public class StaffDaoImpl extends GenericSearchableDaoImpl<Staff, Integer> imple
     }
 
     @Override
-    public Collection<Staff> findBySurnameAndStaffSpecialties(String surname, Collection<StaffSpecialty> staffSpecialties) {
+    public Set<Staff> findBySurnameAndStaffSpecialties(String surname, Collection<StaffSpecialty> staffSpecialties) {
         if (staffSpecialties.isEmpty() && surname.isEmpty())
-            return new LinkedList<>();
+            return new HashSet<>();
 
         Map<String, Object> parameters = new HashMap<>();
         Collection<String> specialtyParameters = new LinkedList<>();
@@ -228,17 +224,18 @@ public class StaffDaoImpl extends GenericSearchableDaoImpl<Staff, Integer> imple
                 )
                 .distinct();
 
-        return new LinkedList<>(this.selectQuery(queryBuilder.getQueryAsString(), parameterSource));    }
+        return this.selectQuery(queryBuilder.getQueryAsString(), parameterSource);
+    }
 
     @Override
-    public Collection<Staff> findByNameOfficeAndStaffSpecialties(String name, Collection<Office> offices, Collection<StaffSpecialty> staffSpecialties) {
+    public Set<Staff> findByNameOfficeAndStaffSpecialties(String name, Collection<Office> offices, Collection<StaffSpecialty> staffSpecialties) {
         return findByNameSurnameOfficeAndStaffSpecialities(name, "", offices, staffSpecialties);
     }
 
     @Override
-    public Collection<Staff> findByNameSurnameAndStaffSpecialties(String name, String surname, Collection<StaffSpecialty> staffSpecialties) {
+    public Set<Staff> findByNameSurnameAndStaffSpecialties(String name, String surname, Collection<StaffSpecialty> staffSpecialties) {
         if (staffSpecialties.isEmpty() && name.isEmpty())
-            return new LinkedList<>();
+            return new HashSet<>();
 
         Map<String, Object> parameters = new HashMap<>();
         Collection<String> specialtyParameters = new LinkedList<>();
@@ -278,13 +275,13 @@ public class StaffDaoImpl extends GenericSearchableDaoImpl<Staff, Integer> imple
                 )
                 .distinct();
 
-        return new LinkedList<>(this.selectQuery(queryBuilder.getQueryAsString(), parameterSource));
+        return this.selectQuery(queryBuilder.getQueryAsString(), parameterSource);
     }
 
     @Override
-    public Collection<Staff> findByNameSurnameAndOffice(String name, String surname, Collection<Office> offices) {
+    public Set<Staff> findByNameSurnameAndOffice(String name, String surname, Collection<Office> offices) {
         if (offices.isEmpty() && name.isEmpty())
-            return new LinkedList<>();
+            return new HashSet<>();
 
         Map<String, Object> parameters = new HashMap<>();
         Collection<String> officeParameters = new LinkedList<>();
@@ -334,9 +331,9 @@ public class StaffDaoImpl extends GenericSearchableDaoImpl<Staff, Integer> imple
     }
 
     @Override
-    public Collection<Staff> findByNameSurnameOfficeAndStaffSpecialities(String name, String surname, Collection<Office> offices, Collection<StaffSpecialty> staffSpecialties) {
+    public Set<Staff> findByNameSurnameOfficeAndStaffSpecialities(String name, String surname, Collection<Office> offices, Collection<StaffSpecialty> staffSpecialties) {
         if (staffSpecialties.isEmpty() && offices.isEmpty() && name.isEmpty() && surname.isEmpty())
-            return new LinkedList<>();
+            return new HashSet<>();
 
         Map<String, Object> parameters = new HashMap<>();
         Collection<String> officeParameters = new LinkedList<>();
@@ -398,19 +395,19 @@ public class StaffDaoImpl extends GenericSearchableDaoImpl<Staff, Integer> imple
     }
 
     @Override
-    public Collection<Staff> findByOfficeAndStaffSpecialties(Collection<Office> offices, Collection<StaffSpecialty> staffSpecialties) {
+    public Set<Staff> findByOfficeAndStaffSpecialties(Collection<Office> offices, Collection<StaffSpecialty> staffSpecialties) {
         return this.findByNameOfficeAndStaffSpecialties("", offices, staffSpecialties);
     }
 
     @Override
-    public Collection<Staff> findBySurnameOfficeAndStaffSpecialties(String surname, Collection<Office> offices, Collection<StaffSpecialty> staffSpecialties) {
+    public Set<Staff> findBySurnameOfficeAndStaffSpecialties(String surname, Collection<Office> offices, Collection<StaffSpecialty> staffSpecialties) {
         return findByNameSurnameOfficeAndStaffSpecialities("", surname, offices, staffSpecialties);
     }
 
     @Override
-    public Collection<Staff> findByNameAndOffice(String name, Collection<Office> offices) {
+    public Set<Staff> findByNameAndOffice(String name, Collection<Office> offices) {
         if (offices.isEmpty() && name.isEmpty())
-            return new LinkedList<>();
+            return new HashSet<>();
 
         Map<String, Object> parameters = new HashMap<>();
         Collection<String> officeParameters = new LinkedList<>();
@@ -454,7 +451,7 @@ public class StaffDaoImpl extends GenericSearchableDaoImpl<Staff, Integer> imple
     }
 
     @Override
-    public Collection<Staff> findByOffice(Collection<Office> offices) {
+    public Set<Staff> findByOffice(Collection<Office> offices) {
         return this.findByFieldIn("office_id", offices);
     }
 

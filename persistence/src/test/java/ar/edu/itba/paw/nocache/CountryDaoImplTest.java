@@ -136,12 +136,12 @@ public class CountryDaoImplTest
         insertCountry();
 
         // 2. Ejercitar
-        List<Country> countries = this.countryDao.findByField("name", COUNTRY);
+        Set<Country> countries = this.countryDao.findByField("name", COUNTRY);
 
         // 3. Postcondiciones
         assertNotNull(countries);
         assertFalse(countries.isEmpty());
-        assertEquals(COUNTRY_ID, countries.get(0).getId());
+        assertEquals(COUNTRY_ID, countries.stream().findFirst().get().getId());
     }
 
     @Test
@@ -151,7 +151,7 @@ public class CountryDaoImplTest
         cleanAllTables();
 
         // 2. Ejercitar
-        List<Country> countries = this.countryDao.findByField("name", COUNTRY);
+        Set<Country> countries = this.countryDao.findByField("name", COUNTRY);
 
         // 3. Postcondiciones
         assertNotNull(countries);
@@ -166,12 +166,12 @@ public class CountryDaoImplTest
         insertCountry();
 
         // 2. Ejercitar
-        List<Country> countries = this.countryDao.findByField("name", JDBCWhereClauseBuilder.Operation.EQ, COUNTRY);
+        Set<Country> countries = this.countryDao.findByField("name", JDBCWhereClauseBuilder.Operation.EQ, COUNTRY);
 
         // 3. Postcondiciones
         assertNotNull(countries);
         assertFalse(countries.isEmpty());
-        assertEquals(COUNTRY_ID, countries.get(0).getId());
+        assertEquals(COUNTRY_ID, countries.stream().findFirst().get().getId());
     }
 
     @Test
@@ -179,7 +179,7 @@ public class CountryDaoImplTest
     {
         // 1. Precondiciones
         cleanAllTables();// 2. Ejercitar
-        List<Country> countries = this.countryDao.findByField("name", JDBCWhereClauseBuilder.Operation.EQ, COUNTRY);
+        Set<Country> countries = this.countryDao.findByField("name", JDBCWhereClauseBuilder.Operation.EQ, COUNTRY);
 
         // 3. Postcondiciones
         assertNotNull(countries);
@@ -282,8 +282,7 @@ public class CountryDaoImplTest
         // 1. Precondiciones
         cleanAllTables();
         insertCountry();
-        Country c = new Country();
-        c.setId("AR");
+        Country c = this.countryDao.findById(COUNTRY_ID).get();
         c.setName("Armenia");
 
         // 2. Ejercitar
@@ -336,9 +335,7 @@ public class CountryDaoImplTest
         provinceMap.put("country_id", "BR");
         provinceJdbcInsert.execute(provinceMap);
 
-        Country c = new Country();
-        c.setId("AR");
-        c.setName("Argentina");
+        Country c = this.countryDao.findById(COUNTRY_ID).get();
         c.getProvinces().add(provinceModel());
 
         // 2. Ejercitar

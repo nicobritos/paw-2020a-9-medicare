@@ -136,12 +136,12 @@ public class ProvinceDaoImplTest
         insertProvince();
 
         // 2. Ejercitar
-        List<Province> provinces = this.provinceDao.findByField("name", PROVINCE);
+        Set<Province> provinces = this.provinceDao.findByField("name", PROVINCE);
 
         // 3. Postcondiciones
         assertNotNull(provinces);
         assertFalse(provinces.isEmpty());
-        assertEquals(PROVINCE, provinces.get(0).getName());
+        assertEquals(PROVINCE, provinces.stream().findFirst().get().getName());
     }
 
     @Test
@@ -151,7 +151,7 @@ public class ProvinceDaoImplTest
         cleanAllTables();
 
         // 2. Ejercitar
-        List<Province> provinces = this.provinceDao.findByField("name", PROVINCE);
+        Set<Province> provinces = this.provinceDao.findByField("name", PROVINCE);
 
         // 3. Postcondiciones
         assertNotNull(provinces);
@@ -167,12 +167,12 @@ public class ProvinceDaoImplTest
         insertProvince();
 
         // 2. Ejercitar
-        List<Province> provinces = this.provinceDao.findByField("name", JDBCWhereClauseBuilder.Operation.EQ, PROVINCE);
+        Set<Province> provinces = this.provinceDao.findByField("name", JDBCWhereClauseBuilder.Operation.EQ, PROVINCE);
 
         // 3. Postcondiciones
         assertNotNull(provinces);
         assertFalse(provinces.isEmpty());
-        assertEquals(PROVINCE, provinces.get(0).getName());
+        assertEquals(PROVINCE, provinces.stream().findFirst().get().getName());
     }
 
     @Test
@@ -182,7 +182,7 @@ public class ProvinceDaoImplTest
         cleanAllTables();
 
         // 2. Ejercitar
-        List<Province> provinces = this.provinceDao.findByField("name", JDBCWhereClauseBuilder.Operation.EQ, PROVINCE);
+        Set<Province> provinces = this.provinceDao.findByField("name", JDBCWhereClauseBuilder.Operation.EQ, PROVINCE);
 
         // 3. Postcondiciones
         assertNotNull(provinces);
@@ -291,8 +291,7 @@ public class ProvinceDaoImplTest
         // 1. Precondiciones
         cleanAllTables();
         insertProvince();
-        Province p = new Province();
-        p.setId(0);
+        Province p = this.provinceDao.findById(0).get();
         p.setName("Corrientes");
 
         // 2. Ejercitar

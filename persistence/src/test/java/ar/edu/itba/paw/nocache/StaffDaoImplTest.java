@@ -440,7 +440,7 @@ public class StaffDaoImplTest
 
         this.insertStaff();
 
-        Staff s = this.staffModel();
+        Staff s = this.staffDao.findById(this.staffModel().getId()).get();
         s.setFirstName(NAME + " (updated)");
 
         // 2. Ejercitar

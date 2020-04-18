@@ -15,12 +15,4 @@ public class StaffSpecialty extends GenericModel<StaffSpecialty, Integer> {
     public void setName(String name) {
         this.name = name;
     }
-
-    @Override
-    public StaffSpecialty copy() {
-        StaffSpecialty staffSpecialty = new StaffSpecialty();
-        staffSpecialty.name = this.name;
-        staffSpecialty.id = this.id;
-        return staffSpecialty;
-    }
 }

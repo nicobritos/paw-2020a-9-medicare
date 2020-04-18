@@ -1,4 +1,4 @@
-package ar.edu.itba.paw.persistence.generics;
+package ar.edu.itba.paw.persistence.utils;
 
 import java.util.function.BiFunction;
 import java.util.function.Function;

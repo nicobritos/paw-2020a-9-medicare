@@ -1,17 +1,21 @@
 package ar.edu.itba.paw.models;
 
 import ar.edu.itba.paw.persistenceAnnotations.Column;
+import ar.edu.itba.paw.persistenceAnnotations.ManyToOne;
 import ar.edu.itba.paw.persistenceAnnotations.OneToMany;
 import ar.edu.itba.paw.persistenceAnnotations.Table;
 
-import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
 
 @Table(name = "system_province", primaryKey = "province_id")
 public class Province extends GenericModel<Province, Integer> {
     @Column(name = "name", required = true)
     private String name;
     @OneToMany(name = "locality_id", className = Locality.class)
-    private JoinedCollection<Locality> localities = new JoinedCollection<>();
+    private Set<Locality> localities = new HashSet<>();
+    @ManyToOne(name = "country_id", inverse = true)
+    private Country country;
 
     public String getName() {
         return this.name;
@@ -21,16 +25,11 @@ public class Province extends GenericModel<Province, Integer> {
         this.name = name;
     }
 
-    public Collection<Locality> getLocalities() {
-        return this.localities.getModels();
+    public Set<Locality> getLocalities() {
+        return this.localities;
     }
 
-    @Override
-    public Province copy() {
-        Province province = new Province();
-        province.name = this.name;
-        province.id = this.id;
-        province.localities = this.localities.copy();
-        return province;
+    public Country getCountry() {
+        return this.country;
     }
 }

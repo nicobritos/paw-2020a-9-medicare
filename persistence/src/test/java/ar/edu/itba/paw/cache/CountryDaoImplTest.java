@@ -3,8 +3,9 @@ package ar.edu.itba.paw.cache;
 import ar.edu.itba.paw.models.Country;
 import ar.edu.itba.paw.models.Province;
 import ar.edu.itba.paw.persistence.CountryDaoImpl;
-import ar.edu.itba.paw.persistence.utils.CacheHelper;
 import ar.edu.itba.paw.persistence.utils.builder.JDBCWhereClauseBuilder;
+import ar.edu.itba.paw.persistence.utils.cache.CacheHelper;
+import ar.edu.itba.paw.persistence.utils.proxy.NotManagedByDAOException;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -163,12 +164,12 @@ public class CountryDaoImplTest
         insertCountry();
 
         // 2. Ejercitar
-        List<Country> countries = this.countryDao.findByField("name", COUNTRY);
+        Set<Country> countries = this.countryDao.findByField("name", COUNTRY);
 
         // 3. Postcondiciones
         assertNotNull(countries);
         assertFalse(countries.isEmpty());
-        assertEquals(COUNTRY_ID, countries.get(0).getId());
+        assertEquals(COUNTRY_ID, countries.stream().findFirst().get().getId());
     }
 
     @Test
@@ -178,7 +179,7 @@ public class CountryDaoImplTest
         cleanAllTables();
 
         // 2. Ejercitar
-        List<Country> countries = this.countryDao.findByField("name", COUNTRY);
+        Set<Country> countries = this.countryDao.findByField("name", COUNTRY);
 
         // 3. Postcondiciones
         assertNotNull(countries);
@@ -193,12 +194,12 @@ public class CountryDaoImplTest
         insertCountry();
 
         // 2. Ejercitar
-        List<Country> countries = this.countryDao.findByField("name", JDBCWhereClauseBuilder.Operation.EQ, COUNTRY);
+        Set<Country> countries = this.countryDao.findByField("name", JDBCWhereClauseBuilder.Operation.EQ, COUNTRY);
 
         // 3. Postcondiciones
         assertNotNull(countries);
         assertFalse(countries.isEmpty());
-        assertEquals(COUNTRY_ID, countries.get(0).getId());
+        assertEquals(COUNTRY_ID, countries.stream().findFirst().get().getId());
     }
 
     @Test
@@ -206,7 +207,7 @@ public class CountryDaoImplTest
     {
         // 1. Precondiciones
         cleanAllTables();// 2. Ejercitar
-        List<Country> countries = this.countryDao.findByField("name", JDBCWhereClauseBuilder.Operation.EQ, COUNTRY);
+        Set<Country> countries = this.countryDao.findByField("name", JDBCWhereClauseBuilder.Operation.EQ, COUNTRY);
 
         // 3. Postcondiciones
         assertNotNull(countries);
@@ -309,6 +310,25 @@ public class CountryDaoImplTest
         // 1. Precondiciones
         cleanAllTables();
         insertCountry();
+        Country c = this.countryDao.findById(COUNTRY_ID).get();
+        c.setName("Armenia");
+
+        // 2. Ejercitar
+        this.countryDao.update(c);
+
+        // 3. Postcondiciones
+        assertEquals(1,JdbcTestUtils.countRowsInTable(jdbcTemplate, COUNTRIES_TABLE));
+        assertEquals(1,JdbcTestUtils.countRowsInTableWhere(jdbcTemplate, COUNTRIES_TABLE, "name = 'Armenia'"));
+        assertEquals(0,JdbcTestUtils.countRowsInTableWhere(jdbcTemplate, COUNTRIES_TABLE, "name = '"+ COUNTRY +"'"));
+
+    }
+
+    @Test(expected = NotManagedByDAOException.class)
+    public void testCountryUpdateNotDAOManaged()
+    {
+        // 1. Precondiciones
+        cleanAllTables();
+        insertCountry();
         Country c = new Country();
         c.setId("AR");
         c.setName("Armenia");
@@ -363,9 +383,7 @@ public class CountryDaoImplTest
         provinceMap.put("country_id", "BR");
         provinceJdbcInsert.execute(provinceMap);
 
-        Country c = new Country();
-        c.setId("AR");
-        c.setName("Argentina");
+        Country c = this.countryDao.findById(COUNTRY_ID).get();
         c.getProvinces().add(provinceModel());
 
         // 2. Ejercitar

@@ -6,6 +6,4 @@ public abstract class Cacheable<M> {
     public boolean isCached() {
         return this.cached;
     }
-
-    public abstract M copy();
 }

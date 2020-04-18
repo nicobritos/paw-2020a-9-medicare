@@ -2,8 +2,8 @@ package ar.edu.itba.paw.cache;
 
 import ar.edu.itba.paw.models.StaffSpecialty;
 import ar.edu.itba.paw.persistence.StaffSpecialtyDaoImpl;
-import ar.edu.itba.paw.persistence.utils.CacheHelper;
 import ar.edu.itba.paw.persistence.utils.builder.JDBCWhereClauseBuilder;
+import ar.edu.itba.paw.persistence.utils.cache.CacheHelper;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -290,7 +290,7 @@ public class StaffSpecialityDaoImplTest {
         // 1. Precondiciones
         cleanAllTables();
         insertStaffSpeciality();
-        StaffSpecialty s = staffSpecialtyModel();
+        StaffSpecialty s = this.staffSpecialtyDao.findById(staffSpecialtyModel().getId()).get();
         s.setName(STAFF_SPECIALTY + " (updated)");
 
         // 2. Ejercitar

@@ -16,7 +16,7 @@ import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.stereotype.Repository;
 
 import javax.sql.DataSource;
-import java.util.Collection;
+import java.util.Set;
 
 @Repository
 public class OfficeDaoImpl extends GenericSearchableDaoImpl<Office, Integer> implements OfficeDao {
@@ -30,7 +30,29 @@ public class OfficeDaoImpl extends GenericSearchableDaoImpl<Office, Integer> imp
     }
 
     @Override
-    public Collection<Office> findByCountry(Country country) {
+    public Set<Office> findByCountry(Country country) {
+//        FilteredCachedCollection<Office> cachedCollection = CacheHelper.filter(
+//                Office.class,
+//                Integer.class,
+//                office -> office.getLocality().getProvince()
+//        );
+//        if (this.isCacheComplete(cachedCollection)) {
+//            return cachedCollection.getCollection();
+//        }
+//
+//        MapSqlParameterSource parameterSource = new MapSqlParameterSource();
+//        parameterSource.addValue("country", country.getId());
+//        parameterSource.addValue("name", StringSearchType.CONTAINS.transform(name));
+//
+//        JDBCWhereClauseBuilder whereClauseBuilder = new JDBCWhereClauseBuilder()
+//                .where(this.formatColumnFromName("name"), Operation.LIKE, ":name", ColumnTransformer.LOWER)
+//                .and()
+//                .where(this.formatColumnFromName("country_id"), Operation.EQ, ":country");
+//
+//        if (!cachedCollection.getCollection().isEmpty()) {
+//            this.excludeModels(cachedCollection.getCompleteCollection(), parameterSource, whereClauseBuilder);
+//        }
+//
         JDBCQueryBuilder queryBuilder = new JDBCSelectQueryBuilder()
                 .selectAll()
                 .from(this.getTableAlias())
@@ -48,7 +70,7 @@ public class OfficeDaoImpl extends GenericSearchableDaoImpl<Office, Integer> imp
     }
 
     @Override
-    public Collection<Office> findByProvince(Province province) {
+    public Set<Office> findByProvince(Province province) {
         JDBCQueryBuilder queryBuilder = new JDBCSelectQueryBuilder()
                 .selectAll()
                 .from(this.getTableAlias())
@@ -65,7 +87,7 @@ public class OfficeDaoImpl extends GenericSearchableDaoImpl<Office, Integer> imp
     }
 
     @Override
-    public Collection<Office> findByLocality(Locality locality) {
+    public Set<Office> findByLocality(Locality locality) {
         return this.findByField("locality_id", locality);
     }
 

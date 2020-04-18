@@ -4,8 +4,8 @@ import ar.edu.itba.paw.models.Country;
 import ar.edu.itba.paw.models.Locality;
 import ar.edu.itba.paw.models.Office;
 import ar.edu.itba.paw.persistence.OfficeDaoImpl;
-import ar.edu.itba.paw.persistence.utils.CacheHelper;
 import ar.edu.itba.paw.persistence.utils.builder.JDBCWhereClauseBuilder;
+import ar.edu.itba.paw.persistence.utils.cache.CacheHelper;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -28,6 +28,7 @@ import static org.junit.Assert.*;
 public class OfficeDaoImplTest
 {
     private static final String NAME = "Hospital Nacional";
+    public static final String NAME_2 = NAME + "_1";
     private static final String STREET = "Av 9 de Julio";
     private static final String PROVINCE = "Buenos Aires";
     private static final String LOCALITY = "Capital Federal";
@@ -110,7 +111,7 @@ public class OfficeDaoImplTest
 
     private void insertAnotherOffice(){
         Map<String, Object> officeMap = new HashMap<>();
-        officeMap.put("name", NAME + "_1");
+        officeMap.put("name", NAME_2);
         officeMap.put("email", EMAIL);
         officeMap.put("phone", PHONE);
         officeMap.put("locality_id", 0); // Identity de HSQLDB empieza en 0
@@ -282,10 +283,12 @@ public class OfficeDaoImplTest
 
         // 2. Ejercitar
         Collection<Office> offices = officeDao.findByName(NAME);
+        Collection<Office> offices2 = officeDao.findByName(NAME_2);
 
         // 3. Postcondiciones
         assertNotNull(offices);
-        assertEquals(1, offices.size());
+        assertEquals(2, offices.size());
+        assertEquals(1, offices2.size());
     }
 
     @Test
@@ -420,7 +423,7 @@ public class OfficeDaoImplTest
         insertOffice();
 
         // Modelo de la oficina a crear
-        Office o = officeModel();
+        Office o = this.officeDao.findById(officeModel().getId()).get();
         o.setName(NAME + " (updated)");
 
         // 2. Ejercitar
