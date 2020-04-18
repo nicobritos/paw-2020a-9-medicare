@@ -43,7 +43,7 @@ public class LocalityDaoImpl extends GenericSearchableDaoImpl<Locality, Integer>
         FilteredCachedCollection<Locality> cachedCollection = CacheHelper.filter(
                 Locality.class,
                 Integer.class,
-                locality -> province.getLocalities().contains(locality) && locality.getName().toLowerCase().contains(finalName)
+                locality -> locality.getName().toLowerCase().contains(finalName) && locality.getProvince().equals(province)
         );
         if (this.isCacheComplete(cachedCollection)) {
             return cachedCollection.getCollectionAsSet();

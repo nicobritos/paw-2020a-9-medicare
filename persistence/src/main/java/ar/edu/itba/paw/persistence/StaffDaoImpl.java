@@ -10,6 +10,8 @@ import ar.edu.itba.paw.persistence.utils.builder.JDBCSelectQueryBuilder;
 import ar.edu.itba.paw.persistence.utils.builder.JDBCWhereClauseBuilder;
 import ar.edu.itba.paw.persistence.utils.builder.JDBCWhereClauseBuilder.ColumnTransformer;
 import ar.edu.itba.paw.persistence.utils.builder.JDBCWhereClauseBuilder.Operation;
+import ar.edu.itba.paw.persistence.utils.cache.CacheHelper;
+import ar.edu.itba.paw.persistence.utils.cache.FilteredCachedCollection;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
@@ -44,31 +46,27 @@ public class StaffDaoImpl extends GenericSearchableDaoImpl<Staff, Integer> imple
         if (staffSpecialties.isEmpty())
             return new HashSet<>();
 
-        Map<String, Object> parameters = new HashMap<>();
-        Collection<String> specialtyParameters = new HashSet<>();
-
-        int i = 0;
-        for (StaffSpecialty staffSpecialty : staffSpecialties) {
-            String parameter = "_specialty_" + i;
-            parameters.put(parameter, staffSpecialty.getId());
-            specialtyParameters.add(":" + parameter);
-            i++;
+        FilteredCachedCollection<Staff> cachedCollection = this.filterCollection("", "", staffSpecialties, new LinkedList<>());
+        if (this.isCacheComplete(cachedCollection)) {
+            return cachedCollection.getCollectionAsSet();
         }
 
+        Map<String, Object> parameters = new HashMap<>();
+        MapSqlParameterSource parameterSource = new MapSqlParameterSource();
+
+        JDBCWhereClauseBuilder whereClauseBuilder = new JDBCWhereClauseBuilder();
+        this.putStaffSpecialtyArguments(staffSpecialties, parameters, whereClauseBuilder);
+        parameterSource.addValues(parameters);
+
+        if (!cachedCollection.getCollection().isEmpty()) {
+            this.excludeModels(cachedCollection.getCompleteCollection(), parameterSource, whereClauseBuilder);
+        }
         JDBCQueryBuilder queryBuilder = new JDBCSelectQueryBuilder()
                 .selectAll()
                 .from(this.getTableAlias())
                 .join("staff_id", this.getSpecialtiesIntermediateTableName(), "staff_id")
-                .where(new JDBCWhereClauseBuilder()
-                        .in(
-                                formatColumnFromName("specialty_id", this.getSpecialtiesIntermediateTableName()),
-                                specialtyParameters
-                        )
-                )
+                .where(whereClauseBuilder)
                 .distinct();
-
-        MapSqlParameterSource parameterSource = new MapSqlParameterSource();
-        parameterSource.addValues(parameters);
 
         return this.selectQuery(queryBuilder.getQueryAsString(), parameterSource);
     }
@@ -78,23 +76,32 @@ public class StaffDaoImpl extends GenericSearchableDaoImpl<Staff, Integer> imple
         if (name.isEmpty() && surname.isEmpty())
             return new HashSet<>();
 
-        Map<String, Object> parameters = new HashMap<>();
         name = name.toLowerCase();
         surname = surname.toLowerCase();
-        parameters.put("firstName", '%' + name + '%');
-        parameters.put("surname", '%' + surname + '%');
+        FilteredCachedCollection<Staff> cachedCollection = this.filterCollection(name, surname, new LinkedList<>(), new LinkedList<>());
+        if (this.isCacheComplete(cachedCollection)) {
+            return cachedCollection.getCollectionAsSet();
+        }
+
+        name = name.toLowerCase();
+        surname = surname.toLowerCase();
+        Map<String, Object> parameters = new HashMap<>();
+        JDBCWhereClauseBuilder whereClauseBuilder = new JDBCWhereClauseBuilder();
+
+        this.putFirstNameArguments(name, parameters, whereClauseBuilder);
+        this.putSurnameArgument(surname, parameters, whereClauseBuilder);
 
         MapSqlParameterSource parameterSource = new MapSqlParameterSource();
         parameterSource.addValues(parameters);
 
+        if (!cachedCollection.getCollection().isEmpty()) {
+            this.excludeModels(cachedCollection.getCompleteCollection(), parameterSource, whereClauseBuilder);
+        }
+
         JDBCQueryBuilder queryBuilder = new JDBCSelectQueryBuilder()
                 .selectAll()
                 .from(this.getTableAlias())
-                .where(new JDBCWhereClauseBuilder()
-                        .where(this.formatColumnFromName("surname"), Operation.LIKE, ":surname", ColumnTransformer.LOWER)
-                        .and()
-                        .where(this.formatColumnFromName("first_name"), Operation.LIKE, ":firstName", ColumnTransformer.LOWER)
-                )
+                .where(whereClauseBuilder)
                 .distinct();
 
         return this.selectQuery(queryBuilder.getQueryAsString(), parameterSource);
@@ -105,36 +112,30 @@ public class StaffDaoImpl extends GenericSearchableDaoImpl<Staff, Integer> imple
         if (staffSpecialties.isEmpty() && name.isEmpty())
             return new HashSet<>();
 
-        Map<String, Object> parameters = new HashMap<>();
-        Collection<String> specialtyParameters = new HashSet<>();
         name = name.toLowerCase();
-        parameters.put("firstName", '%' + name + '%');
-        int i = 0;
-        for (StaffSpecialty staffSpecialty : staffSpecialties) {
-            String parameter = "_specialty_" + i;
-            parameters.put(parameter, staffSpecialty.getId());
-            specialtyParameters.add(":" + parameter);
-            i++;
+        FilteredCachedCollection<Staff> cachedCollection = this.filterCollection(name, "", staffSpecialties, new LinkedList<>());
+        if (this.isCacheComplete(cachedCollection)) {
+            return cachedCollection.getCollectionAsSet();
         }
+
+        Map<String, Object> parameters = new HashMap<>();
+        JDBCWhereClauseBuilder whereClauseBuilder = new JDBCWhereClauseBuilder();
+
+        this.putFirstNameArguments(name, parameters, whereClauseBuilder);
+        this.putStaffSpecialtyArguments(staffSpecialties, parameters, whereClauseBuilder);
 
         MapSqlParameterSource parameterSource = new MapSqlParameterSource();
         parameterSource.addValues(parameters);
 
+        if (!cachedCollection.getCollection().isEmpty()) {
+            this.excludeModels(cachedCollection.getCompleteCollection(), parameterSource, whereClauseBuilder);
+        }
 
         JDBCQueryBuilder queryBuilder = new JDBCSelectQueryBuilder()
                 .selectAll()
                 .from(this.getTableAlias())
                 .join("staff_id", this.getSpecialtiesIntermediateTableName(), "staff_id")
-                .where(new JDBCWhereClauseBuilder()
-                        .in(
-                                formatColumnFromName("specialty_id", this.getSpecialtiesIntermediateTableName()),
-                                specialtyParameters
-                        )
-                        .and()
-                        .where(new JDBCWhereClauseBuilder()
-                                .where(this.formatColumnFromName("first_name"), Operation.LIKE, ":firstName", ColumnTransformer.LOWER)
-                        )
-                )
+                .where(whereClauseBuilder)
                 .distinct();
 
         return this.selectQuery(queryBuilder.getQueryAsString(), parameterSource);
@@ -145,33 +146,22 @@ public class StaffDaoImpl extends GenericSearchableDaoImpl<Staff, Integer> imple
         if (offices.isEmpty() && surname.isEmpty())
             return new HashSet<>();
 
-        Map<String, Object> parameters = new HashMap<>();
-        Collection<String> officeParameters = new HashSet<>();
-
-        int i = 0;
-        for (Office office : offices) {
-            String parameter = "_office_" + i;
-            parameters.put(parameter, office.getId());
-            officeParameters.add(":" + parameter);
-            i++;
+        surname = surname.toLowerCase();
+        FilteredCachedCollection<Staff> cachedCollection = this.filterCollection("", surname, new LinkedList<>(), offices);
+        if (this.isCacheComplete(cachedCollection)) {
+            return cachedCollection.getCollectionAsSet();
         }
 
+        Map<String, Object> parameters = new HashMap<>();
+        JDBCWhereClauseBuilder whereClauseBuilder = new JDBCWhereClauseBuilder();
+        this.putSurnameArgument(surname, parameters, whereClauseBuilder);
+        this.putOfficeArguments(offices, parameters, whereClauseBuilder);
 
-        JDBCWhereClauseBuilder whereClauseBuilder = new JDBCWhereClauseBuilder()
-                .in(
-                        formatColumnFromName("office_id", this.getTableAlias()),
-                        officeParameters
-                );
+        MapSqlParameterSource parameterSource = new MapSqlParameterSource();
+        parameterSource.addValues(parameters);
 
-        if (!surname.isEmpty()) {
-            surname = surname.toLowerCase();
-            parameters.put("surname", '%' + surname + '%');
-
-            whereClauseBuilder
-                    .and()
-                    .where(new JDBCWhereClauseBuilder()
-                            .where(this.formatColumnFromName("surname"), Operation.LIKE, ":surname", ColumnTransformer.LOWER)
-                    );
+        if (!cachedCollection.getCollection().isEmpty()) {
+            this.excludeModels(cachedCollection.getCompleteCollection(), parameterSource, whereClauseBuilder);
         }
 
         JDBCQueryBuilder queryBuilder = new JDBCSelectQueryBuilder()
@@ -179,9 +169,6 @@ public class StaffDaoImpl extends GenericSearchableDaoImpl<Staff, Integer> imple
                 .from(this.getTableAlias())
                 .where(whereClauseBuilder)
                 .distinct();
-
-        MapSqlParameterSource parameterSource = new MapSqlParameterSource();
-        parameterSource.addValues(parameters);
 
         return this.selectQuery(queryBuilder.getQueryAsString(), parameterSource);
     }
@@ -191,37 +178,30 @@ public class StaffDaoImpl extends GenericSearchableDaoImpl<Staff, Integer> imple
         if (staffSpecialties.isEmpty() && surname.isEmpty())
             return new HashSet<>();
 
-        Map<String, Object> parameters = new HashMap<>();
-        Collection<String> specialtyParameters = new LinkedList<>();
         surname = surname.toLowerCase();
-        parameters.put("surname", '%' + surname + '%');
-
-        int i = 0;
-        for (StaffSpecialty staffSpecialty : staffSpecialties) {
-            String parameter = "_specialty_" + i;
-            parameters.put(parameter, staffSpecialty.getId());
-            specialtyParameters.add(":" + parameter);
-            i++;
+        FilteredCachedCollection<Staff> cachedCollection = this.filterCollection("", surname, staffSpecialties, new LinkedList<>());
+        if (this.isCacheComplete(cachedCollection)) {
+            return cachedCollection.getCollectionAsSet();
         }
 
+        Map<String, Object> parameters = new HashMap<>();
         MapSqlParameterSource parameterSource = new MapSqlParameterSource();
+        JDBCWhereClauseBuilder whereClauseBuilder = new JDBCWhereClauseBuilder();
+
+        this.putSurnameArgument(surname, parameters, whereClauseBuilder);
+        this.putStaffSpecialtyArguments(staffSpecialties, parameters, whereClauseBuilder);
+
         parameterSource.addValues(parameters);
 
+        if (!cachedCollection.getCollection().isEmpty()) {
+            this.excludeModels(cachedCollection.getCompleteCollection(), parameterSource, whereClauseBuilder);
+        }
 
         JDBCQueryBuilder queryBuilder = new JDBCSelectQueryBuilder()
                 .selectAll()
                 .from(this.getTableAlias())
                 .join("staff_id", this.getSpecialtiesIntermediateTableName(), "staff_id")
-                .where(new JDBCWhereClauseBuilder()
-                        .in(
-                                formatColumnFromName("specialty_id", this.getSpecialtiesIntermediateTableName()),
-                                specialtyParameters
-                        )
-                        .and()
-                        .where(new JDBCWhereClauseBuilder()
-                                .where(this.formatColumnFromName("surname"), Operation.LIKE, ":surname", ColumnTransformer.LOWER)
-                        )
-                )
+                .where(whereClauseBuilder)
                 .distinct();
 
         return this.selectQuery(queryBuilder.getQueryAsString(), parameterSource);
@@ -229,7 +209,7 @@ public class StaffDaoImpl extends GenericSearchableDaoImpl<Staff, Integer> imple
 
     @Override
     public Set<Staff> findByNameOfficeAndStaffSpecialties(String name, Collection<Office> offices, Collection<StaffSpecialty> staffSpecialties) {
-        return findByNameSurnameOfficeAndStaffSpecialities(name, "", offices, staffSpecialties);
+        return this.findByNameSurnameOfficeAndStaffSpecialities(name, "", offices, staffSpecialties);
     }
 
     @Override
@@ -237,42 +217,32 @@ public class StaffDaoImpl extends GenericSearchableDaoImpl<Staff, Integer> imple
         if (staffSpecialties.isEmpty() && name.isEmpty())
             return new HashSet<>();
 
-        Map<String, Object> parameters = new HashMap<>();
-        Collection<String> specialtyParameters = new LinkedList<>();
         name = name.toLowerCase();
         surname = surname.toLowerCase();
-        parameters.put("firstName", '%' + name + '%');
-        parameters.put("surname", '%' + surname + '%');
-
-        int i = 0;
-        for (StaffSpecialty staffSpecialty : staffSpecialties) {
-            String parameter = "_specialty_" + i;
-            parameters.put(parameter, staffSpecialty.getId());
-            specialtyParameters.add(":" + parameter);
-            i++;
+        FilteredCachedCollection<Staff> cachedCollection = this.filterCollection(name, surname, staffSpecialties, new LinkedList<>());
+        if (this.isCacheComplete(cachedCollection)) {
+            return cachedCollection.getCollectionAsSet();
         }
 
+        Map<String, Object> parameters = new HashMap<>();
         MapSqlParameterSource parameterSource = new MapSqlParameterSource();
+        JDBCWhereClauseBuilder whereClauseBuilder = new JDBCWhereClauseBuilder();
+
+        this.putFirstNameArguments(name, parameters, whereClauseBuilder);
+        this.putSurnameArgument(surname, parameters, whereClauseBuilder);
+        this.putStaffSpecialtyArguments(staffSpecialties, parameters, whereClauseBuilder);
+
         parameterSource.addValues(parameters);
 
+        if (!cachedCollection.getCollection().isEmpty()) {
+            this.excludeModels(cachedCollection.getCompleteCollection(), parameterSource, whereClauseBuilder);
+        }
 
         JDBCQueryBuilder queryBuilder = new JDBCSelectQueryBuilder()
                 .selectAll()
                 .from(this.getTableAlias())
                 .join("staff_id", this.getSpecialtiesIntermediateTableName(), "staff_id")
-                .where(new JDBCWhereClauseBuilder()
-                        .in(
-                                formatColumnFromName("specialty_id", this.getSpecialtiesIntermediateTableName()),
-                                specialtyParameters
-                        )
-                        .and()
-                        .where(new JDBCWhereClauseBuilder()
-                                .where(this.formatColumnFromName("first_name"), Operation.LIKE, ":firstName", ColumnTransformer.LOWER)
-                                .and()
-                                .where(this.formatColumnFromName("surname"), Operation.LIKE, ":surname", ColumnTransformer.LOWER)
-
-                        )
-                )
+                .where(whereClauseBuilder)
                 .distinct();
 
         return this.selectQuery(queryBuilder.getQueryAsString(), parameterSource);
@@ -283,39 +253,25 @@ public class StaffDaoImpl extends GenericSearchableDaoImpl<Staff, Integer> imple
         if (offices.isEmpty() && name.isEmpty())
             return new HashSet<>();
 
-        Map<String, Object> parameters = new HashMap<>();
-        Collection<String> officeParameters = new LinkedList<>();
-
-        int i = 0;
-        for (Office office : offices) {
-            String parameter = "_office_" + i;
-            parameters.put(parameter, office.getId());
-            officeParameters.add(":" + parameter);
-            i++;
+        name = name.toLowerCase();
+        surname = surname.toLowerCase();
+        FilteredCachedCollection<Staff> cachedCollection = this.filterCollection(name, surname, new LinkedList<>(), offices);
+        if (this.isCacheComplete(cachedCollection)) {
+            return cachedCollection.getCollectionAsSet();
         }
 
+        Map<String, Object> parameters = new HashMap<>();
+        MapSqlParameterSource parameterSource = new MapSqlParameterSource();
+        JDBCWhereClauseBuilder whereClauseBuilder = new JDBCWhereClauseBuilder();
 
-        JDBCWhereClauseBuilder whereClauseBuilder = new JDBCWhereClauseBuilder()
-                .in(
-                        formatColumnFromName("office_id", this.getTableAlias()),
-                        officeParameters
-                );
+        this.putFirstNameArguments(name, parameters, whereClauseBuilder);
+        this.putSurnameArgument(surname, parameters, whereClauseBuilder);
+        this.putOfficeArguments(offices, parameters, whereClauseBuilder);
 
-        if (!name.isEmpty()) {
-            name = name.toLowerCase();
-            surname = surname.toLowerCase();
-            parameters.put("firstName", '%' + name + '%');
-            parameters.put("surname", '%' + surname + '%');
+        parameterSource.addValues(parameters);
 
-
-            whereClauseBuilder
-                    .and()
-                    .where(new JDBCWhereClauseBuilder()
-                            .where(this.formatColumnFromName("first_name"), Operation.LIKE, ":firstName", ColumnTransformer.LOWER)
-                            .and()
-                            .where(this.formatColumnFromName("surname"), Operation.LIKE, ":surname", ColumnTransformer.LOWER)
-
-                    );
+        if (!cachedCollection.getCollection().isEmpty()) {
+            this.excludeModels(cachedCollection.getCompleteCollection(), parameterSource, whereClauseBuilder);
         }
 
         JDBCQueryBuilder queryBuilder = new JDBCSelectQueryBuilder()
@@ -324,8 +280,6 @@ public class StaffDaoImpl extends GenericSearchableDaoImpl<Staff, Integer> imple
                 .where(whereClauseBuilder)
                 .distinct();
 
-        MapSqlParameterSource parameterSource = new MapSqlParameterSource();
-        parameterSource.addValues(parameters);
 
         return this.selectQuery(queryBuilder.getQueryAsString(), parameterSource);
     }
@@ -335,50 +289,26 @@ public class StaffDaoImpl extends GenericSearchableDaoImpl<Staff, Integer> imple
         if (staffSpecialties.isEmpty() && offices.isEmpty() && name.isEmpty() && surname.isEmpty())
             return new HashSet<>();
 
+        name = name.toLowerCase();
+        surname = surname.toLowerCase();
+        FilteredCachedCollection<Staff> cachedCollection = this.filterCollection(name, surname, staffSpecialties, offices);
+        if (this.isCacheComplete(cachedCollection)) {
+            return cachedCollection.getCollectionAsSet();
+        }
+
         Map<String, Object> parameters = new HashMap<>();
-        Collection<String> officeParameters = new LinkedList<>();
-        Collection<String> specialtyParameters = new LinkedList<>();
+        MapSqlParameterSource parameterSource = new MapSqlParameterSource();
+        JDBCWhereClauseBuilder whereClauseBuilder = new JDBCWhereClauseBuilder();
 
-        int i = 0;
-        for (Office office : offices) {
-            String parameter = "_office_" + i;
-            parameters.put(parameter, office.getId());
-            officeParameters.add(":" + parameter);
-            i++;
-        }
+        this.putFirstNameArguments(name, parameters, whereClauseBuilder);
+        this.putSurnameArgument(surname, parameters, whereClauseBuilder);
+        this.putOfficeArguments(offices, parameters, whereClauseBuilder);
+        this.putStaffSpecialtyArguments(staffSpecialties, parameters, whereClauseBuilder);
 
-        i = 0;
-        for (StaffSpecialty staffSpecialty : staffSpecialties) {
-            String parameter = "_specialty_" + i;
-            parameters.put(parameter, staffSpecialty.getId());
-            specialtyParameters.add(":" + parameter);
-            i++;
-        }
+        parameterSource.addValues(parameters);
 
-        JDBCWhereClauseBuilder whereClauseBuilder = new JDBCWhereClauseBuilder()
-                .in(
-                        formatColumnFromName("specialty_id", this.getSpecialtiesIntermediateTableName()),
-                        specialtyParameters
-                )
-                .and()
-                .in(
-                        formatColumnFromName("office_id", this.getTableAlias()),
-                        officeParameters
-                );
-
-        if (!name.isEmpty()) {
-            name = name.toLowerCase();
-            surname = surname.toLowerCase();
-            parameters.put("firstName", '%' + name + '%');
-            parameters.put("surname", '%' + surname + '%');
-
-            whereClauseBuilder
-                    .and()
-                    .where(new JDBCWhereClauseBuilder()
-                            .where(this.formatColumnFromName("surname"), Operation.LIKE, ":surname", ColumnTransformer.LOWER)
-                            .and()
-                            .where(this.formatColumnFromName("first_name"), Operation.LIKE, ":firstName", ColumnTransformer.LOWER)
-                    );
+        if (!cachedCollection.getCollection().isEmpty()) {
+            this.excludeModels(cachedCollection.getCompleteCollection(), parameterSource, whereClauseBuilder);
         }
 
         JDBCQueryBuilder queryBuilder = new JDBCSelectQueryBuilder()
@@ -387,9 +317,6 @@ public class StaffDaoImpl extends GenericSearchableDaoImpl<Staff, Integer> imple
                 .join("staff_id", this.getSpecialtiesIntermediateTableName(), "staff_id")
                 .where(whereClauseBuilder)
                 .distinct();
-
-        MapSqlParameterSource parameterSource = new MapSqlParameterSource();
-        parameterSource.addValues(parameters);
 
         return this.selectQuery(queryBuilder.getQueryAsString(), parameterSource);
     }
@@ -401,7 +328,7 @@ public class StaffDaoImpl extends GenericSearchableDaoImpl<Staff, Integer> imple
 
     @Override
     public Set<Staff> findBySurnameOfficeAndStaffSpecialties(String surname, Collection<Office> offices, Collection<StaffSpecialty> staffSpecialties) {
-        return findByNameSurnameOfficeAndStaffSpecialities("", surname, offices, staffSpecialties);
+        return this.findByNameSurnameOfficeAndStaffSpecialities("", surname, offices, staffSpecialties);
     }
 
     @Override
@@ -409,33 +336,23 @@ public class StaffDaoImpl extends GenericSearchableDaoImpl<Staff, Integer> imple
         if (offices.isEmpty() && name.isEmpty())
             return new HashSet<>();
 
-        Map<String, Object> parameters = new HashMap<>();
-        Collection<String> officeParameters = new LinkedList<>();
-
-        int i = 0;
-        for (Office office : offices) {
-            String parameter = "_office_" + i;
-            parameters.put(parameter, office.getId());
-            officeParameters.add(":" + parameter);
-            i++;
+        name = name.toLowerCase();
+        FilteredCachedCollection<Staff> cachedCollection = this.filterCollection(name, "", new LinkedList<>(), offices);
+        if (this.isCacheComplete(cachedCollection)) {
+            return cachedCollection.getCollectionAsSet();
         }
 
+        Map<String, Object> parameters = new HashMap<>();
+        MapSqlParameterSource parameterSource = new MapSqlParameterSource();
+        JDBCWhereClauseBuilder whereClauseBuilder = new JDBCWhereClauseBuilder();
 
-        JDBCWhereClauseBuilder whereClauseBuilder = new JDBCWhereClauseBuilder()
-                .in(
-                        formatColumnFromName("office_id", this.getTableAlias()),
-                        officeParameters
-                );
+        this.putFirstNameArguments(name, parameters, whereClauseBuilder);
+        this.putOfficeArguments(offices, parameters, whereClauseBuilder);
 
-        if (!name.isEmpty()) {
-            name = name.toLowerCase();
-            parameters.put("firstName", '%' + name + '%');
+        parameterSource.addValues(parameters);
 
-            whereClauseBuilder
-                    .and()
-                    .where(new JDBCWhereClauseBuilder()
-                            .where(this.formatColumnFromName("first_name"), Operation.LIKE, ":firstName", ColumnTransformer.LOWER)
-                    );
+        if (!cachedCollection.getCollection().isEmpty()) {
+            this.excludeModels(cachedCollection.getCompleteCollection(), parameterSource, whereClauseBuilder);
         }
 
         JDBCQueryBuilder queryBuilder = new JDBCSelectQueryBuilder()
@@ -443,9 +360,6 @@ public class StaffDaoImpl extends GenericSearchableDaoImpl<Staff, Integer> imple
                 .from(this.getTableAlias())
                 .where(whereClauseBuilder)
                 .distinct();
-
-        MapSqlParameterSource parameterSource = new MapSqlParameterSource();
-        parameterSource.addValues(parameters);
 
         return this.selectQuery(queryBuilder.getQueryAsString(), parameterSource);
     }
@@ -458,6 +372,175 @@ public class StaffDaoImpl extends GenericSearchableDaoImpl<Staff, Integer> imple
     @Override
     protected RowMapper<Staff> getRowMapper() {
         return this.rowMapper;
+    }
+
+    private void putStaffSpecialtyArguments(Collection<StaffSpecialty> staffSpecialties, Map<String, Object> argumentsValues, JDBCWhereClauseBuilder whereClauseBuilder) {
+        if (staffSpecialties.isEmpty())
+            return;
+
+        Collection<String> arguments = new HashSet<>();
+        int i = 0;
+        for (StaffSpecialty staffSpecialty : staffSpecialties) {
+            String parameter = "_specialty_" + i;
+            argumentsValues.put(parameter, staffSpecialty.getId());
+            arguments.add(":" + parameter);
+            i++;
+        }
+        whereClauseBuilder
+                .and()
+                .in(
+                        formatColumnFromName("specialty_id", this.getSpecialtiesIntermediateTableName()),
+                        arguments
+                );
+    }
+
+    private void putOfficeArguments(Collection<Office> offices, Map<String, Object> argumentsValues, JDBCWhereClauseBuilder whereClauseBuilder) {
+        if (offices.isEmpty())
+            return;
+
+        Collection<String> arguments = new HashSet<>();
+        int i = 0;
+        for (Office office : offices) {
+            String parameter = "_office_" + i;
+            argumentsValues.put(parameter, office.getId());
+            arguments.add(":" + parameter);
+            i++;
+        }
+        whereClauseBuilder
+                .and()
+                .in(
+                        formatColumnFromName("office_id", this.getTableAlias()),
+                        arguments
+                );
+    }
+
+    private void putFirstNameArguments(String firstName, Map<String, Object> argumentsValues, JDBCWhereClauseBuilder whereClauseBuilder) {
+        if (firstName.isEmpty())
+            return;
+
+        argumentsValues.put("firstName", firstName);
+        whereClauseBuilder
+                .and()
+                .where(this.formatColumnFromName("first_name"), Operation.LIKE, ":firstName", ColumnTransformer.LOWER);
+    }
+
+    private void putSurnameArgument(String surname, Map<String, Object> argumentsValues, JDBCWhereClauseBuilder whereClauseBuilder) {
+        if (surname.isEmpty())
+            return;
+
+        argumentsValues.put("surname", surname);
+        whereClauseBuilder
+                .and()
+                .where(this.formatColumnFromName("surname"), Operation.LIKE, ":surname", ColumnTransformer.LOWER);
+    }
+
+    private FilteredCachedCollection<Staff> filterCollection(String name, String surname, Collection<StaffSpecialty> staffSpecialties, Collection<Office> offices) {
+        if (!name.isEmpty()) {
+            if (!surname.isEmpty()) {
+                if (!staffSpecialties.isEmpty()) {
+                    if (!offices.isEmpty()) {
+                        return CacheHelper.filter(
+                                Staff.class,
+                                Integer.class,
+                                staff -> staff.getFirstName().toLowerCase().contains(name) &&
+                                        staff.getSurname().toLowerCase().contains(surname) &&
+                                        offices.contains(staff.getOffice()) &&
+                                        staff.getStaffSpecialties().containsAll(staffSpecialties)
+                        );
+                    } else {
+                        return CacheHelper.filter(
+                                Staff.class,
+                                Integer.class,
+                                staff -> staff.getFirstName().toLowerCase().contains(name) &&
+                                        staff.getSurname().toLowerCase().contains(surname) &&
+                                        staff.getStaffSpecialties().containsAll(staffSpecialties)
+                        );
+                    }
+                } else {
+                    if (!offices.isEmpty()) {
+                        return CacheHelper.filter(
+                                Staff.class,
+                                Integer.class,
+                                staff -> staff.getFirstName().toLowerCase().contains(name) &&
+                                        staff.getSurname().toLowerCase().contains(surname) &&
+                                        offices.contains(staff.getOffice())
+                        );
+                    } else {
+                        return CacheHelper.filter(
+                                Staff.class,
+                                Integer.class,
+                                staff -> staff.getFirstName().toLowerCase().contains(name) &&
+                                        staff.getSurname().toLowerCase().contains(surname)
+                        );
+                    }
+                }
+            } else {
+                if (!staffSpecialties.isEmpty()) {
+                    if (!offices.isEmpty()) {
+                        return CacheHelper.filter(
+                                Staff.class,
+                                Integer.class,
+                                staff -> staff.getFirstName().toLowerCase().contains(name) &&
+                                        offices.contains(staff.getOffice()) &&
+                                        staff.getStaffSpecialties().containsAll(staffSpecialties)
+                        );
+                    } else {
+                        return CacheHelper.filter(
+                                Staff.class,
+                                Integer.class,
+                                staff -> staff.getFirstName().toLowerCase().contains(name) &&
+                                        staff.getStaffSpecialties().containsAll(staffSpecialties)
+                        );
+                    }
+                } else {
+                    if (!offices.isEmpty()) {
+                        return CacheHelper.filter(
+                                Staff.class,
+                                Integer.class,
+                                staff -> staff.getFirstName().toLowerCase().contains(name) &&
+                                        offices.contains(staff.getOffice())
+                        );
+                    } else {
+                        return CacheHelper.filter(
+                                Staff.class,
+                                Integer.class,
+                                staff -> staff.getFirstName().toLowerCase().contains(name)
+                        );
+                    }
+                }
+            }
+        } else {
+            if (!staffSpecialties.isEmpty()) {
+                if (!offices.isEmpty()) {
+                    return CacheHelper.filter(
+                            Staff.class,
+                            Integer.class,
+                            staff -> offices.contains(staff.getOffice()) &&
+                                    staff.getStaffSpecialties().containsAll(staffSpecialties)
+                    );
+                } else {
+                    return CacheHelper.filter(
+                            Staff.class,
+                            Integer.class,
+                            staff -> staff.getStaffSpecialties().containsAll(staffSpecialties)
+                    );
+                }
+            } else {
+                if (!offices.isEmpty()) {
+                    return CacheHelper.filter(
+                            Staff.class,
+                            Integer.class,
+                            staff -> offices.contains(staff.getOffice())
+                    );
+                } else {
+                    return CacheHelper.filter(
+                            Staff.class,
+                            Integer.class,
+                            staff -> true
+                    );
+                }
+            }
+        }
     }
 
     private String getSpecialtiesIntermediateTableName() {

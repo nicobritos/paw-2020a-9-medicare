@@ -58,7 +58,7 @@ public class Staff extends GenericModel<Staff, Integer> {
     }
 
     public int getRegistrationNumber() {
-        return this.registrationNumber;
+        return this.registrationNumber == null ? 0 : this.registrationNumber;
     }
 
     public void setRegistrationNumber(Integer registrationNumber) {

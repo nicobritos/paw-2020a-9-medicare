@@ -5,10 +5,10 @@ import ar.edu.itba.paw.models.Country;
 import ar.edu.itba.paw.models.Locality;
 import ar.edu.itba.paw.models.Province;
 
-import java.util.Collection;
+import java.util.Set;
 
 public interface ProvinceService extends GenericService<Province, Integer> {
-    Collection<Province> findByCountry(Country country);
+    Set<Province> findByCountry(Country country);
 
     /**
      * Returns Provinces with a name similar to the one provided filtered out by Country.
@@ -16,9 +16,9 @@ public interface ProvinceService extends GenericService<Province, Integer> {
      * @param name the province's name
      * @return a collection of matched provinces
      */
-    Collection<Province> findByCountryAndName(Country country, String name);
+    Set<Province> findByCountryAndName(Country country, String name);
 
     void addLocality(Province province, Locality locality);
 
-    void addLocalities(Province province, Collection<Locality> localities);
+    void addLocalities(Province province, Set<Locality> localities);
 }

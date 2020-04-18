@@ -43,7 +43,7 @@ public class ProvinceDaoImpl extends GenericSearchableDaoImpl<Province, Integer>
         FilteredCachedCollection<Province> cachedCollection = CacheHelper.filter(
                 Province.class,
                 Integer.class,
-                province -> country.getProvinces().contains(province) && province.getName().toLowerCase().contains(finalName)
+                province -> province.getName().toLowerCase().contains(finalName) && province.getCountry().equals(country)
         );
         if (this.isCacheComplete(cachedCollection)) {
             return cachedCollection.getCollectionAsSet();
