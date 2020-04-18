@@ -15,4 +15,9 @@ public class StaffSpecialty extends GenericModel<StaffSpecialty, Integer> {
     public void setName(String name) {
         this.name = name;
     }
+
+    @Override
+    protected boolean isSameInstance(Object o) {
+        return o instanceof StaffSpecialty;
+    }
 }

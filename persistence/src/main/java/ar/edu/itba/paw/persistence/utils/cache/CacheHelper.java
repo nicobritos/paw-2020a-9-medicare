@@ -59,8 +59,8 @@ public class CacheHelper {
 
             try {
                 ProxyHelper.setField(model, ReflectionGetterSetter.getFieldByName(CACHED_MODEL_FIELD_NAME, mClass), true);
-            } catch (NoSuchFieldException ignored) {
-                System.out.println(ignored);
+            } catch (NoSuchFieldException e) {
+                e.printStackTrace();
             }
         }
         return model;

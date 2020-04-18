@@ -8,18 +8,18 @@ import ar.edu.itba.paw.persistenceAnnotations.ManyToMany;
 import ar.edu.itba.paw.persistenceAnnotations.ManyToOne;
 import ar.edu.itba.paw.persistenceAnnotations.OneToMany;
 import ar.edu.itba.paw.persistenceAnnotations.OneToOne;
-import org.aopalliance.intercept.MethodInterceptor;
-import org.aopalliance.intercept.MethodInvocation;
+import org.springframework.cglib.proxy.MethodInterceptor;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.*;
 import java.util.stream.Collectors;
 
-class ProxiedModel<M extends GenericModel<M, I>, I> implements MethodInterceptor, ProxiedModelCollection {
+class ProxiedModel<M extends GenericModel<M, I>, I> implements ProxiedModelCollection {
     private HashMap<String, Set<GenericModel<Object, Object>>> savedCollection;
     private HashMap<String, ProxyField> lazyFindByIds;
     private HashMap<String, ProxyField> lazyFindById;
+    private MethodInterceptor methodInterceptor;
     private M target;
 
     public ProxiedModel(M target) {
@@ -53,87 +53,6 @@ class ProxiedModel<M extends GenericModel<M, I>, I> implements MethodInterceptor
     @Override
     public void setPreviousCollection(Field field, Set<GenericModel<Object, Object>> models) {
         this.savedCollection.put(field.getName(), new HashSet<>(models));
-    }
-
-    @Override
-    public Object invoke(MethodInvocation methodInvocation) throws Throwable {
-        Method method = methodInvocation.getMethod();
-        Object[] args = methodInvocation.getArguments();
-        Object proxy = methodInvocation.getThis();
-
-        ProxyField savedMethodData = this.lazyFindById.get(method.getName());
-        if (savedMethodData != null) {
-            Method savedMethod = savedMethodData.getDaoMethod();
-            if (savedMethodData.getHasBeenLoaded()) {
-                if (method.isAccessible()) {
-                    return method.invoke(proxy, args);
-                } else {
-                    method.setAccessible(true);
-                    Object result = method.invoke(proxy, args);
-                    method.setAccessible(false);
-                    return result;
-                }
-            }
-
-            Object result;
-            if (method.isAccessible()) {
-                result = savedMethod.invoke(savedMethodData.getDao(), savedMethodData.getModelId());
-            } else {
-                method.setAccessible(true);
-                result = savedMethod.invoke(savedMethodData.getDao(), savedMethodData.getModelId());
-                method.setAccessible(false);
-            }
-            try {
-                Optional<Object> optionalResult = (Optional<Object>) result;
-                result = optionalResult.orElse(null);
-            } catch (ClassCastException ignored) {
-            }
-
-            ReflectionGetterSetter.set(proxy, savedMethodData.getInstanceField(), result, true);
-            savedMethodData.setHasBeenLoaded(true);
-            return result;
-        }
-
-        savedMethodData = this.lazyFindByIds.get(method.getName());
-        if (savedMethodData != null) {
-            Method savedMethod = savedMethodData.getDaoMethod();
-            if (savedMethodData.getHasBeenLoaded()) {
-                if (method.isAccessible()) {
-                    return method.invoke(proxy, args);
-                } else {
-                    method.setAccessible(true);
-                    Object result = method.invoke(proxy, args);
-                    method.setAccessible(false);
-                    return result;
-                }
-            }
-
-            Collection<GenericModel<Object, Object>> result;
-
-            if (method.isAccessible()) {
-                result = (Collection<GenericModel<Object, Object>>) savedMethod.invoke(savedMethodData.getDao(), savedMethodData.getModelIdCollection());
-            } else {
-                method.setAccessible(true);
-                result = (Collection<GenericModel<Object, Object>>) savedMethod.invoke(savedMethodData.getDao(), savedMethodData.getModelIdCollection());
-                method.setAccessible(false);
-            }
-
-            ReflectionGetterSetter.set(proxy, savedMethodData.getInstanceField(), result, true);
-
-            savedMethodData.setHasBeenLoaded(true);
-            this.savedCollection.put(savedMethodData.instanceField.getName(), new HashSet<>(result));
-
-            return result;
-        }
-
-        if (method.isAccessible()) {
-            return method.invoke(proxy, args);
-        } else {
-            method.setAccessible(true);
-            Object result = method.invoke(proxy, args);
-            method.setAccessible(false);
-            return result;
-        }
     }
 
     public void setField(Field field, Object value) {
@@ -267,6 +186,91 @@ class ProxiedModel<M extends GenericModel<M, I>, I> implements MethodInterceptor
                 e.printStackTrace();
             }
         });
+
+        this.methodInterceptor = (proxy, method, args, methodProxy) -> {
+            if (proxy == null && method == null && args == null && methodProxy == null)
+                return this;
+
+            proxy = this.target;
+
+            ProxyField savedMethodData = this.lazyFindById.get(method.getName());
+            if (savedMethodData != null) {
+                Method savedMethod = savedMethodData.getDaoMethod();
+                if (savedMethodData.getHasBeenLoaded()) {
+                    if (method.isAccessible()) {
+                        return method.invoke(proxy, args);
+                    } else {
+                        method.setAccessible(true);
+                        Object result = method.invoke(proxy, args);
+                        method.setAccessible(false);
+                        return result;
+                    }
+                }
+
+                Object result;
+                if (method.isAccessible()) {
+                    result = savedMethod.invoke(savedMethodData.getDao(), savedMethodData.getModelId());
+                } else {
+                    method.setAccessible(true);
+                    result = savedMethod.invoke(savedMethodData.getDao(), savedMethodData.getModelId());
+                    method.setAccessible(false);
+                }
+                try {
+                    Optional<Object> optionalResult = (Optional<Object>) result;
+                    result = optionalResult.orElse(null);
+                } catch (ClassCastException ignored) {
+                }
+
+                ReflectionGetterSetter.set(proxy, savedMethodData.getInstanceField(), result, true);
+                savedMethodData.setHasBeenLoaded(true);
+                return result;
+            }
+
+            savedMethodData = this.lazyFindByIds.get(method.getName());
+            if (savedMethodData != null) {
+                Method savedMethod = savedMethodData.getDaoMethod();
+                if (savedMethodData.getHasBeenLoaded()) {
+                    if (method.isAccessible()) {
+                        return method.invoke(proxy, args);
+                    } else {
+                        method.setAccessible(true);
+                        Object result = method.invoke(proxy, args);
+                        method.setAccessible(false);
+                        return result;
+                    }
+                }
+
+                Collection<GenericModel<Object, Object>> result;
+
+                if (method.isAccessible()) {
+                    result = (Collection<GenericModel<Object, Object>>) savedMethod.invoke(savedMethodData.getDao(), savedMethodData.getModelIdCollection());
+                } else {
+                    method.setAccessible(true);
+                    result = (Collection<GenericModel<Object, Object>>) savedMethod.invoke(savedMethodData.getDao(), savedMethodData.getModelIdCollection());
+                    method.setAccessible(false);
+                }
+
+                ReflectionGetterSetter.set(proxy, savedMethodData.getInstanceField(), result, true);
+
+                savedMethodData.setHasBeenLoaded(true);
+                this.savedCollection.put(savedMethodData.instanceField.getName(), new HashSet<>(result));
+
+                return result;
+            }
+
+            if (method.isAccessible()) {
+                return method.invoke(proxy, args);
+            } else {
+                method.setAccessible(true);
+                Object result = method.invoke(proxy, args);
+                method.setAccessible(false);
+                return result;
+            }
+        };
+    }
+
+    public MethodInterceptor getMethodInterceptor() {
+        return this.methodInterceptor;
     }
 
     private static class ProxyField {
