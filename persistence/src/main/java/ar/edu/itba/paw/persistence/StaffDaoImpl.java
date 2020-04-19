@@ -5,6 +5,7 @@ import ar.edu.itba.paw.models.Office;
 import ar.edu.itba.paw.models.Staff;
 import ar.edu.itba.paw.models.StaffSpecialty;
 import ar.edu.itba.paw.persistence.generics.GenericSearchableDaoImpl;
+import ar.edu.itba.paw.persistence.utils.StringSearchType;
 import ar.edu.itba.paw.persistence.utils.builder.JDBCQueryBuilder;
 import ar.edu.itba.paw.persistence.utils.builder.JDBCSelectQueryBuilder;
 import ar.edu.itba.paw.persistence.utils.builder.JDBCWhereClauseBuilder;
@@ -61,14 +62,10 @@ public class StaffDaoImpl extends GenericSearchableDaoImpl<Staff, Integer> imple
         MapSqlParameterSource parameterSource = new MapSqlParameterSource();
         JDBCWhereClauseBuilder whereClauseBuilder = new JDBCWhereClauseBuilder();
 
-        if(!name.isEmpty())
-            this.putFirstNameArguments(name, parameters, whereClauseBuilder);
-        if(!surname.isEmpty())
-            this.putSurnameArgument(surname, parameters, whereClauseBuilder);
-        if(!offices.isEmpty())
-            this.putOfficeArguments(offices, parameters, whereClauseBuilder);
-        if(!staffSpecialties.isEmpty())
-            this.putStaffSpecialtyArguments(staffSpecialties, parameters, whereClauseBuilder);
+        this.putFirstNameArguments(name, parameters, whereClauseBuilder);
+        this.putSurnameArgument(surname, parameters, whereClauseBuilder);
+        this.putOfficeArguments(offices, parameters, whereClauseBuilder);
+        this.putStaffSpecialtyArguments(staffSpecialties, parameters, whereClauseBuilder);
 
         parameterSource.addValues(parameters);
 
@@ -144,7 +141,7 @@ public class StaffDaoImpl extends GenericSearchableDaoImpl<Staff, Integer> imple
         if (firstName.isEmpty())
             return;
 
-        argumentsValues.put("firstName", firstName);
+        argumentsValues.put("firstName", StringSearchType.CONTAINS.transform(firstName));
         whereClauseBuilder
                 .and()
                 .where(this.formatColumnFromName("first_name"), Operation.LIKE, ":firstName", ColumnTransformer.LOWER);
@@ -154,7 +151,7 @@ public class StaffDaoImpl extends GenericSearchableDaoImpl<Staff, Integer> imple
         if (surname.isEmpty())
             return;
 
-        argumentsValues.put("surname", surname);
+        argumentsValues.put("surname", StringSearchType.CONTAINS.transform(surname));
         whereClauseBuilder
                 .and()
                 .where(this.formatColumnFromName("surname"), Operation.LIKE, ":surname", ColumnTransformer.LOWER);
