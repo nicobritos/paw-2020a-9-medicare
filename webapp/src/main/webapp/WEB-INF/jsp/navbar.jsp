@@ -1,15 +1,15 @@
 <div id="navbar">
-    <div class="container d-flex justify-content-center">
-	<input id="txtSearchName" class="form-control d-inline" type="search" placeholder="Buscá por nombre...">
-	<input id="txtSearchSurname" class="form-control d-inline" type="search" placeholder="Buscá por apellido...">
-	<select id="selEspecialidad" class="form-control d-inline">
+    <div class="container d-flex flex-wrap justify-content-center w-100">
+	<input id="txtSearchName" class="form-control" type="search" placeholder="Buscá por nombre...">
+	<input id="txtSearchSurname" class="form-control" type="search" placeholder="Buscá por apellido...">
+	<select id="selEspecialidad" class="form-control">
 	    <option value="-1" disabled selected>Especialidad</option>
 		<option value="-1">Cualquiera</option>
 		<c:forEach var="specialty" items="${specialties}">
 			<option value="<c:out value="${specialty.id}"/>"><c:out value="${specialty.name}"/></option>
 		</c:forEach>
 	</select>
-	<select id="selLocality" class="form-control d-inline">
+	<select id="selLocality" class="form-control">
 		<option value="-1" disabled selected>Localidad</option>
 		<option value="-1">Cualquiera</option>
 		<c:forEach var="locality" items="${localities}">
