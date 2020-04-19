@@ -1,6 +1,7 @@
 package ar.edu.itba.paw.interfaces.daos;
 
 import ar.edu.itba.paw.interfaces.daos.generic.GenericSearchableDao;
+import ar.edu.itba.paw.models.Locality;
 import ar.edu.itba.paw.models.Office;
 import ar.edu.itba.paw.models.Staff;
 import ar.edu.itba.paw.models.StaffSpecialty;
@@ -21,5 +22,5 @@ public interface StaffDao extends GenericSearchableDao<Staff, Integer> {
      *                         that has any of the specialties in the collection
      * @return the filtered set
      */
-    Set<Staff> findBy(String name, String surname, Collection<Office> offices, Collection<StaffSpecialty> staffSpecialties);
+    Set<Staff> findBy(String name, String surname, Collection<Office> offices, Collection<StaffSpecialty> staffSpecialties, Collection<Locality> localities);
 }

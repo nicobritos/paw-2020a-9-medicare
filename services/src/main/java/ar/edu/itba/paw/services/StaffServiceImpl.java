@@ -2,6 +2,7 @@ package ar.edu.itba.paw.services;
 
 import ar.edu.itba.paw.interfaces.daos.StaffDao;
 import ar.edu.itba.paw.interfaces.services.StaffService;
+import ar.edu.itba.paw.models.Locality;
 import ar.edu.itba.paw.models.Office;
 import ar.edu.itba.paw.models.Staff;
 import ar.edu.itba.paw.models.StaffSpecialty;
@@ -17,8 +18,8 @@ public class StaffServiceImpl extends GenericSearchableServiceImpl<StaffDao, Sta
     private StaffDao repository;
 
     @Override
-    public Set<Staff> findBy(String name, String surname, Set<Office> offices, Set<StaffSpecialty> staffSpecialties) {
-        return this.repository.findBy(name, surname, offices, staffSpecialties);
+    public Set<Staff> findBy(String name, String surname, Set<Office> offices, Set<StaffSpecialty> staffSpecialties, Set<Locality> localities) {
+        return this.repository.findBy(name, surname, offices, staffSpecialties, localities);
     }
 
     @Override
