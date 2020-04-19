@@ -20,6 +20,7 @@ import org.springframework.stereotype.Repository;
 
 import javax.sql.DataSource;
 import java.util.*;
+import java.util.function.Predicate;
 
 @Repository
 public class StaffDaoImpl extends GenericSearchableDaoImpl<Staff, Integer> implements StaffDao {
@@ -158,112 +159,21 @@ public class StaffDaoImpl extends GenericSearchableDaoImpl<Staff, Integer> imple
     }
 
     private FilteredCachedCollection<Staff> filterCache(String name, String surname, Collection<StaffSpecialty> staffSpecialties, Collection<Office> offices) {
+        Predicate<Staff> p = staff -> true; // sirve como default porque son todos ANDs (true && other = other)
         if (!name.isEmpty()) {
-            if (!surname.isEmpty()) {
-                if (!staffSpecialties.isEmpty()) {
-                    if (!offices.isEmpty()) {
-                        return CacheHelper.filter(
-                                Staff.class,
-                                Integer.class,
-                                staff -> staff.getFirstName().toLowerCase().contains(name) &&
-                                        staff.getSurname().toLowerCase().contains(surname) &&
-                                        offices.contains(staff.getOffice()) &&
-                                        staff.getStaffSpecialties().containsAll(staffSpecialties)
-                        );
-                    } else {
-                        return CacheHelper.filter(
-                                Staff.class,
-                                Integer.class,
-                                staff -> staff.getFirstName().toLowerCase().contains(name) &&
-                                        staff.getSurname().toLowerCase().contains(surname) &&
-                                        staff.getStaffSpecialties().containsAll(staffSpecialties)
-                        );
-                    }
-                } else {
-                    if (!offices.isEmpty()) {
-                        return CacheHelper.filter(
-                                Staff.class,
-                                Integer.class,
-                                staff -> staff.getFirstName().toLowerCase().contains(name) &&
-                                        staff.getSurname().toLowerCase().contains(surname) &&
-                                        offices.contains(staff.getOffice())
-                        );
-                    } else {
-                        return CacheHelper.filter(
-                                Staff.class,
-                                Integer.class,
-                                staff -> staff.getFirstName().toLowerCase().contains(name) &&
-                                        staff.getSurname().toLowerCase().contains(surname)
-                        );
-                    }
-                }
-            } else {
-                if (!staffSpecialties.isEmpty()) {
-                    if (!offices.isEmpty()) {
-                        return CacheHelper.filter(
-                                Staff.class,
-                                Integer.class,
-                                staff -> staff.getFirstName().toLowerCase().contains(name) &&
-                                        offices.contains(staff.getOffice()) &&
-                                        staff.getStaffSpecialties().containsAll(staffSpecialties)
-                        );
-                    } else {
-                        return CacheHelper.filter(
-                                Staff.class,
-                                Integer.class,
-                                staff -> staff.getFirstName().toLowerCase().contains(name) &&
-                                        staff.getStaffSpecialties().containsAll(staffSpecialties)
-                        );
-                    }
-                } else {
-                    if (!offices.isEmpty()) {
-                        return CacheHelper.filter(
-                                Staff.class,
-                                Integer.class,
-                                staff -> staff.getFirstName().toLowerCase().contains(name) &&
-                                        offices.contains(staff.getOffice())
-                        );
-                    } else {
-                        return CacheHelper.filter(
-                                Staff.class,
-                                Integer.class,
-                                staff -> staff.getFirstName().toLowerCase().contains(name)
-                        );
-                    }
-                }
-            }
-        } else {
-            if (!staffSpecialties.isEmpty()) {
-                if (!offices.isEmpty()) {
-                    return CacheHelper.filter(
-                            Staff.class,
-                            Integer.class,
-                            staff -> offices.contains(staff.getOffice()) &&
-                                    staff.getStaffSpecialties().containsAll(staffSpecialties)
-                    );
-                } else {
-                    return CacheHelper.filter(
-                            Staff.class,
-                            Integer.class,
-                            staff -> staff.getStaffSpecialties().containsAll(staffSpecialties)
-                    );
-                }
-            } else {
-                if (!offices.isEmpty()) {
-                    return CacheHelper.filter(
-                            Staff.class,
-                            Integer.class,
-                            staff -> offices.contains(staff.getOffice())
-                    );
-                } else {
-                    return CacheHelper.filter(
-                            Staff.class,
-                            Integer.class,
-                            staff -> true
-                    );
-                }
-            }
+            p = p.and(staff -> staff.getFirstName().toLowerCase().contains(name));
         }
+        if(!surname.isEmpty()) {
+            p = p.and(staff -> staff.getSurname().toLowerCase().contains(surname));
+        }
+        if(!staffSpecialties.isEmpty()) {
+            p = p.and(staff -> staff.getStaffSpecialties().containsAll(staffSpecialties));
+        }
+        if(!offices.isEmpty()) {
+            p = p.and(staff -> offices.contains(staff.getOffice()));
+        }
+        // else p = staff -> true, quiero que no me filtre nada si todos son empty
+        return CacheHelper.filter(Staff.class, Integer.class, p);
     }
 
     private String getSpecialtiesIntermediateTableName() {
