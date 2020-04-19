@@ -15,7 +15,7 @@
                     <th>Especialidad</th>
                     <th>Correo electrónico</th>
                     <th>Teléfono</th>
-                    <th>Dirección</th>
+                    <th>Dirección del consultorio</th>
                     <th>Localidad</th>
                 </tr>
                 <c:forEach var="member" items="${staff}">
