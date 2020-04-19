@@ -29,54 +29,22 @@ public class MedicListController {
         final ModelAndView mav = new ModelAndView("index");
         //staff variable that will be passed to the jsp
         Collection<Staff> staffList;
-        //check if specialties parameter was set
-        if(specialties!=null){
-            // create a list that will be passed to search
-            Set<StaffSpecialty> searchedSpecialties = new HashSet<>();
+
+        Set<StaffSpecialty> searchedSpecialties = new HashSet<>();
+
+        if (specialties != null) {
             // split strings to get all specialties used in search
             // and create the search parameter
-            for(String s:specialties.split(",")){
-                try{
+            for (String s : specialties.split(",")) {
+                try {
                     StaffSpecialty specialty = new StaffSpecialty();
                     specialty.setId(Integer.parseInt(s));
                     searchedSpecialties.add(specialty);
-                }catch (NumberFormatException e){
-                }
-            }
-            //if name is not a parameter search only specialties else search for both
-            if(name!=null){
-                if(surname != null){
-                    staffList = this.staffService.findByNameSurnameAndStaffSpecialties(name, surname, searchedSpecialties);
-                }
-                else {
-                    staffList = this.staffService.findByNameAndStaffSpecialties(name, searchedSpecialties);
-                }
-            }else{
-                if(surname != null){
-                    staffList = this.staffService.findBySurnameAndStaffSpecialties(surname, searchedSpecialties);
-                }
-                else {
-                    staffList = this.staffService.findByStaffSpecialties(searchedSpecialties);
+                } catch (NumberFormatException e) {
                 }
             }
         }
-        else{
-            if(name != null){
-                if(surname != null){
-                    staffList = this.staffService.findByNameAndSurname(name, surname);
-                }
-                else {
-                    staffList = this.staffService.findByName(name);
-                }
-            }else{
-                if(surname != null){
-                    staffList = this.staffService.findBySurname(surname);
-                } else {
-                    staffList = this.staffService.list();
-                }
-            }
-        }
-
+        staffList = this.staffService.findBy(name, surname, null, searchedSpecialties);
         Collection<StaffSpecialty> specialtiesList = this.specialityService.list();
 
         // pass objects to model and view

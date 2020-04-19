@@ -15,6 +15,8 @@
                     <th>Especialidad</th>
                     <th>Correo electrónico</th>
                     <th>Teléfono</th>
+                    <th>Dirección</th>
+                    <th>Localidad</th>
                 </tr>
                 <c:forEach var="member" items="${staff}">
                     <tr>
@@ -26,6 +28,8 @@
                         </td>
                         <td><c:out value="${member.email}"/></td>
                         <td><c:out value="${member.phone}"/></td>
+                        <td><c:out value="${member.office.street}"/></td>
+                        <td><c:out value="${member.office.locality.name}"/></td>
                     </tr>
                 </c:forEach>
             </table>
