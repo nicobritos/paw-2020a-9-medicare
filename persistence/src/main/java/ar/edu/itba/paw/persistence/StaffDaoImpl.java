@@ -5,6 +5,7 @@ import ar.edu.itba.paw.models.Office;
 import ar.edu.itba.paw.models.Staff;
 import ar.edu.itba.paw.models.StaffSpecialty;
 import ar.edu.itba.paw.persistence.generics.GenericSearchableDaoImpl;
+import ar.edu.itba.paw.persistence.utils.StringSearchType;
 import ar.edu.itba.paw.persistence.utils.builder.JDBCQueryBuilder;
 import ar.edu.itba.paw.persistence.utils.builder.JDBCSelectQueryBuilder;
 import ar.edu.itba.paw.persistence.utils.builder.JDBCWhereClauseBuilder;
@@ -19,6 +20,7 @@ import org.springframework.stereotype.Repository;
 
 import javax.sql.DataSource;
 import java.util.*;
+import java.util.function.Predicate;
 
 @Repository
 public class StaffDaoImpl extends GenericSearchableDaoImpl<Staff, Integer> implements StaffDao {
@@ -32,265 +34,26 @@ public class StaffDaoImpl extends GenericSearchableDaoImpl<Staff, Integer> imple
     }
 
     @Override
-    public Set<Staff> findBySurname(String surname) {
-        return this.findByFieldIgnoreCase("surname", Operation.LIKE, surname);
-    }
-
-    @Override
-    public Set<Staff> findByName(String name) {
-        return this.findByFieldIgnoreCase("first_name", Operation.LIKE, name);
-    }
-
-    @Override
-    public Set<Staff> findByStaffSpecialties(Collection<StaffSpecialty> staffSpecialties) {
-        if (staffSpecialties.isEmpty())
-            return new HashSet<>();
-
-        FilteredCachedCollection<Staff> cachedCollection = this.filterCache("", "", staffSpecialties, new LinkedList<>());
-        if (this.isCacheComplete(cachedCollection)) {
-            return cachedCollection.getCollectionAsSet();
+    public Set<Staff> findBy(String name, String surname, Collection<Office> offices, Collection<StaffSpecialty> staffSpecialties) {
+        if(name == null) {
+            name = "";
+        } else {
+            name = name.toLowerCase();
         }
-
-        Map<String, Object> parameters = new HashMap<>();
-        MapSqlParameterSource parameterSource = new MapSqlParameterSource();
-
-        JDBCWhereClauseBuilder whereClauseBuilder = new JDBCWhereClauseBuilder();
-        this.putStaffSpecialtyArguments(staffSpecialties, parameters, whereClauseBuilder);
-        parameterSource.addValues(parameters);
-
-        if (!cachedCollection.getCollection().isEmpty()) {
-            this.excludeModels(cachedCollection.getCompleteCollection(), parameterSource, whereClauseBuilder);
+        if(surname == null) {
+            surname = "";
+        } else {
+            surname = surname.toLowerCase();
         }
-        JDBCQueryBuilder queryBuilder = new JDBCSelectQueryBuilder()
-                .selectAll()
-                .from(this.getTableAlias())
-                .join("staff_id", this.getSpecialtiesIntermediateTableName(), "staff_id")
-                .where(whereClauseBuilder)
-                .distinct();
-
-        return this.selectQuery(queryBuilder.getQueryAsString(), parameterSource);
-    }
-
-    @Override
-    public Set<Staff> findByNameAndSurname(String name, String surname) {
-        if (name.isEmpty() && surname.isEmpty())
-            return new HashSet<>();
-
-        name = name.toLowerCase();
-        surname = surname.toLowerCase();
-        FilteredCachedCollection<Staff> cachedCollection = this.filterCache(name, surname, new LinkedList<>(), new LinkedList<>());
-        if (this.isCacheComplete(cachedCollection)) {
-            return cachedCollection.getCollectionAsSet();
+        if(offices == null){
+            offices = Collections.emptyList();
         }
-
-        name = name.toLowerCase();
-        surname = surname.toLowerCase();
-        Map<String, Object> parameters = new HashMap<>();
-        JDBCWhereClauseBuilder whereClauseBuilder = new JDBCWhereClauseBuilder();
-
-        this.putFirstNameArguments(name, parameters, whereClauseBuilder);
-        this.putSurnameArgument(surname, parameters, whereClauseBuilder);
-
-        MapSqlParameterSource parameterSource = new MapSqlParameterSource();
-        parameterSource.addValues(parameters);
-
-        if (!cachedCollection.getCollection().isEmpty()) {
-            this.excludeModels(cachedCollection.getCompleteCollection(), parameterSource, whereClauseBuilder);
+        if(staffSpecialties == null){
+            staffSpecialties = Collections.emptyList();
         }
-
-        JDBCQueryBuilder queryBuilder = new JDBCSelectQueryBuilder()
-                .selectAll()
-                .from(this.getTableAlias())
-                .where(whereClauseBuilder)
-                .distinct();
-
-        return this.selectQuery(queryBuilder.getQueryAsString(), parameterSource);
-    }
-
-    @Override
-    public Set<Staff> findByNameAndStaffSpecialties(String name, Collection<StaffSpecialty> staffSpecialties) {
-        if (staffSpecialties.isEmpty() && name.isEmpty())
-            return new HashSet<>();
-
-        name = name.toLowerCase();
-        FilteredCachedCollection<Staff> cachedCollection = this.filterCache(name, "", staffSpecialties, new LinkedList<>());
-        if (this.isCacheComplete(cachedCollection)) {
-            return cachedCollection.getCollectionAsSet();
-        }
-
-        Map<String, Object> parameters = new HashMap<>();
-        JDBCWhereClauseBuilder whereClauseBuilder = new JDBCWhereClauseBuilder();
-
-        this.putFirstNameArguments(name, parameters, whereClauseBuilder);
-        this.putStaffSpecialtyArguments(staffSpecialties, parameters, whereClauseBuilder);
-
-        MapSqlParameterSource parameterSource = new MapSqlParameterSource();
-        parameterSource.addValues(parameters);
-
-        if (!cachedCollection.getCollection().isEmpty()) {
-            this.excludeModels(cachedCollection.getCompleteCollection(), parameterSource, whereClauseBuilder);
-        }
-
-        JDBCQueryBuilder queryBuilder = new JDBCSelectQueryBuilder()
-                .selectAll()
-                .from(this.getTableAlias())
-                .join("staff_id", this.getSpecialtiesIntermediateTableName(), "staff_id")
-                .where(whereClauseBuilder)
-                .distinct();
-
-        return this.selectQuery(queryBuilder.getQueryAsString(), parameterSource);
-    }
-
-    @Override
-    public Set<Staff> findBySurnameAndOffice(String surname, Collection<Office> offices) {
-        if (offices.isEmpty() && surname.isEmpty())
-            return new HashSet<>();
-
-        surname = surname.toLowerCase();
-        FilteredCachedCollection<Staff> cachedCollection = this.filterCache("", surname, new LinkedList<>(), offices);
-        if (this.isCacheComplete(cachedCollection)) {
-            return cachedCollection.getCollectionAsSet();
-        }
-
-        Map<String, Object> parameters = new HashMap<>();
-        JDBCWhereClauseBuilder whereClauseBuilder = new JDBCWhereClauseBuilder();
-        this.putSurnameArgument(surname, parameters, whereClauseBuilder);
-        this.putOfficeArguments(offices, parameters, whereClauseBuilder);
-
-        MapSqlParameterSource parameterSource = new MapSqlParameterSource();
-        parameterSource.addValues(parameters);
-
-        if (!cachedCollection.getCollection().isEmpty()) {
-            this.excludeModels(cachedCollection.getCompleteCollection(), parameterSource, whereClauseBuilder);
-        }
-
-        JDBCQueryBuilder queryBuilder = new JDBCSelectQueryBuilder()
-                .selectAll()
-                .from(this.getTableAlias())
-                .where(whereClauseBuilder)
-                .distinct();
-
-        return this.selectQuery(queryBuilder.getQueryAsString(), parameterSource);
-    }
-
-    @Override
-    public Set<Staff> findBySurnameAndStaffSpecialties(String surname, Collection<StaffSpecialty> staffSpecialties) {
-        if (staffSpecialties.isEmpty() && surname.isEmpty())
-            return new HashSet<>();
-
-        surname = surname.toLowerCase();
-        FilteredCachedCollection<Staff> cachedCollection = this.filterCache("", surname, staffSpecialties, new LinkedList<>());
-        if (this.isCacheComplete(cachedCollection)) {
-            return cachedCollection.getCollectionAsSet();
-        }
-
-        Map<String, Object> parameters = new HashMap<>();
-        MapSqlParameterSource parameterSource = new MapSqlParameterSource();
-        JDBCWhereClauseBuilder whereClauseBuilder = new JDBCWhereClauseBuilder();
-
-        this.putSurnameArgument(surname, parameters, whereClauseBuilder);
-        this.putStaffSpecialtyArguments(staffSpecialties, parameters, whereClauseBuilder);
-
-        parameterSource.addValues(parameters);
-
-        if (!cachedCollection.getCollection().isEmpty()) {
-            this.excludeModels(cachedCollection.getCompleteCollection(), parameterSource, whereClauseBuilder);
-        }
-
-        JDBCQueryBuilder queryBuilder = new JDBCSelectQueryBuilder()
-                .selectAll()
-                .from(this.getTableAlias())
-                .join("staff_id", this.getSpecialtiesIntermediateTableName(), "staff_id")
-                .where(whereClauseBuilder)
-                .distinct();
-
-        return this.selectQuery(queryBuilder.getQueryAsString(), parameterSource);
-    }
-
-    @Override
-    public Set<Staff> findByNameOfficeAndStaffSpecialties(String name, Collection<Office> offices, Collection<StaffSpecialty> staffSpecialties) {
-        return this.findByNameSurnameOfficeAndStaffSpecialities(name, "", offices, staffSpecialties);
-    }
-
-    @Override
-    public Set<Staff> findByNameSurnameAndStaffSpecialties(String name, String surname, Collection<StaffSpecialty> staffSpecialties) {
-        if (staffSpecialties.isEmpty() && name.isEmpty())
-            return new HashSet<>();
-
-        name = name.toLowerCase();
-        surname = surname.toLowerCase();
-        FilteredCachedCollection<Staff> cachedCollection = this.filterCache(name, surname, staffSpecialties, new LinkedList<>());
-        if (this.isCacheComplete(cachedCollection)) {
-            return cachedCollection.getCollectionAsSet();
-        }
-
-        Map<String, Object> parameters = new HashMap<>();
-        MapSqlParameterSource parameterSource = new MapSqlParameterSource();
-        JDBCWhereClauseBuilder whereClauseBuilder = new JDBCWhereClauseBuilder();
-
-        this.putFirstNameArguments(name, parameters, whereClauseBuilder);
-        this.putSurnameArgument(surname, parameters, whereClauseBuilder);
-        this.putStaffSpecialtyArguments(staffSpecialties, parameters, whereClauseBuilder);
-
-        parameterSource.addValues(parameters);
-
-        if (!cachedCollection.getCollection().isEmpty()) {
-            this.excludeModels(cachedCollection.getCompleteCollection(), parameterSource, whereClauseBuilder);
-        }
-
-        JDBCQueryBuilder queryBuilder = new JDBCSelectQueryBuilder()
-                .selectAll()
-                .from(this.getTableAlias())
-                .join("staff_id", this.getSpecialtiesIntermediateTableName(), "staff_id")
-                .where(whereClauseBuilder)
-                .distinct();
-
-        return this.selectQuery(queryBuilder.getQueryAsString(), parameterSource);
-    }
-
-    @Override
-    public Set<Staff> findByNameSurnameAndOffice(String name, String surname, Collection<Office> offices) {
-        if (offices.isEmpty() && name.isEmpty())
-            return new HashSet<>();
-
-        name = name.toLowerCase();
-        surname = surname.toLowerCase();
-        FilteredCachedCollection<Staff> cachedCollection = this.filterCache(name, surname, new LinkedList<>(), offices);
-        if (this.isCacheComplete(cachedCollection)) {
-            return cachedCollection.getCollectionAsSet();
-        }
-
-        Map<String, Object> parameters = new HashMap<>();
-        MapSqlParameterSource parameterSource = new MapSqlParameterSource();
-        JDBCWhereClauseBuilder whereClauseBuilder = new JDBCWhereClauseBuilder();
-
-        this.putFirstNameArguments(name, parameters, whereClauseBuilder);
-        this.putSurnameArgument(surname, parameters, whereClauseBuilder);
-        this.putOfficeArguments(offices, parameters, whereClauseBuilder);
-
-        parameterSource.addValues(parameters);
-
-        if (!cachedCollection.getCollection().isEmpty()) {
-            this.excludeModels(cachedCollection.getCompleteCollection(), parameterSource, whereClauseBuilder);
-        }
-
-        JDBCQueryBuilder queryBuilder = new JDBCSelectQueryBuilder()
-                .selectAll()
-                .from(this.getTableAlias())
-                .where(whereClauseBuilder)
-                .distinct();
-
-
-        return this.selectQuery(queryBuilder.getQueryAsString(), parameterSource);
-    }
-
-    @Override
-    public Set<Staff> findByNameSurnameOfficeAndStaffSpecialities(String name, String surname, Collection<Office> offices, Collection<StaffSpecialty> staffSpecialties) {
         if (staffSpecialties.isEmpty() && offices.isEmpty() && name.isEmpty() && surname.isEmpty())
-            return new HashSet<>();
+            return this.list();
 
-        name = name.toLowerCase();
-        surname = surname.toLowerCase();
         FilteredCachedCollection<Staff> cachedCollection = this.filterCache(name, surname, staffSpecialties, offices);
         if (this.isCacheComplete(cachedCollection)) {
             return cachedCollection.getCollectionAsSet();
@@ -311,62 +74,23 @@ public class StaffDaoImpl extends GenericSearchableDaoImpl<Staff, Integer> imple
             this.excludeModels(cachedCollection.getCompleteCollection(), parameterSource, whereClauseBuilder);
         }
 
-        JDBCQueryBuilder queryBuilder = new JDBCSelectQueryBuilder()
-                .selectAll()
-                .from(this.getTableAlias())
-                .join("staff_id", this.getSpecialtiesIntermediateTableName(), "staff_id")
-                .where(whereClauseBuilder)
-                .distinct();
-
-        return this.selectQuery(queryBuilder.getQueryAsString(), parameterSource);
-    }
-
-    @Override
-    public Set<Staff> findByOfficeAndStaffSpecialties(Collection<Office> offices, Collection<StaffSpecialty> staffSpecialties) {
-        return this.findByNameOfficeAndStaffSpecialties("", offices, staffSpecialties);
-    }
-
-    @Override
-    public Set<Staff> findBySurnameOfficeAndStaffSpecialties(String surname, Collection<Office> offices, Collection<StaffSpecialty> staffSpecialties) {
-        return this.findByNameSurnameOfficeAndStaffSpecialities("", surname, offices, staffSpecialties);
-    }
-
-    @Override
-    public Set<Staff> findByNameAndOffice(String name, Collection<Office> offices) {
-        if (offices.isEmpty() && name.isEmpty())
-            return new HashSet<>();
-
-        name = name.toLowerCase();
-        FilteredCachedCollection<Staff> cachedCollection = this.filterCache(name, "", new LinkedList<>(), offices);
-        if (this.isCacheComplete(cachedCollection)) {
-            return cachedCollection.getCollectionAsSet();
+        JDBCQueryBuilder queryBuilder;
+        if(staffSpecialties.isEmpty()){
+            queryBuilder = new JDBCSelectQueryBuilder()
+                    .selectAll()
+                    .from(this.getTableAlias())
+                    .where(whereClauseBuilder)
+                    .distinct();
+        } else {
+            queryBuilder = new JDBCSelectQueryBuilder()
+                    .selectAll()
+                    .from(this.getTableAlias())
+                    .join("staff_id", this.getSpecialtiesIntermediateTableName(), "staff_id")
+                    .where(whereClauseBuilder)
+                    .distinct();
         }
 
-        Map<String, Object> parameters = new HashMap<>();
-        MapSqlParameterSource parameterSource = new MapSqlParameterSource();
-        JDBCWhereClauseBuilder whereClauseBuilder = new JDBCWhereClauseBuilder();
-
-        this.putFirstNameArguments(name, parameters, whereClauseBuilder);
-        this.putOfficeArguments(offices, parameters, whereClauseBuilder);
-
-        parameterSource.addValues(parameters);
-
-        if (!cachedCollection.getCollection().isEmpty()) {
-            this.excludeModels(cachedCollection.getCompleteCollection(), parameterSource, whereClauseBuilder);
-        }
-
-        JDBCQueryBuilder queryBuilder = new JDBCSelectQueryBuilder()
-                .selectAll()
-                .from(this.getTableAlias())
-                .where(whereClauseBuilder)
-                .distinct();
-
         return this.selectQuery(queryBuilder.getQueryAsString(), parameterSource);
-    }
-
-    @Override
-    public Set<Staff> findByOffice(Collection<Office> offices) {
-        return this.findByFieldIn("office_id", offices);
     }
 
     @Override
@@ -418,7 +142,7 @@ public class StaffDaoImpl extends GenericSearchableDaoImpl<Staff, Integer> imple
         if (firstName.isEmpty())
             return;
 
-        argumentsValues.put("firstName", firstName);
+        argumentsValues.put("firstName", StringSearchType.CONTAINS.transform(firstName));
         whereClauseBuilder
                 .and()
                 .where(this.formatColumnFromName("first_name"), Operation.LIKE, ":firstName", ColumnTransformer.LOWER);
@@ -428,119 +152,28 @@ public class StaffDaoImpl extends GenericSearchableDaoImpl<Staff, Integer> imple
         if (surname.isEmpty())
             return;
 
-        argumentsValues.put("surname", surname);
+        argumentsValues.put("surname", StringSearchType.CONTAINS.transform(surname));
         whereClauseBuilder
                 .and()
                 .where(this.formatColumnFromName("surname"), Operation.LIKE, ":surname", ColumnTransformer.LOWER);
     }
 
     private FilteredCachedCollection<Staff> filterCache(String name, String surname, Collection<StaffSpecialty> staffSpecialties, Collection<Office> offices) {
+        Predicate<Staff> p = staff -> true; // sirve como default porque son todos ANDs (true && other = other)
         if (!name.isEmpty()) {
-            if (!surname.isEmpty()) {
-                if (!staffSpecialties.isEmpty()) {
-                    if (!offices.isEmpty()) {
-                        return CacheHelper.filter(
-                                Staff.class,
-                                Integer.class,
-                                staff -> staff.getFirstName().toLowerCase().contains(name) &&
-                                        staff.getSurname().toLowerCase().contains(surname) &&
-                                        offices.contains(staff.getOffice()) &&
-                                        staff.getStaffSpecialties().containsAll(staffSpecialties)
-                        );
-                    } else {
-                        return CacheHelper.filter(
-                                Staff.class,
-                                Integer.class,
-                                staff -> staff.getFirstName().toLowerCase().contains(name) &&
-                                        staff.getSurname().toLowerCase().contains(surname) &&
-                                        staff.getStaffSpecialties().containsAll(staffSpecialties)
-                        );
-                    }
-                } else {
-                    if (!offices.isEmpty()) {
-                        return CacheHelper.filter(
-                                Staff.class,
-                                Integer.class,
-                                staff -> staff.getFirstName().toLowerCase().contains(name) &&
-                                        staff.getSurname().toLowerCase().contains(surname) &&
-                                        offices.contains(staff.getOffice())
-                        );
-                    } else {
-                        return CacheHelper.filter(
-                                Staff.class,
-                                Integer.class,
-                                staff -> staff.getFirstName().toLowerCase().contains(name) &&
-                                        staff.getSurname().toLowerCase().contains(surname)
-                        );
-                    }
-                }
-            } else {
-                if (!staffSpecialties.isEmpty()) {
-                    if (!offices.isEmpty()) {
-                        return CacheHelper.filter(
-                                Staff.class,
-                                Integer.class,
-                                staff -> staff.getFirstName().toLowerCase().contains(name) &&
-                                        offices.contains(staff.getOffice()) &&
-                                        staff.getStaffSpecialties().containsAll(staffSpecialties)
-                        );
-                    } else {
-                        return CacheHelper.filter(
-                                Staff.class,
-                                Integer.class,
-                                staff -> staff.getFirstName().toLowerCase().contains(name) &&
-                                        staff.getStaffSpecialties().containsAll(staffSpecialties)
-                        );
-                    }
-                } else {
-                    if (!offices.isEmpty()) {
-                        return CacheHelper.filter(
-                                Staff.class,
-                                Integer.class,
-                                staff -> staff.getFirstName().toLowerCase().contains(name) &&
-                                        offices.contains(staff.getOffice())
-                        );
-                    } else {
-                        return CacheHelper.filter(
-                                Staff.class,
-                                Integer.class,
-                                staff -> staff.getFirstName().toLowerCase().contains(name)
-                        );
-                    }
-                }
-            }
-        } else {
-            if (!staffSpecialties.isEmpty()) {
-                if (!offices.isEmpty()) {
-                    return CacheHelper.filter(
-                            Staff.class,
-                            Integer.class,
-                            staff -> offices.contains(staff.getOffice()) &&
-                                    staff.getStaffSpecialties().containsAll(staffSpecialties)
-                    );
-                } else {
-                    return CacheHelper.filter(
-                            Staff.class,
-                            Integer.class,
-                            staff -> staff.getStaffSpecialties().containsAll(staffSpecialties)
-                    );
-                }
-            } else {
-                if (!offices.isEmpty()) {
-                    return CacheHelper.filter(
-                            Staff.class,
-                            Integer.class,
-                            staff -> offices.contains(staff.getOffice())
-                    );
-                } else {
-                    return CacheHelper.filter(
-                            Staff.class,
-                            Integer.class,
-                            staff -> true
-                    );
-                }
-            }
+            p = p.and(staff -> staff.getFirstName().toLowerCase().contains(name));
         }
+        if(!surname.isEmpty()) {
+            p = p.and(staff -> staff.getSurname().toLowerCase().contains(surname));
+        }
+        if(!staffSpecialties.isEmpty()) {
+            p = p.and(staff -> staff.getStaffSpecialties().containsAll(staffSpecialties));
+        }
+        if(!offices.isEmpty()) {
+            p = p.and(staff -> offices.contains(staff.getOffice()));
+        }
+        // else p = staff -> true, quiero que no me filtre nada si todos son empty
+        return CacheHelper.filter(Staff.class, Integer.class, p);
     }
 
     private String getSpecialtiesIntermediateTableName() {

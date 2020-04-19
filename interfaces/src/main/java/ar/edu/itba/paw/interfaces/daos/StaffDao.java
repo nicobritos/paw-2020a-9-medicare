@@ -9,31 +9,17 @@ import java.util.Collection;
 import java.util.Set;
 
 public interface StaffDao extends GenericSearchableDao<Staff, Integer> {
-    Set<Staff> findBySurname(String surname);
-
-    Set<Staff> findByOffice(Collection<Office> offices);
-
-    Set<Staff> findByStaffSpecialties(Collection<StaffSpecialty> staffSpecialties);
-
-    Set<Staff> findByNameAndSurname(String name, String surname);
-
-    Set<Staff> findByNameAndOffice(String name, Collection<Office> offices);
-
-    Set<Staff> findByNameAndStaffSpecialties(String name, Collection<StaffSpecialty> staffSpecialties);
-
-    Set<Staff> findBySurnameAndOffice(String surname, Collection<Office> offices);
-
-    Set<Staff> findBySurnameAndStaffSpecialties(String surname, Collection<StaffSpecialty> staffSpecialties);
-
-    Set<Staff> findByOfficeAndStaffSpecialties(Collection<Office> offices, Collection<StaffSpecialty> staffSpecialties);
-
-    Set<Staff> findBySurnameOfficeAndStaffSpecialties(String surname, Collection<Office> offices, Collection<StaffSpecialty> staffSpecialties);
-
-    Set<Staff> findByNameOfficeAndStaffSpecialties(String name, Collection<Office> offices, Collection<StaffSpecialty> staffSpecialties);
-
-    Set<Staff> findByNameSurnameAndStaffSpecialties(String name, String surname, Collection<StaffSpecialty> staffSpecialties);
-
-    Set<Staff> findByNameSurnameAndOffice(String name, String surname, Collection<Office> offices);
-
-    Set<Staff> findByNameSurnameOfficeAndStaffSpecialities(String name, String surname, Collection<Office> offices, Collection<StaffSpecialty> staffSpecialties);
+    /**
+     *
+     * @param name if not null nor empty String, the search will filter the list by staff's name that
+     *             contains the string (ignoring case)
+     * @param surname if not null nor empty String, the search will filter the list by staff's surname that
+     *                contains the string (ignoring case)
+     * @param offices if not null nor empty collection, the search will include only those staffs
+     *                that work for any of the offices in the collection
+     * @param staffSpecialties if not null nor empty collection, the search will include only those staffs
+     *                         that has any of the specialties in the collection
+     * @return the filtered set
+     */
+    Set<Staff> findBy(String name, String surname, Collection<Office> offices, Collection<StaffSpecialty> staffSpecialties);
 }

@@ -20,8 +20,8 @@
 		let name = txtSearchName.value ? "name=" + txtSearchName.value : "";
 		let surname = txtSearchSurname.value ? "surname=" + txtSearchSurname.value : "";
 		let specialties = id >= 0 ? "specialties=" + id : "";
-		let nameSurnameConnector = name && surname ? "&&" : "";
-		let specialtiesConnector = id>=0 && (name || surname) ? "&&" : "";
+		let nameSurnameConnector = name && surname ? "&" : "";
+		let specialtiesConnector = id>=0 && (name || surname) ? "&" : "";
 		let querySelector = (id>=0 || name || surname) ? "?" : "";
 		location.href = "<c:url value="/mediclist"/>" + querySelector + name + nameSurnameConnector + surname + specialtiesConnector + specialties;
 	};

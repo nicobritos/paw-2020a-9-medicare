@@ -326,7 +326,7 @@ public class StaffDaoImplTest
         this.insertAnotherStaff();
 
         // 2. Ejercitar
-        Collection<Staff> staffs = this.staffDao.findByName(NAME);
+        Collection<Staff> staffs = this.staffDao.findBy(NAME, null, null, null);
 
         // 3. Postcondiciones
         assertNotNull(staffs);
@@ -339,7 +339,7 @@ public class StaffDaoImplTest
         this.cleanAllTables();
 
         // 2. Ejercitar
-        Collection<Staff> staffs = this.staffDao.findByName(NAME);
+        Collection<Staff> staffs = this.staffDao.findBy(NAME, null, null, null);
 
         // 3. Postcondiciones
         assertNotNull(staffs);
@@ -355,7 +355,7 @@ public class StaffDaoImplTest
         this.insertAnotherStaff();
 
         // 2. Ejercitar
-        Collection<Staff> staffs = this.staffDao.findBySurname(SURNAME);
+        Collection<Staff> staffs = this.staffDao.findBy(null, SURNAME, null, null);
 
         // 3. Postcondiciones
         assertNotNull(staffs);
@@ -368,7 +368,7 @@ public class StaffDaoImplTest
         this.cleanAllTables();
 
         // 2. Ejercitar
-        Collection<Staff> staffs = this.staffDao.findBySurname(SURNAME);
+        Collection<Staff> staffs = this.staffDao.findBy(null, SURNAME, null, null);
 
         // 3. Postcondiciones
         assertNotNull(staffs);
@@ -464,7 +464,7 @@ public class StaffDaoImplTest
         this.insertAnotherStaff();
 
         // 2. Ejercitar
-        Collection<Staff> staffs = this.staffDao.findByNameAndStaffSpecialties(NAME, Collections.singletonList(this.staffSpecialtyModel()));
+        Collection<Staff> staffs = this.staffDao.findBy(NAME, null, null, Collections.singletonList(this.staffSpecialtyModel()));
 
         // 3. Postcondiciones
         assertNotNull(staffs);
@@ -477,7 +477,7 @@ public class StaffDaoImplTest
         this.cleanAllTables();
 
         // 2. Ejercitar
-        Collection<Staff> staffs = this.staffDao.findByNameAndStaffSpecialties(NAME, Collections.singletonList(this.staffSpecialtyModel()));
+        Collection<Staff> staffs = this.staffDao.findBy(NAME, null, null, Collections.singletonList(this.staffSpecialtyModel()));
 
         // 3. Postcondiciones
         assertNotNull(staffs);
@@ -492,7 +492,7 @@ public class StaffDaoImplTest
         this.insertAnotherStaff();
 
         // 2. Ejercitar
-        Collection<Staff> staffs = this.staffDao.findByNameOfficeAndStaffSpecialties(NAME, Collections.singletonList(this.officeModel()), Collections.singletonList(this.staffSpecialtyModel()));
+        Collection<Staff> staffs = this.staffDao.findBy(NAME, null, Collections.singletonList(this.officeModel()), Collections.singletonList(this.staffSpecialtyModel()));
 
         // 3. Postcondiciones
         assertNotNull(staffs);
@@ -505,7 +505,7 @@ public class StaffDaoImplTest
         this.cleanAllTables();
 
         // 2. Ejercitar
-        Collection<Staff> staffs = this.staffDao.findByNameOfficeAndStaffSpecialties(NAME, Collections.singletonList(this.officeModel()), Collections.singletonList(this.staffSpecialtyModel()));
+        Collection<Staff> staffs = this.staffDao.findBy(NAME, null, Collections.singletonList(this.officeModel()), Collections.singletonList(this.staffSpecialtyModel()));
 
         // 3. Postcondiciones
         assertNotNull(staffs);
@@ -520,7 +520,7 @@ public class StaffDaoImplTest
         this.insertAnotherStaff();
 
         // 2. Ejercitar
-        Collection<Staff> staffs = this.staffDao.findByOfficeAndStaffSpecialties(Collections.singletonList(this.officeModel()), Collections.singletonList(this.staffSpecialtyModel()));
+        Collection<Staff> staffs = this.staffDao.findBy(null, null, Collections.singletonList(this.officeModel()), Collections.singletonList(this.staffSpecialtyModel()));
 
         // 3. Postcondiciones
         assertNotNull(staffs);
@@ -533,7 +533,7 @@ public class StaffDaoImplTest
         this.cleanAllTables();
 
         // 2. Ejercitar
-        Collection<Staff> staffs = this.staffDao.findByOfficeAndStaffSpecialties(Collections.singletonList(this.officeModel()), Collections.singletonList(this.staffSpecialtyModel()));
+        Collection<Staff> staffs = this.staffDao.findBy(null, null, Collections.singletonList(this.officeModel()), Collections.singletonList(this.staffSpecialtyModel()));
 
         // 3. Postcondiciones
         assertNotNull(staffs);
@@ -548,7 +548,7 @@ public class StaffDaoImplTest
         this.insertAnotherStaff();
 
         // 2. Ejercitar
-        Collection<Staff> staffs = this.staffDao.findByStaffSpecialties(Collections.singletonList(this.staffSpecialtyModel()));
+        Collection<Staff> staffs = this.staffDao.findBy(null, null, null, Collections.singletonList(this.staffSpecialtyModel()));
 
         // 3. Postcondiciones
         assertNotNull(staffs);
@@ -561,7 +561,7 @@ public class StaffDaoImplTest
         this.cleanAllTables();
 
         // 2. Ejercitar
-        Collection<Staff> staffs = this.staffDao.findByStaffSpecialties(Collections.singletonList(this.staffSpecialtyModel()));
+        Collection<Staff> staffs = this.staffDao.findBy(null, null, null, Collections.singletonList(this.staffSpecialtyModel()));
 
         // 3. Postcondiciones
         assertNotNull(staffs);
