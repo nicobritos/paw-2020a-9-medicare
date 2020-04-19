@@ -1,4 +1,5 @@
 <div id="navbar">
+    <div class="container d-flex justify-content-center">
 	<input id="txtSearchName" class="form-control d-inline" type="search" placeholder="Buscá por nombre...">
 	<input id="txtSearchSurname" class="form-control d-inline" type="search" placeholder="Buscá por apellido...">
 	<select id="selEspecialidad" class="form-control d-inline">
@@ -16,6 +17,7 @@
 		</c:forEach>
 	</select>
 	<button type="button" class="btn btn-info" id="filtrarBtn">Filtrar</button>
+    </div>
 </div>
 <script>
 	let filtrarBtn = document.getElementById("filtrarBtn");
