@@ -1,6 +1,7 @@
 package ar.edu.itba.paw.persistence;
 
 import ar.edu.itba.paw.interfaces.daos.StaffDao;
+import ar.edu.itba.paw.models.Locality;
 import ar.edu.itba.paw.models.Office;
 import ar.edu.itba.paw.models.Staff;
 import ar.edu.itba.paw.models.StaffSpecialty;
@@ -34,27 +35,30 @@ public class StaffDaoImpl extends GenericSearchableDaoImpl<Staff, Integer> imple
     }
 
     @Override
-    public Set<Staff> findBy(String name, String surname, Collection<Office> offices, Collection<StaffSpecialty> staffSpecialties) {
-        if(name == null) {
+    public Set<Staff> findBy(String name, String surname, Collection<Office> offices, Collection<StaffSpecialty> staffSpecialties, Collection<Locality> localities) {
+        if (name == null) {
             name = "";
         } else {
             name = name.toLowerCase();
         }
-        if(surname == null) {
+        if (surname == null) {
             surname = "";
         } else {
             surname = surname.toLowerCase();
         }
-        if(offices == null){
+        if (offices == null) {
             offices = Collections.emptyList();
         }
-        if(staffSpecialties == null){
+        if (staffSpecialties == null) {
             staffSpecialties = Collections.emptyList();
         }
-        if (staffSpecialties.isEmpty() && offices.isEmpty() && name.isEmpty() && surname.isEmpty())
+        if(localities == null){
+            localities = Collections.emptyList();
+        }
+        if (staffSpecialties.isEmpty() && name.isEmpty() && surname.isEmpty() && offices.isEmpty() && localities.isEmpty())
             return this.list();
 
-        FilteredCachedCollection<Staff> cachedCollection = this.filterCache(name, surname, staffSpecialties, offices);
+        FilteredCachedCollection<Staff> cachedCollection = this.filterCache(name, surname, staffSpecialties, offices, localities);
         if (this.isCacheComplete(cachedCollection)) {
             return cachedCollection.getCollectionAsSet();
         }
@@ -67,6 +71,7 @@ public class StaffDaoImpl extends GenericSearchableDaoImpl<Staff, Integer> imple
         this.putSurnameArgument(surname, parameters, whereClauseBuilder);
         this.putOfficeArguments(offices, parameters, whereClauseBuilder);
         this.putStaffSpecialtyArguments(staffSpecialties, parameters, whereClauseBuilder);
+        this.putLocalityArguments(localities, parameters, whereClauseBuilder);
 
         parameterSource.addValues(parameters);
 
@@ -75,19 +80,38 @@ public class StaffDaoImpl extends GenericSearchableDaoImpl<Staff, Integer> imple
         }
 
         JDBCQueryBuilder queryBuilder;
-        if(staffSpecialties.isEmpty()){
-            queryBuilder = new JDBCSelectQueryBuilder()
-                    .selectAll()
-                    .from(this.getTableAlias())
-                    .where(whereClauseBuilder)
-                    .distinct();
+        if (staffSpecialties.isEmpty()) {
+            if(localities.isEmpty()) {
+                queryBuilder = new JDBCSelectQueryBuilder()
+                        .selectAll()
+                        .from(this.getTableAlias())
+                        .where(whereClauseBuilder)
+                        .distinct();
+            } else {
+                queryBuilder = new JDBCSelectQueryBuilder()
+                        .selectAll()
+                        .from(this.getTableAlias())
+                        .join("office_id", this.getOfficeTable(), "office_id")
+                        .where(whereClauseBuilder)
+                        .distinct();
+            }
         } else {
-            queryBuilder = new JDBCSelectQueryBuilder()
-                    .selectAll()
-                    .from(this.getTableAlias())
-                    .join("staff_id", this.getSpecialtiesIntermediateTableName(), "staff_id")
-                    .where(whereClauseBuilder)
-                    .distinct();
+            if(localities.isEmpty()) {
+                queryBuilder = new JDBCSelectQueryBuilder()
+                        .selectAll()
+                        .from(this.getTableAlias())
+                        .join("staff_id", this.getSpecialtiesIntermediateTableName(), "staff_id")
+                        .where(whereClauseBuilder)
+                        .distinct();
+            } else {
+                queryBuilder = new JDBCSelectQueryBuilder()
+                        .selectAll()
+                        .from(this.getTableAlias())
+                        .join("staff_id", this.getSpecialtiesIntermediateTableName(), "staff_id")
+                        .join("office_id", this.getOfficeTable(), "office_id")
+                        .where(whereClauseBuilder)
+                        .distinct();
+            }
         }
 
         return this.selectQuery(queryBuilder.getQueryAsString(), parameterSource);
@@ -96,6 +120,26 @@ public class StaffDaoImpl extends GenericSearchableDaoImpl<Staff, Integer> imple
     @Override
     protected RowMapper<Staff> getRowMapper() {
         return this.rowMapper;
+    }
+
+    private void putLocalityArguments(Collection<Locality> localities, Map<String, Object> argumentsValues, JDBCWhereClauseBuilder whereClauseBuilder) {
+        if (localities.isEmpty())
+            return;
+
+        Collection<String> arguments = new HashSet<>();
+        int i = 0;
+        for (Locality locality : localities) {
+            String parameter = "_locality_" + i;
+            argumentsValues.put(parameter, locality.getId());
+            arguments.add(":" + parameter);
+            i++;
+        }
+        whereClauseBuilder
+                .and()
+                .in(
+                        formatColumnFromName("locality_id", this.getOfficeTable()),
+                        arguments
+                );
     }
 
     private void putStaffSpecialtyArguments(Collection<StaffSpecialty> staffSpecialties, Map<String, Object> argumentsValues, JDBCWhereClauseBuilder whereClauseBuilder) {
@@ -158,19 +202,22 @@ public class StaffDaoImpl extends GenericSearchableDaoImpl<Staff, Integer> imple
                 .where(this.formatColumnFromName("surname"), Operation.LIKE, ":surname", ColumnTransformer.LOWER);
     }
 
-    private FilteredCachedCollection<Staff> filterCache(String name, String surname, Collection<StaffSpecialty> staffSpecialties, Collection<Office> offices) {
+    private FilteredCachedCollection<Staff> filterCache(String name, String surname, Collection<StaffSpecialty> staffSpecialties, Collection<Office> offices, Collection<Locality> localities) {
         Predicate<Staff> p = staff -> true; // sirve como default porque son todos ANDs (true && other = other)
         if (!name.isEmpty()) {
             p = p.and(staff -> staff.getFirstName().toLowerCase().contains(name));
         }
-        if(!surname.isEmpty()) {
+        if (!surname.isEmpty()) {
             p = p.and(staff -> staff.getSurname().toLowerCase().contains(surname));
         }
-        if(!staffSpecialties.isEmpty()) {
+        if (!staffSpecialties.isEmpty()) {
             p = p.and(staff -> staff.getStaffSpecialties().containsAll(staffSpecialties));
         }
-        if(!offices.isEmpty()) {
+        if (!offices.isEmpty()) {
             p = p.and(staff -> offices.contains(staff.getOffice()));
+        }
+        if (!localities.isEmpty()) {
+            p = p.and(staff -> localities.contains(staff.getOffice().getLocality()));
         }
         // else p = staff -> true, quiero que no me filtre nada si todos son empty
         return CacheHelper.filter(Staff.class, Integer.class, p);
@@ -178,5 +225,9 @@ public class StaffDaoImpl extends GenericSearchableDaoImpl<Staff, Integer> imple
 
     private String getSpecialtiesIntermediateTableName() {
         return "system_staff_specialty_staff";
+    }
+
+    private String getOfficeTable() {
+        return "office";
     }
 }
