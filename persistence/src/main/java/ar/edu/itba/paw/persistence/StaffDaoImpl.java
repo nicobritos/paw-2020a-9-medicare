@@ -79,41 +79,17 @@ public class StaffDaoImpl extends GenericSearchableDaoImpl<Staff, Integer> imple
             this.excludeModels(cachedCollection.getCompleteCollection(), parameterSource, whereClauseBuilder);
         }
 
-        JDBCQueryBuilder queryBuilder;
-        if (staffSpecialties.isEmpty()) {
-            if(localities.isEmpty()) {
-                queryBuilder = new JDBCSelectQueryBuilder()
-                        .selectAll()
-                        .from(this.getTableAlias())
-                        .where(whereClauseBuilder)
-                        .distinct();
-            } else {
-                queryBuilder = new JDBCSelectQueryBuilder()
-                        .selectAll()
-                        .from(this.getTableAlias())
-                        .join("office_id", this.getOfficeTable(), "office_id")
-                        .where(whereClauseBuilder)
-                        .distinct();
-            }
-        } else {
-            if(localities.isEmpty()) {
-                queryBuilder = new JDBCSelectQueryBuilder()
-                        .selectAll()
-                        .from(this.getTableAlias())
-                        .join("staff_id", this.getSpecialtiesIntermediateTableName(), "staff_id")
-                        .where(whereClauseBuilder)
-                        .distinct();
-            } else {
-                queryBuilder = new JDBCSelectQueryBuilder()
-                        .selectAll()
-                        .from(this.getTableAlias())
-                        .join("staff_id", this.getSpecialtiesIntermediateTableName(), "staff_id")
-                        .join("office_id", this.getOfficeTable(), "office_id")
-                        .where(whereClauseBuilder)
-                        .distinct();
-            }
+        JDBCSelectQueryBuilder queryBuilder = new JDBCSelectQueryBuilder()
+                .selectAll()
+                .from(this.getTableAlias())
+                .where(whereClauseBuilder)
+                .distinct();
+        if(!staffSpecialties.isEmpty()) {
+            queryBuilder.join("staff_id", this.getSpecialtiesIntermediateTableName(), "staff_id");
         }
-
+        if(!localities.isEmpty()){
+            queryBuilder.join("office_id", this.getOfficeTable(), "office_id");
+        }
         return this.selectQuery(queryBuilder.getQueryAsString(), parameterSource);
     }
 
