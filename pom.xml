@@ -16,6 +16,9 @@
     <org.hsqldb.version>2.3.1</org.hsqldb.version>
     <org.mockito.version>3.3.3</org.mockito.version>
     <org.ehcache.version>3.8.1</org.ehcache.version>
+    <spring-security.version>4.0.4.RELEASE</spring-security.version>
+    <javax.validation-api.version>1.0.0.GA</javax.validation-api.version>
+    <org.hibernate.validator>4.3.1.Final</org.hibernate.validator>
   </properties>
 
   <dependencyManagement>
@@ -89,6 +92,36 @@
         <artifactId>mockito-core</artifactId>
         <version>${org.mockito.version}</version>
         <scope>test</scope>
+      </dependency>
+
+      <dependency>
+        <groupId>org.springframework.security</groupId>
+        <artifactId>spring-security-core</artifactId>
+        <version>${spring-security.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.springframework.security</groupId>
+        <artifactId>spring-security-web</artifactId>
+        <version>${spring-security.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.springframework.security</groupId>
+        <artifactId>spring-security-config</artifactId>
+        <version>${spring-security.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>javax.validation</groupId>
+        <artifactId>validation-api</artifactId>
+        <version>${javax.validation-api.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.hibernate</groupId>
+        <artifactId>hibernate-validator</artifactId>
+        <version>${org.hibernate.validator}</version>
       </dependency>
     </dependencies>
   </dependencyManagement>

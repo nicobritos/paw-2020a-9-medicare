@@ -39,7 +39,7 @@ public abstract class GenericDaoImpl<M extends GenericModel<M, I>, I> implements
     private static final String ARGUMENT_PREFIX = "_r_";
     protected TransactionTemplate transactionTemplate;
     protected NamedParameterJdbcTemplate jdbcTemplate;
-    private SimpleJdbcInsert jdbcInsert;
+    protected SimpleJdbcInsert jdbcInsert;
     private boolean customPrimaryKey;
     private boolean haveBeenListed;
     private String primaryKeyName;
@@ -59,7 +59,7 @@ public abstract class GenericDaoImpl<M extends GenericModel<M, I>, I> implements
             Table table = mClass.getAnnotation(Table.class);
             this.tableName = table.name();
             this.primaryKeyName = table.primaryKey();
-            this.customPrimaryKey = table.customPrimaryKey();
+            this.customPrimaryKey = table.manualPrimaryKey();
             this.jdbcInsert = new SimpleJdbcInsert(dataSource).withTableName(this.tableName);
             if (!this.customPrimaryKey)
                 this.jdbcInsert.usingGeneratedKeyColumns(this.primaryKeyName);
@@ -432,6 +432,25 @@ public abstract class GenericDaoImpl<M extends GenericModel<M, I>, I> implements
             id = model.getId();
         }
         return this.findById(id).get();
+    }
+
+    protected boolean exists(Map<String, ?> columnsValues) {
+        MapSqlParameterSource parameterSource = new MapSqlParameterSource();
+        parameterSource.addValues(columnsValues);
+        JDBCWhereClauseBuilder whereClauseBuilder = new JDBCWhereClauseBuilder();
+        for (String column : columnsValues.keySet()) {
+            whereClauseBuilder
+                    .and()
+                    .where(column, Operation.EQ, ":" + column);
+        }
+
+        JDBCSelectQueryBuilder selectQueryBuilder = new JDBCSelectQueryBuilder()
+                .select(this.getIdColumnName())
+                .from(this.getTableName())
+                .where(whereClauseBuilder)
+                .limit(1);
+
+        return this.jdbcTemplate.query(selectQueryBuilder.getQueryAsString(), parameterSource, ResultSet::next);
     }
 
     /**

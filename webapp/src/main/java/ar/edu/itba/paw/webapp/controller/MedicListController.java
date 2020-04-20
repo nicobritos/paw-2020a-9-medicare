@@ -16,15 +16,12 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
-
 @Controller
 public class MedicListController {
     @Autowired
     StaffService staffService;
-
     @Autowired
     StaffSpecialtyService specialityService;
-
     @Autowired
     LocalityService localityService;
 
