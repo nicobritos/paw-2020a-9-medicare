@@ -1,3 +1,4 @@
+// TODO: remove an leave register.js for al cases of toggle-visibility
 let toggler = document.getElementById("toggle-visibility");
 let eyes = toggler.getElementsByTagName("img");
 let password = document.getElementById("password");
