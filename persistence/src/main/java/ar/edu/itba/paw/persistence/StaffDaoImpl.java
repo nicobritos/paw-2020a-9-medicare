@@ -14,6 +14,7 @@ import ar.edu.itba.paw.persistence.utils.builder.JDBCWhereClauseBuilder.ColumnTr
 import ar.edu.itba.paw.persistence.utils.builder.JDBCWhereClauseBuilder.Operation;
 import ar.edu.itba.paw.persistence.utils.cache.CacheHelper;
 import ar.edu.itba.paw.persistence.utils.cache.FilteredCachedCollection;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
@@ -39,12 +40,12 @@ public class StaffDaoImpl extends GenericSearchableDaoImpl<Staff, Integer> imple
         if (name == null) {
             name = "";
         } else {
-            name = name.toLowerCase();
+            name = StringUtils.stripAccents(name.toLowerCase());
         }
         if (surname == null) {
             surname = "";
         } else {
-            surname = surname.toLowerCase();
+            surname = StringUtils.stripAccents(surname.toLowerCase());
         }
         if (offices == null) {
             offices = Collections.emptyList();
@@ -162,7 +163,7 @@ public class StaffDaoImpl extends GenericSearchableDaoImpl<Staff, Integer> imple
         if (firstName.isEmpty())
             return;
 
-        argumentsValues.put("firstName", StringSearchType.CONTAINS.transform(firstName));
+        argumentsValues.put("firstName", StringSearchType.CONTAINS_NO_ACC.transform(firstName));
         whereClauseBuilder
                 .and()
                 .where(this.formatColumnFromName("first_name"), Operation.LIKE, ":firstName", ColumnTransformer.LOWER);
@@ -172,7 +173,7 @@ public class StaffDaoImpl extends GenericSearchableDaoImpl<Staff, Integer> imple
         if (surname.isEmpty())
             return;
 
-        argumentsValues.put("surname", StringSearchType.CONTAINS.transform(surname));
+        argumentsValues.put("surname", StringSearchType.CONTAINS_NO_ACC.transform(surname));
         whereClauseBuilder
                 .and()
                 .where(this.formatColumnFromName("surname"), Operation.LIKE, ":surname", ColumnTransformer.LOWER);
@@ -181,10 +182,10 @@ public class StaffDaoImpl extends GenericSearchableDaoImpl<Staff, Integer> imple
     private FilteredCachedCollection<Staff> filterCache(String name, String surname, Collection<StaffSpecialty> staffSpecialties, Collection<Office> offices, Collection<Locality> localities) {
         Predicate<Staff> p = staff -> true; // sirve como default porque son todos ANDs (true && other = other)
         if (!name.isEmpty()) {
-            p = p.and(staff -> staff.getFirstName().toLowerCase().contains(name));
+            p = p.and(staff -> StringUtils.stripAccents(staff.getFirstName().toLowerCase()).contains(name));
         }
         if (!surname.isEmpty()) {
-            p = p.and(staff -> staff.getSurname().toLowerCase().contains(surname));
+            p = p.and(staff -> StringUtils.stripAccents(staff.getSurname().toLowerCase()).contains(surname));
         }
         if (!staffSpecialties.isEmpty()) {
             p = p.and(staff -> staff.getStaffSpecialties().containsAll(staffSpecialties));

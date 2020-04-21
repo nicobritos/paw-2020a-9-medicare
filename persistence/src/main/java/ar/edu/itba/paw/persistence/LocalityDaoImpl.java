@@ -51,7 +51,7 @@ public class LocalityDaoImpl extends GenericSearchableDaoImpl<Locality, Integer>
 
         MapSqlParameterSource parameterSource = new MapSqlParameterSource();
         parameterSource.addValue("province", province.getId());
-        parameterSource.addValue("name", StringSearchType.CONTAINS.transform(name));
+        parameterSource.addValue("name", StringSearchType.CONTAINS_NO_ACC.transform(name));
 
         JDBCWhereClauseBuilder whereClauseBuilder = new JDBCWhereClauseBuilder()
                 .where(this.formatColumnFromName("name"), Operation.LIKE, ":name", ColumnTransformer.LOWER)
