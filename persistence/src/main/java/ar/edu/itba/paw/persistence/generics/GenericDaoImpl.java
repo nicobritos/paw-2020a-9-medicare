@@ -307,7 +307,7 @@ public abstract class GenericDaoImpl<M extends GenericModel<M, I>, I> implements
     }
 
     protected Set<M> findByFieldIgnoreCase(String columnName, Operation operation, String value) {
-        return this.findByFieldIgnoreCase(columnName, operation, value, StringSearchType.CONTAINS);
+        return this.findByFieldIgnoreCase(columnName, operation, value, StringSearchType.CONTAINS_NO_ACC);
     }
 
     protected Set<M> findByFieldIgnoreCase(String columnName, Operation operation, String value, StringSearchType stringSearchType) {
