@@ -1,47 +1,18 @@
-.header{
-    background-color: #00C4BA;
+body, html{
+    height: 100%;
 }
 
-.header-brand{
-    font-weight: bold;
-}
-.header-brand:hover{
-    font-weight: bold;
-    color: white!important;
-}
-
-.header-a-element{
-    color: white;
-}
-.header-a-element:hover{
-    color: #e0e0e0;
-}
-.header-btn-element{
-    color: #00C4BA;
-    font-weight: bold;
-}
-.header-btn-element:hover{
-    color: rgb(0, 160, 152);
-    font-weight: bold;
-}
-
-.green-text{
-    color:#00C4BA;
-}
-
-#navbar-logo{
-    height: 1.5em;
-}
-
-.filter-form{
-    background-color: #00C4BA;
-    border-radius: 1em;
-}
-
-.form-title{
-    color: white;
-}
-
-.form-control{
-    background-color: rgba(214, 214, 214);
+body::after{
+    content: "";
+    background-color: rgb(222, 222, 222);
+    background-image: url("./logo.svg");
+    background-position: center;
+    background-repeat: no-repeat;
+    opacity: 0.5;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
+    position: absolute;
+    z-index: -1;
 }
