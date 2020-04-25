@@ -136,7 +136,7 @@ public class ProvinceDaoImplTest
         insertProvince();
 
         // 2. Ejercitar
-        Set<Province> provinces = this.provinceDao.findByField("name", PROVINCE);
+        Collection<Province> provinces = this.provinceDao.findByField("name", PROVINCE);
 
         // 3. Postcondiciones
         assertNotNull(provinces);
@@ -151,7 +151,7 @@ public class ProvinceDaoImplTest
         cleanAllTables();
 
         // 2. Ejercitar
-        Set<Province> provinces = this.provinceDao.findByField("name", PROVINCE);
+        Collection<Province> provinces = this.provinceDao.findByField("name", PROVINCE);
 
         // 3. Postcondiciones
         assertNotNull(provinces);
@@ -167,7 +167,7 @@ public class ProvinceDaoImplTest
         insertProvince();
 
         // 2. Ejercitar
-        Set<Province> provinces = this.provinceDao.findByField("name", JDBCWhereClauseBuilder.Operation.EQ, PROVINCE);
+        Collection<Province> provinces = this.provinceDao.findByField("name", JDBCWhereClauseBuilder.Operation.EQ, PROVINCE);
 
         // 3. Postcondiciones
         assertNotNull(provinces);
@@ -182,7 +182,7 @@ public class ProvinceDaoImplTest
         cleanAllTables();
 
         // 2. Ejercitar
-        Set<Province> provinces = this.provinceDao.findByField("name", JDBCWhereClauseBuilder.Operation.EQ, PROVINCE);
+        Collection<Province> provinces = this.provinceDao.findByField("name", JDBCWhereClauseBuilder.Operation.EQ, PROVINCE);
 
         // 3. Postcondiciones
         assertNotNull(provinces);

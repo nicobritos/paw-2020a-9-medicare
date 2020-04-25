@@ -140,7 +140,7 @@ public class LocalityDaoImplTest
         insertLocality();
 
         // 2. Ejercitar
-        Set<Locality> localitys = this.localityDao.findByField("name", LOCALITY);
+        Collection<Locality> localitys = this.localityDao.findByField("name", LOCALITY);
 
         // 3. Postcondiciones
         assertNotNull(localitys);
@@ -155,7 +155,7 @@ public class LocalityDaoImplTest
         cleanAllTables();
 
         // 2. Ejercitar
-        Set<Locality> localitys = this.localityDao.findByField("name", LOCALITY);
+        Collection<Locality> localitys = this.localityDao.findByField("name", LOCALITY);
 
         // 3. Postcondiciones
         assertNotNull(localitys);
@@ -171,7 +171,7 @@ public class LocalityDaoImplTest
         insertLocality();
 
         // 2. Ejercitar
-        Set<Locality> localitys = this.localityDao.findByField("name", JDBCWhereClauseBuilder.Operation.EQ, LOCALITY);
+        Collection<Locality> localitys = this.localityDao.findByField("name", JDBCWhereClauseBuilder.Operation.EQ, LOCALITY);
 
         // 3. Postcondiciones
         assertNotNull(localitys);
@@ -186,7 +186,7 @@ public class LocalityDaoImplTest
         cleanAllTables();
 
         // 2. Ejercitar
-        Set<Locality> localitys = this.localityDao.findByField("name", JDBCWhereClauseBuilder.Operation.EQ, LOCALITY);
+        Collection<Locality> localitys = this.localityDao.findByField("name", JDBCWhereClauseBuilder.Operation.EQ, LOCALITY);
 
         // 3. Postcondiciones
         assertNotNull(localitys);

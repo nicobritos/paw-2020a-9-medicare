@@ -136,7 +136,7 @@ public class CountryDaoImplTest
         insertCountry();
 
         // 2. Ejercitar
-        Set<Country> countries = this.countryDao.findByField("name", COUNTRY);
+        Collection<Country> countries = this.countryDao.findByField("name", COUNTRY);
 
         // 3. Postcondiciones
         assertNotNull(countries);
@@ -151,7 +151,7 @@ public class CountryDaoImplTest
         cleanAllTables();
 
         // 2. Ejercitar
-        Set<Country> countries = this.countryDao.findByField("name", COUNTRY);
+        Collection<Country> countries = this.countryDao.findByField("name", COUNTRY);
 
         // 3. Postcondiciones
         assertNotNull(countries);
@@ -166,7 +166,7 @@ public class CountryDaoImplTest
         insertCountry();
 
         // 2. Ejercitar
-        Set<Country> countries = this.countryDao.findByField("name", JDBCWhereClauseBuilder.Operation.EQ, COUNTRY);
+        Collection<Country> countries = this.countryDao.findByField("name", JDBCWhereClauseBuilder.Operation.EQ, COUNTRY);
 
         // 3. Postcondiciones
         assertNotNull(countries);
@@ -179,7 +179,7 @@ public class CountryDaoImplTest
     {
         // 1. Precondiciones
         cleanAllTables();// 2. Ejercitar
-        Set<Country> countries = this.countryDao.findByField("name", JDBCWhereClauseBuilder.Operation.EQ, COUNTRY);
+        Collection<Country> countries = this.countryDao.findByField("name", JDBCWhereClauseBuilder.Operation.EQ, COUNTRY);
 
         // 3. Postcondiciones
         assertNotNull(countries);
