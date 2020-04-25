@@ -214,7 +214,7 @@ public class StaffDaoImpl extends GenericSearchableDaoImpl<Staff, Integer> imple
         if(!otherWhereClause.toString().isEmpty()) {
             whereClauseBuilder = otherWhereClause;
             if(!otherWhereClause.toString().isEmpty()){
-                whereClauseBuilder.and().where(namesWhereClause);
+                whereClauseBuilder.and(namesWhereClause);
             }
         } else {
             whereClauseBuilder = namesWhereClause;

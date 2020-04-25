@@ -64,14 +64,6 @@ public class JDBCWhereClauseBuilder {
 
     private StringBuilder clause = new StringBuilder();
 
-    public JDBCWhereClauseBuilder where(JDBCWhereClauseBuilder whereClauseBuilder) {
-        this.clause
-                .append(" (")
-                .append(whereClauseBuilder.toString())
-                .append(") ");
-        return this;
-    }
-
     public JDBCWhereClauseBuilder where(String columnName, Operation operation, String paramName) {
         return this.where(columnName, operation, paramName, null);
     }
@@ -119,9 +111,37 @@ public class JDBCWhereClauseBuilder {
         return this;
     }
 
+    public JDBCWhereClauseBuilder and(JDBCWhereClauseBuilder whereClauseBuilder) {
+        String otherWhereClause = whereClauseBuilder.getClauseAsString();
+        if (otherWhereClause.isEmpty())
+            return this;
+
+        if (this.clause.length() > 0)
+            this.clause.append(" AND ");
+        this.clause
+                .append(" (")
+                .append(otherWhereClause)
+                .append(") ");
+        return this;
+    }
+
     public JDBCWhereClauseBuilder or() {
         if (this.clause.length() > 0)
             this.clause.append(" OR ");
+        return this;
+    }
+
+    public JDBCWhereClauseBuilder or(JDBCWhereClauseBuilder whereClauseBuilder) {
+        String otherWhereClause = whereClauseBuilder.getClauseAsString();
+        if (otherWhereClause.isEmpty())
+            return this;
+
+        if (this.clause.length() > 0)
+            this.clause.append(" OR ");
+        this.clause
+                .append(" (")
+                .append(otherWhereClause)
+                .append(") ");
         return this;
     }
 
