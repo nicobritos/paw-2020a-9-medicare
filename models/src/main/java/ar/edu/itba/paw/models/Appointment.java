@@ -4,18 +4,23 @@ import ar.edu.itba.paw.persistenceAnnotations.Column;
 import ar.edu.itba.paw.persistenceAnnotations.ManyToOne;
 import ar.edu.itba.paw.persistenceAnnotations.Table;
 
+import java.time.Duration;
 import java.util.Date;
 
 @Table(name = "appointment", primaryKey = "appointment_id")
 public class Appointment extends GenericModel<Appointment, Integer> {
+    public static final int DURATION = 15;
+
     @ManyToOne(name = "status_id", required = true)
     private AppointmentStatus appointmentStatus;
     @ManyToOne(name = "patient_id", required = true)
     private Patient patient;
     @ManyToOne(name = "staff_id", required = true)
     private Staff staff;
-    @Column(name = "date", required = true)
-    private Date date;
+    @Column(name = "from_date", required = true)
+    private Date fromDate;
+    @Column(name = "to_date", required = true)
+    private Date toDate;
 
     public AppointmentStatus getAppointmentStatus() {
         return this.appointmentStatus;
@@ -41,12 +46,24 @@ public class Appointment extends GenericModel<Appointment, Integer> {
         this.staff = staff;
     }
 
-    public Date getDate() {
-        return this.date;
+    public Date getFromDate() {
+        return this.fromDate;
     }
 
-    public void setDate(Date date) {
-        this.date = date;
+    public void setFromDate(Date fromDate) {
+        this.fromDate = fromDate;
+    }
+
+    public Date getToDate() {
+        return this.toDate;
+    }
+
+    public void setToDate(Date toDate) {
+        this.toDate = toDate;
+    }
+
+    public int getDuration() {
+        return (int) Duration.between(this.fromDate.toInstant(), this.toDate.toInstant()).toMinutes();
     }
 
     @Override

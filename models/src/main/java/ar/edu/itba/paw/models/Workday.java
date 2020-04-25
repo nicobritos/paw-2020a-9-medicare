@@ -4,16 +4,16 @@ import ar.edu.itba.paw.persistenceAnnotations.Column;
 import ar.edu.itba.paw.persistenceAnnotations.ManyToOne;
 import ar.edu.itba.paw.persistenceAnnotations.Table;
 
-import java.util.Date;
-
 @Table(name = "workday", primaryKey = "workday_id")
 public class Workday extends GenericModel<Workday, Integer> {
-    @ManyToOne(name = "staff_id", required = true)
+    @ManyToOne(name = "staff_id", required = true, inverse = true)
     private Staff staff;
-    @Column(name = "start_date", required = true)
-    private Date startDate;
-    @Column(name = "end_date", required = true)
-    private Date endDate;
+    @Column(name = "start_hour", required = true)
+    private Integer startHour;
+    @Column(name = "end_hour", required = true)
+    private Integer endHour;
+    @Column(name = "day", required = true)
+    private String day;
 
     public Staff getStaff() {
         return this.staff;
@@ -23,20 +23,28 @@ public class Workday extends GenericModel<Workday, Integer> {
         this.staff = staff;
     }
 
-    public Date getStartDate() {
-        return this.startDate;
+    public Integer getStartHour() {
+        return this.startHour;
     }
 
-    public void setStartDate(Date startDate) {
-        this.startDate = startDate;
+    public void setStartHour(Integer startHour) {
+        this.startHour = startHour;
     }
 
-    public Date getEndDate() {
-        return this.endDate;
+    public Integer getEndHour() {
+        return this.endHour;
     }
 
-    public void setEndDate(Date endDate) {
-        this.endDate = endDate;
+    public void setEndHour(Integer endHour) {
+        this.endHour = endHour;
+    }
+
+    public String getDay() {
+        return this.day;
+    }
+
+    public void setDay(String day) {
+        this.day = day;
     }
 
     @Override

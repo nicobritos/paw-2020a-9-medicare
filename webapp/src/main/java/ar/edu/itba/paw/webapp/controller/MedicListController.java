@@ -16,7 +16,10 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
 
 
 @Controller
@@ -83,7 +86,7 @@ public class MedicListController {
             Set<String> words = new HashSet<>(Arrays.asList(name.split(" ")));
             staffList = new HashSet<>(this.staffService.findBy(words, words, null, searchedSpecialties, searchedLocalities, page));
         } else{
-            staffList = this.staffService.findBy((String)null, null, null, searchedSpecialties, searchedLocalities, page);
+            staffList = this.staffService.findBy("", null, null, searchedSpecialties, searchedLocalities, page);
         }
 
         Collection<StaffSpecialty> specialtiesList = this.specialityService.list();

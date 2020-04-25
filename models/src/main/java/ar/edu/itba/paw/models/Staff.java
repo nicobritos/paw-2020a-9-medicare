@@ -1,9 +1,6 @@
 package ar.edu.itba.paw.models;
 
-import ar.edu.itba.paw.persistenceAnnotations.Column;
-import ar.edu.itba.paw.persistenceAnnotations.ManyToMany;
-import ar.edu.itba.paw.persistenceAnnotations.ManyToOne;
-import ar.edu.itba.paw.persistenceAnnotations.Table;
+import ar.edu.itba.paw.persistenceAnnotations.*;
 
 import java.util.Collection;
 import java.util.LinkedList;
@@ -24,6 +21,8 @@ public class Staff extends GenericModel<Staff, Integer> {
     private Collection<StaffSpecialty> staffSpecialties = new LinkedList<>();
     @ManyToOne(name = "office_id", inverse = true)
     private Office office;
+    @OneToMany(name = "staff_id", className = Workday.class)
+    private Collection<Workday> workdays;
 
     public String getFirstName() {
         return this.firstName;
@@ -67,6 +66,10 @@ public class Staff extends GenericModel<Staff, Integer> {
 
     public Collection<StaffSpecialty> getStaffSpecialties() {
         return this.staffSpecialties;
+    }
+
+    public Collection<Workday> getWorkdays() {
+        return this.workdays;
     }
 
     public Office getOffice() {

@@ -15,13 +15,5 @@ public interface GenericService<M extends GenericModel<M, I>, I> {
 
     Collection<M> findByIds(Collection<I> ids);
 
-    M create(M model);
-
-    void update(M model);
-
-    void remove(M model);
-
-    void remove(I id);
-
     Collection<M> list();
 }
