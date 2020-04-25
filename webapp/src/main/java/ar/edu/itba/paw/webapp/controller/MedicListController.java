@@ -8,13 +8,15 @@ import ar.edu.itba.paw.models.Staff;
 import ar.edu.itba.paw.models.StaffSpecialty;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
+import org.springframework.web.util.UriComponentsBuilder;
 
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 
 @Controller
@@ -28,8 +30,20 @@ public class MedicListController {
     @Autowired
     LocalityService localityService;
 
-    @RequestMapping(value = "/mediclist")
-    public ModelAndView medicsList(@RequestParam(value = "name",required = false)String name, @RequestParam(value = "surname",required = false)String surname, @RequestParam(value = "specialties",required = false) String specialties, @RequestParam(value = "localities",required = false) String localities){
+    @RequestMapping(value = "/mediclist/{page}")
+    public ModelAndView medicsList(@RequestParam(value = "name",required = false)String name, @RequestParam(value = "specialties",required = false) String specialties, @RequestParam(value = "localities",required = false) String localities, @PathVariable("page") int page){
+        if(page<=0){ //TODO: redirect instead of doing this
+            MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
+            if(name != null)
+                params.add("name", name);
+            if(specialties != null)
+                params.add("specialties", specialties);
+            if(localities != null)
+                params.add("localities", localities);
+            UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromUriString("/mediclist/1")
+                    .queryParams(params);
+            return new ModelAndView("redirect:"+ uriBuilder.toUriString());
+        }
         //get modelandview from index.jsp
         final ModelAndView mav = new ModelAndView("index");
         //staff variable that will be passed to the jsp
@@ -64,7 +78,14 @@ public class MedicListController {
                 }
             }
         }
-        staffList = this.staffService.findBy(name, surname, null, searchedSpecialties, searchedLocalities);
+
+        if(name != null) {
+            Set<String> words = new HashSet<>(Arrays.asList(name.split(" ")));
+            staffList = new HashSet<>(this.staffService.findBy(words, words, null, searchedSpecialties, searchedLocalities, page));
+        } else{
+            staffList = this.staffService.findBy((String)null, null, null, searchedSpecialties, searchedLocalities, page);
+        }
+
         Collection<StaffSpecialty> specialtiesList = this.specialityService.list();
         Collection<Locality> localitiesList = this.localityService.list();
 
@@ -72,6 +93,10 @@ public class MedicListController {
         mav.addObject("staff", staffList);
         mav.addObject("specialties",specialtiesList);
         mav.addObject("localities",localitiesList);
+        mav.addObject("name", name);
+        mav.addObject("selSpeciality", specialties);
+        mav.addObject("selLocality", localities);
+
 
         return mav;
     }

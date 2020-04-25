@@ -149,7 +149,7 @@ public class JDBCWhereClauseBuilder {
     }
 
     public String getClauseAsString() {
-        return this.clause.toString() + " ";
+        return this.clause.toString().isEmpty()? "" : this.clause.toString()+ " ";
     }
 
     @Override

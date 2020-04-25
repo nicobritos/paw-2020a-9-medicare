@@ -125,6 +125,37 @@ public class CacheHelper {
         );
     }
 
+    public static synchronized <M extends GenericModel<M, I>, I> FilteredCachedCollection<M> filter(Class<M> mClass, Class<I> iClass, Predicate<M> mPredicate, int limit, int offset) { //TODO
+        if (!cacheEnabled)
+            return new FilteredCachedCollection<>();
+
+        Cache<I, M> cache = cacheManager.getCache(mClass.getName(), iClass, mClass);
+        if (cache == null) {
+            createCache(mClass, iClass);
+            return new FilteredCachedCollection<>(CachedCollectionStatus.COMPLETE);
+        }
+
+        List<M> models = new LinkedList<>();
+        List<M> allModels = new LinkedList<>();
+        for (Cache.Entry<I, M> entry : cache) {
+            M model = ProxyHelper.copyInstance(entry.getValue());
+            if (mPredicate.test(entry.getValue())) {
+                try {
+                    ProxyHelper.setField(model, ReflectionGetterSetter.getFieldByName(CACHED_MODEL_FIELD_NAME, mClass), true);
+                } catch (NoSuchFieldException ignored) {
+                }
+                models.add(model);
+            }
+            allModels.add(model);
+        }
+
+        return new FilteredCachedCollection<>(
+                allModels,
+                models,
+                sizes.get(mClass.getName()) == allModels.size() ? CachedCollectionStatus.COMPLETE : CachedCollectionStatus.INCOMPLETE
+        );
+    }
+
     public static synchronized <M extends GenericModel<M, I>, I> void remove(Class<M> mClass, Class<I> iClass, I id) {
         if (!cacheEnabled)
             return;

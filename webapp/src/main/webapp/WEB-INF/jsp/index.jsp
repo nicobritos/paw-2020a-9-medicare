@@ -34,5 +34,29 @@
                 </c:forEach>
             </table>
         </div>
+        <div id="paging" class="p-3 container w-100 justify-content-center">
+            <c:if test="${page > 1}">
+                <button type="button" class="btn btn-info btn-sm" id="prevButton"><</button>
+            </c:if>
+
+            <p class="d-inline mx-2">Página <c:out value="${page}"/></p>
+            <c:if test="${staff.size() == 10}">
+                <button type="button" class="btn btn-info btn-sm" id="nextButton">></button>
+            </c:if>
+        </div>
+        <script>
+            let prevButton = document.getElementById("prevButton");
+            let nextButton = document.getElementById("nextButton");
+            if(prevButton!=null){
+                prevButton.onclick= ()=>{
+                    location.href="<c:url value="/mediclist/${page-1}"/>" + location.search;
+                }
+            }
+            if(nextButton!=null){
+                nextButton.onclick= ()=>{
+                    location.href="<c:url value="/mediclist/${page+1}"/>" + location.search;
+                }
+            }
+        </script>
     </body>
 </html>

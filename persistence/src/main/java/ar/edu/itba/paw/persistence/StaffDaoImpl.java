@@ -23,9 +23,11 @@ import org.springframework.stereotype.Repository;
 import javax.sql.DataSource;
 import java.util.*;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 @Repository
 public class StaffDaoImpl extends GenericSearchableDaoImpl<Staff, Integer> implements StaffDao {
+    private static final int DEFAULT_PAGE_SIZE = 10;
     private final RowMapper<Staff> rowMapper = (resultSet, rowNum) -> this.hydrate(resultSet);
     public static final String TABLE_NAME = getTableNameFromModel(Staff.class);
     public static final String PRIMARY_KEY_NAME = getPrimaryKeyNameFromModel(Staff.class);
@@ -85,6 +87,147 @@ public class StaffDaoImpl extends GenericSearchableDaoImpl<Staff, Integer> imple
                 .from(this.getTableAlias())
                 .where(whereClauseBuilder)
                 .distinct();
+        if(!staffSpecialties.isEmpty()) {
+            queryBuilder.join("staff_id", this.getSpecialtiesIntermediateTableName(), "staff_id");
+        }
+        if(!localities.isEmpty()){
+            queryBuilder.join("office_id", this.getOfficeTable(), "office_id");
+        }
+        return this.selectQuery(queryBuilder.getQueryAsString(), parameterSource);
+    }
+
+    @Override
+    public Set<Staff> findBy(String name, String surname, Collection<Office> offices, Collection<StaffSpecialty> staffSpecialties, Collection<Locality> localities, int page, int pageSize) {
+        if(page<=0)
+            page = 1;
+
+        if(pageSize<=0)
+            pageSize=DEFAULT_PAGE_SIZE;
+
+        if (name == null) {
+            name = "";
+        } else {
+            name = name.toLowerCase();
+        }
+        if (surname == null) {
+            surname = "";
+        } else {
+            surname = surname.toLowerCase();
+        }
+        if (offices == null) {
+            offices = Collections.emptyList();
+        }
+        if (staffSpecialties == null) {
+            staffSpecialties = Collections.emptyList();
+        }
+        if(localities == null){
+            localities = Collections.emptyList();
+        }
+
+        FilteredCachedCollection<Staff> cachedCollection = this.filterCache(name, surname, staffSpecialties, offices, localities, page, pageSize);
+        if (this.isCacheComplete(cachedCollection)) {
+            return cachedCollection.getCollectionAsSet().stream().skip((page-1)*pageSize).limit(pageSize).collect(Collectors.toSet()); //TODO: sacar cuando filter limite resultados
+        }
+
+        Map<String, Object> parameters = new HashMap<>();
+        MapSqlParameterSource parameterSource = new MapSqlParameterSource();
+        JDBCWhereClauseBuilder whereClauseBuilder = new JDBCWhereClauseBuilder();
+
+        this.putFirstNameArguments(name, parameters, whereClauseBuilder);
+        this.putSurnameArgument(surname, parameters, whereClauseBuilder);
+        this.putOfficeArguments(offices, parameters, whereClauseBuilder);
+        this.putStaffSpecialtyArguments(staffSpecialties, parameters, whereClauseBuilder);
+        this.putLocalityArguments(localities, parameters, whereClauseBuilder);
+
+        parameterSource.addValues(parameters);
+
+        if (!cachedCollection.getCollection().isEmpty()) {
+            this.excludeModels(cachedCollection.getCompleteCollection(), parameterSource, whereClauseBuilder);
+        }
+
+        JDBCSelectQueryBuilder queryBuilder = new JDBCSelectQueryBuilder()
+                .selectAll()
+                .from(this.getTableAlias())
+                .where(whereClauseBuilder)
+                .distinct()
+                .limit(pageSize)
+                .offset((page-1)*pageSize);
+        if(!staffSpecialties.isEmpty()) {
+            queryBuilder.join("staff_id", this.getSpecialtiesIntermediateTableName(), "staff_id");
+        }
+        if(!localities.isEmpty()){
+            queryBuilder.join("office_id", this.getOfficeTable(), "office_id");
+        }
+        return this.selectQuery(queryBuilder.getQueryAsString(), parameterSource);
+    }
+
+    @Override
+    public Set<Staff> findBy(Collection<String> names, Collection<String> surnames, Collection<Office> offices, Collection<StaffSpecialty> staffSpecialties, Collection<Locality> localities, int page, int pageSize) {
+        if(page<=0)
+            page = 1;
+
+        if(pageSize<=0)
+            pageSize = DEFAULT_PAGE_SIZE;
+
+        if (names == null) {
+            names = Collections.emptyList();
+        } else {
+            names = names.stream().map(String::toLowerCase).collect(Collectors.toList());
+        }
+        if (surnames == null) {
+            surnames = Collections.emptyList();
+        } else {
+            surnames = surnames.stream().map(String::toLowerCase).collect(Collectors.toList());
+        }
+        if (offices == null) {
+            offices = Collections.emptyList();
+        }
+        if (staffSpecialties == null) {
+            staffSpecialties = Collections.emptyList();
+        }
+        if(localities == null){
+            localities = Collections.emptyList();
+        }
+
+//        FilteredCachedCollection<Staff> cachedCollection = this.filterCache(names, surnames, staffSpecialties, offices, localities, page, pageSize);
+//        if (this.isCacheComplete(cachedCollection)) {
+//            return cachedCollection.getCollectionAsSet().stream().skip((page-1)*pageSize).limit(pageSize).collect(Collectors.toSet()); //TODO: sacar cuando filter limite resultados
+//        }
+
+        Map<String, Object> parameters = new HashMap<>();
+        MapSqlParameterSource parameterSource = new MapSqlParameterSource();
+        JDBCWhereClauseBuilder otherWhereClause = new JDBCWhereClauseBuilder();
+        JDBCWhereClauseBuilder namesWhereClause = new JDBCWhereClauseBuilder();
+
+        this.putFirstNamesArguments(names, parameters, namesWhereClause);
+        this.putSurnamesArguments(surnames, parameters, namesWhereClause);
+        this.putOfficeArguments(offices, parameters, otherWhereClause);
+        this.putStaffSpecialtyArguments(staffSpecialties, parameters, otherWhereClause);
+        this.putLocalityArguments(localities, parameters, otherWhereClause);
+
+        parameterSource.addValues(parameters);
+
+//        if (!cachedCollection.getCollection().isEmpty()) {
+//            this.excludeModels(cachedCollection.getCompleteCollection(), parameterSource, whereClauseBuilder);
+//        }
+
+        JDBCWhereClauseBuilder whereClauseBuilder;
+        if(!otherWhereClause.toString().isEmpty()) {
+            whereClauseBuilder = otherWhereClause;
+            if(!otherWhereClause.toString().isEmpty()){
+                whereClauseBuilder.and().where(namesWhereClause);
+            }
+        } else {
+            whereClauseBuilder = namesWhereClause;
+        }
+
+        JDBCSelectQueryBuilder queryBuilder = new JDBCSelectQueryBuilder()
+                .selectAll()
+                .from(this.getTableAlias())
+                .where(whereClauseBuilder)
+                .distinct()
+                .limit(pageSize)
+                .offset((page-1)*pageSize);
         if(!staffSpecialties.isEmpty()) {
             queryBuilder.join("staff_id", this.getSpecialtiesIntermediateTableName(), "staff_id");
         }
@@ -159,6 +302,42 @@ public class StaffDaoImpl extends GenericSearchableDaoImpl<Staff, Integer> imple
                 );
     }
 
+    private void putFirstNamesArguments(Collection<String> names, Map<String, Object> argumentsValues, JDBCWhereClauseBuilder whereClauseBuilder) {
+        if (names.isEmpty())
+            return;
+
+        int i = 0;
+        for (String name : names) {
+            if (!name.isEmpty()) {
+                String parameter = "_firstName_" + i;
+                argumentsValues.put(parameter, StringSearchType.CONTAINS_NO_ACC.transform(name));
+
+                whereClauseBuilder
+                        .or()
+                        .where(this.formatColumnFromName("first_name"), Operation.LIKE, ":_firstName_" + i, ColumnTransformer.LOWER);
+                i++;
+            }
+        }
+    }
+
+    private void putSurnamesArguments(Collection<String> surnames, Map<String, Object> argumentsValues, JDBCWhereClauseBuilder whereClauseBuilder) {
+        if (surnames.isEmpty())
+            return;
+
+        int i = 0;
+        for (String surname : surnames) {
+            if (!surname.isEmpty()) {
+                String parameter = "_surname_" + i;
+                argumentsValues.put(parameter, StringSearchType.CONTAINS_NO_ACC.transform(surname));
+
+                whereClauseBuilder
+                        .or()
+                        .where(this.formatColumnFromName("surname"), Operation.LIKE, ":_surname_" + i, ColumnTransformer.LOWER);
+                i++;
+            }
+        }
+    }
+
     private void putFirstNameArguments(String firstName, Map<String, Object> argumentsValues, JDBCWhereClauseBuilder whereClauseBuilder) {
         if (firstName.isEmpty())
             return;
@@ -198,6 +377,27 @@ public class StaffDaoImpl extends GenericSearchableDaoImpl<Staff, Integer> imple
         }
         // else p = staff -> true, quiero que no me filtre nada si todos son empty
         return CacheHelper.filter(Staff.class, Integer.class, p);
+    }
+
+    private FilteredCachedCollection<Staff> filterCache(String name, String surname, Collection<StaffSpecialty> staffSpecialties, Collection<Office> offices, Collection<Locality> localities, int page, int pageSize) {
+        Predicate<Staff> p = staff -> true; // sirve como default porque son todos ANDs (true && other = other)
+        if (!name.isEmpty()) {
+            p = p.and(staff -> staff.getFirstName().toLowerCase().contains(name));
+        }
+        if (!surname.isEmpty()) {
+            p = p.and(staff -> staff.getSurname().toLowerCase().contains(surname));
+        }
+        if (!staffSpecialties.isEmpty()) {
+            p = p.and(staff -> staff.getStaffSpecialties().containsAll(staffSpecialties));
+        }
+        if (!offices.isEmpty()) {
+            p = p.and(staff -> offices.contains(staff.getOffice()));
+        }
+        if (!localities.isEmpty()) {
+            p = p.and(staff -> localities.contains(staff.getOffice().getLocality()));
+        }
+        // else p = staff -> true, quiero que no me filtre nada si todos son empty
+        return CacheHelper.filter(Staff.class, Integer.class, p, pageSize, (page-1)*pageSize);
     }
 
     private String getSpecialtiesIntermediateTableName() {
