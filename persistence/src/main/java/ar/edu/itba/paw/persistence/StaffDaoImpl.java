@@ -310,7 +310,7 @@ public class StaffDaoImpl extends GenericSearchableDaoImpl<Staff, Integer> imple
         for (String name : names) {
             if (!name.isEmpty()) {
                 String parameter = "_firstName_" + i;
-                argumentsValues.put(parameter, StringSearchType.CONTAINS.transform(name));
+                argumentsValues.put(parameter, StringSearchType.CONTAINS_NO_ACC.transform(name));
 
                 whereClauseBuilder
                         .or()
@@ -328,7 +328,7 @@ public class StaffDaoImpl extends GenericSearchableDaoImpl<Staff, Integer> imple
         for (String surname : surnames) {
             if (!surname.isEmpty()) {
                 String parameter = "_surname_" + i;
-                argumentsValues.put(parameter, StringSearchType.CONTAINS.transform(surname));
+                argumentsValues.put(parameter, StringSearchType.CONTAINS_NO_ACC.transform(surname));
 
                 whereClauseBuilder
                         .or()
