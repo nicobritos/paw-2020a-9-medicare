@@ -32,6 +32,6 @@
 		let specialtiesConnector = specialtyId>=0 && name ? "&" : "";
 		let localitiesConnector = localityId>=0 && (name || specialtyId>=0) ? "&" : "";
 		let querySelector = (name  || specialtyId>=0 || localityId>=0) ? "?" : "";
-		location.href = "<c:url value="/mediclist"/>" + querySelector + name + specialtiesConnector + specialties + localitiesConnector + localities;
+		location.href = "<c:url value="/mediclist/1"/>" + querySelector + name + specialtiesConnector + specialties + localitiesConnector + localities;
 	};
 </script>

@@ -11,7 +11,7 @@
     <h2 class="display-5 mt-5 green-text">Encontra médicos de forma rápida y fácil</h2>
 </div>
 <div class="container h-50 justify-content-center">
-    <form class="filter-form p-3" action="/mediclist">
+    <form class="filter-form p-3" action="/mediclist/1">
         <div class="form-row">
             <div class="col">
                 <h2 class="ml-5 mt-3 form-title">Buscar médico</h2>

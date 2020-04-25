@@ -8,9 +8,13 @@ import ar.edu.itba.paw.models.Staff;
 import ar.edu.itba.paw.models.StaffSpecialty;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import java.util.*;
 
@@ -26,8 +30,20 @@ public class MedicListController {
     @Autowired
     LocalityService localityService;
 
-    @RequestMapping(value = "/mediclist")
-    public ModelAndView medicsList(@RequestParam(value = "name",required = false)String name, @RequestParam(value = "specialties",required = false) String specialties, @RequestParam(value = "localities",required = false) String localities){
+    @RequestMapping(value = "/mediclist/{page}")
+    public ModelAndView medicsList(@RequestParam(value = "name",required = false)String name, @RequestParam(value = "specialties",required = false) String specialties, @RequestParam(value = "localities",required = false) String localities, @PathVariable("page") int page){
+        if(page<=0){ //TODO: redirect instead of doing this
+            MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
+            if(name != null)
+                params.add("name", name);
+            if(specialties != null)
+                params.add("specialties", specialties);
+            if(localities != null)
+                params.add("localities", localities);
+            UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromUriString("/mediclist/1")
+                    .queryParams(params);
+            return new ModelAndView("redirect:"+ uriBuilder.toUriString());
+        }
         //get modelandview from index.jsp
         final ModelAndView mav = new ModelAndView("index");
         //staff variable that will be passed to the jsp
@@ -67,11 +83,11 @@ public class MedicListController {
             String[] words = name.split(" ");
             staffList = new HashSet<>();
             for (String word : words) {
-                staffList.addAll(this.staffService.findBy(word, null, null, searchedSpecialties, searchedLocalities));
-                staffList.addAll(this.staffService.findBy(null, word, null, searchedSpecialties, searchedLocalities));
+                staffList.addAll(this.staffService.findBy(word, null, null, searchedSpecialties, searchedLocalities, page)); //TODO: fix
+                staffList.addAll(this.staffService.findBy(null, word, null, searchedSpecialties, searchedLocalities, page));
             }
         } else{
-            staffList = this.staffService.findBy(null, null, null, searchedSpecialties, searchedLocalities);
+            staffList = this.staffService.findBy(null, null, null, searchedSpecialties, searchedLocalities, page);
         }
 
         Collection<StaffSpecialty> specialtiesList = this.specialityService.list();

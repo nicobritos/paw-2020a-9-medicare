@@ -63,6 +63,7 @@ public class JDBCSelectQueryBuilder extends JDBCQueryBuilder {
     private String table;
     private String alias;
     private int limit;
+    private int offset;
 
     public JDBCSelectQueryBuilder selectAll() {
         this.selectAll = true;
@@ -141,8 +142,17 @@ public class JDBCSelectQueryBuilder extends JDBCQueryBuilder {
         return this;
     }
 
+    public JDBCSelectQueryBuilder offset(int offset) {
+        this.offset = offset;
+        return this;
+    }
+
     public JDBCSelectQueryBuilder where(JDBCWhereClauseBuilder whereClauseBuilder) {
-        this.whereClauseBuilder = whereClauseBuilder;
+        if(whereClauseBuilder.toString().isEmpty()) {
+            this.whereClauseBuilder = null;
+        } else {
+            this.whereClauseBuilder = whereClauseBuilder;
+        }
         return this;
     }
 
@@ -189,6 +199,12 @@ public class JDBCSelectQueryBuilder extends JDBCQueryBuilder {
             stringBuilder
                     .append(" LIMIT ")
                     .append(this.limit);
+        }
+
+        if (this.offset > 0){
+            stringBuilder
+                    .append(" OFFSET ")
+                    .append(this.offset);
         }
 
         stringBuilder.append(";");

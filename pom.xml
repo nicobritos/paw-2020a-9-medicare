@@ -90,6 +90,18 @@
         <version>${org.mockito.version}</version>
         <scope>test</scope>
       </dependency>
+
+      <dependency>
+        <groupId>org.apache.commons</groupId>
+        <artifactId>commons-lang3</artifactId>
+        <version>${org.apache.commons.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.springframework</groupId>
+        <artifactId>spring-web</artifactId>
+        <version>${org.springframework.version}</version>
+      </dependency>
     </dependencies>
   </dependencyManagement>
 

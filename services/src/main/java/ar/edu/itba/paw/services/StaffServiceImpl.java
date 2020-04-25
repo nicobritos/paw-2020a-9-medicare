@@ -14,12 +14,19 @@ import java.util.Set;
 
 @Service
 public class StaffServiceImpl extends GenericSearchableServiceImpl<StaffDao, Staff, Integer> implements StaffService {
+    private static final int PAGE_SIZE = 10;
+
     @Autowired
     private StaffDao repository;
 
     @Override
     public Set<Staff> findBy(String name, String surname, Set<Office> offices, Set<StaffSpecialty> staffSpecialties, Set<Locality> localities) {
         return this.repository.findBy(name, surname, offices, staffSpecialties, localities);
+    }
+
+    @Override
+    public Set<Staff> findBy(String name, String surname, Set<Office> offices, Set<StaffSpecialty> staffSpecialties, Set<Locality> localities, int page) {
+        return this.repository.findBy(name, surname, offices, staffSpecialties, localities, page, PAGE_SIZE);
     }
 
     @Override
