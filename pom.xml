@@ -19,6 +19,8 @@
     <spring-security.version>4.0.4.RELEASE</spring-security.version>
     <javax.validation-api.version>1.0.0.GA</javax.validation-api.version>
     <org.hibernate.validator>4.3.1.Final</org.hibernate.validator>
+    <com.fasterxml.jackson.core.version>2.4.1</com.fasterxml.jackson.core.version>
+    <com.fasterxml.jackson.databind.version>2.4.1.1</com.fasterxml.jackson.databind.version>
   </properties>
 
   <dependencyManagement>
@@ -123,6 +125,18 @@
         <artifactId>hibernate-validator</artifactId>
         <version>${org.hibernate.validator}</version>
       </dependency>
+
+      <dependency>
+        <groupId>com.fasterxml.jackson.core</groupId>
+        <artifactId>jackson-core</artifactId>
+        <version>${com.fasterxml.jackson.core.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>com.fasterxml.jackson.core</groupId>
+        <artifactId>jackson-databind</artifactId>
+        <version>${com.fasterxml.jackson.databind.version}</version>
+      </dependency>
     </dependencies>
   </dependencyManagement>
 
@@ -133,5 +147,6 @@
     <module>persistence</module>
     <module>persistenceAnnotations</module>
     <module>models</module>
+    <module>auth</module>
   </modules>
 </project>

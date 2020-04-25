@@ -1,28 +1,28 @@
-create table "user"
+create table users
 (
     email text not null,
     password text not null,
-    user_id serial not null,
+    users_id serial not null,
     first_name text not null,
     surname text not null,
     phone text
 );
 
 create unique index user_email_uindex
-    on "user" (email);
+    on users (email);
 
-create unique index user_user_id_uindex
-    on "user" (user_id);
+create unique index user_users_id_uindex
+    on users (users_id);
 
-alter table "user"
+alter table users
     add constraint user_pk
-        primary key (user_id);
+        primary key (users_id);
 
 create table patient
 (
     user_id int
-        constraint patient_user_user_id_fk
-            references "user"
+        constraint patient_users_users_id_fk
+            references users
             on update restrict on delete set null,
     office_id int not null
         constraint patient_office_office_id_fk

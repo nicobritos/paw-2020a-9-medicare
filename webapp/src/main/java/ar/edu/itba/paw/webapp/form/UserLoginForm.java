@@ -4,9 +4,10 @@ import org.hibernate.validator.constraints.Email;
 import org.hibernate.validator.constraints.NotEmpty;
 
 public class UserLoginForm {
-    @Email
-    @NotEmpty
+    @Email(message = "Debe escribir un mail válido")
+    @NotEmpty(message = "Debe escribir un mail válido")
     private String email;
+    @NotEmpty(message = "Debe escribir una contraseña")
     private String password;
 
     public String getEmail() {

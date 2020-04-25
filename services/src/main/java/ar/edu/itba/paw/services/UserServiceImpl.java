@@ -3,6 +3,7 @@ package ar.edu.itba.paw.services;
 import ar.edu.itba.paw.interfaces.daos.UserDao;
 import ar.edu.itba.paw.interfaces.services.UserService;
 import ar.edu.itba.paw.models.User;
+import ar.edu.itba.paw.services.exceptions.EmailAlreadyExistsException;
 import ar.edu.itba.paw.services.generics.GenericSearchableServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -20,8 +21,7 @@ public class UserServiceImpl extends GenericSearchableServiceImpl<UserDao, User,
     @Override
     public User create(User user) {
         if (this.repository.existsEmail(user.getEmail())) {
-//            throw new EmailAlreadyExistsException();
-            throw new RuntimeException("Email ya existe");
+            throw new EmailAlreadyExistsException();
         }
 
         user.setPassword(this.passwordEncoder.encode(user.getPassword()));
@@ -33,9 +33,14 @@ public class UserServiceImpl extends GenericSearchableServiceImpl<UserDao, User,
         Optional<User> user = this.repository.findByEmail(email);
         if (!user.isPresent())
             return user;
-        if (!this.passwordEncoder.matches(user.get().getPassword(), password))
+        if (!this.passwordEncoder.matches(password, user.get().getPassword()))
             return Optional.empty();
         return user;
+    }
+
+    @Override
+    public Optional<User> findByUsername(String username) {
+        return this.repository.findByEmail(username);
     }
 
     @Override

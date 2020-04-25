@@ -1,5 +1,5 @@
 let togglers = document.getElementsByClassName("toggle-visibility");
-for (const t of togglers) {
+for (let t of togglers) {
   let eyes = t.getElementsByTagName("img");
   let password = document.getElementById(t.htmlFor);
   t.onclick = function() {

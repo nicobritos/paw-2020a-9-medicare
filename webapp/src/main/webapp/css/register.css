@@ -54,11 +54,11 @@ body,html{
     cursor: pointer;
 }
 
-.form-atras-btn{
+.form-back-btn{
     background-color: grey!important;
     color:white;
 }
-.form-atras-btn:hover{
+.form-back-btn:hover{
     background-color: rgb(94, 94, 94)!important;
     color:white;
 }

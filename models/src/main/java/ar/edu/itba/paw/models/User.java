@@ -7,7 +7,7 @@ import ar.edu.itba.paw.persistenceAnnotations.Table;
 import java.util.HashSet;
 import java.util.Set;
 
-@Table(name = "\"user\"", primaryKey = "user_id")
+@Table(name = "users", primaryKey = "users_id")
 public class User extends GenericModel<User, Integer> {
     @Column(name = "email", required = true)
     private String email;

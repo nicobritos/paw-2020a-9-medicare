@@ -8,7 +8,6 @@ import org.springframework.web.servlet.ModelAndView;
 public class LandingController {
     @RequestMapping("/")
     public ModelAndView landingPage(){
-        final ModelAndView mov = new ModelAndView("landing");
-        return mov;
+        return new ModelAndView("landing");
     }
 }

@@ -7,17 +7,19 @@ import org.hibernate.validator.constraints.NotEmpty;
 import javax.validation.constraints.Size;
 
 public class UserSignUpForm {
-    @Email
-    @NotEmpty
+    @Email(message = "Debe escribir un mail válido")
+    @NotEmpty(message = "Debe escribir un mail válido")
     private String email;
-    @Size(min = 8, max = 100)
+    @NotEmpty(message = "La contraseña debe tener entre 8 y 100 caracteres")
+    @Size(min = 8, max = 100, message = "La contraseña debe tener entre 8 y 100 caracteres")
     private String password;
-    @Size(min = 8, max = 100)
-    private String repeatPassword;
-    @Size(min = 2, max = 20)
+    @NotEmpty(message = "La contraseña debe tener entre 8 y 100 caracteres")
+    @Size(min = 2, max = 20, message = "El nombre debe tener entre 2 y 20 caracteres")
     private String firstName;
-    @Size(min = 2, max = 20)
+    @NotEmpty(message = "La contraseña debe tener entre 8 y 100 caracteres")
+    @Size(min = 2, max = 20, message = "El nombre debe tener entre 2 y 20 caracteres")
     private String surname;
+
 
     public String getEmail() {
         return this.email;
@@ -33,14 +35,6 @@ public class UserSignUpForm {
 
     public void setPassword(String password) {
         this.password = password;
-    }
-
-    public String getRepeatPassword() {
-        return this.repeatPassword;
-    }
-
-    public void setRepeatPassword(String repeatPassword) {
-        this.repeatPassword = repeatPassword;
     }
 
     public String getFirstName() {
