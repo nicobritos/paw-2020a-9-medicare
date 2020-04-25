@@ -15,6 +15,7 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.context.AbstractSecurityWebApplicationInitializer;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -38,7 +39,9 @@ public class WebAuthConfig extends WebSecurityConfigurerAdapter {
 
     @Override
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-        auth.userDetailsService(this.userDetailsService).passwordEncoder(this.passwordEncoder());
+        auth
+                .userDetailsService(this.userDetailsService)
+                .passwordEncoder(this.passwordEncoder());
     }
 
     @Override
@@ -47,13 +50,18 @@ public class WebAuthConfig extends WebSecurityConfigurerAdapter {
                 .invalidSessionUrl("/login")
                 .invalidSessionUrl("/signup")
             .and().authorizeRequests()
+                .anyRequest().fullyAuthenticated()
                 .antMatchers("/").anonymous()
                 .antMatchers("/login").anonymous()
+                .antMatchers("/signup").anonymous()
                 .antMatchers("/patient/**").hasRole(UserRoles.PATIENT.name())
                 .antMatchers("/staff/**").hasRole(UserRoles.STAFF.name())
             .and().formLogin()
                 .usernameParameter("email")
                 .passwordParameter("password")
+//                .loginProcessingUrl("/login")
+                .loginPage("/login")
+                .permitAll()
                 .defaultSuccessUrl("/", false)  // todo: change to /patient or /staff
             .and().rememberMe()
                 .rememberMeParameter("remember_me")
@@ -65,7 +73,8 @@ public class WebAuthConfig extends WebSecurityConfigurerAdapter {
                 .logoutSuccessUrl("/")
             .and().exceptionHandling()
                 .accessDeniedPage("/403")
-            .and().csrf().disable();
+            .and().csrf()
+                .disable();
     }
 
     @Override
@@ -82,5 +91,9 @@ public class WebAuthConfig extends WebSecurityConfigurerAdapter {
             stringBuilder.append(line);
         }
         return stringBuilder.toString();
+    }
+
+    public static class SecurityWebInitializer extends AbstractSecurityWebApplicationInitializer {
+
     }
 }

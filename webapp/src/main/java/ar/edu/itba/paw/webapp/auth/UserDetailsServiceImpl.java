@@ -26,7 +26,6 @@ public class UserDetailsServiceImpl implements UserDetailsService {
             throw new UsernameNotFoundException("No existe ningun usuario con el mail: " + username);
         }
 
-        // TODO
         Collection<? extends GrantedAuthority> authorities = Arrays.asList(
                 new SimpleGrantedAuthority(UserRoles.STAFF.name()),
                 new SimpleGrantedAuthority(UserRoles.PATIENT.name())

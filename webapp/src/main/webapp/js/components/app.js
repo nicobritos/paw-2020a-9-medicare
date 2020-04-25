@@ -43,16 +43,9 @@ const App = function() {
                 reject(data);
             };
 
-            if ($.isPlainObject(parameters)) {
-                parameters = JSON.stringify(parameters);
-            }
-
-            $.ajax({
+            let options = {
                 url: url,
                 type: method,
-                data: parameters,
-                dataType: 'json',
-                contentType: 'application/json',
                 success: function (data) {
                     if (data.status.error) {
                         errorCallback(data);
@@ -64,7 +57,16 @@ const App = function() {
                     showError();
                     reject();
                 }
-            });
+            };
+            if ($.isPlainObject(parameters)) {
+                options.data = JSON.stringify(parameters);
+                options.dataType = 'json';
+                options.contentType = 'application/json';
+            } else {
+                options.data = parameters;
+            }
+
+            $.ajax(url, options);
         });
     };
 

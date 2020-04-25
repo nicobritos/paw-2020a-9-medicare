@@ -11,10 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.validation.Valid;
@@ -42,27 +39,26 @@ public class LoginController extends GenericController {
         });
     }
 
-    @RequestMapping(value = "/login", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
-    @ResponseBody
-    public JsonResponse loginAction(@Valid @RequestBody final UserLoginForm form, final BindingResult errors) {
-        return this.formatJsonResponse(() -> {
-            if (errors.hasErrors()) {
-                throw new MediCareException(this.getErrorMessages(errors.getAllErrors()));
-            }
+    @RequestMapping(value = "/login", method = RequestMethod.POST)
+    public ModelAndView loginAction(@Valid @ModelAttribute("loginForm") final UserLoginForm form, final BindingResult errors) {
+        ModelAndView modelAndView = new ModelAndView();
+        if (errors.hasErrors()) {
+            return this.loginIndex(form);
+        }
 
-            Optional<User> user = this.userService.login(form.getEmail(), form.getPassword());
-            if (!user.isPresent()) {
-                throw new MediCareException("Credenciales invalidas");
-            }
+        Optional<User> user = this.userService.login(form.getEmail(), form.getPassword());
+        if (!user.isPresent()) {
+            modelAndView.setViewName("/login");
+            modelAndView.addObject("credentialsError", true);
+            return modelAndView;
+        }
 
-            Map<String, Object> parameters = new HashMap<>();
-            parameters.put("id", user.get().getId());
-            return parameters;
-        });
+        modelAndView.setViewName("/landing");
+        return modelAndView;
     }
 
     @RequestMapping(value = "/login", method = RequestMethod.GET)
-    public ModelAndView loginIndex() {
+    public ModelAndView loginIndex(@ModelAttribute("loginForm") final UserLoginForm form) {
         return new ModelAndView("login");
     }
 

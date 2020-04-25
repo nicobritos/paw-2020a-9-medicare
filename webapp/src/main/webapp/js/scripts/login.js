@@ -15,12 +15,16 @@ const Login = function () {
             }
         });
 
-        $('#login-confirm').click(() => {
-            App.post('/login', {
-                email: $('#email').val(),
-                password: password.val()
-            });
-        });
+        // $('#login-confirm').click((e) => {
+        //     e.preventDefault();
+        //     e.stopPropagation();
+        //
+        //     // let parameter = 'email='
+        //     App.post('/login', {
+        //         email: $('#email').val(),
+        //         password: password.val()
+        //     });
+        // });
     };
 
     return {
