@@ -7,7 +7,6 @@ import ar.edu.itba.paw.models.Staff;
 import ar.edu.itba.paw.models.StaffSpecialty;
 import ar.edu.itba.paw.persistence.generics.GenericSearchableDaoImpl;
 import ar.edu.itba.paw.persistence.utils.StringSearchType;
-import ar.edu.itba.paw.persistence.utils.builder.JDBCQueryBuilder;
 import ar.edu.itba.paw.persistence.utils.builder.JDBCSelectQueryBuilder;
 import ar.edu.itba.paw.persistence.utils.builder.JDBCWhereClauseBuilder;
 import ar.edu.itba.paw.persistence.utils.builder.JDBCWhereClauseBuilder.ColumnTransformer;
@@ -38,7 +37,7 @@ public class StaffDaoImpl extends GenericSearchableDaoImpl<Staff, Integer> imple
     }
 
     @Override
-    public Set<Staff> findBy(String name, String surname, Collection<Office> offices, Collection<StaffSpecialty> staffSpecialties, Collection<Locality> localities) {
+    public List<Staff> findBy(String name, String surname, Collection<Office> offices, Collection<StaffSpecialty> staffSpecialties, Collection<Locality> localities) {
         if (name == null) {
             name = "";
         } else {
@@ -63,7 +62,7 @@ public class StaffDaoImpl extends GenericSearchableDaoImpl<Staff, Integer> imple
 
         FilteredCachedCollection<Staff> cachedCollection = this.filterCache(name, surname, staffSpecialties, offices, localities);
         if (this.isCacheComplete(cachedCollection)) {
-            return cachedCollection.getCollectionAsSet();
+            return cachedCollection.getCollectionAsList();
         }
 
         Map<String, Object> parameters = new HashMap<>();
@@ -97,7 +96,7 @@ public class StaffDaoImpl extends GenericSearchableDaoImpl<Staff, Integer> imple
     }
 
     @Override
-    public Set<Staff> findBy(String name, String surname, Collection<Office> offices, Collection<StaffSpecialty> staffSpecialties, Collection<Locality> localities, int page, int pageSize) {
+    public List<Staff> findBy(String name, String surname, Collection<Office> offices, Collection<StaffSpecialty> staffSpecialties, Collection<Locality> localities, int page, int pageSize) {
         if(page<=0)
             page = 1;
 
@@ -126,7 +125,7 @@ public class StaffDaoImpl extends GenericSearchableDaoImpl<Staff, Integer> imple
 
         FilteredCachedCollection<Staff> cachedCollection = this.filterCache(name, surname, staffSpecialties, offices, localities, page, pageSize);
         if (this.isCacheComplete(cachedCollection)) {
-            return cachedCollection.getCollectionAsSet().stream().skip((page-1)*pageSize).limit(pageSize).collect(Collectors.toSet()); //TODO: sacar cuando filter limite resultados
+            return cachedCollection.getCollectionAsList().stream().skip((page-1)*pageSize).limit(pageSize).collect(Collectors.toList()); //TODO: sacar cuando filter limite resultados
         }
 
         Map<String, Object> parameters = new HashMap<>();
@@ -162,7 +161,7 @@ public class StaffDaoImpl extends GenericSearchableDaoImpl<Staff, Integer> imple
     }
 
     @Override
-    public Set<Staff> findBy(Collection<String> names, Collection<String> surnames, Collection<Office> offices, Collection<StaffSpecialty> staffSpecialties, Collection<Locality> localities, int page, int pageSize) {
+    public List<Staff> findBy(Collection<String> names, Collection<String> surnames, Collection<Office> offices, Collection<StaffSpecialty> staffSpecialties, Collection<Locality> localities, int page, int pageSize) {
         if(page<=0)
             page = 1;
 

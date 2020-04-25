@@ -1,9 +1,8 @@
 package ar.edu.itba.paw.persistence.utils.cache;
 
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.LinkedList;
-import java.util.Set;
+import java.util.List;
 
 public class CachedCollection<T> {
     private CachedCollectionStatus status;
@@ -30,10 +29,10 @@ public class CachedCollection<T> {
         return this.collection;
     }
 
-    public Set<T> getCollectionAsSet() {
-        if (this.collection instanceof Set) {
-            return (Set<T>) this.collection;
+    public List<T> getCollectionAsList() {
+        if (this.collection instanceof List) {
+            return (List<T>) this.collection;
         }
-        return new HashSet<>(this.collection);
+        return new LinkedList<>(this.collection);
     }
 }

@@ -4,10 +4,10 @@ import ar.edu.itba.paw.interfaces.daos.generic.GenericSearchableDao;
 import ar.edu.itba.paw.models.Locality;
 import ar.edu.itba.paw.models.Province;
 
-import java.util.Set;
+import java.util.List;
 
 public interface LocalityDao extends GenericSearchableDao<Locality, Integer> {
-    Set<Locality> findByProvince(Province province);
+    List<Locality> findByProvince(Province province);
 
     /**
      * Returns Provinces with a name similar to the one provided filtered out by Country.
@@ -15,5 +15,5 @@ public interface LocalityDao extends GenericSearchableDao<Locality, Integer> {
      * @param name the province's name
      * @return a collection of matched provinces
      */
-    Set<Locality> findByProvinceAndName(Province province, String name);
+    List<Locality> findByProvinceAndName(Province province, String name);
 }

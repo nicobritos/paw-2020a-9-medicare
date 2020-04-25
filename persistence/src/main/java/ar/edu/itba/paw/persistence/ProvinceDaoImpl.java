@@ -18,7 +18,7 @@ import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.stereotype.Repository;
 
 import javax.sql.DataSource;
-import java.util.Set;
+import java.util.List;
 
 @Repository
 public class ProvinceDaoImpl extends GenericSearchableDaoImpl<Province, Integer> implements ProvinceDao {
@@ -32,12 +32,12 @@ public class ProvinceDaoImpl extends GenericSearchableDaoImpl<Province, Integer>
     }
 
     @Override
-    public Set<Province> findByCountry(Country country) {
+    public List<Province> findByCountry(Country country) {
         return this.findByField("country_id", Operation.EQ, country);
     }
 
     @Override
-    public Set<Province> findByCountryAndName(Country country, String name) {
+    public List<Province> findByCountryAndName(Country country, String name) {
         name = name.toLowerCase();
         String finalName = name;
         FilteredCachedCollection<Province> cachedCollection = CacheHelper.filter(
@@ -46,7 +46,7 @@ public class ProvinceDaoImpl extends GenericSearchableDaoImpl<Province, Integer>
                 province -> province.getName().toLowerCase().contains(finalName) && province.getCountry().equals(country)
         );
         if (this.isCacheComplete(cachedCollection)) {
-            return cachedCollection.getCollectionAsSet();
+            return cachedCollection.getCollectionAsList();
         }
 
         MapSqlParameterSource parameterSource = new MapSqlParameterSource();

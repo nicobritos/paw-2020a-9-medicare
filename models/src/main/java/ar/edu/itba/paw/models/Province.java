@@ -5,15 +5,15 @@ import ar.edu.itba.paw.persistenceAnnotations.ManyToOne;
 import ar.edu.itba.paw.persistenceAnnotations.OneToMany;
 import ar.edu.itba.paw.persistenceAnnotations.Table;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.Collection;
+import java.util.LinkedList;
 
 @Table(name = "system_province", primaryKey = "province_id")
 public class Province extends GenericModel<Province, Integer> {
     @Column(name = "name", required = true)
     private String name;
     @OneToMany(name = "locality_id", className = Locality.class)
-    private Set<Locality> localities = new HashSet<>();
+    private Collection<Locality> localities = new LinkedList<>();
     @ManyToOne(name = "country_id", inverse = true)
     private Country country;
 
@@ -25,7 +25,7 @@ public class Province extends GenericModel<Province, Integer> {
         this.name = name;
     }
 
-    public Set<Locality> getLocalities() {
+    public Collection<Locality> getLocalities() {
         return this.localities;
     }
 

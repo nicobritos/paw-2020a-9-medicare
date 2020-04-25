@@ -6,12 +6,12 @@ import ar.edu.itba.paw.models.Locality;
 import ar.edu.itba.paw.models.Office;
 import ar.edu.itba.paw.models.Province;
 
-import java.util.Set;
+import java.util.List;
 
 public interface OfficeDao extends GenericSearchableDao<Office, Integer> {
-    Set<Office> findByCountry(Country country);
+    List<Office> findByCountry(Country country);
 
-    Set<Office> findByProvince(Province province);
+    List<Office> findByProvince(Province province);
 
-    Set<Office> findByLocality(Locality locality);
+    List<Office> findByLocality(Locality locality);
 }

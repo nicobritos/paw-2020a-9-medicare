@@ -9,7 +9,8 @@ import org.springframework.cglib.proxy.MethodInterceptor;
 import java.beans.PropertyDescriptor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
-import java.util.HashSet;
+import java.util.Collection;
+import java.util.LinkedList;
 import java.util.Set;
 
 public abstract class ProxyHelper {
@@ -35,11 +36,11 @@ public abstract class ProxyHelper {
         return (M) enhancer.create();
     }
 
-    public static <M extends GenericModel<M, I>, I> Set<GenericModel<Object, Object>> getPreviousCollection(M model, Field field) {
+    public static <M extends GenericModel<M, I>, I> Collection<GenericModel<Object, Object>> getPreviousCollection(M model, Field field) {
         ProxiedModel<M, I> proxiedModel = getAsProxiedModel(model);
         if (proxiedModel != null)
             return proxiedModel.getPreviousModels(field);
-        return new HashSet<>();
+        return new LinkedList<>();
     }
 
     public static <M extends GenericModel<M, I>, I> void setPreviousCollection(M model, Field field, Set<GenericModel<Object, Object>> models) {

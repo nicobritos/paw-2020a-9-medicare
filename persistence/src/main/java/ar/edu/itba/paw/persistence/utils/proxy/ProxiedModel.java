@@ -12,11 +12,14 @@ import org.springframework.cglib.proxy.MethodInterceptor;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-import java.util.*;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 class ProxiedModel<M extends GenericModel<M, I>, I> implements ProxiedModelCollection {
-    private HashMap<String, Set<GenericModel<Object, Object>>> savedCollection;
+    private HashMap<String, Collection<GenericModel<Object, Object>>> savedCollection;
     private HashMap<String, ProxyField> lazyFindByIds;
     private HashMap<String, ProxyField> lazyFindById;
     private MethodInterceptor methodInterceptor;
@@ -46,13 +49,13 @@ class ProxiedModel<M extends GenericModel<M, I>, I> implements ProxiedModelColle
     }
 
     @Override
-    public Set<GenericModel<Object, Object>> getPreviousModels(Field field) {
+    public Collection<GenericModel<Object, Object>> getPreviousModels(Field field) {
         return this.savedCollection.get(field.getName());
     }
 
     @Override
-    public void setPreviousCollection(Field field, Set<GenericModel<Object, Object>> models) {
-        this.savedCollection.put(field.getName(), new HashSet<>(models));
+    public void setPreviousCollection(Field field, Collection<GenericModel<Object, Object>> models) {
+        this.savedCollection.put(field.getName(), new LinkedList<>(models));
     }
 
     public void setField(Field field, Object value) {
@@ -253,7 +256,7 @@ class ProxiedModel<M extends GenericModel<M, I>, I> implements ProxiedModelColle
                 ReflectionGetterSetter.set(proxy, savedMethodData.getInstanceField(), result, true);
 
                 savedMethodData.setHasBeenLoaded(true);
-                this.savedCollection.put(savedMethodData.instanceField.getName(), new HashSet<>(result));
+                this.savedCollection.put(savedMethodData.instanceField.getName(), new LinkedList<>(result));
 
                 return result;
             }

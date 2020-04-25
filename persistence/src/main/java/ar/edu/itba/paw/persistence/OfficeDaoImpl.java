@@ -18,7 +18,7 @@ import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.stereotype.Repository;
 
 import javax.sql.DataSource;
-import java.util.Set;
+import java.util.List;
 
 @Repository
 public class OfficeDaoImpl extends GenericSearchableDaoImpl<Office, Integer> implements OfficeDao {
@@ -32,14 +32,14 @@ public class OfficeDaoImpl extends GenericSearchableDaoImpl<Office, Integer> imp
     }
 
     @Override
-    public Set<Office> findByCountry(Country country) {
+    public List<Office> findByCountry(Country country) {
         FilteredCachedCollection<Office> cachedCollection = CacheHelper.filter(
                 Office.class,
                 Integer.class,
                 office -> office.getLocality().getProvince().getCountry().equals(country)
         );
         if (this.isCacheComplete(cachedCollection)) {
-            return cachedCollection.getCollectionAsSet();
+            return cachedCollection.getCollectionAsList();
         }
 
         MapSqlParameterSource parameterSource = new MapSqlParameterSource();
@@ -64,14 +64,14 @@ public class OfficeDaoImpl extends GenericSearchableDaoImpl<Office, Integer> imp
     }
 
     @Override
-    public Set<Office> findByProvince(Province province) {
+    public List<Office> findByProvince(Province province) {
         FilteredCachedCollection<Office> cachedCollection = CacheHelper.filter(
                 Office.class,
                 Integer.class,
                 office -> office.getLocality().getProvince().equals(province)
         );
         if (this.isCacheComplete(cachedCollection)) {
-            return cachedCollection.getCollectionAsSet();
+            return cachedCollection.getCollectionAsList();
         }
 
         MapSqlParameterSource parameterSource = new MapSqlParameterSource();
@@ -95,7 +95,7 @@ public class OfficeDaoImpl extends GenericSearchableDaoImpl<Office, Integer> imp
     }
 
     @Override
-    public Set<Office> findByLocality(Locality locality) {
+    public List<Office> findByLocality(Locality locality) {
         return this.findByField("locality_id", locality);
     }
 

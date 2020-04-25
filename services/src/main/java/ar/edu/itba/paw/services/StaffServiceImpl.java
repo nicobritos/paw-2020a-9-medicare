@@ -10,6 +10,7 @@ import ar.edu.itba.paw.services.generics.GenericSearchableServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Set;
 
 @Service
@@ -20,17 +21,17 @@ public class StaffServiceImpl extends GenericSearchableServiceImpl<StaffDao, Sta
     private StaffDao repository;
 
     @Override
-    public Set<Staff> findBy(String name, String surname, Set<Office> offices, Set<StaffSpecialty> staffSpecialties, Set<Locality> localities) {
+    public List<Staff> findBy(String name, String surname, Set<Office> offices, Set<StaffSpecialty> staffSpecialties, Set<Locality> localities) {
         return this.repository.findBy(name, surname, offices, staffSpecialties, localities);
     }
 
     @Override
-    public Set<Staff> findBy(String name, String surname, Set<Office> offices, Set<StaffSpecialty> staffSpecialties, Set<Locality> localities, int page) {
+    public List<Staff> findBy(String name, String surname, Set<Office> offices, Set<StaffSpecialty> staffSpecialties, Set<Locality> localities, int page) {
         return this.repository.findBy(name, surname, offices, staffSpecialties, localities, page, PAGE_SIZE);
     }
 
     @Override
-    public Set<Staff> findBy(Set<String> name, Set<String> surname, Set<Office> offices, Set<StaffSpecialty> staffSpecialties, Set<Locality> localities, int page) {
+    public List<Staff> findBy(Set<String> name, Set<String> surname, Set<Office> offices, Set<StaffSpecialty> staffSpecialties, Set<Locality> localities, int page) {
         return this.repository.findBy(name, surname, offices, staffSpecialties, localities, page, PAGE_SIZE);
     }
 
