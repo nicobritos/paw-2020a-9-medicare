@@ -16,6 +16,7 @@
     <org.hsqldb.version>2.3.1</org.hsqldb.version>
     <org.mockito.version>3.3.3</org.mockito.version>
     <org.ehcache.version>3.8.1</org.ehcache.version>
+    <org.apache.commons.version>3.0</org.apache.commons.version>
   </properties>
 
   <dependencyManagement>

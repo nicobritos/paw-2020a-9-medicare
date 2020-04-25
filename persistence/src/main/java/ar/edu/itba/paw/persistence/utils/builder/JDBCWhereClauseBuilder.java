@@ -39,7 +39,7 @@ public class JDBCWhereClauseBuilder {
 
     public enum ColumnTransformer {
         LENGTH(" LENGTH(", ") "),
-        LOWER(" LOWER(", ") ");
+        LOWER(" unaccent(LOWER(", "))");
 
         private String prefix;
         private String suffix;
