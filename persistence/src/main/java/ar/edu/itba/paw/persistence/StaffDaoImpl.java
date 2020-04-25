@@ -122,8 +122,6 @@ public class StaffDaoImpl extends GenericSearchableDaoImpl<Staff, Integer> imple
         if(localities == null){
             localities = Collections.emptyList();
         }
-//        if (staffSpecialties.isEmpty() && name.isEmpty() && surname.isEmpty() && offices.isEmpty() && localities.isEmpty())
-//            return this.list();
 
         FilteredCachedCollection<Staff> cachedCollection = this.filterCache(name, surname, staffSpecialties, offices, localities, page, pageSize);
         if (this.isCacheComplete(cachedCollection)) {
@@ -144,6 +142,82 @@ public class StaffDaoImpl extends GenericSearchableDaoImpl<Staff, Integer> imple
 
         if (!cachedCollection.getCollection().isEmpty()) {
             this.excludeModels(cachedCollection.getCompleteCollection(), parameterSource, whereClauseBuilder);
+        }
+
+        JDBCSelectQueryBuilder queryBuilder = new JDBCSelectQueryBuilder()
+                .selectAll()
+                .from(this.getTableAlias())
+                .where(whereClauseBuilder)
+                .distinct()
+                .limit(pageSize)
+                .offset((page-1)*pageSize);
+        if(!staffSpecialties.isEmpty()) {
+            queryBuilder.join("staff_id", this.getSpecialtiesIntermediateTableName(), "staff_id");
+        }
+        if(!localities.isEmpty()){
+            queryBuilder.join("office_id", this.getOfficeTable(), "office_id");
+        }
+        return this.selectQuery(queryBuilder.getQueryAsString(), parameterSource);
+    }
+
+    @Override
+    public Set<Staff> findBy(Collection<String> names, Collection<String> surnames, Collection<Office> offices, Collection<StaffSpecialty> staffSpecialties, Collection<Locality> localities, int page, int pageSize) {
+        if(page<=0)
+            page = 1;
+
+        if(pageSize<=0)
+            pageSize = DEFAULT_PAGE_SIZE;
+
+        if (names == null) {
+            names = Collections.emptyList();
+        } else {
+            names = names.stream().map(String::toLowerCase).collect(Collectors.toList());
+        }
+        if (surnames == null) {
+            surnames = Collections.emptyList();
+        } else {
+            surnames = surnames.stream().map(String::toLowerCase).collect(Collectors.toList());
+        }
+        if (offices == null) {
+            offices = Collections.emptyList();
+        }
+        if (staffSpecialties == null) {
+            staffSpecialties = Collections.emptyList();
+        }
+        if(localities == null){
+            localities = Collections.emptyList();
+        }
+
+//        FilteredCachedCollection<Staff> cachedCollection = this.filterCache(names, surnames, staffSpecialties, offices, localities, page, pageSize);
+//        if (this.isCacheComplete(cachedCollection)) {
+//            return cachedCollection.getCollectionAsSet().stream().skip((page-1)*pageSize).limit(pageSize).collect(Collectors.toSet()); //TODO: sacar cuando filter limite resultados
+//        }
+
+        Map<String, Object> parameters = new HashMap<>();
+        MapSqlParameterSource parameterSource = new MapSqlParameterSource();
+        JDBCWhereClauseBuilder otherWhereClause = new JDBCWhereClauseBuilder();
+        JDBCWhereClauseBuilder namesWhereClause = new JDBCWhereClauseBuilder();
+
+        this.putFirstNamesArguments(names, parameters, namesWhereClause);
+        this.putSurnamesArguments(surnames, parameters, namesWhereClause);
+        this.putOfficeArguments(offices, parameters, otherWhereClause);
+        this.putStaffSpecialtyArguments(staffSpecialties, parameters, otherWhereClause);
+        this.putLocalityArguments(localities, parameters, otherWhereClause);
+
+        parameterSource.addValues(parameters);
+
+//        if (!cachedCollection.getCollection().isEmpty()) {
+//            this.excludeModels(cachedCollection.getCompleteCollection(), parameterSource, whereClauseBuilder);
+//        }
+
+        JDBCWhereClauseBuilder whereClauseBuilder;
+        if(!otherWhereClause.toString().isEmpty()) {
+            whereClauseBuilder = otherWhereClause;
+            if(!otherWhereClause.toString().isEmpty()){
+                whereClauseBuilder.and().where(namesWhereClause);
+            }
+        } else {
+            whereClauseBuilder = namesWhereClause;
         }
 
         JDBCSelectQueryBuilder queryBuilder = new JDBCSelectQueryBuilder()
@@ -225,6 +299,42 @@ public class StaffDaoImpl extends GenericSearchableDaoImpl<Staff, Integer> imple
                         formatColumnFromName("office_id", this.getTableAlias()),
                         arguments
                 );
+    }
+
+    private void putFirstNamesArguments(Collection<String> names, Map<String, Object> argumentsValues, JDBCWhereClauseBuilder whereClauseBuilder) {
+        if (names.isEmpty())
+            return;
+
+        int i = 0;
+        for (String name : names) {
+            if (!name.isEmpty()) {
+                String parameter = "_firstName_" + i;
+                argumentsValues.put(parameter, StringSearchType.CONTAINS.transform(name));
+
+                whereClauseBuilder
+                        .or()
+                        .where(this.formatColumnFromName("first_name"), Operation.LIKE, ":_firstName_" + i, ColumnTransformer.LOWER);
+                i++;
+            }
+        }
+    }
+
+    private void putSurnamesArguments(Collection<String> surnames, Map<String, Object> argumentsValues, JDBCWhereClauseBuilder whereClauseBuilder) {
+        if (surnames.isEmpty())
+            return;
+
+        int i = 0;
+        for (String surname : surnames) {
+            if (!surname.isEmpty()) {
+                String parameter = "_surname_" + i;
+                argumentsValues.put(parameter, StringSearchType.CONTAINS.transform(surname));
+
+                whereClauseBuilder
+                        .or()
+                        .where(this.formatColumnFromName("surname"), Operation.LIKE, ":_surname_" + i, ColumnTransformer.LOWER);
+                i++;
+            }
+        }
     }
 
     private void putFirstNameArguments(String firstName, Map<String, Object> argumentsValues, JDBCWhereClauseBuilder whereClauseBuilder) {

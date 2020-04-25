@@ -30,6 +30,11 @@ public class StaffServiceImpl extends GenericSearchableServiceImpl<StaffDao, Sta
     }
 
     @Override
+    public Set<Staff> findBy(Set<String> name, Set<String> surname, Set<Office> offices, Set<StaffSpecialty> staffSpecialties, Set<Locality> localities, int page) {
+        return this.repository.findBy(name, surname, offices, staffSpecialties, localities, page, PAGE_SIZE);
+    }
+
+    @Override
     public void addStaffSpecialty(Staff staff, StaffSpecialty staffSpecialty) {
         staff.getStaffSpecialties().add(staffSpecialty);
         this.repository.update(staff);

@@ -80,14 +80,10 @@ public class MedicListController {
         }
 
         if(name != null) {
-            String[] words = name.split(" ");
-            staffList = new HashSet<>();
-            for (String word : words) {
-                staffList.addAll(this.staffService.findBy(word, null, null, searchedSpecialties, searchedLocalities, page)); //TODO: fix
-                staffList.addAll(this.staffService.findBy(null, word, null, searchedSpecialties, searchedLocalities, page));
-            }
+            Set<String> words = new HashSet<>(Arrays.asList(name.split(" ")));
+            staffList = new HashSet<>(this.staffService.findBy(words, words, null, searchedSpecialties, searchedLocalities, page));
         } else{
-            staffList = this.staffService.findBy(null, null, null, searchedSpecialties, searchedLocalities, page);
+            staffList = this.staffService.findBy((String)null, null, null, searchedSpecialties, searchedLocalities, page);
         }
 
         Collection<StaffSpecialty> specialtiesList = this.specialityService.list();
