@@ -7,7 +7,7 @@ import ar.edu.itba.paw.persistenceAnnotations.Table;
 import java.util.HashSet;
 import java.util.Set;
 
-@Table(name = "system_country", primaryKey = "country_id", customPrimaryKey = true)
+@Table(name = "system_country", primaryKey = "country_id", manualPrimaryKey = true)
 public class Country extends GenericModel<Country, String> {
     @Column(name = "name", required = true)
     private String name;

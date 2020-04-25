@@ -22,6 +22,10 @@ public class Office extends GenericModel<Office, Integer> {
     private String street;
     @OneToMany(name = "office_id", className = Staff.class)
     private Set<Staff> staffs = new HashSet<>();
+    @OneToMany(name = "patient_id", className = Patient.class)
+    private Set<Patient> patients = new HashSet<>();
+    @Column(name = "url")
+    private String url;
 
     public String getName() {
         return this.name;
@@ -65,6 +69,18 @@ public class Office extends GenericModel<Office, Integer> {
 
     public Set<Staff> getStaffs() {
         return this.staffs;
+    }
+
+    public Set<Patient> getPatients() {
+        return patients;
+    }
+
+    public String getUrl() {
+        return url;
+    }
+
+    public void setUrl(String url) {
+        this.url = url;
     }
 
     @Override
