@@ -45,7 +45,7 @@
                 <label for="password">Contraseña</label>
             </div>
             <div class="col-8">
-                <form:input path="password" class="form-control" type="password" name="password" id="password"/>
+                <form:input path="password" class="form-control pr-5" type="password" name="password" id="password"/>
                 <!-- For this to work for must be the id of the password input -->
                 <label for="password" class="toggle-visibility"><img src='<c:url value="/css/eye.svg"/> '><img
                         src='<c:url value="/css/noeye.svg"/>' style="display: none;"></label>
@@ -56,7 +56,7 @@
                 <label for="repeatPassword">Repetir contraseña</label>
             </div>
             <div class="col-8">
-                <form:input path="repeatPassword" class="form-control" type="password" name="repeatPassword"
+                <form:input path="repeatPassword" class="form-control pr-5" type="password" name="repeatPassword"
                             id="repeatPassword"/>
                 <!-- For this to work for must be the id of the password input -->
                 <label for="repeatPassword" class="toggle-visibility"><img src='<c:url value="/css/eye.svg"/> '><img
