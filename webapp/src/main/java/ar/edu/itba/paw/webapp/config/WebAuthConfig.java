@@ -50,8 +50,7 @@ public class WebAuthConfig extends WebSecurityConfigurerAdapter {
                 .invalidSessionUrl("/login")
                 .invalidSessionUrl("/signup")
             .and().authorizeRequests()
-                .anyRequest().fullyAuthenticated()
-                .antMatchers("/").anonymous()
+                .antMatchers("/").permitAll()
                 .antMatchers("/login").anonymous()
                 .antMatchers("/signup").anonymous()
                 .antMatchers("/patient/**").hasRole(UserRoles.PATIENT.name())
@@ -71,6 +70,7 @@ public class WebAuthConfig extends WebSecurityConfigurerAdapter {
             .and().logout()
                 .logoutUrl("/logout") // todo
                 .logoutSuccessUrl("/")
+                .invalidateHttpSession(true)
             .and().exceptionHandling()
                 .accessDeniedPage("/403")
             .and().csrf()
