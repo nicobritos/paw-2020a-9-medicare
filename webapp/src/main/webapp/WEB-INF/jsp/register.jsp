@@ -48,7 +48,7 @@
                 <form:input path="password" class="form-control" type="password" name="password" id="password"/>
                 <!-- For this to work for must be the id of the password input -->
                 <label for="password" class="toggle-visibility"><img src='<c:url value="/css/eye.svg"/> '><img
-                        src='<c:url value="/css/noeye.svg"/> ' style="display: none;"></label>
+                        src='<c:url value="/css/noeye.svg"/>' style="display: none;"></label>
             </div>
         </div>
         <div class="form-group row">
