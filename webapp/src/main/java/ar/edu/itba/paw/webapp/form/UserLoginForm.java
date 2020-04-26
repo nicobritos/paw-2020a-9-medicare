@@ -9,6 +9,7 @@ public class UserLoginForm {
     private String email;
     @NotEmpty(message = "Debe escribir una contraseña")
     private String password;
+    private Boolean rememberMe;
 
     public String getEmail() {
         return this.email;
@@ -24,5 +25,13 @@ public class UserLoginForm {
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    public boolean getRememberMe() {
+        return this.rememberMe == null ? false : this.rememberMe;
+    }
+
+    public void setRememberMe(Boolean rememberMe) {
+        this.rememberMe = rememberMe;
     }
 }

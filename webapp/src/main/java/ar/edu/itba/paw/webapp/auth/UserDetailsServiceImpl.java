@@ -23,7 +23,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         Optional<User> user = this.userService.findByUsername(username);
         if (!user.isPresent()) {
-            throw new UsernameNotFoundException("No existe ningun usuario con el mail: " + username);
+            throw new UsernameNotFoundException("Invalid credentials");
         }
 
         Collection<? extends GrantedAuthority> authorities;

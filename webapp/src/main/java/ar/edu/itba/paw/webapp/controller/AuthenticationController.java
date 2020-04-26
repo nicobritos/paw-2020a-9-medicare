@@ -23,7 +23,7 @@ import javax.validation.Valid;
 import java.util.Optional;
 
 @Controller
-public class LoginController extends GenericController {
+public class AuthenticationController extends GenericController {
     @Autowired
     private UserService userService;
     @Autowired
@@ -34,31 +34,33 @@ public class LoginController extends GenericController {
         if (errors.hasErrors()) {
             return this.signupIndex(form);
         }
-        if (this.userService.findByUsername(form.getEmail()).isPresent()) {
+        if (!form.getPassword().equals(form.getRepeatPassword())) {
+            errors.reject("Equals.signupForm.repeatPassword", null, "Error");
             return this.signupIndex(form);
-            // TODO
+        }
+        if (this.userService.findByUsername(form.getEmail()).isPresent()) {
+            errors.reject("EmailAlreadyTaken.signupForm.email", null, "Error");
+            return this.signupIndex(form);
         }
 
         User newUser = this.userService.create(form.getAsUser());
-        this.authenticateUserAndSetSession(newUser, form.getPassword(), request);
-        return new ModelAndView("redirect:/");
+        this.authenticateSignedUpUser(newUser, form.getPassword(), request);
+        return new ModelAndView("/landing");
     }
 
     @RequestMapping(value = "/login", method = RequestMethod.POST)
     public ModelAndView loginAction(@Valid @ModelAttribute("loginForm") final UserLoginForm form, final BindingResult errors, HttpServletRequest request) {
         if (errors.hasErrors()) {
-            // TODO:
             return this.loginIndex(form);
         }
 
         Optional<User> user = this.userService.findByUsername(form.getEmail());
-        if(!user.isPresent()){ // email no existe
-            // TODO: set errors
+        if (!user.isPresent()) {
+            errors.reject("InvalidCredentials.loginForm", null, "Error");
             return this.loginIndex(form);
         }
 
-        this.authenticateUserAndSetSession(user.get(), form.getPassword(), request);
-        return new ModelAndView("redirect:/");
+        return new ModelAndView("/landing");
     }
 
     @RequestMapping(value = "/login", method = RequestMethod.GET)
@@ -71,13 +73,7 @@ public class LoginController extends GenericController {
         return new ModelAndView("register");
     }
 
-
-    @RequestMapping("/403")
-    public ModelAndView forbidden(){
-        return new ModelAndView("403");
-    }
-
-    private void authenticateUserAndSetSession(User user, String password, HttpServletRequest request) {
+    private void authenticateSignedUpUser(User user, String password, HttpServletRequest request) {
         try {
             String username = user.getEmail();
             UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(username, password);

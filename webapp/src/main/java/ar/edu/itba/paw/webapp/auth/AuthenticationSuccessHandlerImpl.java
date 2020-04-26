@@ -35,6 +35,6 @@ public class AuthenticationSuccessHandlerImpl implements AuthenticationSuccessHa
         }
         if (isPatient)
             return "/patient/home";
-        return "/login/complete";
+        return "/signup/complete";
     }
 }
