@@ -14,12 +14,14 @@ public class UserSignUpForm {
     @Size(min = 8, max = 100, message = "La contraseña debe tener entre 8 y 100 caracteres")
     private String password;
     @NotEmpty(message = "La contraseña debe tener entre 8 y 100 caracteres")
+    @Size(min = 8, max = 100, message = "La contraseña debe tener entre 8 y 100 caracteres")
+    private String repeatPassword;
+    @NotEmpty(message = "El nombre debe tener entre 8 y 100 caracteres")
     @Size(min = 2, max = 20, message = "El nombre debe tener entre 2 y 20 caracteres")
     private String firstName;
-    @NotEmpty(message = "La contraseña debe tener entre 8 y 100 caracteres")
+    @NotEmpty(message = "El nombre debe tener entre 8 y 100 caracteres")
     @Size(min = 2, max = 20, message = "El nombre debe tener entre 2 y 20 caracteres")
     private String surname;
-
 
     public String getEmail() {
         return this.email;
@@ -60,5 +62,13 @@ public class UserSignUpForm {
         user.setFirstName(this.firstName);
         user.setSurname(this.surname);
         return user;
+    }
+
+    public String getRepeatPassword() {
+        return this.repeatPassword;
+    }
+
+    public void setRepeatPassword(String repeatPassword) {
+        this.repeatPassword = repeatPassword;
     }
 }

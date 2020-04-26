@@ -29,16 +29,6 @@ public class UserServiceImpl extends GenericSearchableServiceImpl<UserDao, User,
     }
 
     @Override
-    public Optional<User> login(String email, String password) {
-        Optional<User> user = this.repository.findByEmail(email);
-        if (!user.isPresent())
-            return user;
-        if (!this.passwordEncoder.matches(password, user.get().getPassword()))
-            return Optional.empty();
-        return user;
-    }
-
-    @Override
     public Optional<User> findByUsername(String username) {
         return this.repository.findByEmail(username);
     }
