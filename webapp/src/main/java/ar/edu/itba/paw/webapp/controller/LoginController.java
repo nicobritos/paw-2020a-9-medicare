@@ -20,6 +20,7 @@ import org.springframework.web.servlet.ModelAndView;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
+import java.util.Optional;
 
 @Controller
 public class LoginController extends GenericController {
@@ -30,7 +31,6 @@ public class LoginController extends GenericController {
 
     @RequestMapping(value = "/signup", method = RequestMethod.POST)
     public ModelAndView signupAction(@Valid @ModelAttribute("signupForm") final UserSignUpForm form, final BindingResult errors, HttpServletRequest request, HttpServletResponse response) {
-        ModelAndView modelAndView = new ModelAndView();
         if (errors.hasErrors()) {
             return this.signupIndex(form);
         }
@@ -41,20 +41,24 @@ public class LoginController extends GenericController {
 
         User newUser = this.userService.create(form.getAsUser());
         this.authenticateUserAndSetSession(newUser, form.getPassword(), request);
-        modelAndView.setViewName("/landing");
-        return modelAndView;
+        return new ModelAndView("redirect:/");
     }
 
     @RequestMapping(value = "/login", method = RequestMethod.POST)
-    public ModelAndView loginAction(@Valid @ModelAttribute("loginForm") final UserLoginForm form, final BindingResult errors) {
-        ModelAndView modelAndView = new ModelAndView();
+    public ModelAndView loginAction(@Valid @ModelAttribute("loginForm") final UserLoginForm form, final BindingResult errors, HttpServletRequest request) {
         if (errors.hasErrors()) {
             // TODO:
             return this.loginIndex(form);
         }
 
-        modelAndView.setViewName("/landing");
-        return modelAndView;
+        Optional<User> user = this.userService.findByUsername(form.getEmail());
+        if(!user.isPresent()){ // email no existe
+            // TODO: set errors
+            return this.loginIndex(form);
+        }
+
+        this.authenticateUserAndSetSession(user.get(), form.getPassword(), request);
+        return new ModelAndView("redirect:/");
     }
 
     @RequestMapping(value = "/login", method = RequestMethod.GET)
@@ -65,6 +69,12 @@ public class LoginController extends GenericController {
     @RequestMapping(value = "/signup", method = RequestMethod.GET)
     public ModelAndView signupIndex(@ModelAttribute("signupForm") final UserSignUpForm form) {
         return new ModelAndView("register");
+    }
+
+
+    @RequestMapping("/403")
+    public ModelAndView forbidden(){
+        return new ModelAndView("403");
     }
 
     private void authenticateUserAndSetSession(User user, String password, HttpServletRequest request) {

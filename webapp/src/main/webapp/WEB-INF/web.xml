@@ -66,6 +66,10 @@
     <error-code>500</error-code>
     <location>/WEB-INF/jsp/500.jsp</location>
   </error-page>
+  <error-page>
+    <error-code>403</error-code>
+    <location>/WEB-INF/jsp/403.jsp</location>
+  </error-page>
 
   <jsp-config>
     <jsp-property-group>

@@ -27,9 +27,9 @@ public class AuthenticationSuccessHandlerImpl implements AuthenticationSuccessHa
         Collection<? extends GrantedAuthority> authorities = authentication.getAuthorities();
         boolean isPatient = false;
         for (GrantedAuthority authority : authorities) {
-            if (authority.getAuthority().equals(UserRole.STAFF.name())) {
+            if (authority.getAuthority().equals("ROLE_" + UserRole.STAFF.name())) {
                 return "/staff/home";
-            } else if (authority.getAuthority().equals(UserRole.PATIENT.name())) {
+            } else if (authority.getAuthority().equals("ROLE_" + UserRole.PATIENT.name())) {
                 isPatient = true;
             }
         }

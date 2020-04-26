@@ -28,9 +28,9 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 
         Collection<? extends GrantedAuthority> authorities;
         if (!user.get().getStaffs().isEmpty()) {
-            authorities = Collections.singletonList(new SimpleGrantedAuthority(UserRole.STAFF.name()));
+            authorities = Collections.singletonList(new SimpleGrantedAuthority("ROLE_" + UserRole.STAFF.name()));
         } else {
-            authorities = Collections.singletonList(new SimpleGrantedAuthority(UserRole.PATIENT.name()));
+            authorities = Collections.singletonList(new SimpleGrantedAuthority("ROLE_" + UserRole.PATIENT.name()));
         }
 
         return new org.springframework.security.core.userdetails.User(username, user.get().getPassword(), authorities);
