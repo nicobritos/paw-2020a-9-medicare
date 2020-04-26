@@ -40,7 +40,7 @@ public class LoginController extends GenericController {
         }
 
         User newUser = this.userService.create(form.getAsUser());
-        this.authenticateUserAndSetSession(newUser, request);
+        this.authenticateUserAndSetSession(newUser, form.getPassword(), request);
         modelAndView.setViewName("/landing");
         return modelAndView;
     }
@@ -67,14 +67,17 @@ public class LoginController extends GenericController {
         return new ModelAndView("register");
     }
 
-    private void authenticateUserAndSetSession(User user, HttpServletRequest request) {
-        String username = user.getEmail();
-        String password = user.getPassword();
-        UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(username, password);
-        // generate session if one doesn't exist
-        request.getSession();
+    private void authenticateUserAndSetSession(User user, String password, HttpServletRequest request) {
+        try {
+            String username = user.getEmail();
+            UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(username, password);
+            // generate session if one doesn't exist
+            request.getSession();
 
-        Authentication authenticatedUser = this.authenticationManager.authenticate(token);
-        SecurityContextHolder.getContext().setAuthentication(authenticatedUser);
+            Authentication authenticatedUser = this.authenticationManager.authenticate(token);
+            SecurityContextHolder.getContext().setAuthentication(authenticatedUser);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }

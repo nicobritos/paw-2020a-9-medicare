@@ -1,5 +1,6 @@
 package ar.edu.itba.paw.webapp.config;
 
+import ar.edu.itba.paw.webapp.auth.AuthenticationSuccessHandlerImpl;
 import ar.edu.itba.paw.webapp.auth.UserRoles;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -58,7 +59,8 @@ public class WebAuthConfig extends WebSecurityConfigurerAdapter {
                 .invalidSessionUrl("/login")
                 .invalidSessionUrl("/signup")
             .and().authorizeRequests()
-                .antMatchers("/").permitAll()
+                .antMatchers("/").anonymous()
+                .antMatchers("/**").authenticated()
                 .antMatchers("/login").anonymous()
                 .antMatchers("/signup").anonymous()
                 .antMatchers("/patient/**").hasRole(UserRoles.PATIENT.name())
@@ -66,10 +68,9 @@ public class WebAuthConfig extends WebSecurityConfigurerAdapter {
             .and().formLogin()
                 .usernameParameter("email")
                 .passwordParameter("password")
-//                .loginProcessingUrl("/login")
                 .loginPage("/login")
                 .permitAll()
-                .defaultSuccessUrl("/", false)  // todo: change to /patient or /staff
+                .successHandler(new AuthenticationSuccessHandlerImpl())
             .and().rememberMe()
                 .rememberMeParameter("remember_me")
                 .userDetailsService(this.userDetailsService)

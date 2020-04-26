@@ -10,8 +10,8 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Component;
 
-import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Optional;
 
 @Component
@@ -26,10 +26,13 @@ public class UserDetailsServiceImpl implements UserDetailsService {
             throw new UsernameNotFoundException("No existe ningun usuario con el mail: " + username);
         }
 
-        Collection<? extends GrantedAuthority> authorities = Arrays.asList(
-                new SimpleGrantedAuthority(UserRoles.STAFF.name()),
-                new SimpleGrantedAuthority(UserRoles.PATIENT.name())
-        );
+        Collection<? extends GrantedAuthority> authorities;
+        if (!user.get().getStaffs().isEmpty()) {
+            authorities = Collections.singletonList(new SimpleGrantedAuthority(UserRoles.STAFF.name()));
+        } else {
+            authorities = Collections.singletonList(new SimpleGrantedAuthority(UserRoles.PATIENT.name()));
+        }
+
         return new org.springframework.security.core.userdetails.User(username, user.get().getPassword(), authorities);
     }
 }
