@@ -1,7 +1,7 @@
 package ar.edu.itba.paw.webapp.config;
 
 import ar.edu.itba.paw.webapp.auth.AuthenticationSuccessHandlerImpl;
-import ar.edu.itba.paw.webapp.auth.UserRoles;
+import ar.edu.itba.paw.webapp.auth.UserRole;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -60,11 +60,11 @@ public class WebAuthConfig extends WebSecurityConfigurerAdapter {
                 .invalidSessionUrl("/signup")
             .and().authorizeRequests()
                 .antMatchers("/").anonymous()
-                .antMatchers("/**").authenticated()
                 .antMatchers("/login").anonymous()
                 .antMatchers("/signup").anonymous()
-                .antMatchers("/patient/**").hasRole(UserRoles.PATIENT.name())
-                .antMatchers("/staff/**").hasRole(UserRoles.STAFF.name())
+                .antMatchers("/signup/complete").not().hasAnyRole(UserRole.names())
+                .antMatchers("/patient/**").hasRole(UserRole.PATIENT.name())
+                .antMatchers("/staff/**").hasRole(UserRole.STAFF.name())
             .and().formLogin()
                 .usernameParameter("email")
                 .passwordParameter("password")
@@ -80,6 +80,7 @@ public class WebAuthConfig extends WebSecurityConfigurerAdapter {
                 .logoutUrl("/logout") // todo
                 .logoutSuccessUrl("/")
                 .invalidateHttpSession(true)
+                .permitAll()
             .and().exceptionHandling()
                 .accessDeniedPage("/403")
             .and().csrf()
