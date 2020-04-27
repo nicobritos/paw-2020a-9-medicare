@@ -18,15 +18,12 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 import java.util.*;
 
-
 @Controller
 public class MedicListController {
     @Autowired
     StaffService staffService;
-
     @Autowired
     StaffSpecialtyService specialityService;
-
     @Autowired
     LocalityService localityService;
 

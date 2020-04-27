@@ -39,7 +39,7 @@ public abstract class GenericDaoImpl<M extends GenericModel<M, I>, I> implements
     private static final String ARGUMENT_PREFIX = "_r_";
     protected TransactionTemplate transactionTemplate;
     protected NamedParameterJdbcTemplate jdbcTemplate;
-    private SimpleJdbcInsert jdbcInsert;
+    protected SimpleJdbcInsert jdbcInsert;
     private boolean customPrimaryKey;
     private boolean haveBeenListed;
     private String primaryKeyName;
@@ -59,7 +59,7 @@ public abstract class GenericDaoImpl<M extends GenericModel<M, I>, I> implements
             Table table = mClass.getAnnotation(Table.class);
             this.tableName = table.name();
             this.primaryKeyName = table.primaryKey();
-            this.customPrimaryKey = table.customPrimaryKey();
+            this.customPrimaryKey = table.manualPrimaryKey();
             this.jdbcInsert = new SimpleJdbcInsert(dataSource).withTableName(this.tableName);
             if (!this.customPrimaryKey)
                 this.jdbcInsert.usingGeneratedKeyColumns(this.primaryKeyName);
@@ -434,6 +434,25 @@ public abstract class GenericDaoImpl<M extends GenericModel<M, I>, I> implements
         return this.findById(id).get();
     }
 
+    protected boolean exists(Map<String, ?> columnsValues) {
+        MapSqlParameterSource parameterSource = new MapSqlParameterSource();
+        parameterSource.addValues(columnsValues);
+        JDBCWhereClauseBuilder whereClauseBuilder = new JDBCWhereClauseBuilder();
+        for (String column : columnsValues.keySet()) {
+            whereClauseBuilder
+                    .and()
+                    .where(column, Operation.EQ, ":" + column);
+        }
+
+        JDBCSelectQueryBuilder selectQueryBuilder = new JDBCSelectQueryBuilder()
+                .select(this.getIdColumnName())
+                .from(this.getTableName())
+                .where(whereClauseBuilder)
+                .limit(1);
+
+        return this.jdbcTemplate.query(selectQueryBuilder.getQueryAsString(), parameterSource, ResultSet::next);
+    }
+
     /**
      * It returns the table name
      * Can be overwritten to return a table alias
@@ -709,80 +728,12 @@ public abstract class GenericDaoImpl<M extends GenericModel<M, I>, I> implements
 
             ProxyHelper.setPreviousCollection(model, field, actualModels);
         });
-
-        ReflectionGetterSetter.iterateValues(model, OneToMany.class, (field, o) -> {
-            OneToMany relation = field.getAnnotation(OneToMany.class);
-            if (relation.inverse())
-                return;
-
-            Set<GenericModel<Object, Object>> actualModels = (Set<GenericModel<Object, Object>>) o;
-            if (relation.required() && (o == null || actualModels.isEmpty())) {
-                throw new IllegalStateException("This field is marked as required but its value is null or empty");
-            }
-
-            Class<? extends GenericModel<?, Object>> otherClass;
-            try {
-                otherClass = (Class<? extends GenericModel<?, Object>>) relation.className();
-            } catch (ClassCastException e) {
-                // TODO
-                throw new RuntimeException(e);
-            }
-
-            Set<GenericModel<Object, Object>> previousModels = ProxyHelper.getPreviousCollection(model, field);
-
-            MapSqlParameterSource removedParameterSource = new MapSqlParameterSource();
-            Collection<String> removedArguments = new LinkedList<>();
-            MapSqlParameterSource addedParameterSource = new MapSqlParameterSource();
-            Collection<String> addedArguments = new LinkedList<>();
-            int i = 0;
-            for (GenericModel<Object, Object> genericModel : actualModels) {
-                if (!previousModels.contains(genericModel)) {
-                    addedParameterSource.addValue("_added_" + i, genericModel.getId());
-                    addedArguments.add(":_added_" + i);
-                }
-            }
-            i = 0;
-            for (GenericModel<Object, Object> genericModel : previousModels) {
-                if (!actualModels.contains(genericModel)) {
-                    removedParameterSource.addValue("_removed_" + i, genericModel.getId());
-                    removedArguments.add(":_removed_" + i);
-                }
-            }
-
-            if (removedArguments.size() == 0 && addedArguments.size() == 0)
-                return;
-
-            Table otherTable = otherClass.getAnnotation(Table.class);
-            // Process removedModels
-            if (removedArguments.size() > 0) {
-                removedParameterSource.addValue("null", null);
-                JDBCUpdateQueryBuilder updateQueryBuilder = new JDBCUpdateQueryBuilder()
-                        .update(otherTable.name())
-                        .value(relation.name(), ":null")
-                        .where(new JDBCWhereClauseBuilder()
-                                .in(otherTable.primaryKey(), removedArguments)
-                        );
-                this.updateQuery(updateQueryBuilder.getQueryAsString(), removedParameterSource);
-            }
-            // Process addedModels
-            if (addedArguments.size() > 0) {
-                addedParameterSource.addValue("id", model.getId());
-                JDBCUpdateQueryBuilder updateQueryBuilder = new JDBCUpdateQueryBuilder()
-                        .update(otherTable.name())
-                        .value(relation.name(), ":id")
-                        .where(new JDBCWhereClauseBuilder()
-                                .in(otherTable.primaryKey(), addedArguments)
-                        );
-                this.updateQuery(updateQueryBuilder.getQueryAsString(), addedParameterSource);
-            }
-
-            ProxyHelper.setPreviousCollection(model, field, actualModels);
-        });
-        ReflectionGetterSetter.iterateValues(model, ManyToMany.class, (field, o) -> {
+        ReflectionGetterSetter.iterateFields(model.getClass(), ManyToMany.class, field -> {
             ManyToMany relation = field.getAnnotation(ManyToMany.class);
             if (relation.inverse())
                 return;
 
+            Object o = ReflectionGetterSetter.get(model, field, false);
             Set<GenericModel<Object, Object>> actualModels = (Set<GenericModel<Object, Object>>) o;
             if (relation.required() && (o == null || actualModels.isEmpty())) {
                 throw new IllegalStateException("This field is marked as required but its value is null or empty");
