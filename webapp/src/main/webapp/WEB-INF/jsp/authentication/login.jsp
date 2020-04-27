@@ -39,7 +39,7 @@
         </div>
         <div class="form-group row align-items-center">
             <div class="col">
-                <label for="medicare_password" class="mb-0">Recuerdame</label>
+                <label for="medicare_remember_me" class="mb-0">Recuerdame</label>
             </div>
             <div class="col-8">
                 <form:checkbox path="rememberMe" id="medicare_remember_me" name="medicare_remember_me"/>

@@ -37,3 +37,6 @@ create unique index patient_patient_id_uindex
 alter table patient
     add constraint patient_pk
         primary key (patient_id);
+
+alter table office
+    add url text;

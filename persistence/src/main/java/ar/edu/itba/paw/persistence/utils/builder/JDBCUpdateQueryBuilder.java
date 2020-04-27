@@ -68,6 +68,9 @@ public class JDBCUpdateQueryBuilder extends JDBCQueryBuilder {
             values.add(pair.getValue());
         }
 
+        if (keys.size() == 1) {
+            return " " + this.joinStrings(keys) + " = " + this.joinStrings(values) + " ";
+        }
         return " (" + this.joinStrings(keys) + ") = (" + this.joinStrings(values) + ") ";
     }
 

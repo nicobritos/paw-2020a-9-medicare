@@ -71,7 +71,7 @@ public class WebAuthConfig extends WebSecurityConfigurerAdapter {
                 .permitAll()
                 .successHandler(new AuthenticationSuccessHandlerImpl())
             .and().rememberMe()
-                .rememberMeParameter("medicare_remember_me")
+                .rememberMeParameter("rememberMe")
                 .userDetailsService(this.userDetailsService)
                 .key(this.getSecretKey())
                 .tokenValiditySeconds((int) TimeUnit.DAYS.toSeconds(30))
