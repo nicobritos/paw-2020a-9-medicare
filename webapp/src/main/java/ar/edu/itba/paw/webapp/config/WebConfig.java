@@ -8,7 +8,10 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.support.ReloadableResourceBundleMessageSource;
+import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.jdbc.datasource.SimpleDriverDataSource;
+import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.annotation.EnableTransactionManagement;
 import org.springframework.web.servlet.ViewResolver;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 import org.springframework.web.servlet.view.InternalResourceViewResolver;
@@ -25,6 +28,7 @@ import java.nio.charset.StandardCharsets;
         "ar.edu.itba.paw.webapp.transformer"
 })
 @Configuration
+@EnableTransactionManagement
 public class WebConfig {
     protected static final String DB_URL = "jdbc:postgresql://10.16.1.110:5432/paw-2020a-9";
     protected static final String DB_USER = "paw-2020a-9";
@@ -82,5 +86,10 @@ public class WebConfig {
         mapper.configure(MapperFeature.DEFAULT_VIEW_INCLUSION, true);
 
         return mapper;
+    }
+
+    @Bean
+    public PlatformTransactionManager transactionManager(final DataSource ds){
+        return new DataSourceTransactionManager(ds);
     }
 }

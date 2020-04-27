@@ -87,35 +87,21 @@ public class AuthenticationController extends GenericController {
             return this.signupStaffIndex(form);
         }
 
-        User newUser;
-        try {
-            newUser = this.userService.create(form.getAsUser());
-            this.authenticateSignedUpUser(newUser, form.getPassword(), request);
-        } catch (MediCareException e) {
-            errors.reject("EmailAlreadyTaken.signupForm.email", null, "Error");
-            return this.signupStaffIndex(form);
-        }
+        User newUser = form.getAsUser();
 
         Office office = new Office();
         office.setEmail(newUser.getEmail());
         office.setName("Consultorio de " + newUser.getFirstName() + " " + newUser.getSurname());
         office.setLocality(locality.get());
         office.setStreet(form.getAddress());
-        office = this.officeService.create(office);
-
-        Staff staff = new Staff();
-        staff.setEmail(newUser.getEmail());
-        staff.setFirstName(newUser.getFirstName());
-        staff.setSurname(newUser.getSurname());
-        staff = this.staffService.create(staff);
-
-        office.getStaffs().add(staff);
-        this.officeService.update(office);
-
-        newUser.getStaffs().add(staff);
-        this.userService.update(newUser);
-
-        return new ModelAndView("/staff/home");
+        try {
+            userService.create(newUser, office);
+        } catch (MediCareException e) {
+            errors.reject("EmailAlreadyTaken.signupForm.email", null, "Error");
+            return this.signupStaffIndex(form);
+        }
+        this.authenticateSignedUpUser(newUser, form.getPassword(), request);
+        return new ModelAndView("redirect:/staff/home");
     }
 
     @RequestMapping(value = "/signup/patient", method = RequestMethod.POST)
@@ -137,7 +123,7 @@ public class AuthenticationController extends GenericController {
             return this.signupPatientIndex(form);
         }
 
-        return new ModelAndView("/patient/home");
+        return new ModelAndView("redirect:/patient/home");
     }
 
     @RequestMapping(value = "/login", method = RequestMethod.GET)
