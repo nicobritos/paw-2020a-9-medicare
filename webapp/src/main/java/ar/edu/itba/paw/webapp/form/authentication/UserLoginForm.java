@@ -1,13 +1,13 @@
-package ar.edu.itba.paw.webapp.form;
+package ar.edu.itba.paw.webapp.form.authentication;
 
 import org.hibernate.validator.constraints.Email;
 import org.hibernate.validator.constraints.NotEmpty;
 
 public class UserLoginForm {
-    @Email(message = "Debe escribir un mail válido")
-    @NotEmpty(message = "Debe escribir un mail válido")
+    @Email
+    @NotEmpty
     private String email;
-    @NotEmpty(message = "Debe escribir una contraseña")
+    @NotEmpty
     private String password;
     private Boolean rememberMe;
 

@@ -40,7 +40,7 @@ const App = function() {
         return new Promise((resolve, reject) => {
             let errorCallback = function (data) {
                 showError(data.status.messages);
-                reject(data);
+                reject(data.status.messages);
             };
 
             let options = {
@@ -50,7 +50,7 @@ const App = function() {
                     if (data.status.error) {
                         errorCallback(data);
                     } else {
-                        resolve(data);
+                        resolve(data.data);
                     }
                 },
                 error: function () {
@@ -58,16 +58,48 @@ const App = function() {
                     reject();
                 }
             };
-            if ($.isPlainObject(parameters)) {
-                options.data = JSON.stringify(parameters);
-                options.dataType = 'json';
-                options.contentType = 'application/json';
-            } else {
-                options.data = parameters;
+            if (Object.keys(parameters).length > 0) {
+                if ($.isPlainObject(parameters)) {
+                    options.data = JSON.stringify(parameters);
+                    options.dataType = 'json';
+                    options.contentType = 'application/json';
+                } else {
+                    options.data = parameters;
+                }
             }
 
             $.ajax(url, options);
         });
+    };
+
+    let goto = function (url) {
+        if (url.startsWith('/')) {
+            location.href = url;
+        } else if (url.startsWith('..')) {
+            let pathname = location.pathname;
+            if (pathname.endsWith('/') || pathname.endsWith('#')) pathname = pathname.substring(0, pathname.length - 1);
+
+            let oldPaths = pathname.split('/');
+            let newPaths = url.split('/');
+
+            while (newPaths.length) {
+                if (newPaths[0] === '') {
+                    newPaths.shift();
+                } else {
+                    if (newPaths[0] !== '..') break;
+                    oldPaths.pop();
+                    newPaths.shift();
+                }
+            }
+
+            location.pathname = oldPaths.concat(newPaths).join('/');
+        } else if (url.startsWith('http://') || url.startsWith('https://')) {
+            location.href = url;
+        } else {
+            let pathname = location.pathname;
+            if (pathname.endsWith('/') || pathname.endsWith('#')) pathname = pathname.substring(0, pathname.length - 1);
+            location.pathname = [pathname, url].join('/');
+        }
     };
 
     return {
@@ -76,6 +108,10 @@ const App = function() {
         },
         post: function (url, parameters = {}) {
             return ajax(url, parameters, 'POST');
-        }
+        },
+        goBack: function () {
+            history.back();
+        },
+        goto: goto
     };
 }();

@@ -18,7 +18,12 @@ import javax.sql.DataSource;
 import java.nio.charset.StandardCharsets;
 
 @EnableWebMvc
-@ComponentScan({ "ar.edu.itba.paw.webapp.controller","ar.edu.itba.paw.services","ar.edu.itba.paw.persistence"})
+@ComponentScan({
+        "ar.edu.itba.paw.webapp.controller",
+        "ar.edu.itba.paw.services",
+        "ar.edu.itba.paw.persistence",
+        "ar.edu.itba.paw.webapp.transformer"
+})
 @Configuration
 public class WebConfig {
     protected static final String DB_URL = "jdbc:postgresql://10.16.1.110:5432/paw-2020a-9";

@@ -60,8 +60,7 @@ public class WebAuthConfig extends WebSecurityConfigurerAdapter {
             .and().authorizeRequests()
                 .antMatchers("/").anonymous()
                 .antMatchers("/login").anonymous()
-                .antMatchers("/signup").anonymous()
-                .antMatchers("/signup/complete").not().hasAnyRole(UserRole.names())
+                .antMatchers("/signup/**").anonymous()
                 .antMatchers("/patient/**").hasRole(UserRole.PATIENT.name())
                 .antMatchers("/staff/**").hasRole(UserRole.STAFF.name())
                 .antMatchers("/**").authenticated()
@@ -77,7 +76,7 @@ public class WebAuthConfig extends WebSecurityConfigurerAdapter {
                 .key(this.getSecretKey())
                 .tokenValiditySeconds((int) TimeUnit.DAYS.toSeconds(30))
             .and().logout()
-                .logoutUrl("/logout") // todo
+                .logoutUrl("/logout")
                 .logoutSuccessUrl("/")
                 .invalidateHttpSession(true)
                 .permitAll()
@@ -89,7 +88,7 @@ public class WebAuthConfig extends WebSecurityConfigurerAdapter {
 
     @Override
     public void configure(WebSecurity web) throws Exception {
-        web.ignoring().antMatchers("/css/**", "/img/**", "/403", "/500", "/404");
+        web.ignoring().antMatchers("/js/**", "/css/**", "/img/**", "/403", "/500", "/404");
     }
 
     private String getSecretKey() throws IOException {

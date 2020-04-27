@@ -1,4 +1,4 @@
-package ar.edu.itba.paw.webapp.form;
+package ar.edu.itba.paw.webapp.form.authentication;
 
 import ar.edu.itba.paw.models.User;
 import org.hibernate.validator.constraints.Email;
@@ -6,7 +6,7 @@ import org.hibernate.validator.constraints.NotEmpty;
 
 import javax.validation.constraints.Size;
 
-public class UserSignUpForm {
+public abstract class UserSignUpForm {
     @Email
     @NotEmpty
     private String email;
@@ -70,4 +70,6 @@ public class UserSignUpForm {
     public void setRepeatPassword(String repeatPassword) {
         this.repeatPassword = repeatPassword;
     }
+
+    public abstract boolean isStaff();
 }
