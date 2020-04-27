@@ -1,0 +1,46 @@
+html,body{
+    height: 100%;
+}
+.header{
+    background-color: #00C4BA;
+}
+
+.header-brand{
+    font-weight: bold;
+}
+.header-brand:hover{
+    font-weight: bold;
+    color: white!important;
+}
+
+.header-a-element{
+    color: white;
+}
+.header-a-element:hover{
+    color: #e0e0e0;
+}
+.header-btn-element{
+    color: #00C4BA;
+    font-weight: bold;
+}
+.header-btn-element:hover{
+    color: rgb(0, 160, 152);
+    font-weight: bold;
+}
+
+.green-text{
+    color:#00C4BA;
+}
+
+#navbar-logo{
+    width: 2em;
+}
+
+
+.grey-background{
+    background-color: rgba(214, 214, 214);
+}
+
+.fill-height{
+    flex:1 1 auto;
+}
