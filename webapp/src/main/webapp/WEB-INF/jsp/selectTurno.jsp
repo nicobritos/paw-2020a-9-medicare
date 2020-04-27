@@ -3,7 +3,7 @@
 <html lang="en">
   <head>
     <%@ include file = "head.jsp" %>
-    <link rel="stylesheet" href="styles.css" />
+    <link rel="stylesheet" href='<c:url value="/css/selectTurno.css"/>' />
   </head>
   <body class="container-fluid d-flex flex-column p-0">
   <%--TODO use navbarLogged--%>
@@ -99,6 +99,7 @@
               <p>23 abr</p>
               <button class="btn btn-sm btn-secondary mb-2">10:00hs</button>
             </div>
+            <%-- TODO:connect boton adelante --%>
             <div class="col-1 p-0 flex-shrink-1"><button class="btn">></button></div>
           </div>
         </div>
