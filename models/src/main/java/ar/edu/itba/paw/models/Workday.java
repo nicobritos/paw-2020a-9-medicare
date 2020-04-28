@@ -12,6 +12,10 @@ public class Workday extends GenericModel<Workday, Integer> {
     private Integer startHour;
     @Column(name = "end_hour", required = true)
     private Integer endHour;
+    @Column(name = "start_minute", required = true)
+    private Integer startMinute;
+    @Column(name = "end_minute", required = true)
+    private Integer endMinute;
     @Column(name = "day", required = true)
     private String day;
 
@@ -45,6 +49,22 @@ public class Workday extends GenericModel<Workday, Integer> {
 
     public void setDay(String day) {
         this.day = day;
+    }
+
+    public Integer getStartMinute() {
+        return this.startMinute;
+    }
+
+    public void setStartMinute(Integer startMinute) {
+        this.startMinute = startMinute;
+    }
+
+    public Integer getEndMinute() {
+        return this.endMinute;
+    }
+
+    public void setEndMinute(Integer endMinute) {
+        this.endMinute = endMinute;
     }
 
     @Override

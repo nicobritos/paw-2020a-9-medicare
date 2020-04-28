@@ -1,10 +1,11 @@
-package ar.edu.itba.paw;
+package ar.edu.itba.paw.cache;
 
 import ar.edu.itba.paw.models.Locality;
 import ar.edu.itba.paw.models.Office;
 import ar.edu.itba.paw.models.Staff;
 import ar.edu.itba.paw.models.StaffSpecialty;
 import ar.edu.itba.paw.persistence.StaffDaoImpl;
+import ar.edu.itba.paw.persistence.utils.cache.CacheHelper;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -47,6 +48,7 @@ public class StaffDaoImplTest
     private static final String COUNTRY_TABLE = "system_country";
     private static final String SPECIALTY_STAFF_TABLE = "system_staff_specialty_staff";
 
+
     private StaffDaoImpl staffDao;
     private JdbcTemplate jdbcTemplate;
     private SimpleJdbcInsert staffSpecialtyStaffInsert;
@@ -61,6 +63,7 @@ public class StaffDaoImplTest
 
     private void cleanAllTables(){
         this.jdbcTemplate.execute("TRUNCATE SCHEMA PUBLIC RESTART IDENTITY AND COMMIT NO CHECK");
+        CacheHelper.clean();
     }
 
     private void insertOffice(){

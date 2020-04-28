@@ -1,7 +1,8 @@
-package ar.edu.itba.paw;
+package ar.edu.itba.paw.cache;
 
 import ar.edu.itba.paw.models.StaffSpecialty;
 import ar.edu.itba.paw.persistence.StaffSpecialtyDaoImpl;
+import ar.edu.itba.paw.persistence.utils.cache.CacheHelper;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -43,6 +44,7 @@ public class StaffSpecialityDaoImplTest {
 
     private void cleanAllTables() {
         this.jdbcTemplate.execute("TRUNCATE SCHEMA PUBLIC RESTART IDENTITY AND COMMIT NO CHECK");
+        CacheHelper.clean();
     }
 
     private StaffSpecialty staffSpecialtyModel() {
