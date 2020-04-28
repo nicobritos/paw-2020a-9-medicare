@@ -44,7 +44,7 @@ alter table office
 alter table staff
     add constraint staff_users_users_id_fk
         foreign key (user_id) references users
-            on update restrict on delete set null
+            on update restrict on delete set null;
 
 create index staff_user_id_index
-    on staff (user_id)
+    on staff (user_id);
