@@ -1,10 +1,7 @@
-package ar.edu.itba.paw.cache;
+package ar.edu.itba.paw;
 
 import ar.edu.itba.paw.models.Province;
-import ar.edu.itba.paw.persistence.CountryDaoImpl;
 import ar.edu.itba.paw.persistence.ProvinceDaoImpl;
-import ar.edu.itba.paw.persistence.utils.builder.JDBCWhereClauseBuilder;
-import ar.edu.itba.paw.persistence.utils.cache.CacheHelper;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -34,7 +31,6 @@ public class ProvinceDaoImplTest
     private static final String COUNTRIES_TABLE = "system_country";
 
     private ProvinceDaoImpl provinceDao;
-    private CountryDaoImpl countryDao;
     private JdbcTemplate jdbcTemplate;
     private SimpleJdbcInsert provinceJdbcInsert;
     private SimpleJdbcInsert countryJdbcInsert;
@@ -44,7 +40,6 @@ public class ProvinceDaoImplTest
 
     @Before
     public void setUp(){
-        this.countryDao = new CountryDaoImpl(this.ds);
         this.provinceDao = new ProvinceDaoImpl(this.ds);
         this.jdbcTemplate = new JdbcTemplate(this.ds);
         this.provinceJdbcInsert = new SimpleJdbcInsert(this.ds)
@@ -56,7 +51,6 @@ public class ProvinceDaoImplTest
 
     private void cleanAllTables(){
         this.jdbcTemplate.execute("TRUNCATE SCHEMA PUBLIC RESTART IDENTITY AND COMMIT NO CHECK");
-        CacheHelper.clean();
     }
 
     private Province provinceModel(){
@@ -131,67 +125,6 @@ public class ProvinceDaoImplTest
 
         // 3. Postcondiciones
         assertFalse(province.isPresent());
-    }
-
-    @Test
-    public void testFindProvinceByField()
-    {
-        // 1. Precondiciones
-        cleanAllTables();
-        insertProvince();
-
-        // 2. Ejercitar
-        Set<Province> provinces = this.provinceDao.findByField("name", PROVINCE);
-
-        // 3. Postcondiciones
-        assertNotNull(provinces);
-        assertFalse(provinces.isEmpty());
-        assertEquals(PROVINCE, provinces.stream().findFirst().get().getName());
-    }
-
-    @Test
-    public void testFindProvinceByFieldDoesntExist()
-    {
-        // 1. Precondiciones
-        cleanAllTables();
-
-        // 2. Ejercitar
-        Set<Province> provinces = this.provinceDao.findByField("name", PROVINCE);
-
-        // 3. Postcondiciones
-        assertNotNull(provinces);
-        assertTrue(provinces.isEmpty());
-    }
-
-    @Test
-    public void testFindProvinceByFieldOp()
-    {
-        // 1. Precondiciones
-        cleanAllTables();
-
-        insertProvince();
-
-        // 2. Ejercitar
-        Set<Province> provinces = this.provinceDao.findByField("name", JDBCWhereClauseBuilder.Operation.EQ, PROVINCE);
-
-        // 3. Postcondiciones
-        assertNotNull(provinces);
-        assertFalse(provinces.isEmpty());
-        assertEquals(PROVINCE, provinces.stream().findFirst().get().getName());
-    }
-
-    @Test
-    public void testFindProvinceByFieldOpDoesntExist()
-    {
-        // 1. Precondiciones
-        cleanAllTables();
-
-        // 2. Ejercitar
-        Set<Province> provinces = this.provinceDao.findByField("name", JDBCWhereClauseBuilder.Operation.EQ, PROVINCE);
-
-        // 3. Postcondiciones
-        assertNotNull(provinces);
-        assertTrue(provinces.isEmpty());
     }
 
     @Test

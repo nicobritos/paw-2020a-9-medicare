@@ -1,12 +1,10 @@
-package ar.edu.itba.paw.cache;
+package ar.edu.itba.paw;
 
 import ar.edu.itba.paw.models.Locality;
 import ar.edu.itba.paw.models.Office;
 import ar.edu.itba.paw.models.Staff;
 import ar.edu.itba.paw.models.StaffSpecialty;
 import ar.edu.itba.paw.persistence.StaffDaoImpl;
-import ar.edu.itba.paw.persistence.utils.builder.JDBCWhereClauseBuilder;
-import ar.edu.itba.paw.persistence.utils.cache.CacheHelper;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -49,7 +47,6 @@ public class StaffDaoImplTest
     private static final String COUNTRY_TABLE = "system_country";
     private static final String SPECIALTY_STAFF_TABLE = "system_staff_specialty_staff";
 
-
     private StaffDaoImpl staffDao;
     private JdbcTemplate jdbcTemplate;
     private SimpleJdbcInsert staffSpecialtyStaffInsert;
@@ -64,7 +61,6 @@ public class StaffDaoImplTest
 
     private void cleanAllTables(){
         this.jdbcTemplate.execute("TRUNCATE SCHEMA PUBLIC RESTART IDENTITY AND COMMIT NO CHECK");
-        CacheHelper.clean();
     }
 
     private void insertOffice(){
@@ -253,64 +249,6 @@ public class StaffDaoImplTest
 
         // 2. Ejercitar
         Collection<Staff> staffs = this.staffDao.findByIds(Arrays.asList(0,1,2)); // Identity de HSQLDB empieza en 0
-
-        // 3. Postcondiciones
-        assertNotNull(staffs);
-        assertTrue(staffs.isEmpty());
-    }
-
-    @Test
-    public void testFindByField(){
-        // 1. Precondiciones
-        this.cleanAllTables();
-
-        this.insertStaff();
-        this.insertAnotherStaff();
-
-        // 2. Ejercitar
-        Collection<Staff> staffs = this.staffDao.findByField("email", EMAIL);
-
-        // 3. Postcondiciones
-        assertNotNull(staffs);
-        assertEquals(2, staffs.size());
-    }
-
-    @Test
-    public void testFindByFieldDoesntExist(){
-        // 1. Precondiciones
-        this.cleanAllTables();
-
-        // 2. Ejercitar
-        Collection<Staff> staffs = this.staffDao.findByField("email", EMAIL);
-
-        // 3. Postcondiciones
-        assertNotNull(staffs);
-        assertTrue(staffs.isEmpty());
-    }
-
-    @Test
-    public void testFindByFieldOp(){
-        // 1. Precondiciones
-        this.cleanAllTables();
-
-        this.insertStaff();
-        this.insertAnotherStaff();
-
-        // 2. Ejercitar
-        Collection<Staff> staffs = this.staffDao.findByField("staff_id", JDBCWhereClauseBuilder.Operation.GEQ, 1);
-
-        // 3. Postcondiciones
-        assertNotNull(staffs);
-        assertEquals(1, staffs.size());
-    }
-
-    @Test
-    public void testFindByFieldOpDoesntExist(){
-        // 1. Precondiciones
-        this.cleanAllTables();
-
-        // 2. Ejercitar
-        Collection<Staff> staffs = this.staffDao.findByField("staff_id", JDBCWhereClauseBuilder.Operation.GEQ, 1);
 
         // 3. Postcondiciones
         assertNotNull(staffs);

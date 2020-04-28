@@ -1,11 +1,8 @@
-package ar.edu.itba.paw.cache;
+package ar.edu.itba.paw;
 
 import ar.edu.itba.paw.models.Country;
 import ar.edu.itba.paw.models.Province;
 import ar.edu.itba.paw.persistence.CountryDaoImpl;
-import ar.edu.itba.paw.persistence.utils.builder.JDBCWhereClauseBuilder;
-import ar.edu.itba.paw.persistence.utils.cache.CacheHelper;
-import ar.edu.itba.paw.persistence.utils.proxy.NotManagedByDAOException;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -55,7 +52,6 @@ public class CountryDaoImplTest
 
     private void cleanAllTables(){
         this.jdbcTemplate.execute("TRUNCATE SCHEMA PUBLIC RESTART IDENTITY AND COMMIT NO CHECK");
-        CacheHelper.clean();
     }
 
     private Province provinceModel(){
@@ -119,31 +115,6 @@ public class CountryDaoImplTest
     }
 
     @Test
-    public void testFindCountryByIdDuplicate()
-    {
-        // 1. Precondiciones
-        cleanAllTables();
-        insertCountry();
-
-        // 2. Ejercitar
-        Optional<Country> country = this.countryDao.findById(COUNTRY_ID);
-        Optional<Country> country2 = this.countryDao.findById(COUNTRY_ID);
-
-        // 3. Postcondiciones
-        assertTrue(country.isPresent());
-        assertEquals(COUNTRY, country.get().getName());
-        assertEquals(COUNTRY_ID, country.get().getId());
-
-        assertTrue(country2.isPresent());
-        assertEquals(COUNTRY, country2.get().getName());
-        assertEquals(COUNTRY_ID, country2.get().getId());
-
-        assertNotSame(country.get(), country2.get());
-        assertFalse(country.get().isCached());
-        assertTrue(country2.get().isCached());
-    }
-
-    @Test
     public void testFindCountryByIdDoesntExist()
     {
         // 1. Precondiciones
@@ -154,64 +125,6 @@ public class CountryDaoImplTest
 
         // 3. Postcondiciones
         assertFalse(country.isPresent());
-    }
-
-    @Test
-    public void testFindCountryByField()
-    {
-        // 1. Precondiciones
-        cleanAllTables();
-        insertCountry();
-
-        // 2. Ejercitar
-        Set<Country> countries = this.countryDao.findByField("name", COUNTRY);
-
-        // 3. Postcondiciones
-        assertNotNull(countries);
-        assertFalse(countries.isEmpty());
-        assertEquals(COUNTRY_ID, countries.stream().findFirst().get().getId());
-    }
-
-    @Test
-    public void testFindCountryByFieldDoesntExist()
-    {
-        // 1. Precondiciones
-        cleanAllTables();
-
-        // 2. Ejercitar
-        Set<Country> countries = this.countryDao.findByField("name", COUNTRY);
-
-        // 3. Postcondiciones
-        assertNotNull(countries);
-        assertTrue(countries.isEmpty());
-    }
-
-    @Test
-    public void testFindCountryByFieldOp()
-    {
-        // 1. Precondiciones
-        cleanAllTables();
-        insertCountry();
-
-        // 2. Ejercitar
-        Set<Country> countries = this.countryDao.findByField("name", JDBCWhereClauseBuilder.Operation.EQ, COUNTRY);
-
-        // 3. Postcondiciones
-        assertNotNull(countries);
-        assertFalse(countries.isEmpty());
-        assertEquals(COUNTRY_ID, countries.stream().findFirst().get().getId());
-    }
-
-    @Test
-    public void testFindCountryByFieldOpDoesntExist()
-    {
-        // 1. Precondiciones
-        cleanAllTables();// 2. Ejercitar
-        Set<Country> countries = this.countryDao.findByField("name", JDBCWhereClauseBuilder.Operation.EQ, COUNTRY);
-
-        // 3. Postcondiciones
-        assertNotNull(countries);
-        assertTrue(countries.isEmpty());
     }
 
     @Test
@@ -311,26 +224,6 @@ public class CountryDaoImplTest
         cleanAllTables();
         insertCountry();
         Country c = this.countryDao.findById(COUNTRY_ID).get();
-        c.setName("Armenia");
-
-        // 2. Ejercitar
-        this.countryDao.update(c);
-
-        // 3. Postcondiciones
-        assertEquals(1,JdbcTestUtils.countRowsInTable(jdbcTemplate, COUNTRIES_TABLE));
-        assertEquals(1,JdbcTestUtils.countRowsInTableWhere(jdbcTemplate, COUNTRIES_TABLE, "name = 'Armenia'"));
-        assertEquals(0,JdbcTestUtils.countRowsInTableWhere(jdbcTemplate, COUNTRIES_TABLE, "name = '"+ COUNTRY +"'"));
-
-    }
-
-    @Test(expected = NotManagedByDAOException.class)
-    public void testCountryUpdateNotDAOManaged()
-    {
-        // 1. Precondiciones
-        cleanAllTables();
-        insertCountry();
-        Country c = new Country();
-        c.setId("AR");
         c.setName("Armenia");
 
         // 2. Ejercitar

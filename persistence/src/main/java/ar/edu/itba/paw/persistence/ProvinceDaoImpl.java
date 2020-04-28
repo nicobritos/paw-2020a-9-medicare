@@ -10,8 +10,6 @@ import ar.edu.itba.paw.persistence.utils.builder.JDBCSelectQueryBuilder;
 import ar.edu.itba.paw.persistence.utils.builder.JDBCWhereClauseBuilder;
 import ar.edu.itba.paw.persistence.utils.builder.JDBCWhereClauseBuilder.ColumnTransformer;
 import ar.edu.itba.paw.persistence.utils.builder.JDBCWhereClauseBuilder.Operation;
-import ar.edu.itba.paw.persistence.utils.cache.CacheHelper;
-import ar.edu.itba.paw.persistence.utils.cache.FilteredCachedCollection;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
@@ -40,14 +38,6 @@ public class ProvinceDaoImpl extends GenericSearchableDaoImpl<Province, Integer>
     public Set<Province> findByCountryAndName(Country country, String name) {
         name = name.toLowerCase();
         String finalName = name;
-        FilteredCachedCollection<Province> cachedCollection = CacheHelper.filter(
-                Province.class,
-                Integer.class,
-                province -> province.getName().toLowerCase().contains(finalName) && province.getCountry().equals(country)
-        );
-        if (this.isCacheComplete(cachedCollection)) {
-            return cachedCollection.getCollectionAsSet();
-        }
 
         MapSqlParameterSource parameterSource = new MapSqlParameterSource();
         parameterSource.addValue("country", country.getId());
@@ -57,10 +47,6 @@ public class ProvinceDaoImpl extends GenericSearchableDaoImpl<Province, Integer>
                 .where(this.formatColumnFromName("name"), Operation.LIKE, ":name", ColumnTransformer.LOWER)
                 .and()
                 .where(this.formatColumnFromName("country_id"), Operation.EQ, ":country");
-
-        if (!cachedCollection.getCollection().isEmpty()) {
-            this.excludeModels(cachedCollection.getCompleteCollection(), parameterSource, whereClauseBuilder);
-        }
 
         JDBCQueryBuilder queryBuilder = new JDBCSelectQueryBuilder()
                 .selectAll()

@@ -8,10 +8,6 @@ import ar.edu.itba.paw.persistence.utils.StringSearchType;
 import ar.edu.itba.paw.persistence.utils.builder.*;
 import ar.edu.itba.paw.persistence.utils.builder.JDBCWhereClauseBuilder.ColumnTransformer;
 import ar.edu.itba.paw.persistence.utils.builder.JDBCWhereClauseBuilder.Operation;
-import ar.edu.itba.paw.persistence.utils.cache.CacheHelper;
-import ar.edu.itba.paw.persistence.utils.cache.CachedCollection;
-import ar.edu.itba.paw.persistence.utils.cache.CachedCollectionStatus;
-import ar.edu.itba.paw.persistence.utils.cache.FilteredCachedCollection;
 import ar.edu.itba.paw.persistence.utils.proxy.NotManagedByDAOException;
 import ar.edu.itba.paw.persistence.utils.proxy.ProxyHelper;
 import ar.edu.itba.paw.persistenceAnnotations.*;
@@ -68,11 +64,6 @@ public abstract class GenericDaoImpl<M extends GenericModel<M, I>, I> implements
 
     @Override
     public Optional<M> findById(I id) {
-        M model = this.getFromCache(id);
-        if (model != null) {
-            return Optional.of(model);
-        }
-
         JDBCQueryBuilder queryBuilder = new JDBCSelectQueryBuilder()
                 .selectAll()
                 .from(this.getTableAlias())
@@ -84,9 +75,7 @@ public abstract class GenericDaoImpl<M extends GenericModel<M, I>, I> implements
         // Note that "parameterName" should NOT be preceded by a semicolon (as it is in the query)
         args.addValue("id", id);
 
-        Optional<M> mOptional = this.selectQuerySingle(queryBuilder.getQueryAsString(), args);
-        mOptional.ifPresent(this::setToCache);
-        return mOptional;
+        return this.selectQuerySingle(queryBuilder.getQueryAsString(), args);
     }
 
     @Override
@@ -96,23 +85,6 @@ public abstract class GenericDaoImpl<M extends GenericModel<M, I>, I> implements
 
         Map<String, Object> parameters = new HashMap<>();
         Collection<String> idsParameters = new LinkedList<>();
-        Set<M> foundModels = new HashSet<>();
-
-        int i = 0;
-        for (I id : ids) {
-            M foundModel = this.getFromCache(id);
-            if (foundModel != null) {
-                foundModels.add(foundModel);
-            } else {
-                String parameter = "_ids_" + i;
-                parameters.put(parameter, id);
-                idsParameters.add(":" + parameter);
-                i++;
-            }
-        }
-        if (foundModels.size() == ids.size()) {
-            return foundModels;
-        }
 
         JDBCQueryBuilder queryBuilder = new JDBCSelectQueryBuilder()
                 .selectAll()
@@ -124,12 +96,7 @@ public abstract class GenericDaoImpl<M extends GenericModel<M, I>, I> implements
         MapSqlParameterSource args = new MapSqlParameterSource();
         args.addValues(parameters);
 
-        Collection<M> queriedModels = this.selectQuery(queryBuilder.getQueryAsString(), args);
-        if (!queriedModels.isEmpty()) {
-            this.setToCache(queriedModels);
-            foundModels.addAll(queriedModels);
-        }
-        return foundModels;
+        return this.selectQuery(queryBuilder.getQueryAsString(), args);
     }
 
     @Override
@@ -152,7 +119,6 @@ public abstract class GenericDaoImpl<M extends GenericModel<M, I>, I> implements
             this.saveRelations(newModel);
 
             newModel = this.findById(newModel.getId()).get();
-            this.setToCache(newModel);
             return newModel;
         });
     }
@@ -190,7 +156,6 @@ public abstract class GenericDaoImpl<M extends GenericModel<M, I>, I> implements
         this.transactionTemplate.execute(transactionStatus -> {
             this.updateQuery(queryBuilder.getQueryAsString(), parameterSource);
             this.saveRelations(model);
-            this.setToCache(model);
             return null;
         });
     }
@@ -212,55 +177,19 @@ public abstract class GenericDaoImpl<M extends GenericModel<M, I>, I> implements
         parameterSource.addValue("id", id);
 
         this.updateQuery(queryBuilder.getQueryAsString(), parameterSource);
-        this.removeFromCache(id);
     }
 
     @Override
     public Set<M> list() {
-        CachedCollection<M> cachedModels = this.listFromCache();
-        if (this.isCacheComplete(cachedModels)) {
-            return cachedModels.getCollectionAsSet();
-        }
-        Set<M> previousModels = cachedModels.getCollectionAsSet();
-
         JDBCSelectQueryBuilder queryBuilder = new JDBCSelectQueryBuilder()
                 .selectAll()
                 .from(this.getTableAlias());
 
         MapSqlParameterSource parameterSource = new MapSqlParameterSource();
-        if (!previousModels.isEmpty()) {
-            JDBCWhereClauseBuilder whereClauseBuilder = new JDBCWhereClauseBuilder();
-            this.excludeModels(previousModels, parameterSource, whereClauseBuilder);
-            queryBuilder.where(whereClauseBuilder);
-        }
 
         Set<M> newModels = this.selectQuery(queryBuilder.getQueryAsString(), parameterSource);
-        this.setToCache(newModels);
         this.haveBeenListed = true;
-        newModels.addAll(previousModels);
         return newModels;
-    }
-
-    /**
-     * Searches for a collection of models that have a columnName equals to the provided object's value
-     * @param columnName the db column name
-     * @param value the column's value. If it extends GenericModel then its ID will be used
-     * @return a collection of models found
-     */
-    @Override
-    public Set<M> findByField(String columnName, Object value) {
-        return this.findByField(columnName, Operation.EQ, value);
-    }
-
-    /**
-     * Searches for a collection of models that have a columnName equals to the provided string (case insensitive)
-     * @param columnName the db column name
-     * @param value the column's value
-     * @return a collection of models found
-     */
-    @Override
-    public Set<M> findByFieldIgnoreCase(String columnName, String value) {
-        return this.findByFieldIgnoreCase(columnName, Operation.EQ, value, StringSearchType.EQUALS);
     }
 
     @Override
@@ -276,13 +205,6 @@ public abstract class GenericDaoImpl<M extends GenericModel<M, I>, I> implements
      * @return
      */
     public Set<M> findByField(String columnName, Operation operation, Object value) {
-        FilteredCachedCollection<M> cachedModels = this.filterFromCache(columnName, operation, value);
-        if (this.isCacheComplete(cachedModels)) {
-            return cachedModels.getCollectionAsSet();
-        }
-        Set<M> models = cachedModels.getCollectionAsSet();
-        Collection<M> allCachedModels = cachedModels.getCompleteCollection();
-
         JDBCWhereClauseBuilder whereClauseBuilder = new JDBCWhereClauseBuilder()
                 .where(this.formatColumnFromAlias(columnName), operation, ":argument");
 
@@ -292,9 +214,6 @@ public abstract class GenericDaoImpl<M extends GenericModel<M, I>, I> implements
         } else {
             parameterSource.addValue("argument", value);
         }
-        if (!allCachedModels.isEmpty()) {
-            this.excludeModels(allCachedModels, parameterSource, whereClauseBuilder);
-        }
 
         JDBCQueryBuilder queryBuilder = new JDBCSelectQueryBuilder()
                 .selectAll()
@@ -302,7 +221,6 @@ public abstract class GenericDaoImpl<M extends GenericModel<M, I>, I> implements
                 .where(whereClauseBuilder);
 
         Set<M> newModels = this.selectQuery(queryBuilder.getQueryAsString(), parameterSource);
-        newModels.addAll(models);
         return newModels;
     }
 
@@ -311,22 +229,12 @@ public abstract class GenericDaoImpl<M extends GenericModel<M, I>, I> implements
     }
 
     protected Set<M> findByFieldIgnoreCase(String columnName, Operation operation, String value, StringSearchType stringSearchType) {
-        FilteredCachedCollection<M> cachedModels = this.filterFromCacheIgnoreCase(columnName, value, stringSearchType);
-        if (this.isCacheComplete(cachedModels)) {
-            return cachedModels.getCollectionAsSet();
-        }
-        Set<M> models = cachedModels.getCollectionAsSet();
-        Collection<M> allCachedModels = cachedModels.getCompleteCollection();
-
         JDBCWhereClauseBuilder whereClauseBuilder = new JDBCWhereClauseBuilder()
                 .where(this.formatColumnFromAlias(columnName), operation, ":argument", ColumnTransformer.LOWER);
 
         value = value.toLowerCase();
         MapSqlParameterSource parameterSource = new MapSqlParameterSource();
         parameterSource.addValue("argument", stringSearchType.transform(value));
-        if (!allCachedModels.isEmpty()) {
-            this.excludeModels(allCachedModels, parameterSource, whereClauseBuilder);
-        }
 
         JDBCQueryBuilder queryBuilder = new JDBCSelectQueryBuilder()
                 .selectAll()
@@ -334,48 +242,6 @@ public abstract class GenericDaoImpl<M extends GenericModel<M, I>, I> implements
                 .where(whereClauseBuilder);
 
         Set<M> newModels = this.selectQuery(queryBuilder.getQueryAsString(), parameterSource);
-        newModels.addAll(models);
-        return newModels;
-    }
-
-    protected Set<M> findByFieldIn(String columnName, Collection<?> values) {
-        if (values.isEmpty())
-            return new HashSet<>();
-
-        FilteredCachedCollection<M> cachedModels = this.filterFromCacheIn(columnName, values);
-        if (this.isCacheComplete(cachedModels)) {
-            return cachedModels.getCollectionAsSet();
-        }
-        Set<M> models = cachedModels.getCollectionAsSet();
-        Collection<M> allCachedModels = cachedModels.getCompleteCollection();
-
-        Map<String, Object> parameters = new HashMap<>();
-        int i = 0;
-        for (Object value : values) {
-            if (value instanceof GenericModel) {
-                parameters.put("_" + i, ((GenericModel) value).getId());
-            } else {
-                parameters.put("_" + i, value);
-            }
-            i++;
-        }
-
-        JDBCWhereClauseBuilder whereClauseBuilder = new JDBCWhereClauseBuilder()
-                .in(this.formatColumnFromAlias(columnName), parameters.keySet());
-
-        MapSqlParameterSource parameterSource = new MapSqlParameterSource();
-        parameterSource.addValues(parameters);
-        if (!allCachedModels.isEmpty()) {
-            this.excludeModels(allCachedModels, parameterSource, whereClauseBuilder);
-        }
-
-        JDBCQueryBuilder queryBuilder = new JDBCSelectQueryBuilder()
-                .selectAll()
-                .from(this.getTableAlias())
-                .where(whereClauseBuilder);
-
-        Set<M> newModels = this.selectQuery(queryBuilder.getQueryAsString(), parameterSource);
-        newModels.addAll(models);
         return newModels;
     }
 
@@ -476,17 +342,6 @@ public abstract class GenericDaoImpl<M extends GenericModel<M, I>, I> implements
 
     protected String getIdColumnName() {
         return this.primaryKeyName;
-    }
-
-    /**
-     * Returns a map associating column name with an argument name and the value in the model
-     * associated with that field. The arguments may be prefixed to avoid name collisions
-     * @param model the model
-     * @param prefix the arguments' prefix (can be empty)
-     * @return the map
-     */
-    protected Map<String, Pair<String, Object>> getModelColumnsArgumentValue(M model, String prefix) {
-        return this.getModelColumnsArgumentValue(model, prefix, false);
     }
 
     /**
@@ -648,8 +503,6 @@ public abstract class GenericDaoImpl<M extends GenericModel<M, I>, I> implements
 
         return m;
     }
-
-    // TODO Force set cache on update
 
     /**
      * TODO
@@ -852,49 +705,6 @@ public abstract class GenericDaoImpl<M extends GenericModel<M, I>, I> implements
         }
 
         return map;
-    }
-
-    protected boolean isCacheComplete(CachedCollection<M> cachedCollection) {
-        return this.haveBeenListed && cachedCollection.getStatus() == CachedCollectionStatus.COMPLETE;
-    }
-
-    protected synchronized M getFromCache(I id) {
-        return CacheHelper.get(this.mClass, this.iClass, id);
-    }
-
-    protected synchronized void setToCache(M model) {
-        CacheHelper.set(this.mClass, this.iClass, model);
-    }
-
-    protected synchronized void setToCache(Collection<M> models) {
-        CacheHelper.set(this.mClass, this.iClass, models);
-    }
-
-    protected synchronized void removeFromCache(I id) {
-        CacheHelper.remove(this.mClass, this.iClass, id);
-    }
-
-    protected synchronized CachedCollection<M> listFromCache() {
-        return CacheHelper.getAll(this.mClass, this.iClass);
-    }
-
-    protected synchronized FilteredCachedCollection<M> filterFromCache(String columnName, Operation operation, Object value) {
-        return CacheHelper.filter(this.mClass, this.iClass, m -> {
-            Object mValue = ReflectionGetterSetter.getValueAnnotatedWith(m, Column.class, column -> column.name().equals(columnName));
-            return operation.operate(mValue, value);
-        });
-    }
-
-    protected synchronized FilteredCachedCollection<M> filterFromCacheIgnoreCase(String columnName, String value, StringSearchType stringSearchType) {
-        return CacheHelper.filter(this.mClass, this.iClass, m -> {
-            Object mValue = ReflectionGetterSetter.getValueAnnotatedWith(m, Column.class, column -> column.name().equals(columnName));
-            if (mValue == null) return value == null;
-            return stringSearchType.operate(mValue.toString().toLowerCase(), value.toLowerCase());
-        });
-    }
-
-    protected synchronized FilteredCachedCollection<M> filterFromCacheIn(String columnName, Collection<? extends Object> values) {
-        return this.filterFromCache(columnName, Operation.EQ, values);
     }
 
     protected void excludeModels(Collection<M> models, MapSqlParameterSource parameterSource, JDBCWhereClauseBuilder whereClauseBuilder) {

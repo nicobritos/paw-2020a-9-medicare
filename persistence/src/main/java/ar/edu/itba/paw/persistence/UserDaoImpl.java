@@ -3,6 +3,7 @@ package ar.edu.itba.paw.persistence;
 import ar.edu.itba.paw.interfaces.daos.UserDao;
 import ar.edu.itba.paw.models.User;
 import ar.edu.itba.paw.persistence.generics.GenericSearchableDaoImpl;
+import ar.edu.itba.paw.persistence.utils.builder.JDBCWhereClauseBuilder.Operation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
@@ -32,7 +33,7 @@ public class UserDaoImpl extends GenericSearchableDaoImpl<User, Integer> impleme
 
     @Override
     public Optional<User> findByEmail(String email) {
-        return this.findByField("email", email).stream().findFirst();
+        return this.findByField("email", Operation.EQ, email).stream().findFirst();
     }
 
     @Override

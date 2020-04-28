@@ -1,10 +1,9 @@
-package ar.edu.itba.paw.nocache;
+package ar.edu.itba.paw;
 
 import ar.edu.itba.paw.models.Country;
 import ar.edu.itba.paw.models.Locality;
 import ar.edu.itba.paw.models.Office;
 import ar.edu.itba.paw.persistence.OfficeDaoImpl;
-import ar.edu.itba.paw.persistence.utils.builder.JDBCWhereClauseBuilder;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -207,63 +206,6 @@ public class OfficeDaoImplTest
 
         // 2. Ejercitar
         Collection<Office> offices = officeDao.findByIds(Arrays.asList(0,1,2)); // Identity de HSQLDB empieza en 0
-
-        // 3. Postcondiciones
-        assertNotNull(offices);
-        assertTrue(offices.isEmpty());
-    }
-
-    @Test
-    public void testFindByField(){
-        // 1. Precondiciones
-        cleanAllTables();
-        insertOffice();
-        insertAnotherOffice();
-
-        // 2. Ejercitar
-        Collection<Office> offices = officeDao.findByField("email", EMAIL);
-
-        // 3. Postcondiciones
-        assertNotNull(offices);
-        assertEquals(2, offices.size());
-    }
-
-    @Test
-    public void testFindByFieldDoesntExist(){
-        // 1. Precondiciones
-        cleanAllTables();
-
-        // 2. Ejercitar
-        Collection<Office> offices = officeDao.findByField("email", EMAIL);
-
-        // 3. Postcondiciones
-        assertNotNull(offices);
-        assertTrue(offices.isEmpty());
-    }
-
-    @Test
-    public void testFindByFieldOp(){
-        // 1. Precondiciones
-        // Vaciar tablas
-        cleanAllTables();
-        insertOffice();
-        insertAnotherOffice();
-
-        // 2. Ejercitar
-        Collection<Office> offices = officeDao.findByField("office_id", JDBCWhereClauseBuilder.Operation.LEQ, 1);
-
-        // 3. Postcondiciones
-        assertNotNull(offices);
-        assertEquals(2, offices.size());
-    }
-
-    @Test
-    public void testFindByFieldOpDoesntExist(){
-        // 1. Precondiciones
-        cleanAllTables();
-
-        // 2. Ejercitar
-        Collection<Office> offices = officeDao.findByField("office_id", JDBCWhereClauseBuilder.Operation.LEQ, 1);
 
         // 3. Postcondiciones
         assertNotNull(offices);

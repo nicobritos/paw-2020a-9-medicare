@@ -1,9 +1,7 @@
-package ar.edu.itba.paw.cache;
+package ar.edu.itba.paw;
 
 import ar.edu.itba.paw.models.Locality;
 import ar.edu.itba.paw.persistence.LocalityDaoImpl;
-import ar.edu.itba.paw.persistence.utils.builder.JDBCWhereClauseBuilder;
-import ar.edu.itba.paw.persistence.utils.cache.CacheHelper;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -31,8 +29,6 @@ public class LocalityDaoImplTest
     private static final String LOCALITIES_TABLE = "system_locality";
     private static final String PROVINCES_TABLE = "system_province";
 
-
-
     private LocalityDaoImpl localityDao;
     private JdbcTemplate jdbcTemplate;
     private SimpleJdbcInsert localityJdbcInsert;
@@ -55,7 +51,6 @@ public class LocalityDaoImplTest
 
     private void cleanAllTables(){
         this.jdbcTemplate.execute("TRUNCATE SCHEMA PUBLIC RESTART IDENTITY AND COMMIT NO CHECK");
-        CacheHelper.clean();
     }
 
     private Locality localityModel(){
@@ -130,67 +125,6 @@ public class LocalityDaoImplTest
 
         // 3. Postcondiciones
         assertFalse(locality.isPresent());
-    }
-
-    @Test
-    public void testFindLocalityByField()
-    {
-        // 1. Precondiciones
-        cleanAllTables();
-        insertLocality();
-
-        // 2. Ejercitar
-        Set<Locality> localitys = this.localityDao.findByField("name", LOCALITY);
-
-        // 3. Postcondiciones
-        assertNotNull(localitys);
-        assertFalse(localitys.isEmpty());
-        assertEquals(LOCALITY, localitys.stream().findFirst().get().getName());
-    }
-
-    @Test
-    public void testFindLocalityByFieldDoesntExist()
-    {
-        // 1. Precondiciones
-        cleanAllTables();
-
-        // 2. Ejercitar
-        Set<Locality> localitys = this.localityDao.findByField("name", LOCALITY);
-
-        // 3. Postcondiciones
-        assertNotNull(localitys);
-        assertTrue(localitys.isEmpty());
-    }
-
-    @Test
-    public void testFindLocalityByFieldOp()
-    {
-        // 1. Precondiciones
-        cleanAllTables();
-
-        insertLocality();
-
-        // 2. Ejercitar
-        Set<Locality> localitys = this.localityDao.findByField("name", JDBCWhereClauseBuilder.Operation.EQ, LOCALITY);
-
-        // 3. Postcondiciones
-        assertNotNull(localitys);
-        assertFalse(localitys.isEmpty());
-        assertEquals(LOCALITY, localitys.stream().findFirst().get().getName());
-    }
-
-    @Test
-    public void testFindLocalityByFieldOpDoesntExist()
-    {
-        // 1. Precondiciones
-        cleanAllTables();
-
-        // 2. Ejercitar
-        Set<Locality> localitys = this.localityDao.findByField("name", JDBCWhereClauseBuilder.Operation.EQ, LOCALITY);
-
-        // 3. Postcondiciones
-        assertNotNull(localitys);
-        assertTrue(localitys.isEmpty());
     }
 
     @Test
