@@ -3,8 +3,8 @@ package ar.edu.itba.paw.interfaces.daos.generic;
 import ar.edu.itba.paw.models.GenericModel;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 
 /**
  * This provides a generic DAO interface
@@ -14,7 +14,7 @@ import java.util.Set;
 public interface GenericDao<M extends GenericModel<M, I>, I> {
     Optional<M> findById(I id);
 
-    Set<M> findByIds(Collection<I> ids);
+    List<M> findByIds(Collection<I> ids);
 
     M create(M model);
 
@@ -24,7 +24,7 @@ public interface GenericDao<M extends GenericModel<M, I>, I> {
 
     void remove(I id);
 
-    Set<M> list();
+    List<M> list();
 
     Class<M> getModelClass();
 }

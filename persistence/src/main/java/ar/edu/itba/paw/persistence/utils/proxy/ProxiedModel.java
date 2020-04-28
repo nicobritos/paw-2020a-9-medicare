@@ -12,11 +12,16 @@ import org.springframework.cglib.proxy.MethodInterceptor;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-import java.util.*;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 class ProxiedModel<M extends GenericModel<M, I>, I> implements ProxiedModelCollection {
-    private HashMap<String, Set<GenericModel<Object, Object>>> savedCollection;
+    private HashMap<String, Collection<GenericModel<Object, Object>>> savedCollection;
+    private HashMap<String, ProxyField> bypassFindByIds;
+    private HashMap<String, ProxyField> bypassFindById;
     private HashMap<String, ProxyField> lazyFindByIds;
     private HashMap<String, ProxyField> lazyFindById;
     private MethodInterceptor methodInterceptor;
@@ -24,6 +29,8 @@ class ProxiedModel<M extends GenericModel<M, I>, I> implements ProxiedModelColle
 
     public ProxiedModel(M target) {
         this.savedCollection = new HashMap<>();
+        this.bypassFindByIds = new HashMap<>();
+        this.bypassFindById = new HashMap<>();
         this.lazyFindByIds = new HashMap<>();
         this.lazyFindById = new HashMap<>();
         this.target = target;
@@ -32,6 +39,8 @@ class ProxiedModel<M extends GenericModel<M, I>, I> implements ProxiedModelColle
 
     public ProxiedModel(ProxiedModel<M, I> targetCopy) {
         this.savedCollection = new HashMap<>();
+        this.bypassFindByIds = new HashMap<>();
+        this.bypassFindById = new HashMap<>();
         this.lazyFindByIds = new HashMap<>();
         this.lazyFindById = new HashMap<>();
         try {
@@ -46,13 +55,13 @@ class ProxiedModel<M extends GenericModel<M, I>, I> implements ProxiedModelColle
     }
 
     @Override
-    public Set<GenericModel<Object, Object>> getPreviousModels(Field field) {
+    public Collection<GenericModel<Object, Object>> getPreviousModels(Field field) {
         return this.savedCollection.get(field.getName());
     }
 
     @Override
-    public void setPreviousCollection(Field field, Set<GenericModel<Object, Object>> models) {
-        this.savedCollection.put(field.getName(), new HashSet<>(models));
+    public void setPreviousCollection(Field field, Collection<GenericModel<Object, Object>> models) {
+        this.savedCollection.put(field.getName(), new LinkedList<>(models));
     }
 
     public void setField(Field field, Object value) {
@@ -68,7 +77,7 @@ class ProxiedModel<M extends GenericModel<M, I>, I> implements ProxiedModelColle
 
         ReflectionGetterSetter.iterateFields(mClass, OneToOne.class, field -> {
             OneToOne relation = field.getAnnotation(OneToOne.class);
-            if (!relation.lazy())
+            if (!relation.inverse() && !relation.lazy())
                 return;
 
             Class<? extends GenericModel<?, Object>> otherClass;
@@ -81,16 +90,29 @@ class ProxiedModel<M extends GenericModel<M, I>, I> implements ProxiedModelColle
 
             GenericDao<? extends GenericModel<?, Object>, Object> otherDao = DAOManager.getDaoForModel(otherClass);
             try {
-                this.lazyFindById.put(
-                        ReflectionGetterSetter.getter(mClass, field).getName(),
-                        new ProxyField(
-                                otherDao,
-                                otherDao.getClass().getMethod("findById", Object.class),
-                                target,
-                                field,
-                                false
-                        )
-                );
+                if (relation.inverse()) {
+                    this.bypassFindById.put(
+                            ReflectionGetterSetter.getter(mClass, field).getName(),
+                            new ProxyField(
+                                    otherDao,
+                                    otherDao.getClass().getMethod("findById", Object.class),
+                                    target,
+                                    field,
+                                    false
+                            )
+                    );
+                } else {
+                    this.lazyFindById.put(
+                            ReflectionGetterSetter.getter(mClass, field).getName(),
+                            new ProxyField(
+                                    otherDao,
+                                    otherDao.getClass().getMethod("findById", Object.class),
+                                    target,
+                                    field,
+                                    false
+                            )
+                    );
+                }
             } catch (NoSuchMethodException e) {
                 // TODO
                 e.printStackTrace();
@@ -98,7 +120,7 @@ class ProxiedModel<M extends GenericModel<M, I>, I> implements ProxiedModelColle
         });
         ReflectionGetterSetter.iterateFields(mClass, OneToMany.class, field -> {
             OneToMany relation = field.getAnnotation(OneToMany.class);
-            if (!relation.lazy())
+            if (!relation.inverse() && !relation.lazy())
                 return;
 
             Class<? extends GenericModel<?, Object>> otherClass;
@@ -111,16 +133,29 @@ class ProxiedModel<M extends GenericModel<M, I>, I> implements ProxiedModelColle
 
             GenericDao<? extends GenericModel<?, Object>, Object> otherDao = DAOManager.getDaoForModel(otherClass);
             try {
-                this.lazyFindByIds.put(
-                        ReflectionGetterSetter.getter(mClass, field).getName(),
-                        new ProxyField(
-                                otherDao,
-                                otherDao.getClass().getMethod("findByIds", Collection.class),
-                                target,
-                                field,
-                                false
-                        )
-                );
+                if (relation.inverse()) {
+                    this.bypassFindByIds.put(
+                            ReflectionGetterSetter.getter(mClass, field).getName(),
+                            new ProxyField(
+                                    otherDao,
+                                    otherDao.getClass().getMethod("findByIds", Collection.class),
+                                    target,
+                                    field,
+                                    false
+                            )
+                    );
+                } else {
+                    this.lazyFindByIds.put(
+                            ReflectionGetterSetter.getter(mClass, field).getName(),
+                            new ProxyField(
+                                    otherDao,
+                                    otherDao.getClass().getMethod("findByIds", Collection.class),
+                                    target,
+                                    field,
+                                    false
+                            )
+                    );
+                }
             } catch (NoSuchMethodException e) {
                 // TODO
                 e.printStackTrace();
@@ -128,7 +163,7 @@ class ProxiedModel<M extends GenericModel<M, I>, I> implements ProxiedModelColle
         });
         ReflectionGetterSetter.iterateFields(mClass, ManyToOne.class, field -> {
             ManyToOne relation = field.getAnnotation(ManyToOne.class);
-            if (!relation.lazy())
+            if (!relation.inverse() && !relation.lazy())
                 return;
 
             Class<? extends GenericModel<?, Object>> otherClass;
@@ -141,16 +176,29 @@ class ProxiedModel<M extends GenericModel<M, I>, I> implements ProxiedModelColle
 
             GenericDao<? extends GenericModel<?, Object>, Object> otherDao = DAOManager.getDaoForModel(otherClass);
             try {
-                this.lazyFindById.put(
-                        ReflectionGetterSetter.getter(mClass, field).getName(),
-                        new ProxyField(
-                                otherDao,
-                                otherDao.getClass().getMethod("findById", Object.class),
-                                target,
-                                field,
-                                false
-                        )
-                );
+                if (relation.inverse()) {
+                    this.bypassFindById.put(
+                            ReflectionGetterSetter.getter(mClass, field).getName(),
+                            new ProxyField(
+                                    otherDao,
+                                    otherDao.getClass().getMethod("findById", Object.class),
+                                    target,
+                                    field,
+                                    false
+                            )
+                    );
+                } else {
+                    this.lazyFindById.put(
+                            ReflectionGetterSetter.getter(mClass, field).getName(),
+                            new ProxyField(
+                                    otherDao,
+                                    otherDao.getClass().getMethod("findById", Object.class),
+                                    target,
+                                    field,
+                                    false
+                            )
+                    );
+                }
             } catch (NoSuchMethodException e) {
                 // TODO
                 e.printStackTrace();
@@ -158,7 +206,7 @@ class ProxiedModel<M extends GenericModel<M, I>, I> implements ProxiedModelColle
         });
         ReflectionGetterSetter.iterateFields(mClass, ManyToMany.class, field -> {
             ManyToMany relation = field.getAnnotation(ManyToMany.class);
-            if (!relation.lazy())
+            if (!relation.inverse() && !relation.lazy())
                 return;
 
             Class<? extends GenericModel<?, Object>> otherClass;
@@ -171,16 +219,29 @@ class ProxiedModel<M extends GenericModel<M, I>, I> implements ProxiedModelColle
 
             GenericDao<? extends GenericModel<?, Object>, Object> otherDao = DAOManager.getDaoForModel(otherClass);
             try {
-                this.lazyFindByIds.put(
-                        ReflectionGetterSetter.getter(mClass, field).getName(),
-                        new ProxyField(
-                                otherDao,
-                                otherDao.getClass().getMethod("findByIds", Collection.class),
-                                target,
-                                field,
-                                false
-                        )
-                );
+                if (relation.inverse()) {
+                    this.bypassFindByIds.put(
+                            ReflectionGetterSetter.getter(mClass, field).getName(),
+                            new ProxyField(
+                                    otherDao,
+                                    otherDao.getClass().getMethod("findByIds", Collection.class),
+                                    target,
+                                    field,
+                                    false
+                            )
+                    );
+                } else {
+                    this.lazyFindByIds.put(
+                            ReflectionGetterSetter.getter(mClass, field).getName(),
+                            new ProxyField(
+                                    otherDao,
+                                    otherDao.getClass().getMethod("findByIds", Collection.class),
+                                    target,
+                                    field,
+                                    false
+                            )
+                    );
+                }
             } catch (NoSuchMethodException e) {
                 // TODO
                 e.printStackTrace();
@@ -192,10 +253,49 @@ class ProxiedModel<M extends GenericModel<M, I>, I> implements ProxiedModelColle
                 return this;
 
             proxy = this.target;
+            ProxyField savedMethodData = this.bypassFindById.get(method.getName());
+            if (savedMethodData != null) {
+                Object result;
+                Method savedMethod = savedMethodData.getDaoMethod();
+                if (method.isAccessible()) {
+                    result = savedMethod.invoke(savedMethodData.getDao(), savedMethodData.getModelId());
+                } else {
+                    method.setAccessible(true);
+                    result = savedMethod.invoke(savedMethodData.getDao(), savedMethodData.getModelId());
+                    method.setAccessible(false);
+                }
+                try {
+                    Optional<Object> optionalResult = (Optional<Object>) result;
+                    result = optionalResult.orElse(null);
+                } catch (ClassCastException ignored) {
+                }
 
-            ProxyField savedMethodData = this.lazyFindById.get(method.getName());
+                ReflectionGetterSetter.set(proxy, savedMethodData.getInstanceField(), result, true);
+                return result;
+            }
+
+            savedMethodData = this.bypassFindByIds.get(method.getName());
             if (savedMethodData != null) {
                 Method savedMethod = savedMethodData.getDaoMethod();
+                Collection<GenericModel<Object, Object>> result;
+                if (method.isAccessible()) {
+                    result = (Collection<GenericModel<Object, Object>>) savedMethod.invoke(savedMethodData.getDao(), savedMethodData.getModelIdCollection());
+                } else {
+                    method.setAccessible(true);
+                    result = (Collection<GenericModel<Object, Object>>) savedMethod.invoke(savedMethodData.getDao(), savedMethodData.getModelIdCollection());
+                    method.setAccessible(false);
+                }
+
+                ReflectionGetterSetter.set(proxy, savedMethodData.getInstanceField(), result, true);
+
+                savedMethodData.setHasBeenLoaded(true);
+                this.savedCollection.put(savedMethodData.instanceField.getName(), new LinkedList<>(result));
+
+                return result;
+            }
+
+            savedMethodData = this.lazyFindById.get(method.getName());
+            if (savedMethodData != null) {
                 if (savedMethodData.getHasBeenLoaded()) {
                     if (method.isAccessible()) {
                         return method.invoke(proxy, args);
@@ -208,6 +308,7 @@ class ProxiedModel<M extends GenericModel<M, I>, I> implements ProxiedModelColle
                 }
 
                 Object result;
+                Method savedMethod = savedMethodData.getDaoMethod();
                 if (method.isAccessible()) {
                     result = savedMethod.invoke(savedMethodData.getDao(), savedMethodData.getModelId());
                 } else {
@@ -228,7 +329,6 @@ class ProxiedModel<M extends GenericModel<M, I>, I> implements ProxiedModelColle
 
             savedMethodData = this.lazyFindByIds.get(method.getName());
             if (savedMethodData != null) {
-                Method savedMethod = savedMethodData.getDaoMethod();
                 if (savedMethodData.getHasBeenLoaded()) {
                     if (method.isAccessible()) {
                         return method.invoke(proxy, args);
@@ -240,8 +340,8 @@ class ProxiedModel<M extends GenericModel<M, I>, I> implements ProxiedModelColle
                     }
                 }
 
+                Method savedMethod = savedMethodData.getDaoMethod();
                 Collection<GenericModel<Object, Object>> result;
-
                 if (method.isAccessible()) {
                     result = (Collection<GenericModel<Object, Object>>) savedMethod.invoke(savedMethodData.getDao(), savedMethodData.getModelIdCollection());
                 } else {
@@ -253,7 +353,7 @@ class ProxiedModel<M extends GenericModel<M, I>, I> implements ProxiedModelColle
                 ReflectionGetterSetter.set(proxy, savedMethodData.getInstanceField(), result, true);
 
                 savedMethodData.setHasBeenLoaded(true);
-                this.savedCollection.put(savedMethodData.instanceField.getName(), new HashSet<>(result));
+                this.savedCollection.put(savedMethodData.instanceField.getName(), new LinkedList<>(result));
 
                 return result;
             }

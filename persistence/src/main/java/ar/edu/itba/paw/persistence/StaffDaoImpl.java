@@ -34,7 +34,7 @@ public class StaffDaoImpl extends GenericSearchableDaoImpl<Staff, Integer> imple
     }
 
     @Override
-    public Set<Staff> findBy(String name, String surname, Collection<Office> offices, Collection<StaffSpecialty> staffSpecialties, Collection<Locality> localities) {
+    public List<Staff> findBy(String name, String surname, Collection<Office> offices, Collection<StaffSpecialty> staffSpecialties, Collection<Locality> localities) {
         if (name == null) {
             name = "";
         } else {
@@ -84,7 +84,7 @@ public class StaffDaoImpl extends GenericSearchableDaoImpl<Staff, Integer> imple
     }
 
     @Override
-    public Set<Staff> findBy(String name, String surname, Collection<Office> offices, Collection<StaffSpecialty> staffSpecialties, Collection<Locality> localities, int page, int pageSize) {
+    public List<Staff> findBy(String name, String surname, Collection<Office> offices, Collection<StaffSpecialty> staffSpecialties, Collection<Locality> localities, int page, int pageSize) {
         if(page<=0)
             page = 1;
 
@@ -140,7 +140,7 @@ public class StaffDaoImpl extends GenericSearchableDaoImpl<Staff, Integer> imple
     }
 
     @Override
-    public Set<Staff> findBy(Collection<String> names, Collection<String> surnames, Collection<Office> offices, Collection<StaffSpecialty> staffSpecialties, Collection<Locality> localities, int page, int pageSize) {
+    public List<Staff> findBy(Collection<String> names, Collection<String> surnames, Collection<Office> offices, Collection<StaffSpecialty> staffSpecialties, Collection<Locality> localities, int page, int pageSize) {
         if(page<=0)
             page = 1;
 

@@ -33,7 +33,7 @@ public class UserDaoImpl extends GenericSearchableDaoImpl<User, Integer> impleme
 
     @Override
     public Optional<User> findByEmail(String email) {
-        return this.findByField("email", Operation.EQ, email).stream().findFirst();
+        return this.findByField("email", Operation.EQ, email, user -> user.getEmail().equals(email)).stream().findFirst();
     }
 
     @Override

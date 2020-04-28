@@ -5,6 +5,7 @@ import ar.edu.itba.paw.interfaces.services.generic.GenericService;
 import ar.edu.itba.paw.models.GenericModel;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -19,7 +20,7 @@ public abstract class GenericServiceImpl<DAO extends GenericDao<M, I>, M extends
     }
 
     @Override
-    public Collection<M> findByIds(Collection<I> ids) {
+    public List<M> findByIds(Collection<I> ids) {
         return this.getRepository().findByIds(ids);
     }
 
@@ -44,7 +45,7 @@ public abstract class GenericServiceImpl<DAO extends GenericDao<M, I>, M extends
     }
 
     @Override
-    public Collection<M> list() {
+    public List<M> list() {
         return this.getRepository().list();
     }
     

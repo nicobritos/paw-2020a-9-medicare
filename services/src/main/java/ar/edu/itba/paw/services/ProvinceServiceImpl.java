@@ -9,6 +9,7 @@ import ar.edu.itba.paw.services.generics.GenericServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Set;
 
 @Service
@@ -17,12 +18,12 @@ public class ProvinceServiceImpl extends GenericServiceImpl<ProvinceDao, Provinc
     private ProvinceDao repository;
 
     @Override
-    public Set<Province> findByCountry(Country country) {
+    public List<Province> findByCountry(Country country) {
         return this.repository.findByCountry(country);
     }
 
     @Override
-    public Set<Province> findByCountryAndName(Country country, String name) {
+    public List<Province> findByCountryAndName(Country country, String name) {
         return this.repository.findByCountryAndName(country, name);
     }
 

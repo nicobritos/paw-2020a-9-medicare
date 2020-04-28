@@ -63,7 +63,7 @@ public class AuthenticationController extends GenericController {
 
     @RequestMapping(value = "/signup/staff/localities/{id}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
-    public JsonResponse getProvinces(@PathVariable Integer id) {
+    public JsonResponse getLocalities(@PathVariable Integer id) {
         return this.formatJsonResponse(() -> {
             Province province = new Province();
             province.setId(id);

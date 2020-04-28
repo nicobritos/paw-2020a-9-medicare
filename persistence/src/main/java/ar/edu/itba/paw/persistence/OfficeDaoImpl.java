@@ -10,13 +10,15 @@ import ar.edu.itba.paw.persistence.utils.builder.JDBCQueryBuilder;
 import ar.edu.itba.paw.persistence.utils.builder.JDBCSelectQueryBuilder;
 import ar.edu.itba.paw.persistence.utils.builder.JDBCWhereClauseBuilder;
 import ar.edu.itba.paw.persistence.utils.builder.JDBCWhereClauseBuilder.Operation;
+import ar.edu.itba.paw.persistence.utils.cache.CacheHelper;
+import ar.edu.itba.paw.persistence.utils.cache.FilteredCachedCollection;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.stereotype.Repository;
 
 import javax.sql.DataSource;
-import java.util.Set;
+import java.util.List;
 
 @Repository
 public class OfficeDaoImpl extends GenericSearchableDaoImpl<Office, Integer> implements OfficeDao {
@@ -30,12 +32,25 @@ public class OfficeDaoImpl extends GenericSearchableDaoImpl<Office, Integer> imp
     }
 
     @Override
-    public Set<Office> findByCountry(Country country) {
+    public List<Office> findByCountry(Country country) {
+        FilteredCachedCollection<Office> cachedCollection = CacheHelper.filter(
+                Office.class,
+                Integer.class,
+                office -> office.getLocality().getProvince().getCountry().equals(country)
+        );
+        if (this.isCacheComplete(cachedCollection)) {
+            return cachedCollection.getCollectionAsList();
+        }
+
         MapSqlParameterSource parameterSource = new MapSqlParameterSource();
         parameterSource.addValue("country_id", country.getId());
 
         JDBCWhereClauseBuilder whereClauseBuilder = new JDBCWhereClauseBuilder()
                 .where("country_id", Operation.EQ, ":country_id");
+
+        if (!cachedCollection.getCollection().isEmpty()) {
+            this.excludeModels(cachedCollection.getCompleteCollection(), parameterSource, whereClauseBuilder);
+        }
 
         JDBCQueryBuilder queryBuilder = new JDBCSelectQueryBuilder()
                 .selectAll()
@@ -49,12 +64,25 @@ public class OfficeDaoImpl extends GenericSearchableDaoImpl<Office, Integer> imp
     }
 
     @Override
-    public Set<Office> findByProvince(Province province) {
+    public List<Office> findByProvince(Province province) {
+        FilteredCachedCollection<Office> cachedCollection = CacheHelper.filter(
+                Office.class,
+                Integer.class,
+                office -> office.getLocality().getProvince().equals(province)
+        );
+        if (this.isCacheComplete(cachedCollection)) {
+            return cachedCollection.getCollectionAsList();
+        }
+
         MapSqlParameterSource parameterSource = new MapSqlParameterSource();
         parameterSource.addValue("province_id", province.getId());
 
         JDBCWhereClauseBuilder whereClauseBuilder = new JDBCWhereClauseBuilder()
                 .where("province_id", Operation.EQ, ":province_id");
+
+        if (!cachedCollection.getCollection().isEmpty()) {
+            this.excludeModels(cachedCollection.getCompleteCollection(), parameterSource, whereClauseBuilder);
+        }
 
         JDBCQueryBuilder queryBuilder = new JDBCSelectQueryBuilder()
                 .selectAll()
@@ -67,8 +95,8 @@ public class OfficeDaoImpl extends GenericSearchableDaoImpl<Office, Integer> imp
     }
 
     @Override
-    public Set<Office> findByLocality(Locality locality) {
-        return this.findByField("locality_id", Operation.EQ, locality);
+    public List<Office> findByLocality(Locality locality) {
+        return this.findByField("locality_id", Operation.EQ, locality, office -> office.getLocality().equals(locality));
     }
 
     @Override

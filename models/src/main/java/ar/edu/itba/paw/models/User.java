@@ -4,8 +4,8 @@ import ar.edu.itba.paw.persistenceAnnotations.Column;
 import ar.edu.itba.paw.persistenceAnnotations.OneToMany;
 import ar.edu.itba.paw.persistenceAnnotations.Table;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.Collection;
+import java.util.LinkedList;
 
 @Table(name = "users", primaryKey = "users_id")
 public class User extends GenericModel<User, Integer> {
@@ -18,9 +18,9 @@ public class User extends GenericModel<User, Integer> {
     @Column(name = "surname", required = true)
     private String surname;
     @OneToMany(name = "staff_id", className = Staff.class)
-    private Set<Staff> staffs = new HashSet<>();
+    private Collection<Staff> staffs = new LinkedList<>();
     @OneToMany(name = "patient_id", className = Patient.class)
-    private Set<Patient> patients = new HashSet<>();
+    private Collection<Patient> patients = new LinkedList<>();
 
     public String getEmail() {
         return this.email;
@@ -30,11 +30,11 @@ public class User extends GenericModel<User, Integer> {
         this.email = email;
     }
 
-    public Set<Staff> getStaffs() {
+    public Collection<Staff> getStaffs() {
         return this.staffs;
     }
 
-    public Set<Patient> getPatients() {
+    public Collection<Patient> getPatients() {
         return this.patients;
     }
 

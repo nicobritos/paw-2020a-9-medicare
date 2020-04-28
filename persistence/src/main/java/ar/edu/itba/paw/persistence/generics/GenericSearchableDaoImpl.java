@@ -5,7 +5,7 @@ import ar.edu.itba.paw.models.GenericModel;
 import ar.edu.itba.paw.persistence.utils.builder.JDBCWhereClauseBuilder.Operation;
 
 import javax.sql.DataSource;
-import java.util.Set;
+import java.util.List;
 
 /**
  * This provides a generic listable DAO abstract class
@@ -27,7 +27,7 @@ public abstract class GenericSearchableDaoImpl<M extends GenericModel<M, I>, I> 
      * @return a collection of matched models
      */
     @Override
-    public Set<M> findByName(String name) {
+    public List<M> findByName(String name) {
         return this.findByFieldIgnoreCase("name", Operation.LIKE, name);
     }
 }

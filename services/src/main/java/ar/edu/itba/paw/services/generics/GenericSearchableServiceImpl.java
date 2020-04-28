@@ -4,7 +4,7 @@ import ar.edu.itba.paw.interfaces.daos.generic.GenericSearchableDao;
 import ar.edu.itba.paw.interfaces.services.generic.GenericSearchableService;
 import ar.edu.itba.paw.models.GenericModel;
 
-import java.util.Collection;
+import java.util.List;
 
 /**
  * This provides a generic Service abstract class
@@ -15,7 +15,7 @@ import java.util.Collection;
  */
 public abstract class GenericSearchableServiceImpl<DAO extends GenericSearchableDao<M, I>, M extends GenericModel<M, I>, I> extends GenericServiceImpl<DAO, M, I> implements GenericSearchableService<M, I> {
     @Override
-    public Collection<M> findByName(String name) {
+    public List<M> findByName(String name) {
         return this.getRepository().findByName(name);
     }
 }

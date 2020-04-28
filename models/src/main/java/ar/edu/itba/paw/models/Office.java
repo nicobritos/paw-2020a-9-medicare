@@ -5,8 +5,8 @@ import ar.edu.itba.paw.persistenceAnnotations.ManyToOne;
 import ar.edu.itba.paw.persistenceAnnotations.OneToMany;
 import ar.edu.itba.paw.persistenceAnnotations.Table;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.Collection;
+import java.util.LinkedList;
 
 @Table(name = "office", primaryKey = "office_id")
 public class Office extends GenericModel<Office, Integer> {
@@ -21,9 +21,9 @@ public class Office extends GenericModel<Office, Integer> {
     @Column(name = "street", required = true)
     private String street;
     @OneToMany(name = "office_id", className = Staff.class)
-    private Set<Staff> staffs = new HashSet<>();
+    private Collection<Staff> staffs = new LinkedList<>();
     @OneToMany(name = "patient_id", className = Patient.class)
-    private Set<Patient> patients = new HashSet<>();
+    private Collection<Patient> patients = new LinkedList<>();
     @Column(name = "url")
     private String url;
 
@@ -67,11 +67,11 @@ public class Office extends GenericModel<Office, Integer> {
         this.locality = locality;
     }
 
-    public Set<Staff> getStaffs() {
+    public Collection<Staff> getStaffs() {
         return this.staffs;
     }
 
-    public Set<Patient> getPatients() {
+    public Collection<Patient> getPatients() {
         return patients;
     }
 

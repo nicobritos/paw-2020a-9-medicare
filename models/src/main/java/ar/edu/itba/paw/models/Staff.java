@@ -5,8 +5,8 @@ import ar.edu.itba.paw.persistenceAnnotations.ManyToMany;
 import ar.edu.itba.paw.persistenceAnnotations.ManyToOne;
 import ar.edu.itba.paw.persistenceAnnotations.Table;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.Collection;
+import java.util.LinkedList;
 
 @Table(name = "staff", primaryKey = "staff_id")
 public class Staff extends GenericModel<Staff, Integer> {
@@ -21,7 +21,7 @@ public class Staff extends GenericModel<Staff, Integer> {
     @Column(name = "registration_number")
     private Integer registrationNumber;
     @ManyToMany(name = "staff_id", otherName = "specialty_id", tableName = "system_staff_specialty_staff", className = StaffSpecialty.class)
-    private Set<StaffSpecialty> staffSpecialties = new HashSet<>();
+    private Collection<StaffSpecialty> staffSpecialties = new LinkedList<>();
     @ManyToOne(name = "office_id", inverse = true)
     private Office office;
 
@@ -65,7 +65,7 @@ public class Staff extends GenericModel<Staff, Integer> {
         this.registrationNumber = registrationNumber;
     }
 
-    public Set<StaffSpecialty> getStaffSpecialties() {
+    public Collection<StaffSpecialty> getStaffSpecialties() {
         return this.staffSpecialties;
     }
 
