@@ -3,6 +3,7 @@ package ar.edu.itba.paw.interfaces.services.generic;
 import ar.edu.itba.paw.models.GenericModel;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -13,7 +14,15 @@ import java.util.Optional;
 public interface GenericService<M extends GenericModel<M, I>, I> {
     Optional<M> findById(I id);
 
-    Collection<M> findByIds(Collection<I> ids);
+    List<M> findByIds(Collection<I> ids);
 
-    Collection<M> list();
+    M create(M model);
+
+    void update(M model);
+
+    void remove(M model);
+
+    void remove(I id);
+
+    List<M> list();
 }

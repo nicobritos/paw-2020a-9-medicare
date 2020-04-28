@@ -96,7 +96,7 @@ public class OfficeDaoImpl extends GenericSearchableDaoImpl<Office, Integer> imp
 
     @Override
     public List<Office> findByLocality(Locality locality) {
-        return this.findByField("locality_id", locality);
+        return this.findByField("locality_id", Operation.EQ, locality, office -> office.getLocality().equals(locality));
     }
 
     @Override

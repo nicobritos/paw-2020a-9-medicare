@@ -11,7 +11,6 @@ import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Collection;
 import java.util.LinkedList;
-import java.util.Set;
 
 public abstract class ProxyHelper {
     public static <M extends GenericModel<M, I>, I> M copyInstance(M instance) {
@@ -43,7 +42,7 @@ public abstract class ProxyHelper {
         return new LinkedList<>();
     }
 
-    public static <M extends GenericModel<M, I>, I> void setPreviousCollection(M model, Field field, Set<GenericModel<Object, Object>> models) {
+    public static <M extends GenericModel<M, I>, I> void setPreviousCollection(M model, Field field, Collection<GenericModel<Object, Object>> models) {
         ProxiedModel<M, I> proxiedModel = getAsProxiedModel(model);
         if (proxiedModel != null)
             proxiedModel.setPreviousCollection(field, models);

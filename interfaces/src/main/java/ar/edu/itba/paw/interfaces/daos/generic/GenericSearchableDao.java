@@ -2,7 +2,7 @@ package ar.edu.itba.paw.interfaces.daos.generic;
 
 import ar.edu.itba.paw.models.GenericModel;
 
-import java.util.Collection;
+import java.util.List;
 
 /**
  * This provides a generic listable DAO interface
@@ -18,5 +18,5 @@ public interface GenericSearchableDao<M extends GenericModel<M, I>, I> extends G
      * @param name the <M>'s name
      * @return a collection of matched <M>
      */
-    Collection<M> findByName(String name);
+    List<M> findByName(String name);
 }

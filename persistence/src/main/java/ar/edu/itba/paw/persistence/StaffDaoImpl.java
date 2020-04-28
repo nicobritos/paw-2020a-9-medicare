@@ -11,8 +11,6 @@ import ar.edu.itba.paw.persistence.utils.builder.JDBCSelectQueryBuilder;
 import ar.edu.itba.paw.persistence.utils.builder.JDBCWhereClauseBuilder;
 import ar.edu.itba.paw.persistence.utils.builder.JDBCWhereClauseBuilder.ColumnTransformer;
 import ar.edu.itba.paw.persistence.utils.builder.JDBCWhereClauseBuilder.Operation;
-import ar.edu.itba.paw.persistence.utils.cache.CacheHelper;
-import ar.edu.itba.paw.persistence.utils.cache.FilteredCachedCollection;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.RowMapper;
@@ -21,7 +19,6 @@ import org.springframework.stereotype.Repository;
 
 import javax.sql.DataSource;
 import java.util.*;
-import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 @Repository
@@ -60,11 +57,6 @@ public class StaffDaoImpl extends GenericSearchableDaoImpl<Staff, Integer> imple
         if (staffSpecialties.isEmpty() && name.isEmpty() && surname.isEmpty() && offices.isEmpty() && localities.isEmpty())
             return this.list();
 
-        FilteredCachedCollection<Staff> cachedCollection = this.filterCache(name, surname, staffSpecialties, offices, localities);
-        if (this.isCacheComplete(cachedCollection)) {
-            return cachedCollection.getCollectionAsList();
-        }
-
         Map<String, Object> parameters = new HashMap<>();
         MapSqlParameterSource parameterSource = new MapSqlParameterSource();
         JDBCWhereClauseBuilder whereClauseBuilder = new JDBCWhereClauseBuilder();
@@ -76,10 +68,6 @@ public class StaffDaoImpl extends GenericSearchableDaoImpl<Staff, Integer> imple
         this.putLocalityArguments(localities, parameters, whereClauseBuilder);
 
         parameterSource.addValues(parameters);
-
-        if (!cachedCollection.getCollection().isEmpty()) {
-            this.excludeModels(cachedCollection.getCompleteCollection(), parameterSource, whereClauseBuilder);
-        }
 
         JDBCSelectQueryBuilder queryBuilder = new JDBCSelectQueryBuilder()
                 .selectAll()
@@ -123,11 +111,6 @@ public class StaffDaoImpl extends GenericSearchableDaoImpl<Staff, Integer> imple
             localities = Collections.emptyList();
         }
 
-        FilteredCachedCollection<Staff> cachedCollection = this.filterCache(name, surname, staffSpecialties, offices, localities, page, pageSize);
-        if (this.isCacheComplete(cachedCollection)) {
-            return cachedCollection.getCollectionAsList().stream().skip((page-1)*pageSize).limit(pageSize).collect(Collectors.toList()); //TODO: sacar cuando filter limite resultados
-        }
-
         Map<String, Object> parameters = new HashMap<>();
         MapSqlParameterSource parameterSource = new MapSqlParameterSource();
         JDBCWhereClauseBuilder whereClauseBuilder = new JDBCWhereClauseBuilder();
@@ -139,10 +122,6 @@ public class StaffDaoImpl extends GenericSearchableDaoImpl<Staff, Integer> imple
         this.putLocalityArguments(localities, parameters, whereClauseBuilder);
 
         parameterSource.addValues(parameters);
-
-        if (!cachedCollection.getCollection().isEmpty()) {
-            this.excludeModels(cachedCollection.getCompleteCollection(), parameterSource, whereClauseBuilder);
-        }
 
         JDBCSelectQueryBuilder queryBuilder = new JDBCSelectQueryBuilder()
                 .selectAll()
@@ -355,48 +334,6 @@ public class StaffDaoImpl extends GenericSearchableDaoImpl<Staff, Integer> imple
         whereClauseBuilder
                 .and()
                 .where(this.formatColumnFromName("surname"), Operation.LIKE, ":surname", ColumnTransformer.LOWER);
-    }
-
-    private FilteredCachedCollection<Staff> filterCache(String name, String surname, Collection<StaffSpecialty> staffSpecialties, Collection<Office> offices, Collection<Locality> localities) {
-        Predicate<Staff> p = staff -> true; // sirve como default porque son todos ANDs (true && other = other)
-        if (!name.isEmpty()) {
-            p = p.and(staff -> StringUtils.stripAccents(staff.getFirstName().toLowerCase()).contains(name));
-        }
-        if (!surname.isEmpty()) {
-            p = p.and(staff -> StringUtils.stripAccents(staff.getSurname().toLowerCase()).contains(surname));
-        }
-        if (!staffSpecialties.isEmpty()) {
-            p = p.and(staff -> staff.getStaffSpecialties().containsAll(staffSpecialties));
-        }
-        if (!offices.isEmpty()) {
-            p = p.and(staff -> offices.contains(staff.getOffice()));
-        }
-        if (!localities.isEmpty()) {
-            p = p.and(staff -> localities.contains(staff.getOffice().getLocality()));
-        }
-        // else p = staff -> true, quiero que no me filtre nada si todos son empty
-        return CacheHelper.filter(Staff.class, Integer.class, p);
-    }
-
-    private FilteredCachedCollection<Staff> filterCache(String name, String surname, Collection<StaffSpecialty> staffSpecialties, Collection<Office> offices, Collection<Locality> localities, int page, int pageSize) {
-        Predicate<Staff> p = staff -> true; // sirve como default porque son todos ANDs (true && other = other)
-        if (!name.isEmpty()) {
-            p = p.and(staff -> staff.getFirstName().toLowerCase().contains(name));
-        }
-        if (!surname.isEmpty()) {
-            p = p.and(staff -> staff.getSurname().toLowerCase().contains(surname));
-        }
-        if (!staffSpecialties.isEmpty()) {
-            p = p.and(staff -> staff.getStaffSpecialties().containsAll(staffSpecialties));
-        }
-        if (!offices.isEmpty()) {
-            p = p.and(staff -> offices.contains(staff.getOffice()));
-        }
-        if (!localities.isEmpty()) {
-            p = p.and(staff -> localities.contains(staff.getOffice().getLocality()));
-        }
-        // else p = staff -> true, quiero que no me filtre nada si todos son empty
-        return CacheHelper.filter(Staff.class, Integer.class, p, pageSize, (page-1)*pageSize);
     }
 
     private String getSpecialtiesIntermediateTableName() {

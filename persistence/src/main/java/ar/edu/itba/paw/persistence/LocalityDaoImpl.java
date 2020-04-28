@@ -33,7 +33,7 @@ public class LocalityDaoImpl extends GenericSearchableDaoImpl<Locality, Integer>
 
     @Override
     public List<Locality> findByProvince(Province province) {
-        return this.findByField("province_id", Operation.EQ, province);
+        return this.findByField("province_id", Operation.EQ, province, locality -> locality.getProvince().equals(province));
     }
 
     @Override

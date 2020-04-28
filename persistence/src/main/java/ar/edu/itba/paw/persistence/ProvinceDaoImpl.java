@@ -33,7 +33,7 @@ public class ProvinceDaoImpl extends GenericSearchableDaoImpl<Province, Integer>
 
     @Override
     public List<Province> findByCountry(Country country) {
-        return this.findByField("country_id", Operation.EQ, country);
+        return this.findByField("country_id", Operation.EQ, country, province -> province.getCountry().equals(country));
     }
 
     @Override

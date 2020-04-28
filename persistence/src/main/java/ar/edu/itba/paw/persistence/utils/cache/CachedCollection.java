@@ -1,8 +1,6 @@
 package ar.edu.itba.paw.persistence.utils.cache;
 
-import java.util.Collection;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 
 public class CachedCollection<T> {
     private CachedCollectionStatus status;
@@ -27,6 +25,13 @@ public class CachedCollection<T> {
 
     public Collection<T> getCollection() {
         return this.collection;
+    }
+
+    public List<T> getCollectionAsList() {
+        if (this.collection instanceof List) {
+            return (List<T>) this.collection;
+        }
+        return new LinkedList<>(this.collection);
     }
 
     public List<T> getCollectionAsList() {

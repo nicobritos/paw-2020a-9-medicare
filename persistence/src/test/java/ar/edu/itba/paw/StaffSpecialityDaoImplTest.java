@@ -1,8 +1,7 @@
-package ar.edu.itba.paw.nocache;
+package ar.edu.itba.paw;
 
 import ar.edu.itba.paw.models.StaffSpecialty;
 import ar.edu.itba.paw.persistence.StaffSpecialtyDaoImpl;
-import ar.edu.itba.paw.persistence.utils.builder.JDBCWhereClauseBuilder;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -131,64 +130,6 @@ public class StaffSpecialityDaoImplTest {
 
         // 2. Ejercitar
         Collection<StaffSpecialty> staffSpecialties = staffSpecialtyDao.findByIds(Arrays.asList(0, 1, 2)); // Identity de HSQLDB empieza en 0
-
-        // 3. Postcondiciones
-        assertNotNull(staffSpecialties);
-        assertTrue(staffSpecialties.isEmpty());
-    }
-
-    @Test
-    public void testFindByField() {
-        // 1. Precondiciones
-        cleanAllTables();
-
-        insertStaffSpeciality();
-        insertAnotherStaffSpeciality();
-
-        // 2. Ejercitar
-        Collection<StaffSpecialty> staffSpecialties = staffSpecialtyDao.findByField("name", STAFF_SPECIALTY);
-
-        // 3. Postcondiciones
-        assertNotNull(staffSpecialties);
-        assertEquals(1, staffSpecialties.size());
-    }
-
-    @Test
-    public void testFindByFieldDoesntExist() {
-        // 1. Precondiciones
-        cleanAllTables();
-
-        // 2. Ejercitar
-        Collection<StaffSpecialty> staffSpecialties = staffSpecialtyDao.findByField("name", STAFF_SPECIALTY);
-
-        // 3. Postcondiciones
-        assertNotNull(staffSpecialties);
-        assertTrue(staffSpecialties.isEmpty());
-    }
-
-    @Test
-    public void testFindByFieldOp() {
-        // 1. Precondiciones
-        cleanAllTables();
-
-        insertStaffSpeciality();
-        insertAnotherStaffSpeciality();
-
-        // 2. Ejercitar
-        Collection<StaffSpecialty> staffSpecialties = staffSpecialtyDao.findByField("specialty_id", JDBCWhereClauseBuilder.Operation.GEQ, 1);
-
-        // 3. Postcondiciones
-        assertNotNull(staffSpecialties);
-        assertEquals(1, staffSpecialties.size());
-    }
-
-    @Test
-    public void testFindByFieldOpDoesntExist() {
-        // 1. Precondiciones
-        cleanAllTables();
-
-        // 2. Ejercitar
-        Collection<StaffSpecialty> staffSpecialties = staffSpecialtyDao.findByField("specialty_id", JDBCWhereClauseBuilder.Operation.GEQ, 1);
 
         // 3. Postcondiciones
         assertNotNull(staffSpecialties);

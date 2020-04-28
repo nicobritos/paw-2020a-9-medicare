@@ -156,24 +156,24 @@ public class CacheHelper {
         );
     }
 
-    public static synchronized <M extends GenericModel<M, I>, I> void remove(Class<M> mClass, Class<I> iClass, I id) {
+    public static synchronized <M extends GenericModel<M, I>, I> void remove(Class<M> mClass, Class<?> iClass, Object id) {
         if (!cacheEnabled)
             return;
 
-        Cache<I, M> cache = cacheManager.getCache(mClass.getName(), iClass, mClass);
-        if (cache != null && cache.containsKey(id)) {
-            cache.remove(id);
+        Cache<I, M> cache = (Cache<I, M>) cacheManager.getCache(mClass.getName(), iClass, mClass);
+        if (cache != null && cache.containsKey((I) id)) {
+            cache.remove((I) id);
             sizes.put(mClass.getName(), sizes.get(mClass.getName()) - 1);
         }
     }
 
-    public static synchronized <M extends GenericModel<M, I>, I> void set(Class<M> mClass, Class<I> iClass, M model) {
+    public static synchronized <M extends GenericModel<M, I>, I> void set(Class<?> mClass, Class<?> iClass, M model) {
         if (!cacheEnabled)
             return;
 
-        Cache<I, M> cache = cacheManager.getCache(mClass.getName(), iClass, mClass);
+        Cache<I, M> cache = (Cache<I, M>) cacheManager.getCache(mClass.getName(), iClass, mClass);
         if (cache == null) {
-            cache = createCache(mClass, iClass);
+            cache = createCache((Class<M>) mClass, (Class<I>)iClass);
         }
 
         cache.put(model.getId(), model);
