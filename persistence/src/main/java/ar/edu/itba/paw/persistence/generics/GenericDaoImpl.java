@@ -504,7 +504,7 @@ public abstract class GenericDaoImpl<M extends GenericModel<M, I>, I> implements
                     .distinct();
             MapSqlParameterSource parameterSource = new MapSqlParameterSource();
             parameterSource.addValue("id", m.getId());
-            Collection<GenericModel<Object, Object>> otherInstances = new HashSet<>();
+            Collection<GenericModel<Object, Object>> otherInstances = new LinkedList<>();
             this.selectQuery(
                     queryBuilder.getQueryAsString(),
                     parameterSource,
@@ -552,7 +552,7 @@ public abstract class GenericDaoImpl<M extends GenericModel<M, I>, I> implements
                     .distinct();
             MapSqlParameterSource parameterSource = new MapSqlParameterSource();
             parameterSource.addValue("id", m.getId());
-            Collection<GenericModel<Object, Object>> otherInstances = new HashSet<>();
+            Collection<GenericModel<Object, Object>> otherInstances = new LinkedList<>();
             this.selectQuery(
                     queryBuilder.getQueryAsString(),
                     parameterSource,

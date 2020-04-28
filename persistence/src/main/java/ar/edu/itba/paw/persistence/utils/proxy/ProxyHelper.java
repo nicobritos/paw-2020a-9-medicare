@@ -10,7 +10,7 @@ import java.beans.PropertyDescriptor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Collection;
-import java.util.HashSet;
+import java.util.LinkedList;
 
 public abstract class ProxyHelper {
     public static <M extends GenericModel<M, I>, I> M copyInstance(M instance) {
@@ -39,7 +39,7 @@ public abstract class ProxyHelper {
         ProxiedModel<M, I> proxiedModel = getAsProxiedModel(model);
         if (proxiedModel != null)
             return proxiedModel.getPreviousModels(field);
-        return new HashSet<>();
+        return new LinkedList<>();
     }
 
     public static <M extends GenericModel<M, I>, I> void setPreviousCollection(M model, Field field, Collection<GenericModel<Object, Object>> models) {
