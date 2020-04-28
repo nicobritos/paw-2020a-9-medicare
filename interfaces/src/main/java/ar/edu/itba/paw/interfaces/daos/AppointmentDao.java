@@ -5,10 +5,15 @@ import ar.edu.itba.paw.models.Appointment;
 import ar.edu.itba.paw.models.Patient;
 import ar.edu.itba.paw.models.Staff;
 
+import java.time.LocalDate;
 import java.util.List;
 
 public interface AppointmentDao extends GenericDao<Appointment, Integer> {
     List<Appointment> findPending(Patient patient);
 
+    List<Appointment> findPending(Staff staff);
+
     List<Appointment> findPending(Patient patient, Staff staff);
+
+    List<Appointment> findByDate(Staff staff, LocalDate date);
 }

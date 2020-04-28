@@ -6,6 +6,7 @@ import ar.edu.itba.paw.interfaces.services.StaffSpecialtyService;
 import ar.edu.itba.paw.models.Locality;
 import ar.edu.itba.paw.models.Staff;
 import ar.edu.itba.paw.models.StaffSpecialty;
+import ar.edu.itba.paw.webapp.controller.utils.GenericController;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.util.LinkedMultiValueMap;
@@ -22,7 +23,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 @Controller
-public class MedicListController {
+public class MedicListController extends GenericController {
     @Autowired
     StaffService staffService;
     @Autowired
@@ -30,22 +31,27 @@ public class MedicListController {
     @Autowired
     LocalityService localityService;
 
+    @RequestMapping("/mediclist")
+    public ModelAndView medicList(@RequestParam(value = "name",required = false)String name, @RequestParam(value = "specialties",required = false) String specialties, @RequestParam(value = "localities",required = false) String localities){
+        MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
+        if(name != null)
+            params.add("name", name);
+        if(specialties != null)
+            params.add("specialties", specialties);
+        if(localities != null)
+            params.add("localities", localities);
+        UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromUriString("/mediclist/1")
+                .queryParams(params);
+        return new ModelAndView("redirect:"+ uriBuilder.toUriString());
+    }
+
     @RequestMapping(value = "/mediclist/{page}")
     public ModelAndView medicsList(@RequestParam(value = "name",required = false)String name, @RequestParam(value = "specialties",required = false) String specialties, @RequestParam(value = "localities",required = false) String localities, @PathVariable("page") int page){
         if(page<=0){ //TODO: redirect instead of doing this
-            MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
-            if(name != null)
-                params.add("name", name);
-            if(specialties != null)
-                params.add("specialties", specialties);
-            if(localities != null)
-                params.add("localities", localities);
-            UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromUriString("/mediclist/1")
-                    .queryParams(params);
-            return new ModelAndView("redirect:"+ uriBuilder.toUriString());
+            return medicList(name, specialties, localities);
         }
-        //get modelandview from index.jsp
-        final ModelAndView mav = new ModelAndView("index");
+        //get modelandview from medicList.jsp
+        final ModelAndView mav = new ModelAndView("medicList");
         //staff variable that will be passed to the jsp
         Collection<Staff> staffList;
 
@@ -90,6 +96,7 @@ public class MedicListController {
         Collection<Locality> localitiesList = this.localityService.list();
 
         // pass objects to model and view
+        mav.addObject("user", getUser());
         mav.addObject("staff", staffList);
         mav.addObject("specialties",specialtiesList);
         mav.addObject("localities",localitiesList);
