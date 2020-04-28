@@ -33,11 +33,4 @@ public class CachedCollection<T> {
         }
         return new LinkedList<>(this.collection);
     }
-
-    public List<T> getCollectionAsList() {
-        if (this.collection instanceof List) {
-            return (List<T>) this.collection;
-        }
-        return new LinkedList<>(this.collection);
-    }
 }

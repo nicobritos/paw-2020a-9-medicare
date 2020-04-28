@@ -298,7 +298,7 @@ public abstract class GenericDaoImpl<M extends GenericModel<M, I>, I> implements
         if (this.isCacheComplete(cachedModels)) {
             return cachedModels.getCollectionAsList();
         }
-        Collection<M> models = cachedModels.getCollectionAsSet();
+        Collection<M> models = cachedModels.getCollectionAsList();
         Collection<M> allCachedModels = cachedModels.getCompleteCollection();
 
         JDBCWhereClauseBuilder whereClauseBuilder = new JDBCWhereClauseBuilder()
