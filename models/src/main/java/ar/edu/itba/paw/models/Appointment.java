@@ -11,8 +11,8 @@ import java.util.Date;
 public class Appointment extends GenericModel<Appointment, Integer> {
     public static final int DURATION = 15;
 
-    @ManyToOne(name = "status_id", required = true)
-    private AppointmentStatus appointmentStatus;
+    @Column(name = "status", required = true)
+    private String appointmentStatus;
     @ManyToOne(name = "patient_id", required = true)
     private Patient patient;
     @ManyToOne(name = "staff_id", required = true)
@@ -22,11 +22,11 @@ public class Appointment extends GenericModel<Appointment, Integer> {
     @Column(name = "to_date", required = true)
     private Date toDate;
 
-    public AppointmentStatus getAppointmentStatus() {
+    public String getAppointmentStatus() {
         return this.appointmentStatus;
     }
 
-    public void setAppointmentStatus(AppointmentStatus appointmentStatus) {
+    public void setAppointmentStatus(String appointmentStatus) {
         this.appointmentStatus = appointmentStatus;
     }
 
