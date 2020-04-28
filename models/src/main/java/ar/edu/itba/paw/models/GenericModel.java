@@ -6,7 +6,7 @@ import java.util.Objects;
  * This class provides a generic implementation of a model.
  * @param <I>
  */
-public abstract class GenericModel<M, I> {
+public abstract class GenericModel<M, I> extends Cacheable {
     protected I id;
 
     public I getId() {
