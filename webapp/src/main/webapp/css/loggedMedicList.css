@@ -63,7 +63,6 @@ html,body{
 .turno-list{
     -ms-overflow-style: none;
     scrollbar-width: none;
-    max-height: 70vh;
 }
 
 .turno-list::-webkit-scrollbar{

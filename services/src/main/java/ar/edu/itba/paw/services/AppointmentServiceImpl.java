@@ -8,6 +8,7 @@ import ar.edu.itba.paw.services.generics.GenericServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.LinkedList;
@@ -26,8 +27,23 @@ public class AppointmentServiceImpl extends GenericServiceImpl<AppointmentDao, A
     }
 
     @Override
+    public List<Appointment> findPending(Staff staff) {
+        return this.repository.findPending(staff);
+    }
+
+    @Override
     public List<Appointment> findPending(Patient patient, Staff staff) {
         return this.repository.findPending(patient, staff);
+    }
+
+    @Override
+    public List<Appointment> findTodayAppointments(Staff staff){
+        return this.repository.findByDate(staff, LocalDate.now());
+    }
+
+    @Override
+    public List<Appointment> findAppointmentsByDate(Staff staff, LocalDate date){
+        return this.repository.findByDate(staff, date);
     }
 
     @Override

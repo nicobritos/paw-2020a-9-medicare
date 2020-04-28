@@ -80,4 +80,10 @@ public class Staff extends GenericModel<Staff, Integer> {
     protected boolean isSameInstance(Object o) {
         return o instanceof Staff;
     }
+
+    public void setUser(User user) { // TODO: cambiar cuando se cambie la db
+        setFirstName(user.getFirstName());
+        setSurname(user.getSurname());
+        setEmail(user.getEmail());
+    }
 }

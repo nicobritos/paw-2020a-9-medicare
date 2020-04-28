@@ -5,8 +5,8 @@
         <link rel="stylesheet" type="text/css" href="<c:url value="/css/styles.css"/>">
     </head>
     <body>
-        <%@ include file = "header.jsp" %>
         <%@ include file = "navbar.jsp" %>
+        <%@ include file = "searchbar.jsp" %>
         <br>
         <div style="overflow-x:auto;">
             <table>

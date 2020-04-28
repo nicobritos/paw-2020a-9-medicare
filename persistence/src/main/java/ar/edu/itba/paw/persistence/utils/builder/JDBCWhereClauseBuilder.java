@@ -39,7 +39,10 @@ public class JDBCWhereClauseBuilder {
 
     public enum ColumnTransformer {
         LENGTH(" LENGTH(", ") "),
-        LOWER(" unaccent(LOWER(", "))");
+        LOWER(" unaccent(LOWER(", "))"),
+        DAY("EXTRACT(DAY FROM ",")"),
+        MONTH("EXTRACT(MONTH FROM ",")"),
+        YEAR("EXTRACT(YEAR FROM ",")");
 
         private String prefix;
         private String suffix;
