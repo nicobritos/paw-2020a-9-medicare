@@ -1,7 +1,5 @@
 package ar.edu.itba.paw.webapp.form;
 
-import ar.edu.itba.paw.models.Office;
-
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.Pattern;
@@ -9,15 +7,16 @@ import javax.validation.constraints.Pattern;
 public class WorkdayForm {
     @Min(0)
     @Max(7)
-    int dow;
+    private int dow;
 
     @Pattern(regexp="(2[0-3]|[01][0-9]):[0-5][0-9]")
-    String startHour;
+    private String startHour;
 
     @Pattern(regexp="(2[0-3]|[01][0-9]):[0-5][0-9]")
-    String endHour;
+    private String endHour;
 
-    Office office;
+    @Min(0)
+    private int officeId;
 
     public int getDow() {
         return dow;
@@ -43,11 +42,11 @@ public class WorkdayForm {
         this.endHour = endHour;
     }
 
-    public Office getOffice() {
-        return office;
+    public int getOfficeId() {
+        return officeId;
     }
 
-    public void setOffice(Office office) {
-        this.office = office;
+    public void setOfficeId(int officeId) {
+        this.officeId = officeId;
     }
 }

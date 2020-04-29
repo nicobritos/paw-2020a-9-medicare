@@ -64,19 +64,20 @@
 
         <div class="form-group row">
           <div class="col">
-            <label for="endHour">Consultorio</label>
+            <label for="officeId">Consultorio</label>
           </div>
           <div class="col-8">
-            <form:select class="form-control" type="time" name="office" id="office" path="office">
+            <form:select class="form-control" name="officeId" id="officeId" path="officeId">
               <c:forEach items="${user.get().staffs}" var="staff">
-                <form:option value="${staff.office}">${staff.office.name}</form:option>
+                <form:option value="${staff.office.id}">${staff.office.name}</form:option>
               </c:forEach>
             </form:select>
           </div>
         </div>
 
         <div class="form-row justify-content-between">
-          <form:button class="form-atras-btn btn" type="reset">Atrás</form:button><form:button type="submit" class="btn btn-primary">Agregar</form:button>
+          <a href="<c:url value="/staff/profile"/>">
+            <form:button class="form-atras-btn btn" type="button">Atrás</form:button></a><form:button type="submit" class="btn btn-primary">Agregar</form:button>
         </div>
       </form:form>
     </div>
