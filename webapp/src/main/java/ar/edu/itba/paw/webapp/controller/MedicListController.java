@@ -162,52 +162,6 @@ public class MedicListController extends GenericController {
         return mav;
     }
 
-//    @RequestMapping(value = "/appointment", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
-//    @ResponseBody
-//    public ModelAndView createAppointment(){
-//        Optional<Staff> staff = staffService.findById(id);
-//        if(!staff.isPresent()){
-//            return new ModelAndView("error/404"); //todo: throw status code instead of this
-//        }
-//        ModelAndView mav = new ModelAndView();
-//
-//        LocalDate today = LocalDate.now();
-//        LocalDate monday;
-//
-//        switch (LocalDate.now().getDayOfWeek()){
-//            case SUNDAY:
-//                monday = today.plusDays(1);
-//                break;
-//            case MONDAY:
-//                monday = today;
-//                break;
-//            case TUESDAY:
-//                monday = today.minusDays(1);
-//                break;
-//            case WEDNESDAY:
-//                monday = today.minusDays(2);
-//                break;
-//            case THURSDAY:
-//                monday = today.minusDays(3);
-//                break;
-//            case FRIDAY:
-//                monday = today.minusDays(4);
-//                break;
-//            case SATURDAY:
-//                monday = today.minusDays(5);
-//                break;
-//            default:
-//                throw new RuntimeException();
-//        }
-//
-//        mav.addObject("today", today);
-//        mav.addObject("monday", monday);
-//        mav.addObject("user", getUser());
-//        mav.addObject("staff", staff.get());
-//        mav.setViewName("selectTurno");
-//        return mav;
-//    }
-
     @RequestMapping(value = "/timeslots/{id}", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
     public JsonResponse timeslots(

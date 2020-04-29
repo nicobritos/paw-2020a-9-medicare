@@ -9,8 +9,7 @@ create table appointment
             references patient
             on update restrict on delete restrict,
     staff_id integer not null,
-    from_date date not null,
-    to_date date not null
+    from_date date not null
 );
 
 alter table appointment owner to postgres;
@@ -19,7 +18,7 @@ create unique index appointment_appointment_id_uindex
     on appointment (appointment_id);
 
 create index appointment_from_date_to_date_index
-    on appointment (from_date, to_date);
+    on appointment (from_date);
 
 create index appointment_status_status_index
     on appointment (status, status);

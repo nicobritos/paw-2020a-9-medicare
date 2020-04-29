@@ -62,11 +62,16 @@ var AppointmentRequest = function() {
     };
 
     let requestAppointment = function(year, month, day, hour, minute) {
-        console.log(year);
-        console.log(month);
-        console.log(day);
-        console.log(hour);
-        console.log(minute);
+        App.post('/patient/appointment', {
+            staffId: staffId,
+            year: year,
+            month: month,
+            day: day,
+            minute: minute,
+            hour: hour
+        }).then(() => {
+            App.showOk(['Su turno fue agendado exitosamente'], 'Agendado');
+        });
     };
 
     return {

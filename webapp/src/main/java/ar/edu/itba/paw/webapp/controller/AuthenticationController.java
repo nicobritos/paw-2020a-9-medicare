@@ -94,7 +94,7 @@ public class AuthenticationController extends GenericController {
         office.setLocality(locality.get());
         office.setStreet(form.getAddress());
         try {
-            this.userService.create(newUser, office);
+            this.userService.createAsStaff(newUser, office);
         } catch (EmailAlreadyExistsException e) {
             errors.reject("EmailAlreadyTaken.signupForm.email", null, "Error");
             return this.signupStaffIndex(form);

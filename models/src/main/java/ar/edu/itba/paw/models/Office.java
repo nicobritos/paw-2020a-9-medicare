@@ -22,7 +22,7 @@ public class Office extends GenericModel<Office, Integer> {
     private String street;
     @OneToMany(name = "office_id", className = Staff.class)
     private Collection<Staff> staffs = new LinkedList<>();
-    @OneToMany(name = "patient_id", className = Patient.class)
+    @OneToMany(name = "office_id", className = Patient.class)
     private Collection<Patient> patients = new LinkedList<>();
     @Column(name = "url")
     private String url;

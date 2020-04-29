@@ -1,24 +1,29 @@
 package ar.edu.itba.paw.webapp.controller.patient;
 
+import ar.edu.itba.paw.interfaces.MediCareException;
 import ar.edu.itba.paw.interfaces.services.*;
+import ar.edu.itba.paw.models.Appointment;
 import ar.edu.itba.paw.models.Patient;
 import ar.edu.itba.paw.models.Staff;
 import ar.edu.itba.paw.models.User;
 import ar.edu.itba.paw.webapp.controller.utils.GenericController;
+import ar.edu.itba.paw.webapp.controller.utils.JsonResponse;
+import ar.edu.itba.paw.webapp.form.RequestAppointmentForm;
 import ar.edu.itba.paw.webapp.form.UserProfileForm;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
+import java.sql.Date;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.LinkedList;
 import java.util.Optional;
 
 @Controller
@@ -38,6 +43,9 @@ public class PatientSideController extends GenericController {
 
     @Autowired
     private StaffService staffService;
+
+    @Autowired
+    private PatientService patientService;
 
 
     @RequestMapping("/patient/home")
@@ -103,23 +111,40 @@ public class PatientSideController extends GenericController {
         return mav;
     }
 
+    @RequestMapping(value = "/patient/appointment", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseBody
+    public JsonResponse makeAppointment(
+            @Valid @RequestBody RequestAppointmentForm form,
+            final BindingResult errors){
+        return this.formatJsonResponse(errors, () -> {
+            Optional<Staff> staff = this.staffService.findById(form.getStaffId());
+            if (!staff.isPresent()) {
+                throw new MediCareException("No existe el staff solicitado");
+            }
+            LocalDate dateFrom = LocalDate.of(form.getYear(), form.getMonth(), form.getDay());
+            if (dateFrom.isBefore(LocalDate.now())) { // TODO: Check hour/minute
+                throw new MediCareException("No puede sacar un turno en el pasado");
+            }
 
-    //TODO: FORMS
-    @RequestMapping(value = "/patient/appointment/{staffId}/{year}/{dayOfYear}", method = RequestMethod.GET)
-    public ModelAndView makeAppointment(@PathVariable("staffId") final int staffId ,@PathVariable("year") final int year, @PathVariable("dayOfYear") final int dayOfYear){
-        ModelAndView mav = new ModelAndView();
-        LocalDate date = LocalDate.ofYearDay(year, dayOfYear);
-        if(date.isBefore(LocalDate.now())){
-            return new ModelAndView("redirect:/appointment/" + staffId); //TODO: errors
-        }
-        Optional<Staff> staff = staffService.findById(staffId);
-        if(!staff.isPresent()){
-            return new ModelAndView("redirect:/mediclist/1"); //TODO: errors
-        }
-        mav.addObject("user", getUser());
-        mav.addObject("staff", staff.get());
-        mav.addObject("date", date);
-        mav.setViewName("patientSide/reservarTurno");
-        return mav;
+            Optional<Patient> patientOptional = this.patientService.findByUserAndOffice(this.getUser().get(), staff.get().getOffice());
+            Patient patient;
+            if (!patientOptional.isPresent()) {
+                patient = new Patient();
+                patient.setOffice(staff.get().getOffice());
+                patient.setUser(this.getUser().get());
+                patient = this.userService.createNewPatient(patient);
+            } else {
+                patient = patientOptional.get();
+            }
+
+            LocalDateTime date = LocalDateTime.of(dateFrom.getYear(), dateFrom.getMonthValue(), dateFrom.getDayOfMonth(), form.getHour(), form.getMinute(), 0);
+            Appointment appointment = new Appointment();
+            appointment.setStaff(staff.get());
+            appointment.setPatient(patient);
+            appointment.setFromDate(Date.valueOf(date.toLocalDate()));
+
+            this.appointmentService.create(appointment);
+            return new LinkedList<>();
+        });
     }
 }

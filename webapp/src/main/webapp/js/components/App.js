@@ -1,12 +1,12 @@
 const App = function() {
-    let showOk = function (messages) {
+    let showOk = function (messages, title = 'Exito') {
         if (messages == null) {
             return;
         }
 
         for (let message of messages) {
             $.notify({
-                title: '<b>Exito: </b>',
+                title: '<b>' + title + ': </b>',
                 message: message,
                 icon: 'fa fa-tick'
             }, {
@@ -18,14 +18,14 @@ const App = function() {
         }
     };
 
-    let showError = function (messages) {
+    let showError = function (messages, title = 'Error') {
         if (messages == null) {
             messages = ['Un error ha ocurrido'];
         }
 
         for (let message of messages) {
             $.notify({
-                title: '<b>Error: </b>',
+                title: '<b>' + title + ': </b>',
                 message: message,
                 icon: 'fa fa-warning'
             }, {
@@ -137,6 +137,8 @@ const App = function() {
                 return ajax(url, parameters, 'POST');
             }
         },
+        showError: showError,
+        showOk: showOk,
         goBack: function () {
             history.back();
         },

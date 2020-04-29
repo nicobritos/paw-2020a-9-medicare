@@ -2,10 +2,12 @@ package ar.edu.itba.paw.services;
 
 import ar.edu.itba.paw.interfaces.daos.UserDao;
 import ar.edu.itba.paw.interfaces.services.OfficeService;
+import ar.edu.itba.paw.interfaces.services.PatientService;
 import ar.edu.itba.paw.interfaces.services.StaffService;
 import ar.edu.itba.paw.interfaces.services.UserService;
 import ar.edu.itba.paw.interfaces.services.exceptions.EmailAlreadyExistsException;
 import ar.edu.itba.paw.models.Office;
+import ar.edu.itba.paw.models.Patient;
 import ar.edu.itba.paw.models.Staff;
 import ar.edu.itba.paw.models.User;
 import ar.edu.itba.paw.services.generics.GenericSearchableServiceImpl;
@@ -25,6 +27,8 @@ public class UserServiceImpl extends GenericSearchableServiceImpl<UserDao, User,
     @Autowired
     private StaffService staffService;
     @Autowired
+    private PatientService patientService;
+    @Autowired
     private PasswordEncoder passwordEncoder;
 
     @Override
@@ -39,7 +43,20 @@ public class UserServiceImpl extends GenericSearchableServiceImpl<UserDao, User,
 
     @Override
     @Transactional
-    public User create(User user, Office office) throws EmailAlreadyExistsException {
+    public Patient createNewPatient(Patient patient) throws EmailAlreadyExistsException {
+        Patient newPatient = this.patientService.create(patient);
+        Office office = patient.getOffice();
+        office.getPatients().add(newPatient);
+        this.officeService.update(office);
+        User user = patient.getUser();
+        user.getPatients().add(newPatient);
+        this.update(user);
+        return newPatient;
+    }
+
+    @Override
+    @Transactional
+    public User createAsStaff(User user, Office office) throws EmailAlreadyExistsException {
         User newUser;
         newUser = this.create(user);
 

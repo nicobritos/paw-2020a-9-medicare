@@ -124,8 +124,7 @@ create table appointment
             references patient
             ,
     staff_id integer not null,
-    from_date date not null,
-    to_date date not null
+    from_date date not null
 );
 
 create table workday

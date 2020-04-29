@@ -4,6 +4,8 @@ import ar.edu.itba.paw.persistenceAnnotations.Column;
 import ar.edu.itba.paw.persistenceAnnotations.ManyToOne;
 import ar.edu.itba.paw.persistenceAnnotations.Table;
 
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.util.Date;
 
 @Table(name = "appointment", primaryKey = "appointment_id")
@@ -52,10 +54,8 @@ public class Appointment extends GenericModel<Appointment, Integer> {
         this.fromDate = fromDate;
     }
 
-    public Date getToDate(){
-        Date date = fromDate;
-        date.setMinutes(fromDate.getMinutes() + 15);
-        return date;
+    public LocalDateTime getToDate(){
+        return LocalDateTime.ofEpochSecond(this.fromDate.toInstant().getEpochSecond(), 0, ZoneOffset.UTC);
     }
 
     @Override
