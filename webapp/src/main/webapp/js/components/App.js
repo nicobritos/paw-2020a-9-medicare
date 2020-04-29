@@ -60,7 +60,11 @@ const App = function() {
             };
             if (Object.keys(parameters).length > 0) {
                 if ($.isPlainObject(parameters)) {
-                    options.data = JSON.stringify(parameters);
+                    if (method.toLowerCase() == 'get') {
+                        options.data = parameters;
+                    } else {
+                        options.data = JSON.stringify(parameters);
+                    }
                     options.dataType = 'json';
                     options.contentType = 'application/json';
                 } else {

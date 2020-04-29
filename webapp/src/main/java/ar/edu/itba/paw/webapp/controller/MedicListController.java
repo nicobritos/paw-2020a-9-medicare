@@ -11,6 +11,7 @@ import ar.edu.itba.paw.models.StaffSpecialty;
 import ar.edu.itba.paw.webapp.controller.utils.GenericController;
 import ar.edu.itba.paw.webapp.controller.utils.JsonResponse;
 import ar.edu.itba.paw.webapp.form.RequestTimeslotForm;
+import ar.edu.itba.paw.webapp.transformer.AppointmentTimeSlotTransformer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
@@ -37,6 +38,8 @@ public class MedicListController extends GenericController {
     LocalityService localityService;
     @Autowired
     private AppointmentService appointmentService;
+    @Autowired
+    private AppointmentTimeSlotTransformer appointmentTimeSlotTransformer;
 
     @RequestMapping("/mediclist")
     public ModelAndView medicList(@RequestParam(value = "name",required = false)String name, @RequestParam(value = "specialties",required = false) String specialties, @RequestParam(value = "localities",required = false) String localities){
@@ -159,11 +162,11 @@ public class MedicListController extends GenericController {
         return mav;
     }
 
-    @RequestMapping(value = "/timeslots/{id}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    @RequestMapping(value = "/timeslots/{id}", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
     public JsonResponse timeslots(
             @PathVariable("id") final int id,
-            @Valid @RequestParam RequestTimeslotForm form,
+            @Valid @RequestBody RequestTimeslotForm form,
             final BindingResult errors
             ){
         return this.formatJsonResponse(errors, () -> {
@@ -178,11 +181,11 @@ public class MedicListController extends GenericController {
                 throw new MediCareException("Fechas invalidas");
             }
 
-            return this.appointmentService.findAvailableTimeslots(
+            return this.appointmentTimeSlotTransformer.transform(this.appointmentService.findAvailableTimeslots(
                     staff.get(),
                     dateFrom,
                     dateTo
-            );
+            ));
         });
     }
 }
