@@ -52,6 +52,12 @@ public class Appointment extends GenericModel<Appointment, Integer> {
         this.fromDate = fromDate;
     }
 
+    public Date getToDate(){
+        Date date = fromDate;
+        date.setMinutes(fromDate.getMinutes() + 15);
+        return date;
+    }
+
     @Override
     protected boolean isSameInstance(Object o) {
         return o instanceof Appointment;
