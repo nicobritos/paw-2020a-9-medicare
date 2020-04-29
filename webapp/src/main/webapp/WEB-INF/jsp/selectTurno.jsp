@@ -22,13 +22,13 @@
               </div>
               <div class="row mt-3 d-flex justify-content-start">
                 <c:forEach items="${staff.staffSpecialties}" var="specialty">
-                  <p>${specialty}</p>
+                  <p>${specialty.name}</p>
                 </c:forEach>
               </div>
             </div>
           </div>
           <div class="row mt-3 pl-4">
-            <p>Direccíon: ${staff.office.street} - ${staff.office.locality}</p>
+            <p>Direccíon: ${staff.office.street} - ${staff.office.locality.name}</p>
           </div>
           <div class="row pl-4">
             <p>Teléfono: ${staff.office.phone}</p>

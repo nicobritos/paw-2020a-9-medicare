@@ -78,7 +78,9 @@
                       </div>
                       <div class="col d-flex justify-content-center align-items-center">
                         <!-- TODO link to request appointment url -->
-                        <button onclick="<c:url value="/appointment/${member.id}"/>" class="btn btn-info">Ver turnos</button>
+                        <a href="<c:url value="/appointment/${member.id}"/>">
+                          <button type="button" class="btn btn-info">Ver turnos</button>
+                        </a>
                       </div>
                     </div>
                   </div>

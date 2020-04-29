@@ -1,10 +1,8 @@
 package ar.edu.itba.paw.webapp.controller;
 
-import ar.edu.itba.paw.interfaces.services.AppointmentService;
-import ar.edu.itba.paw.interfaces.services.LocalityService;
-import ar.edu.itba.paw.interfaces.services.StaffSpecialtyService;
-import ar.edu.itba.paw.interfaces.services.UserService;
+import ar.edu.itba.paw.interfaces.services.*;
 import ar.edu.itba.paw.models.Patient;
+import ar.edu.itba.paw.models.Staff;
 import ar.edu.itba.paw.models.User;
 import ar.edu.itba.paw.webapp.controller.utils.GenericController;
 import ar.edu.itba.paw.webapp.form.UserProfileForm;
@@ -37,6 +35,9 @@ public class PatientSideController extends GenericController {
 
     @Autowired
     UserService userService;
+
+    @Autowired
+    private StaffService staffService;
 
 
     @RequestMapping("/patient/home")
@@ -111,7 +112,13 @@ public class PatientSideController extends GenericController {
         if(date.isBefore(LocalDate.now())){
             return new ModelAndView("redirect:/appointment/" + staffId); //TODO: errors
         }
+        Optional<Staff> staff = staffService.findById(staffId);
+        if(!staff.isPresent()){
+            return new ModelAndView("redirect:/mediclist/1"); //TODO: errors
+        }
         mav.addObject("user", getUser());
+        mav.addObject("staff", staff.get());
+        mav.addObject("date", date);
         mav.setViewName("patientSide/reservarTurno");
         return mav;
     }
