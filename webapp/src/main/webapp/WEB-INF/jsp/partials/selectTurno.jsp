@@ -1,9 +1,11 @@
 <script type="text/template" id="appointment-select-modal">
-    <div class="d-flex flex-horizontal justify-content-between align-content-center">
-        <button class="btn" id="day-left"><</button>
-        <div class="d-flex flex-horizontal" id="week-container">
+    <div class="d-flex flex-row justify-content-between align-content-center">
+<%--        <button class="btn" id="day-left"><</button>--%>
+        <div class="d-flex flex-row w-100 justify-content-center">
+            <div class="d-flex flex-row w-75 justify-content-center" id="week-container">
+            </div>
         </div>
-        <button id="day-right" class="btn">></button>
+<%--        <button id="day-right" class="btn">></button>--%>
 <%--        <c:forEach var="i" begin="0" end="4">--%>
 <%--            <div class="col-1 mr-4 p-0">--%>
 <%--                <a href="<c:url value="/patient/appointment/${staff.id}/${monday.plusDays(i).year}/${monday.plusDays(i).dayOfYear}"/>">--%>
@@ -28,9 +30,9 @@
 </script>
 
 <script type="text/template" id="appointment-select-modal-day">
-    <div class="d-flex flex-vertical" id="day-container">
-        <span class="text-center">{0}</span>
-        <div class="d-flex flex-vertical" id="button-container" style="overflow-y: auto; max-height: 60vh;">
+    <div class="d-flex flex-column w-100 flex-shrink-1" id="day-container">
+        <h3 class="text-center mb-2">{0}</h3>
+        <div class="d-flex flex-column" id="button-container" style="overflow-y: auto; max-height: 40vh;">
         </div>
     </div>
 </script>

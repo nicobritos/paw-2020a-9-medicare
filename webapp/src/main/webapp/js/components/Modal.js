@@ -9,7 +9,7 @@ const Modal = function() {
             footer = $(footer);
         }
 
-        let modal = $($('#modal-generic-modal').text().format(title, body.text(), footer.text()));
+        let modal = $($('#modal-generic-modal').html().format(title, body.html(), footer.html()));
         if (isDefaultFooter) {
             if (confirmCallback) {
                 modal.find('#modal-generic-modal-footer-confirm').click(function() {

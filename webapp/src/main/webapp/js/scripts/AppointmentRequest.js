@@ -2,18 +2,20 @@ var AppointmentRequest = function() {
     let staffId = null;
 
     let bindElements = function () {
-        getStaffTimeslots().then(timeslots => {
-            let modal = Modal.create(
-                'Turnos', // TODO I18N
-                $($('#appointment-select-modal').text())
-            );
+        let modal = Modal.create(
+            'Turnos', // TODO I18N
+            $($('#appointment-select-modal').html())
+        );
+        modal.modal('show');
 
+        getStaffTimeslots().then(timeslots => {
             let weekContainer = modal.find('#week-container');
             weekContainer.empty();
 
             for (let dateTimeslot of timeslots) {
-                let dayContainer = $($('#appointment-select-modal-day').text().format(
-                    dateTimeslot.year + '/' + dateTimeslot.month + '/' + dateTimeslot.day
+                let date = dateTimeslot.date;
+                let dayContainer = $($('#appointment-select-modal-day').html().format(
+                    date.year + '/' + date.month + '/' + date.day
                 ));
                 weekContainer.append(dayContainer);
 
@@ -22,13 +24,14 @@ var AppointmentRequest = function() {
                     let button = $(
                         '<button ' +
                         'type="button" ' +
-                        'class="btn" ' +
+                        'class="btn btn-info m-1" ' +
                         'data-hour="' + timeslot.hour + '" ' +
                         'data-minute="' + timeslot.minute + '" ' +
-                        'data-year="' + dateTimeslot.year + '" ' +
-                        'data-month="' + dateTimeslot.month + '" ' +
-                        'data-day="' + dateTimeslot.day + '" ' +
+                        'data-year="' + date.year + '" ' +
+                        'data-month="' + date.month + '" ' +
+                        'data-day="' + date.day + '" ' +
                         '>' +
+                        timeslot.hour + ':' + timeslot.minute +
                         '</button>'
                     );
                     button.click(function() {
@@ -44,8 +47,6 @@ var AppointmentRequest = function() {
                     buttonContainer.append(button);
                 }
             }
-
-            modal.modal('show');
         });
     };
 
