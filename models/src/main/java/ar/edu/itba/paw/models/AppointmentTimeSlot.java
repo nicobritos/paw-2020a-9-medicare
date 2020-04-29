@@ -4,10 +4,9 @@ import java.util.Objects;
 
 public class AppointmentTimeSlot {
     private String day;
-    private int fromHour;
-    private int fromMinute;
-    private int toHour;
-    private int toMinute;
+    private int hour;
+    private int minute;
+    private int duration;
 
     public String getDay() {
         return this.day;
@@ -18,39 +17,35 @@ public class AppointmentTimeSlot {
     }
 
     public int getFromHour() {
-        return this.fromHour;
+        return this.hour;
     }
 
-    public void setFromHour(int fromHour) {
-        this.fromHour = fromHour;
+    public void setFromHour(int hour) {
+        this.hour = hour;
     }
 
     public int getFromMinute() {
-        return this.fromMinute;
+        return this.minute;
     }
 
-    public void setFromMinute(int fromMinute) {
-        this.fromMinute = fromMinute;
+    public void setFromMinute(int minute) {
+        this.minute = minute;
     }
 
     public int getToHour() {
-        return this.toHour;
-    }
-
-    public void setToHour(int toHour) {
-        this.toHour = toHour;
+        return this.hour + Math.abs((this.minute + this.duration) / 60);
     }
 
     public int getToMinute() {
-        return this.toMinute;
-    }
-
-    public void setToMinute(int toMinute) {
-        this.toMinute = toMinute;
+        return (this.minute + this.duration) % 60;
     }
 
     public int getDuration() {
-        return (this.toHour - this.fromHour) + (this.toMinute - this.fromMinute);
+        return this.duration;
+    }
+
+    public void setDuration(int duration) {
+        this.duration = duration;
     }
 
     @Override
@@ -58,15 +53,14 @@ public class AppointmentTimeSlot {
         if (this == o) return true;
         if (!(o instanceof AppointmentTimeSlot)) return false;
         AppointmentTimeSlot that = (AppointmentTimeSlot) o;
-        return this.getFromHour() == that.getFromHour() &&
-                this.getFromMinute() == that.getFromMinute() &&
-                this.getToHour() == that.getToHour() &&
+        return this.getToHour() == that.getToHour() &&
                 this.getToMinute() == that.getToMinute() &&
-                this.getDay() == that.getDay();
+                this.getDuration() == that.getDuration() &&
+                Objects.equals(this.getDay(), that.getDay());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(this.getDay(), this.getFromHour(), this.getFromMinute(), this.getToHour(), this.getToMinute());
+        return Objects.hash(this.getDay(), this.getToHour(), this.getToMinute(), this.getDuration());
     }
 }

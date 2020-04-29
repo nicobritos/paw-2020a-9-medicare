@@ -4,7 +4,6 @@ import ar.edu.itba.paw.persistenceAnnotations.Column;
 import ar.edu.itba.paw.persistenceAnnotations.ManyToOne;
 import ar.edu.itba.paw.persistenceAnnotations.Table;
 
-import java.time.Duration;
 import java.util.Date;
 
 @Table(name = "appointment", primaryKey = "appointment_id")
@@ -19,8 +18,7 @@ public class Appointment extends GenericModel<Appointment, Integer> {
     private Staff staff;
     @Column(name = "from_date", required = true)
     private Date fromDate;
-    @Column(name = "to_date", required = true)
-    private Date toDate;
+    // TODO: Remove to date
 
     public String getAppointmentStatus() {
         return this.appointmentStatus;
@@ -52,18 +50,6 @@ public class Appointment extends GenericModel<Appointment, Integer> {
 
     public void setFromDate(Date fromDate) {
         this.fromDate = fromDate;
-    }
-
-    public Date getToDate() {
-        return this.toDate;
-    }
-
-    public void setToDate(Date toDate) {
-        this.toDate = toDate;
-    }
-
-    public int getDuration() {
-        return (int) Duration.between(this.fromDate.toInstant(), this.toDate.toInstant()).toMinutes();
     }
 
     @Override

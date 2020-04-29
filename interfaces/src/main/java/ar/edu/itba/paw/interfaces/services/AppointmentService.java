@@ -14,9 +14,9 @@ public interface AppointmentService extends GenericService<Appointment, Integer>
 
     List<Appointment> find(Patient patient);
 
-    List<Appointment> findTodayAppointments(Staff staff);
+    List<Appointment> findToday(Staff staff);
 
-    List<Appointment> findTodayAppointments(Patient patient);
+    List<Appointment> findToday(Patient patient);
 
     List<Appointment> findByDay(Staff staff, LocalDate date);
 
@@ -24,6 +24,8 @@ public interface AppointmentService extends GenericService<Appointment, Integer>
             AppointmentAlreadyCancelledException,
             InvalidAppointmentStatusChangeException,
             AppointmentAlreadyCompletedException;
+
+    List<AppointmentTimeSlot> findAvailableTimeslots(Staff staff, LocalDate fromDate, LocalDate toDate);
 
     List<AppointmentTimeSlot> findAvailableTimeslots(Staff staff, LocalDate date);
 }
