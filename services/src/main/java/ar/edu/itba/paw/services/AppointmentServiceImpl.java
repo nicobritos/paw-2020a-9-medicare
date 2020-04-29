@@ -93,7 +93,7 @@ public class AppointmentServiceImpl extends GenericServiceImpl<AppointmentDao, A
     }
 
     @Override
-    public List<AppointmentTimeSlot> findAvailableTimeslots(Patient patient, Staff staff, LocalDate localDate) {
+    public List<AppointmentTimeSlot> findAvailableTimeslots(Staff staff, LocalDate localDate) {
         LocalDate now = LocalDate.now();
         if(localDate.isBefore(now) && (localDate.getDayOfMonth() != now.getDayOfMonth())){
             return new LinkedList<>();
@@ -139,22 +139,6 @@ public class AppointmentServiceImpl extends GenericServiceImpl<AppointmentDao, A
         }
 
         return appointmentTimeSlots;
-    }
-
-    @Override
-    public List<AppointmentTimeSlot> findAvailableTimeslots(Staff staff, LocalDate localDate) {
-        List<Workday> workdays = this.workdayService.findByStaff(staff, WorkdayDay.from(localDate));
-        if (workdays.isEmpty())
-            return new LinkedList<>();
-
-        List<Appointment> appointments = this.findByDay(staff, localDate);
-        List<AppointmentTimeSlot> availableTimeslots = new LinkedList<>();
-        for (Workday workday : workdays) {
-            // todo
-        }
-
-
-        return new LinkedList<>(); // TODO
     }
 
     @Override

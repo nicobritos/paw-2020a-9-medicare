@@ -79,7 +79,7 @@ public class MedicSideController extends GenericController {
         mav.addObject("today", today);
         mav.addObject("monday", monday);
         mav.addObject("todayAppointments", appointmentService.findTodayAppointments(staff));
-        mav.addObject("appointments", appointmentService.findPending(staff)); // TODO: cambiar
+        mav.addObject("appointments", appointmentService.find(staff)); // TODO: cambiar
         mav.addObject("specialties", staffSpecialtyService.list());
         mav.addObject("localities", localityService.list());
         mav.setViewName("homeMedico");

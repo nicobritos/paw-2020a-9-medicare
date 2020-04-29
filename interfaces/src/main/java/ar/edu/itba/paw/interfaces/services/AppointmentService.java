@@ -25,7 +25,5 @@ public interface AppointmentService extends GenericService<Appointment, Integer>
             InvalidAppointmentStatusChangeException,
             AppointmentAlreadyCompletedException;
 
-    List<AppointmentTimeSlot> findAvailableTimeslots(Patient patient, Staff staff, LocalDate date);
-
     List<AppointmentTimeSlot> findAvailableTimeslots(Staff staff, LocalDate date);
 }

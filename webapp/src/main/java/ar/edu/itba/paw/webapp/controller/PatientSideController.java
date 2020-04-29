@@ -51,7 +51,7 @@ public class PatientSideController extends GenericController {
         patient.setUser(user.get());
 
         mav.addObject("user", user);
-        mav.addObject("appointments", appointmentService.findPending(patient));
+        mav.addObject("appointments", appointmentService.find(patient));
         mav.addObject("specialties", staffSpecialtyService.list());
         mav.addObject("localities", localityService.list());
 
