@@ -162,7 +162,7 @@ public class MedicSideController extends GenericController {
         }
 
 
-        Optional<Office> office = officeService.findById(form.getId());
+        Optional<Office> office = officeService.findById(form.getOfficeId());
         if(!office.isPresent()){
             return this.addWorkday(form);
         }

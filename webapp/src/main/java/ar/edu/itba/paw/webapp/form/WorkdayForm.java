@@ -16,7 +16,7 @@ public class WorkdayForm {
     private String endHour;
 
     @Min(0)
-    private int id;
+    private int officeId;
 
     public int getDow() {
         return dow;
@@ -42,11 +42,11 @@ public class WorkdayForm {
         this.endHour = endHour;
     }
 
-    public int getId() {
-        return id;
+    public int getOfficeId() {
+        return officeId;
     }
 
-    public void setId(int id) {
-        this.id = id;
+    public void setOfficeId(int officeId) {
+        this.officeId = officeId;
     }
 }
