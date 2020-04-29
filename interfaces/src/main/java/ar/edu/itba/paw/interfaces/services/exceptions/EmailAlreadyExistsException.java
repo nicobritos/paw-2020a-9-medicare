@@ -1,4 +1,4 @@
-package ar.edu.itba.paw.services.exceptions;
+package ar.edu.itba.paw.interfaces.services.exceptions;
 
 import ar.edu.itba.paw.interfaces.MediCareException;
 

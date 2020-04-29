@@ -1,5 +1,8 @@
 package ar.edu.itba.paw.interfaces.services;
 
+import ar.edu.itba.paw.interfaces.services.exceptions.AppointmentAlreadyCancelledException;
+import ar.edu.itba.paw.interfaces.services.exceptions.AppointmentAlreadyCompletedException;
+import ar.edu.itba.paw.interfaces.services.exceptions.InvalidAppointmentStatusChangeException;
 import ar.edu.itba.paw.interfaces.services.generic.GenericService;
 import ar.edu.itba.paw.models.*;
 
@@ -7,19 +10,20 @@ import java.time.LocalDate;
 import java.util.List;
 
 public interface AppointmentService extends GenericService<Appointment, Integer> {
-    List<Appointment> findPending(Patient patient);
+    List<Appointment> find(Staff staff);
 
-    List<Appointment> findPending(Staff staff);
+    List<Appointment> find(Patient patient);
 
     List<Appointment> findTodayAppointments(Staff staff);
 
-    List<Appointment> findAppointmentsByDate(Staff staff, LocalDate date);
+    List<Appointment> findByDay(Staff staff, LocalDate date);
 
-    List<Appointment> findPending(Patient patient, Staff staff);
+    void setStatus(Appointment appointment, AppointmentStatus status) throws
+            AppointmentAlreadyCancelledException,
+            InvalidAppointmentStatusChangeException,
+            AppointmentAlreadyCompletedException;
 
-    void setStatus(Appointment appointment, AppointmentStatus status);
+    List<AppointmentTimeSlot> findAvailableTimeslots(Patient patient, Staff staff, LocalDate date);
 
-    List<AppointmentTimeSlot> findAvailableTimeslots(Patient patient, Staff staff);
-
-    List<AppointmentTimeSlot> findAvailableTimeslots(Staff staff);
+    List<AppointmentTimeSlot> findAvailableTimeslots(Staff staff, LocalDate date);
 }

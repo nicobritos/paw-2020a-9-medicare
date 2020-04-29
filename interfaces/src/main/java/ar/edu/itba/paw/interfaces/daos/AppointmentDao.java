@@ -9,6 +9,10 @@ import java.time.LocalDate;
 import java.util.List;
 
 public interface AppointmentDao extends GenericDao<Appointment, Integer> {
+    List<Appointment> find(Patient patient);
+
+    List<Appointment> find(Staff staff);
+
     List<Appointment> findPending(Patient patient);
 
     List<Appointment> findPending(Staff staff);

@@ -1,14 +1,13 @@
 package ar.edu.itba.paw.services;
 
-import ar.edu.itba.paw.interfaces.MediCareException;
 import ar.edu.itba.paw.interfaces.daos.UserDao;
 import ar.edu.itba.paw.interfaces.services.OfficeService;
 import ar.edu.itba.paw.interfaces.services.StaffService;
 import ar.edu.itba.paw.interfaces.services.UserService;
+import ar.edu.itba.paw.interfaces.services.exceptions.EmailAlreadyExistsException;
 import ar.edu.itba.paw.models.Office;
 import ar.edu.itba.paw.models.Staff;
 import ar.edu.itba.paw.models.User;
-import ar.edu.itba.paw.services.exceptions.EmailAlreadyExistsException;
 import ar.edu.itba.paw.services.generics.GenericSearchableServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -29,7 +28,7 @@ public class UserServiceImpl extends GenericSearchableServiceImpl<UserDao, User,
     private PasswordEncoder passwordEncoder;
 
     @Override
-    public User create(User user) {
+    public User create(User user) throws EmailAlreadyExistsException {
         if (this.repository.existsEmail(user.getEmail())) {
             throw new EmailAlreadyExistsException();
         }
@@ -40,9 +39,9 @@ public class UserServiceImpl extends GenericSearchableServiceImpl<UserDao, User,
 
     @Override
     @Transactional
-    public User create(User user, Office office){
+    public User create(User user, Office office) throws EmailAlreadyExistsException {
         User newUser;
-        newUser = create(user);
+        newUser = this.create(user);
 
         office = this.officeService.create(office);
 
@@ -56,7 +55,7 @@ public class UserServiceImpl extends GenericSearchableServiceImpl<UserDao, User,
         this.officeService.update(office);
 
         newUser.getStaffs().add(staff);
-        update(newUser);
+        this.update(newUser);
 
         return newUser;
     }
