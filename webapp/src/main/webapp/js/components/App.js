@@ -106,6 +106,8 @@ const App = function() {
         }
     };
 
+    let baseUrl = $("base")[0].href;
+
     return {
         init: function() {
             // First, checks if it isn't implemented yet.
@@ -122,14 +124,16 @@ const App = function() {
             }
         },
         get: function(url, parameters = {}) {
-            return ajax(url, parameters);
+            return ajax(baseUrl + url, parameters);
         },
         post: function (url, parameters = {}) {
-            return ajax(url, parameters, 'POST');
+            return ajax(baseUrl + url, parameters, 'POST');
         },
         goBack: function () {
             history.back();
         },
-        goto: goto
+        goto: function (url) {
+            return goto(baseUrl + url);
+        }
     };
 }();
