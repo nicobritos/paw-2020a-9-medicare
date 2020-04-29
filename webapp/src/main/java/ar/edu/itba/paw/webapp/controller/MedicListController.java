@@ -1,5 +1,7 @@
 package ar.edu.itba.paw.webapp.controller;
 
+import ar.edu.itba.paw.interfaces.MediCareException;
+import ar.edu.itba.paw.interfaces.services.AppointmentService;
 import ar.edu.itba.paw.interfaces.services.LocalityService;
 import ar.edu.itba.paw.interfaces.services.StaffService;
 import ar.edu.itba.paw.interfaces.services.StaffSpecialtyService;
@@ -7,27 +9,34 @@ import ar.edu.itba.paw.models.Locality;
 import ar.edu.itba.paw.models.Staff;
 import ar.edu.itba.paw.models.StaffSpecialty;
 import ar.edu.itba.paw.webapp.controller.utils.GenericController;
+import ar.edu.itba.paw.webapp.controller.utils.JsonResponse;
+import ar.edu.itba.paw.webapp.form.RequestTimeslotForm;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import javax.validation.Valid;
 import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
 import java.util.*;
 
 @Controller
 public class MedicListController extends GenericController {
+    private static final long MAX_DAYS_APPOINTMENTS = 7;
     @Autowired
     StaffService staffService;
     @Autowired
     StaffSpecialtyService specialityService;
     @Autowired
     LocalityService localityService;
+    @Autowired
+    private AppointmentService appointmentService;
 
     @RequestMapping("/mediclist")
     public ModelAndView medicList(@RequestParam(value = "name",required = false)String name, @RequestParam(value = "specialties",required = false) String specialties, @RequestParam(value = "localities",required = false) String localities){
@@ -148,5 +157,32 @@ public class MedicListController extends GenericController {
         mav.addObject("staff", staff.get());
         mav.setViewName("selectTurno");
         return mav;
+    }
+
+    @RequestMapping(value = "/timeslots/{id}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseBody
+    public JsonResponse timeslots(
+            @PathVariable("id") final int id,
+            @Valid @RequestParam RequestTimeslotForm form,
+            final BindingResult errors
+            ){
+        return this.formatJsonResponse(errors, () -> {
+            Optional<Staff> staff = this.staffService.findById(id);
+            if (!staff.isPresent()) {
+                throw new MediCareException("No existe el staff solicitado");
+            }
+            LocalDate dateFrom = LocalDate.of(form.getFromYear(), form.getFromMonth(), form.getFromDay());
+            LocalDate dateTo = LocalDate.of(form.getToYear(), form.getToMonth(), form.getToDay());
+            long daysBetween = Math.abs(ChronoUnit.DAYS.between(dateFrom, dateTo));
+            if (daysBetween > MAX_DAYS_APPOINTMENTS || dateTo.isBefore(dateFrom)) {
+                throw new MediCareException("Fechas invalidas");
+            }
+
+            return this.appointmentService.findAvailableTimeslots(
+                    staff.get(),
+                    dateFrom,
+                    dateTo
+            );
+        });
     }
 }

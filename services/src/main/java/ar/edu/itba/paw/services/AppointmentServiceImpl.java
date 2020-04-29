@@ -11,7 +11,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
-import java.time.ZoneId;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.LinkedList;
@@ -35,12 +34,12 @@ public class AppointmentServiceImpl extends GenericServiceImpl<AppointmentDao, A
     }
 
     @Override
-    public List<Appointment> findTodayAppointments(Staff staff){
+    public List<Appointment> findToday(Staff staff){
         return this.repository.findByDate(staff, LocalDate.now());
     }
 
     @Override
-    public List<Appointment> findTodayAppointments(Patient patient){
+    public List<Appointment> findToday(Patient patient){
         return this.repository.findByDate(patient, LocalDate.now());
     }
 
@@ -70,75 +69,88 @@ public class AppointmentServiceImpl extends GenericServiceImpl<AppointmentDao, A
     }
 
     public Appointment create(Appointment model) throws InvalidAppointmentDateException, InvalidAppointmentDurationException, MediCareException {
-        if (!(model.getDuration() == Appointment.DURATION))
-            throw new InvalidAppointmentDurationException();
-        if (!this.isValidDate(model.getStaff(), model.getFromDate(), model.getToDate()))
-            throw new InvalidAppointmentDateException();
-
-        model.setAppointmentStatus(AppointmentStatus.PENDING.name());
-        LocalDate fromDateToCreate = LocalDate.from(model.getFromDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDate());
-        LocalDate toDateToCreate = LocalDate.from(model.getToDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDate());
-
-        List<Appointment> appointments = findByDay(model.getStaff(), fromDateToCreate);
-        for (Appointment appointment : appointments){
-            LocalDate appointmentFromDate = LocalDate.from(appointment.getFromDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDate());
-            LocalDate appointmentToDate = LocalDate.from(appointment.getToDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDate());
-
-            if(fromDateToCreate.isAfter(appointmentFromDate) && fromDateToCreate.isBefore(appointmentToDate)
-            || (toDateToCreate.isAfter(appointmentFromDate) && toDateToCreate.isBefore(appointmentToDate))){
-                throw new MediCareException("Workday date overlaps with an existing one");
-            }
-        }
-        return this.repository.create(model);
+//        if (!this.isValidDate(model.getStaff(), model.getFromDate()))
+//            throw new InvalidAppointmentDateException();
+//
+//        model.setAppointmentStatus(AppointmentStatus.PENDING.name());
+//        LocalDate fromDateToCreate = LocalDate.from(model.getFromDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDate());
+//
+//        List<Appointment> appointments = findByDay(model.getStaff(), fromDateToCreate);
+//        for (Appointment appointment : appointments){
+//            LocalDate appointmentFromDate = LocalDate.from(appointment.getFromDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDate());
+//            LocalDate appointmentToDate = LocalDate.from(appointment.getToDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDate());
+//
+//            if(fromDateToCreate.isAfter(appointmentFromDate) && fromDateToCreate.isBefore(appointmentToDate)
+//            || (toDateToCreate.isAfter(appointmentFromDate) && toDateToCreate.isBefore(appointmentToDate))){
+//                throw new MediCareException("Workday date overlaps with an existing one");
+//            }
+//        }
+//        return this.repository.create(model);
+        return null;
     }
 
     @Override
-    public List<AppointmentTimeSlot> findAvailableTimeslots(Staff staff, LocalDate localDate) {
+    public List<AppointmentTimeSlot> findAvailableTimeslots(Staff staff, LocalDate fromDate, LocalDate toDate) {
         LocalDate now = LocalDate.now();
-        if(localDate.isBefore(now) && (localDate.getDayOfMonth() != now.getDayOfMonth())){
-            return new LinkedList<>();
-        }
-
-        WorkdayDay workdayDay;
-        switch (localDate.getDayOfWeek()){
-            case SUNDAY:
-                workdayDay = WorkdayDay.SUNDAY;
-                break;
-            case MONDAY:
-                workdayDay = WorkdayDay.MONDAY;
-                break;
-            case TUESDAY:
-                workdayDay = WorkdayDay.TUESDAY;
-                break;
-            case WEDNESDAY:
-                workdayDay = WorkdayDay.WEDNESDAY;
-                break;
-            case THURSDAY:
-                workdayDay = WorkdayDay.THURSDAY;
-                break;
-            case FRIDAY:
-                workdayDay = WorkdayDay.FRIDAY;
-                break;
-            case SATURDAY:
-                workdayDay = WorkdayDay.SATURDAY;
-                break;
-            default:
-                workdayDay = null;
-
-        }
-        List<Workday> workdays = this.workdayService.findByStaff(staff, workdayDay);
         List<AppointmentTimeSlot> appointmentTimeSlots = new LinkedList<>();
-        for (Workday workday : workdays){
-            AppointmentTimeSlot appointmentTimeSlot = new AppointmentTimeSlot();
-            appointmentTimeSlot.setDay(workday.getDay());
-            appointmentTimeSlot.setFromHour(workday.getStartHour());
-            appointmentTimeSlot.setFromMinute(workday.getStartMinute());
-            appointmentTimeSlot.setToHour(workday.getStartHour());
-            appointmentTimeSlot.setToHour(workday.getEndHour());
-            appointmentTimeSlots.add(appointmentTimeSlot);
+        LocalDate localDate = LocalDate.ofEpochDay(fromDate.toEpochDay());
+        while (!toDate.isAfter(localDate)) {
+            if (localDate.isBefore(now)){
+                localDate = localDate.plusDays(1);
+                continue;
+            }
+
+            WorkdayDay workdayDay = WorkdayDay.from(localDate);
+            List<Workday> workdays = this.workdayService.findByStaff(staff, workdayDay);
+            for (Workday workday : workdays) {
+                for (int j = workday.getStartMinute(); j < 60; j += Appointment.DURATION) {
+                    AppointmentTimeSlot appointmentTimeSlot = new AppointmentTimeSlot();
+                    appointmentTimeSlot.setDay(workday.getDay());
+                    appointmentTimeSlot.setFromHour(workday.getStartHour());
+                    appointmentTimeSlot.setFromMinute(j);
+                    appointmentTimeSlot.setDuration(Appointment.DURATION);
+                    appointmentTimeSlots.add(appointmentTimeSlot);
+                }
+                for (int i = workday.getStartHour() + 1; i < workday.getEndHour(); i++) {
+                    for (int j = 0; j < 60; j += Appointment.DURATION) {
+                        AppointmentTimeSlot appointmentTimeSlot = new AppointmentTimeSlot();
+                        appointmentTimeSlot.setDay(workday.getDay());
+                        appointmentTimeSlot.setFromHour(i);
+                        appointmentTimeSlot.setFromMinute(j);
+                        appointmentTimeSlot.setDuration(Appointment.DURATION);
+                        appointmentTimeSlots.add(appointmentTimeSlot);
+                    }
+                }
+                for (int j = 0; j < workday.getEndMinute(); j += Appointment.DURATION) {
+                    AppointmentTimeSlot appointmentTimeSlot = new AppointmentTimeSlot();
+                    appointmentTimeSlot.setDay(workday.getDay());
+                    appointmentTimeSlot.setFromHour(workday.getEndHour());
+                    appointmentTimeSlot.setFromMinute(j);
+                    appointmentTimeSlot.setDuration(Appointment.DURATION);
+                    appointmentTimeSlots.add(appointmentTimeSlot);
+                }
+
+                List<Appointment> takenAppointments = this.findByDay(staff, localDate);
+                for (Appointment appointment : takenAppointments) {
+                    AppointmentTimeSlot appointmentTimeSlot = new AppointmentTimeSlot();
+                    appointmentTimeSlot.setDay(workday.getDay());
+                    appointmentTimeSlot.setFromHour(appointment.getFromDate().getHours());
+                    appointmentTimeSlot.setFromMinute(appointment.getFromDate().getMinutes());
+                    appointmentTimeSlot.setDuration(Appointment.DURATION);
+
+                    appointmentTimeSlots.remove(appointmentTimeSlot);
+                }
+            }
+
+            localDate = localDate.plusDays(1);
         }
 
         return appointmentTimeSlots;
+    }
+
+    @Override
+    public List<AppointmentTimeSlot> findAvailableTimeslots(Staff staff, LocalDate date) {
+        return this.findAvailableTimeslots(staff, date, date);
     }
 
     @Override
@@ -164,12 +176,12 @@ public class AppointmentServiceImpl extends GenericServiceImpl<AppointmentDao, A
         toCalendar.setTime(toDate);
 
         AppointmentTimeSlot appointmentTimeSlot = new AppointmentTimeSlot();
-        appointmentTimeSlot.setDay(WorkdayDay.from(fromCalendar).name());
-        appointmentTimeSlot.setFromHour(fromCalendar.get(Calendar.HOUR));
-        appointmentTimeSlot.setFromMinute(fromCalendar.get(Calendar.MINUTE));
-
-        appointmentTimeSlot.setToHour(toCalendar.get(Calendar.HOUR));
-        appointmentTimeSlot.setToMinute(toCalendar.get(Calendar.MINUTE));
+//        appointmentTimeSlot.setDay(WorkdayDay.from(fromCalendar).name());
+//        appointmentTimeSlot.setFromHour(fromCalendar.get(Calendar.HOUR));
+//        appointmentTimeSlot.setFromMinute(fromCalendar.get(Calendar.MINUTE));
+//
+//        appointmentTimeSlot.setToHour(toCalendar.get(Calendar.HOUR));
+//        appointmentTimeSlot.setToMinute(toCalendar.get(Calendar.MINUTE));
 
         if (!this.workdayService.isStaffWorking(staff, appointmentTimeSlot))
             return false;
@@ -181,11 +193,11 @@ public class AppointmentServiceImpl extends GenericServiceImpl<AppointmentDao, A
     }
 
     private boolean isValidTimeSlot(AppointmentTimeSlot appointmentTimeSlot) {
-        if (appointmentTimeSlot.getFromHour() < appointmentTimeSlot.getToHour())
-            return false;
-        if (appointmentTimeSlot.getFromHour() == appointmentTimeSlot.getToHour()
-                && appointmentTimeSlot.getFromMinute() <= appointmentTimeSlot.getToMinute())
-            return false;
+//        if (appointmentTimeSlot.getFromHour() < appointmentTimeSlot.getToHour())
+//            return false;
+//        if (appointmentTimeSlot.getFromHour() == appointmentTimeSlot.getToHour()
+//                && appointmentTimeSlot.getFromMinute() <= appointmentTimeSlot.getToMinute())
+//            return false;
         return appointmentTimeSlot.getDuration() == Appointment.DURATION;
     }
 }
