@@ -11,10 +11,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 @Service
 public class AppointmentServiceImpl extends GenericServiceImpl<AppointmentDao, Appointment, Integer> implements AppointmentService {
@@ -69,24 +71,25 @@ public class AppointmentServiceImpl extends GenericServiceImpl<AppointmentDao, A
     }
 
     public Appointment create(Appointment model) throws InvalidAppointmentDateException, InvalidAppointmentDurationException, MediCareException {
-//        if (!this.isValidDate(model.getStaff(), model.getFromDate()))
-//            throw new InvalidAppointmentDateException();
-//
-//        model.setAppointmentStatus(AppointmentStatus.PENDING.name());
-//        LocalDate fromDateToCreate = LocalDate.from(model.getFromDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDate());
-//
-//        List<Appointment> appointments = findByDay(model.getStaff(), fromDateToCreate);
-//        for (Appointment appointment : appointments){
-//            LocalDate appointmentFromDate = LocalDate.from(appointment.getFromDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDate());
-//            LocalDate appointmentToDate = LocalDate.from(appointment.getToDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDate());
-//
-//            if(fromDateToCreate.isAfter(appointmentFromDate) && fromDateToCreate.isBefore(appointmentToDate)
-//            || (toDateToCreate.isAfter(appointmentFromDate) && toDateToCreate.isBefore(appointmentToDate))){
-//                throw new MediCareException("Workday date overlaps with an existing one");
-//            }
-//        }
-//        return this.repository.create(model);
-        return null;
+        if (!this.isValidDate(model.getStaff(), model.getFromDate(), model.getToDate()))
+            throw new InvalidAppointmentDateException();
+
+        model.setAppointmentStatus(AppointmentStatus.PENDING.name());
+        LocalDate fromDateToCreate = LocalDate.from(model.getFromDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDate());
+        LocalDate toDateToCreate = LocalDate.from(model.getToDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDate());
+
+
+        List<Appointment> appointments = findByDay(model.getStaff(), fromDateToCreate);
+        for (Appointment appointment : appointments){
+            LocalDate appointmentFromDate = LocalDate.from(appointment.getFromDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDate());
+            LocalDate appointmentToDate = LocalDate.from(appointment.getToDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDate());
+
+            if(fromDateToCreate.isAfter(appointmentFromDate) && fromDateToCreate.isBefore(appointmentToDate)
+            || (toDateToCreate.isAfter(appointmentFromDate) && toDateToCreate.isBefore(appointmentToDate))){
+                throw new MediCareException("Workday date overlaps with an existing one");
+            }
+        }
+        return this.repository.create(model);
     }
 
     @Override
@@ -177,12 +180,11 @@ public class AppointmentServiceImpl extends GenericServiceImpl<AppointmentDao, A
         toCalendar.setTime(toDate);
 
         AppointmentTimeSlot appointmentTimeSlot = new AppointmentTimeSlot();
-//        appointmentTimeSlot.setDay(WorkdayDay.from(fromCalendar).name());
-//        appointmentTimeSlot.setFromHour(fromCalendar.get(Calendar.HOUR));
-//        appointmentTimeSlot.setFromMinute(fromCalendar.get(Calendar.MINUTE));
-//
-//        appointmentTimeSlot.setToHour(toCalendar.get(Calendar.HOUR));
-//        appointmentTimeSlot.setToMinute(toCalendar.get(Calendar.MINUTE));
+
+        appointmentTimeSlot.setDate(LocalDate.from(fromDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDate()));
+        appointmentTimeSlot.setFromHour(fromCalendar.get(Calendar.HOUR));
+        appointmentTimeSlot.setFromMinute(fromCalendar.get(Calendar.MINUTE));
+        appointmentTimeSlot.setDuration(toCalendar.get(Calendar.HOUR));
 
         if (!this.workdayService.isStaffWorking(staff, appointmentTimeSlot))
             return false;
@@ -194,11 +196,11 @@ public class AppointmentServiceImpl extends GenericServiceImpl<AppointmentDao, A
     }
 
     private boolean isValidTimeSlot(AppointmentTimeSlot appointmentTimeSlot) {
-//        if (appointmentTimeSlot.getFromHour() < appointmentTimeSlot.getToHour())
-//            return false;
-//        if (appointmentTimeSlot.getFromHour() == appointmentTimeSlot.getToHour()
-//                && appointmentTimeSlot.getFromMinute() <= appointmentTimeSlot.getToMinute())
-//            return false;
+        if (appointmentTimeSlot.getFromHour() < appointmentTimeSlot.getToHour())
+            return false;
+        if (appointmentTimeSlot.getFromHour() == appointmentTimeSlot.getToHour()
+                && appointmentTimeSlot.getFromMinute() <= appointmentTimeSlot.getToMinute())
+            return false;
         return appointmentTimeSlot.getDuration() == Appointment.DURATION;
     }
 }
