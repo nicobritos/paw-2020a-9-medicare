@@ -4,7 +4,7 @@
 <html>
 <head>
     <%@ include file="../head.jsp" %>
-    <link rel="stylesheet" href='<c:url value="/css/login.css"/> '>
+    <link rel="stylesheet" href='<c:url value="/css/authentication/login.css"/> '>
 </head>
 <body>
 <div class="container w-100 h-100 d-flex flex-column justify-content-center align-items-center">
@@ -13,7 +13,7 @@
     <form:form modelAttribute="loginForm" class="register-form border p-5 rounded" action="${loginUrl}" method="POST"
                enctype="application/x-www-form-urlencoded">
         <div class="row">
-            <h6>Medicare <img src='<c:url value="/css/logo.svg"/>' id="logo"/></h6>
+            <h6>Medicare <img src='<c:url value="/img/logo.svg"/>' id="logo"/></h6>
         </div>
         <div class="row justify-content-start">
             <h1 class="register-form-title">Iniciar sesión</h1>
@@ -33,8 +33,8 @@
             <div class="col-8">
                 <form:input path="password" class="form-control pr-5" type="password" name="medicare_password" id="medicare_password"/>
                 <!-- For this to work for must be the id of the password input -->
-                <label for="medicare_password" class="toggle-visibility"><img src='<c:url value="/css/eye.svg"/> '><img
-                        src='<c:url value="/css/noeye.svg"/>' style="display: none;"></label>
+                <label for="medicare_password" class="toggle-visibility"><img src='<c:url value="/img/eye.svg"/> '><img
+                        src='<c:url value="/img/noeye.svg"/>' style="display: none;"></label>
             </div>
         </div>
         <div class="form-group row align-items-center">
@@ -58,7 +58,7 @@
         </c:if>
     </form:form>
 </div>
-<script src='<c:url value="/js/scripts/login.js"/> '></script>
+<script src='<c:url value="/js/scripts/authentication/login.js"/> '></script>
 <script>
     $(document).ready(() => {
         Login.init();

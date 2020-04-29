@@ -27,4 +27,10 @@ public interface GenericDao<M extends GenericModel<M, I>, I> {
     List<M> list();
 
     Class<M> getModelClass();
+
+    Collection<M> findByField(String field, Object value);
+
+    Optional<?> findFieldById(I id, String field);
+
+    Collection<?> findFieldByIdManyToMany(I id, String key, String field, String tableName);
 }

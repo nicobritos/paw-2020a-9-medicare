@@ -12,6 +12,7 @@ public interface UserService extends GenericSearchableService<User, Integer> {
 
     User create(User user, Office office) throws EmailAlreadyExistsException;
 
-    void update(User user) throws EmailAlreadyExistsException;
+    void updatePassword(User user, String newPassword);
 
+    void update(User user) throws EmailAlreadyExistsException;
 }

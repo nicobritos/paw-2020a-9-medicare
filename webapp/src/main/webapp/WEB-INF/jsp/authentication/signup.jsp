@@ -3,14 +3,14 @@
 <html>
 <head>
     <%@ include file="../head.jsp" %>
-    <link rel="stylesheet" href='<c:url value="/css/register.css"/> '>
+    <link rel="stylesheet" href='<c:url value="/css/authentication/register.css"/> '>
 </head>
 <body>
 <div class="container w-100 h-100 d-flex flex-column justify-content-center align-items-center">
     <c:url value="/login" var="loginUrl"/>
     <div class="register-form border p-5 rounded">
         <div class="row">
-            <h6>Medicare <img src='<c:url value="/css/logo.svg"/>' id="logo"/></h6>
+            <h6>Medicare <img src='<c:url value="/img/logo.svg"/>' id="logo"/></h6>
         </div>
         <div class="row justify-content-start">
             <h1 class="register-form-title">Crear cuenta</h1>
@@ -27,7 +27,7 @@
         </div>
     </div>
 </div>
-<script src='<c:url value="/js/scripts/register.js"/> '></script>
+<script src='<c:url value="/js/scripts/authentication/register.js"/> '></script>
 <script>
     $(document).ready(() => {
         Register.init();

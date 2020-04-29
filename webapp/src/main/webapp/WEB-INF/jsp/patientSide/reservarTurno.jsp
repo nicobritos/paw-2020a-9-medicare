@@ -53,7 +53,7 @@
             </div>
             <div class="row justify-content-center border-top border-light py-2">
               <div class="col-3 d-flex align-items-center justify-content-center">
-                <img src='<c:url value="/css/calendarIcon.svg"/>' class="w-75" alt="calendar icon">
+                <img src='<c:url value="/img/calendarIcon.svg"/>' class="w-75" alt="calendar icon">
               </div>
               <div class="col p-0">
                 <%-- TODO: connect hora--%>
@@ -63,7 +63,7 @@
             </div>
             <div class="row justify-content-center border-top border-light py-2">
               <div class="col-3 d-flex align-items-center justify-content-center">
-                <img src='<c:url value="/css/mapIcon.svg"/> ' class="w-75" alt="map icon">
+                <img src='<c:url value="/img/mapIcon.svg"/> ' class="w-75" alt="map icon">
               </div>
               <div class="col p-0">
                 <p class="m-0 white-text">${staff.office.street}</p>

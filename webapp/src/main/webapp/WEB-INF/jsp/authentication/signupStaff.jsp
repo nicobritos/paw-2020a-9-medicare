@@ -3,7 +3,7 @@
 <html>
 <head>
     <%@ include file="../head.jsp" %>
-    <link rel="stylesheet" href='<c:url value="/css/register.css"/> '>
+    <link rel="stylesheet" href='<c:url value="/css/authentication/register.css"/> '>
 </head>
 <body>
 <div class="container w-100 h-100 d-flex flex-column justify-content-center align-items-center">
@@ -12,7 +12,7 @@
     <form:form modelAttribute="signupForm" class="register-form border p-5 rounded" action="${signupUrl}" method="POST"
                enctype="application/x-www-form-urlencoded">
         <div class="row">
-            <h6>Medicare <img src='<c:url value="/css/logo.svg"/>' id="logo"/></h6>
+            <h6>Medicare <img src='<c:url value="/img/logo.svg"/>' id="logo"/></h6>
         </div>
         <div class="row justify-content-start">
             <h1 class="register-form-title">Crear cuenta</h1>
@@ -48,8 +48,8 @@
             <div class="col-8">
                 <form:input path="password" class="form-control pr-5" type="password" name="medicare_password" id="medicare_password"/>
                 <!-- For this to work for must be the id of the password input -->
-                <label for="medicare_password" class="toggle-visibility"><img src='<c:url value="/css/eye.svg"/> '><img
-                        src='<c:url value="/css/noeye.svg"/>' style="display: none;"></label>
+                <label for="medicare_password" class="toggle-visibility"><img src='<c:url value="/img/eye.svg"/> '><img
+                        src='<c:url value="/img/noeye.svg"/>' style="display: none;"></label>
             </div>
         </div>
         <div class="form-group row">
@@ -60,8 +60,8 @@
                 <form:input path="repeatPassword" class="form-control pr-5" type="password" name="medicare_repeatPassword"
                             id="medicare_repeatPassword"/>
                 <!-- For this to work for must be the id of the password input -->
-                <label for="medicare_repeatPassword" class="toggle-visibility"><img src='<c:url value="/css/eye.svg"/> '><img
-                        src='<c:url value="/css/noeye.svg"/> ' style="display: none;"></label>
+                <label for="medicare_repeatPassword" class="toggle-visibility"><img src='<c:url value="/img/eye.svg"/> '><img
+                        src='<c:url value="/img/noeye.svg"/> ' style="display: none;"></label>
             </div>
         </div>
         <div class="form-group row">
@@ -104,7 +104,7 @@
         <form:errors path="*" cssClass="mt-4 mb-0 text-danger" element="p"/>
     </form:form>
 </div>
-<script src='<c:url value="/js/scripts/register.js"/> '></script>
+<script src='<c:url value="/js/scripts/authentication/register.js"/> '></script>
 <script>
     $(document).ready(() => {
         Register.initStaff();

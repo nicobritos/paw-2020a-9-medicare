@@ -3,7 +3,7 @@
   <div class="container w-100 justify-content-start">
     <img
       class="navbar-brand"
-      src='<c:url value="/css/whiteLogo.svg"/>'
+      src='<c:url value="/img/whiteLogo.svg"/>'
       alt="logo"
       id="navbar-logo"
     />

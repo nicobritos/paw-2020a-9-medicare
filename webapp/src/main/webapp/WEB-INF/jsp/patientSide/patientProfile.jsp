@@ -4,7 +4,7 @@
 <html lang="en">
   <head>
     <%@ include file = "../head.jsp" %>
-    <link rel="stylesheet" href='<c:url value="/css/patientProfile.css"/> ' />
+    <link rel="stylesheet" href='<c:url value="/css/patient/patientProfile.css"/> ' />
   </head>
   <body class="d-flex flex-column">
     <%@ include file="../navbar/navbarLogged.jsp" %>
@@ -25,19 +25,19 @@
                         <div class="row">
                             <div class="col p-0 m-0">
                                 <!-- TODO Connect image function-->
-                                <h3>Nombre/s <label for="firstName" class="toggle-readonly"><img type="button" src='<c:url value="/css/editPencil.svg"/>' alt="editar"/></label></h3>
+                                <h3>Nombre/s <label for="firstName" class="toggle-readonly"><img type="button" src='<c:url value="/img/editPencil.svg"/>' alt="editar"/></label></h3>
                                 <form:input class="form-control mb-3 w-75" id="firstName" name="firstName" value="${user.get().firstName}" path="firstName" readonly="true"/>
                             </div>
                             <div class="col p-0 m-0">
                                 <!-- TODO Connect image function-->
-                                <h3>Apellido <label for="surname" class="toggle-readonly"><img type="button" src='<c:url value="/css/editPencil.svg"/>' alt="editar"/></label></h3>
+                                <h3>Apellido <label for="surname" class="toggle-readonly"><img type="button" src='<c:url value="/img/editPencil.svg"/>' alt="editar"/></label></h3>
                                 <form:input class="form-control mb-3 w-75" name="surname" id="surname" value="${user.get().surname}" path="surname" readonly="true"/>
                             </div>
                         </div>
                         <div class="row">
                             <div class="col p-0 m-0">
                                 <!-- TODO Connect image function-->
-                                <h3>Telefono<img type="button" src='<c:url value="/css/editPencil.svg"/>' alt="editar"></h3>
+                                <h3>Telefono<img type="button" src='<c:url value="/img/editPencil.svg"/>' alt="editar"></h3>
                                 <!-- TODO Connect telefono-->
                                 <c:forEach var="patient" items="${user.get().patients}">
                                     <label for="phone"></label><input class="form-control mb-3 w-75" id="phone" name="phone" value="${patient.phone}" readonly/>
@@ -45,21 +45,21 @@
                             </div>
                             <div class="col p-0 m-0">
                                 <!-- TODO Connect image function-->
-                                <h3>Email <label for="email" class="toggle-readonly"><img type="button" src='<c:url value="/css/editPencil.svg"/>' alt="editar"/></label></h3>
+                                <h3>Email <label for="email" class="toggle-readonly"><img type="button" src='<c:url value="/img/editPencil.svg"/>' alt="editar"/></label></h3>
                                 <form:input class="form-control mb-3 w-75" id="email" name="email" value="${user.get().email}" path="email" readonly="true"/>
                             </div>
                         </div>
                       <div class="row">
                         <div class="col p-0 m-0">
-                          <h3>Contraseña <label for="password" class="toggle-readonly"><img type="button" src='<c:url value="/css/editPencil.svg"/>' alt="editar"/></label></h3>
+                          <h3>Contraseña <label for="password" class="toggle-readonly"><img type="button" src='<c:url value="/img/editPencil.svg"/>' alt="editar"/></label></h3>
                           <form:input type="password" class="form-control mb-3 w-75" id="password" name="password" path="password" readonly="true"/>
-                          <label for="password" class="toggle-visibility"><img src='<c:url value="/css/eye.svg"/> ' style="display: none;"><img src='<c:url value="/css/noeye.svg"/>' style="display: none;"></label>
+                          <label for="password" class="toggle-visibility"><img src='<c:url value="/img/eye.svg"/> ' style="display: none;"><img src='<c:url value="/img/noeye.svg"/>' style="display: none;"></label>
                         </div>
                         <div class="col p-0 m-0" id="repeat-password-container" style="display: none">
                           <h3>Repetir contraseña</h3>
                           <label for="repeatPassword" class="toggle-readonly">
                               <form:input visible="false" type="password" class="form-control mb-3 w-75" id="repeatPassword" name="repeatPassword" path="repeatPassword" readonly="true"/>
-                            <label for="repeatPassword" class="toggle-visibility"><img src='<c:url value="/css/eye.svg"/> ' style="display: none;"><img src='<c:url value="/css/noeye.svg"/>' style="display: none;"></label>
+                            <label for="repeatPassword" class="toggle-visibility"><img src='<c:url value="/img/eye.svg"/> ' style="display: none;"><img src='<c:url value="/img/noeye.svg"/>' style="display: none;"></label>
                         </div>
                       </div>
                         <form:errors path="*" cssClass="mt-4 mb-0 text-danger" element="p"/>
@@ -73,7 +73,7 @@
       </div>
       </div>
     </div>
-    <script src='<c:url value="/js/scripts/patientProfile.js"/> '></script>
+    <script src='<c:url value="/js/scripts/patient/patientProfile.js"/> '></script>
   <script>Profile.init()</script>
   </body>
 </html>

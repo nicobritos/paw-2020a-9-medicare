@@ -7,7 +7,7 @@
 <body>
 <div class="container h-100 d-flex flex-column justify-content-center align-items-center">
     <div>
-        <h1>MediCare<img src="<c:url value="/css/logo.svg"/>" alt="logo" class="logo-for-error"></h1>
+        <h1>MediCare<img src="<c:url value="/img/logo.svg"/>" alt="logo" class="logo-for-error"></h1>
         <h4><h4 class="d-inline">500</h4>. Hubo un error.</h4>
         <h6>Falló algo en nuestro servidor.</h6>
         <h6>Prueba refrescar o volver al Home</h6>

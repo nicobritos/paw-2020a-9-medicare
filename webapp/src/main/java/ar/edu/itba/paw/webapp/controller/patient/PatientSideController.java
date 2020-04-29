@@ -44,7 +44,7 @@ public class PatientSideController extends GenericController {
     public ModelAndView patientHome(){
         Optional<User> user = this.getUser();
         if(!user.isPresent()) {
-            return new ModelAndView("redirect:/login");
+            return new ModelAndView("authentication/login");
         }
         ModelAndView mav = new ModelAndView();
 
@@ -64,7 +64,7 @@ public class PatientSideController extends GenericController {
     public ModelAndView patientProfile(@ModelAttribute("patientProfileForm") final UserProfileForm form){
         Optional<User> user = getUser();
         if(!user.isPresent()) {
-            return new ModelAndView("redirect:/login");
+            return new ModelAndView("authentication/login");
         }
         ModelAndView mav = new ModelAndView();
         mav.addObject("user", user);
@@ -77,7 +77,7 @@ public class PatientSideController extends GenericController {
     public ModelAndView editMedicUser(@Valid @ModelAttribute("patientProfileForm") final UserProfileForm form, final BindingResult errors, HttpServletRequest request, HttpServletResponse response){
         Optional<User> user = getUser();
         if(!user.isPresent()) {
-            return new ModelAndView("redirect:/login");
+            return new ModelAndView("authentication/login");
         }
 
         if (errors.hasErrors() || form.getPassword().length()<8 || !form.getPassword().equals(form.getRepeatPassword())) {

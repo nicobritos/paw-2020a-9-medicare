@@ -247,24 +247,81 @@ public abstract class GenericDaoImpl<M extends GenericModel<M, I>, I> implements
         return this.mClass;
     }
 
+    @Override
+    public Collection<M> findByField(String field, Object value) {
+        return this.findByField(field, Operation.EQ, value, null);
+    }
+
+    @Override
+    public Optional<?> findFieldById(I id, String field) {
+        JDBCWhereClauseBuilder whereClauseBuilder = new JDBCWhereClauseBuilder()
+                .where(this.formatColumnFromAlias(this.getIdColumnName()), Operation.EQ, ":id");
+
+        MapSqlParameterSource parameterSource = new MapSqlParameterSource();
+        parameterSource.addValue("id", id);
+
+        JDBCQueryBuilder queryBuilder = new JDBCSelectQueryBuilder()
+                .select(field)
+                .from(this.getTableAlias())
+                .where(whereClauseBuilder);
+
+        Collection<Object> values = new LinkedList<>();
+        this.selectQuery(
+                queryBuilder.getQueryAsString(),
+                parameterSource,
+                rs -> values.add(rs.getObject(field))
+        );
+
+        return values.stream().findFirst();
+    }
+
+    @Override
+    public Collection<Object> findFieldByIdManyToMany(I id, String keyField, String field, String tableName) {
+        // The other element's IDs are in a different table
+        JDBCSelectQueryBuilder queryBuilder = new JDBCSelectQueryBuilder()
+                .select(field)
+                .from(tableName)
+                .where(new JDBCWhereClauseBuilder()
+                        .where(formatColumnFromName(keyField, tableName), Operation.EQ, ":id")
+                )
+                .distinct();
+
+        MapSqlParameterSource parameterSource = new MapSqlParameterSource();
+        parameterSource.addValue("id", id);
+        Collection<Object> values = new LinkedList<>();
+        this.selectQuery(
+                queryBuilder.getQueryAsString(),
+                parameterSource,
+                rs -> values.add(rs.getObject(field))
+        );
+
+        return values;
+    }
+
     /**
-     * TODO
      * @param columnName
      * @param operation
      * @param value if value is a generic model then it will use its id
      * @return
      */
     public List<M> findByField(String columnName, Operation operation, Object value, Predicate<M> filter) {
-        FilteredCachedCollection<M> cachedModels = CacheHelper.filter(
-                this.mClass,
-                this.iClass,
-                filter
-        );
-        if (this.isCacheComplete(cachedModels)) {
-            return cachedModels.getCollectionAsList();
+        FilteredCachedCollection<M> cachedModels;
+        List<M> models;
+        if (filter != null) {
+            cachedModels = CacheHelper.filter(
+                    this.mClass,
+                    this.iClass,
+                    filter
+            );
+            if (this.isCacheComplete(cachedModels)) {
+                return cachedModels.getCollectionAsList();
+            }
+            models = cachedModels.getCollectionAsList();
+        } else {
+            cachedModels = null;
+            models = new LinkedList<>();
         }
-        List<M> models = cachedModels.getCollectionAsList();
-        Collection<M> allCachedModels = cachedModels.getCompleteCollection();
+
 
         JDBCWhereClauseBuilder whereClauseBuilder = new JDBCWhereClauseBuilder()
                 .where(this.formatColumnFromAlias(columnName), operation, ":argument");
@@ -275,8 +332,11 @@ public abstract class GenericDaoImpl<M extends GenericModel<M, I>, I> implements
         } else {
             parameterSource.addValue("argument", value);
         }
-        if (!allCachedModels.isEmpty()) {
-            this.excludeModels(allCachedModels, parameterSource, whereClauseBuilder);
+        if (cachedModels != null) {
+            Collection<M> allCachedModels = cachedModels.getCompleteCollection();
+            if (!allCachedModels.isEmpty()) {
+                this.excludeModels(allCachedModels, parameterSource, whereClauseBuilder);
+            }
         }
 
         JDBCQueryBuilder queryBuilder = new JDBCSelectQueryBuilder()

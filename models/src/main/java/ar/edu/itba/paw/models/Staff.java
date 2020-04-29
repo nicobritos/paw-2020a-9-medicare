@@ -78,19 +78,12 @@ public class Staff extends GenericModel<Staff, Integer> {
         return this.office;
     }
 
+    public User getUser() {
+        return this.user;
+    }
+
     @Override
     protected boolean isSameInstance(Object o) {
         return o instanceof Staff;
-    }
-
-    public void setUser(User user) { // TODO: cambiar cuando se cambie la db
-        setFirstName(user.getFirstName());
-        setSurname(user.getSurname());
-        setEmail(user.getEmail());
-        this.user = user;
-    }
-
-    public User getUser() {
-        return user;
     }
 }

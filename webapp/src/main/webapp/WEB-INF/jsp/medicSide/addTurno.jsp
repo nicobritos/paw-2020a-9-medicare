@@ -14,7 +14,7 @@
         
         
         <div class="row">
-          <h6>Medicare <img src='<c:url value="/css/logo.svg"/> ' id="logo"/></h6>
+          <h6>Medicare <img src='<c:url value="/img/logo.svg"/> ' id="logo"/></h6>
         </div>
         <div class="row justify-content-start">
           <h1 class="addturn-form-title">Agregar turno</h1>

@@ -109,7 +109,7 @@ public class MedicListController extends GenericController {
     public ModelAndView appointment(@PathVariable("id") final int id){
         Optional<Staff> staff = staffService.findById(id);
         if(!staff.isPresent()){
-            return new ModelAndView("redirect:error/404"); //todo: throw status code instead of this
+            return new ModelAndView("error/404"); //todo: throw status code instead of this
         }
         ModelAndView mav = new ModelAndView();
 

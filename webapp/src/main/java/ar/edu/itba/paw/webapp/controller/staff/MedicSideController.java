@@ -1,14 +1,20 @@
 package ar.edu.itba.paw.webapp.controller;
 
 import ar.edu.itba.paw.interfaces.services.*;
-import ar.edu.itba.paw.models.*;
+import ar.edu.itba.paw.models.Staff;
+import ar.edu.itba.paw.models.User;
+import ar.edu.itba.paw.models.Workday;
+import ar.edu.itba.paw.models.WorkdayDay;
 import ar.edu.itba.paw.webapp.controller.utils.GenericController;
 import ar.edu.itba.paw.webapp.form.UserProfileForm;
 import ar.edu.itba.paw.webapp.form.WorkdayForm;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
@@ -41,12 +47,11 @@ public class MedicSideController extends GenericController {
     public ModelAndView medicHome(){
         Optional<User> user = this.getUser();
         if(!user.isPresent()) {
-            return new ModelAndView("redirect:/login");
+            return new ModelAndView("authentication/login");
         }
         ModelAndView mav = new ModelAndView();
 
         Staff staff = new Staff();
-        staff.setUser(user.get());
 
         LocalDate today = LocalDate.now();
         LocalDate monday;
@@ -92,7 +97,7 @@ public class MedicSideController extends GenericController {
     public ModelAndView medicProfile(@ModelAttribute("medicProfileForm") final UserProfileForm form){
         Optional<User> user = getUser();
         if(!user.isPresent()) {
-            return new ModelAndView("redirect:/login");
+            return new ModelAndView("authentication/login");
         }
         ModelAndView mav = new ModelAndView();
         mav.addObject("user", user);
@@ -105,7 +110,7 @@ public class MedicSideController extends GenericController {
     public ModelAndView editMedicUser(@Valid @ModelAttribute("medicProfileForm") final UserProfileForm form, final BindingResult errors, HttpServletRequest request, HttpServletResponse response){
         Optional<User> user = getUser();
         if(!user.isPresent()) {
-            return new ModelAndView("redirect:/login");
+            return new ModelAndView("authentication/login");
         }
 
         if (errors.hasErrors() || form.getPassword().length()<8 || !form.getPassword().equals(form.getRepeatPassword())) {
@@ -136,7 +141,7 @@ public class MedicSideController extends GenericController {
     public ModelAndView addWorkday(@ModelAttribute("workdayForm") final WorkdayForm form){
         Optional<User> user = getUser();
         if(!user.isPresent()) {
-            return new ModelAndView("redirect:/login");
+            return new ModelAndView("authentication/login");
         }
 
         ModelAndView mav = new ModelAndView();
@@ -149,7 +154,7 @@ public class MedicSideController extends GenericController {
     public ModelAndView addWorkdayAction(@Valid @ModelAttribute("workdayForm") final WorkdayForm form, final BindingResult errors, HttpServletRequest request, HttpServletResponse response){
         Optional<User> user = getUser();
         if(!user.isPresent()) {
-            return new ModelAndView("redirect:/login");
+            return new ModelAndView("authentication/login");
         }
 
         if (errors.hasErrors()) {
@@ -208,11 +213,11 @@ public class MedicSideController extends GenericController {
     public ModelAndView deleteWorkday(@PathVariable("workdayId") final int workdayId){
         Optional<User> user = getUser();
         if(!user.isPresent()) {
-            return new ModelAndView("redirect:/login");
+            return new ModelAndView("authentication/login");
         }
         Optional<Workday> workday = workdayService.findById(workdayId);
         if(!workday.isPresent() || !workday.get().getStaff().getUser().equals(user.get())){
-            return new ModelAndView("redirect:/403"); //todo: throw status code instead of this
+            return new ModelAndView("error/403"); //todo: throw status code instead of this
         }
 
         workdayService.remove(workdayId);

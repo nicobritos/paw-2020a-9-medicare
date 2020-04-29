@@ -2,7 +2,7 @@
 <!DOCTYPE html>
 <html lang="en">
     <%@ include file = "../head.jsp" %>
-    <link rel="stylesheet" href='<c:url value="/css/homeMedico.css"/> ' />
+    <link rel="stylesheet" href='<c:url value="/css/staff/homeMedico.css"/> ' />
   </head>
   <body>
     <%@ include file="../navbar/navbarLogged.jsp"%>
@@ -42,7 +42,7 @@
                     <div class="col-2 justify-content-start">
                       <div class="dropdown">
                         <img
-                          src='<c:url value="/css/moreOptions.svg" />'
+                          src='<c:url value="/img/moreOptions.svg" />'
                           class="moreOptionsButton"
                           alt=""
                           data-toggle="dropdown"
@@ -103,7 +103,7 @@
                       <div class="col-2 justify-content-start">
                         <div class="dropdown">
                           <img
-                            src='<c:url value="/css/moreOptions.svg"/> '
+                            src='<c:url value="/img/moreOptions.svg"/> '
                             class="moreOptionsButton"
                             alt=""
                             data-toggle="dropdown"

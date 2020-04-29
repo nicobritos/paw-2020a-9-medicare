@@ -3,7 +3,7 @@
 <html lang="en">
   <head>
     <%@ include file = "../head.jsp" %>
-    <link rel="stylesheet" href='<c:url value="/css/homePaciente.css"/>' />
+    <link rel="stylesheet" href='<c:url value="/css/patient/homePaciente.css"/>' />
   </head>
   <body>
   <!-- TODO: change navbar -->
@@ -48,7 +48,7 @@
                     <div class="col-1 justify-content-start">
                         <div class="dropdown">
                             <!-- TODO connect icon -->
-                            <img src='<c:url value="/css/moreOptions.svg"/>' class="moreOptionsButton" alt="nore options" data-toggle="dropdown">
+                            <img src='<c:url value="/img/moreOptions.svg"/>' class="moreOptionsButton" alt="nore options" data-toggle="dropdown">
                             <div class="dropdown-menu">
                               <!-- TODO conect to the options -->
                             <a class="dropdown-item" href="#">Cancelar</a>

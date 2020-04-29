@@ -19,12 +19,13 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 class ProxiedModel<M extends GenericModel<M, I>, I> implements ProxiedModelCollection {
-    private HashMap<String, Collection<GenericModel<Object, Object>>> savedCollection;
-    private HashMap<String, ProxyField> bypassFindByIds;
-    private HashMap<String, ProxyField> bypassFindById;
-    private HashMap<String, ProxyField> lazyFindByIds;
-    private HashMap<String, ProxyField> lazyFindById;
+    private final HashMap<String, Collection<GenericModel<Object, Object>>> savedCollection;
+    private final HashMap<String, ProxyField> bypassFindByIds;
+    private final HashMap<String, ProxyField> bypassFindById;
+    private final HashMap<String, ProxyField> lazyFindByIds;
+    private final HashMap<String, ProxyField> lazyFindById;
     private MethodInterceptor methodInterceptor;
+    private GenericDao<M, I> dao;
     private M target;
 
     public ProxiedModel(M target) {
@@ -34,6 +35,7 @@ class ProxiedModel<M extends GenericModel<M, I>, I> implements ProxiedModelColle
         this.lazyFindByIds = new HashMap<>();
         this.lazyFindById = new HashMap<>();
         this.target = target;
+        this.dao = DAOManager.getDaoForModel(this.target.getClass());
         this.initialize();
     }
 
@@ -49,6 +51,7 @@ class ProxiedModel<M extends GenericModel<M, I>, I> implements ProxiedModelColle
             e.printStackTrace();
             return;
         }
+        this.dao = DAOManager.getDaoForModel(this.target.getClass());
 
         ReflectionGetterSetter.setValues(this.target, ReflectionGetterSetter.listValues(targetCopy.target), true);
         this.initialize();
@@ -73,7 +76,7 @@ class ProxiedModel<M extends GenericModel<M, I>, I> implements ProxiedModelColle
     }
 
     private void initialize() {
-        Class<M> mClass = (Class<M>) target.getClass();
+        Class<M> mClass = (Class<M>) this.target.getClass();
 
         ReflectionGetterSetter.iterateFields(mClass, OneToOne.class, field -> {
             OneToOne relation = field.getAnnotation(OneToOne.class);
@@ -96,7 +99,7 @@ class ProxiedModel<M extends GenericModel<M, I>, I> implements ProxiedModelColle
                             new ProxyField(
                                     otherDao,
                                     otherDao.getClass().getMethod("findById", Object.class),
-                                    target,
+                                    this.target,
                                     field,
                                     false
                             )
@@ -107,7 +110,7 @@ class ProxiedModel<M extends GenericModel<M, I>, I> implements ProxiedModelColle
                             new ProxyField(
                                     otherDao,
                                     otherDao.getClass().getMethod("findById", Object.class),
-                                    target,
+                                    this.target,
                                     field,
                                     false
                             )
@@ -139,7 +142,7 @@ class ProxiedModel<M extends GenericModel<M, I>, I> implements ProxiedModelColle
                             new ProxyField(
                                     otherDao,
                                     otherDao.getClass().getMethod("findByIds", Collection.class),
-                                    target,
+                                    this.target,
                                     field,
                                     false
                             )
@@ -150,7 +153,7 @@ class ProxiedModel<M extends GenericModel<M, I>, I> implements ProxiedModelColle
                             new ProxyField(
                                     otherDao,
                                     otherDao.getClass().getMethod("findByIds", Collection.class),
-                                    target,
+                                    this.target,
                                     field,
                                     false
                             )
@@ -182,7 +185,7 @@ class ProxiedModel<M extends GenericModel<M, I>, I> implements ProxiedModelColle
                             new ProxyField(
                                     otherDao,
                                     otherDao.getClass().getMethod("findById", Object.class),
-                                    target,
+                                    this.target,
                                     field,
                                     false
                             )
@@ -193,7 +196,7 @@ class ProxiedModel<M extends GenericModel<M, I>, I> implements ProxiedModelColle
                             new ProxyField(
                                     otherDao,
                                     otherDao.getClass().getMethod("findById", Object.class),
-                                    target,
+                                    this.target,
                                     field,
                                     false
                             )
@@ -225,7 +228,7 @@ class ProxiedModel<M extends GenericModel<M, I>, I> implements ProxiedModelColle
                             new ProxyField(
                                     otherDao,
                                     otherDao.getClass().getMethod("findByIds", Collection.class),
-                                    target,
+                                    this.target,
                                     field,
                                     false
                             )
@@ -236,7 +239,7 @@ class ProxiedModel<M extends GenericModel<M, I>, I> implements ProxiedModelColle
                             new ProxyField(
                                     otherDao,
                                     otherDao.getClass().getMethod("findByIds", Collection.class),
-                                    target,
+                                    this.target,
                                     field,
                                     false
                             )
@@ -255,19 +258,38 @@ class ProxiedModel<M extends GenericModel<M, I>, I> implements ProxiedModelColle
             proxy = this.target;
             ProxyField savedMethodData = this.bypassFindById.get(method.getName());
             if (savedMethodData != null) {
-                Object result;
-                Method savedMethod = savedMethodData.getDaoMethod();
-                if (method.isAccessible()) {
-                    result = savedMethod.invoke(savedMethodData.getDao(), savedMethodData.getModelId());
+                // We always want to refresh the model reference so we need to retrieve it from the persistence layer
+                Object result, modelId;
+                if (savedMethodData.getInstanceField().isAnnotationPresent(OneToOne.class)) {
+                    OneToOne relation = savedMethodData.getInstanceField().getAnnotation(OneToOne.class);
+                    if (relation.inverse()) {
+                        result = savedMethodData.getDao().findByField(relation.name(), this.target.getId()).stream().findFirst().orElse(null);
+                        modelId = null;
+                    } else {
+                        modelId = this.dao.findFieldById(this.target.getId(), relation.name()).orElse(null);
+                        result = null;
+                    }
                 } else {
-                    method.setAccessible(true);
-                    result = savedMethod.invoke(savedMethodData.getDao(), savedMethodData.getModelId());
-                    method.setAccessible(false);
+                    ManyToOne relation = savedMethodData.getInstanceField().getAnnotation(ManyToOne.class);
+                    modelId = this.dao.findFieldById(this.target.getId(), relation.name()).orElse(null);
+                    result = null;
                 }
-                try {
-                    Optional<Object> optionalResult = (Optional<Object>) result;
-                    result = optionalResult.orElse(null);
-                } catch (ClassCastException ignored) {
+
+                if (modelId != null) {
+                    Method savedMethod = savedMethodData.getDaoMethod();
+                    if (method.isAccessible()) {
+                        result = savedMethod.invoke(savedMethodData.getDao(), modelId);
+                    } else {
+                        method.setAccessible(true);
+                        result = savedMethod.invoke(savedMethodData.getDao(), modelId);
+                        method.setAccessible(false);
+                    }
+
+                    try {
+                        Optional<Object> optionalResult = (Optional<Object>) result;
+                        result = optionalResult.orElse(null);
+                    } catch (ClassCastException ignored) {
+                    }
                 }
 
                 ReflectionGetterSetter.set(proxy, savedMethodData.getInstanceField(), result, true);
@@ -276,21 +298,29 @@ class ProxiedModel<M extends GenericModel<M, I>, I> implements ProxiedModelColle
 
             savedMethodData = this.bypassFindByIds.get(method.getName());
             if (savedMethodData != null) {
+                // We always want to refresh the model reference so we need to retrieve it from the persistence layer
+                Collection<?> modelIds;
+                if (savedMethodData.getInstanceField().isAnnotationPresent(ManyToMany.class)) {
+                    ManyToMany relation = savedMethodData.getInstanceField().getAnnotation(ManyToMany.class);
+                    modelIds = this.dao.findFieldByIdManyToMany(this.target.getId(), relation.name(), relation.otherName(), relation.tableName());
+                } else {
+                    OneToMany relation = savedMethodData.getInstanceField().getAnnotation(OneToMany.class);
+                    modelIds = savedMethodData.getDao().findByField(relation.name(), this.target.getId());
+                }
+
                 Method savedMethod = savedMethodData.getDaoMethod();
                 Collection<GenericModel<Object, Object>> result;
                 if (method.isAccessible()) {
-                    result = (Collection<GenericModel<Object, Object>>) savedMethod.invoke(savedMethodData.getDao(), savedMethodData.getModelIdCollection());
+                    result = (Collection<GenericModel<Object, Object>>) savedMethod.invoke(savedMethodData.getDao(), modelIds);
                 } else {
                     method.setAccessible(true);
-                    result = (Collection<GenericModel<Object, Object>>) savedMethod.invoke(savedMethodData.getDao(), savedMethodData.getModelIdCollection());
+                    result = (Collection<GenericModel<Object, Object>>) savedMethod.invoke(savedMethodData.getDao(), modelIds);
                     method.setAccessible(false);
                 }
 
                 ReflectionGetterSetter.set(proxy, savedMethodData.getInstanceField(), result, true);
 
-                savedMethodData.setHasBeenLoaded(true);
                 this.savedCollection.put(savedMethodData.instanceField.getName(), new LinkedList<>(result));
-
                 return result;
             }
 
@@ -375,10 +405,10 @@ class ProxiedModel<M extends GenericModel<M, I>, I> implements ProxiedModelColle
 
     private static class ProxyField {
         private boolean hasBeenLoaded;
-        private GenericDao<? extends GenericModel, Object> dao;
-        private Field instanceField;
-        private Method daoMethod;
-        private Object instance;
+        private final GenericDao<? extends GenericModel, Object> dao;
+        private final Field instanceField;
+        private final Method daoMethod;
+        private final Object instance;
 
         ProxyField(GenericDao<? extends GenericModel, Object> dao, Method daoMethod, Object instance, Field instanceField, boolean hasBeenLoaded) {
             this.hasBeenLoaded = hasBeenLoaded;
