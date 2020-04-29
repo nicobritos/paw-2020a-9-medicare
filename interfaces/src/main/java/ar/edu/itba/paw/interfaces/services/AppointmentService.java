@@ -16,6 +16,8 @@ public interface AppointmentService extends GenericService<Appointment, Integer>
 
     List<Appointment> findTodayAppointments(Staff staff);
 
+    List<Appointment> findTodayAppointments(Patient patient);
+
     List<Appointment> findByDay(Staff staff, LocalDate date);
 
     void setStatus(Appointment appointment, AppointmentStatus status) throws

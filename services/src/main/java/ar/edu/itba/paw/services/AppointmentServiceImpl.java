@@ -38,6 +38,11 @@ public class AppointmentServiceImpl extends GenericServiceImpl<AppointmentDao, A
     }
 
     @Override
+    public List<Appointment> findTodayAppointments(Patient patient){
+        return this.repository.findByDate(patient, LocalDate.now());
+    }
+
+    @Override
     public List<Appointment> findByDay(Staff staff, LocalDate date){
         return this.repository.findByDate(staff, date);
     }

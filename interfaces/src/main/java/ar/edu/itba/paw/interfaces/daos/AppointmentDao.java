@@ -20,4 +20,6 @@ public interface AppointmentDao extends GenericDao<Appointment, Integer> {
     List<Appointment> findPending(Patient patient, Staff staff);
 
     List<Appointment> findByDate(Staff staff, LocalDate date);
+
+    List<Appointment> findByDate(Patient patient, LocalDate date);
 }

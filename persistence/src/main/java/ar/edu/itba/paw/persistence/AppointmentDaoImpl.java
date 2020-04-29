@@ -227,6 +227,44 @@ public class AppointmentDaoImpl extends GenericDaoImpl<Appointment, Integer> imp
     }
 
     @Override
+    public List<Appointment> findByDate(Patient patient, LocalDate date) {
+        FilteredCachedCollection<Appointment> cachedCollection = CacheHelper.filter(
+                Appointment.class,
+                Integer.class,
+                appointment -> appointment.getPatient().getId().equals(patient.getId()) &&
+                        appointment.getFromDate().getDate() == LocalDate.now().getDayOfMonth()
+        );
+        if (this.isCacheComplete(cachedCollection)) {
+            return cachedCollection.getCollectionAsList();
+        }
+
+        MapSqlParameterSource parameterSource = new MapSqlParameterSource();
+        parameterSource.addValue("patient", patient.getId());
+        parameterSource.addValue("year", date.getYear());
+        parameterSource.addValue("month", date.getMonthValue());
+        parameterSource.addValue("day", date.getDayOfMonth());
+
+        JDBCWhereClauseBuilder whereClauseBuilder = new JDBCWhereClauseBuilder()
+                .where(this.formatColumnFromName("patient_id"), Operation.EQ, ":patient")
+                .and()
+                .where(this.formatColumnFromName("from_date"), Operation.EQ, ":year", JDBCWhereClauseBuilder.ColumnTransformer.YEAR)
+                .and()
+                .where(this.formatColumnFromName("from_date"), Operation.EQ, ":month", JDBCWhereClauseBuilder.ColumnTransformer.MONTH)
+                .and()
+                .where(this.formatColumnFromName("from_date"), Operation.EQ, ":day", JDBCWhereClauseBuilder.ColumnTransformer.DAY);
+
+        if (!cachedCollection.getCollection().isEmpty()) {
+            this.excludeModels(cachedCollection.getCompleteCollection(), parameterSource, whereClauseBuilder);
+        }
+        JDBCQueryBuilder queryBuilder = new JDBCSelectQueryBuilder()
+                .selectAll()
+                .from(this.getTableName())
+                .where(whereClauseBuilder);
+
+        return this.selectQuery(queryBuilder.getQueryAsString(), parameterSource);
+    }
+
+    @Override
     protected RowMapper<Appointment> getRowMapper() {
         return this.rowMapper;
     }
