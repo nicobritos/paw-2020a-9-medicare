@@ -21,10 +21,11 @@ const Modal = function() {
                 else destroy(modal);
             });
         }
-        return modal;
+        return $(modal);
     };
 
     let destroy = function(modal) {
+        modal = $(modal);
         modal.on(
             'hidden.bs.modal',
             function() {

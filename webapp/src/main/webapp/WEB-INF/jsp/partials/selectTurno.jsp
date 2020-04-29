@@ -29,7 +29,9 @@
 
 <script type="text/template" id="appointment-select-modal-day">
     <div class="d-flex flex-vertical" id="day-container">
-
+        <span class="text-center">{0}</span>
+        <div class="d-flex flex-vertical" id="button-container" style="overflow-y: auto; max-height: 60vh;">
+        </div>
     </div>
 </script>
 

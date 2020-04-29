@@ -1,9 +1,6 @@
 package ar.edu.itba.paw.webapp.transformer;
 
-import java.util.Collection;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public abstract class GenericTransformer<T> {
     public abstract Map<String, ?> transform(T t);
@@ -14,5 +11,9 @@ public abstract class GenericTransformer<T> {
             list.add(this.transform(t));
         }
         return list;
+    }
+
+    public Map<String, ?> transformMap(Collection<T> ts) {
+        return new HashMap<>();
     }
 }

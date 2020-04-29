@@ -1,19 +1,20 @@
 package ar.edu.itba.paw.models;
 
+import java.time.LocalDate;
 import java.util.Objects;
 
 public class AppointmentTimeSlot {
-    private String day;
+    private LocalDate date;
     private int hour;
     private int minute;
     private int duration;
 
-    public String getDay() {
-        return this.day;
+    public LocalDate getDate() {
+        return this.date;
     }
 
-    public void setDay(String day) {
-        this.day = day;
+    public void setDate(LocalDate date) {
+        this.date = date;
     }
 
     public int getFromHour() {
@@ -56,11 +57,11 @@ public class AppointmentTimeSlot {
         return this.getToHour() == that.getToHour() &&
                 this.getToMinute() == that.getToMinute() &&
                 this.getDuration() == that.getDuration() &&
-                Objects.equals(this.getDay(), that.getDay());
+                Objects.equals(this.getDate(), that.getDate());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(this.getDay(), this.getToHour(), this.getToMinute(), this.getDuration());
+        return Objects.hash(this.getDate(), this.getToHour(), this.getToMinute(), this.getDuration());
     }
 }

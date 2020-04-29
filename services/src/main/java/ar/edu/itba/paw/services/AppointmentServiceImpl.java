@@ -93,19 +93,20 @@ public class AppointmentServiceImpl extends GenericServiceImpl<AppointmentDao, A
     public List<AppointmentTimeSlot> findAvailableTimeslots(Staff staff, LocalDate fromDate, LocalDate toDate) {
         LocalDate now = LocalDate.now();
         List<AppointmentTimeSlot> appointmentTimeSlots = new LinkedList<>();
-        LocalDate localDate = LocalDate.ofEpochDay(fromDate.toEpochDay());
-        while (!toDate.isAfter(localDate)) {
-            if (localDate.isBefore(now)){
-                localDate = localDate.plusDays(1);
-                continue;
-            }
-
+        LocalDate localDate;
+        if (now.isBefore(fromDate)) {
+            localDate = LocalDate.ofEpochDay(now.toEpochDay());
+        } else {
+            localDate = LocalDate.ofEpochDay(fromDate.toEpochDay());
+        }
+        while (toDate.isAfter(localDate)) {
             WorkdayDay workdayDay = WorkdayDay.from(localDate);
             List<Workday> workdays = this.workdayService.findByStaff(staff, workdayDay);
+            LocalDate localDateCopy = LocalDate.ofEpochDay(localDate.toEpochDay());
             for (Workday workday : workdays) {
                 for (int j = workday.getStartMinute(); j < 60; j += Appointment.DURATION) {
                     AppointmentTimeSlot appointmentTimeSlot = new AppointmentTimeSlot();
-                    appointmentTimeSlot.setDay(workday.getDay());
+                    appointmentTimeSlot.setDate(localDateCopy);
                     appointmentTimeSlot.setFromHour(workday.getStartHour());
                     appointmentTimeSlot.setFromMinute(j);
                     appointmentTimeSlot.setDuration(Appointment.DURATION);
@@ -114,7 +115,7 @@ public class AppointmentServiceImpl extends GenericServiceImpl<AppointmentDao, A
                 for (int i = workday.getStartHour() + 1; i < workday.getEndHour(); i++) {
                     for (int j = 0; j < 60; j += Appointment.DURATION) {
                         AppointmentTimeSlot appointmentTimeSlot = new AppointmentTimeSlot();
-                        appointmentTimeSlot.setDay(workday.getDay());
+                        appointmentTimeSlot.setDate(localDateCopy);
                         appointmentTimeSlot.setFromHour(i);
                         appointmentTimeSlot.setFromMinute(j);
                         appointmentTimeSlot.setDuration(Appointment.DURATION);
@@ -123,7 +124,7 @@ public class AppointmentServiceImpl extends GenericServiceImpl<AppointmentDao, A
                 }
                 for (int j = 0; j < workday.getEndMinute(); j += Appointment.DURATION) {
                     AppointmentTimeSlot appointmentTimeSlot = new AppointmentTimeSlot();
-                    appointmentTimeSlot.setDay(workday.getDay());
+                    appointmentTimeSlot.setDate(localDateCopy);
                     appointmentTimeSlot.setFromHour(workday.getEndHour());
                     appointmentTimeSlot.setFromMinute(j);
                     appointmentTimeSlot.setDuration(Appointment.DURATION);
@@ -133,7 +134,7 @@ public class AppointmentServiceImpl extends GenericServiceImpl<AppointmentDao, A
                 List<Appointment> takenAppointments = this.findByDay(staff, localDate);
                 for (Appointment appointment : takenAppointments) {
                     AppointmentTimeSlot appointmentTimeSlot = new AppointmentTimeSlot();
-                    appointmentTimeSlot.setDay(workday.getDay());
+                    appointmentTimeSlot.setDate(localDateCopy);
                     appointmentTimeSlot.setFromHour(appointment.getFromDate().getHours());
                     appointmentTimeSlot.setFromMinute(appointment.getFromDate().getMinutes());
                     appointmentTimeSlot.setDuration(Appointment.DURATION);
