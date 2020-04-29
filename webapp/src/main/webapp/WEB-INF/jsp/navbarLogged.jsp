@@ -33,6 +33,17 @@
       <a href="<c:url value="/logout"/>" class="m-0 p-0 header-a-element"><small class="m-0 p-0">Cerrar sesión</small></a>
     </div>
     <%--TODO:connect correct image--%>
-    <img id="navbarUserImage" class="ml-2" src="https://fonts.gstatic.com/s/i/materialicons/account_circle/v4/24px.svg" alt="">
+        <c:choose>
+          <c:when test="${user.get().staffs.isEmpty()}">
+            <a href="<c:url value="/patient/profile"/>">
+              <img id="navbarPatientUserImage" class="ml-2" src="https://fonts.gstatic.com/s/i/materialicons/account_circle/v4/24px.svg" alt="">
+            </a>
+          </c:when>
+          <c:otherwise>
+            <a href="<c:url value="/staff/profile"/>">
+              <img id="navbarStaffUserImage" class="ml-2" src="https://fonts.gstatic.com/s/i/materialicons/account_circle/v4/24px.svg" alt="">
+            </a>
+          </c:otherwise>
+        </c:choose>
   </div>
 </nav>
