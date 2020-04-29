@@ -33,6 +33,8 @@ create table workday
             on update restrict on delete cascade,
     start_hour int not null,
     end_hour int not null,
+    start_minute int not null default 0,
+    end_minute int not null default 0,
     day text not null
 );
 
@@ -45,5 +47,3 @@ create unique index workday_workday_id_uindex
 alter table workday
     add constraint workday_pk
         primary key (workday_id);
-
-

@@ -3,17 +3,17 @@ package ar.edu.itba.paw.models;
 import java.util.Objects;
 
 public class AppointmentTimeSlot {
-    private WorkdayDay day;
+    private String day;
     private int fromHour;
     private int fromMinute;
     private int toHour;
     private int toMinute;
 
-    public WorkdayDay getDay() {
+    public String getDay() {
         return this.day;
     }
 
-    public void setDay(WorkdayDay day) {
+    public void setDay(String day) {
         this.day = day;
     }
 
