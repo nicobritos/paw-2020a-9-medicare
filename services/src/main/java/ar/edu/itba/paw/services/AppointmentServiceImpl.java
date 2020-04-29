@@ -136,8 +136,9 @@ public class AppointmentServiceImpl extends GenericServiceImpl<AppointmentDao, A
                 for (Appointment appointment : takenAppointments) {
                     AppointmentTimeSlot appointmentTimeSlot = new AppointmentTimeSlot();
                     appointmentTimeSlot.setDate(localDateCopy);
-                    appointmentTimeSlot.setFromHour(appointment.getFromDate().getHours());
-                    appointmentTimeSlot.setFromMinute(appointment.getFromDate().getMinutes());
+                    // todo date to anything useful
+//                    appointmentTimeSlot.setFromHour(appointment.getFromLocalDate().getHour());
+//                    appointmentTimeSlot.setFromMinute(appointment.getFromLocalDate().getMinute());
                     appointmentTimeSlot.setDuration(Appointment.DURATION);
 
                     appointmentTimeSlots.remove(appointmentTimeSlot);

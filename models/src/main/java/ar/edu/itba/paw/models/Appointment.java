@@ -62,4 +62,8 @@ public class Appointment extends GenericModel<Appointment, Integer> {
     protected boolean isSameInstance(Object o) {
         return o instanceof Appointment;
     }
+
+    public LocalDateTime getFromLocalDate() {
+        return LocalDateTime.ofEpochSecond(this.fromDate.toInstant().getEpochSecond(), 0, ZoneOffset.UTC);
+    }
 }
