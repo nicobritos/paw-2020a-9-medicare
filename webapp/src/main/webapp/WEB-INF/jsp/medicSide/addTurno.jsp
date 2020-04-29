@@ -67,9 +67,9 @@
             <label for="endHour">Consultorio</label>
           </div>
           <div class="col-8">
-            <form:select class="form-control" type="time" name="office" id="office" path="office">
+            <form:select class="form-control" name="id" id="id" path="id">
               <c:forEach items="${user.get().staffs}" var="staff">
-                <form:option value="${staff.office}">${staff.office.name}</form:option>
+                <form:option value="${staff.office.id}">${staff.office.name}</form:option>
               </c:forEach>
             </form:select>
           </div>

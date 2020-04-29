@@ -1,10 +1,7 @@
-package ar.edu.itba.paw.webapp.controller;
+package ar.edu.itba.paw.webapp.controller.staff;
 
 import ar.edu.itba.paw.interfaces.services.*;
-import ar.edu.itba.paw.models.Staff;
-import ar.edu.itba.paw.models.User;
-import ar.edu.itba.paw.models.Workday;
-import ar.edu.itba.paw.models.WorkdayDay;
+import ar.edu.itba.paw.models.*;
 import ar.edu.itba.paw.webapp.controller.utils.GenericController;
 import ar.edu.itba.paw.webapp.form.UserProfileForm;
 import ar.edu.itba.paw.webapp.form.WorkdayForm;
@@ -39,6 +36,9 @@ public class MedicSideController extends GenericController {
 
     @Autowired
     LocalityService localityService;
+
+    @Autowired
+    OfficeService officeService;
 
     @Autowired
     WorkdayService workdayService;
@@ -161,7 +161,13 @@ public class MedicSideController extends GenericController {
             return this.addWorkday(form);
         }
 
-        Optional<Staff> realStaff = user.get().getStaffs().stream().filter(staff -> staff.getOffice().equals(form.getOffice())).findFirst();
+
+        Optional<Office> office = officeService.findById(form.getId());
+        if(!office.isPresent()){
+            return this.addWorkday(form);
+        }
+
+        Optional<Staff> realStaff = user.get().getStaffs().stream().filter(staff -> staff.getOffice().equals(office.get())).findFirst();
         if(!realStaff.isPresent()){
             return this.addWorkday(form);
         }
