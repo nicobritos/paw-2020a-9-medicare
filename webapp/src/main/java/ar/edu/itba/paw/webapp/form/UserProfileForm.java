@@ -18,6 +18,9 @@ public class UserProfileForm {
     @NotEmpty
     @Size(min = 2, max = 20)
     private String surname;
+    @Size(max = 100)
+    private String password;
+    private String repeatPassword;
 
     public String getEmail() {
         return email;
@@ -49,5 +52,21 @@ public class UserProfileForm {
 
     public void setSurname(String surname) {
         this.surname = surname;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
+    public String getRepeatPassword() {
+        return repeatPassword;
+    }
+
+    public void setRepeatPassword(String repeatPassword) {
+        this.repeatPassword = repeatPassword;
     }
 }

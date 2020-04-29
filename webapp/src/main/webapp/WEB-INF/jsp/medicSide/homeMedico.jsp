@@ -1,11 +1,11 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jstl/core_rt"%>
 <!DOCTYPE html>
 <html lang="en">
-    <%@ include file = "head.jsp" %>
+    <%@ include file = "../head.jsp" %>
     <link rel="stylesheet" href='<c:url value="/css/homeMedico.css"/> ' />
   </head>
   <body>
-    <%@ include file="navbarLogged.jsp"%>
+    <%@ include file="../navbar/navbarLogged.jsp"%>
     <div class="container h-75 w-100 mt-5">
       <div class="row">
         <div class="col-5">

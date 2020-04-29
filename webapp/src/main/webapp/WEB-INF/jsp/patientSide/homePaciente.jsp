@@ -2,12 +2,12 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    <%@ include file = "head.jsp" %>
+    <%@ include file = "../head.jsp" %>
     <link rel="stylesheet" href='<c:url value="/css/homePaciente.css"/>' />
   </head>
   <body>
   <!-- TODO: change navbar -->
-    <%@ include file="navbarLogged.jsp"%>
+    <%@ include file="../navbar/navbarLogged.jsp"%>
 
     <div class="container h-75 w-100 mt-5">
       <div class="row">

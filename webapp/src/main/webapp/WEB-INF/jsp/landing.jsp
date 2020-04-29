@@ -6,12 +6,12 @@
     <link rel="stylesheet" type="text/css" href='<c:url value="/css/landing.css"/>'>
 </head>
 <body>
-<%@ include file = "navbar.jsp" %>
+<%@ include file = "navbar/navbar.jsp" %>
 <div class="container w-100 ml-4 mb-5">
     <h2 class="display-5 mt-5 green-text">Encontra médicos de forma rápida y fácil</h2>
 </div>
 <div class="container h-50 justify-content-center">
-    <form class="filter-form p-3" action="/mediclist/1">
+    <form class="filter-form p-3" action="<c:url value="/mediclist/1"/>">
         <div class="form-row">
             <div class="col">
                 <h2 class="ml-5 mt-3 form-title">Buscar médico</h2>

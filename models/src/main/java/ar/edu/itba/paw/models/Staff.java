@@ -17,6 +17,8 @@ public class Staff extends GenericModel<Staff, Integer> {
     private String email;
     @Column(name = "registration_number")
     private Integer registrationNumber;
+    @ManyToOne(name = "user_id", inverse = true)
+    private User user;
     @ManyToMany(name = "staff_id", otherName = "specialty_id", tableName = "system_staff_specialty_staff", className = StaffSpecialty.class)
     private Collection<StaffSpecialty> staffSpecialties = new LinkedList<>();
     @ManyToOne(name = "office_id", inverse = true)
@@ -85,5 +87,10 @@ public class Staff extends GenericModel<Staff, Integer> {
         setFirstName(user.getFirstName());
         setSurname(user.getSurname());
         setEmail(user.getEmail());
+        this.user = user;
+    }
+
+    public User getUser() {
+        return user;
     }
 }

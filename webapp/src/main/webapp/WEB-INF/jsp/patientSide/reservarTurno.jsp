@@ -2,12 +2,12 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    <%@ include file = "head.jsp" %>
+    <%@ include file = "../head.jsp" %>
     <link rel="stylesheet" href='<c:url value="/css/reservarTurno.css"/>' />
   </head>
   <body class="container-fluid p-0 m-0 d-flex flex-column">
   <%-- TODO:connect to navbar--%>
-  <%@ include file="navbarNotLogged.jsp" %>
+  <%@ include file="../navbar/navbarNotLogged.jsp" %>
   <div class="container fill-height">
       <div class="row mt-4">
         <%-- TODO:connect form--%>

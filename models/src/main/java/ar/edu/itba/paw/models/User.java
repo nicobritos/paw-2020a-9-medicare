@@ -17,9 +17,9 @@ public class User extends GenericModel<User, Integer> {
     private String firstName;
     @Column(name = "surname", required = true)
     private String surname;
-    @OneToMany(name = "staff_id", className = Staff.class)
+    @OneToMany(name = "user_id", className = Staff.class)
     private Collection<Staff> staffs = new LinkedList<>();
-    @OneToMany(name = "patient_id", className = Patient.class)
+    @OneToMany(name = "user_id", className = Patient.class)
     private Collection<Patient> patients = new LinkedList<>();
 
     public String getEmail() {

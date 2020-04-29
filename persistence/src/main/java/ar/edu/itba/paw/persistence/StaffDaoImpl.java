@@ -216,6 +216,75 @@ public class StaffDaoImpl extends GenericSearchableDaoImpl<Staff, Integer> imple
     }
 
     @Override
+    public List<Staff> findBy(Collection<String> names, Collection<String> surnames, Collection<Office> offices, Collection<StaffSpecialty> staffSpecialties, Collection<Locality> localities) {
+        if (names == null) {
+            names = Collections.emptyList();
+        } else {
+            names = names.stream().map(String::toLowerCase).collect(Collectors.toList());
+        }
+        if (surnames == null) {
+            surnames = Collections.emptyList();
+        } else {
+            surnames = surnames.stream().map(String::toLowerCase).collect(Collectors.toList());
+        }
+        if (offices == null) {
+            offices = Collections.emptyList();
+        }
+        if (staffSpecialties == null) {
+            staffSpecialties = Collections.emptyList();
+        }
+        if(localities == null){
+            localities = Collections.emptyList();
+        }
+
+//        FilteredCachedCollection<Staff> cachedCollection = this.filterCache(names, surnames, staffSpecialties, offices, localities, page, pageSize);
+//        if (this.isCacheComplete(cachedCollection)) {
+//            return cachedCollection.getCollectionAsSet().stream().skip((page-1)*pageSize).limit(pageSize).collect(Collectors.toSet()); //TODO: sacar cuando filter limite resultados
+//        }
+
+        Map<String, Object> parameters = new HashMap<>();
+        MapSqlParameterSource parameterSource = new MapSqlParameterSource();
+        JDBCWhereClauseBuilder otherWhereClause = new JDBCWhereClauseBuilder();
+        JDBCWhereClauseBuilder namesWhereClause = new JDBCWhereClauseBuilder();
+
+        this.putFirstNamesArguments(names, parameters, namesWhereClause);
+        this.putSurnamesArguments(surnames, parameters, namesWhereClause);
+        this.putOfficeArguments(offices, parameters, otherWhereClause);
+        this.putStaffSpecialtyArguments(staffSpecialties, parameters, otherWhereClause);
+        this.putLocalityArguments(localities, parameters, otherWhereClause);
+
+        parameterSource.addValues(parameters);
+
+//        if (!cachedCollection.getCollection().isEmpty()) {
+//            this.excludeModels(cachedCollection.getCompleteCollection(), parameterSource, whereClauseBuilder);
+//        }
+
+        JDBCWhereClauseBuilder whereClauseBuilder;
+        if(!otherWhereClause.toString().isEmpty()) {
+            whereClauseBuilder = otherWhereClause;
+            if(!otherWhereClause.toString().isEmpty()){
+                whereClauseBuilder.and(namesWhereClause);
+            }
+        } else {
+            whereClauseBuilder = namesWhereClause;
+        }
+
+        JDBCSelectQueryBuilder queryBuilder = new JDBCSelectQueryBuilder()
+                .selectAll()
+                .from(this.getTableAlias())
+                .where(whereClauseBuilder)
+                .distinct();
+
+        if(!staffSpecialties.isEmpty()) {
+            queryBuilder.join("staff_id", this.getSpecialtiesIntermediateTableName(), "staff_id");
+        }
+        if(!localities.isEmpty()){
+            queryBuilder.join("office_id", this.getOfficeTable(), "office_id");
+        }
+        return this.selectQuery(queryBuilder.getQueryAsString(), parameterSource);
+    }
+
+    @Override
     protected RowMapper<Staff> getRowMapper() {
         return this.rowMapper;
     }

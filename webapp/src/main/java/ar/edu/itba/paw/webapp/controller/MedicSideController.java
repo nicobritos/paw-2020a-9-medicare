@@ -1,14 +1,10 @@
 package ar.edu.itba.paw.webapp.controller;
 
-import ar.edu.itba.paw.interfaces.daos.UserDao;
-import ar.edu.itba.paw.interfaces.services.AppointmentService;
-import ar.edu.itba.paw.interfaces.services.LocalityService;
-import ar.edu.itba.paw.interfaces.services.StaffSpecialtyService;
-import ar.edu.itba.paw.interfaces.services.UserService;
-import ar.edu.itba.paw.models.Staff;
-import ar.edu.itba.paw.models.User;
+import ar.edu.itba.paw.interfaces.services.*;
+import ar.edu.itba.paw.models.*;
 import ar.edu.itba.paw.webapp.controller.utils.GenericController;
 import ar.edu.itba.paw.webapp.form.UserProfileForm;
+import ar.edu.itba.paw.webapp.form.WorkdayForm;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
@@ -33,7 +29,13 @@ public class MedicSideController extends GenericController {
     StaffSpecialtyService staffSpecialtyService;
 
     @Autowired
+    StaffService staffService;
+
+    @Autowired
     LocalityService localityService;
+
+    @Autowired
+    WorkdayService workdayService;
 
     @RequestMapping("/staff/home")
     public ModelAndView medicHome(){
@@ -82,7 +84,7 @@ public class MedicSideController extends GenericController {
         mav.addObject("appointments", appointmentService.find(staff)); // TODO: cambiar
         mav.addObject("specialties", staffSpecialtyService.list());
         mav.addObject("localities", localityService.list());
-        mav.setViewName("homeMedico");
+        mav.setViewName("medicSide/homeMedico");
         return mav;
     }
 
@@ -95,7 +97,7 @@ public class MedicSideController extends GenericController {
         ModelAndView mav = new ModelAndView();
         mav.addObject("user", user);
 
-        mav.setViewName("medicProfile");
+        mav.setViewName("medicSide/medicProfile");
         return mav;
     }
 
@@ -106,20 +108,118 @@ public class MedicSideController extends GenericController {
             return new ModelAndView("redirect:/login");
         }
 
-        if (errors.hasErrors()) {
+        if (errors.hasErrors() || form.getPassword().length()<8 || !form.getPassword().equals(form.getRepeatPassword())) {
+            return this.medicProfile(form);
+        }
+        Optional<User> userOptional = userService.findByUsername(form.getEmail());
+        if(userOptional.isPresent() && !userOptional.get().equals(user.get())){ // si se edito el email pero ya existe cuenta con ese email
             return this.medicProfile(form);
         }
 
         User editedUser = user.get();
         editedUser.setFirstName(form.getFirstName());
         editedUser.setSurname(form.getSurname());
+
         editedUser.setEmail(form.getEmail());
+        if(!form.getPassword().isEmpty())
+            editedUser.setPassword(form.getPassword());
         //TODO: PHONE
         userService.update(editedUser);
 
         ModelAndView mav = new ModelAndView();
         mav.addObject("user", user);
-        mav.setViewName("medicProfile");
+        mav.setViewName("medicSide/medicProfile");
+        return mav;
+    }
+
+    @RequestMapping(value="/staff/profile/workday", method = RequestMethod.GET)
+    public ModelAndView addWorkday(@ModelAttribute("workdayForm") final WorkdayForm form){
+        Optional<User> user = getUser();
+        if(!user.isPresent()) {
+            return new ModelAndView("redirect:/login");
+        }
+
+        ModelAndView mav = new ModelAndView();
+        mav.addObject("user", user);
+        mav.setViewName("medicSide/addTurno");
+        return mav;
+    }
+
+    @RequestMapping(value="/staff/profile/workday", method = RequestMethod.POST)
+    public ModelAndView addWorkdayAction(@Valid @ModelAttribute("workdayForm") final WorkdayForm form, final BindingResult errors, HttpServletRequest request, HttpServletResponse response){
+        Optional<User> user = getUser();
+        if(!user.isPresent()) {
+            return new ModelAndView("redirect:/login");
+        }
+
+        if (errors.hasErrors()) {
+            return this.addWorkday(form);
+        }
+
+        Optional<Staff> realStaff = user.get().getStaffs().stream().filter(staff -> staff.getOffice().equals(form.getOffice())).findFirst();
+        if(!realStaff.isPresent()){
+            return this.addWorkday(form);
+        }
+
+        Workday workday = new Workday();
+        switch (form.getDow()){
+            case 0:
+                workday.setDay(WorkdayDay.SUNDAY.name());
+                break;
+            case 1:
+                workday.setDay(WorkdayDay.MONDAY.name());
+                break;
+            case 2:
+                workday.setDay(WorkdayDay.TUESDAY.name());
+                break;
+            case 3:
+                workday.setDay(WorkdayDay.WEDNESDAY.name());
+                break;
+            case 4:
+                workday.setDay(WorkdayDay.THURSDAY.name());
+                break;
+            case 5:
+                workday.setDay(WorkdayDay.FRIDAY.name());
+                break;
+            case 6:
+                workday.setDay(WorkdayDay.SATURDAY.name());
+                break;
+            default:
+                return this.addWorkday(form);
+        }
+        String[] startTime = form.getStartHour().split(":");
+        workday.setStartHour(Integer.parseInt(startTime[0]));
+        workday.setStartMinute(Integer.parseInt(startTime[1]));
+        String[] endTime = form.getEndHour().split(":");
+        workday.setEndHour(Integer.parseInt(endTime[0]));
+        workday.setEndMinute(Integer.parseInt(endTime[1]));
+        workday.setStaff(realStaff.get());
+
+        realStaff.get().getWorkdays().add(workday);
+        staffService.update(realStaff.get());
+
+        ModelAndView mav = new ModelAndView();
+        mav.addObject("user", user);
+        mav.setViewName("redirect:/staff/profile");
+        return mav;
+    }
+
+    @RequestMapping(value="/staff/profile/workday/delete/{workdayId}", method = RequestMethod.POST)
+    public ModelAndView deleteWorkday(@PathVariable("workdayId") final int workdayId){
+        Optional<User> user = getUser();
+        if(!user.isPresent()) {
+            return new ModelAndView("redirect:/login");
+        }
+        Optional<Workday> workday = workdayService.findById(workdayId);
+        if(!workday.isPresent() || !workday.get().getStaff().getUser().equals(user.get())){
+            return new ModelAndView("redirect:/403"); //todo: throw status code instead of this
+        }
+
+        workdayService.remove(workdayId);
+
+        ModelAndView mav = new ModelAndView();
+        mav.addObject("user", user);
+        mav.setViewName("medicSide/addTurno");
         return mav;
     }
 }

@@ -7,7 +7,7 @@
     <link rel="stylesheet" href='<c:url value="/css/loggedMedicList.css"/> ' />
   </head>
   <body>
-    <%@ include file="navbar.jsp" %>
+    <%@ include file="navbar/navbar.jsp" %>
 
     <form action="<c:url value="/mediclist/1"/>">
       <div class="container h-75">
@@ -78,7 +78,7 @@
                       </div>
                       <div class="col d-flex justify-content-center align-items-center">
                         <!-- TODO link to request appointment url -->
-                        <button onclick="<c:url value="/"/>" class="btn btn-info">Ver turno</button>
+                        <button onclick="<c:url value="/appointment/${member.id}"/>" class="btn btn-info">Ver turnos</button>
                       </div>
                     </div>
                   </div>

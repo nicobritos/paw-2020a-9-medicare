@@ -49,6 +49,7 @@ public class UserServiceImpl extends GenericSearchableServiceImpl<UserDao, User,
         staff.setEmail(newUser.getEmail());
         staff.setFirstName(newUser.getFirstName());
         staff.setSurname(newUser.getSurname());
+        staff.setUser(user);
         staff = this.staffService.create(staff);
 
         office.getStaffs().add(staff);
@@ -58,6 +59,17 @@ public class UserServiceImpl extends GenericSearchableServiceImpl<UserDao, User,
         this.update(newUser);
 
         return newUser;
+    }
+
+    @Override
+    public void update(User user){
+        Optional<User> userOptional = this.repository.findByEmail(user.getEmail());
+        if (userOptional.isPresent() && !userOptional.get().equals(user)) {
+            throw new EmailAlreadyExistsException();
+        }
+
+        user.setPassword(this.passwordEncoder.encode(user.getPassword()));
+        super.update(user);
     }
 
     @Override

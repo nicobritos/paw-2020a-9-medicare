@@ -1,11 +1,9 @@
 package ar.edu.itba.paw.webapp.controller;
 
-import ar.edu.itba.paw.interfaces.daos.UserDao;
 import ar.edu.itba.paw.interfaces.services.AppointmentService;
 import ar.edu.itba.paw.interfaces.services.LocalityService;
 import ar.edu.itba.paw.interfaces.services.StaffSpecialtyService;
 import ar.edu.itba.paw.interfaces.services.UserService;
-import ar.edu.itba.paw.models.Appointment;
 import ar.edu.itba.paw.models.Patient;
 import ar.edu.itba.paw.models.User;
 import ar.edu.itba.paw.webapp.controller.utils.GenericController;
@@ -14,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.ModelAndView;
@@ -21,6 +20,7 @@ import org.springframework.web.servlet.ModelAndView;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
+import java.time.LocalDate;
 import java.util.Optional;
 
 @Controller
@@ -55,7 +55,7 @@ public class PatientSideController extends GenericController {
         mav.addObject("specialties", staffSpecialtyService.list());
         mav.addObject("localities", localityService.list());
 
-        mav.setViewName("homePaciente");
+        mav.setViewName("patientSide/homePaciente");
         return mav;
     }
 
@@ -68,7 +68,7 @@ public class PatientSideController extends GenericController {
         ModelAndView mav = new ModelAndView();
         mav.addObject("user", user);
 
-        mav.setViewName("patientProfile");
+        mav.setViewName("patientSide/patientProfile");
         return mav;
     }
 
@@ -79,7 +79,11 @@ public class PatientSideController extends GenericController {
             return new ModelAndView("redirect:/login");
         }
 
-        if (errors.hasErrors()) {
+        if (errors.hasErrors() || form.getPassword().length()<8 || !form.getPassword().equals(form.getRepeatPassword())) {
+            return this.patientProfile(form);
+        }
+        Optional<User> userOptional = userService.findByUsername(form.getEmail());
+        if(userOptional.isPresent() && !userOptional.get().equals(user.get())){ // si se edito el email pero ya existe cuenta con ese email
             return this.patientProfile(form);
         }
 
@@ -87,12 +91,28 @@ public class PatientSideController extends GenericController {
         editedUser.setFirstName(form.getFirstName());
         editedUser.setSurname(form.getSurname());
         editedUser.setEmail(form.getEmail());
+        if(!form.getPassword().isEmpty())
+            editedUser.setPassword(form.getPassword());
         //TODO: PHONE
         userService.update(editedUser);
 
         ModelAndView mav = new ModelAndView();
         mav.addObject("user", user);
-        mav.setViewName("patientProfile");
+        mav.setViewName("patientSide/patientProfile");
+        return mav;
+    }
+
+
+    //TODO: FORMS
+    @RequestMapping(value = "/patient/appointment/{staffId}/{year}/{dayOfYear}", method = RequestMethod.GET)
+    public ModelAndView makeAppointment(@PathVariable("staffId") final int staffId ,@PathVariable("year") final int year, @PathVariable("dayOfYear") final int dayOfYear){
+        ModelAndView mav = new ModelAndView();
+        LocalDate date = LocalDate.ofYearDay(year, dayOfYear);
+        if(date.isBefore(LocalDate.now())){
+            return new ModelAndView("redirect:/appointment/" + staffId); //TODO: errors
+        }
+        mav.addObject("user", getUser());
+        mav.setViewName("patientSide/reservarTurno");
         return mav;
     }
 }

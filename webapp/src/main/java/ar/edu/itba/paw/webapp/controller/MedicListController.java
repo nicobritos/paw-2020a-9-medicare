@@ -17,10 +17,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Set;
+import java.time.LocalDate;
+import java.util.*;
 
 @Controller
 public class MedicListController extends GenericController {
@@ -47,7 +45,7 @@ public class MedicListController extends GenericController {
 
     @RequestMapping(value = "/mediclist/{page}")
     public ModelAndView medicsList(@RequestParam(value = "name",required = false)String name, @RequestParam(value = "specialties",required = false) String specialties, @RequestParam(value = "localities",required = false) String localities, @PathVariable("page") int page){
-        if(page<=0){ //TODO: redirect instead of doing this
+        if(page<=0){
             return medicList(name, specialties, localities);
         }
         //get modelandview from medicList.jsp
@@ -89,7 +87,7 @@ public class MedicListController extends GenericController {
             Set<String> words = new HashSet<>(Arrays.asList(name.split(" ")));
             staffList = new HashSet<>(this.staffService.findBy(words, words, null, searchedSpecialties, searchedLocalities, page));
         } else{
-            staffList = this.staffService.findBy("", null, null, searchedSpecialties, searchedLocalities, page);
+            staffList = this.staffService.findBy((String) null, null, null, searchedSpecialties, searchedLocalities, page);
         }
 
         Collection<StaffSpecialty> specialtiesList = this.specialityService.list();
@@ -104,7 +102,51 @@ public class MedicListController extends GenericController {
         mav.addObject("selSpeciality", specialties);
         mav.addObject("selLocality", localities);
 
+        return mav;
+    }
 
+    @RequestMapping("/appointment/{id}")
+    public ModelAndView appointment(@PathVariable("id") final int id){
+        Optional<Staff> staff = staffService.findById(id);
+        if(!staff.isPresent()){
+            return new ModelAndView("redirect:error/404"); //todo: throw status code instead of this
+        }
+        ModelAndView mav = new ModelAndView();
+
+        LocalDate today = LocalDate.now();
+        LocalDate monday;
+
+        switch (LocalDate.now().getDayOfWeek()){
+            case SUNDAY:
+                monday = today.plusDays(1);
+                break;
+            case MONDAY:
+                monday = today;
+                break;
+            case TUESDAY:
+                monday = today.minusDays(1);
+                break;
+            case WEDNESDAY:
+                monday = today.minusDays(2);
+                break;
+            case THURSDAY:
+                monday = today.minusDays(3);
+                break;
+            case FRIDAY:
+                monday = today.minusDays(4);
+                break;
+            case SATURDAY:
+                monday = today.minusDays(5);
+                break;
+            default:
+                throw new RuntimeException();
+        }
+
+        mav.addObject("today", today);
+        mav.addObject("monday", monday);
+        mav.addObject("user", getUser());
+        mav.addObject("staff", staff.get());
+        mav.setViewName("selectTurno");
         return mav;
     }
 }

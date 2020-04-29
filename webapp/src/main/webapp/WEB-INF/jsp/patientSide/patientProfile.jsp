@@ -3,11 +3,11 @@
 
 <html lang="en">
   <head>
-    <%@ include file = "head.jsp" %>
+    <%@ include file = "../head.jsp" %>
     <link rel="stylesheet" href='<c:url value="/css/patientProfile.css"/> ' />
   </head>
   <body class="d-flex flex-column">
-    <%@ include file="navbarLogged.jsp" %>
+    <%@ include file="../navbar/navbarLogged.jsp" %>
     <div class="container flex-fill mx-5 pl-5 mt-3 w-100">
         <div class="row">
             <div class="col-4 align-items-start d-flex flex-column">
@@ -49,6 +49,19 @@
                                 <form:input class="form-control mb-3 w-75" id="email" name="email" value="${user.get().email}" path="email" readonly="true"/>
                             </div>
                         </div>
+                      <div class="row">
+                        <div class="col p-0 m-0">
+                          <h3>Contraseña <label for="password" class="toggle-readonly"><img type="button" src='<c:url value="/css/editPencil.svg"/>' alt="editar"/></label></h3>
+                          <form:input type="password" class="form-control mb-3 w-75" id="password" name="password" path="password" readonly="true"/>
+                          <label for="password" class="toggle-visibility"><img src='<c:url value="/css/eye.svg"/> ' style="display: none;"><img src='<c:url value="/css/noeye.svg"/>' style="display: none;"></label>
+                        </div>
+                        <div class="col p-0 m-0" id="repeat-password-container" style="display: none">
+                          <h3>Repetir contraseña</h3>
+                          <label for="repeatPassword" class="toggle-readonly">
+                              <form:input visible="false" type="password" class="form-control mb-3 w-75" id="repeatPassword" name="repeatPassword" path="repeatPassword" readonly="true"/>
+                            <label for="repeatPassword" class="toggle-visibility"><img src='<c:url value="/css/eye.svg"/> ' style="display: none;"><img src='<c:url value="/css/noeye.svg"/>' style="display: none;"></label>
+                        </div>
+                      </div>
                         <form:errors path="*" cssClass="mt-4 mb-0 text-danger" element="p"/>
                         <div class="form-row justify-content-between align-items-end mt-2">
                             <button type="submit" class="btn btn-info">Confirmar cambios</button>
