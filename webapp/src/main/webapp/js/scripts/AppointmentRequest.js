@@ -10,13 +10,13 @@ var AppointmentRequest = function() {
     };
 
     let getStaffTimeslots = function () {
-        return App.get('/timeslots/' + staffId, {
-            from_day: 29,
-            from_month: 4,
-            from_year: 2020,
-            to_day: 1,
-            to_month: 5,
-            to_year: 2020
+        return App.post('/timeslots/' + staffId, {
+            fromDay: 29,
+            fromMonth: 4,
+            fromYear: 2020,
+            toDay: 1,
+            toMonth: 5,
+            toYear: 2020
         });
     };
 
