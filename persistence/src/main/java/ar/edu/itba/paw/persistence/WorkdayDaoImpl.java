@@ -95,7 +95,7 @@ public class WorkdayDaoImpl extends GenericDaoImpl<Workday, Integer> implements 
         FilteredCachedCollection<Workday> cachedCollection = CacheHelper.filter(
                 Workday.class,
                 Integer.class,
-                workday -> workday.getDay().equals(timeSlot.getDay().name())
+                workday -> workday.getDay().equals(timeSlot.getDay())
                         && workday.getStaff().getId().equals(staff.getId())
                         && workday.getStartHour() <= timeSlot.getFromHour()
                         && (workday.getEndHour() > timeSlot.getToHour()
@@ -109,7 +109,7 @@ public class WorkdayDaoImpl extends GenericDaoImpl<Workday, Integer> implements 
 
         MapSqlParameterSource parameterSource = new MapSqlParameterSource();
         parameterSource.addValue("staff", staff.getId());
-        parameterSource.addValue("day", timeSlot.getDay().name());
+        parameterSource.addValue("day", timeSlot.getDay());
         parameterSource.addValue("from_hour", timeSlot.getFromHour());
         parameterSource.addValue("to_hour", timeSlot.getToHour());
 

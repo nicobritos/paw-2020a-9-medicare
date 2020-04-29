@@ -1,4 +1,4 @@
-package ar.edu.itba.paw.nocache;
+package ar.edu.itba.paw;
 
 import ar.edu.itba.paw.models.StaffSpecialty;
 import ar.edu.itba.paw.persistence.StaffSpecialtyDaoImpl;

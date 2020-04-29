@@ -85,7 +85,7 @@ public class AppointmentServiceImpl extends GenericServiceImpl<AppointmentDao, A
         toCalendar.setTime(toDate);
 
         AppointmentTimeSlot appointmentTimeSlot = new AppointmentTimeSlot();
-        appointmentTimeSlot.setDay(WorkdayDay.fromCalendar(fromCalendar));
+        appointmentTimeSlot.setDay(WorkdayDay.fromCalendar(fromCalendar).name());
         appointmentTimeSlot.setFromHour(fromCalendar.get(Calendar.HOUR));
         appointmentTimeSlot.setFromMinute(fromCalendar.get(Calendar.MINUTE));
 
