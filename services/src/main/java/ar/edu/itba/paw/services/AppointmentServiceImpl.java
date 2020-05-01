@@ -60,7 +60,7 @@ public class AppointmentServiceImpl extends GenericServiceImpl<AppointmentDao, A
         } else if (appointment.getAppointmentStatus().equals(AppointmentStatus.COMPLETE.name())) {
             throw new AppointmentAlreadyCompletedException();
         } else if (!this.isValidStatusChange(appointment.getAppointmentStatus(), status.name())) {
-            throw new InvalidAppointmentStatusChangeException();
+            throw new InvalidAppointmentStatusChangeException(appointment.getAppointmentStatus(), status.name());
         }
 
         appointment.setAppointmentStatus(status.name());
@@ -165,7 +165,7 @@ public class AppointmentServiceImpl extends GenericServiceImpl<AppointmentDao, A
         if (appointmentStatus.equals(AppointmentStatus.PENDING.name())) {
             return newStatus.equals(AppointmentStatus.WAITING.name()) || newStatus.equals(AppointmentStatus.CANCELLED.name());
         } else if (appointmentStatus.equals(AppointmentStatus.WAITING.name())) {
-            return newStatus.equals(AppointmentStatus.SEEN.name());
+            return newStatus.equals(AppointmentStatus.SEEN.name()) || newStatus.equals(AppointmentStatus.CANCELLED.name());
         } else if (appointmentStatus.equals(AppointmentStatus.SEEN.name())) {
             return newStatus.equals(AppointmentStatus.COMPLETE.name());
         }
