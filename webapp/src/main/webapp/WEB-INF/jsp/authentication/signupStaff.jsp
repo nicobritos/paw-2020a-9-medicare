@@ -90,7 +90,7 @@
         </div>
         <div class="form-group row">
             <div class="col">
-                <label for="surname">Dirección</label>
+                <label for="address">Dirección</label>
             </div>
             <div class="col-8">
                 <form:input path="address" class="form-control" type="text" name="address" id="address"/>
