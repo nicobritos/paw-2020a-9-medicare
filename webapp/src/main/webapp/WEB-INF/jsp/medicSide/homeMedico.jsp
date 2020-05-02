@@ -62,7 +62,7 @@
           <div class="row d-flex justify-content-around">
             <!-- TODO connect buttons and days -->
             <!-- TODO the selected day should be font-weight-bold -->
-            <button type="button" class="btn"><</button>
+            <button type="button" class="btn" id="prevWeekBtn"><</button>
             <!-- this is one -->
             <c:forEach var="i" begin="0" end="6">
               <span class="ml-1 mr-1 d-flex flex-column align-items-center">
@@ -101,7 +101,7 @@
                 </c:choose></p>
               </span>
             </c:forEach>
-            <button type="button" class="btn">></button>
+            <button type="button" class="btn" id="nextWeekBtn">></button>
           </div>
           <div class="row justify-content-center">
             <!-- TODO: change items -->
@@ -149,5 +149,6 @@
         </div>
       </div>
     </div>
+  <script src='<c:url value="/js/scripts/staff/homeMedico.js"/> '></script>
   </body>
 </html>

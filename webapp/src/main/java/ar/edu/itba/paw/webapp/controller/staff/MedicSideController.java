@@ -8,16 +8,14 @@ import ar.edu.itba.paw.webapp.form.WorkdayForm;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import java.time.LocalDate;
+import java.util.Map;
 import java.util.Optional;
 
 @Controller
@@ -44,7 +42,7 @@ public class MedicSideController extends GenericController {
     WorkdayService workdayService;
 
     @RequestMapping("/staff/home")
-    public ModelAndView medicHome(){
+    public ModelAndView medicHome(@RequestParam(defaultValue = "0") String week){
         Optional<User> user = this.getUser();
         if(!user.isPresent()) {
             return new ModelAndView("authentication/login");
