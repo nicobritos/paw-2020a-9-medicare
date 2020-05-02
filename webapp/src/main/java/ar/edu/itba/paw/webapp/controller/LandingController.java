@@ -29,11 +29,15 @@ public class LandingController extends GenericController{
     @RequestMapping("/")
     public ModelAndView landingPage(){
         final ModelAndView mav = new ModelAndView("landing");
+        Optional<User> user = getUser();
+        if(user.isPresent() && !user.get().getStaffs().isEmpty()){
+            return new ModelAndView("redirect:/staff/home");
+        }
         Collection<StaffSpecialty> specialtiesList = this.specialtyService.list();
         Collection<Locality> localitiesList = this.localityService.list();
 
         // pass objects to model and view
-        mav.addObject("user", getUser());
+        mav.addObject("user", user);
         mav.addObject("specialties",specialtiesList);
         mav.addObject("localities",localitiesList);
         return mav;

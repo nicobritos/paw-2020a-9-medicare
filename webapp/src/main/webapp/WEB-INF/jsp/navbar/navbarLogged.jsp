@@ -15,9 +15,12 @@
       <%--TODO:connect to correct link--%>
     <c:choose>
       <c:when test="${user.get().staffs.isEmpty()}">
-      <a href="<c:url value="/patient/home"/> " class="header-a-element nav-link mx-3"
+        <a href="<c:url value="/patient/home"/> " class="header-a-element nav-link mx-3"
         >Mis turnos</a
-      >
+        >
+        <a href="<c:url value="/mediclist/1"/>" class="header-a-element nav-link mx-3"
+        >Buscar médicos</a
+        >
       </c:when>
       <c:otherwise>
         <a href="<c:url value="/staff/home"/> " class="header-a-element nav-link mx-3"
@@ -25,9 +28,6 @@
         >
       </c:otherwise>
     </c:choose>
-    <a href="<c:url value="/mediclist/1"/>" class="header-a-element nav-link mx-3"
-      >Buscar médicos</a
-    >
     <div class="d-inline-flex flex-column align-items-end">
       <p style="font-weight: 400;" class="m-0 p-0 text-muted white-text">${user.get().firstName} ${user.get().surname}</p>
       <a href="<c:url value="/logout"/>" class="m-0 p-0 header-a-element"><small class="m-0 p-0">Cerrar sesión</small></a>

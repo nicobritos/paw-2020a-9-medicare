@@ -59,7 +59,7 @@ public class WebAuthConfig extends WebSecurityConfigurerAdapter {
                 .invalidSessionUrl("/")
             .and().authorizeRequests()
                 .antMatchers("/").permitAll()
-                .antMatchers("/mediclist/**").permitAll()
+                .antMatchers("/mediclist/**").hasAnyRole("ANONYMOUS", UserRole.PATIENT.name())
                 .antMatchers("/login").anonymous()
                 .antMatchers("/signup/**").anonymous()
                 .antMatchers("/patient/**").hasRole(UserRole.PATIENT.name())

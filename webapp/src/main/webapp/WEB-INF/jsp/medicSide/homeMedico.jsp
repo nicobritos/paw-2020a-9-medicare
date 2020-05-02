@@ -17,9 +17,7 @@
       </div>
       <div class="row h-100">
         <div class="col-4 h-100 pl-0 mr-3 w-100">
-          <!-- TODO connect to turnos -->
           <ul class="list-group turno-list mr-2 w-100 h-100 overflow-auto">
-            <!-- TODO remove id. was just for testing -->
             <c:forEach var="appointment" items="${todayAppointments}">
               <li class="list-group-item turno-item mb-3" id="lit">
                 <div class="container">
@@ -66,14 +64,41 @@
             <!-- TODO the selected day should be font-weight-bold -->
             <button type="button" class="btn"><</button>
             <!-- this is one -->
-            <c:forEach var="i" begin="0" end="5">
-              <span class="d-flex flex-column align-items-center">
+            <c:forEach var="i" begin="0" end="6">
+              <span class="ml-1 mr-1 d-flex flex-column align-items-center">
                 <!-- day of the week -->
-                <p class="mb-0">${monday.plusDays(i).dayOfWeek.name()}</p>
+
+                <p class="mb-0">
+                  <c:choose>
+                    <c:when test="${monday.plusDays(i).dayOfWeek.name() == 'MONDAY'}">Lunes</c:when>
+                    <c:when test="${monday.plusDays(i).dayOfWeek.name() == 'TUESDAY'}">Martes</c:when>
+                    <c:when test="${monday.plusDays(i).dayOfWeek.name() == 'WEDNESDAY'}">Miércoles</c:when>
+                    <c:when test="${monday.plusDays(i).dayOfWeek.name() == 'THURSDAY'}">Jueves</c:when>
+                    <c:when test="${monday.plusDays(i).dayOfWeek.name() == 'FRIDAY'}">Viernes</c:when>
+                    <c:when test="${monday.plusDays(i).dayOfWeek.name() == 'SATURDAY'}">Sábado</c:when>
+                    <c:when test="${monday.plusDays(i).dayOfWeek.name() == 'SUNDAY'}">Domingo</c:when>
+                    <c:otherwise>${monday.plusDays(i).dayOfWeek.name()}</c:otherwise>
+                  </c:choose>
+                </p>
                 <!-- day/month -->
-                <p class="my-0">${monday.plusDays(i).dayOfMonth} de ${monday.plusDays(i).month.name()}</p>
-                <!-- TODO:  Amount of turnos this day -->
-                <p>${todayAppointments.size()} turnos</p>
+                <p class="my-0">${monday.plusDays(i).dayOfMonth} de <c:choose>
+                  <c:when test="${monday.plusDays(i).month.name() == 'JANUARY'}">enero</c:when>
+                  <c:when test="${monday.plusDays(i).month.name() == 'FEBRUARY'}">febrero</c:when>
+                  <c:when test="${monday.plusDays(i).month.name() == 'MARCH'}">marzo</c:when>
+                  <c:when test="${monday.plusDays(i).month.name() == 'APRIL'}">abril</c:when>
+                  <c:when test="${monday.plusDays(i).month.name() == 'MAY'}">mayo</c:when>
+                  <c:when test="${monday.plusDays(i).month.name() == 'JUNE'}">junio</c:when>
+                  <c:when test="${monday.plusDays(i).month.name() == 'JULY'}">julio</c:when>
+                  <c:when test="${monday.plusDays(i).month.name() == 'AUGUST'}">agosto</c:when>
+                  <c:when test="${monday.plusDays(i).month.name() == 'SEPTEMBER'}">septiembre</c:when>
+                  <c:when test="${monday.plusDays(i).month.name() == 'OCTOBER'}">octubre</c:when>
+                  <c:when test="${monday.plusDays(i).month.name() == 'NOVEMBER'}">noviembre</c:when>
+                  <c:when test="${monday.plusDays(i).month.name() == 'DECEMBER'}">diciembre</c:when>
+                  <c:otherwise>${monday.plusDays(i).month.name()}</c:otherwise></c:choose></p>
+                <p>${todayAppointments.size()} <c:choose>
+                  <c:when test="${todayAppointments.size() == 1}">turno</c:when>
+                  <c:otherwise>turnos</c:otherwise>
+                </c:choose></p>
               </span>
             </c:forEach>
             <button type="button" class="btn">></button>
