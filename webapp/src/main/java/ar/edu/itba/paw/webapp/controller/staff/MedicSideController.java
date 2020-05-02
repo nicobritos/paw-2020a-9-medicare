@@ -42,7 +42,7 @@ public class MedicSideController extends GenericController {
     WorkdayService workdayService;
 
     @RequestMapping("/staff/home")
-    public ModelAndView medicHome(@RequestParam(defaultValue = "0") String week){
+    public ModelAndView medicHome(@RequestParam(defaultValue = "0") String week,@RequestParam(defaultValue = "0", name = "today") String todayOffset){
         Optional<User> user = this.getUser();
         if(!user.isPresent()) {
             return new ModelAndView("authentication/login");

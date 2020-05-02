@@ -67,6 +67,8 @@
             <c:forEach var="i" begin="0" end="6">
               <span class="ml-1 mr-1 d-flex flex-column align-items-center">
                 <!-- day of the week -->
+                <span class="medicare-day-span" data-day="${monday.plusDays(i)}">
+
 
                 <p class="mb-0">
                   <c:choose>
@@ -100,6 +102,7 @@
                   <c:otherwise>turnos</c:otherwise>
                 </c:choose></p>
               </span>
+                </span>
             </c:forEach>
             <button type="button" class="btn" id="nextWeekBtn">></button>
           </div>
