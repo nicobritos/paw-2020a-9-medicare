@@ -41,7 +41,7 @@ public abstract class GenericDaoImpl<M extends GenericModel<I>, I> implements Ge
     private final Class<M> mClass;
     private String tableName;
 
-    public GenericDaoImpl(DataSource dataSource, Class<M> mClass, Class<I> iClass) {
+    public GenericDaoImpl(DataSource dataSource, Class<M> mClass) {
         this.transactionTemplate = new TransactionTemplate(new DataSourceTransactionManager(dataSource));
         this.jdbcTemplate = new NamedParameterJdbcTemplate(dataSource);
         this.mClass = mClass;
@@ -59,8 +59,8 @@ public abstract class GenericDaoImpl<M extends GenericModel<I>, I> implements Ge
 
     @Override
     public Optional<M> findById(I id) {
-        JDBCQueryBuilder queryBuilder = new JDBCSelectQueryBuilder()
-                .selectAll()
+        JDBCSelectQueryBuilder selectQueryBuilder = new JDBCSelectQueryBuilder()
+                .selectAll(this.mClass)
                 .from(this.getTableAlias())
                 .where(new JDBCWhereClauseBuilder()
                         .where(this.formatColumnFromAlias(this.getIdColumnName()), Operation.EQ, ":id")
@@ -70,7 +70,8 @@ public abstract class GenericDaoImpl<M extends GenericModel<I>, I> implements Ge
         // Note that "parameterName" should NOT be preceded by a semicolon (as it is in the query)
         args.addValue("id", id);
 
-        return this.selectQuerySingle(queryBuilder.getQueryAsString(), args);
+        this.populateJoins(selectQueryBuilder);
+        return this.selectQuerySingle(selectQueryBuilder.getQueryAsString(), args);
     }
 
     @Override
@@ -81,8 +82,8 @@ public abstract class GenericDaoImpl<M extends GenericModel<I>, I> implements Ge
         Map<String, Object> parameters = new HashMap<>();
         Collection<String> idsParameters = new LinkedList<>();
 
-        JDBCQueryBuilder queryBuilder = new JDBCSelectQueryBuilder()
-                .selectAll()
+        JDBCSelectQueryBuilder selectQueryBuilder = new JDBCSelectQueryBuilder()
+                .selectAll(this.mClass)
                 .from(this.getTableAlias())
                 .where(new JDBCWhereClauseBuilder()
                         .in(this.formatColumnFromAlias(this.getIdColumnName()), idsParameters)
@@ -91,7 +92,8 @@ public abstract class GenericDaoImpl<M extends GenericModel<I>, I> implements Ge
         MapSqlParameterSource args = new MapSqlParameterSource();
         args.addValues(parameters);
 
-        return this.selectQuery(queryBuilder.getQueryAsString(), args);
+        this.populateJoins(selectQueryBuilder);
+        return this.selectQuery(selectQueryBuilder.getQueryAsString(), args);
     }
 
     @Override
@@ -168,11 +170,12 @@ public abstract class GenericDaoImpl<M extends GenericModel<I>, I> implements Ge
 
     @Override
     public List<M> list() {
-        JDBCSelectQueryBuilder queryBuilder = new JDBCSelectQueryBuilder()
-                .selectAll()
+        JDBCSelectQueryBuilder selectQueryBuilder = new JDBCSelectQueryBuilder()
+                .selectAll(this.mClass)
                 .from(this.getTableAlias());
+        this.populateJoins(selectQueryBuilder);
         MapSqlParameterSource parameterSource = new MapSqlParameterSource();
-        return this.selectQuery(queryBuilder.getQueryAsString(), parameterSource);
+        return this.selectQuery(selectQueryBuilder.getQueryAsString(), parameterSource);
     }
 
     @Override
@@ -193,14 +196,15 @@ public abstract class GenericDaoImpl<M extends GenericModel<I>, I> implements Ge
         MapSqlParameterSource parameterSource = new MapSqlParameterSource();
         parameterSource.addValue("id", id);
 
-        JDBCQueryBuilder queryBuilder = new JDBCSelectQueryBuilder()
+        JDBCSelectQueryBuilder selectQueryBuilder = new JDBCSelectQueryBuilder()
                 .select(field)
                 .from(this.getTableAlias())
                 .where(whereClauseBuilder);
 
+        this.populateJoins(selectQueryBuilder);
         Collection<Object> values = new LinkedList<>();
         this.selectQuery(
-                queryBuilder.getQueryAsString(),
+                selectQueryBuilder.getQueryAsString(),
                 parameterSource,
                 rs -> values.add(rs.getObject(field))
         );
@@ -226,12 +230,11 @@ public abstract class GenericDaoImpl<M extends GenericModel<I>, I> implements Ge
         }
 
         JDBCSelectQueryBuilder selectQueryBuilder = new JDBCSelectQueryBuilder()
-                .selectAll()
+                .selectAll(this.mClass)
                 .from(this.getTableAlias())
                 .where(whereClauseBuilder);
 
         this.populateJoins(selectQueryBuilder);
-
         return this.selectQuery(selectQueryBuilder.getQueryAsString(), parameterSource);
     }
 
@@ -247,12 +250,13 @@ public abstract class GenericDaoImpl<M extends GenericModel<I>, I> implements Ge
         MapSqlParameterSource parameterSource = new MapSqlParameterSource();
         parameterSource.addValue("argument", stringSearchType.transform(value));
 
-        JDBCQueryBuilder queryBuilder = new JDBCSelectQueryBuilder()
-                .selectAll()
+        JDBCSelectQueryBuilder selectQueryBuilder = new JDBCSelectQueryBuilder()
+                .selectAll(this.mClass)
                 .from(this.getTableAlias())
                 .where(whereClauseBuilder);
 
-        return this.selectQuery(queryBuilder.getQueryAsString(), parameterSource);
+        this.populateJoins(selectQueryBuilder);
+        return this.selectQuery(selectQueryBuilder.getQueryAsString(), parameterSource);
     }
 
     protected List<M> selectQuery(String query) {
@@ -324,6 +328,7 @@ public abstract class GenericDaoImpl<M extends GenericModel<I>, I> implements Ge
                 .where(whereClauseBuilder)
                 .limit(1);
 
+        this.populateJoins(selectQueryBuilder);
         return this.jdbcTemplate.query(selectQueryBuilder.getQueryAsString(), parameterSource, ResultSet::next);
     }
 

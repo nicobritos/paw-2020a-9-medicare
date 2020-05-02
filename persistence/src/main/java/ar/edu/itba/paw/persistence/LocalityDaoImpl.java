@@ -29,7 +29,11 @@ import java.util.Map;
 public class LocalityDaoImpl extends GenericSearchableDaoImpl<Locality, Integer> implements LocalityDao {
     public static final RowMapperAlias<Locality> ROW_MAPPER = (prefix, resultSet) -> {
         Locality locality = new Locality();
-        locality.setId(resultSet.getInt(formatColumnFromName(LocalityDaoImpl.PRIMARY_KEY_NAME, prefix)));
+        try {
+            locality.setId(resultSet.getInt(formatColumnFromName(LocalityDaoImpl.PRIMARY_KEY_NAME, prefix)));
+        } catch (SQLException e) {
+            locality.setId(resultSet.getInt(LocalityDaoImpl.PRIMARY_KEY_NAME));
+        }
         populateEntity(locality, resultSet, prefix);
         return locality;
     };
@@ -59,7 +63,7 @@ public class LocalityDaoImpl extends GenericSearchableDaoImpl<Locality, Integer>
                 .where(this.formatColumnFromName("province_id"), Operation.EQ, ":province");
 
         JDBCQueryBuilder queryBuilder = new JDBCSelectQueryBuilder()
-                .selectAll()
+                .selectAll(Locality.class)
                 .from(this.getTableName())
                 .where(whereClauseBuilder);
 
@@ -80,7 +84,14 @@ public class LocalityDaoImpl extends GenericSearchableDaoImpl<Locality, Integer>
                 Province province = null;
                 Country country = null;
 
-                Locality locality = entitiesMap.computeIfAbsent(resultSet.getInt(this.formatColumnFromAlias(this.getIdColumnName())), integer -> {
+                try {
+                    id = resultSet.getInt(this.formatColumnFromAlias(this.getIdColumnName()));
+                } catch (SQLException e) {
+                    id = resultSet.getInt(this.getIdColumnName());
+                }
+                if (resultSet.wasNull())
+                    continue;
+                Locality locality = entitiesMap.computeIfAbsent(id, integer -> {
                     try {
                         Locality newLocality = ROW_MAPPER.mapRow(this.getTableAlias(), resultSet);
                         sortedLocalities.add(newLocality);
@@ -127,7 +138,7 @@ public class LocalityDaoImpl extends GenericSearchableDaoImpl<Locality, Integer>
     @Override
     protected void populateJoins(JDBCSelectQueryBuilder selectQueryBuilder) {
         selectQueryBuilder
-                .joinAlias("province_id", ProvinceDaoImpl.TABLE_NAME, "p", ProvinceDaoImpl.PRIMARY_KEY_NAME, JoinType.LEFT)
-                .joinAlias("p", "country_id", CountryDaoImpl.TABLE_NAME, "c", CountryDaoImpl.PRIMARY_KEY_NAME, JoinType.LEFT);
+                .joinAlias("province_id", ProvinceDaoImpl.TABLE_NAME, "p", ProvinceDaoImpl.PRIMARY_KEY_NAME, JoinType.LEFT, Province.class)
+                .joinAlias("p", "country_id", CountryDaoImpl.TABLE_NAME, "c", CountryDaoImpl.PRIMARY_KEY_NAME, JoinType.LEFT, Country.class);
     }
 }

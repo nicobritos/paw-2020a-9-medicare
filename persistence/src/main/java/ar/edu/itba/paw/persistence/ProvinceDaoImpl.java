@@ -28,7 +28,11 @@ import java.util.Map;
 public class ProvinceDaoImpl extends GenericSearchableDaoImpl<Province, Integer> implements ProvinceDao {
     public static final RowMapperAlias<Province> ROW_MAPPER = (prefix, resultSet) -> {
         Province province = new Province();
-        province.setId(resultSet.getInt(formatColumnFromName(ProvinceDaoImpl.PRIMARY_KEY_NAME, prefix)));
+        try {
+            province.setId(resultSet.getInt(formatColumnFromName(ProvinceDaoImpl.PRIMARY_KEY_NAME, prefix)));
+        } catch (SQLException e) {
+            province.setId(resultSet.getInt(ProvinceDaoImpl.PRIMARY_KEY_NAME));
+        }
         populateEntity(province, resultSet, prefix);
         return province;
     };
@@ -58,7 +62,7 @@ public class ProvinceDaoImpl extends GenericSearchableDaoImpl<Province, Integer>
                 .where(this.formatColumnFromName("country_id"), Operation.EQ, ":country");
 
         JDBCQueryBuilder queryBuilder = new JDBCSelectQueryBuilder()
-                .selectAll()
+                .selectAll(Province.class)
                 .from(this.getTableName())
                 .where(whereClauseBuilder);
 
@@ -73,10 +77,18 @@ public class ProvinceDaoImpl extends GenericSearchableDaoImpl<Province, Integer>
 
             List<Province> sortedEntities = new LinkedList<>();
             while (resultSet.next()) {
-                String id;
+                int id;
+                String idString;
                 Country country = null;
 
-                Province province = entitiesMap.computeIfAbsent(resultSet.getInt(this.formatColumnFromAlias(this.getIdColumnName())), integer -> {
+                try {
+                    id = resultSet.getInt(this.formatColumnFromAlias(this.getIdColumnName()));
+                } catch (SQLException e) {
+                    id = resultSet.getInt(this.getIdColumnName());
+                }
+                if (resultSet.wasNull())
+                    continue;
+                Province province = entitiesMap.computeIfAbsent(id, integer -> {
                     try {
                         Province newProvince = ROW_MAPPER.mapRow(this.getTableAlias(), resultSet);
                         sortedEntities.add(newProvince);
@@ -89,9 +101,9 @@ public class ProvinceDaoImpl extends GenericSearchableDaoImpl<Province, Integer>
                     continue;
                 }
 
-                id = resultSet.getString(formatColumnFromName(CountryDaoImpl.PRIMARY_KEY_NAME, "c"));
+                idString = resultSet.getString(formatColumnFromName(CountryDaoImpl.PRIMARY_KEY_NAME, "c"));
                 if (!resultSet.wasNull()) {
-                    country = countryMap.computeIfAbsent(id, integer -> {
+                    country = countryMap.computeIfAbsent(idString, integer -> {
                         try {
                             return CountryDaoImpl.ROW_MAPPER.mapRow("c", resultSet);
                         } catch (SQLException throwables) {
@@ -110,6 +122,6 @@ public class ProvinceDaoImpl extends GenericSearchableDaoImpl<Province, Integer>
     @Override
     protected void populateJoins(JDBCSelectQueryBuilder selectQueryBuilder) {
         selectQueryBuilder
-                .joinAlias("country_id", CountryDaoImpl.TABLE_NAME, "c", CountryDaoImpl.PRIMARY_KEY_NAME, JoinType.LEFT);
+                .joinAlias("country_id", CountryDaoImpl.TABLE_NAME, "c", CountryDaoImpl.PRIMARY_KEY_NAME, JoinType.LEFT, Country.class);
     }
 }

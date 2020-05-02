@@ -20,7 +20,11 @@ import java.util.Map;
 public class StaffSpecialtyDaoImpl extends GenericSearchableDaoImpl<StaffSpecialty, Integer> implements StaffSpecialtyDao {
     public static final RowMapperAlias<StaffSpecialty> ROW_MAPPER = (prefix, resultSet) -> {
         StaffSpecialty staffSpecialty = new StaffSpecialty();
-        staffSpecialty.setId(resultSet.getInt(formatColumnFromName(StaffSpecialtyDaoImpl.PRIMARY_KEY_NAME, prefix)));
+        try {
+            staffSpecialty.setId(resultSet.getInt(formatColumnFromName(StaffSpecialtyDaoImpl.PRIMARY_KEY_NAME, prefix)));
+        } catch (SQLException e) {
+            staffSpecialty.setId(resultSet.getInt(StaffSpecialtyDaoImpl.PRIMARY_KEY_NAME));
+        }
         populateEntity(staffSpecialty, resultSet, prefix);
         return staffSpecialty;
     };
@@ -38,7 +42,15 @@ public class StaffSpecialtyDaoImpl extends GenericSearchableDaoImpl<StaffSpecial
             Map<Integer, StaffSpecialty> entityMap = new HashMap<>();
             List<StaffSpecialty> sortedEntities = new LinkedList<>();
             while (resultSet.next()) {
-                entityMap.computeIfAbsent(resultSet.getInt(this.formatColumnFromAlias(this.getIdColumnName())), string -> {
+                int id;
+                try {
+                    id = resultSet.getInt(this.formatColumnFromAlias(this.getIdColumnName()));
+                } catch (SQLException e) {
+                    id = resultSet.getInt(this.getIdColumnName());
+                }
+                if (resultSet.wasNull())
+                    continue;
+                entityMap.computeIfAbsent(id, string -> {
                     try {
                         StaffSpecialty newEntity = ROW_MAPPER.mapRow(this.getTableAlias(), resultSet);
                         sortedEntities.add(newEntity);

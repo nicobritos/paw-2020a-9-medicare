@@ -22,7 +22,11 @@ import java.util.*;
 public class PatientDaoImpl extends GenericSearchableDaoImpl<Patient, Integer> implements PatientDao {
     public static final RowMapperAlias<Patient> ROW_MAPPER = (prefix, resultSet) -> {
         Patient patient = new Patient();
-        patient.setId(resultSet.getInt(formatColumnFromName(PatientDaoImpl.PRIMARY_KEY_NAME, prefix)));
+        try {
+            patient.setId(resultSet.getInt(formatColumnFromName(PatientDaoImpl.PRIMARY_KEY_NAME, prefix)));
+        } catch (SQLException e) {
+            patient.setId(resultSet.getInt(PatientDaoImpl.PRIMARY_KEY_NAME));
+        }
         populateEntity(patient, resultSet, prefix);
         return patient;
     };
@@ -46,7 +50,7 @@ public class PatientDaoImpl extends GenericSearchableDaoImpl<Patient, Integer> i
                 .where(this.formatColumnFromName("user_id"), Operation.EQ, ":user_id");
 
         JDBCQueryBuilder queryBuilder = new JDBCSelectQueryBuilder()
-                .selectAll()
+                .selectAll(Patient.class)
                 .from(this.getTableName())
                 .where(whereClauseBuilder);
 
@@ -74,7 +78,14 @@ public class PatientDaoImpl extends GenericSearchableDaoImpl<Patient, Integer> i
                 Province province = null;
                 Country country = null;
 
-                Patient patient = entitiesMap.computeIfAbsent(resultSet.getInt(this.formatColumnFromAlias(this.getIdColumnName())), integer -> {
+                try {
+                    id = resultSet.getInt(this.formatColumnFromAlias(this.getIdColumnName()));
+                } catch (SQLException e) {
+                    id = resultSet.getInt(this.getIdColumnName());
+                }
+                if (resultSet.wasNull())
+                    continue;
+                Patient patient = entitiesMap.computeIfAbsent(id, integer -> {
                     try {
                         Patient newEntity = ROW_MAPPER.mapRow(this.getTableAlias(), resultSet);
                         sortedEntities.add(newEntity);
@@ -158,10 +169,10 @@ public class PatientDaoImpl extends GenericSearchableDaoImpl<Patient, Integer> i
     @Override
     protected void populateJoins(JDBCSelectQueryBuilder selectQueryBuilder) {
         selectQueryBuilder
-                .joinAlias("user_id", UserDaoImpl.TABLE_NAME, "up", UserDaoImpl.PRIMARY_KEY_NAME, JoinType.LEFT)
-                .joinAlias("p", "office_id", OfficeDaoImpl.TABLE_NAME, "op", OfficeDaoImpl.PRIMARY_KEY_NAME, JoinType.LEFT)
-                .joinAlias("op", "locality_id", LocalityDaoImpl.TABLE_NAME, "lp", LocalityDaoImpl.PRIMARY_KEY_NAME, JoinType.LEFT)
-                .joinAlias("lp", "province_id", ProvinceDaoImpl.TABLE_NAME, "pps", ProvinceDaoImpl.PRIMARY_KEY_NAME, JoinType.LEFT)
-                .joinAlias("pps", "country_id", CountryDaoImpl.TABLE_NAME, "cp", CountryDaoImpl.PRIMARY_KEY_NAME, JoinType.LEFT);
+                .joinAlias("user_id", UserDaoImpl.TABLE_NAME, "up", UserDaoImpl.PRIMARY_KEY_NAME, JoinType.LEFT, User.class)
+                .joinAlias("p", "office_id", OfficeDaoImpl.TABLE_NAME, "op", OfficeDaoImpl.PRIMARY_KEY_NAME, JoinType.LEFT, Office.class)
+                .joinAlias("op", "locality_id", LocalityDaoImpl.TABLE_NAME, "lp", LocalityDaoImpl.PRIMARY_KEY_NAME, JoinType.LEFT, Locality.class)
+                .joinAlias("lp", "province_id", ProvinceDaoImpl.TABLE_NAME, "pps", ProvinceDaoImpl.PRIMARY_KEY_NAME, JoinType.LEFT, Province.class)
+                .joinAlias("pps", "country_id", CountryDaoImpl.TABLE_NAME, "cp", CountryDaoImpl.PRIMARY_KEY_NAME, JoinType.LEFT, Country.class);
     }
 }

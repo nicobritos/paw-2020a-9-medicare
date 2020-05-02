@@ -16,7 +16,7 @@ import java.util.List;
  */
 public abstract class GenericSearchableDaoImpl<M extends GenericModel<I>, I> extends GenericDaoImpl<M, I> implements GenericSearchableDao<M, I> {
     public GenericSearchableDaoImpl(DataSource dataSource, Class<M> mClass, Class<I> iClass) {
-        super(dataSource, mClass, iClass);
+        super(dataSource, mClass);
     }
 
     /**

@@ -18,7 +18,11 @@ import java.util.*;
 public class UserDaoImpl extends GenericSearchableDaoImpl<User, Integer> implements UserDao {
     public static final RowMapperAlias<User> ROW_MAPPER = (prefix, resultSet) -> {
         User user = new User();
-        user.setId(resultSet.getInt(formatColumnFromName(UserDaoImpl.PRIMARY_KEY_NAME, prefix)));
+        try {
+            user.setId(resultSet.getInt(formatColumnFromName(UserDaoImpl.PRIMARY_KEY_NAME, prefix)));
+        } catch (SQLException e) {
+            user.setId(resultSet.getInt(UserDaoImpl.PRIMARY_KEY_NAME));
+        }
         populateEntity(user, resultSet, prefix);
         return user;
     };
@@ -48,7 +52,15 @@ public class UserDaoImpl extends GenericSearchableDaoImpl<User, Integer> impleme
             Map<Integer, User> entityMap = new HashMap<>();
             List<User> sortedEntities = new LinkedList<>();
             while (resultSet.next()) {
-                entityMap.computeIfAbsent(resultSet.getInt(this.formatColumnFromAlias(this.getIdColumnName())), string -> {
+                int id;
+                try {
+                    id = resultSet.getInt(this.formatColumnFromAlias(this.getIdColumnName()));
+                } catch (SQLException e) {
+                    id = resultSet.getInt(this.getIdColumnName());
+                }
+                if (resultSet.wasNull())
+                    continue;
+                entityMap.computeIfAbsent(id, string -> {
                     try {
                         User newEntity = ROW_MAPPER.mapRow(this.getTableAlias(), resultSet);
                         sortedEntities.add(newEntity);

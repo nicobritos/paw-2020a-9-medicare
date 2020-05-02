@@ -49,10 +49,10 @@ public class OfficeDaoImpl extends GenericSearchableDaoImpl<Office, Integer> imp
                 .where("country_id", Operation.EQ, ":country_id");
 
         JDBCQueryBuilder queryBuilder = new JDBCSelectQueryBuilder()
-                .selectAll()
+                .selectAll(Office.class)
                 .from(this.getTableAlias())
-                .join("locality_id", LocalityDaoImpl.TABLE_NAME, LocalityDaoImpl.PRIMARY_KEY_NAME)
-                .join(LocalityDaoImpl.TABLE_NAME, "province_id", ProvinceDaoImpl.TABLE_NAME, ProvinceDaoImpl.PRIMARY_KEY_NAME)
+                .join("locality_id", LocalityDaoImpl.TABLE_NAME, LocalityDaoImpl.PRIMARY_KEY_NAME, Locality.class)
+                .join(LocalityDaoImpl.TABLE_NAME, "province_id", ProvinceDaoImpl.TABLE_NAME, ProvinceDaoImpl.PRIMARY_KEY_NAME, Province.class)
                 .where(whereClauseBuilder)
                 .distinct();
 
@@ -68,9 +68,9 @@ public class OfficeDaoImpl extends GenericSearchableDaoImpl<Office, Integer> imp
                 .where("province_id", Operation.EQ, ":province_id");
 
         JDBCQueryBuilder queryBuilder = new JDBCSelectQueryBuilder()
-                .selectAll()
+                .selectAll(Office.class)
                 .from(this.getTableAlias())
-                .join("locality_id", LocalityDaoImpl.TABLE_NAME, LocalityDaoImpl.PRIMARY_KEY_NAME)
+                .join("locality_id", LocalityDaoImpl.TABLE_NAME, LocalityDaoImpl.PRIMARY_KEY_NAME, Locality.class)
                 .where(whereClauseBuilder)
                 .distinct();
 
@@ -99,7 +99,14 @@ public class OfficeDaoImpl extends GenericSearchableDaoImpl<Office, Integer> imp
                 Province province = null;
                 Country country = null;
 
-                Office office = appointmentMap.computeIfAbsent(resultSet.getInt(this.formatColumnFromAlias(this.getIdColumnName())), integer -> {
+                try {
+                    id = resultSet.getInt(this.formatColumnFromAlias(this.getIdColumnName()));
+                } catch (SQLException e) {
+                    id = resultSet.getInt(this.getIdColumnName());
+                }
+                if (resultSet.wasNull())
+                    continue;
+                Office office = appointmentMap.computeIfAbsent(id, integer -> {
                     try {
                         Office newOffice = ROW_MAPPER.mapRow(this.getTableAlias(), resultSet);
                         sortedEntities.add(newOffice);
@@ -159,8 +166,8 @@ public class OfficeDaoImpl extends GenericSearchableDaoImpl<Office, Integer> imp
     @Override
     protected void populateJoins(JDBCSelectQueryBuilder selectQueryBuilder) {
         selectQueryBuilder
-                .joinAlias("locality_id", LocalityDaoImpl.TABLE_NAME, "l", LocalityDaoImpl.PRIMARY_KEY_NAME, JoinType.LEFT)
-                .joinAlias("l", "province_id", ProvinceDaoImpl.TABLE_NAME, "ps", ProvinceDaoImpl.PRIMARY_KEY_NAME, JoinType.LEFT)
-                .joinAlias("ps", "country_id", CountryDaoImpl.TABLE_NAME, "cs", CountryDaoImpl.PRIMARY_KEY_NAME, JoinType.LEFT);
+                .joinAlias("locality_id", LocalityDaoImpl.TABLE_NAME, "l", LocalityDaoImpl.PRIMARY_KEY_NAME, JoinType.LEFT, Locality.class)
+                .joinAlias("l", "province_id", ProvinceDaoImpl.TABLE_NAME, "ps", ProvinceDaoImpl.PRIMARY_KEY_NAME, JoinType.LEFT, Province.class)
+                .joinAlias("ps", "country_id", CountryDaoImpl.TABLE_NAME, "cs", CountryDaoImpl.PRIMARY_KEY_NAME, JoinType.LEFT, Country.class);
     }
 }

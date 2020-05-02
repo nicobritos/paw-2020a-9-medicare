@@ -23,7 +23,11 @@ import java.util.*;
 public class AppointmentDaoImpl extends GenericDaoImpl<Appointment, Integer> implements AppointmentDao {
     public static final RowMapperAlias<Appointment> ROW_MAPPER = (prefix, resultSet) -> {
         Appointment appointment = new Appointment();
-        appointment.setId(resultSet.getInt(formatColumnFromName(AppointmentDaoImpl.PRIMARY_KEY_NAME, prefix)));
+        try {
+            appointment.setId(resultSet.getInt(formatColumnFromName(AppointmentDaoImpl.PRIMARY_KEY_NAME, prefix)));
+        } catch (SQLException e) {
+            appointment.setId(resultSet.getInt(AppointmentDaoImpl.PRIMARY_KEY_NAME));
+        }
         populateEntity(appointment, resultSet, prefix);
         return appointment;
     };
@@ -32,16 +36,16 @@ public class AppointmentDaoImpl extends GenericDaoImpl<Appointment, Integer> imp
 
     @Autowired
     public AppointmentDaoImpl(DataSource dataSource) {
-        super(dataSource, Appointment.class, Integer.class);
+        super(dataSource, Appointment.class);
     }
 
     @Override
     public Optional<Appointment> findById(Integer id) {
         JDBCSelectQueryBuilder selectQueryBuilder = new JDBCSelectQueryBuilder()
-                .selectAll()
+                .selectAll(Appointment.class)
                 .from("appointment")
-                .join("staff_id", Operation.EQ, StaffDaoImpl.TABLE_NAME, "staff_id")
-                .join("patient_id", Operation.EQ, PatientDaoImpl.TABLE_NAME, "patient_id")
+                .join("staff_id", Operation.EQ, StaffDaoImpl.TABLE_NAME, "staff_id", Staff.class)
+                .join("patient_id", Operation.EQ, PatientDaoImpl.TABLE_NAME, "patient_id", Patient.class)
                 .where(new JDBCWhereClauseBuilder()
                         .where("appointment_id", Operation.EQ, ":appointment_id")
                 );
@@ -60,7 +64,7 @@ public class AppointmentDaoImpl extends GenericDaoImpl<Appointment, Integer> imp
                 .where(this.formatColumnFromName("patient_id"), Operation.EQ, ":patient");
 
         JDBCQueryBuilder queryBuilder = new JDBCSelectQueryBuilder()
-                .selectAll()
+                .selectAll(Appointment.class)
                 .from(this.getTableName())
                 .where(whereClauseBuilder);
 
@@ -76,7 +80,7 @@ public class AppointmentDaoImpl extends GenericDaoImpl<Appointment, Integer> imp
                 .where(this.formatColumnFromName("staff_id"), Operation.EQ, ":staff");
 
         JDBCQueryBuilder queryBuilder = new JDBCSelectQueryBuilder()
-                .selectAll()
+                .selectAll(Appointment.class)
                 .from(this.getTableName())
                 .where(whereClauseBuilder);
 
@@ -95,7 +99,7 @@ public class AppointmentDaoImpl extends GenericDaoImpl<Appointment, Integer> imp
                 .where(this.formatColumnFromName("status"), Operation.EQ, ":status");
 
         JDBCQueryBuilder queryBuilder = new JDBCSelectQueryBuilder()
-                .selectAll()
+                .selectAll(Appointment.class)
                 .from(this.getTableName())
                 .where(whereClauseBuilder);
 
@@ -114,7 +118,7 @@ public class AppointmentDaoImpl extends GenericDaoImpl<Appointment, Integer> imp
                 .where(this.formatColumnFromName("status"), Operation.EQ, ":status");
 
         JDBCQueryBuilder queryBuilder = new JDBCSelectQueryBuilder()
-                .selectAll()
+                .selectAll(Appointment.class)
                 .from(this.getTableName())
                 .where(whereClauseBuilder);
 
@@ -123,7 +127,6 @@ public class AppointmentDaoImpl extends GenericDaoImpl<Appointment, Integer> imp
 
     @Override
     public List<Appointment> findPending(Patient patient, Staff staff) {
-
         MapSqlParameterSource parameterSource = new MapSqlParameterSource();
         parameterSource.addValue("patient", patient.getId());
         parameterSource.addValue("staff", staff.getId());
@@ -137,7 +140,7 @@ public class AppointmentDaoImpl extends GenericDaoImpl<Appointment, Integer> imp
                 .where(this.formatColumnFromName("status"), Operation.EQ, ":status");
 
         JDBCQueryBuilder queryBuilder = new JDBCSelectQueryBuilder()
-                .selectAll()
+                .selectAll(Appointment.class)
                 .from(this.getTableName())
                 .where(whereClauseBuilder);
 
@@ -162,7 +165,7 @@ public class AppointmentDaoImpl extends GenericDaoImpl<Appointment, Integer> imp
                 .where(this.formatColumnFromName("from_date"), Operation.EQ, ":day", JDBCWhereClauseBuilder.ColumnTransformer.DAY);
 
         JDBCQueryBuilder queryBuilder = new JDBCSelectQueryBuilder()
-                .selectAll()
+                .selectAll(Appointment.class)
                 .from(this.getTableName())
                 .where(whereClauseBuilder);
 
@@ -187,7 +190,7 @@ public class AppointmentDaoImpl extends GenericDaoImpl<Appointment, Integer> imp
                 .where(this.formatColumnFromName("from_date"), Operation.EQ, ":day", JDBCWhereClauseBuilder.ColumnTransformer.DAY);
 
         JDBCQueryBuilder queryBuilder = new JDBCSelectQueryBuilder()
-                .selectAll()
+                .selectAll(Appointment.class)
                 .from(this.getTableName())
                 .where(whereClauseBuilder);
 
@@ -227,7 +230,14 @@ public class AppointmentDaoImpl extends GenericDaoImpl<Appointment, Integer> imp
                 Province provinceStaff = null;
                 Country countryStaff = null;
 
-                Appointment entity = entitiesMap.computeIfAbsent(resultSet.getInt(this.formatColumnFromAlias(this.getIdColumnName())), integer -> {
+                try {
+                    id = resultSet.getInt(this.formatColumnFromAlias(this.getIdColumnName()));
+                } catch (SQLException e) {
+                    id = resultSet.getInt(this.getIdColumnName());
+                }
+                if (resultSet.wasNull())
+                    continue;
+                Appointment entity = entitiesMap.computeIfAbsent(id, integer -> {
                     try {
                         Appointment newAppointment = ROW_MAPPER.mapRow(this.getTableAlias(), resultSet);
                         sortedEntities.add(newAppointment);
@@ -413,20 +423,20 @@ public class AppointmentDaoImpl extends GenericDaoImpl<Appointment, Integer> imp
     @Override
     protected void populateJoins(JDBCSelectQueryBuilder selectQueryBuilder) {
         selectQueryBuilder
-                .joinAlias("patient_id", PatientDaoImpl.TABLE_NAME, "p", PatientDaoImpl.PRIMARY_KEY_NAME, JoinType.LEFT)
-                .joinAlias("p", "user_id", UserDaoImpl.TABLE_NAME, "up", UserDaoImpl.PRIMARY_KEY_NAME, JoinType.LEFT)
-                .joinAlias("p", "office_id", OfficeDaoImpl.TABLE_NAME, "op", OfficeDaoImpl.PRIMARY_KEY_NAME, JoinType.LEFT)
-                .joinAlias("op", "locality_id", LocalityDaoImpl.TABLE_NAME, "lp", LocalityDaoImpl.PRIMARY_KEY_NAME, JoinType.LEFT)
-                .joinAlias("lp", "province_id", ProvinceDaoImpl.TABLE_NAME, "pps", ProvinceDaoImpl.PRIMARY_KEY_NAME, JoinType.LEFT)
-                .joinAlias("pps", "country_id", CountryDaoImpl.TABLE_NAME, "cp", CountryDaoImpl.PRIMARY_KEY_NAME, JoinType.LEFT);
+                .joinAlias("patient_id", PatientDaoImpl.TABLE_NAME, "p", PatientDaoImpl.PRIMARY_KEY_NAME, JoinType.LEFT, Patient.class)
+                .joinAlias("p", "user_id", UserDaoImpl.TABLE_NAME, "up", UserDaoImpl.PRIMARY_KEY_NAME, JoinType.LEFT, User.class)
+                .joinAlias("p", "office_id", OfficeDaoImpl.TABLE_NAME, "op", OfficeDaoImpl.PRIMARY_KEY_NAME, JoinType.LEFT, Office.class)
+                .joinAlias("op", "locality_id", LocalityDaoImpl.TABLE_NAME, "lp", LocalityDaoImpl.PRIMARY_KEY_NAME, JoinType.LEFT, Locality.class)
+                .joinAlias("lp", "province_id", ProvinceDaoImpl.TABLE_NAME, "pps", ProvinceDaoImpl.PRIMARY_KEY_NAME, JoinType.LEFT, Province.class)
+                .joinAlias("pps", "country_id", CountryDaoImpl.TABLE_NAME, "cp", CountryDaoImpl.PRIMARY_KEY_NAME, JoinType.LEFT, Country.class);
         selectQueryBuilder
-                .joinAlias("staff_id", StaffDaoImpl.TABLE_NAME, "s", StaffDaoImpl.PRIMARY_KEY_NAME, JoinType.LEFT)
-                .joinAlias("s", "user_id", UserDaoImpl.TABLE_NAME, "us", UserDaoImpl.PRIMARY_KEY_NAME, JoinType.LEFT)
-                .joinAlias("s", "office_id", OfficeDaoImpl.TABLE_NAME, "os", OfficeDaoImpl.PRIMARY_KEY_NAME, JoinType.LEFT)
-                .joinAlias("os", "locality_id", LocalityDaoImpl.TABLE_NAME, "l", LocalityDaoImpl.PRIMARY_KEY_NAME, JoinType.LEFT)
-                .joinAlias("l", "province_id", ProvinceDaoImpl.TABLE_NAME, "ps", ProvinceDaoImpl.PRIMARY_KEY_NAME, JoinType.LEFT)
-                .joinAlias("ps", "country_id", CountryDaoImpl.TABLE_NAME, "cs", CountryDaoImpl.PRIMARY_KEY_NAME, JoinType.LEFT)
-                .joinAlias("staff_id", "system_staff_specialty_staff", "sss", "staff_id", JoinType.LEFT)
-                .joinAlias("sss", "specialty_id", StaffSpecialtyDaoImpl.TABLE_NAME, "ss", StaffSpecialtyDaoImpl.PRIMARY_KEY_NAME, JoinType.LEFT);
+                .joinAlias("staff_id", StaffDaoImpl.TABLE_NAME, "s", StaffDaoImpl.PRIMARY_KEY_NAME, JoinType.LEFT, Staff.class)
+                .joinAlias("s", "user_id", UserDaoImpl.TABLE_NAME, "us", UserDaoImpl.PRIMARY_KEY_NAME, JoinType.LEFT, User.class)
+                .joinAlias("s", "office_id", OfficeDaoImpl.TABLE_NAME, "os", OfficeDaoImpl.PRIMARY_KEY_NAME, JoinType.LEFT, Office.class)
+                .joinAlias("os", "locality_id", LocalityDaoImpl.TABLE_NAME, "l", LocalityDaoImpl.PRIMARY_KEY_NAME, JoinType.LEFT, Locality.class)
+                .joinAlias("l", "province_id", ProvinceDaoImpl.TABLE_NAME, "ps", ProvinceDaoImpl.PRIMARY_KEY_NAME, JoinType.LEFT, Province.class)
+                .joinAlias("ps", "country_id", CountryDaoImpl.TABLE_NAME, "cs", CountryDaoImpl.PRIMARY_KEY_NAME, JoinType.LEFT, Country.class)
+                .joinAlias("staff_id", "system_staff_specialty_staff", "sss", "staff_id", JoinType.LEFT, null)
+                .joinAlias("sss", "specialty_id", StaffSpecialtyDaoImpl.TABLE_NAME, "ss", StaffSpecialtyDaoImpl.PRIMARY_KEY_NAME, JoinType.LEFT, StaffSpecialty.class);
     }
 }

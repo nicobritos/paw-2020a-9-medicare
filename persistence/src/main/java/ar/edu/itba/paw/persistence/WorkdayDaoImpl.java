@@ -25,7 +25,11 @@ import java.util.Map;
 public class WorkdayDaoImpl extends GenericDaoImpl<Workday, Integer> implements WorkdayDao {
     public static final RowMapperAlias<Workday> ROW_MAPPER = (prefix, resultSet) -> {
         Workday workday = new Workday();
-        workday.setId(resultSet.getInt(formatColumnFromName(WorkdayDaoImpl.PRIMARY_KEY_NAME, prefix)));
+        try {
+            workday.setId(resultSet.getInt(formatColumnFromName(WorkdayDaoImpl.PRIMARY_KEY_NAME, prefix)));
+        } catch (SQLException e) {
+            workday.setId(resultSet.getInt(WorkdayDaoImpl.PRIMARY_KEY_NAME));
+        }
         populateEntity(workday, resultSet, prefix);
         return workday;
     };
@@ -34,7 +38,7 @@ public class WorkdayDaoImpl extends GenericDaoImpl<Workday, Integer> implements 
 
     @Autowired
     public WorkdayDaoImpl(DataSource dataSource) {
-        super(dataSource, Workday.class, Integer.class);
+        super(dataSource, Workday.class);
     }
 
     @Override
@@ -46,7 +50,7 @@ public class WorkdayDaoImpl extends GenericDaoImpl<Workday, Integer> implements 
                 .where(this.formatColumnFromName("staff_id"), Operation.EQ, ":staff");
 
         JDBCQueryBuilder queryBuilder = new JDBCSelectQueryBuilder()
-                .selectAll()
+                .selectAll(Workday.class)
                 .from(this.getTableName())
                 .where(whereClauseBuilder);
 
@@ -65,7 +69,7 @@ public class WorkdayDaoImpl extends GenericDaoImpl<Workday, Integer> implements 
                 .where(this.formatColumnFromName("staff_id"), Operation.EQ, ":staff");
 
         JDBCQueryBuilder queryBuilder = new JDBCSelectQueryBuilder()
-                .selectAll()
+                .selectAll(Workday.class)
                 .from(this.getTableName())
                 .where(whereClauseBuilder);
 
@@ -97,7 +101,7 @@ public class WorkdayDaoImpl extends GenericDaoImpl<Workday, Integer> implements 
                 .where(this.formatColumnFromName("staff_id"), Operation.EQ, ":staff");
 
         JDBCQueryBuilder queryBuilder = new JDBCSelectQueryBuilder()
-                .selectAll()
+                .selectAll(Workday.class)
                 .from(this.getTableName())
                 .where(whereClauseBuilder);
 
@@ -130,7 +134,14 @@ public class WorkdayDaoImpl extends GenericDaoImpl<Workday, Integer> implements 
                 Province province = null;
                 Country country = null;
 
-                Workday workday = entitiesMap.computeIfAbsent(resultSet.getInt(this.formatColumnFromAlias(this.getIdColumnName())), integer -> {
+                try {
+                    id = resultSet.getInt(this.formatColumnFromAlias(this.getIdColumnName()));
+                } catch (SQLException e) {
+                    id = resultSet.getInt(this.getIdColumnName());
+                }
+                if (resultSet.wasNull())
+                    continue;
+                Workday workday = entitiesMap.computeIfAbsent(id, integer -> {
                     try {
                         Workday newWorkday = ROW_MAPPER.mapRow(this.getTableAlias(), resultSet);
                         sortedEntities.add(newWorkday);
@@ -240,13 +251,13 @@ public class WorkdayDaoImpl extends GenericDaoImpl<Workday, Integer> implements 
     @Override
     protected void populateJoins(JDBCSelectQueryBuilder selectQueryBuilder) {
         selectQueryBuilder
-            .joinAlias("staff_id", StaffDaoImpl.TABLE_NAME, "s", StaffDaoImpl.PRIMARY_KEY_NAME, JoinType.LEFT)
-            .joinAlias("s", "user_id", UserDaoImpl.TABLE_NAME, "us", UserDaoImpl.PRIMARY_KEY_NAME, JoinType.LEFT)
-            .joinAlias("s", "office_id", OfficeDaoImpl.TABLE_NAME, "os", OfficeDaoImpl.PRIMARY_KEY_NAME, JoinType.LEFT)
-            .joinAlias("os", "locality_id", LocalityDaoImpl.TABLE_NAME, "l", LocalityDaoImpl.PRIMARY_KEY_NAME, JoinType.LEFT)
-            .joinAlias("l", "province_id", ProvinceDaoImpl.TABLE_NAME, "ps", ProvinceDaoImpl.PRIMARY_KEY_NAME, JoinType.LEFT)
-            .joinAlias("ps", "country_id", CountryDaoImpl.TABLE_NAME, "cs", CountryDaoImpl.PRIMARY_KEY_NAME, JoinType.LEFT)
-            .joinAlias("staff_id", "system_staff_specialty_staff", "sss", "staff_id", JoinType.LEFT)
-            .joinAlias("sss", "specialty_id", StaffSpecialtyDaoImpl.TABLE_NAME, "ss", StaffSpecialtyDaoImpl.PRIMARY_KEY_NAME, JoinType.LEFT);
+            .joinAlias("staff_id", StaffDaoImpl.TABLE_NAME, "s", StaffDaoImpl.PRIMARY_KEY_NAME, JoinType.LEFT, Staff.class)
+            .joinAlias("s", "user_id", UserDaoImpl.TABLE_NAME, "us", UserDaoImpl.PRIMARY_KEY_NAME, JoinType.LEFT, User.class)
+            .joinAlias("s", "office_id", OfficeDaoImpl.TABLE_NAME, "os", OfficeDaoImpl.PRIMARY_KEY_NAME, JoinType.LEFT, Office.class)
+            .joinAlias("os", "locality_id", LocalityDaoImpl.TABLE_NAME, "l", LocalityDaoImpl.PRIMARY_KEY_NAME, JoinType.LEFT, Locality.class)
+            .joinAlias("l", "province_id", ProvinceDaoImpl.TABLE_NAME, "ps", ProvinceDaoImpl.PRIMARY_KEY_NAME, JoinType.LEFT, Province.class)
+            .joinAlias("ps", "country_id", CountryDaoImpl.TABLE_NAME, "cs", CountryDaoImpl.PRIMARY_KEY_NAME, JoinType.LEFT, Country.class)
+            .joinAlias("staff_id", "system_staff_specialty_staff", "sss", "staff_id", JoinType.LEFT, null)
+            .joinAlias("sss", "specialty_id", StaffSpecialtyDaoImpl.TABLE_NAME, "ss", StaffSpecialtyDaoImpl.PRIMARY_KEY_NAME, JoinType.LEFT, StaffSpecialty.class);
     }
 }

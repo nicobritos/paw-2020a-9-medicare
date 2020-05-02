@@ -26,7 +26,11 @@ public class StaffDaoImpl extends GenericSearchableDaoImpl<Staff, Integer> imple
     private static final int DEFAULT_PAGE_SIZE = 10;
     public static final RowMapperAlias<Staff> ROW_MAPPER = (prefix, resultSet) -> {
         Staff staff = new Staff();
-        staff.setId(resultSet.getInt(formatColumnFromName(StaffDaoImpl.PRIMARY_KEY_NAME, prefix)));
+        try {
+            staff.setId(resultSet.getInt(formatColumnFromName(StaffDaoImpl.PRIMARY_KEY_NAME, prefix)));
+        } catch (SQLException e) {
+            staff.setId(resultSet.getInt(StaffDaoImpl.PRIMARY_KEY_NAME));
+        }
         populateEntity(staff, resultSet, prefix);
         return staff;
     };
@@ -75,15 +79,15 @@ public class StaffDaoImpl extends GenericSearchableDaoImpl<Staff, Integer> imple
         parameterSource.addValues(parameters);
 
         JDBCSelectQueryBuilder queryBuilder = new JDBCSelectQueryBuilder()
-                .selectAll()
+                .selectAll(Staff.class)
                 .from(this.getTableAlias())
                 .where(whereClauseBuilder)
                 .distinct();
         if(!staffSpecialties.isEmpty()) {
-            queryBuilder.join("staff_id", this.getSpecialtiesIntermediateTableName(), "staff_id");
+            queryBuilder.join("staff_id", this.getSpecialtiesIntermediateTableName(), "staff_id", null);
         }
         if(!localities.isEmpty()){
-            queryBuilder.join("office_id", this.getOfficeTable(), "office_id");
+            queryBuilder.join("office_id", OfficeDaoImpl.TABLE_NAME, "office_id", Office.class);
         }
         return this.selectQuery(queryBuilder.getQueryAsString(), parameterSource);
     }
@@ -129,17 +133,17 @@ public class StaffDaoImpl extends GenericSearchableDaoImpl<Staff, Integer> imple
         parameterSource.addValues(parameters);
 
         JDBCSelectQueryBuilder queryBuilder = new JDBCSelectQueryBuilder()
-                .selectAll()
+                .selectAll(Staff.class)
                 .from(this.getTableAlias())
                 .where(whereClauseBuilder)
                 .distinct()
                 .limit(pageSize)
                 .offset((page-1)*pageSize);
         if(!staffSpecialties.isEmpty()) {
-            queryBuilder.join("staff_id", this.getSpecialtiesIntermediateTableName(), "staff_id");
+            queryBuilder.join("staff_id", this.getSpecialtiesIntermediateTableName(), "staff_id", null);
         }
         if(!localities.isEmpty()){
-            queryBuilder.join("office_id", this.getOfficeTable(), "office_id");
+            queryBuilder.join("office_id", OfficeDaoImpl.TABLE_NAME, "office_id", Office.class);
         }
         return this.selectQuery(queryBuilder.getQueryAsString(), parameterSource);
     }
@@ -196,17 +200,17 @@ public class StaffDaoImpl extends GenericSearchableDaoImpl<Staff, Integer> imple
         }
 
         JDBCSelectQueryBuilder queryBuilder = new JDBCSelectQueryBuilder()
-                .selectAll()
+                .selectAll(Staff.class)
                 .from(this.getTableAlias())
                 .where(whereClauseBuilder)
                 .distinct()
                 .limit(pageSize)
                 .offset((page-1)*pageSize);
         if(!staffSpecialties.isEmpty()) {
-            queryBuilder.join("staff_id", this.getSpecialtiesIntermediateTableName(), "staff_id");
+            queryBuilder.join("staff_id", this.getSpecialtiesIntermediateTableName(), "staff_id", null);
         }
         if(!localities.isEmpty()){
-            queryBuilder.join("office_id", this.getOfficeTable(), "office_id");
+            queryBuilder.join("office_id", OfficeDaoImpl.TABLE_NAME, "office_id", Office.class);
         }
         return this.selectQuery(queryBuilder.getQueryAsString(), parameterSource);
     }
@@ -257,16 +261,16 @@ public class StaffDaoImpl extends GenericSearchableDaoImpl<Staff, Integer> imple
         }
 
         JDBCSelectQueryBuilder queryBuilder = new JDBCSelectQueryBuilder()
-                .selectAll()
+                .selectAll(Staff.class)
                 .from(this.getTableAlias())
                 .where(whereClauseBuilder)
                 .distinct();
 
         if(!staffSpecialties.isEmpty()) {
-            queryBuilder.join("staff_id", this.getSpecialtiesIntermediateTableName(), "staff_id");
+            queryBuilder.join("staff_id", this.getSpecialtiesIntermediateTableName(), "staff_id", null);
         }
         if(!localities.isEmpty()){
-            queryBuilder.join("office_id", this.getOfficeTable(), "office_id");
+            queryBuilder.join("office_id", OfficeDaoImpl.TABLE_NAME, "office_id", Office.class);
         }
         return this.selectQuery(queryBuilder.getQueryAsString(), parameterSource);
     }
@@ -294,7 +298,14 @@ public class StaffDaoImpl extends GenericSearchableDaoImpl<Staff, Integer> imple
                 Province province = null;
                 Country country = null;
 
-                Staff staff = entitiesMap.computeIfAbsent(resultSet.getInt(this.formatColumnFromAlias(this.getIdColumnName())), integer -> {
+                try {
+                    id = resultSet.getInt(this.formatColumnFromAlias(this.getIdColumnName()));
+                } catch (SQLException e) {
+                    id = resultSet.getInt(this.getIdColumnName());
+                }
+                if (resultSet.wasNull())
+                    continue;
+                Staff staff = entitiesMap.computeIfAbsent(id, integer -> {
                     try {
                         Staff newEntity = ROW_MAPPER.mapRow(this.getTableAlias(), resultSet);
                         sortedEntities.add(newEntity);
@@ -390,13 +401,13 @@ public class StaffDaoImpl extends GenericSearchableDaoImpl<Staff, Integer> imple
     @Override
     protected void populateJoins(JDBCSelectQueryBuilder selectQueryBuilder) {
         selectQueryBuilder
-                .joinAlias("s", "user_id", UserDaoImpl.TABLE_NAME, "us", UserDaoImpl.PRIMARY_KEY_NAME, JoinType.LEFT)
-                .joinAlias("s", "office_id", OfficeDaoImpl.TABLE_NAME, "os", OfficeDaoImpl.PRIMARY_KEY_NAME, JoinType.LEFT)
-                .joinAlias("os", "locality_id", LocalityDaoImpl.TABLE_NAME, "l", LocalityDaoImpl.PRIMARY_KEY_NAME, JoinType.LEFT)
-                .joinAlias("l", "province_id", ProvinceDaoImpl.TABLE_NAME, "ps", ProvinceDaoImpl.PRIMARY_KEY_NAME, JoinType.LEFT)
-                .joinAlias("ps", "country_id", CountryDaoImpl.TABLE_NAME, "cs", CountryDaoImpl.PRIMARY_KEY_NAME, JoinType.LEFT)
-                .joinAlias("staff_id", "system_staff_specialty_staff", "sss", "staff_id", JoinType.LEFT)
-                .joinAlias("sss", "specialty_id", StaffSpecialtyDaoImpl.TABLE_NAME, "ss", StaffSpecialtyDaoImpl.PRIMARY_KEY_NAME, JoinType.LEFT);
+                .joinAlias("s", "user_id", UserDaoImpl.TABLE_NAME, "us", UserDaoImpl.PRIMARY_KEY_NAME, JoinType.LEFT, User.class)
+                .joinAlias("s", "office_id", OfficeDaoImpl.TABLE_NAME, "os", OfficeDaoImpl.PRIMARY_KEY_NAME, JoinType.LEFT, Office.class)
+                .joinAlias("os", "locality_id", LocalityDaoImpl.TABLE_NAME, "l", LocalityDaoImpl.PRIMARY_KEY_NAME, JoinType.LEFT, Locality.class)
+                .joinAlias("l", "province_id", ProvinceDaoImpl.TABLE_NAME, "ps", ProvinceDaoImpl.PRIMARY_KEY_NAME, JoinType.LEFT, Province.class)
+                .joinAlias("ps", "country_id", CountryDaoImpl.TABLE_NAME, "cs", CountryDaoImpl.PRIMARY_KEY_NAME, JoinType.LEFT, Country.class)
+                .joinAlias("staff_id", "system_staff_specialty_staff", "sss", "staff_id", JoinType.LEFT, null)
+                .joinAlias("sss", "specialty_id", StaffSpecialtyDaoImpl.TABLE_NAME, "ss", StaffSpecialtyDaoImpl.PRIMARY_KEY_NAME, JoinType.LEFT, StaffSpecialty.class);
     }
 
     private void putLocalityArguments(Collection<Locality> localities, Map<String, Object> argumentsValues, JDBCWhereClauseBuilder whereClauseBuilder) {
@@ -414,7 +425,7 @@ public class StaffDaoImpl extends GenericSearchableDaoImpl<Staff, Integer> imple
         whereClauseBuilder
                 .and()
                 .in(
-                        formatColumnFromName("locality_id", this.getOfficeTable()),
+                        formatColumnFromName("locality_id", OfficeDaoImpl.TABLE_NAME),
                         arguments
                 );
     }

@@ -20,7 +20,11 @@ import java.util.Map;
 public class CountryDaoImpl extends GenericSearchableDaoImpl<Country, String> implements CountryDao {
     public static final RowMapperAlias<Country> ROW_MAPPER = (prefix, resultSet) -> {
         Country country = new Country();
-        country.setId(resultSet.getString(formatColumnFromName(CountryDaoImpl.PRIMARY_KEY_NAME, prefix)));
+        try {
+            country.setId(resultSet.getString(formatColumnFromName(CountryDaoImpl.PRIMARY_KEY_NAME, prefix)));
+        } catch (SQLException e) {
+            country.setId(resultSet.getString(CountryDaoImpl.PRIMARY_KEY_NAME));
+        }
         populateEntity(country, resultSet, prefix);
         return country;
     };
@@ -38,7 +42,15 @@ public class CountryDaoImpl extends GenericSearchableDaoImpl<Country, String> im
             Map<String, Country> entityMap = new HashMap<>();
             List<Country> sortedEntities = new LinkedList<>();
             while (resultSet.next()) {
-                entityMap.computeIfAbsent(resultSet.getString(this.formatColumnFromAlias(this.getIdColumnName())), string -> {
+                String id;
+                try {
+                    id = resultSet.getString(this.formatColumnFromAlias(this.getIdColumnName()));
+                } catch (SQLException e) {
+                    id = resultSet.getString(this.getIdColumnName());
+                }
+                if (resultSet.wasNull())
+                    continue;
+                entityMap.computeIfAbsent(id, string -> {
                     try {
                         Country newEntity = ROW_MAPPER.mapRow(this.getTableAlias(), resultSet);
                         sortedEntities.add(newEntity);
