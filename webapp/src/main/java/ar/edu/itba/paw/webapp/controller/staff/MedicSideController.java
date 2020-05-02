@@ -216,7 +216,7 @@ public class MedicSideController extends GenericController {
         return mav;
     }
 
-    @RequestMapping(value="/staff/profile/workday/delete/{workdayId}", method = RequestMethod.POST)
+    @RequestMapping(value="/staff/profile/workday/delete/{workdayId}", method = RequestMethod.GET)
     public ModelAndView deleteWorkday(@PathVariable("workdayId") final int workdayId){
         Optional<User> user = getUser();
         if(!user.isPresent()) {
@@ -231,7 +231,7 @@ public class MedicSideController extends GenericController {
 
         ModelAndView mav = new ModelAndView();
         mav.addObject("user", user);
-        mav.setViewName("medicSide/addTurno");
+        mav.setViewName("redirect:/staff/profile");
         return mav;
     }
 }

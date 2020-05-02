@@ -79,7 +79,7 @@
                     <c:forEach var="staff" items="${user.get().staffs}">
                       <c:forEach var="workday" items="${staff.workdays}">
                         <p class="m-0">- ${workday.day} de ${workday.startHour}:00hs a ${workday.endHour}:00hs - ${workday.staff.office.name}</p>
-                        <a href="/staff/workday/remove/${workday.id}" class="btn">X</a>
+                        <a href='<c:url value="/staff/profile/workday/delete/${workday.id}"/> ' class="btn">X</a>
                       </c:forEach>
                     </c:forEach>
                   </div>
