@@ -15,7 +15,6 @@
     <org.postgresql.version>42.2.5</org.postgresql.version>
     <org.hsqldb.version>2.3.1</org.hsqldb.version>
     <org.mockito.version>3.3.3</org.mockito.version>
-    <org.ehcache.version>3.8.1</org.ehcache.version>
     <org.apache.commons.version>3.0</org.apache.commons.version>
     <spring-security.version>4.0.4.RELEASE</spring-security.version>
     <javax.validation-api.version>1.0.0.GA</javax.validation-api.version>
@@ -82,12 +81,6 @@
         <groupId>org.postgresql</groupId>
         <artifactId>postgresql</artifactId>
         <version>${org.postgresql.version}</version>
-      </dependency>
-
-      <dependency>
-        <groupId>org.ehcache</groupId>
-        <artifactId>ehcache</artifactId>
-        <version>${org.ehcache.version}</version>
       </dependency>
 
       <dependency>
