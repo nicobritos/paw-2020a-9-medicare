@@ -22,6 +22,8 @@
     <org.hibernate.validator>4.3.1.Final</org.hibernate.validator>
     <com.fasterxml.jackson.core.version>2.4.1</com.fasterxml.jackson.core.version>
     <com.fasterxml.jackson.databind.version>2.4.1.1</com.fasterxml.jackson.databind.version>
+    <org.simpleflatmapper.sfm-jdbc.version>8.2.2</org.simpleflatmapper.sfm-jdbc.version>
+    <joda-time.version>2.10.6</joda-time.version>
   </properties>
 
   <dependencyManagement>
@@ -31,6 +33,18 @@
         <artifactId>junit</artifactId>
         <version>${junit.version}</version>
         <scope>test</scope>
+      </dependency>
+
+      <dependency>
+        <groupId>org.simpleflatmapper</groupId>
+        <artifactId>sfm-jdbc</artifactId>
+        <version>${org.simpleflatmapper.sfm-jdbc.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>joda-time</groupId>
+        <artifactId>joda-time</artifactId>
+        <version>${joda-time.version}</version>
       </dependency>
 
       <dependency>
