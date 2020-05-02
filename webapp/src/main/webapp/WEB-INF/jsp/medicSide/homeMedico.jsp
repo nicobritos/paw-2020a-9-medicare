@@ -1,4 +1,5 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jstl/core_rt"%>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <!DOCTYPE html>
 <html lang="en">
     <%@ include file = "../head.jsp" %>
@@ -9,7 +10,18 @@
     <div class="container h-75 w-100 mt-5">
       <div class="row">
         <div class="col-5">
-          <h4>Agenda de hoy</h4>
+          <h4>Agenda de
+          <c:choose>
+            <c:when test="${isToday}">
+              hoy
+            </c:when>
+            <c:otherwise>
+              <%--TODO: revise--%>
+              <fmt:parseDate value="${today}" pattern="yyyy-MM-dd" var="parsedDate" type="date"/>
+              <fmt:formatDate value="${parsedDate}" type="date"/>
+            </c:otherwise>
+          </c:choose>
+          </h4>
         </div>
         <div class="col">
           <h4>Agenda semanal</h4>

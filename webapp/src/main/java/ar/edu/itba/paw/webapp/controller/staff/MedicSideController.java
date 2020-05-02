@@ -15,6 +15,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import java.time.LocalDate;
+import java.time.format.DateTimeParseException;
 import java.util.Map;
 import java.util.Optional;
 
@@ -42,7 +43,7 @@ public class MedicSideController extends GenericController {
     WorkdayService workdayService;
 
     @RequestMapping("/staff/home")
-    public ModelAndView medicHome(@RequestParam(defaultValue = "0") String week,@RequestParam(defaultValue = "0", name = "today") String todayOffset){
+    public ModelAndView medicHome(@RequestParam(defaultValue = "0") String week,@RequestParam(defaultValue = "0", name = "today") String newToday){
         Optional<User> user = this.getUser();
         if(!user.isPresent()) {
             return new ModelAndView("authentication/login");
@@ -50,9 +51,9 @@ public class MedicSideController extends GenericController {
         ModelAndView mav = new ModelAndView();
 
         Staff staff = new Staff();
-
         LocalDate today = LocalDate.now();
         LocalDate monday;
+        boolean isToday=true;
 
         switch (LocalDate.now().getDayOfWeek()){
             case SUNDAY:
@@ -79,9 +80,25 @@ public class MedicSideController extends GenericController {
             default:
                 throw new RuntimeException();
         }
+        if(newToday!=null){
+            try{
+                today = LocalDate.parse(newToday);
+                isToday = false;
+            }catch (DateTimeParseException e){
 
+            }
+        }
+        if(week!=null){
+            try{
+                long weekOffset = Long.parseLong(week);
+                monday = monday.plusWeeks(weekOffset);
+            }catch (NumberFormatException e){
+
+            }
+        }
         mav.addObject("user", user);
         mav.addObject("today", today);
+        mav.addObject("isToday",isToday);
         mav.addObject("monday", monday);
         mav.addObject("todayAppointments", appointmentService.findToday(staff));
         mav.addObject("appointments", appointmentService.find(staff)); // TODO: cambiar
