@@ -78,7 +78,7 @@
                   <div class="row d-flex align-items-center justify-content-between">
                     <c:forEach var="staff" items="${user.get().staffs}">
                       <c:forEach var="workday" items="${staff.workdays}">
-                        <p class="m-0">- ${workday.day} de ${workday.startHour}:00hs a ${workday.endHour}:00hs - ${workday.staff.office.name}</p>
+                        <p class="m-0">- ${workday.day} de ${workday.startHour}:${workday.startMinute}hs a ${workday.endHour}:${workday.endMinute}hs - ${workday.staff.office.name}</p>
                         <a href='<c:url value="/staff/profile/workday/delete/${workday.id}"/> ' class="btn">X</a>
                       </c:forEach>
                     </c:forEach>
