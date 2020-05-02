@@ -205,6 +205,7 @@ public class MedicSideController extends GenericController {
         workday.setEndHour(Integer.parseInt(endTime[0]));
         workday.setEndMinute(Integer.parseInt(endTime[1]));
         workday.setStaff(realStaff.get());
+        workday = workdayService.create(workday);
 
         realStaff.get().getWorkdays().add(workday);
         staffService.update(realStaff.get());

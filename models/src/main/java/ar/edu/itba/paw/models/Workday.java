@@ -6,7 +6,7 @@ import ar.edu.itba.paw.persistenceAnnotations.Table;
 
 @Table(name = "workday", primaryKey = "workday_id")
 public class Workday extends GenericModel<Workday, Integer> {
-    @ManyToOne(name = "staff_id", inverse = true)
+    @ManyToOne(name = "staff_id")
     private Staff staff;
     @Column(name = "start_hour", required = true)
     private Integer startHour;
