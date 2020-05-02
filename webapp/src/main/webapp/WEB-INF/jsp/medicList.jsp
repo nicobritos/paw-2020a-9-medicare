@@ -87,14 +87,18 @@
                         </li>
                     </c:forEach>
                 </ul>
-                <div id="paging" class="p-3 container w-100 justify-content-center">
+                <div id="paging" class="p-3 d-flex container w-100 justify-content-center">
                     <c:if test="${page > 1}">
-                        <button type="button" class="btn btn-info btn-sm" id="prevButton"><</button>
+                        <div>
+                            <button type="button" class="btn btn-info btn-sm" id="prevButton"><</button>
+                        </div>
                     </c:if>
 
                     <p class="d-inline mx-2">Página <c:out value="${page}"/></p>
                     <c:if test="${staff.size() == 10}">
-                        <button type="button" class="btn btn-info btn-sm" id="nextButton">></button>
+                        <div>
+                            <button type="button" class="btn btn-info btn-sm" id="nextButton">></button>
+                        </div>
                     </c:if>
                 </div>
             </div>
