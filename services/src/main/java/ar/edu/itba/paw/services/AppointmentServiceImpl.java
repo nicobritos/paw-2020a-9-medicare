@@ -68,8 +68,8 @@ public class AppointmentServiceImpl extends GenericServiceImpl<AppointmentDao, A
     }
 
     public Appointment create(Appointment model) throws InvalidAppointmentDateException, InvalidAppointmentDurationException, MediCareException {
-        if (!this.isValidDate(model.getStaff(), model.getFromDate(), model.getFromDate())) // todo
-            throw new InvalidAppointmentDateException();
+//        if (!this.isValidDate(model.getStaff(), model.getFromDate(), model.getFromDate())) // todo
+//            throw new InvalidAppointmentDateException();
 
         model.setAppointmentStatus(AppointmentStatus.PENDING.name());
         // TODO CHANGE DATE CLASS

@@ -21,6 +21,10 @@ public class Province extends GenericModel<Integer> {
         return this.country;
     }
 
+    public void setCountry(Country country) {
+        this.country = country;
+    }
+
     @Override
     protected boolean isSameInstance(Object o) {
         return o instanceof Province;

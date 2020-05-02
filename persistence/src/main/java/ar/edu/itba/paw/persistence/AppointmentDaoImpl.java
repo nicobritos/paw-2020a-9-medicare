@@ -1,29 +1,32 @@
 package ar.edu.itba.paw.persistence;
 
 import ar.edu.itba.paw.interfaces.daos.AppointmentDao;
-import ar.edu.itba.paw.models.Appointment;
-import ar.edu.itba.paw.models.AppointmentStatus;
-import ar.edu.itba.paw.models.Patient;
-import ar.edu.itba.paw.models.Staff;
+import ar.edu.itba.paw.models.*;
 import ar.edu.itba.paw.persistence.generics.GenericDaoImpl;
+import ar.edu.itba.paw.persistence.utils.RowMapperAlias;
 import ar.edu.itba.paw.persistence.utils.builder.JDBCQueryBuilder;
 import ar.edu.itba.paw.persistence.utils.builder.JDBCSelectQueryBuilder;
+import ar.edu.itba.paw.persistence.utils.builder.JDBCSelectQueryBuilder.JoinType;
 import ar.edu.itba.paw.persistence.utils.builder.JDBCWhereClauseBuilder;
 import ar.edu.itba.paw.persistence.utils.builder.JDBCWhereClauseBuilder.Operation;
-import ar.edu.itba.paw.persistence.utils.cache.CacheHelper;
-import ar.edu.itba.paw.persistence.utils.cache.FilteredCachedCollection;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jdbc.core.RowMapper;
+import org.springframework.jdbc.core.ResultSetExtractor;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.stereotype.Repository;
 
 import javax.sql.DataSource;
+import java.sql.SQLException;
 import java.time.LocalDate;
-import java.util.List;
+import java.util.*;
 
 @Repository
 public class AppointmentDaoImpl extends GenericDaoImpl<Appointment, Integer> implements AppointmentDao {
-    private final RowMapper<Appointment> rowMapper = (resultSet, rowNum) -> this.hydrate(resultSet);
+    public static final RowMapperAlias<Appointment> ROW_MAPPER = (prefix, resultSet) -> {
+        Appointment appointment = new Appointment();
+        appointment.setId(resultSet.getInt(formatColumnFromName(AppointmentDaoImpl.PRIMARY_KEY_NAME, prefix)));
+        populateEntity(appointment, resultSet, prefix);
+        return appointment;
+    };
     public static final String TABLE_NAME = getTableNameFromModel(Appointment.class);
     public static final String PRIMARY_KEY_NAME = getPrimaryKeyNameFromModel(Appointment.class);
 
@@ -33,25 +36,29 @@ public class AppointmentDaoImpl extends GenericDaoImpl<Appointment, Integer> imp
     }
 
     @Override
-    public List<Appointment> find(Patient patient) {
-        FilteredCachedCollection<Appointment> cachedCollection = CacheHelper.filter(
-                Appointment.class,
-                Integer.class,
-                appointment -> appointment.getStaff().getId().equals(patient.getId())
-        );
-        if (this.isCacheComplete(cachedCollection)) {
-            return cachedCollection.getCollectionAsList();
-        }
+    public Optional<Appointment> findById(Integer id) {
+        JDBCSelectQueryBuilder selectQueryBuilder = new JDBCSelectQueryBuilder()
+                .selectAll()
+                .from("appointment")
+                .join("staff_id", Operation.EQ, StaffDaoImpl.TABLE_NAME, "staff_id")
+                .join("patient_id", Operation.EQ, PatientDaoImpl.TABLE_NAME, "patient_id")
+                .where(new JDBCWhereClauseBuilder()
+                        .where("appointment_id", Operation.EQ, ":appointment_id")
+                );
+        MapSqlParameterSource parameterSource = new MapSqlParameterSource();
+        parameterSource.addValue("appointment_id", id);
+        List<Appointment> appointments =  this.jdbcTemplate.query(selectQueryBuilder.getQueryAsString(), parameterSource, this.getResultSetExtractor());
+        return appointments.stream().findFirst();
+    }
 
+    @Override
+    public List<Appointment> find(Patient patient) {
         MapSqlParameterSource parameterSource = new MapSqlParameterSource();
         parameterSource.addValue("patient", patient.getId());
 
         JDBCWhereClauseBuilder whereClauseBuilder = new JDBCWhereClauseBuilder()
                 .where(this.formatColumnFromName("patient_id"), Operation.EQ, ":patient");
 
-        if (!cachedCollection.getCollection().isEmpty()) {
-            this.excludeModels(cachedCollection.getCompleteCollection(), parameterSource, whereClauseBuilder);
-        }
         JDBCQueryBuilder queryBuilder = new JDBCSelectQueryBuilder()
                 .selectAll()
                 .from(this.getTableName())
@@ -62,24 +69,12 @@ public class AppointmentDaoImpl extends GenericDaoImpl<Appointment, Integer> imp
 
     @Override
     public List<Appointment> find(Staff staff) {
-        FilteredCachedCollection<Appointment> cachedCollection = CacheHelper.filter(
-                Appointment.class,
-                Integer.class,
-                appointment -> appointment.getStaff().getId().equals(staff.getId())
-        );
-        if (this.isCacheComplete(cachedCollection)) {
-            return cachedCollection.getCollectionAsList();
-        }
-
         MapSqlParameterSource parameterSource = new MapSqlParameterSource();
         parameterSource.addValue("staff", staff.getId());
 
         JDBCWhereClauseBuilder whereClauseBuilder = new JDBCWhereClauseBuilder()
                 .where(this.formatColumnFromName("staff_id"), Operation.EQ, ":staff");
 
-        if (!cachedCollection.getCollection().isEmpty()) {
-            this.excludeModels(cachedCollection.getCompleteCollection(), parameterSource, whereClauseBuilder);
-        }
         JDBCQueryBuilder queryBuilder = new JDBCSelectQueryBuilder()
                 .selectAll()
                 .from(this.getTableName())
@@ -90,16 +85,6 @@ public class AppointmentDaoImpl extends GenericDaoImpl<Appointment, Integer> imp
 
     @Override
     public List<Appointment> findPending(Patient patient) {
-        FilteredCachedCollection<Appointment> cachedCollection = CacheHelper.filter(
-                Appointment.class,
-                Integer.class,
-                appointment -> appointment.getPatient().getId().equals(patient.getId())
-                        && appointment.getAppointmentStatus().equals(AppointmentStatus.PENDING.name())
-        );
-        if (this.isCacheComplete(cachedCollection)) {
-            return cachedCollection.getCollectionAsList();
-        }
-
         MapSqlParameterSource parameterSource = new MapSqlParameterSource();
         parameterSource.addValue("patient", patient.getId());
         parameterSource.addValue("status", AppointmentStatus.CANCELLED);
@@ -109,9 +94,6 @@ public class AppointmentDaoImpl extends GenericDaoImpl<Appointment, Integer> imp
                 .and()
                 .where(this.formatColumnFromName("status"), Operation.EQ, ":status");
 
-        if (!cachedCollection.getCollection().isEmpty()) {
-            this.excludeModels(cachedCollection.getCompleteCollection(), parameterSource, whereClauseBuilder);
-        }
         JDBCQueryBuilder queryBuilder = new JDBCSelectQueryBuilder()
                 .selectAll()
                 .from(this.getTableName())
@@ -122,16 +104,6 @@ public class AppointmentDaoImpl extends GenericDaoImpl<Appointment, Integer> imp
 
     @Override
     public List<Appointment> findPending(Staff staff) {
-        FilteredCachedCollection<Appointment> cachedCollection = CacheHelper.filter(
-                Appointment.class,
-                Integer.class,
-                appointment -> appointment.getStaff().getId().equals(staff.getId())
-                        && appointment.getAppointmentStatus().equals(AppointmentStatus.PENDING.name())
-        );
-        if (this.isCacheComplete(cachedCollection)) {
-            return cachedCollection.getCollectionAsList();
-        }
-
         MapSqlParameterSource parameterSource = new MapSqlParameterSource();
         parameterSource.addValue("staff", staff.getId());
         parameterSource.addValue("status", AppointmentStatus.CANCELLED);
@@ -141,9 +113,6 @@ public class AppointmentDaoImpl extends GenericDaoImpl<Appointment, Integer> imp
                 .and()
                 .where(this.formatColumnFromName("status"), Operation.EQ, ":status");
 
-        if (!cachedCollection.getCollection().isEmpty()) {
-            this.excludeModels(cachedCollection.getCompleteCollection(), parameterSource, whereClauseBuilder);
-        }
         JDBCQueryBuilder queryBuilder = new JDBCSelectQueryBuilder()
                 .selectAll()
                 .from(this.getTableName())
@@ -154,16 +123,6 @@ public class AppointmentDaoImpl extends GenericDaoImpl<Appointment, Integer> imp
 
     @Override
     public List<Appointment> findPending(Patient patient, Staff staff) {
-        FilteredCachedCollection<Appointment> cachedCollection = CacheHelper.filter(
-                Appointment.class,
-                Integer.class,
-                appointment -> appointment.getPatient().getId().equals(patient.getId())
-                        && appointment.getStaff().getId().equals(staff.getId())
-                        && appointment.getAppointmentStatus().equals(AppointmentStatus.PENDING.name())
-        );
-        if (this.isCacheComplete(cachedCollection)) {
-            return cachedCollection.getCollectionAsList();
-        }
 
         MapSqlParameterSource parameterSource = new MapSqlParameterSource();
         parameterSource.addValue("patient", patient.getId());
@@ -177,9 +136,6 @@ public class AppointmentDaoImpl extends GenericDaoImpl<Appointment, Integer> imp
                 .and()
                 .where(this.formatColumnFromName("status"), Operation.EQ, ":status");
 
-        if (!cachedCollection.getCollection().isEmpty()) {
-            this.excludeModels(cachedCollection.getCompleteCollection(), parameterSource, whereClauseBuilder);
-        }
         JDBCQueryBuilder queryBuilder = new JDBCSelectQueryBuilder()
                 .selectAll()
                 .from(this.getTableName())
@@ -190,16 +146,6 @@ public class AppointmentDaoImpl extends GenericDaoImpl<Appointment, Integer> imp
 
     @Override
     public List<Appointment> findByDate(Staff staff, LocalDate date) {
-        FilteredCachedCollection<Appointment> cachedCollection = CacheHelper.filter(
-                Appointment.class,
-                Integer.class,
-                appointment -> appointment.getStaff().getId().equals(staff.getId()) &&
-                        appointment.getFromDate().getDate() == LocalDate.now().getDayOfMonth()
-        );
-        if (this.isCacheComplete(cachedCollection)) {
-            return cachedCollection.getCollectionAsList();
-        }
-
         MapSqlParameterSource parameterSource = new MapSqlParameterSource();
         parameterSource.addValue("staff", staff.getId());
         parameterSource.addValue("year", date.getYear());
@@ -215,9 +161,6 @@ public class AppointmentDaoImpl extends GenericDaoImpl<Appointment, Integer> imp
                 .and()
                 .where(this.formatColumnFromName("from_date"), Operation.EQ, ":day", JDBCWhereClauseBuilder.ColumnTransformer.DAY);
 
-        if (!cachedCollection.getCollection().isEmpty()) {
-            this.excludeModels(cachedCollection.getCompleteCollection(), parameterSource, whereClauseBuilder);
-        }
         JDBCQueryBuilder queryBuilder = new JDBCSelectQueryBuilder()
                 .selectAll()
                 .from(this.getTableName())
@@ -228,16 +171,6 @@ public class AppointmentDaoImpl extends GenericDaoImpl<Appointment, Integer> imp
 
     @Override
     public List<Appointment> findByDate(Patient patient, LocalDate date) {
-        FilteredCachedCollection<Appointment> cachedCollection = CacheHelper.filter(
-                Appointment.class,
-                Integer.class,
-                appointment -> appointment.getPatient().getId().equals(patient.getId()) &&
-                        appointment.getFromDate().getDate() == LocalDate.now().getDayOfMonth()
-        );
-        if (this.isCacheComplete(cachedCollection)) {
-            return cachedCollection.getCollectionAsList();
-        }
-
         MapSqlParameterSource parameterSource = new MapSqlParameterSource();
         parameterSource.addValue("patient", patient.getId());
         parameterSource.addValue("year", date.getYear());
@@ -253,9 +186,6 @@ public class AppointmentDaoImpl extends GenericDaoImpl<Appointment, Integer> imp
                 .and()
                 .where(this.formatColumnFromName("from_date"), Operation.EQ, ":day", JDBCWhereClauseBuilder.ColumnTransformer.DAY);
 
-        if (!cachedCollection.getCollection().isEmpty()) {
-            this.excludeModels(cachedCollection.getCompleteCollection(), parameterSource, whereClauseBuilder);
-        }
         JDBCQueryBuilder queryBuilder = new JDBCSelectQueryBuilder()
                 .selectAll()
                 .from(this.getTableName())
@@ -265,7 +195,238 @@ public class AppointmentDaoImpl extends GenericDaoImpl<Appointment, Integer> imp
     }
 
     @Override
-    protected RowMapper<Appointment> getRowMapper() {
-        return this.rowMapper;
+    protected ResultSetExtractor<List<Appointment>> getResultSetExtractor() {
+        return resultSet -> {
+            Map<Integer, Appointment> entitiesMap = new HashMap<>();
+
+            Map<Integer, Patient> patientMap = new HashMap<>();
+            Map<Integer, Office> officeMap = new HashMap<>();
+            Map<Integer, Locality> localityMap = new HashMap<>();
+            Map<Integer, Province> provinceMap = new HashMap<>();
+            Map<String, Country> countryMap = new HashMap<>();
+            Map<Integer, User> userMap = new HashMap<>();
+
+            Map<Integer, Staff> staffMap = new HashMap<>();
+            Map<Integer, StaffSpecialty> staffSpecialtyMap = new HashMap<>();
+
+            List<Appointment> sortedEntities = new LinkedList<>();
+            while (resultSet.next()) {
+                int id;
+                String idString;
+                Patient patient = null;
+                Staff staff = null;
+                User userPatient = null;
+                User userStaff = null;
+                Office officeStaff = null;
+                Office officePatient = null;
+                StaffSpecialty staffSpecialty = null;
+                Locality localityPatient = null;
+                Province provincePatient = null;
+                Country countryPatient = null;
+                Locality localityStaff = null;
+                Province provinceStaff = null;
+                Country countryStaff = null;
+
+                Appointment entity = entitiesMap.computeIfAbsent(resultSet.getInt(this.formatColumnFromAlias(this.getIdColumnName())), integer -> {
+                    try {
+                        Appointment newAppointment = ROW_MAPPER.mapRow(this.getTableAlias(), resultSet);
+                        sortedEntities.add(newAppointment);
+                        return newAppointment;
+                    } catch (SQLException e) {
+                        return null;
+                    }
+                });
+                if (entity == null) {
+                    continue;
+                }
+
+                id = resultSet.getInt(formatColumnFromName(PatientDaoImpl.PRIMARY_KEY_NAME, "p"));
+                if (!resultSet.wasNull()) {
+                    patient = patientMap.computeIfAbsent(id, integer -> {
+                        try {
+                            return PatientDaoImpl.ROW_MAPPER.mapRow("p", resultSet);
+                        } catch (SQLException e) {
+                            return null;
+                        }
+                    });
+                }
+                id = resultSet.getInt(formatColumnFromName(UserDaoImpl.PRIMARY_KEY_NAME, "up"));
+                if (!resultSet.wasNull()) {
+                    userPatient = userMap.computeIfAbsent(id, integer -> {
+                        try {
+                            return UserDaoImpl.ROW_MAPPER.mapRow("up", resultSet);
+                        } catch (SQLException e) {
+                            return null;
+                        }
+                    });
+                }
+                id = resultSet.getInt(formatColumnFromName(OfficeDaoImpl.PRIMARY_KEY_NAME, "op"));
+                if (!resultSet.wasNull()) {
+                    officePatient = officeMap.computeIfAbsent(id, integer -> {
+                        try {
+                            return OfficeDaoImpl.ROW_MAPPER.mapRow("op", resultSet);
+                        } catch (SQLException e) {
+                            return null;
+                        }
+                    });
+                }
+                id = resultSet.getInt(formatColumnFromName(LocalityDaoImpl.PRIMARY_KEY_NAME, "lp"));
+                if (!resultSet.wasNull()) {
+                    localityPatient = localityMap.computeIfAbsent(id, integer -> {
+                        try {
+                            return LocalityDaoImpl.ROW_MAPPER.mapRow("lp", resultSet);
+                        } catch (SQLException throwables) {
+                            return null;
+                        }
+                    });
+                }
+                id = resultSet.getInt(formatColumnFromName(ProvinceDaoImpl.PRIMARY_KEY_NAME, "pps"));
+                if (!resultSet.wasNull()) {
+                    provincePatient = provinceMap.computeIfAbsent(id, integer -> {
+                        try {
+                            return ProvinceDaoImpl.ROW_MAPPER.mapRow("pps", resultSet);
+                        } catch (SQLException throwables) {
+                            return null;
+                        }
+                    });
+                }
+                idString = resultSet.getString(formatColumnFromName(CountryDaoImpl.PRIMARY_KEY_NAME, "cp"));
+                if (!resultSet.wasNull()) {
+                    countryPatient = countryMap.computeIfAbsent(idString, integer -> {
+                        try {
+                            return CountryDaoImpl.ROW_MAPPER.mapRow("cp", resultSet);
+                        } catch (SQLException throwables) {
+                            return null;
+                        }
+                    });
+                }
+
+                id = resultSet.getInt(formatColumnFromName(StaffDaoImpl.PRIMARY_KEY_NAME, "s"));
+                if (!resultSet.wasNull()) {
+                    staff = staffMap.computeIfAbsent(id, integer -> {
+                        try {
+                            return StaffDaoImpl.ROW_MAPPER.mapRow("s", resultSet);
+                        } catch (SQLException throwables) {
+                            return null;
+                        }
+                    });
+                }
+                id = resultSet.getInt(formatColumnFromName(UserDaoImpl.PRIMARY_KEY_NAME, "us"));
+                if (!resultSet.wasNull()) {
+                    userStaff = userMap.computeIfAbsent(id, integer -> {
+                        try {
+                            return UserDaoImpl.ROW_MAPPER.mapRow("us", resultSet);
+                        } catch (SQLException e) {
+                            return null;
+                        }
+                    });
+                }
+                id = resultSet.getInt(formatColumnFromName(OfficeDaoImpl.PRIMARY_KEY_NAME, "os"));
+                if (!resultSet.wasNull()) {
+                    officeStaff = officeMap.computeIfAbsent(id, integer -> {
+                        try {
+                            return OfficeDaoImpl.ROW_MAPPER.mapRow("os", resultSet);
+                        } catch (SQLException throwables) {
+                            return null;
+                        }
+                    });
+                }
+                id = resultSet.getInt(formatColumnFromName(LocalityDaoImpl.PRIMARY_KEY_NAME, "l"));
+                if (!resultSet.wasNull()) {
+                    localityStaff = localityMap.computeIfAbsent(id, integer -> {
+                        try {
+                            return LocalityDaoImpl.ROW_MAPPER.mapRow("l", resultSet);
+                        } catch (SQLException throwables) {
+                            return null;
+                        }
+                    });
+                }
+                id = resultSet.getInt(formatColumnFromName(ProvinceDaoImpl.PRIMARY_KEY_NAME, "ps"));
+                if (!resultSet.wasNull()) {
+                    provinceStaff = provinceMap.computeIfAbsent(id, integer -> {
+                        try {
+                            return ProvinceDaoImpl.ROW_MAPPER.mapRow("ps", resultSet);
+                        } catch (SQLException throwables) {
+                            return null;
+                        }
+                    });
+                }
+                idString = resultSet.getString(formatColumnFromName(CountryDaoImpl.PRIMARY_KEY_NAME, "cs"));
+                if (!resultSet.wasNull()) {
+                    countryStaff = countryMap.computeIfAbsent(idString, integer -> {
+                        try {
+                            return CountryDaoImpl.ROW_MAPPER.mapRow("cs", resultSet);
+                        } catch (SQLException throwables) {
+                            return null;
+                        }
+                    });
+                }
+                id = resultSet.getInt(formatColumnFromName(StaffSpecialtyDaoImpl.PRIMARY_KEY_NAME, "ss"));
+                if (!resultSet.wasNull()) {
+                    staffSpecialty = staffSpecialtyMap.computeIfAbsent(id, integer -> {
+                        try {
+                            return StaffSpecialtyDaoImpl.ROW_MAPPER.mapRow("ss", resultSet);
+                        } catch (SQLException throwables) {
+                            return null;
+                        }
+                    });
+                }
+
+                if (patient != null) {
+                    entity.setPatient(patient);
+                    if (officePatient != null) {
+                        patient.setOffice(officePatient);
+                        officePatient.setLocality(localityPatient);
+                    }
+                    if (userPatient != null)
+                        patient.setUser(userPatient);
+                }
+                if (localityPatient != null && provincePatient != null) {
+                    localityPatient.setProvince(provincePatient);
+                }
+                if (provincePatient != null && countryPatient != null) {
+                    provincePatient.setCountry(countryPatient);
+                }
+
+                if (staff != null) {
+                    entity.setStaff(staff);
+                    if (officeStaff != null) {
+                        staff.setOffice(officeStaff);
+                        officeStaff.setLocality(localityStaff);
+                    }
+                    if (userStaff != null)
+                        staff.setUser(userStaff);
+                    if (staffSpecialty != null)
+                        staff.getStaffSpecialties().add(staffSpecialty);
+                }
+                if (localityStaff != null && provinceStaff != null) {
+                    localityStaff.setProvince(provinceStaff);
+                }
+                if (provinceStaff != null && countryStaff != null) {
+                    provinceStaff.setCountry(countryStaff);
+                }
+            }
+            return sortedEntities;
+        };
+    }
+
+    @Override
+    protected void populateJoins(JDBCSelectQueryBuilder selectQueryBuilder) {
+        selectQueryBuilder
+                .joinAlias("patient_id", PatientDaoImpl.TABLE_NAME, "p", PatientDaoImpl.PRIMARY_KEY_NAME, JoinType.LEFT)
+                .joinAlias("p", "user_id", UserDaoImpl.TABLE_NAME, "up", UserDaoImpl.PRIMARY_KEY_NAME, JoinType.LEFT)
+                .joinAlias("p", "office_id", OfficeDaoImpl.TABLE_NAME, "op", OfficeDaoImpl.PRIMARY_KEY_NAME, JoinType.LEFT)
+                .joinAlias("op", "locality_id", LocalityDaoImpl.TABLE_NAME, "lp", LocalityDaoImpl.PRIMARY_KEY_NAME, JoinType.LEFT)
+                .joinAlias("lp", "province_id", ProvinceDaoImpl.TABLE_NAME, "pps", ProvinceDaoImpl.PRIMARY_KEY_NAME, JoinType.LEFT)
+                .joinAlias("pps", "country_id", CountryDaoImpl.TABLE_NAME, "cp", CountryDaoImpl.PRIMARY_KEY_NAME, JoinType.LEFT);
+        selectQueryBuilder
+                .joinAlias("staff_id", StaffDaoImpl.TABLE_NAME, "s", StaffDaoImpl.PRIMARY_KEY_NAME, JoinType.LEFT)
+                .joinAlias("s", "user_id", UserDaoImpl.TABLE_NAME, "us", UserDaoImpl.PRIMARY_KEY_NAME, JoinType.LEFT)
+                .joinAlias("s", "office_id", OfficeDaoImpl.TABLE_NAME, "os", OfficeDaoImpl.PRIMARY_KEY_NAME, JoinType.LEFT)
+                .joinAlias("os", "locality_id", LocalityDaoImpl.TABLE_NAME, "l", LocalityDaoImpl.PRIMARY_KEY_NAME, JoinType.LEFT)
+                .joinAlias("l", "province_id", ProvinceDaoImpl.TABLE_NAME, "ps", ProvinceDaoImpl.PRIMARY_KEY_NAME, JoinType.LEFT)
+                .joinAlias("ps", "country_id", CountryDaoImpl.TABLE_NAME, "cs", CountryDaoImpl.PRIMARY_KEY_NAME, JoinType.LEFT)
+                .joinAlias("staff_id", "system_staff_specialty_staff", "sss", "staff_id", JoinType.LEFT)
+                .joinAlias("sss", "specialty_id", StaffSpecialtyDaoImpl.TABLE_NAME, "ss", StaffSpecialtyDaoImpl.PRIMARY_KEY_NAME, JoinType.LEFT);
     }
 }

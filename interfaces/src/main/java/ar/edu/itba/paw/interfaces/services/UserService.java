@@ -11,6 +11,8 @@ import java.util.Optional;
 public interface UserService extends GenericSearchableService<User, Integer> {
     Optional<User> findByUsername(String username);
 
+    boolean isStaff(User user);
+
     User createAsStaff(User user, Office office) throws EmailAlreadyExistsException;
 
     void updatePassword(User user, String newPassword);

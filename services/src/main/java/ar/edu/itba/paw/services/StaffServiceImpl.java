@@ -41,6 +41,11 @@ public class StaffServiceImpl extends GenericSearchableServiceImpl<StaffDao, Sta
     }
 
     @Override
+    public List<Staff> findByUser(Integer id) {
+        return this.repository.findByField("user_id", id);
+    }
+
+    @Override
     public void addStaffSpecialty(Staff staff, StaffSpecialty staffSpecialty) {
         staff.getStaffSpecialties().add(staffSpecialty);
         this.repository.update(staff);

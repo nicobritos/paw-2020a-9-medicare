@@ -6,8 +6,8 @@ import ar.edu.itba.paw.interfaces.services.StaffSpecialtyService;
 import ar.edu.itba.paw.models.Locality;
 import ar.edu.itba.paw.models.StaffSpecialty;
 import ar.edu.itba.paw.models.User;
-import org.springframework.beans.factory.annotation.Autowired;
 import ar.edu.itba.paw.webapp.controller.utils.GenericController;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.ModelAndView;
@@ -30,7 +30,7 @@ public class LandingController extends GenericController{
     public ModelAndView landingPage(){
         final ModelAndView mav = new ModelAndView("landing");
         Optional<User> user = getUser();
-        if(user.isPresent() && !user.get().getStaffs().isEmpty()){
+        if(user.isPresent() && this.isStaff()){
             return new ModelAndView("redirect:/staff/home");
         }
         Collection<StaffSpecialty> specialtiesList = this.specialtyService.list();

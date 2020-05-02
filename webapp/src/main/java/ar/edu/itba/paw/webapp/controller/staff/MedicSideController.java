@@ -167,10 +167,11 @@ public class MedicSideController extends GenericController {
             return this.addWorkday(form);
         }
 
-        Optional<Staff> realStaff = user.get().getStaffs().stream().filter(staff -> staff.getOffice().equals(office.get())).findFirst();
-        if(!realStaff.isPresent()){
-            return this.addWorkday(form);
-        }
+        // TODO
+//        Optional<Staff> realStaff = user.get().getStaffs().stream().filter(staff -> staff.getOffice().equals(office.get())).findFirst();
+//        if(!realStaff.isPresent()){
+//            return this.addWorkday(form);
+//        }
 
         Workday workday = new Workday();
         switch (form.getDow()){
@@ -204,11 +205,12 @@ public class MedicSideController extends GenericController {
         String[] endTime = form.getEndHour().split(":");
         workday.setEndHour(Integer.parseInt(endTime[0]));
         workday.setEndMinute(Integer.parseInt(endTime[1]));
-        workday.setStaff(realStaff.get());
-        workday = workdayService.create(workday);
-
-        realStaff.get().getWorkdays().add(workday);
-        staffService.update(realStaff.get());
+        // TODO
+//        workday.setStaff(realStaff.get());
+//        workday = workdayService.create(workday);
+//
+//        realStaff.get().getWorkdays().add(workday);
+//        staffService.update(realStaff.get());
 
         ModelAndView mav = new ModelAndView();
         mav.addObject("user", user);

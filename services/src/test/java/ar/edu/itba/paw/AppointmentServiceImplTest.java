@@ -4,6 +4,7 @@ import ar.edu.itba.paw.interfaces.daos.AppointmentDao;
 import ar.edu.itba.paw.interfaces.services.exceptions.InvalidAppointmentStatusChangeException;
 import ar.edu.itba.paw.models.*;
 import ar.edu.itba.paw.services.AppointmentServiceImpl;
+import org.joda.time.DateTime;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
@@ -12,8 +13,6 @@ import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import java.time.LocalDate;
-import java.time.ZoneId;
-import java.util.Date;
 
 import static org.junit.Assert.fail;
 
@@ -124,9 +123,9 @@ public class AppointmentServiceImplTest {
         return staff;
     }
 
-    private Date dateModel(){
+    private DateTime dateModel(){
         LocalDate localDate = LocalDate.of(YEAR, MONTH, DAY_OF_MONTH);
-        return Date.from(localDate.atStartOfDay(ZoneId.systemDefault()).toInstant());
+        return new DateTime(localDate);
     }
 
     private Appointment appointmentModel(){

@@ -11,7 +11,7 @@ import java.util.Optional;
  * @param <M> the DAO model type
  * @param <I> the Model's id type
  */
-public interface GenericDao<M extends GenericModel<M, I>, I> {
+public interface GenericDao<M extends GenericModel<I>, I> {
     Optional<M> findById(I id);
 
     List<M> findByIds(Collection<I> ids);
@@ -28,9 +28,7 @@ public interface GenericDao<M extends GenericModel<M, I>, I> {
 
     Class<M> getModelClass();
 
-    Collection<M> findByField(String field, Object value);
+    List<M> findByField(String field, Object value);
 
     Optional<?> findFieldById(I id, String field);
-
-    Collection<?> findFieldByIdManyToMany(I id, String key, String field, String tableName);
 }

@@ -114,13 +114,31 @@ public class JDBCSelectQueryBuilder extends JDBCQueryBuilder {
     }
 
     public JDBCSelectQueryBuilder join(String tableLeft, String columnLeft, Operation operation, String tableRight, String columnRight, JoinType joinType) {
+        return this.joinAlias(tableLeft, columnLeft, operation, tableRight, tableRight, columnRight, joinType);
+    }
+
+    public JDBCSelectQueryBuilder joinAlias(String columnLeft, String tableRight, String aliasRight, String columnRight) {
+        return this.joinAlias(this.alias, columnLeft, Operation.EQ, tableRight, aliasRight, columnRight, JoinType.INNER);
+    }
+
+    public JDBCSelectQueryBuilder joinAlias(String columnLeft, String tableRight, String aliasRight, String columnRight, JoinType joinType) {
+        return this.joinAlias(this.alias, columnLeft, Operation.EQ, tableRight, aliasRight, columnRight, joinType);
+    }
+
+    public JDBCSelectQueryBuilder joinAlias(String tableLeft, String columnLeft, String tableRight, String aliasRight, String columnRight, JoinType joinType) {
+        return this.joinAlias(tableLeft, columnLeft, Operation.EQ, tableRight, aliasRight, columnRight, joinType);
+    }
+
+    public JDBCSelectQueryBuilder joinAlias(String tableLeft, String columnLeft, Operation operation, String tableRight, String aliasRight, String columnRight, JoinType joinType) {
         String string = joinType.getJoinType() +
                 " JOIN " +
                 tableRight +
+                " " +
+                aliasRight +
                 " ON " +
                 tableLeft + "." + columnLeft +
                 operation.getOperation() +
-                tableRight + "." + columnRight;
+                aliasRight + "." + columnRight;
 
         this.joins.add(string);
         return this;
