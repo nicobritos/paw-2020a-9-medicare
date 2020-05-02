@@ -5,8 +5,7 @@
     <%@ include file="../head.jsp" %>
     <link rel="stylesheet" href='<c:url value="/css/authentication/register.css"/> '>
 </head>
-<body>
-<div class="container w-100 h-100 d-flex flex-column justify-content-center align-items-center">
+<body class="container-fluid w-100 m-0 p-0 d-flex flex-column justify-content-center align-items-center">
     <c:url value="/login" var="loginUrl"/>
     <c:url value="/signup/staff" var="signupUrl"/>
     <form:form modelAttribute="signupForm" class="register-form border p-5 rounded" action="${signupUrl}" method="POST"
@@ -69,7 +68,7 @@
                 <label for="country">Pais</label>
             </div>
             <div class="col-8">
-                <form:select cssStyle="width: 100%;" path="countryId" items="${countryMap}" id="country"/>
+                <form:select cssClass="form-control" cssStyle="width: 100%;" path="countryId" items="${countryMap}" id="country"/>
             </div>
         </div>
         <div class="form-group row" id="province-container">
@@ -77,7 +76,7 @@
                 <label for="province">Provincia</label>
             </div>
             <div class="col-8">
-                <form:select cssStyle="width: 100%;" path="provinceId" id="province"/>
+                <form:select cssClass="form-control" cssStyle="width: 100%;" path="provinceId" id="province"/>
             </div>
         </div>
         <div class="form-group row" id="locality-container">
@@ -85,7 +84,7 @@
                 <label for="locality">Localidad</label>
             </div>
             <div class="col-8">
-                <form:select cssStyle="width: 100%;" path="localityId" id="locality"/>
+                <form:select cssClass="form-control" cssStyle="width: 100%;" path="localityId" id="locality"/>
             </div>
         </div>
         <div class="form-group row">
@@ -103,7 +102,6 @@
 
         <form:errors path="*" cssClass="mt-4 mb-0 text-danger" element="p"/>
     </form:form>
-</div>
 <script src='<c:url value="/js/scripts/authentication/register.js"/> '></script>
 <script>
     $(document).ready(() => {
