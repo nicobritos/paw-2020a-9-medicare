@@ -4,7 +4,6 @@ import ar.edu.itba.paw.interfaces.daos.PatientDao;
 import ar.edu.itba.paw.models.*;
 import ar.edu.itba.paw.persistence.generics.GenericSearchableDaoImpl;
 import ar.edu.itba.paw.persistence.utils.RowMapperAlias;
-import ar.edu.itba.paw.persistence.utils.builder.JDBCQueryBuilder;
 import ar.edu.itba.paw.persistence.utils.builder.JDBCSelectQueryBuilder;
 import ar.edu.itba.paw.persistence.utils.builder.JDBCSelectQueryBuilder.JoinType;
 import ar.edu.itba.paw.persistence.utils.builder.JDBCWhereClauseBuilder;
@@ -49,12 +48,12 @@ public class PatientDaoImpl extends GenericSearchableDaoImpl<Patient, Integer> i
                 .and()
                 .where(this.formatColumnFromName("user_id"), Operation.EQ, ":user_id");
 
-        JDBCQueryBuilder queryBuilder = new JDBCSelectQueryBuilder()
+        JDBCSelectQueryBuilder queryBuilder = new JDBCSelectQueryBuilder()
                 .selectAll(Patient.class)
                 .from(this.getTableName())
                 .where(whereClauseBuilder);
 
-        return this.selectQuery(queryBuilder.getQueryAsString(), parameterSource).stream().findFirst();
+        return this.selectQuery(queryBuilder, parameterSource).stream().findFirst();
     }
 
     @Override
@@ -170,7 +169,7 @@ public class PatientDaoImpl extends GenericSearchableDaoImpl<Patient, Integer> i
     protected void populateJoins(JDBCSelectQueryBuilder selectQueryBuilder) {
         selectQueryBuilder
                 .joinAlias("user_id", UserDaoImpl.TABLE_NAME, "up", UserDaoImpl.PRIMARY_KEY_NAME, JoinType.LEFT, User.class)
-                .joinAlias("p", "office_id", OfficeDaoImpl.TABLE_NAME, "op", OfficeDaoImpl.PRIMARY_KEY_NAME, JoinType.LEFT, Office.class)
+                .joinAlias("office_id", OfficeDaoImpl.TABLE_NAME, "op", OfficeDaoImpl.PRIMARY_KEY_NAME, JoinType.LEFT, Office.class)
                 .joinAlias("op", "locality_id", LocalityDaoImpl.TABLE_NAME, "lp", LocalityDaoImpl.PRIMARY_KEY_NAME, JoinType.LEFT, Locality.class)
                 .joinAlias("lp", "province_id", ProvinceDaoImpl.TABLE_NAME, "pps", ProvinceDaoImpl.PRIMARY_KEY_NAME, JoinType.LEFT, Province.class)
                 .joinAlias("pps", "country_id", CountryDaoImpl.TABLE_NAME, "cp", CountryDaoImpl.PRIMARY_KEY_NAME, JoinType.LEFT, Country.class);

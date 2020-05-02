@@ -4,7 +4,6 @@ import ar.edu.itba.paw.interfaces.daos.WorkdayDao;
 import ar.edu.itba.paw.models.*;
 import ar.edu.itba.paw.persistence.generics.GenericDaoImpl;
 import ar.edu.itba.paw.persistence.utils.RowMapperAlias;
-import ar.edu.itba.paw.persistence.utils.builder.JDBCQueryBuilder;
 import ar.edu.itba.paw.persistence.utils.builder.JDBCSelectQueryBuilder;
 import ar.edu.itba.paw.persistence.utils.builder.JDBCSelectQueryBuilder.JoinType;
 import ar.edu.itba.paw.persistence.utils.builder.JDBCWhereClauseBuilder;
@@ -49,12 +48,12 @@ public class WorkdayDaoImpl extends GenericDaoImpl<Workday, Integer> implements 
         JDBCWhereClauseBuilder whereClauseBuilder = new JDBCWhereClauseBuilder()
                 .where(this.formatColumnFromName("staff_id"), Operation.EQ, ":staff");
 
-        JDBCQueryBuilder queryBuilder = new JDBCSelectQueryBuilder()
+        JDBCSelectQueryBuilder queryBuilder = new JDBCSelectQueryBuilder()
                 .selectAll(Workday.class)
                 .from(this.getTableName())
                 .where(whereClauseBuilder);
 
-        return this.selectQuery(queryBuilder.getQueryAsString(), parameterSource);
+        return this.selectQuery(queryBuilder, parameterSource);
     }
 
     @Override
@@ -68,12 +67,12 @@ public class WorkdayDaoImpl extends GenericDaoImpl<Workday, Integer> implements 
                 .and()
                 .where(this.formatColumnFromName("staff_id"), Operation.EQ, ":staff");
 
-        JDBCQueryBuilder queryBuilder = new JDBCSelectQueryBuilder()
+        JDBCSelectQueryBuilder queryBuilder = new JDBCSelectQueryBuilder()
                 .selectAll(Workday.class)
                 .from(this.getTableName())
                 .where(whereClauseBuilder);
 
-        return this.selectQuery(queryBuilder.getQueryAsString(), parameterSource);
+        return this.selectQuery(queryBuilder, parameterSource);
     }
 
     @Override
@@ -100,12 +99,12 @@ public class WorkdayDaoImpl extends GenericDaoImpl<Workday, Integer> implements 
                 .and()
                 .where(this.formatColumnFromName("staff_id"), Operation.EQ, ":staff");
 
-        JDBCQueryBuilder queryBuilder = new JDBCSelectQueryBuilder()
+        JDBCSelectQueryBuilder queryBuilder = new JDBCSelectQueryBuilder()
                 .selectAll(Workday.class)
                 .from(this.getTableName())
                 .where(whereClauseBuilder);
 
-        return !this.selectQuery(queryBuilder.getQueryAsString(), parameterSource).isEmpty();
+        return !this.selectQuery(queryBuilder, parameterSource).isEmpty();
     }
 
     @Override

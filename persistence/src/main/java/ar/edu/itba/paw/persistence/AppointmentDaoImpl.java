@@ -4,7 +4,6 @@ import ar.edu.itba.paw.interfaces.daos.AppointmentDao;
 import ar.edu.itba.paw.models.*;
 import ar.edu.itba.paw.persistence.generics.GenericDaoImpl;
 import ar.edu.itba.paw.persistence.utils.RowMapperAlias;
-import ar.edu.itba.paw.persistence.utils.builder.JDBCQueryBuilder;
 import ar.edu.itba.paw.persistence.utils.builder.JDBCSelectQueryBuilder;
 import ar.edu.itba.paw.persistence.utils.builder.JDBCSelectQueryBuilder.JoinType;
 import ar.edu.itba.paw.persistence.utils.builder.JDBCWhereClauseBuilder;
@@ -51,8 +50,7 @@ public class AppointmentDaoImpl extends GenericDaoImpl<Appointment, Integer> imp
                 );
         MapSqlParameterSource parameterSource = new MapSqlParameterSource();
         parameterSource.addValue("appointment_id", id);
-        List<Appointment> appointments =  this.jdbcTemplate.query(selectQueryBuilder.getQueryAsString(), parameterSource, this.getResultSetExtractor());
-        return appointments.stream().findFirst();
+        return this.selectQuerySingle(selectQueryBuilder, parameterSource);
     }
 
     @Override
@@ -63,12 +61,12 @@ public class AppointmentDaoImpl extends GenericDaoImpl<Appointment, Integer> imp
         JDBCWhereClauseBuilder whereClauseBuilder = new JDBCWhereClauseBuilder()
                 .where(this.formatColumnFromName("patient_id"), Operation.EQ, ":patient");
 
-        JDBCQueryBuilder queryBuilder = new JDBCSelectQueryBuilder()
+        JDBCSelectQueryBuilder queryBuilder = new JDBCSelectQueryBuilder()
                 .selectAll(Appointment.class)
                 .from(this.getTableName())
                 .where(whereClauseBuilder);
 
-        return this.selectQuery(queryBuilder.getQueryAsString(), parameterSource);
+        return this.selectQuery(queryBuilder, parameterSource);
     }
 
     @Override
@@ -79,12 +77,12 @@ public class AppointmentDaoImpl extends GenericDaoImpl<Appointment, Integer> imp
         JDBCWhereClauseBuilder whereClauseBuilder = new JDBCWhereClauseBuilder()
                 .where(this.formatColumnFromName("staff_id"), Operation.EQ, ":staff");
 
-        JDBCQueryBuilder queryBuilder = new JDBCSelectQueryBuilder()
+        JDBCSelectQueryBuilder queryBuilder = new JDBCSelectQueryBuilder()
                 .selectAll(Appointment.class)
                 .from(this.getTableName())
                 .where(whereClauseBuilder);
 
-        return this.selectQuery(queryBuilder.getQueryAsString(), parameterSource);
+        return this.selectQuery(queryBuilder, parameterSource);
     }
 
     @Override
@@ -98,12 +96,12 @@ public class AppointmentDaoImpl extends GenericDaoImpl<Appointment, Integer> imp
                 .and()
                 .where(this.formatColumnFromName("status"), Operation.EQ, ":status");
 
-        JDBCQueryBuilder queryBuilder = new JDBCSelectQueryBuilder()
+        JDBCSelectQueryBuilder queryBuilder = new JDBCSelectQueryBuilder()
                 .selectAll(Appointment.class)
                 .from(this.getTableName())
                 .where(whereClauseBuilder);
 
-        return this.selectQuery(queryBuilder.getQueryAsString(), parameterSource);
+        return this.selectQuery(queryBuilder, parameterSource);
     }
 
     @Override
@@ -117,12 +115,12 @@ public class AppointmentDaoImpl extends GenericDaoImpl<Appointment, Integer> imp
                 .and()
                 .where(this.formatColumnFromName("status"), Operation.EQ, ":status");
 
-        JDBCQueryBuilder queryBuilder = new JDBCSelectQueryBuilder()
+        JDBCSelectQueryBuilder queryBuilder = new JDBCSelectQueryBuilder()
                 .selectAll(Appointment.class)
                 .from(this.getTableName())
                 .where(whereClauseBuilder);
 
-        return this.selectQuery(queryBuilder.getQueryAsString(), parameterSource);
+        return this.selectQuery(queryBuilder, parameterSource);
     }
 
     @Override
@@ -139,12 +137,12 @@ public class AppointmentDaoImpl extends GenericDaoImpl<Appointment, Integer> imp
                 .and()
                 .where(this.formatColumnFromName("status"), Operation.EQ, ":status");
 
-        JDBCQueryBuilder queryBuilder = new JDBCSelectQueryBuilder()
+        JDBCSelectQueryBuilder queryBuilder = new JDBCSelectQueryBuilder()
                 .selectAll(Appointment.class)
                 .from(this.getTableName())
                 .where(whereClauseBuilder);
 
-        return this.selectQuery(queryBuilder.getQueryAsString(), parameterSource);
+        return this.selectQuery(queryBuilder, parameterSource);
     }
 
     @Override
@@ -164,12 +162,12 @@ public class AppointmentDaoImpl extends GenericDaoImpl<Appointment, Integer> imp
                 .and()
                 .where(this.formatColumnFromName("from_date"), Operation.EQ, ":day", JDBCWhereClauseBuilder.ColumnTransformer.DAY);
 
-        JDBCQueryBuilder queryBuilder = new JDBCSelectQueryBuilder()
+        JDBCSelectQueryBuilder queryBuilder = new JDBCSelectQueryBuilder()
                 .selectAll(Appointment.class)
                 .from(this.getTableName())
                 .where(whereClauseBuilder);
 
-        return this.selectQuery(queryBuilder.getQueryAsString(), parameterSource);
+        return this.selectQuery(queryBuilder, parameterSource);
     }
 
     @Override
@@ -189,12 +187,12 @@ public class AppointmentDaoImpl extends GenericDaoImpl<Appointment, Integer> imp
                 .and()
                 .where(this.formatColumnFromName("from_date"), Operation.EQ, ":day", JDBCWhereClauseBuilder.ColumnTransformer.DAY);
 
-        JDBCQueryBuilder queryBuilder = new JDBCSelectQueryBuilder()
+        JDBCSelectQueryBuilder queryBuilder = new JDBCSelectQueryBuilder()
                 .selectAll(Appointment.class)
                 .from(this.getTableName())
                 .where(whereClauseBuilder);
 
-        return this.selectQuery(queryBuilder.getQueryAsString(), parameterSource);
+        return this.selectQuery(queryBuilder, parameterSource);
     }
 
     @Override

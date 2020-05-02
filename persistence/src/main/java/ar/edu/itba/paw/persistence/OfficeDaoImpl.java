@@ -7,7 +7,6 @@ import ar.edu.itba.paw.models.Office;
 import ar.edu.itba.paw.models.Province;
 import ar.edu.itba.paw.persistence.generics.GenericSearchableDaoImpl;
 import ar.edu.itba.paw.persistence.utils.RowMapperAlias;
-import ar.edu.itba.paw.persistence.utils.builder.JDBCQueryBuilder;
 import ar.edu.itba.paw.persistence.utils.builder.JDBCSelectQueryBuilder;
 import ar.edu.itba.paw.persistence.utils.builder.JDBCSelectQueryBuilder.JoinType;
 import ar.edu.itba.paw.persistence.utils.builder.JDBCWhereClauseBuilder;
@@ -48,7 +47,7 @@ public class OfficeDaoImpl extends GenericSearchableDaoImpl<Office, Integer> imp
         JDBCWhereClauseBuilder whereClauseBuilder = new JDBCWhereClauseBuilder()
                 .where("country_id", Operation.EQ, ":country_id");
 
-        JDBCQueryBuilder queryBuilder = new JDBCSelectQueryBuilder()
+        JDBCSelectQueryBuilder queryBuilder = new JDBCSelectQueryBuilder()
                 .selectAll(Office.class)
                 .from(this.getTableAlias())
                 .join("locality_id", LocalityDaoImpl.TABLE_NAME, LocalityDaoImpl.PRIMARY_KEY_NAME, Locality.class)
@@ -56,7 +55,7 @@ public class OfficeDaoImpl extends GenericSearchableDaoImpl<Office, Integer> imp
                 .where(whereClauseBuilder)
                 .distinct();
 
-        return this.selectQuery(queryBuilder.getQueryAsString(), parameterSource);
+        return this.selectQuery(queryBuilder, parameterSource);
     }
 
     @Override
@@ -67,14 +66,14 @@ public class OfficeDaoImpl extends GenericSearchableDaoImpl<Office, Integer> imp
         JDBCWhereClauseBuilder whereClauseBuilder = new JDBCWhereClauseBuilder()
                 .where("province_id", Operation.EQ, ":province_id");
 
-        JDBCQueryBuilder queryBuilder = new JDBCSelectQueryBuilder()
+        JDBCSelectQueryBuilder queryBuilder = new JDBCSelectQueryBuilder()
                 .selectAll(Office.class)
                 .from(this.getTableAlias())
                 .join("locality_id", LocalityDaoImpl.TABLE_NAME, LocalityDaoImpl.PRIMARY_KEY_NAME, Locality.class)
                 .where(whereClauseBuilder)
                 .distinct();
 
-        return this.selectQuery(queryBuilder.getQueryAsString(), parameterSource);
+        return this.selectQuery(queryBuilder, parameterSource);
     }
 
     @Override
