@@ -1,12 +1,13 @@
 package ar.edu.itba.paw.models;
 
-import ar.edu.itba.paw.persistenceAnnotations.*;
+import ar.edu.itba.paw.persistenceAnnotations.Column;
+import ar.edu.itba.paw.persistenceAnnotations.Table;
 
 import java.util.Collection;
 import java.util.LinkedList;
 
 @Table(name = "staff", primaryKey = "staff_id")
-public class Staff extends GenericModel<Staff, Integer> {
+public class Staff extends GenericModel<Integer> {
     @Column(name = "first_name", required = true)
     private String firstName;
     @Column(name = "surname", required = true)
@@ -17,14 +18,9 @@ public class Staff extends GenericModel<Staff, Integer> {
     private String email;
     @Column(name = "registration_number")
     private Integer registrationNumber;
-    @ManyToOne(name = "user_id", inverse = true)
     private User user;
-    @ManyToMany(name = "staff_id", otherName = "specialty_id", tableName = "system_staff_specialty_staff", className = StaffSpecialty.class)
-    private Collection<StaffSpecialty> staffSpecialties = new LinkedList<>();
-    @ManyToOne(name = "office_id", inverse = true)
     private Office office;
-    @OneToMany(name = "staff_id", className = Workday.class)
-    private Collection<Workday> workdays;
+    private Collection<StaffSpecialty> staffSpecialties = new LinkedList<>();
 
     public String getFirstName() {
         return this.firstName;
@@ -66,14 +62,6 @@ public class Staff extends GenericModel<Staff, Integer> {
         this.registrationNumber = registrationNumber;
     }
 
-    public Collection<StaffSpecialty> getStaffSpecialties() {
-        return this.staffSpecialties;
-    }
-
-    public Collection<Workday> getWorkdays() {
-        return this.workdays;
-    }
-
     public Office getOffice() {
         return this.office;
     }
@@ -82,8 +70,20 @@ public class Staff extends GenericModel<Staff, Integer> {
         return this.user;
     }
 
+    public void setUser(User user) {
+        this.user = user;
+    }
+
+    public void setOffice(Office office) {
+        this.office = office;
+    }
+
     @Override
     protected boolean isSameInstance(Object o) {
         return o instanceof Staff;
+    }
+
+    public Collection<StaffSpecialty> getStaffSpecialties() {
+        return this.staffSpecialties;
     }
 }

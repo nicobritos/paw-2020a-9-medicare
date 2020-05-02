@@ -1,18 +1,12 @@
 package ar.edu.itba.paw.models;
 
 import ar.edu.itba.paw.persistenceAnnotations.Column;
-import ar.edu.itba.paw.persistenceAnnotations.OneToMany;
 import ar.edu.itba.paw.persistenceAnnotations.Table;
 
-import java.util.Collection;
-import java.util.LinkedList;
-
 @Table(name = "system_country", primaryKey = "country_id", manualPrimaryKey = true)
-public class Country extends GenericModel<Country, String> {
+public class Country extends GenericModel<String> {
     @Column(name = "name", required = true)
     private String name;
-    @OneToMany(name = "country_id", className = Province.class)
-    private Collection<Province> provinces = new LinkedList<>();
 
     public String getName() {
         return this.name;
@@ -20,10 +14,6 @@ public class Country extends GenericModel<Country, String> {
 
     public void setName(String name) {
         this.name = name;
-    }
-
-    public Collection<Province> getProvinces() {
-        return this.provinces;
     }
 
     @Override
