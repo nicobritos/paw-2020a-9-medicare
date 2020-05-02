@@ -4,6 +4,7 @@ import ar.edu.itba.paw.models.GenericModel;
 import ar.edu.itba.paw.persistence.utils.ReflectionGetterSetter;
 import ar.edu.itba.paw.persistence.utils.builder.JDBCWhereClauseBuilder.Operation;
 import ar.edu.itba.paw.persistenceAnnotations.Column;
+import ar.edu.itba.paw.persistenceAnnotations.Table;
 
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -248,9 +249,11 @@ public class JDBCSelectQueryBuilder extends JDBCQueryBuilder {
 
         List<String> columns = new LinkedList<>();
         for (Map.Entry<String, Class<? extends GenericModel<?>>> entry : this.joinColumns.entrySet()) {
+            Table table = entry.getValue().getAnnotation(Table.class);
+            columns.add(entry.getKey() + "." + table.primaryKey() + " AS " + "\"" + entry.getKey() + "." + table.primaryKey() + "\"");
             ReflectionGetterSetter.iterateFields(entry.getValue(), Column.class, field -> {
                 Column column = field.getAnnotation(Column.class);
-                columns.add("\"" + entry.getKey() + "." + column.name() + "\"");
+                columns.add(entry.getKey() + "." + column.name() + " AS " + "\"" + entry.getKey() + "." + column.name() + "\"");
             });
         }
         return this.joinStrings(columns);
