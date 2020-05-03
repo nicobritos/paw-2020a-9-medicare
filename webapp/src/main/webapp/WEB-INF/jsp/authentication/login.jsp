@@ -28,7 +28,7 @@
         </div>
         <div class="form-group row">
             <div class="col">
-                <label for="medicare_password"><spring:message code="Password"></label>
+                <label for="medicare_password"><spring:message code="Password"/></label>
             </div>
             <div class="col-8">
                 <form:input path="password" class="form-control pr-5" type="password" name="medicare_password" id="medicare_password"/>
