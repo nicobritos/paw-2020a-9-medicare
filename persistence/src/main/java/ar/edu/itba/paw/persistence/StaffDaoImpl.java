@@ -295,6 +295,9 @@ public class StaffDaoImpl extends GenericSearchableDaoImpl<Staff, Integer> imple
 
     @Override
     public void addStaffSpecialties(Staff staff, Collection<StaffSpecialty> staffSpecialties) {
+        for (StaffSpecialty staffSpecialty : staffSpecialties) {
+            this.addStaffSpecialty(staff, staffSpecialty);
+        }
     }
 
     @Override
