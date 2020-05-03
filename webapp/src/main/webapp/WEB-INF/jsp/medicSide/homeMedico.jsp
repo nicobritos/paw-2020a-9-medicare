@@ -1,4 +1,6 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jstl/core_rt"%>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+<%@ taglib prefix="spring" uri="http://www.springframework.org/tags" %>
 <!DOCTYPE html>
 <html lang="en">
     <%@ include file = "../head.jsp" %>
@@ -9,7 +11,19 @@
     <div class="container h-75 w-100 mt-5">
       <div class="row">
         <div class="col-5">
-          <h4>Agenda de hoy</h4>
+          <h4>
+            <spring:message code="AgendaFor"/>
+          <c:choose>
+            <c:when test="${isToday}">
+              <spring:message code="today"/>
+            </c:when>
+            <c:otherwise>
+              <%--TODO: revise--%>
+              <fmt:parseDate value="${today}" pattern="yyyy-MM-dd" var="parsedDate" type="date"/>
+              <fmt:formatDate value="${parsedDate}" type="date"/>
+            </c:otherwise>
+          </c:choose>
+          </h4>
         </div>
         <div class="col">
           <h4>Agenda semanal</h4>
@@ -62,11 +76,13 @@
           <div class="row d-flex justify-content-around">
             <!-- TODO connect buttons and days -->
             <!-- TODO the selected day should be font-weight-bold -->
-            <button type="button" class="btn"><</button>
+            <button type="button" class="btn" id="prevWeekBtn"><</button>
             <!-- this is one -->
             <c:forEach var="i" begin="0" end="6">
               <span class="ml-1 mr-1 d-flex flex-column align-items-center">
                 <!-- day of the week -->
+                <span class="medicare-day-span" data-day="${monday.plusDays(i)}">
+
 
                 <p class="mb-0">
                   <c:choose>
@@ -100,8 +116,9 @@
                   <c:otherwise>turnos</c:otherwise>
                 </c:choose></p>
               </span>
+                </span>
             </c:forEach>
-            <button type="button" class="btn">></button>
+            <button type="button" class="btn" id="nextWeekBtn">></button>
           </div>
           <div class="row justify-content-center">
             <!-- TODO: change items -->
@@ -135,8 +152,8 @@
                           />
                           <div class="dropdown-menu">
                             <!-- TODO conect to the options -->
-                            <a class="dropdown-item" href="#">Cancelar</a>
-                            <a class="dropdown-item" href="#">Reprogramar</a>
+                            <a class="dropdown-item" href="#"><spring:message code="Cancel"/></a>
+                            <a class="dropdown-item" href="#"><spring:message code="Reprogram"/></a>
                           </div>
                         </div>
                       </div>
@@ -149,5 +166,6 @@
         </div>
       </div>
     </div>
+  <script src='<c:url value="/js/scripts/staff/homeMedico.js"/> '></script>
   </body>
 </html>

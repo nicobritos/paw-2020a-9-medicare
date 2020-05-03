@@ -8,16 +8,15 @@ import ar.edu.itba.paw.webapp.form.WorkdayForm;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import java.time.LocalDate;
+import java.time.format.DateTimeParseException;
+import java.util.Map;
 import java.util.Optional;
 
 @Controller
@@ -44,7 +43,7 @@ public class MedicSideController extends GenericController {
     WorkdayService workdayService;
 
     @RequestMapping("/staff/home")
-    public ModelAndView medicHome(){
+    public ModelAndView medicHome(@RequestParam(defaultValue = "0") String week,@RequestParam(defaultValue = "0", name = "today") String newToday){
         Optional<User> user = this.getUser();
         if(!user.isPresent()) {
             return new ModelAndView("authentication/login");
@@ -52,9 +51,9 @@ public class MedicSideController extends GenericController {
         ModelAndView mav = new ModelAndView();
 
         Staff staff = new Staff();
-
         LocalDate today = LocalDate.now();
         LocalDate monday;
+        boolean isToday=true;
 
         switch (LocalDate.now().getDayOfWeek()){
             case SUNDAY:
@@ -81,12 +80,28 @@ public class MedicSideController extends GenericController {
             default:
                 throw new RuntimeException();
         }
+        if(newToday!=null){
+            try{
+                today = LocalDate.parse(newToday);
+                isToday = false;
+            }catch (DateTimeParseException e){
 
+            }
+        }
+        if(week!=null){
+            try{
+                long weekOffset = Long.parseLong(week);
+                monday = monday.plusWeeks(weekOffset);
+            }catch (NumberFormatException e){
+
+            }
+        }
         mav.addObject("user", user);
         if(isStaff()) {
             mav.addObject("staffs", staffService.findByUser(user.get().getId()));
         }
         mav.addObject("today", today);
+        mav.addObject("isToday",isToday);
         mav.addObject("monday", monday);
         mav.addObject("todayAppointments", appointmentService.findToday(staff));
         mav.addObject("appointments", appointmentService.find(staff)); // TODO: cambiar

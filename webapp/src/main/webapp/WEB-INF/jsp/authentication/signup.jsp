@@ -1,5 +1,6 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jstl/core_rt" %>
 <%@ taglib prefix="form" uri="http://www.springframework.org/tags/form" %>
+<%@ taglib prefix="spring" uri="http://www.springframework.org/tags" %>
 <html>
 <head>
     <%@ include file="../head.jsp" %>
@@ -13,16 +14,16 @@
             <h6>Medicare <img src='<c:url value="/img/logo.svg"/>' id="logo"/></h6>
         </div>
         <div class="row justify-content-start">
-            <h1 class="register-form-title">Crear cuenta</h1>
+            <h1 class="register-form-title"><spring:message code="CreateAccount"/></h1>
         </div>
         <div class="form-row justify-content-between align-items-end">
             <div class="d-flex flex-column mr-5 align-items-center card card-shadow pointer p-2" id="signup-patient">
                 <i class="fas fa-hospital-user" style="font-size: 80px;"></i>
-                <h4 class="mt-2">Busco médicos</h4>
+                <h4 class="mt-2"><spring:message code="LookingForMedics"/></h4>
             </div>
             <div class="d-flex flex-column align-items-center card card-shadow pointer p-2" id="signup-staff">
                 <i class="fa fa-user-md" style="font-size: 80px;"></i>
-                <h4 class="mt-2">Soy un médico</h4>
+                <h4 class="mt-2"><spring:message code="IMAMedic"/></h4>
             </div>
         </div>
     </div>

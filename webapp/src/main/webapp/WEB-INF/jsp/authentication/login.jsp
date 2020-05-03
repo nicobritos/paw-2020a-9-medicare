@@ -16,11 +16,11 @@
             <h6>Medicare <img src='<c:url value="/img/logo.svg"/>' id="logo"/></h6>
         </div>
         <div class="row justify-content-start">
-            <h1 class="register-form-title">Iniciar sesión</h1>
+            <h1 class="register-form-title"><spring:message code="Login"/></h1>
         </div>
         <div class="form-group row">
             <div class="col">
-                <label for="medicare_email">Email</label>
+                <label for="medicare_email"><spring:message code="Email"/></label>
             </div>
             <div class="col-8">
                 <form:input path="email" class="form-control" type="email" name="medicare_email" id="medicare_email"/>
@@ -28,7 +28,7 @@
         </div>
         <div class="form-group row">
             <div class="col">
-                <label for="medicare_password">Contraseña</label>
+                <label for="medicare_password"><spring:message code="Password"/></label>
             </div>
             <div class="col-8">
                 <form:input path="password" class="form-control pr-5" type="password" name="medicare_password" id="medicare_password"/>
@@ -39,15 +39,15 @@
         </div>
         <div class="form-group row align-items-center">
             <div class="col">
-                <label for="medicare_remember_me" class="mb-0">Recuerdame</label>
+                <label for="medicare_remember_me" class="mb-0"><spring:message code="RememberMe"/></label>
             </div>
             <div class="col-8">
                 <form:checkbox path="rememberMe" id="medicare_remember_me" name="medicare_remember_me"/>
             </div>
         </div>
         <div class="form-row justify-content-between align-items-end mt-2">
-            <a class="form-link" href="${signupUrl}">Crear cuenta</a>
-            <button type="submit" class="btn btn-primary">Confirmar</button>
+            <a class="form-link" href="${signupUrl}"><spring:message code="CreateAccount"/></a>
+            <button type="submit" class="btn btn-primary"><spring:message code="Comfirm"/></button>
         </div>
 
         <form:errors path="*" cssClass="mt-4 mb-0 text-danger" element="p"/>
