@@ -6,6 +6,7 @@ import ar.edu.itba.paw.persistence.generics.GenericDaoImpl;
 import ar.edu.itba.paw.persistence.utils.RowMapperAlias;
 import ar.edu.itba.paw.persistence.utils.builder.JDBCSelectQueryBuilder;
 import ar.edu.itba.paw.persistence.utils.builder.JDBCSelectQueryBuilder.JoinType;
+import ar.edu.itba.paw.persistence.utils.builder.JDBCUpdateQueryBuilder;
 import ar.edu.itba.paw.persistence.utils.builder.JDBCWhereClauseBuilder;
 import ar.edu.itba.paw.persistence.utils.builder.JDBCWhereClauseBuilder.Operation;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -46,7 +47,7 @@ public class WorkdayDaoImpl extends GenericDaoImpl<Workday, Integer> implements 
         parameterSource.addValue("user", user.getId());
 
         JDBCWhereClauseBuilder whereClauseBuilder = new JDBCWhereClauseBuilder()
-                .where(UserDaoImpl.PRIMARY_KEY_NAME, Operation.EQ, ":user");
+                .where(formatColumnFromName(UserDaoImpl.PRIMARY_KEY_NAME, UserDaoImpl.TABLE_NAME), Operation.EQ, ":user");
 
         JDBCSelectQueryBuilder queryBuilder = new JDBCSelectQueryBuilder()
                 .selectAll(Workday.class)
@@ -98,11 +99,11 @@ public class WorkdayDaoImpl extends GenericDaoImpl<Workday, Integer> implements 
         MapSqlParameterSource parameterSource = new MapSqlParameterSource();
         parameterSource.addValue("staff", staff.getId());
         parameterSource.addValue("day", WorkdayDay.from(timeSlot.getDate()));
-        parameterSource.addValue("from_hour", timeSlot.getFromHour());
-        parameterSource.addValue("to_hour", timeSlot.getToHour());
+        parameterSource.addValue("from_hour", timeSlot.getDate().getHourOfDay());
+        parameterSource.addValue("to_hour", timeSlot.getToDate().getHourOfDay());
 
         Operation toHourOperation;
-        if (timeSlot.getToMinute() == 0) {
+        if (timeSlot.getToDate().getMinuteOfHour() == 0) {
             toHourOperation = Operation.GEQ;
         } else {
             toHourOperation = Operation.GT;
@@ -123,6 +124,21 @@ public class WorkdayDaoImpl extends GenericDaoImpl<Workday, Integer> implements 
                 .where(whereClauseBuilder);
 
         return !this.selectQuery(queryBuilder, parameterSource).isEmpty();
+    }
+
+    @Override
+    public void setStaff(Workday workday, Staff staff) {
+        MapSqlParameterSource parameterSource = new MapSqlParameterSource();
+        parameterSource.addValue("staff", staff.getId());
+        parameterSource.addValue("workday", workday.getId());
+
+        JDBCUpdateQueryBuilder updateQueryBuilder = new JDBCUpdateQueryBuilder()
+                .update(this.getTableName(), this.getTableAlias())
+                .value("staff_id", ":staff")
+                .where(new JDBCWhereClauseBuilder()
+                        .where(PRIMARY_KEY_NAME, Operation.EQ, ":workday")
+                );
+        this.updateQuery(updateQueryBuilder.getQueryAsString(), parameterSource);
     }
 
     @Override

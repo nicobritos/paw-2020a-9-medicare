@@ -7,8 +7,11 @@ import java.util.Map.Entry;
 public class JDBCInsertQueryBuilder extends JDBCQueryBuilder {
     public static final String DEFAULT_COLUMN_VALUE = "DEFAULT";
 
+    public static enum OnConflictPolicy { NOTHING, UPDATE }
+
     private Map<String, String> values = new HashMap<>();
 
+    private OnConflictPolicy conflictPolicy;
     private String table;
 
     public JDBCInsertQueryBuilder into(String tableName) {
@@ -30,12 +33,24 @@ public class JDBCInsertQueryBuilder extends JDBCQueryBuilder {
         return this;
     }
 
+    public JDBCInsertQueryBuilder onConflict(OnConflictPolicy conflictPolicy) {
+        this.conflictPolicy = conflictPolicy;
+        return this;
+    }
+
     @Override
     public String getQueryAsString() {
-        return "INSERT INTO " +
+        StringBuilder stringBuilder = new StringBuilder(
+                "INSERT INTO " +
                 this.table +
-                this.getValuesAsString() +
-                ";";
+                this.getValuesAsString()
+        );
+        if (this.conflictPolicy != null) {
+            stringBuilder
+                    .append(" ON CONFLICT DO ")
+                    .append(this.conflictPolicy.name());
+        }
+        return stringBuilder.toString();
     }
 
     @Override

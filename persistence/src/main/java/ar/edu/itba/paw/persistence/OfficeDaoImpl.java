@@ -9,6 +9,7 @@ import ar.edu.itba.paw.persistence.generics.GenericSearchableDaoImpl;
 import ar.edu.itba.paw.persistence.utils.RowMapperAlias;
 import ar.edu.itba.paw.persistence.utils.builder.JDBCSelectQueryBuilder;
 import ar.edu.itba.paw.persistence.utils.builder.JDBCSelectQueryBuilder.JoinType;
+import ar.edu.itba.paw.persistence.utils.builder.JDBCUpdateQueryBuilder;
 import ar.edu.itba.paw.persistence.utils.builder.JDBCWhereClauseBuilder;
 import ar.edu.itba.paw.persistence.utils.builder.JDBCWhereClauseBuilder.Operation;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -79,6 +80,21 @@ public class OfficeDaoImpl extends GenericSearchableDaoImpl<Office, Integer> imp
     @Override
     public List<Office> findByLocality(Locality locality) {
         return this.findByField("locality_id", Operation.EQ, locality);
+    }
+
+    @Override
+    public void setLocality(Office office, Locality locality) {
+        MapSqlParameterSource parameterSource = new MapSqlParameterSource();
+        parameterSource.addValue("locality", locality.getId());
+        parameterSource.addValue("office_id", office.getId());
+
+        JDBCUpdateQueryBuilder updateQueryBuilder = new JDBCUpdateQueryBuilder()
+                .update(this.getTableName(), this.getTableAlias())
+                .value("locality_id", ":locality")
+                .where(new JDBCWhereClauseBuilder()
+                        .where(PRIMARY_KEY_NAME, Operation.EQ, ":office_id")
+                );
+        this.updateQuery(updateQueryBuilder.getQueryAsString(), parameterSource);
     }
 
     @Override

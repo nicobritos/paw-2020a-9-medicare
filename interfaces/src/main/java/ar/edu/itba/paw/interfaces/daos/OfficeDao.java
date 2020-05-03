@@ -14,4 +14,6 @@ public interface OfficeDao extends GenericSearchableDao<Office, Integer> {
     List<Office> findByProvince(Province province);
 
     List<Office> findByLocality(Locality locality);
+
+    void setLocality(Office office, Locality locality);
 }

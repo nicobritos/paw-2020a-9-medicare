@@ -6,6 +6,7 @@ import ar.edu.itba.paw.persistence.generics.GenericSearchableDaoImpl;
 import ar.edu.itba.paw.persistence.utils.RowMapperAlias;
 import ar.edu.itba.paw.persistence.utils.builder.JDBCSelectQueryBuilder;
 import ar.edu.itba.paw.persistence.utils.builder.JDBCSelectQueryBuilder.JoinType;
+import ar.edu.itba.paw.persistence.utils.builder.JDBCUpdateQueryBuilder;
 import ar.edu.itba.paw.persistence.utils.builder.JDBCWhereClauseBuilder;
 import ar.edu.itba.paw.persistence.utils.builder.JDBCWhereClauseBuilder.Operation;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -70,6 +71,36 @@ public class PatientDaoImpl extends GenericSearchableDaoImpl<Patient, Integer> i
                 .where(whereClauseBuilder);
 
         return this.selectQuery(queryBuilder, parameterSource);
+    }
+
+    @Override
+    public void setUser(Patient patient, User user) {
+        MapSqlParameterSource parameterSource = new MapSqlParameterSource();
+        parameterSource.addValue("patient", patient.getId());
+        parameterSource.addValue("user", user.getId());
+
+        JDBCUpdateQueryBuilder updateQueryBuilder = new JDBCUpdateQueryBuilder()
+                .update(this.getTableName(), this.getTableAlias())
+                .value("user_id", ":user")
+                .where(new JDBCWhereClauseBuilder()
+                        .where(PRIMARY_KEY_NAME, Operation.EQ, "patient")
+                );
+        this.updateQuery(updateQueryBuilder.getQueryAsString(), parameterSource);
+    }
+
+    @Override
+    public void setOffice(Patient patient, Office office) {
+        MapSqlParameterSource parameterSource = new MapSqlParameterSource();
+        parameterSource.addValue("patient", patient.getId());
+        parameterSource.addValue("office", office.getId());
+
+        JDBCUpdateQueryBuilder updateQueryBuilder = new JDBCUpdateQueryBuilder()
+                .update(this.getTableName(), this.getTableAlias())
+                .value("office_id", ":office")
+                .where(new JDBCWhereClauseBuilder()
+                        .where(PRIMARY_KEY_NAME, Operation.EQ, ":patient")
+                );
+        this.updateQuery(updateQueryBuilder.getQueryAsString(), parameterSource);
     }
 
     @Override

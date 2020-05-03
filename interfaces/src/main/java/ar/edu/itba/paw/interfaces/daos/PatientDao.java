@@ -12,4 +12,8 @@ public interface PatientDao extends GenericSearchableDao<Patient, Integer> {
     Optional<Patient> findByUserAndOffice(User user, Office office);
 
     List<Patient> findByUser(User user);
+
+    void setUser(Patient patient, User user);
+
+    void setOffice(Patient patient, Office office);
 }
