@@ -3,6 +3,7 @@ package ar.edu.itba.paw.persistence;
 import ar.edu.itba.paw.interfaces.daos.CountryDao;
 import ar.edu.itba.paw.models.Country;
 import ar.edu.itba.paw.persistence.generics.GenericSearchableDaoImpl;
+import ar.edu.itba.paw.persistence.utils.JDBCArgumentValue;
 import ar.edu.itba.paw.persistence.utils.RowMapperAlias;
 import ar.edu.itba.paw.persistence.utils.builder.JDBCSelectQueryBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -67,5 +68,10 @@ public class CountryDaoImpl extends GenericSearchableDaoImpl<Country, String> im
     @Override
     protected void populateJoins(JDBCSelectQueryBuilder selectQueryBuilder) {
 
+    }
+
+    @Override
+    protected Map<String, JDBCArgumentValue> getModelRelationsArgumentValue(Country model, String prefix) {
+        return null;
     }
 }

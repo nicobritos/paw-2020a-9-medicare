@@ -3,6 +3,7 @@ package ar.edu.itba.paw.persistence;
 import ar.edu.itba.paw.interfaces.daos.UserDao;
 import ar.edu.itba.paw.models.User;
 import ar.edu.itba.paw.persistence.generics.GenericSearchableDaoImpl;
+import ar.edu.itba.paw.persistence.utils.JDBCArgumentValue;
 import ar.edu.itba.paw.persistence.utils.RowMapperAlias;
 import ar.edu.itba.paw.persistence.utils.builder.JDBCSelectQueryBuilder;
 import ar.edu.itba.paw.persistence.utils.builder.JDBCWhereClauseBuilder.Operation;
@@ -77,5 +78,10 @@ public class UserDaoImpl extends GenericSearchableDaoImpl<User, Integer> impleme
     @Override
     protected void populateJoins(JDBCSelectQueryBuilder selectQueryBuilder) {
 
+    }
+
+    @Override
+    protected Map<String, JDBCArgumentValue> getModelRelationsArgumentValue(User model, String prefix) {
+        return null;
     }
 }

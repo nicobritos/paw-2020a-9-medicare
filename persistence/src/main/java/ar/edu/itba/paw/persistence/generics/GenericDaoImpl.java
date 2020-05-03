@@ -2,7 +2,7 @@ package ar.edu.itba.paw.persistence.generics;
 
 import ar.edu.itba.paw.interfaces.daos.generic.GenericDao;
 import ar.edu.itba.paw.models.GenericModel;
-import ar.edu.itba.paw.persistence.utils.Pair;
+import ar.edu.itba.paw.persistence.utils.JDBCArgumentValue;
 import ar.edu.itba.paw.persistence.utils.ReflectionGetterSetter;
 import ar.edu.itba.paw.persistence.utils.StringSearchType;
 import ar.edu.itba.paw.persistence.utils.builder.*;
@@ -102,14 +102,14 @@ public abstract class GenericDaoImpl<M extends GenericModel<I>, I> implements Ge
 
     @Override
     public synchronized M create(M model) {
-        Map<String, Pair<String, Object>> columnsArgumentValue = this.getModelColumnsArgumentValue(model, "", true);
+        Map<String, JDBCArgumentValue> columnsArgumentValue = this.getModelColumnsArgumentValue(model, "", true);
         if (this.customPrimaryKey) {
-            columnsArgumentValue.put(this.getIdColumnName(), new Pair<>(":" + this.getIdColumnName(), model.getId()));
+            columnsArgumentValue.put(this.getIdColumnName(), new JDBCArgumentValue(this.getIdColumnName(), model.getId()));
         }
 
         Map<String, Object> argumentsValues = new HashMap<>();
-        for (Entry<String, Pair<String, Object>> columnArgumentValue : columnsArgumentValue.entrySet()) {
-            argumentsValues.put(columnArgumentValue.getKey(), columnArgumentValue.getValue().getRight());
+        for (Entry<String, JDBCArgumentValue> columnArgumentValue : columnsArgumentValue.entrySet()) {
+            argumentsValues.put(columnArgumentValue.getKey(), columnArgumentValue.getValue().getValue());
         }
 
         MapSqlParameterSource parameterSource = new MapSqlParameterSource();
@@ -117,8 +117,7 @@ public abstract class GenericDaoImpl<M extends GenericModel<I>, I> implements Ge
 
         return this.transactionTemplate.execute(transactionStatus -> {
             M newModel = this.insertQuery(model, parameterSource);
-            newModel = this.findById(newModel.getId()).get();
-            return newModel;
+            return this.findById(newModel.getId()).get();
         });
     }
 
@@ -128,13 +127,13 @@ public abstract class GenericDaoImpl<M extends GenericModel<I>, I> implements Ge
      */
     @Override
     public synchronized void update(M model) {
-        Map<String, Pair<String, Object>> columnsArgumentValue = this.getModelColumnsArgumentValue(model, ARGUMENT_PREFIX, true);
+        Map<String, JDBCArgumentValue> columnsArgumentValue = this.getModelColumnsArgumentValue(model, ARGUMENT_PREFIX, true);
 
         Map<String, String> columnsArguments = new HashMap<>();
         Map<String, Object> argumentsValues = new HashMap<>();
-        for (Entry<String, Pair<String, Object>> columnArgumentValue : columnsArgumentValue.entrySet()) {
-            columnsArguments.put(columnArgumentValue.getKey(), columnArgumentValue.getValue().getLeft());
-            argumentsValues.put(ARGUMENT_PREFIX + columnArgumentValue.getKey(), columnArgumentValue.getValue().getRight());
+        for (Entry<String, JDBCArgumentValue> columnArgumentValue : columnsArgumentValue.entrySet()) {
+            columnsArguments.put(columnArgumentValue.getKey(), columnArgumentValue.getValue().getArgument());
+            argumentsValues.put(ARGUMENT_PREFIX + columnArgumentValue.getKey(), columnArgumentValue.getValue().getValue());
         }
 
         String argumentName = ARGUMENT_PREFIX + "id";
@@ -368,8 +367,8 @@ public abstract class GenericDaoImpl<M extends GenericModel<I>, I> implements Ge
      *                     set to true and the model has a null value associated with that field
      * @return the map
      */
-    protected Map<String, Pair<String, Object>> getModelColumnsArgumentValue(M model, String prefix, boolean checkRequired) {
-        Map<String, Pair<String, Object>> map = new HashMap<>();
+    protected Map<String, JDBCArgumentValue> getModelColumnsArgumentValue(M model, String prefix, boolean checkRequired) {
+        Map<String, JDBCArgumentValue> map = new HashMap<>();
 
         // This code is duplicated so as to not be checking another variable in every loop, thus making it more
         // time efficient at the expense of having duplicated code.
@@ -379,17 +378,22 @@ public abstract class GenericDaoImpl<M extends GenericModel<I>, I> implements Ge
                 if (column.required() && o == null)
                     throw new IllegalStateException("This field is marked as required but its value is null");
 
-                map.put(column.name(), new Pair<>(":" + prefix + column.name(), o));
+                map.put(column.name(), new JDBCArgumentValue(prefix + column.name(), o));
             });
         } else {
             ReflectionGetterSetter.iterateValues(model, Column.class, (field, o) -> {
                 Column column = field.getAnnotation(Column.class);
-                map.put(column.name(), new Pair<>(":" + prefix + column.name(), o));
+                map.put(column.name(), new JDBCArgumentValue(prefix + column.name(), o));
             });
         }
 
+        Map<String, JDBCArgumentValue> relationsMap = this.getModelRelationsArgumentValue(model, prefix);
+        if (relationsMap != null)
+            map.putAll(relationsMap);
         return map;
     }
+
+    protected abstract Map<String, JDBCArgumentValue> getModelRelationsArgumentValue(M model, String prefix);
 
     protected static String formatColumnFromName(String columnName, String tableName) {
         return tableName + "." + columnName;

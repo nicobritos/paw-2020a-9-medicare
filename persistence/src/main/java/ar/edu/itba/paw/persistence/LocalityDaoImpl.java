@@ -5,6 +5,7 @@ import ar.edu.itba.paw.models.Country;
 import ar.edu.itba.paw.models.Locality;
 import ar.edu.itba.paw.models.Province;
 import ar.edu.itba.paw.persistence.generics.GenericSearchableDaoImpl;
+import ar.edu.itba.paw.persistence.utils.JDBCArgumentValue;
 import ar.edu.itba.paw.persistence.utils.RowMapperAlias;
 import ar.edu.itba.paw.persistence.utils.StringSearchType;
 import ar.edu.itba.paw.persistence.utils.builder.JDBCSelectQueryBuilder;
@@ -139,5 +140,12 @@ public class LocalityDaoImpl extends GenericSearchableDaoImpl<Locality, Integer>
         selectQueryBuilder
                 .joinAlias("province_id", ProvinceDaoImpl.TABLE_NAME, "p", ProvinceDaoImpl.PRIMARY_KEY_NAME, JoinType.LEFT, Province.class)
                 .joinAlias("p", "country_id", CountryDaoImpl.TABLE_NAME, "c", CountryDaoImpl.PRIMARY_KEY_NAME, JoinType.LEFT, Country.class);
+    }
+
+    @Override
+    protected Map<String, JDBCArgumentValue> getModelRelationsArgumentValue(Locality model, String prefix) {
+        Map<String, JDBCArgumentValue> map = new HashMap<>();
+        map.put("province_id", new JDBCArgumentValue(prefix + "province_id", model.getProvince() != null ? model.getProvince().getId() : null));
+        return map;
     }
 }

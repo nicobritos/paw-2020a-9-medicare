@@ -1,11 +1,18 @@
 package ar.edu.itba.paw.persistence.utils.builder;
 
+import org.joda.time.DateTime;
+import org.joda.time.format.DateTimeFormat;
+import org.joda.time.format.DateTimeFormatter;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.function.BiPredicate;
 import java.util.stream.Collectors;
 
 public class JDBCWhereClauseBuilder {
+    private static final DateTimeFormatter dateFormatter = DateTimeFormat.forPattern("yyyy-MM-dd");
+    private static final DateTimeFormatter dateTimeFormatter = DateTimeFormat.forPattern("yyyy-mm-dd HH:mm:ss");
+
     public enum Operation {
         EQ(" = ", (o1, o2) -> (o1 == null && o2 == null) || (o1 != null && o1.equals(o2))),
         NEQ(" <> ", (o1, o2) -> (o1 == null && o2 != null) || (o1 != null && !o1.equals(o2))),
@@ -167,6 +174,29 @@ public class JDBCWhereClauseBuilder {
                 .append(min)
                 .append(" AND ")
                 .append(max);
+
+        return this;
+    }
+
+    public JDBCWhereClauseBuilder between(String columnName, DateTime fromDate, DateTime toDate) {
+        return this.between(columnName, fromDate, toDate, null);
+    }
+
+    public JDBCWhereClauseBuilder between(String columnName, DateTime fromDate, DateTime toDate, ColumnTransformer columnTransformer) {
+        if (columnTransformer != null) {
+            this.clause
+                    .append(columnTransformer.getPrefix())
+                    .append(columnName)
+                    .append(columnTransformer.getSuffix());
+        } else {
+            this.clause.append(columnName);
+        }
+
+        this.clause
+                .append(" BETWEEN ")
+                .append(dateTimeFormatter.print(fromDate))
+                .append(" AND ")
+                .append(dateTimeFormatter.print(toDate));
 
         return this;
     }

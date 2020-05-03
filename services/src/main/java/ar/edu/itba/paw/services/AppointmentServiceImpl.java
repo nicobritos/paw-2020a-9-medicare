@@ -13,8 +13,6 @@ import org.springframework.stereotype.Service;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Service
 public class AppointmentServiceImpl extends GenericServiceImpl<AppointmentDao, Appointment, Integer> implements AppointmentService {
@@ -33,22 +31,22 @@ public class AppointmentServiceImpl extends GenericServiceImpl<AppointmentDao, A
 
     @Override
     public List<Appointment> find(Staff staff) {
-        return this.repository.find(staff).stream().peek(this::completeAppointment).collect(Collectors.toList());
+        return this.repository.find(staff);
     }
 
     @Override
     public List<Appointment> findByStaffs(List<Staff> staffs){
-        return this.repository.findByStaffs(staffs).stream().peek(this::completeAppointment).collect(Collectors.toList());
+        return this.repository.findByStaffs(staffs);
     }
 
     @Override
     public List<Appointment> find(Patient patient) {
-        return this.repository.find(patient).stream().peek(this::completeAppointment).collect(Collectors.toList());
+        return this.repository.find(patient);
     }
 
     @Override
     public List<Appointment> findByPatients(List<Patient> patients) {
-        return this.repository.findByPatients(patients).stream().peek(this::completeAppointment).collect(Collectors.toList());
+        return this.repository.findByPatients(patients);
     }
 
     @Override
@@ -58,22 +56,22 @@ public class AppointmentServiceImpl extends GenericServiceImpl<AppointmentDao, A
 
     @Override
     public List<Appointment> findToday(Patient patient){
-        return this.repository.findByDate(patient, DateTime.now()).stream().peek(this::completeAppointment).collect(Collectors.toList());
+        return this.repository.findByDate(patient, DateTime.now());
     }
 
     @Override
     public List<Appointment> findByDay(Staff staff, DateTime date){
-        return this.repository.findByStaffsAndDate(Collections.singletonList(staff), date).stream().peek(this::completeAppointment).collect(Collectors.toList());
+        return this.repository.findByStaffsAndDate(Collections.singletonList(staff), date);
     }
 
     @Override
     public List<Appointment> findByStaffsAndDay(List<Staff> staffs, DateTime date){
-        return this.repository.findByStaffsAndDate(staffs, date).stream().peek(this::completeAppointment).collect(Collectors.toList());
+        return this.repository.findByStaffsAndDate(staffs, date);
     }
 
     @Override
     public List<Appointment> findByPatientsAndDay(List<Patient> patients, DateTime date){
-        return this.repository.findByPatientsAndDate(patients, date).stream().peek(this::completeAppointment).collect(Collectors.toList());
+        return this.repository.findByPatientsAndDate(patients, date);
     }
 
 
@@ -213,18 +211,5 @@ public class AppointmentServiceImpl extends GenericServiceImpl<AppointmentDao, A
         if (!this.workdayService.isStaffWorking(staff, appointmentTimeSlot))
             return false;
         return this.findAvailableTimeslots(staff, fromDate).contains(appointmentTimeSlot);
-    }
-
-    private void completeAppointment(Appointment appointment) {
-        Optional<Patient> appointmentPatient = patientService.findById(appointment.getPatientId());
-        if (appointmentPatient.isPresent()) {
-            Optional<User> user = userService.findById(appointmentPatient.get().getUserId());
-            user.ifPresent(value -> appointmentPatient.get().setUser(value));
-            Optional<Office> office = officeService.findById(appointmentPatient.get().getOfficeId());
-            office.ifPresent(value -> appointmentPatient.get().setOffice(value));
-        }
-        Optional<Staff> appointmentStaff = staffService.findById(appointment.getStaffId());
-        appointmentStaff.ifPresent(appointment::setStaff);
-        appointmentPatient.ifPresent(appointment::setPatient);
     }
 }

@@ -3,6 +3,7 @@ package ar.edu.itba.paw.persistence;
 import ar.edu.itba.paw.interfaces.daos.PatientDao;
 import ar.edu.itba.paw.models.*;
 import ar.edu.itba.paw.persistence.generics.GenericSearchableDaoImpl;
+import ar.edu.itba.paw.persistence.utils.JDBCArgumentValue;
 import ar.edu.itba.paw.persistence.utils.RowMapperAlias;
 import ar.edu.itba.paw.persistence.utils.builder.JDBCSelectQueryBuilder;
 import ar.edu.itba.paw.persistence.utils.builder.JDBCSelectQueryBuilder.JoinType;
@@ -220,5 +221,13 @@ public class PatientDaoImpl extends GenericSearchableDaoImpl<Patient, Integer> i
                 .joinAlias("op", "locality_id", LocalityDaoImpl.TABLE_NAME, "lp", LocalityDaoImpl.PRIMARY_KEY_NAME, JoinType.LEFT, Locality.class)
                 .joinAlias("lp", "province_id", ProvinceDaoImpl.TABLE_NAME, "pps", ProvinceDaoImpl.PRIMARY_KEY_NAME, JoinType.LEFT, Province.class)
                 .joinAlias("pps", "country_id", CountryDaoImpl.TABLE_NAME, "cp", CountryDaoImpl.PRIMARY_KEY_NAME, JoinType.LEFT, Country.class);
+    }
+
+    @Override
+    protected Map<String, JDBCArgumentValue> getModelRelationsArgumentValue(Patient model, String prefix) {
+        Map<String, JDBCArgumentValue> map = new HashMap<>();
+        map.put("office_id", new JDBCArgumentValue(prefix + "office_id", model.getOffice() != null ? model.getOffice().getId() : null));
+        map.put("user_id", new JDBCArgumentValue(prefix + "user_id", model.getUser() != null ? model.getUser().getId() : null));
+        return map;
     }
 }

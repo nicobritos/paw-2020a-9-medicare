@@ -3,6 +3,7 @@ package ar.edu.itba.paw.persistence;
 import ar.edu.itba.paw.interfaces.daos.WorkdayDao;
 import ar.edu.itba.paw.models.*;
 import ar.edu.itba.paw.persistence.generics.GenericDaoImpl;
+import ar.edu.itba.paw.persistence.utils.JDBCArgumentValue;
 import ar.edu.itba.paw.persistence.utils.RowMapperAlias;
 import ar.edu.itba.paw.persistence.utils.builder.JDBCSelectQueryBuilder;
 import ar.edu.itba.paw.persistence.utils.builder.JDBCSelectQueryBuilder.JoinType;
@@ -292,5 +293,12 @@ public class WorkdayDaoImpl extends GenericDaoImpl<Workday, Integer> implements 
             .joinAlias("ps", "country_id", CountryDaoImpl.TABLE_NAME, "cs", CountryDaoImpl.PRIMARY_KEY_NAME, JoinType.LEFT, Country.class)
             .joinAlias("staff_id", "system_staff_specialty_staff", "sss", "staff_id", JoinType.LEFT, null)
             .joinAlias("sss", "specialty_id", StaffSpecialtyDaoImpl.TABLE_NAME, "ss", StaffSpecialtyDaoImpl.PRIMARY_KEY_NAME, JoinType.LEFT, StaffSpecialty.class);
+    }
+
+    @Override
+    protected Map<String, JDBCArgumentValue> getModelRelationsArgumentValue(Workday model, String prefix) {
+        Map<String, JDBCArgumentValue> map = new HashMap<>();
+        map.put("staff_id", new JDBCArgumentValue(prefix + "staff_id", model.getStaff() != null ? model.getStaff().getId() : null));
+        return map;
     }
 }

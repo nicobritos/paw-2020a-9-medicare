@@ -6,6 +6,7 @@ import ar.edu.itba.paw.models.Locality;
 import ar.edu.itba.paw.models.Office;
 import ar.edu.itba.paw.models.Province;
 import ar.edu.itba.paw.persistence.generics.GenericSearchableDaoImpl;
+import ar.edu.itba.paw.persistence.utils.JDBCArgumentValue;
 import ar.edu.itba.paw.persistence.utils.RowMapperAlias;
 import ar.edu.itba.paw.persistence.utils.builder.JDBCSelectQueryBuilder;
 import ar.edu.itba.paw.persistence.utils.builder.JDBCSelectQueryBuilder.JoinType;
@@ -184,5 +185,13 @@ public class OfficeDaoImpl extends GenericSearchableDaoImpl<Office, Integer> imp
                 .joinAlias("locality_id", LocalityDaoImpl.TABLE_NAME, "l", LocalityDaoImpl.PRIMARY_KEY_NAME, JoinType.LEFT, Locality.class)
                 .joinAlias("l", "province_id", ProvinceDaoImpl.TABLE_NAME, "ps", ProvinceDaoImpl.PRIMARY_KEY_NAME, JoinType.LEFT, Province.class)
                 .joinAlias("ps", "country_id", CountryDaoImpl.TABLE_NAME, "cs", CountryDaoImpl.PRIMARY_KEY_NAME, JoinType.LEFT, Country.class);
+    }
+
+    @Override
+    protected Map<String, JDBCArgumentValue> getModelRelationsArgumentValue(Office model, String prefix) {
+        Map<String, JDBCArgumentValue> map = new HashMap<>();
+        if (model.getLocality() != null)
+            map.put("locality_id", new JDBCArgumentValue(prefix + "locality_id", model.getLocality() != null ? model.getLocality().getId() : null));
+        return map;
     }
 }

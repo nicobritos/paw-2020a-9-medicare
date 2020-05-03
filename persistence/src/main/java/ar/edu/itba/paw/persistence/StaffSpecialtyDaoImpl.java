@@ -3,6 +3,7 @@ package ar.edu.itba.paw.persistence;
 import ar.edu.itba.paw.interfaces.daos.StaffSpecialtyDao;
 import ar.edu.itba.paw.models.StaffSpecialty;
 import ar.edu.itba.paw.persistence.generics.GenericSearchableDaoImpl;
+import ar.edu.itba.paw.persistence.utils.JDBCArgumentValue;
 import ar.edu.itba.paw.persistence.utils.RowMapperAlias;
 import ar.edu.itba.paw.persistence.utils.builder.JDBCSelectQueryBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -66,5 +67,10 @@ public class StaffSpecialtyDaoImpl extends GenericSearchableDaoImpl<StaffSpecial
 
     @Override
     protected void populateJoins(JDBCSelectQueryBuilder selectQueryBuilder) {
+    }
+
+    @Override
+    protected Map<String, JDBCArgumentValue> getModelRelationsArgumentValue(StaffSpecialty model, String prefix) {
+        return null;
     }
 }

@@ -3,12 +3,11 @@ package ar.edu.itba.paw.persistence;
 import ar.edu.itba.paw.interfaces.daos.AppointmentDao;
 import ar.edu.itba.paw.models.*;
 import ar.edu.itba.paw.persistence.generics.GenericDaoImpl;
+import ar.edu.itba.paw.persistence.utils.JDBCArgumentValue;
 import ar.edu.itba.paw.persistence.utils.RowMapperAlias;
 import ar.edu.itba.paw.persistence.utils.builder.JDBCSelectQueryBuilder;
 import ar.edu.itba.paw.persistence.utils.builder.JDBCSelectQueryBuilder.JoinType;
-import ar.edu.itba.paw.persistence.utils.builder.JDBCUpdateQueryBuilder;
 import ar.edu.itba.paw.persistence.utils.builder.JDBCWhereClauseBuilder;
-import ar.edu.itba.paw.persistence.utils.builder.JDBCWhereClauseBuilder.ColumnTransformer;
 import ar.edu.itba.paw.persistence.utils.builder.JDBCWhereClauseBuilder.Operation;
 import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -228,12 +227,7 @@ public class AppointmentDaoImpl extends GenericDaoImpl<Appointment, Integer> imp
         parameterSource.addValues(parameters);
 
         JDBCWhereClauseBuilder otherWhereClause = new JDBCWhereClauseBuilder()
-                .between(this.formatColumnFromName("from_date"), fromDate.getYear(), toDate.getYear(), ColumnTransformer.YEAR)
-                .and()
-                .between(this.formatColumnFromName("from_date"), fromDate.getMonthOfYear(), toDate.getMonthOfYear(), ColumnTransformer.MONTH)
-                .and()
-                .between(this.formatColumnFromName("from_date"), fromDate.getDayOfMonth(), toDate.getDayOfMonth(), ColumnTransformer.DAY);
-
+                .between(this.formatColumnFromName("from_date"), fromDate, toDate);
 
         JDBCWhereClauseBuilder whereClauseBuilder;
         if(!otherWhereClause.toString().isEmpty()) {
@@ -319,31 +313,11 @@ public class AppointmentDaoImpl extends GenericDaoImpl<Appointment, Integer> imp
     }
 
     @Override
-    public void setStaff(Appointment appointment, Staff staff) {
-        MapSqlParameterSource parameterSource = new MapSqlParameterSource();
-        parameterSource.addValue("staff_id", staff.getId());
-        JDBCUpdateQueryBuilder updateQueryBuilder = new JDBCUpdateQueryBuilder()
-                .update(this.getTableName(), this.getTableAlias())
-                .value("staff_id", ":staff_id")
-                .where(new JDBCWhereClauseBuilder()
-                    .where(PRIMARY_KEY_NAME, Operation.EQ, "appointment_id")
-                );
-        this.updateQuery(updateQueryBuilder.getQueryAsString(), parameterSource);
-    }
-
-    @Override
-    public void setPatient(Appointment appointment, Patient patient) {
-        MapSqlParameterSource parameterSource = new MapSqlParameterSource();
-        parameterSource.addValue("appointment_id", appointment.getId());
-        parameterSource.addValue("patient_id", patient.getId());
-
-        JDBCUpdateQueryBuilder updateQueryBuilder = new JDBCUpdateQueryBuilder()
-                .update(this.getTableName(), this.getTableAlias())
-                .value("patient_id", ":patient_id")
-                .where(new JDBCWhereClauseBuilder()
-                        .where(PRIMARY_KEY_NAME, Operation.EQ, ":appointment_id")
-                );
-        this.updateQuery(updateQueryBuilder.getQueryAsString(), parameterSource);
+    protected Map<String, JDBCArgumentValue> getModelRelationsArgumentValue(Appointment model, String prefix) {
+        Map<String, JDBCArgumentValue> map = new HashMap<>();
+        map.put("staff_id", new JDBCArgumentValue(prefix + "staff_id", model.getStaff() != null ? model.getStaff().getId() : null));
+        map.put("patient_id", new JDBCArgumentValue(prefix + "patient_id", model.getPatient() != null ? model.getPatient().getId() : null));
+        return map;
     }
 
     @Override

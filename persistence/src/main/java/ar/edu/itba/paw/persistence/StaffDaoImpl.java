@@ -3,6 +3,7 @@ package ar.edu.itba.paw.persistence;
 import ar.edu.itba.paw.interfaces.daos.StaffDao;
 import ar.edu.itba.paw.models.*;
 import ar.edu.itba.paw.persistence.generics.GenericSearchableDaoImpl;
+import ar.edu.itba.paw.persistence.utils.JDBCArgumentValue;
 import ar.edu.itba.paw.persistence.utils.RowMapperAlias;
 import ar.edu.itba.paw.persistence.utils.StringSearchType;
 import ar.edu.itba.paw.persistence.utils.builder.JDBCInsertQueryBuilder;
@@ -446,6 +447,14 @@ public class StaffDaoImpl extends GenericSearchableDaoImpl<Staff, Integer> imple
                 .joinAlias("ps", "country_id", CountryDaoImpl.TABLE_NAME, "cs", CountryDaoImpl.PRIMARY_KEY_NAME, JoinType.LEFT, Country.class)
                 .joinAlias("staff_id", "system_staff_specialty_staff", "sss", "staff_id", JoinType.LEFT, null)
                 .joinAlias("sss", "specialty_id", StaffSpecialtyDaoImpl.TABLE_NAME, "ss", StaffSpecialtyDaoImpl.PRIMARY_KEY_NAME, JoinType.LEFT, StaffSpecialty.class);
+    }
+
+    @Override
+    protected Map<String, JDBCArgumentValue> getModelRelationsArgumentValue(Staff model, String prefix) {
+        Map<String, JDBCArgumentValue> map = new HashMap<>();
+        map.put("office_id", new JDBCArgumentValue(prefix + "office_id", model.getOffice() != null ? model.getOffice().getId() : null));
+        map.put("user_id", new JDBCArgumentValue(prefix + "user_id", model.getUser() != null ? model.getUser().getId() : null));
+        return map;
     }
 
     private void putLocalityArguments(Collection<Locality> localities, Map<String, Object> argumentsValues, JDBCWhereClauseBuilder whereClauseBuilder) {
