@@ -88,72 +88,70 @@ public class AppointmentServiceImpl extends GenericServiceImpl<AppointmentDao, A
         List<AppointmentTimeSlot> appointmentTimeSlots = new LinkedList<>();
         DateTime dateTime;
         if (now.isBefore(fromDate)) {
-            dateTime = now;
-        } else {
-            dateTime = fromDate;
+            fromDate = now;
         }
 
-        while (toDate.isAfter(dateTime)) {
-            WorkdayDay workdayDay = WorkdayDay.from(dateTime);
-            List<Workday> workdays = this.workdayService.findByStaff(staff, workdayDay);
+        while (toDate.isAfter(fromDate)) {
+            WorkdayDay workdayDay = WorkdayDay.from(fromDate);
+            List<Workday> workdays = this.workdayService.findByStaff(staff, workdayDay); // Los horarios de ese día
             for (Workday workday : workdays) {
+                // Primera hora
                 for (int j = workday.getStartMinute(); j < 60; j += Appointment.DURATION) {
                     AppointmentTimeSlot appointmentTimeSlot = new AppointmentTimeSlot();
                     appointmentTimeSlot.setDate(new DateTime(
-                            dateTime.getYear(),
-                            dateTime.getMonthOfYear(),
-                            dateTime.getDayOfMonth(),
+                            fromDate.getYear(),
+                            fromDate.getMonthOfYear(),
+                            fromDate.getDayOfMonth(),
                             workday.getStartHour(),
                             j,
-                            dateTime.getZone()
+                            fromDate.getZone()
                     ));
                     appointmentTimeSlots.add(appointmentTimeSlot);
                 }
+                // Resto de las horas menos la última
                 for (int i = workday.getStartHour() + 1; i < workday.getEndHour(); i++) {
                     for (int j = 0; j < 60; j += Appointment.DURATION) {
                         AppointmentTimeSlot appointmentTimeSlot = new AppointmentTimeSlot();
                         appointmentTimeSlot.setDate(new DateTime(
-                                dateTime.getYear(),
-                                dateTime.getMonthOfYear(),
-                                dateTime.getDayOfMonth(),
+                                fromDate.getYear(),
+                                fromDate.getMonthOfYear(),
+                                fromDate.getDayOfMonth(),
                                 i,
                                 j,
-                                dateTime.getZone()
+                                fromDate.getZone()
                         ));
                         appointmentTimeSlots.add(appointmentTimeSlot);
                     }
                 }
+                //Ultima hora
                 for (int j = 0; j < workday.getEndMinute(); j += Appointment.DURATION) {
                     AppointmentTimeSlot appointmentTimeSlot = new AppointmentTimeSlot();
                     appointmentTimeSlot.setDate(new DateTime(
-                            dateTime.getYear(),
-                            dateTime.getMonthOfYear(),
-                            dateTime.getDayOfMonth(),
+                            fromDate.getYear(),
+                            fromDate.getMonthOfYear(),
+                            fromDate.getDayOfMonth(),
                             workday.getEndHour(),
                             j,
-                            dateTime.getZone()
+                            fromDate.getZone()
                     ));
                     appointmentTimeSlots.add(appointmentTimeSlot);
                 }
 
-                List<Appointment> takenAppointments = this.findByDay(staff, dateTime);
-                for (Appointment appointment : takenAppointments) {
-                    AppointmentTimeSlot appointmentTimeSlot = new AppointmentTimeSlot();
-                    appointmentTimeSlot.setDate(new DateTime(
-                            dateTime.getYear(),
-                            dateTime.getMonthOfYear(),
-                            dateTime.getDayOfMonth(),
-                            appointment.getFromDate().getHourOfDay(),
-                            appointment.getFromDate().getMinuteOfDay(),
-                            dateTime.getZone()
-                    ));
-                    appointmentTimeSlots.remove(appointmentTimeSlot);
-                }
+                this.findByDay(staff, fromDate).forEach(appointment -> {
+                            AppointmentTimeSlot appointmentTimeSlot = new AppointmentTimeSlot();
+                            appointmentTimeSlot.setDate(new DateTime(
+                                    appointment.getFromDate().getYear(),
+                                    appointment.getFromDate().getMonthOfYear(),
+                                    appointment.getFromDate().getDayOfMonth(),
+                                    appointment.getFromDate().getHourOfDay(),
+                                    appointment.getFromDate().getMinuteOfDay(),
+                                    appointment.getFromDate().getZone()
+                            ));
+                            appointmentTimeSlots.remove(appointmentTimeSlot);
+                        });
             }
-
-            dateTime = dateTime.plusDays(1);
+            fromDate = fromDate.plusDays(1);
         }
-
         return appointmentTimeSlots;
     }
 
