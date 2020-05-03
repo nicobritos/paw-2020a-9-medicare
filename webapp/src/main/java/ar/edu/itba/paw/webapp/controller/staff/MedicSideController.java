@@ -51,7 +51,7 @@ public class MedicSideController extends GenericController {
     WorkdayService workdayService;
 
     @RequestMapping("/staff/home")
-    public ModelAndView medicHome(@RequestParam(defaultValue = "0") String week,@RequestParam(defaultValue = "0", name = "today") String newToday){
+    public ModelAndView medicHome(@RequestParam(defaultValue = "0") String week,@RequestParam(required = false, name = "today") String newToday){
         Optional<User> user = this.getUser();
         if(!user.isPresent()) {
             return new ModelAndView("authentication/login");
@@ -62,32 +62,6 @@ public class MedicSideController extends GenericController {
         DateTime today = DateTime.now();
         DateTime monday;
         boolean isToday=true;
-
-        switch (DateTime.now().getDayOfWeek()){
-            case SUNDAY:
-                monday = today.plusDays(1);
-                break;
-            case MONDAY:
-                monday = today;
-                break;
-            case TUESDAY:
-                monday = today.minusDays(1);
-                break;
-            case WEDNESDAY:
-                monday = today.minusDays(2);
-                break;
-            case THURSDAY:
-                monday = today.minusDays(3);
-                break;
-            case FRIDAY:
-                monday = today.minusDays(4);
-                break;
-            case SATURDAY:
-                monday = today.minusDays(5);
-                break;
-            default:
-                throw new RuntimeException();
-        }
         if(newToday!=null){
             try{
                 today = DateTime.parse(newToday);
@@ -99,11 +73,13 @@ public class MedicSideController extends GenericController {
         if(week!=null){
             try{
                 int weekOffset = Integer.parseInt(week);
-                monday = monday.plusWeeks(weekOffset);
+                today = today.plusWeeks(weekOffset);
             }catch (NumberFormatException e){
 
             }
         }
+        monday = today.minusDays(today.getDayOfWeek() - 1);
+
         mav.addObject("user", user);
         if(isStaff()) {
             mav.addObject("staffs", staffService.findByUser(user.get().getId()));
