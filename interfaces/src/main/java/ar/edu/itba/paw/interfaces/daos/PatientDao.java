@@ -9,4 +9,6 @@ import java.util.Optional;
 
 public interface PatientDao extends GenericSearchableDao<Patient, Integer> {
     Optional<Patient> findByUserAndOffice(User user, Office office);
+
+    Optional<Patient> findByUser(User user);
 }

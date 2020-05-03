@@ -22,6 +22,11 @@ public class PatientServiceImpl extends GenericSearchableServiceImpl<PatientDao,
     }
 
     @Override
+    public Optional<Patient> findByUser(User user) {
+        return this.repository.findByUser(user);
+    }
+
+    @Override
     protected PatientDao getRepository() {
         return this.repository;
     }

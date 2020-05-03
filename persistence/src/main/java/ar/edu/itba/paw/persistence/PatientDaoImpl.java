@@ -57,6 +57,22 @@ public class PatientDaoImpl extends GenericSearchableDaoImpl<Patient, Integer> i
     }
 
     @Override
+    public Optional<Patient> findByUser(User user) {
+        MapSqlParameterSource parameterSource = new MapSqlParameterSource();
+        parameterSource.addValue("user_id", user.getId());
+
+        JDBCWhereClauseBuilder whereClauseBuilder = new JDBCWhereClauseBuilder()
+                .where(this.formatColumnFromName("user_id"), Operation.EQ, ":user_id");
+
+        JDBCSelectQueryBuilder queryBuilder = new JDBCSelectQueryBuilder()
+                .selectAll(Patient.class)
+                .from(this.getTableName())
+                .where(whereClauseBuilder);
+
+        return this.selectQuery(queryBuilder, parameterSource).stream().findFirst();
+    }
+
+    @Override
     protected ResultSetExtractor<List<Patient>> getResultSetExtractor() {
         return resultSet -> {
             Map<Integer, Patient> entitiesMap = new HashMap<>();
