@@ -1,14 +1,13 @@
 package ar.edu.itba.paw.interfaces.daos;
 
 import ar.edu.itba.paw.interfaces.daos.generic.GenericDao;
-import ar.edu.itba.paw.models.AppointmentTimeSlot;
-import ar.edu.itba.paw.models.Staff;
-import ar.edu.itba.paw.models.Workday;
-import ar.edu.itba.paw.models.WorkdayDay;
+import ar.edu.itba.paw.models.*;
 
 import java.util.List;
 
 public interface WorkdayDao extends GenericDao<Workday, Integer> {
+    List<Workday> findByUser(User user);
+
     List<Workday> findByStaff(Staff staff);
 
     List<Workday> findByStaff(Staff staff, WorkdayDay day);

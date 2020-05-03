@@ -15,13 +15,14 @@
     <org.postgresql.version>42.2.5</org.postgresql.version>
     <org.hsqldb.version>2.3.1</org.hsqldb.version>
     <org.mockito.version>3.3.3</org.mockito.version>
-    <org.ehcache.version>3.8.1</org.ehcache.version>
     <org.apache.commons.version>3.0</org.apache.commons.version>
     <spring-security.version>4.0.4.RELEASE</spring-security.version>
     <javax.validation-api.version>1.0.0.GA</javax.validation-api.version>
     <org.hibernate.validator>4.3.1.Final</org.hibernate.validator>
     <com.fasterxml.jackson.core.version>2.4.1</com.fasterxml.jackson.core.version>
     <com.fasterxml.jackson.databind.version>2.4.1.1</com.fasterxml.jackson.databind.version>
+    <org.simpleflatmapper.sfm-jdbc.version>8.2.2</org.simpleflatmapper.sfm-jdbc.version>
+    <joda-time.version>2.10.6</joda-time.version>
   </properties>
 
   <dependencyManagement>
@@ -31,6 +32,18 @@
         <artifactId>junit</artifactId>
         <version>${junit.version}</version>
         <scope>test</scope>
+      </dependency>
+
+      <dependency>
+        <groupId>org.simpleflatmapper</groupId>
+        <artifactId>sfm-jdbc</artifactId>
+        <version>${org.simpleflatmapper.sfm-jdbc.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>joda-time</groupId>
+        <artifactId>joda-time</artifactId>
+        <version>${joda-time.version}</version>
       </dependency>
 
       <dependency>
@@ -68,12 +81,6 @@
         <groupId>org.postgresql</groupId>
         <artifactId>postgresql</artifactId>
         <version>${org.postgresql.version}</version>
-      </dependency>
-
-      <dependency>
-        <groupId>org.ehcache</groupId>
-        <artifactId>ehcache</artifactId>
-        <version>${org.ehcache.version}</version>
       </dependency>
 
       <dependency>

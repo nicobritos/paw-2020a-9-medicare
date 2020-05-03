@@ -1,19 +1,21 @@
 package ar.edu.itba.paw.models;
 
+import org.joda.time.DateTime;
+
 import java.time.LocalDate;
 import java.util.Objects;
 
 public class AppointmentTimeSlot {
-    private LocalDate date;
+    private DateTime date;
     private int hour;
     private int minute;
     private int duration;
 
-    public LocalDate getDate() {
+    public DateTime getDate() {
         return this.date;
     }
 
-    public void setDate(LocalDate date) {
+    public void setDate(DateTime date) {
         this.date = date;
     }
 

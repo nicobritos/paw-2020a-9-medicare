@@ -8,10 +8,13 @@ import ar.edu.itba.paw.interfaces.services.StaffSpecialtyService;
 import ar.edu.itba.paw.models.Locality;
 import ar.edu.itba.paw.models.Staff;
 import ar.edu.itba.paw.models.StaffSpecialty;
+import ar.edu.itba.paw.models.User;
 import ar.edu.itba.paw.webapp.controller.utils.GenericController;
 import ar.edu.itba.paw.webapp.controller.utils.JsonResponse;
 import ar.edu.itba.paw.webapp.form.RequestTimeslotForm;
 import ar.edu.itba.paw.webapp.transformer.AppointmentTimeSlotTransformer;
+import org.joda.time.DateTime;
+import org.joda.time.Days;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
@@ -106,7 +109,11 @@ public class MedicListController extends GenericController {
         Collection<Locality> localitiesList = this.localityService.list();
 
         // pass objects to model and view
-        mav.addObject("user", getUser());
+        Optional<User> user = getUser();
+        mav.addObject("user", user);
+        if(user.isPresent() && isStaff()) {
+            mav.addObject("staffs", staffService.findByUser(user.get().getId()));
+        }
         mav.addObject("staff", staffList);
         mav.addObject("specialties",specialtiesList);
         mav.addObject("localities",localitiesList);
@@ -156,7 +163,11 @@ public class MedicListController extends GenericController {
 
         mav.addObject("today", today);
         mav.addObject("monday", monday);
-        mav.addObject("user", getUser());
+        Optional<User> user = getUser();
+        mav.addObject("user", user);
+        if(user.isPresent() && isStaff()) {
+            mav.addObject("staffs", staffService.findByUser(user.get().getId()));
+        }
         mav.addObject("staff", staff.get());
         mav.setViewName("selectTurno");
         return mav;
@@ -174,9 +185,9 @@ public class MedicListController extends GenericController {
             if (!staff.isPresent()) {
                 throw new MediCareException("No existe el staff solicitado");
             }
-            LocalDate dateFrom = LocalDate.of(form.getFromYear(), form.getFromMonth(), form.getFromDay());
-            LocalDate dateTo = LocalDate.of(form.getToYear(), form.getToMonth(), form.getToDay());
-            long daysBetween = Math.abs(ChronoUnit.DAYS.between(dateFrom, dateTo));
+            DateTime dateFrom = new DateTime(form.getFromYear(), form.getFromMonth(), form.getFromDay(), 0,0);
+            DateTime dateTo = new DateTime(form.getToYear(), form.getToMonth(), form.getToDay(), 23, 59, 59,999);
+            long daysBetween = Days.daysBetween(dateFrom.toLocalDate(), dateTo.toLocalDate()).getDays();
             if (daysBetween > MAX_DAYS_APPOINTMENTS || dateTo.isBefore(dateFrom)) {
                 throw new MediCareException("Fechas invalidas");
             }

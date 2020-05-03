@@ -7,6 +7,7 @@ import ar.edu.itba.paw.interfaces.services.WorkdayService;
 import ar.edu.itba.paw.interfaces.services.exceptions.*;
 import ar.edu.itba.paw.models.*;
 import ar.edu.itba.paw.services.generics.GenericServiceImpl;
+import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -34,16 +35,16 @@ public class AppointmentServiceImpl extends GenericServiceImpl<AppointmentDao, A
 
     @Override
     public List<Appointment> findToday(Staff staff){
-        return this.repository.findByDate(staff, LocalDate.now());
+        return this.repository.findByDate(staff, DateTime.now());
     }
 
     @Override
     public List<Appointment> findToday(Patient patient){
-        return this.repository.findByDate(patient, LocalDate.now());
+        return this.repository.findByDate(patient, DateTime.now());
     }
 
     @Override
-    public List<Appointment> findByDay(Staff staff, LocalDate date){
+    public List<Appointment> findByDay(Staff staff, DateTime date){
         return this.repository.findByDate(staff, date);
     }
 
@@ -68,8 +69,8 @@ public class AppointmentServiceImpl extends GenericServiceImpl<AppointmentDao, A
     }
 
     public Appointment create(Appointment model) throws InvalidAppointmentDateException, InvalidAppointmentDurationException, MediCareException {
-        if (!this.isValidDate(model.getStaff(), model.getFromDate(), model.getFromDate())) // todo
-            throw new InvalidAppointmentDateException();
+//        if (!this.isValidDate(model.getStaff(), model.getFromDate(), model.getFromDate())) // todo
+//            throw new InvalidAppointmentDateException();
 
         model.setAppointmentStatus(AppointmentStatus.PENDING.name());
         // TODO CHANGE DATE CLASS
@@ -91,23 +92,23 @@ public class AppointmentServiceImpl extends GenericServiceImpl<AppointmentDao, A
     }
 
     @Override
-    public List<AppointmentTimeSlot> findAvailableTimeslots(Staff staff, LocalDate fromDate, LocalDate toDate) {
-        LocalDate now = LocalDate.now();
+    public List<AppointmentTimeSlot> findAvailableTimeslots(Staff staff, DateTime fromDate, DateTime toDate) {
+        DateTime now = DateTime.now();
         List<AppointmentTimeSlot> appointmentTimeSlots = new LinkedList<>();
-        LocalDate localDate;
+        DateTime dateTime;
         if (now.isBefore(fromDate)) {
-            localDate = LocalDate.ofEpochDay(now.toEpochDay());
+            dateTime = now;
         } else {
-            localDate = LocalDate.ofEpochDay(fromDate.toEpochDay());
+            dateTime = fromDate;
         }
-        while (toDate.isAfter(localDate)) {
-            WorkdayDay workdayDay = WorkdayDay.from(localDate);
+        while (toDate.isAfter(dateTime)) {
+            WorkdayDay workdayDay = WorkdayDay.from(dateTime);
             List<Workday> workdays = this.workdayService.findByStaff(staff, workdayDay);
-            LocalDate localDateCopy = LocalDate.ofEpochDay(localDate.toEpochDay());
+            DateTime dateTimeCopy = dateTime;
             for (Workday workday : workdays) {
                 for (int j = workday.getStartMinute(); j < 60; j += Appointment.DURATION) {
                     AppointmentTimeSlot appointmentTimeSlot = new AppointmentTimeSlot();
-                    appointmentTimeSlot.setDate(localDateCopy);
+                    appointmentTimeSlot.setDate(dateTimeCopy);
                     appointmentTimeSlot.setFromHour(workday.getStartHour());
                     appointmentTimeSlot.setFromMinute(j);
                     appointmentTimeSlot.setDuration(Appointment.DURATION);
@@ -116,7 +117,7 @@ public class AppointmentServiceImpl extends GenericServiceImpl<AppointmentDao, A
                 for (int i = workday.getStartHour() + 1; i < workday.getEndHour(); i++) {
                     for (int j = 0; j < 60; j += Appointment.DURATION) {
                         AppointmentTimeSlot appointmentTimeSlot = new AppointmentTimeSlot();
-                        appointmentTimeSlot.setDate(localDateCopy);
+                        appointmentTimeSlot.setDate(dateTimeCopy);
                         appointmentTimeSlot.setFromHour(i);
                         appointmentTimeSlot.setFromMinute(j);
                         appointmentTimeSlot.setDuration(Appointment.DURATION);
@@ -125,17 +126,17 @@ public class AppointmentServiceImpl extends GenericServiceImpl<AppointmentDao, A
                 }
                 for (int j = 0; j < workday.getEndMinute(); j += Appointment.DURATION) {
                     AppointmentTimeSlot appointmentTimeSlot = new AppointmentTimeSlot();
-                    appointmentTimeSlot.setDate(localDateCopy);
+                    appointmentTimeSlot.setDate(dateTimeCopy);
                     appointmentTimeSlot.setFromHour(workday.getEndHour());
                     appointmentTimeSlot.setFromMinute(j);
                     appointmentTimeSlot.setDuration(Appointment.DURATION);
                     appointmentTimeSlots.add(appointmentTimeSlot);
                 }
 
-                List<Appointment> takenAppointments = this.findByDay(staff, localDate);
+                List<Appointment> takenAppointments = this.findByDay(staff, dateTime);
                 for (Appointment appointment : takenAppointments) {
                     AppointmentTimeSlot appointmentTimeSlot = new AppointmentTimeSlot();
-                    appointmentTimeSlot.setDate(localDateCopy);
+                    appointmentTimeSlot.setDate(dateTimeCopy);
                     // todo date to anything useful
 //                    appointmentTimeSlot.setFromHour(appointment.getFromLocalDate().getHour());
 //                    appointmentTimeSlot.setFromMinute(appointment.getFromLocalDate().getMinute());
@@ -145,14 +146,14 @@ public class AppointmentServiceImpl extends GenericServiceImpl<AppointmentDao, A
                 }
             }
 
-            localDate = localDate.plusDays(1);
+            dateTime = dateTime.plusDays(1);
         }
 
         return appointmentTimeSlots;
     }
 
     @Override
-    public List<AppointmentTimeSlot> findAvailableTimeslots(Staff staff, LocalDate date) {
+    public List<AppointmentTimeSlot> findAvailableTimeslots(Staff staff, DateTime date) {
         return this.findAvailableTimeslots(staff, date, date);
     }
 

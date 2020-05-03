@@ -1,6 +1,7 @@
 package ar.edu.itba.paw.webapp.transformer;
 
 import ar.edu.itba.paw.models.AppointmentTimeSlot;
+import org.joda.time.DateTime;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
@@ -21,13 +22,13 @@ public class AppointmentTimeSlotTransformer extends GenericTransformer<Appointme
     public Collection<Map<String, ?>> transform(Collection<AppointmentTimeSlot> appointmentTimeSlots) {
         Collection<Map<String, ?>> transformed = new LinkedList<>();
 
-        Map<LocalDate, List<Map<String, ?>>> transformedTimeSlotsPerDay = new HashMap<>();
+        Map<DateTime, List<Map<String, ?>>> transformedTimeSlotsPerDay = new HashMap<>();
         for (AppointmentTimeSlot appointmentTimeSlot : appointmentTimeSlots) {
             List<Map<String, ?>> transformedTimeSlots = transformedTimeSlotsPerDay.computeIfAbsent(appointmentTimeSlot.getDate(), k -> new LinkedList<>());
             transformedTimeSlots.add(this.transform(appointmentTimeSlot));
         }
 
-        for (Map.Entry<LocalDate, List<Map<String, ?>>> dateList : transformedTimeSlotsPerDay.entrySet()) {
+        for (Map.Entry<DateTime, List<Map<String, ?>>> dateList : transformedTimeSlotsPerDay.entrySet()) {
             Map<String, Object> map = new HashMap<>();
             map.put("date", this.transformDate(dateList.getKey()));
             map.put("timeslots", dateList.getValue());
@@ -37,10 +38,10 @@ public class AppointmentTimeSlotTransformer extends GenericTransformer<Appointme
         return transformed;
     }
 
-    private Map<String, ?> transformDate(LocalDate date) {
+    private Map<String, ?> transformDate(DateTime date) {
         Map<String, Object> map = new HashMap<>();
         map.put("year", date.getYear());
-        map.put("month", date.getMonthValue());
+        map.put("month", date.getMonthOfYear());
         map.put("day", date.getDayOfMonth());
         return map;
     }

@@ -39,7 +39,7 @@
                                 <!-- TODO Connect image function-->
                                 <h3>Telefono<img type="button" src='<c:url value="/img/editPencil.svg"/>' alt="editar"></h3>
                                 <!-- TODO Connect telefono-->
-                                <c:forEach var="patient" items="${user.get().patients}">
+                                <c:forEach var="patient" items="${patients}">
                                     <label for="phone"></label><input class="form-control mb-3 w-75" id="phone" name="phone" value="${patient.phone}" readonly/>
                                 </c:forEach>
                             </div>

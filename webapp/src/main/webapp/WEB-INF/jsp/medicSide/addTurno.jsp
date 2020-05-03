@@ -68,7 +68,7 @@
           </div>
           <div class="col-8">
             <form:select class="form-control" name="officeId" id="officeId" path="officeId">
-              <c:forEach items="${user.get().staffs}" var="staff">
+              <c:forEach items="${staffs}" var="staff">
                 <form:option value="${staff.office.id}">${staff.office.name}</form:option>
               </c:forEach>
             </form:select>

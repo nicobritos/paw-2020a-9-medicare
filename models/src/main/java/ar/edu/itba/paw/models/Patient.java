@@ -1,13 +1,10 @@
 package ar.edu.itba.paw.models;
 
-import ar.edu.itba.paw.persistenceAnnotations.ManyToOne;
 import ar.edu.itba.paw.persistenceAnnotations.Table;
 
 @Table(name = "patient", primaryKey = "patient_id")
-public class Patient extends GenericModel<Patient, Integer> {
-    @ManyToOne(name = "user_id", inverse = true)
+public class Patient extends GenericModel<Integer> {
     private User user;
-    @ManyToOne(name = "office_id", inverse = true)
     private Office office;
 
     public User getUser() {

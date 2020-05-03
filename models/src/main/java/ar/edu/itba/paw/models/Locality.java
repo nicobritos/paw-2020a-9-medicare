@@ -1,14 +1,12 @@
 package ar.edu.itba.paw.models;
 
 import ar.edu.itba.paw.persistenceAnnotations.Column;
-import ar.edu.itba.paw.persistenceAnnotations.ManyToOne;
 import ar.edu.itba.paw.persistenceAnnotations.Table;
 
 @Table(name = "system_locality", primaryKey = "locality_id")
-public class Locality extends GenericModel<Locality, Integer> {
+public class Locality extends GenericModel<Integer> {
     @Column(name = "name", required = true)
     private String name;
-    @ManyToOne(name = "province_id", inverse = true)
     private Province province;
 
     public String getName() {
@@ -21,6 +19,10 @@ public class Locality extends GenericModel<Locality, Integer> {
 
     public Province getProvince() {
         return this.province;
+    }
+
+    public void setProvince(Province province) {
+        this.province = province;
     }
 
     @Override

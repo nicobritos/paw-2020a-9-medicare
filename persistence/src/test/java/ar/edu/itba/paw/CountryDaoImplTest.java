@@ -96,7 +96,6 @@ public class CountryDaoImplTest
         assertEquals(1, JdbcTestUtils.countRowsInTable(this.jdbcTemplate, COUNTRIES_TABLE));
         assertEquals(COUNTRY, country.getName());
         assertEquals(COUNTRY_ID, country.getId());
-        assertTrue(country.getProvinces().isEmpty());
     }
 
     @Test
@@ -263,27 +262,5 @@ public class CountryDaoImplTest
 
         // 3. Postcondiciones
         assertEquals(0,JdbcTestUtils.countRowsInTable(jdbcTemplate, COUNTRIES_TABLE));
-    }
-
-    @Test
-    public void testCountryUpdateProvinces(){
-        // 1. Precondiciones
-        cleanAllTables();
-        insertCountry();
-        insertAnotherCountry();
-        Map<String, Object> provinceMap = new HashMap<>();
-        provinceMap.put("name", PROVINCE);
-        provinceMap.put("country_id", "BR");
-        provinceJdbcInsert.execute(provinceMap);
-
-        Country c = this.countryDao.findById(COUNTRY_ID).get();
-        c.getProvinces().add(provinceModel());
-
-        // 2. Ejercitar
-        this.countryDao.update(c);
-
-        // 3. Postcondiciones
-        assertEquals(2,JdbcTestUtils.countRowsInTable(jdbcTemplate, COUNTRIES_TABLE));
-        assertEquals(1,JdbcTestUtils.countRowsInTableWhere(jdbcTemplate, PROVINCES_TABLE, "country_id = '" + COUNTRY_ID + "'"));
     }
 }

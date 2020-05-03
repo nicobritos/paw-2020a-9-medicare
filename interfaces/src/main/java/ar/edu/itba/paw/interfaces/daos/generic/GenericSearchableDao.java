@@ -11,7 +11,7 @@ import java.util.List;
  * @param <M> the DAO model type
  * @param <I> the Model's id type
  */
-public interface GenericSearchableDao<M extends GenericModel<M, I>, I> extends GenericDao<M, I> {
+public interface GenericSearchableDao<M extends GenericModel<I>, I> extends GenericDao<M, I> {
     /**
      * Returns a collection of <M> that have a name similar to the one provided.
      * The search is not case-sensitive nor exact

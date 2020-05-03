@@ -42,15 +42,21 @@ public class UserServiceImpl extends GenericSearchableServiceImpl<UserDao, User,
     }
 
     @Override
+    public boolean isStaff(User user) {
+        return !this.staffService.findByUser(user.getId()).isEmpty();
+    }
+
+    @Override
     @Transactional
     public Patient createNewPatient(Patient patient) throws EmailAlreadyExistsException {
         Patient newPatient = this.patientService.create(patient);
-        Office office = patient.getOffice();
-        office.getPatients().add(newPatient);
-        this.officeService.update(office);
-        User user = patient.getUser();
-        user.getPatients().add(newPatient);
-        this.update(user);
+        // TODO
+//        Office office = patient.getOffice();
+//        office.getPatients().add(newPatient);
+//        this.officeService.update(office);
+//        User user = patient.getUser();
+//        user.getPatients().add(newPatient);
+//        this.update(user);
         return newPatient;
     }
 
@@ -68,11 +74,12 @@ public class UserServiceImpl extends GenericSearchableServiceImpl<UserDao, User,
         staff.setSurname(newUser.getSurname());
         staff = this.staffService.create(staff);
 
-        office.getStaffs().add(staff);
-        this.officeService.update(office);
-
-        newUser.getStaffs().add(staff);
-        this.update(newUser);
+        // TODO
+//        office.getStaffs().add(staff);
+//        this.officeService.update(office);
+//
+//        newUser.getStaffs().add(staff);
+//        this.update(newUser);
 
         return newUser;
     }

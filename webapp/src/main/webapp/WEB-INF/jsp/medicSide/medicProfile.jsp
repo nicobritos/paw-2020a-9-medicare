@@ -35,7 +35,7 @@
               <div class="row">
                 <div class="col p-0 m-0">
                   <h3>Teléfono/s</h3>
-                    <c:forEach var="staff" items="${user.get().staffs}">
+                    <c:forEach var="staff" items="${staffs}">
                       <label for="phone"></label><input class="form-control mb-3 w-75" id="phone" name="phone" value="${staff.office.phone}" readonly/>
                     </c:forEach>
                  </div>
@@ -64,7 +64,7 @@
               </form:form>
               <div class="row mb-3">
                 <h3>Consultorio</h3>
-                  <c:forEach var="staff" items="${user.get().staffs}">
+                  <c:forEach var="staff" items="${staffs}">
                     <div class="container p-0 m-0 pl-3">
                       <div class="row d-flex align-items-center justify-content-between">
                         <p class="m-0">- ${staff.office.name}</p>
@@ -76,8 +76,8 @@
                 <h3>Horarios</h3>
                 <div class="container p-0 m-0 pl-3">
                   <div class="row d-flex align-items-center justify-content-between">
-                    <c:forEach var="staff" items="${user.get().staffs}">
-                      <c:forEach var="workday" items="${staff.workdays}">
+                    <c:forEach var="staff" items="${staffs}">
+                      <c:forEach var="workday" items="${workdays}">
                         <p class="m-0">- ${workday.day} de ${workday.startHour}:${workday.startMinute}hs a ${workday.endHour}:${workday.endMinute}hs - ${workday.staff.office.name}</p>
                         <a href='<c:url value="/staff/profile/workday/delete/${workday.id}"/> ' class="btn">X</a>
                       </c:forEach>

@@ -1,12 +1,10 @@
 package ar.edu.itba.paw.models;
 
 import ar.edu.itba.paw.persistenceAnnotations.Column;
-import ar.edu.itba.paw.persistenceAnnotations.ManyToOne;
 import ar.edu.itba.paw.persistenceAnnotations.Table;
 
 @Table(name = "workday", primaryKey = "workday_id")
-public class Workday extends GenericModel<Workday, Integer> {
-    @ManyToOne(name = "staff_id")
+public class Workday extends GenericModel<Integer> {
     private Staff staff;
     @Column(name = "start_hour", required = true)
     private Integer startHour;

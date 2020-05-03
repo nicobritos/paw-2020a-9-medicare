@@ -20,7 +20,6 @@ import org.springframework.web.servlet.ModelAndView;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
-import java.sql.Date;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.LinkedList;
@@ -59,7 +58,11 @@ public class PatientSideController extends GenericController {
         Patient patient = new Patient();
         patient.setUser(user.get());
 
+        Optional<Appointment> appointment = this.appointmentService.findById(2);
         mav.addObject("user", user);
+        if(isStaff()) {
+            mav.addObject("staffs", staffService.findByUser(user.get().getId()));
+        }
         mav.addObject("appointments", appointmentService.find(patient));
         mav.addObject("specialties", staffSpecialtyService.list());
         mav.addObject("localities", localityService.list());
@@ -76,6 +79,11 @@ public class PatientSideController extends GenericController {
         }
         ModelAndView mav = new ModelAndView();
         mav.addObject("user", user);
+        if(isStaff()) {
+            mav.addObject("staffs", staffService.findByUser(user.get().getId()));
+        } else {
+            mav.addObject("patients", patientService.findByUser(user.get()));
+        }
 
         mav.setViewName("patientSide/patientProfile");
         return mav;
@@ -107,6 +115,9 @@ public class PatientSideController extends GenericController {
 
         ModelAndView mav = new ModelAndView();
         mav.addObject("user", user);
+        if(isStaff()) {
+            mav.addObject("staffs", staffService.findByUser(user.get().getId()));
+        }
         mav.setViewName("patientSide/patientProfile");
         return mav;
     }
@@ -141,7 +152,8 @@ public class PatientSideController extends GenericController {
             Appointment appointment = new Appointment();
             appointment.setStaff(staff.get());
             appointment.setPatient(patient);
-            appointment.setFromDate(Date.valueOf(date.toLocalDate()));
+            // TODO
+//            appointment.setFromDate(Date.valueOf(date.toLocalDate()));
 
             this.appointmentService.create(appointment);
             return new LinkedList<>();

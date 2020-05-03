@@ -1,26 +1,19 @@
 package ar.edu.itba.paw.models;
 
 import ar.edu.itba.paw.persistenceAnnotations.Column;
-import ar.edu.itba.paw.persistenceAnnotations.ManyToOne;
 import ar.edu.itba.paw.persistenceAnnotations.Table;
-
-import java.time.LocalDateTime;
-import java.time.ZoneOffset;
-import java.util.Date;
+import org.joda.time.DateTime;
 
 @Table(name = "appointment", primaryKey = "appointment_id")
-public class Appointment extends GenericModel<Appointment, Integer> {
+public class Appointment extends GenericModel<Integer> {
     public static final int DURATION = 15;
 
     @Column(name = "status", required = true)
     private String appointmentStatus;
-    @ManyToOne(name = "patient_id", required = true)
-    private Patient patient;
-    @ManyToOne(name = "staff_id", required = true)
-    private Staff staff;
     @Column(name = "from_date", required = true)
-    private Date fromDate;
-    // TODO: Remove to date
+    private DateTime fromDate;
+    private Patient patient;
+    private Staff staff;
 
     public String getAppointmentStatus() {
         return this.appointmentStatus;
@@ -46,24 +39,20 @@ public class Appointment extends GenericModel<Appointment, Integer> {
         this.staff = staff;
     }
 
-    public Date getFromDate() {
+    public DateTime getFromDate() {
         return this.fromDate;
     }
 
-    public void setFromDate(Date fromDate) {
+    public void setFromDate(DateTime fromDate) {
         this.fromDate = fromDate;
     }
 
-    public LocalDateTime getToDate(){
-        return LocalDateTime.ofEpochSecond(this.fromDate.toInstant().getEpochSecond(), 0, ZoneOffset.UTC);
+    public DateTime getToDate(){
+        return this.fromDate.plusMinutes(Appointment.DURATION);
     }
 
     @Override
     protected boolean isSameInstance(Object o) {
         return o instanceof Appointment;
-    }
-
-    public LocalDateTime getFromLocalDate() {
-        return LocalDateTime.ofEpochSecond(this.fromDate.toInstant().getEpochSecond(), 0, ZoneOffset.UTC);
     }
 }
