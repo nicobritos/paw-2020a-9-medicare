@@ -101,9 +101,8 @@
                   <c:when test="${monday.plusDays(i).monthOfYear == 11}"><spring:message code="November"/></c:when>
                   <c:when test="${monday.plusDays(i).monthOfYear == 12}"><spring:message code="December"/></c:when>
                   <c:otherwise>${monday.plusDays(i).monthOfYear}</c:otherwise></c:choose></p>
-<%--                  TODO: HACER DINAMICO POR CADA DIA--%>
-                <p>${appointments.size()} <c:choose>
-                  <c:when test="${appointments.size() == 1}"><spring:message code="appointment"/></c:when>
+                <p>${weekAppointments.get(monday.plusDays(i).dayOfWeek).size()} <c:choose>
+                  <c:when test="${weekAppointments.get(monday.plusDays(i).dayOfWeek).size() == 1}"><spring:message code="appointment"/></c:when>
                   <c:otherwise><spring:message code="appointments"/></c:otherwise>
                 </c:choose></p>
               </span>
@@ -114,7 +113,7 @@
           <div class="row justify-content-center">
             <!-- TODO: change items -->
             <ul class="list-group turno-list mr-2 w-50 overflow-auto">
-              <c:forEach var="appointment" items="${appointments}">
+              <c:forEach var="appointment" items="${weekAppointments.get(today.dayOfWeek)}">
                 <li class="list-group-item turno-item mb-3">
                   <div class="container">
                     <div class="row">
