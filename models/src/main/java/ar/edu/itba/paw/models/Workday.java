@@ -16,6 +16,8 @@ public class Workday extends GenericModel<Integer> {
     private Integer endMinute;
     @Column(name = "day", required = true)
     private String day;
+    @Column(name = "staff_id", required = true)
+    private int staffId;
 
     public Staff getStaff() {
         return this.staff;
@@ -23,6 +25,7 @@ public class Workday extends GenericModel<Integer> {
 
     public void setStaff(Staff staff) {
         this.staff = staff;
+        this.staffId = staff.getId();
     }
 
     public Integer getStartHour() {
@@ -63,6 +66,18 @@ public class Workday extends GenericModel<Integer> {
 
     public void setEndMinute(Integer endMinute) {
         this.endMinute = endMinute;
+    }
+
+    public int getStaffId() {
+        return staffId;
+    }
+
+    public void setStaffId(int staffId) {
+        this.staffId = staffId;
+
+        if(this.staff != null && !this.staff.getId().equals(staffId)){
+            this.staff = null;
+        }
     }
 
     @Override

@@ -17,7 +17,7 @@
             <!-- TODO connect-->
 <%--            <a href="">Cambiar foto de perfil</a>--%>
             <!-- TODO Connect-->
-            <a class="mt-3" href=""><spring:message code="ChangePassword"/></a>
+            <%--<a class="mt-3" href=""><spring:message code="ChangePassword"/></a>--%>
           </div>
           <div class="col-6">
             <div class="container p-0 pt-4 m-0">
@@ -79,7 +79,16 @@
                   <div class="row d-flex align-items-center justify-content-between">
                     <c:forEach var="staff" items="${staffs}">
                       <c:forEach var="workday" items="${workdays}">
-                        <p class="m-0">- ${workday.day} de ${workday.startHour}:${workday.startMinute}hs a ${workday.endHour}:${workday.endMinute}hs - ${workday.staff.office.name}</p>
+                        <p class="m-0">- <c:choose>
+                          <c:when test="${workday.day == 'MONDAY'}"><spring:message code="Monday"/></c:when>
+                          <c:when test="${workday.day == 'TUESDAY'}"><spring:message code="Tuesday"/></c:when>
+                          <c:when test="${workday.day == 'WEDNESDAY'}"><spring:message code="Wednesday"/></c:when>
+                          <c:when test="${workday.day == 'THURSDAY'}"><spring:message code="Thursday"/></c:when>
+                          <c:when test="${workday.day == 'FRIDAY'}"><spring:message code="Friday"/></c:when>
+                          <c:when test="${workday.day == 'SATURDAY'}"><spring:message code="Saturday"/></c:when>
+                          <c:when test="${workday.day == 'SUNDAY'}"><spring:message code="Sunday"/></c:when>
+                          <c:otherwise>${workday.day}</c:otherwise>
+                        </c:choose> de <c:if test="${workday.startHour < 10}">0</c:if>${workday.startHour}:<c:if test="${workday.startMinute < 10}">0</c:if>${workday.startMinute}hs a <c:if test="${workday.endHour < 10}">0</c:if>${workday.endHour}:<c:if test="${workday.endMinute < 10}">0</c:if>${workday.endMinute}hs - ${workday.staff.office.name}</p>
                         <a href='<c:url value="/staff/profile/workday/delete/${workday.id}"/> ' class="btn">X</a>
                       </c:forEach>
                     </c:forEach>
