@@ -13,7 +13,7 @@
     <div class="container h-75">
         <div class="row mt-4 justify-content-center">
             <%--TODO connect name search--%>
-            <input class="form-control w-100" type="text" name="name" placeholder="Nombre"/>
+            <input class="form-control w-100" type="text" name="name" placeholder="<spring:message code="Name"/>"/>
         </div>
         <div class="row mt-4">
             <div class="col-4 px-3">
@@ -25,8 +25,8 @@
                 <%--          </div>--%>
                 <div class="row mt-4">
                     <select class="form-control w-100" type="text" name="specialties" id="selEspecialidad">
-                        <option value="-1" disabled selected>Especialidad</option>
-                        <option value="-1">Cualquiera</option>
+                        <option value="-1" disabled selected><spring:message code="Specialty"/></option>
+                        <option value="-1"><spring:message code="Any"/></option>
                         <c:forEach var="specialty" items="${specialties}">
                             <option value="<c:out value="${specialty.id}"/>"><c:out value="${specialty.name}"/></option>
                         </c:forEach>
@@ -35,15 +35,15 @@
                 <div class="row mt-4">
                     <%--TODO connect localidad search--%>
                     <select class="form-control w-100" type="text" name="localities" id="localidad">
-                        <option value="-1" disabled selected>Localidad</option>
-                        <option value="-1">Cualquiera</option>
+                        <option value="-1" disabled selected><spring:message code="Locality"/></option>
+                        <option value="-1"><spring:message code="Any"/></option>
                         <c:forEach var="locality" items="${localities}">
                             <option value="<c:out value="${locality.id}"/>"><c:out value="${locality.name}"/></option>
                         </c:forEach>
                     </select>
                 </div>
                 <div class="row mt-4">
-                    <button type="submit" class="btn btn-info w-100 rounded-pill">Filtrar</button>
+                    <button type="submit" class="btn btn-info w-100 rounded-pill"><spring:message code="Filter"/></button>
                 </div>
             </div>
             <div class="col-1"></div>
@@ -79,7 +79,7 @@
                                     <div class="col d-flex justify-content-center align-items-center">
                                         <button type="button" class="btn btn-info available-appointments-button"
                                                 data-id="${member.id}">
-                                            Turnos disponibles
+                                            <spring:message code="AvailableAppointments"/>
                                         </button>
                                     </div>
                                 </div>

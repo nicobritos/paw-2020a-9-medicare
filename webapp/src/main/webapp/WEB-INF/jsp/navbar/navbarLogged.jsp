@@ -1,3 +1,4 @@
+<%@ taglib prefix="spring" uri="http://www.springframework.org/tags" %>
 <nav class="navbar navbar-expand header">
   <!-- TODO -->
   <div class="container w-100 justify-content-start">
@@ -16,21 +17,21 @@
     <c:choose>
       <c:when test="${staffs == null}">
         <a href="<c:url value="/patient/home"/> " class="header-a-element nav-link mx-3"
-        >Mis turnos</a
+        ><spring:message code="MyAppointments"/></a
         >
         <a href="<c:url value="/mediclist/1"/>" class="header-a-element nav-link mx-3"
-        >Buscar médicos</a
+        ><spring:message code="SearchMedics"/></a
         >
       </c:when>
       <c:otherwise>
         <a href="<c:url value="/staff/home"/> " class="header-a-element nav-link mx-3"
-        >Mis turnos</a
+        ><spring:message code="MyAppointments"/></a
         >
       </c:otherwise>
     </c:choose>
     <div class="d-inline-flex flex-column align-items-end">
       <p style="font-weight: 400;" class="m-0 p-0 text-muted white-text">${user.get().firstName} ${user.get().surname}</p>
-      <a href="<c:url value="/logout"/>" class="m-0 p-0 header-a-element"><small class="m-0 p-0">Cerrar sesión</small></a>
+      <a href="<c:url value="/logout"/>" class="m-0 p-0 header-a-element"><small class="m-0 p-0"><spring:message code="Logout"/></small></a>
     </div>
     <%--TODO:connect correct image--%>
         <c:choose>

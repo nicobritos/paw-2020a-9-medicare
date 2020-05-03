@@ -26,7 +26,7 @@
           </h4>
         </div>
         <div class="col">
-          <h4>Agenda semanal</h4>
+          <h4><spring:message code="WeeklyAgenda"/></h4>
         </div>
       </div>
       <div class="row h-100">
@@ -61,8 +61,8 @@
                         />
                         <div class="dropdown-menu">
                           <!-- TODO conect to the options -->
-                          <a class="dropdown-item" href="#">Cancelar</a>
-                          <a class="dropdown-item" href="#">Reprogramar</a>
+                          <a class="dropdown-item" href="#"><spring:message code="Cancel"/></a>
+                          <a class="dropdown-item" href="#"><spring:message code="Reprogram"/></a>
                         </div>
                       </div>
                     </div>
@@ -86,34 +86,34 @@
 
                 <p class="mb-0">
                   <c:choose>
-                    <c:when test="${monday.plusDays(i).dayOfWeek.name() == 'MONDAY'}">Lunes</c:when>
-                    <c:when test="${monday.plusDays(i).dayOfWeek.name() == 'TUESDAY'}">Martes</c:when>
-                    <c:when test="${monday.plusDays(i).dayOfWeek.name() == 'WEDNESDAY'}">Miércoles</c:when>
-                    <c:when test="${monday.plusDays(i).dayOfWeek.name() == 'THURSDAY'}">Jueves</c:when>
-                    <c:when test="${monday.plusDays(i).dayOfWeek.name() == 'FRIDAY'}">Viernes</c:when>
-                    <c:when test="${monday.plusDays(i).dayOfWeek.name() == 'SATURDAY'}">Sábado</c:when>
-                    <c:when test="${monday.plusDays(i).dayOfWeek.name() == 'SUNDAY'}">Domingo</c:when>
+                    <c:when test="${monday.plusDays(i).dayOfWeek.name() == 'MONDAY'}"><spring:message code="Monday"/></c:when>
+                    <c:when test="${monday.plusDays(i).dayOfWeek.name() == 'TUESDAY'}"><spring:message code="Tuesday"/></c:when>
+                    <c:when test="${monday.plusDays(i).dayOfWeek.name() == 'WEDNESDAY'}"><spring:message code="Wednesday"/></c:when>
+                    <c:when test="${monday.plusDays(i).dayOfWeek.name() == 'THURSDAY'}"><spring:message code="Thursday"/></c:when>
+                    <c:when test="${monday.plusDays(i).dayOfWeek.name() == 'FRIDAY'}"><spring:message code="Friday"/></c:when>
+                    <c:when test="${monday.plusDays(i).dayOfWeek.name() == 'SATURDAY'}"><spring:message code="Saturday"/></c:when>
+                    <c:when test="${monday.plusDays(i).dayOfWeek.name() == 'SUNDAY'}"><spring:message code="Sunday"/></c:when>
                     <c:otherwise>${monday.plusDays(i).dayOfWeek.name()}</c:otherwise>
                   </c:choose>
                 </p>
                 <!-- day/month -->
-                <p class="my-0">${monday.plusDays(i).dayOfMonth} de <c:choose>
-                  <c:when test="${monday.plusDays(i).month.name() == 'JANUARY'}">enero</c:when>
-                  <c:when test="${monday.plusDays(i).month.name() == 'FEBRUARY'}">febrero</c:when>
-                  <c:when test="${monday.plusDays(i).month.name() == 'MARCH'}">marzo</c:when>
-                  <c:when test="${monday.plusDays(i).month.name() == 'APRIL'}">abril</c:when>
-                  <c:when test="${monday.plusDays(i).month.name() == 'MAY'}">mayo</c:when>
-                  <c:when test="${monday.plusDays(i).month.name() == 'JUNE'}">junio</c:when>
-                  <c:when test="${monday.plusDays(i).month.name() == 'JULY'}">julio</c:when>
-                  <c:when test="${monday.plusDays(i).month.name() == 'AUGUST'}">agosto</c:when>
-                  <c:when test="${monday.plusDays(i).month.name() == 'SEPTEMBER'}">septiembre</c:when>
-                  <c:when test="${monday.plusDays(i).month.name() == 'OCTOBER'}">octubre</c:when>
-                  <c:when test="${monday.plusDays(i).month.name() == 'NOVEMBER'}">noviembre</c:when>
-                  <c:when test="${monday.plusDays(i).month.name() == 'DECEMBER'}">diciembre</c:when>
+                <p class="my-0">${monday.plusDays(i).dayOfMonth} <spring:message code="of"/> <c:choose>
+                  <c:when test="${monday.plusDays(i).month.name() == 'JANUARY'}"><spring:message code="January"/></c:when>
+                  <c:when test="${monday.plusDays(i).month.name() == 'FEBRUARY'}"><spring:message code="February"/></c:when>
+                  <c:when test="${monday.plusDays(i).month.name() == 'MARCH'}"><spring:message code="March"/></c:when>
+                  <c:when test="${monday.plusDays(i).month.name() == 'APRIL'}"><spring:message code="April"/></c:when>
+                  <c:when test="${monday.plusDays(i).month.name() == 'MAY'}"><spring:message code="May"/></c:when>
+                  <c:when test="${monday.plusDays(i).month.name() == 'JUNE'}"><spring:message code="June"/></c:when>
+                  <c:when test="${monday.plusDays(i).month.name() == 'JULY'}"><spring:message code="July"/></c:when>
+                  <c:when test="${monday.plusDays(i).month.name() == 'AUGUST'}"><spring:message code="August"/></c:when>
+                  <c:when test="${monday.plusDays(i).month.name() == 'SEPTEMBER'}"><spring:message code="September"/></c:when>
+                  <c:when test="${monday.plusDays(i).month.name() == 'OCTOBER'}"><spring:message code="October"/></c:when>
+                  <c:when test="${monday.plusDays(i).month.name() == 'NOVEMBER'}"><spring:message code="November"/></c:when>
+                  <c:when test="${monday.plusDays(i).month.name() == 'DECEMBER'}"><spring:message code="December"/></c:when>
                   <c:otherwise>${monday.plusDays(i).month.name()}</c:otherwise></c:choose></p>
                 <p>${todayAppointments.size()} <c:choose>
-                  <c:when test="${todayAppointments.size() == 1}">turno</c:when>
-                  <c:otherwise>turnos</c:otherwise>
+                  <c:when test="${todayAppointments.size() == 1}"><spring:message code="appointment"/></c:when>
+                  <c:otherwise><spring:message code="appointments"/></c:otherwise>
                 </c:choose></p>
               </span>
                 </span>

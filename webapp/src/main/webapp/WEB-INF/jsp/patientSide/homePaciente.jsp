@@ -1,4 +1,5 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jstl/core_rt"%>
+<%@ taglib prefix="spring" uri="http://www.springframework.org/tags" %>
 <!DOCTYPE html>
 <html lang="en">
   <head>
@@ -11,7 +12,7 @@
 
     <div class="container h-75 w-100 mt-5">
       <div class="row">
-        <h4>Mis turnos</h4>
+        <h4><spring:message code="MyAppointments"/></h4>
       </div>
       <div class="row h-100">
         <div class="col h-100 pl-0 mr-5 w-100">
@@ -51,8 +52,8 @@
                             <img src='<c:url value="/img/moreOptions.svg"/>' class="moreOptionsButton" alt="nore options" data-toggle="dropdown">
                             <div class="dropdown-menu">
                               <!-- TODO conect to the options -->
-                            <a class="dropdown-item" href="#">Cancelar</a>
-                            <a class="dropdown-item" href="#">Reprogramar</a>
+                            <a class="dropdown-item" href="#"><spring:message code="Cancel"/></a>
+                            <a class="dropdown-item" href="#"><spring:message code="Reprogram"/></a>
                           </div>
                         </div>
                     </div>
@@ -65,15 +66,15 @@
         <div class="col">
           <form action="<c:url value="/mediclist/1"/>" class="container p-5 filter-form">
             <div class="row justify-content-start">
-              <h3 class="form-title">Buscar medico</h3>
+              <h3 class="form-title"><spring:message code="SearchMedics"/></h3>
             </div>
             <div class="row justify-content-start my-3">
-              <input class="w-100 form-control" type="text" name="name" id="name" placeholder="Nombre y/o apellido">
+              <input class="w-100 form-control" type="text" name="name" id="name" placeholder="<spring:message code="NameAndOrSurname"/>">
             </div>
             <div class="row justify-content-start my-3">
               <select name="specialties" class="form-control">
-                <option value="-1" disabled selected>Especialidad</option>
-                <option value="-1">Cualquiera</option>
+                <option value="-1" disabled selected><spring:message code="Specialty"/></option>
+                <option value="-1"><spring:message code="Any"/></option>
                 <c:forEach var="specialty" items="${specialties}">
                   <option value="<c:out value="${specialty.id}"/>"><c:out value="${specialty.name}"/></option>
                 </c:forEach>
@@ -81,15 +82,15 @@
             </div>
             <div class="row justify-content-start my-3">
               <select name="localities" class="form-control">
-                <option value="-1" disabled selected>Localidad</option>
-                <option value="-1">Cualquiera</option>
+                <option value="-1" disabled selected><spring:message code="Locality"/></option>
+                <option value="-1"><spring:message code="Any"/></option>
                 <c:forEach var="locality" items="${localities}">
                   <option value="<c:out value="${locality.id}"/>"><c:out value="${locality.name}"/></option>
                 </c:forEach>
               </select>
             </div>
             <div class="row justify-content-start my-3">
-              <button class="w-100 btn rounded-pill btn-light header-btn-element">Buscar médicos</button>
+              <button class="w-100 btn rounded-pill btn-light header-btn-element"><spring:message code="SearchMedics"/></button>
             </div>
           </form>
         </div>

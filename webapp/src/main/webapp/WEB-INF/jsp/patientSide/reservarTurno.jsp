@@ -11,33 +11,33 @@
       <div class="row mt-4">
         <%-- TODO:connect form--%>
         <form class="col d-flex flex-column">
-          <h4 class="text-muted">Reserva de turnos</h4>
-          <p class="mt-3 text-muted">Motivos</p>
+          <h4 class="text-muted"><spring:message code="ScheduleAppointment"/></h4>
+          <p class="mt-3 text-muted"><spring:message code="Motive"/></p>
           <%-- TODO:connect input--%>
           <label for="motivo"></label><input placeholder="Motivo de consulta" value="Consulta <c:forEach var="specialty" items="${staff.staffSpecialties}">${specialty.name}</c:forEach>" type="text" name="motivo" id="motivo" class="form-control w-50"/>
-          <p class="mt-3 text-muted mb-1">Datos personales</p>
+          <p class="mt-3 text-muted mb-1"><spring:message code="PersonalData"/></p>
           <div class="container-fluid p-0 d-flex flex-row">
             <div class="col px-0">
               <%-- TODO:connect nombre--%>
-              <input placeholder="Nombre" value="${user.get().firstName}" type="text" name="motivo" id="motivo" class="form-control">
+              <input placeholder="<spring:message code="Name"/>" value="${user.get().firstName}" type="text" name="motivo" id="motivo" class="form-control">
             </div>
             <div class="col p-0 ml-2">
               <%-- TODO:connect apellido--%>
-              <input placeholder="Apellido" value="${user.get().surname}" type="text" name="motivo" id="motivo" class="form-control">
+              <input placeholder="<spring:message code="Surname"/>" value="${user.get().surname}" type="text" name="motivo" id="motivo" class="form-control">
             </div>
           </div>
           <%-- TODO:connect telefono--%>
-          <input placeholder="Teléfono" type="text" name="telefono" id="telefono" class="form-control mt-3 w-50">
+          <input placeholder="<spring:message code="Phone"/>" type="text" name="telefono" id="telefono" class="form-control mt-3 w-50">
           <%-- TODO:connect email--%>
-          <input placeholder="Email" value="${user.get().email}" type="text" name="email" id="email" class="form-control mt-3 w-50">
+          <input placeholder="<spring:message code="Email"/>" value="${user.get().email}" type="text" name="email" id="email" class="form-control mt-3 w-50">
           <%-- TODO:connect comentario--%>
-          <textarea placeholder="Comentario (opcional)" class="form-control mt-3" name="comentarios" id="comentarios" cols="30" rows="5"></textarea>
-          <button type="submit" class="btn btn-info mt-3 w-100">Reservar turno</button>
+          <textarea placeholder="<spring:message code="OptionalComment"/>" class="form-control mt-3" name="comentarios" id="comentarios" cols="30" rows="5"></textarea>
+          <button type="submit" class="btn btn-info mt-3 w-100"><spring:message code="ScheduleAppointment"/></button>
         </form>
         <div class="col">
           <div class="container details-container mt-5 p-3 w-75">
             <div class="row justify-content-center">
-              <h4 class="white-text">Detalles de consulta</h4>
+              <h4 class="white-text"><spring:message code="AppointmentDetails"/></h4>
             </div>
             <div class="row justify-content-center border-top border-light py-2">
               <div class="col-3">
@@ -58,7 +58,7 @@
               <div class="col p-0">
                 <%-- TODO: connect hora--%>
                 <p class="m-0 white-text">${date.dayOfWeek.name()} ${date.dayOfMonth} de ${date.month.name()}, 20:00hs</p>
-                  <a href="<c:url value="/appointment/${staffId}"/> "><small class="white-text">Cambiar fecha</small></a>
+                  <a href="<c:url value="/appointment/${staffId}"/> "><small class="white-text"><spring:message code="ChangeDate"/></small></a>
               </div>
             </div>
             <div class="row justify-content-center border-top border-light py-2">

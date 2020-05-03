@@ -29,18 +29,18 @@
                 </div>
             </div>
             <div class="row mt-3 pl-4">
-                <p>Direccíon: ${staff.office.street} - ${staff.office.locality.name}</p>
+                <p><spring:message code="Address"/>: ${staff.office.street} - ${staff.office.locality.name}</p>
             </div>
             <div class="row pl-4">
-                <p>Teléfono: ${staff.office.phone}</p>
+                <p><spring:message code="Phone"/>: ${staff.office.phone}</p>
             </div>
             <div class="row pl-4">
-                <p>Email: ${staff.email}</p>
+                <p><spring:message code="Email"/>: ${staff.email}</p>
             </div>
         </div>
         <div class="col ml-5 mt-3 p-0">
             <div class="row">
-                <h4>Seleccionar turno</h4>
+                <h4><spring:message code="SelectAppointment"/></h4>
             </div>
             <div class="row">
                 <div class="col-1 p-0">
