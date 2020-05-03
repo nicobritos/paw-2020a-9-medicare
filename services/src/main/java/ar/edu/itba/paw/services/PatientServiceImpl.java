@@ -9,6 +9,7 @@ import ar.edu.itba.paw.services.generics.GenericSearchableServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -22,7 +23,7 @@ public class PatientServiceImpl extends GenericSearchableServiceImpl<PatientDao,
     }
 
     @Override
-    public Optional<Patient> findByUser(User user) {
+    public List<Patient> findByUser(User user) {
         return this.repository.findByUser(user);
     }
 

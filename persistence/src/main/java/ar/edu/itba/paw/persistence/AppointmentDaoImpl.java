@@ -8,6 +8,7 @@ import ar.edu.itba.paw.persistence.utils.builder.JDBCSelectQueryBuilder;
 import ar.edu.itba.paw.persistence.utils.builder.JDBCSelectQueryBuilder.JoinType;
 import ar.edu.itba.paw.persistence.utils.builder.JDBCWhereClauseBuilder;
 import ar.edu.itba.paw.persistence.utils.builder.JDBCWhereClauseBuilder.Operation;
+import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.ResultSetExtractor;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
@@ -146,11 +147,11 @@ public class AppointmentDaoImpl extends GenericDaoImpl<Appointment, Integer> imp
     }
 
     @Override
-    public List<Appointment> findByDate(Staff staff, LocalDate date) {
+    public List<Appointment> findByDate(Staff staff, DateTime date) {
         MapSqlParameterSource parameterSource = new MapSqlParameterSource();
         parameterSource.addValue("staff", staff.getId());
         parameterSource.addValue("year", date.getYear());
-        parameterSource.addValue("month", date.getMonthValue());
+        parameterSource.addValue("month", date.getMonthOfYear());
         parameterSource.addValue("day", date.getDayOfMonth());
 
         JDBCWhereClauseBuilder whereClauseBuilder = new JDBCWhereClauseBuilder()
@@ -171,11 +172,11 @@ public class AppointmentDaoImpl extends GenericDaoImpl<Appointment, Integer> imp
     }
 
     @Override
-    public List<Appointment> findByDate(Patient patient, LocalDate date) {
+    public List<Appointment> findByDate(Patient patient, DateTime date) {
         MapSqlParameterSource parameterSource = new MapSqlParameterSource();
         parameterSource.addValue("patient", patient.getId());
         parameterSource.addValue("year", date.getYear());
-        parameterSource.addValue("month", date.getMonthValue());
+        parameterSource.addValue("month", date.getMonthOfYear());
         parameterSource.addValue("day", date.getDayOfMonth());
 
         JDBCWhereClauseBuilder whereClauseBuilder = new JDBCWhereClauseBuilder()

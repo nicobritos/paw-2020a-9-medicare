@@ -57,7 +57,7 @@ public class PatientDaoImpl extends GenericSearchableDaoImpl<Patient, Integer> i
     }
 
     @Override
-    public Optional<Patient> findByUser(User user) {
+    public List<Patient> findByUser(User user) {
         MapSqlParameterSource parameterSource = new MapSqlParameterSource();
         parameterSource.addValue("user_id", user.getId());
 
@@ -69,7 +69,7 @@ public class PatientDaoImpl extends GenericSearchableDaoImpl<Patient, Integer> i
                 .from(this.getTableName())
                 .where(whereClauseBuilder);
 
-        return this.selectQuery(queryBuilder, parameterSource).stream().findFirst();
+        return this.selectQuery(queryBuilder, parameterSource);
     }
 
     @Override

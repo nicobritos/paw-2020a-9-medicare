@@ -60,6 +60,9 @@ public class PatientSideController extends GenericController {
 
         Optional<Appointment> appointment = this.appointmentService.findById(2);
         mav.addObject("user", user);
+        if(isStaff()) {
+            mav.addObject("staffs", staffService.findByUser(user.get().getId()));
+        }
         mav.addObject("appointments", appointmentService.find(patient));
         mav.addObject("specialties", staffSpecialtyService.list());
         mav.addObject("localities", localityService.list());
@@ -76,6 +79,11 @@ public class PatientSideController extends GenericController {
         }
         ModelAndView mav = new ModelAndView();
         mav.addObject("user", user);
+        if(isStaff()) {
+            mav.addObject("staffs", staffService.findByUser(user.get().getId()));
+        } else {
+            mav.addObject("patients", patientService.findByUser(user.get()));
+        }
 
         mav.setViewName("patientSide/patientProfile");
         return mav;
@@ -107,6 +115,9 @@ public class PatientSideController extends GenericController {
 
         ModelAndView mav = new ModelAndView();
         mav.addObject("user", user);
+        if(isStaff()) {
+            mav.addObject("staffs", staffService.findByUser(user.get().getId()));
+        }
         mav.setViewName("patientSide/patientProfile");
         return mav;
     }

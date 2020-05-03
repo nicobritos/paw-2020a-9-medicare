@@ -14,7 +14,7 @@
   <div class="container w-100 justify-content-end">
       <%--TODO:connect to correct link--%>
     <c:choose>
-      <c:when test="${user.get().staffs.isEmpty()}">
+      <c:when test="${staffs == null}">
         <a href="<c:url value="/patient/home"/> " class="header-a-element nav-link mx-3"
         >Mis turnos</a
         >
@@ -34,7 +34,7 @@
     </div>
     <%--TODO:connect correct image--%>
         <c:choose>
-          <c:when test="${user.get().staffs.isEmpty()}">
+          <c:when test="${staffs == null}">
             <a href="<c:url value="/patient/profile"/>">
               <img id="navbarPatientUserImage" class="ml-2" src="https://fonts.gstatic.com/s/i/materialicons/account_circle/v4/24px.svg" alt="">
             </a>

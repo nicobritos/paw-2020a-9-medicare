@@ -1,5 +1,8 @@
 package ar.edu.itba.paw.models;
 
+import org.joda.time.DateTime;
+import org.joda.time.DateTimeConstants;
+
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.util.Calendar;
@@ -26,20 +29,20 @@ public enum WorkdayDay {
         }
     }
 
-    public static WorkdayDay from(LocalDate localDate) {
-        if (localDate.getDayOfWeek().equals(DayOfWeek.MONDAY)) {
+    public static WorkdayDay from(DateTime localDate) {
+        if (localDate.getDayOfWeek() == DateTimeConstants.MONDAY) {
             return MONDAY;
-        } else if (localDate.getDayOfWeek().equals(DayOfWeek.TUESDAY)) {
+        } else if (localDate.getDayOfWeek() == DateTimeConstants.TUESDAY) {
             return TUESDAY;
-        } else if (localDate.getDayOfWeek().equals(DayOfWeek.WEDNESDAY)) {
+        } else if (localDate.getDayOfWeek() == DateTimeConstants.WEDNESDAY) {
             return WEDNESDAY;
-        } else if (localDate.getDayOfWeek().equals(DayOfWeek.THURSDAY)) {
+        } else if (localDate.getDayOfWeek() == DateTimeConstants.THURSDAY) {
             return THURSDAY;
-        } else if (localDate.getDayOfWeek().equals(DayOfWeek.FRIDAY)) {
+        } else if (localDate.getDayOfWeek() == DateTimeConstants.FRIDAY) {
             return FRIDAY;
-        } else if (localDate.getDayOfWeek().equals(DayOfWeek.SATURDAY)) {
+        } else if (localDate.getDayOfWeek() == DateTimeConstants.SATURDAY) {
             return SATURDAY;
-        } else if (localDate.getDayOfWeek().equals(DayOfWeek.SUNDAY)) {
+        } else if (localDate.getDayOfWeek() == DateTimeConstants.SUNDAY) {
             return SUNDAY;
         }
         return null;

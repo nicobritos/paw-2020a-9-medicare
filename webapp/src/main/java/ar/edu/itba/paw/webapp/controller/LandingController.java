@@ -38,6 +38,9 @@ public class LandingController extends GenericController{
 
         // pass objects to model and view
         mav.addObject("user", user);
+        if(user.isPresent() && isStaff()) {
+            mav.addObject("staffs", staffService.findByUser(user.get().getId()));
+        }
         mav.addObject("specialties",specialtiesList);
         mav.addObject("localities",localitiesList);
         return mav;

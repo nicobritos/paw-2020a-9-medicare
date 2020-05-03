@@ -83,6 +83,9 @@ public class MedicSideController extends GenericController {
         }
 
         mav.addObject("user", user);
+        if(isStaff()) {
+            mav.addObject("staffs", staffService.findByUser(user.get().getId()));
+        }
         mav.addObject("today", today);
         mav.addObject("monday", monday);
         mav.addObject("todayAppointments", appointmentService.findToday(staff));
@@ -101,7 +104,10 @@ public class MedicSideController extends GenericController {
         }
         ModelAndView mav = new ModelAndView();
         mav.addObject("user", user);
-
+        if(isStaff()) {
+            mav.addObject("staffs", staffService.findByUser(user.get().getId()));
+            mav.addObject("workdays", workdayService.findByUser(user.get()));
+        }
         mav.setViewName("medicSide/medicProfile");
         return mav;
     }
@@ -133,6 +139,9 @@ public class MedicSideController extends GenericController {
 
         ModelAndView mav = new ModelAndView();
         mav.addObject("user", user);
+        if(isStaff()) {
+            mav.addObject("staffs", staffService.findByUser(user.get().getId()));
+        }
         mav.setViewName("medicSide/medicProfile");
         return mav;
     }
@@ -146,6 +155,9 @@ public class MedicSideController extends GenericController {
 
         ModelAndView mav = new ModelAndView();
         mav.addObject("user", user);
+        if(isStaff()) {
+            mav.addObject("staffs", staffService.findByUser(user.get().getId()));
+        }
         mav.setViewName("medicSide/addTurno");
         return mav;
     }
@@ -214,7 +226,9 @@ public class MedicSideController extends GenericController {
 
         ModelAndView mav = new ModelAndView();
         mav.addObject("user", user);
-        mav.setViewName("redirect:/staff/profile");
+        if(isStaff()) {
+            mav.addObject("staffs", staffService.findByUser(user.get().getId()));
+        }        mav.setViewName("redirect:/staff/profile");
         return mav;
     }
 
@@ -233,6 +247,9 @@ public class MedicSideController extends GenericController {
 
         ModelAndView mav = new ModelAndView();
         mav.addObject("user", user);
+        if(isStaff()) {
+            mav.addObject("staffs", staffService.findByUser(user.get().getId()));
+        }
         mav.setViewName("redirect:/staff/profile");
         return mav;
     }
