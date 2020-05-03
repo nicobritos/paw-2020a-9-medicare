@@ -1,10 +1,10 @@
 package ar.edu.itba.paw.webapp.transformer;
 
+import ar.edu.itba.paw.models.Appointment;
 import ar.edu.itba.paw.models.AppointmentTimeSlot;
 import org.joda.time.DateTime;
 import org.springframework.stereotype.Component;
 
-import java.time.LocalDate;
 import java.util.*;
 
 @Component
@@ -12,9 +12,9 @@ public class AppointmentTimeSlotTransformer extends GenericTransformer<Appointme
     @Override
     public Map<String, ?> transform(AppointmentTimeSlot timeSlot) {
         Map<String, Object> map = new HashMap<>();
-        map.put("hour", timeSlot.getFromHour());
-        map.put("minute", timeSlot.getFromMinute());
-        map.put("duration", timeSlot.getDuration());
+        map.put("hour", timeSlot.getDate().getHourOfDay());
+        map.put("minute", timeSlot.getDate().getMinuteOfDay());
+        map.put("duration", Appointment.DURATION);
         return map;
     }
 

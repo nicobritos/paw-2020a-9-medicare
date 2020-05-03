@@ -80,6 +80,12 @@ public abstract class GenericDaoImpl<M extends GenericModel<I>, I> implements Ge
 
         Map<String, Object> parameters = new HashMap<>();
         Collection<String> idsParameters = new LinkedList<>();
+        int i = 0;
+        for (I id : ids) {
+            String parameter = "_id_" + i;
+            idsParameters.add(":" + parameter);
+            parameters.put(":" + parameter, id);
+        }
 
         JDBCSelectQueryBuilder selectQueryBuilder = new JDBCSelectQueryBuilder()
                 .selectAll(this.mClass)
@@ -293,13 +299,6 @@ public abstract class GenericDaoImpl<M extends GenericModel<I>, I> implements Ge
         return this.jdbcTemplate.query(selectQueryBuilder.getQueryAsString(), args, this.getResultSetExtractor()).stream().findFirst();
     }
 
-    /**
-     * Workaround to return key with HSQLDB.
-     * Note that it runs two queries: it creates the entity, and then it retrieves the full model
-     * from the DB. This is done to fill in fields which have default values in the DB
-     * @param args the arguments
-     * @return the newly inserted model
-     */
     protected M insertQuery(M model, MapSqlParameterSource args) {
         I id;
         if (!this.customPrimaryKey) {

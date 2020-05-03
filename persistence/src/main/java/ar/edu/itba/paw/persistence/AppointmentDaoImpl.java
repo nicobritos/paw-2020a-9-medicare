@@ -6,6 +6,7 @@ import ar.edu.itba.paw.persistence.generics.GenericDaoImpl;
 import ar.edu.itba.paw.persistence.utils.RowMapperAlias;
 import ar.edu.itba.paw.persistence.utils.builder.JDBCSelectQueryBuilder;
 import ar.edu.itba.paw.persistence.utils.builder.JDBCSelectQueryBuilder.JoinType;
+import ar.edu.itba.paw.persistence.utils.builder.JDBCUpdateQueryBuilder;
 import ar.edu.itba.paw.persistence.utils.builder.JDBCWhereClauseBuilder;
 import ar.edu.itba.paw.persistence.utils.builder.JDBCWhereClauseBuilder.Operation;
 import org.joda.time.DateTime;
@@ -16,7 +17,6 @@ import org.springframework.stereotype.Repository;
 
 import javax.sql.DataSource;
 import java.sql.SQLException;
-import java.time.LocalDate;
 import java.util.*;
 
 @Repository
@@ -194,6 +194,34 @@ public class AppointmentDaoImpl extends GenericDaoImpl<Appointment, Integer> imp
                 .where(whereClauseBuilder);
 
         return this.selectQuery(queryBuilder, parameterSource);
+    }
+
+    @Override
+    public void setStaff(Appointment appointment, Staff staff) {
+        MapSqlParameterSource parameterSource = new MapSqlParameterSource();
+        parameterSource.addValue("staff_id", staff.getId());
+        JDBCUpdateQueryBuilder updateQueryBuilder = new JDBCUpdateQueryBuilder()
+                .update(this.getTableName(), this.getTableAlias())
+                .value("staff_id", ":staff_id")
+                .where(new JDBCWhereClauseBuilder()
+                    .where(PRIMARY_KEY_NAME, Operation.EQ, "appointment_id")
+                );
+        this.updateQuery(updateQueryBuilder.getQueryAsString(), parameterSource);
+    }
+
+    @Override
+    public void setPatient(Appointment appointment, Patient patient) {
+        MapSqlParameterSource parameterSource = new MapSqlParameterSource();
+        parameterSource.addValue("appointment_id", appointment.getId());
+        parameterSource.addValue("patient_id", patient.getId());
+
+        JDBCUpdateQueryBuilder updateQueryBuilder = new JDBCUpdateQueryBuilder()
+                .update(this.getTableName(), this.getTableAlias())
+                .value("patient_id", ":patient_id")
+                .where(new JDBCWhereClauseBuilder()
+                        .where(PRIMARY_KEY_NAME, Operation.EQ, ":appointment_id")
+                );
+        this.updateQuery(updateQueryBuilder.getQueryAsString(), parameterSource);
     }
 
     @Override

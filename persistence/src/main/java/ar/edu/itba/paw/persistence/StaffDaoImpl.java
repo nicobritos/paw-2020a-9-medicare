@@ -5,8 +5,11 @@ import ar.edu.itba.paw.models.*;
 import ar.edu.itba.paw.persistence.generics.GenericSearchableDaoImpl;
 import ar.edu.itba.paw.persistence.utils.RowMapperAlias;
 import ar.edu.itba.paw.persistence.utils.StringSearchType;
+import ar.edu.itba.paw.persistence.utils.builder.JDBCInsertQueryBuilder;
+import ar.edu.itba.paw.persistence.utils.builder.JDBCInsertQueryBuilder.OnConflictPolicy;
 import ar.edu.itba.paw.persistence.utils.builder.JDBCSelectQueryBuilder;
 import ar.edu.itba.paw.persistence.utils.builder.JDBCSelectQueryBuilder.JoinType;
+import ar.edu.itba.paw.persistence.utils.builder.JDBCUpdateQueryBuilder;
 import ar.edu.itba.paw.persistence.utils.builder.JDBCWhereClauseBuilder;
 import ar.edu.itba.paw.persistence.utils.builder.JDBCWhereClauseBuilder.ColumnTransformer;
 import ar.edu.itba.paw.persistence.utils.builder.JDBCWhereClauseBuilder.Operation;
@@ -273,6 +276,41 @@ public class StaffDaoImpl extends GenericSearchableDaoImpl<Staff, Integer> imple
             queryBuilder.join("office_id", OfficeDaoImpl.TABLE_NAME, "office_id", Office.class);
         }
         return this.selectQuery(queryBuilder, parameterSource);
+    }
+
+    @Override
+    public void setOffice(Staff staff, Office office) {
+        MapSqlParameterSource parameterSource = new MapSqlParameterSource();
+        parameterSource.addValue("staff", staff.getId());
+        parameterSource.addValue("office", office.getId());
+
+        JDBCUpdateQueryBuilder updateQueryBuilder = new JDBCUpdateQueryBuilder()
+                .update(this.getTableName(), this.getTableAlias())
+                .value("office_id", ":office")
+                .where(new JDBCWhereClauseBuilder()
+                        .where(PRIMARY_KEY_NAME, Operation.EQ, "staff")
+                );
+        this.updateQuery(updateQueryBuilder.getQueryAsString(), parameterSource);
+    }
+
+    @Override
+    public void addStaffSpecialties(Staff staff, Collection<StaffSpecialty> staffSpecialties) {
+        for (StaffSpecialty staffSpecialty : staffSpecialties) {
+            this.addStaffSpecialty(staff, staffSpecialty);
+        }
+    }
+
+    @Override
+    public void addStaffSpecialty(Staff staff, StaffSpecialty staffSpecialty) {
+        MapSqlParameterSource parameterSource = new MapSqlParameterSource();
+        parameterSource.addValue("staff_id", staff.getId());
+        parameterSource.addValue("specialty_id", staffSpecialty.getId());
+        JDBCInsertQueryBuilder insertQueryBuilder = new JDBCInsertQueryBuilder()
+                .into(this.getTableName())
+                .value("staff_id", ":staff_id")
+                .value("specialty_id", ":specialty_id")
+                .onConflict(OnConflictPolicy.NOTHING);
+        this.updateQuery(insertQueryBuilder.getQueryAsString(), parameterSource);
     }
 
     @Override
