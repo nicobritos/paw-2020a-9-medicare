@@ -7,7 +7,6 @@
     <link rel="stylesheet" href='<c:url value="/css/patient/homePaciente.css"/>' />
   </head>
   <body>
-  <!-- TODO: change navbar -->
     <%@ include file="../navbar/navbarLogged.jsp"%>
 
     <div class="container h-75 w-100 mt-5">
@@ -33,9 +32,8 @@
                         <h5>${appointment.staff.firstName} ${appointment.staff.surname}</h5>
                       </div>
                       <div class="row">
-                          <!-- TODO doctor specialty -->
                         <c:forEach var="specialty" items="${appointment.staff.staffSpecialties}">
-                          <p class="m-0">${specialty}</p>
+                          <p class="m-0">${specialty.name}</p>
                         </c:forEach>
                       </div>
                       <div class="row">
