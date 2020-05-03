@@ -71,7 +71,7 @@ public class AppointmentServiceImpl extends GenericServiceImpl<AppointmentDao, A
 
     @Override
     public List<Appointment> findByStaffsAndDay(List<Staff> staffs, DateTime from, DateTime to){
-        return this.repository.findByStaffsAndDate(staffs, from, to).stream().peek(this::completeAppointment).collect(Collectors.toList());
+        return this.repository.findByStaffsAndDate(staffs, from, to);
     }
 
     @Override
