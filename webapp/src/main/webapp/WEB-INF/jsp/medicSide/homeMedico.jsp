@@ -1,5 +1,6 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jstl/core_rt"%>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+<%@ taglib prefix="spring" uri="http://www.springframework.org/tags" %>
 <!DOCTYPE html>
 <html lang="en">
     <%@ include file = "../head.jsp" %>
@@ -10,10 +11,11 @@
     <div class="container h-75 w-100 mt-5">
       <div class="row">
         <div class="col-5">
-          <h4>Agenda de
+          <h4>
+            <spring:message code="AgendaFor"/>
           <c:choose>
             <c:when test="${isToday}">
-              hoy
+              <spring:message code="today"/>
             </c:when>
             <c:otherwise>
               <%--TODO: revise--%>
@@ -150,8 +152,8 @@
                           />
                           <div class="dropdown-menu">
                             <!-- TODO conect to the options -->
-                            <a class="dropdown-item" href="#">Cancelar</a>
-                            <a class="dropdown-item" href="#">Reprogramar</a>
+                            <a class="dropdown-item" href="#"><spring:message code="Cancel"/></a>
+                            <a class="dropdown-item" href="#"><spring:message code="Reprogram"/></a>
                           </div>
                         </div>
                       </div>
