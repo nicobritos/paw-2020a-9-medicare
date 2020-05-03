@@ -12,6 +12,14 @@ const Profile = function () {
         }
       }
     }
+
+    let deleteWorkdaybtns = document.getElementsByClassName("deleteWorkday");
+    for (let b of deleteWorkdaybtns){
+      b.onclick = function(e){
+        e.preventDefault();
+        deleteWorkday(b.href,b.parentNode);
+      }
+    }
   };
 
   let toggleVisibility = function () {
@@ -34,6 +42,22 @@ const Profile = function () {
         }
       }
     }
+  };
+
+  let deleteWorkday=function(url,elemToDelete) {
+    fetch(url, {
+      method: "DELETE"
+    }).then(function (r) {
+      if(r.ok){
+        elemToDelete.parentNode.removeChild(elemToDelete);
+      }else if(r.status === 500){
+        App.showError();
+      }else{
+        return Promise.reject();
+      }
+    }).catch(function (e) {
+      location.reload();
+    });
   };
 
   return {

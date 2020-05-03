@@ -80,6 +80,7 @@
                     <c:forEach var="staff" items="${staffs}">
                       <c:forEach var="workday" items="${workdays}">
                         <p class="m-0">- <c:choose>
+                          <%-- TODO: maybe use spring:message directly instead of with choose --%>
                           <c:when test="${workday.day == 'MONDAY'}"><spring:message code="Monday"/></c:when>
                           <c:when test="${workday.day == 'TUESDAY'}"><spring:message code="Tuesday"/></c:when>
                           <c:when test="${workday.day == 'WEDNESDAY'}"><spring:message code="Wednesday"/></c:when>
@@ -89,7 +90,7 @@
                           <c:when test="${workday.day == 'SUNDAY'}"><spring:message code="Sunday"/></c:when>
                           <c:otherwise>${workday.day}</c:otherwise>
                         </c:choose> de <c:if test="${workday.startHour < 10}">0</c:if>${workday.startHour}:<c:if test="${workday.startMinute < 10}">0</c:if>${workday.startMinute}hs a <c:if test="${workday.endHour < 10}">0</c:if>${workday.endHour}:<c:if test="${workday.endMinute < 10}">0</c:if>${workday.endMinute}hs - ${workday.staff.office.name}</p>
-                        <a href='<c:url value="/staff/profile/workday/delete/${workday.id}"/> ' class="btn">X</a>
+                        <a href='<c:url value="/staff/profile/workday/delete/${workday.id}"/> ' class="btn deleteWorkday">X</a>
                       </c:forEach>
                     </c:forEach>
                   </div>

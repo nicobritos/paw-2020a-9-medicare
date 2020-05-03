@@ -7,6 +7,8 @@ import ar.edu.itba.paw.webapp.form.UserProfileForm;
 import ar.edu.itba.paw.webapp.form.WorkdayForm;
 import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
@@ -262,25 +264,19 @@ public class MedicSideController extends GenericController {
         return mav;
     }
 
-    @RequestMapping(value="/staff/profile/workday/delete/{workdayId}", method = RequestMethod.GET) //TODO: change RequestMethod
-    public ModelAndView deleteWorkday(@PathVariable("workdayId") final int workdayId){
+    @RequestMapping(value="/staff/profile/workday/delete/{workdayId}", method = RequestMethod.DELETE)
+    public ResponseEntity deleteWorkday(@PathVariable("workdayId") final int workdayId){
         Optional<User> user = getUser();
         if(!user.isPresent()) {
-            return new ModelAndView("authentication/login");
+            return new ResponseEntity(HttpStatus.UNAUTHORIZED); //TODO:check status code
         }
         Optional<Workday> workday = workdayService.findById(workdayId);
         if(!workday.isPresent() || !workday.get().getStaff().getUser().equals(user.get())){
-            return new ModelAndView("error/403"); //todo: throw status code instead of this
+            return new ResponseEntity(HttpStatus.FORBIDDEN);//TODO: check status code
         }
 
         workdayService.remove(workdayId);
 
-        ModelAndView mav = new ModelAndView();
-        mav.addObject("user", user);
-        if(isStaff()) {
-            mav.addObject("staffs", staffService.findByUser(user.get().getId()));
-        }
-        mav.setViewName("redirect:/staff/profile");
-        return mav;
+        return new ResponseEntity(HttpStatus.NO_CONTENT);
     }
 }
