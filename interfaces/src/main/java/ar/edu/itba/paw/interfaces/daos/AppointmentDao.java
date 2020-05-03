@@ -6,6 +6,7 @@ import ar.edu.itba.paw.models.Patient;
 import ar.edu.itba.paw.models.Staff;
 import org.joda.time.DateTime;
 
+import java.util.Collection;
 import java.util.List;
 
 public interface AppointmentDao extends GenericDao<Appointment, Integer> {
@@ -13,13 +14,15 @@ public interface AppointmentDao extends GenericDao<Appointment, Integer> {
 
     List<Appointment> find(Staff staff);
 
+    List<Appointment> find(List<Staff> staffs);
+
     List<Appointment> findPending(Patient patient);
 
     List<Appointment> findPending(Staff staff);
 
     List<Appointment> findPending(Patient patient, Staff staff);
 
-    List<Appointment> findByDate(Staff staff, DateTime date);
+    List<Appointment> findByDate(Collection<Staff> staffs, DateTime date);
 
     List<Appointment> findByDate(Patient patient, DateTime date);
 

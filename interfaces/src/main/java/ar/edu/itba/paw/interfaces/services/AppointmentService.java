@@ -12,13 +12,17 @@ import java.util.List;
 public interface AppointmentService extends GenericService<Appointment, Integer> {
     List<Appointment> find(Staff staff);
 
+    List<Appointment> find(List<Staff> staffs);
+
     List<Appointment> find(Patient patient);
 
-    List<Appointment> findToday(Staff staff);
+    List<Appointment> findToday(List<Staff> staff);
 
     List<Appointment> findToday(Patient patient);
 
     List<Appointment> findByDay(Staff staff, DateTime date);
+
+    List<Appointment> findByDay(List<Staff> staff, DateTime date);
 
     void setStatus(Appointment appointment, AppointmentStatus status) throws
             AppointmentAlreadyCancelledException,

@@ -195,7 +195,7 @@ public class StaffDaoImpl extends GenericSearchableDaoImpl<Staff, Integer> imple
         JDBCWhereClauseBuilder whereClauseBuilder;
         if(!otherWhereClause.toString().isEmpty()) {
             whereClauseBuilder = otherWhereClause;
-            if(!otherWhereClause.toString().isEmpty()){
+            if(!namesWhereClause.toString().isEmpty()){
                 whereClauseBuilder.and(namesWhereClause);
             }
         } else {

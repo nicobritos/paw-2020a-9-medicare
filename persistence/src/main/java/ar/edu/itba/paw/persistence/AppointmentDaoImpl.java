@@ -87,6 +87,22 @@ public class AppointmentDaoImpl extends GenericDaoImpl<Appointment, Integer> imp
     }
 
     @Override
+    public List<Appointment> find(List<Staff> staffs){
+        Map<String, Object> params = new HashMap<>();
+        JDBCWhereClauseBuilder staffsWhereClause = new JDBCWhereClauseBuilder();
+        putStaffsArguments(staffs, params, staffsWhereClause);
+        MapSqlParameterSource parameterSource = new MapSqlParameterSource();
+        parameterSource.addValues(params);
+
+        JDBCSelectQueryBuilder queryBuilder = new JDBCSelectQueryBuilder()
+                .selectAll(Appointment.class)
+                .from(this.getTableName())
+                .where(staffsWhereClause);
+
+        return this.selectQuery(queryBuilder, parameterSource);
+    }
+
+    @Override
     public List<Appointment> findPending(Patient patient) {
         MapSqlParameterSource parameterSource = new MapSqlParameterSource();
         parameterSource.addValue("patient", patient.getId());
@@ -147,21 +163,35 @@ public class AppointmentDaoImpl extends GenericDaoImpl<Appointment, Integer> imp
     }
 
     @Override
-    public List<Appointment> findByDate(Staff staff, DateTime date) {
+    public List<Appointment> findByDate(Collection<Staff> staffs, DateTime date) {
+        Map<String, Object> parameters = new HashMap<>();
+        JDBCWhereClauseBuilder staffWhereClause = new JDBCWhereClauseBuilder();
+        putStaffsArguments(staffs, parameters, staffWhereClause);
         MapSqlParameterSource parameterSource = new MapSqlParameterSource();
-        parameterSource.addValue("staff", staff.getId());
-        parameterSource.addValue("year", date.getYear());
-        parameterSource.addValue("month", date.getMonthOfYear());
-        parameterSource.addValue("day", date.getDayOfMonth());
+        parameters.put("year", date.getYear());
+        parameters.put("month", date.getMonthOfYear());
+        parameters.put("day", date.getDayOfMonth());
+        parameterSource.addValues(parameters);
 
-        JDBCWhereClauseBuilder whereClauseBuilder = new JDBCWhereClauseBuilder()
-                .where(this.formatColumnFromName("staff_id"), Operation.EQ, ":staff")
-                .and()
+
+
+        JDBCWhereClauseBuilder otherWhereClause = new JDBCWhereClauseBuilder()
                 .where(this.formatColumnFromName("from_date"), Operation.EQ, ":year", JDBCWhereClauseBuilder.ColumnTransformer.YEAR)
                 .and()
                 .where(this.formatColumnFromName("from_date"), Operation.EQ, ":month", JDBCWhereClauseBuilder.ColumnTransformer.MONTH)
                 .and()
                 .where(this.formatColumnFromName("from_date"), Operation.EQ, ":day", JDBCWhereClauseBuilder.ColumnTransformer.DAY);
+
+
+        JDBCWhereClauseBuilder whereClauseBuilder;
+        if(!otherWhereClause.toString().isEmpty()) {
+            whereClauseBuilder = otherWhereClause;
+            if(!staffWhereClause.toString().isEmpty()){
+                whereClauseBuilder.and(staffWhereClause);
+            }
+        } else {
+            whereClauseBuilder = staffWhereClause;
+        }
 
         JDBCSelectQueryBuilder queryBuilder = new JDBCSelectQueryBuilder()
                 .selectAll(Appointment.class)
@@ -465,5 +495,25 @@ public class AppointmentDaoImpl extends GenericDaoImpl<Appointment, Integer> imp
                 .joinAlias("ps", "country_id", CountryDaoImpl.TABLE_NAME, "cs", CountryDaoImpl.PRIMARY_KEY_NAME, JoinType.LEFT, Country.class)
                 .joinAlias("staff_id", "system_staff_specialty_staff", "sss", "staff_id", JoinType.LEFT, null)
                 .joinAlias("sss", "specialty_id", StaffSpecialtyDaoImpl.TABLE_NAME, "ss", StaffSpecialtyDaoImpl.PRIMARY_KEY_NAME, JoinType.LEFT, StaffSpecialty.class);
+    }
+
+    private void putStaffsArguments(Collection<Staff> staffs, Map<String, Object> argumentsValues, JDBCWhereClauseBuilder whereClauseBuilder) {
+        if (staffs.isEmpty())
+            return;
+
+        Collection<String> arguments = new HashSet<>();
+        int i = 0;
+        for (Staff staff : staffs) {
+            String parameter = "_office_" + i;
+            argumentsValues.put(parameter, staff.getId());
+            arguments.add(":" + parameter);
+            i++;
+        }
+        whereClauseBuilder
+                .and()
+                .in(
+                        formatColumnFromName("staff_id", this.getTableAlias()),
+                        arguments
+                );
     }
 }

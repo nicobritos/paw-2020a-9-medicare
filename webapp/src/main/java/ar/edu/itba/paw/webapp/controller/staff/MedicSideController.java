@@ -5,6 +5,7 @@ import ar.edu.itba.paw.models.*;
 import ar.edu.itba.paw.webapp.controller.utils.GenericController;
 import ar.edu.itba.paw.webapp.form.UserProfileForm;
 import ar.edu.itba.paw.webapp.form.WorkdayForm;
+import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
@@ -16,8 +17,12 @@ import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
+
+import static org.joda.time.DateTimeConstants.*;
 
 @Controller
 public class MedicSideController extends GenericController {
@@ -32,6 +37,9 @@ public class MedicSideController extends GenericController {
 
     @Autowired
     StaffService staffService;
+
+    @Autowired
+    PatientService patientService;
 
     @Autowired
     LocalityService localityService;
@@ -50,12 +58,12 @@ public class MedicSideController extends GenericController {
         }
         ModelAndView mav = new ModelAndView();
 
-        Staff staff = new Staff();
-        LocalDate today = LocalDate.now();
-        LocalDate monday;
+        List<Staff> userStaffs = staffService.findByUser(user.get().getId());
+        DateTime today = DateTime.now();
+        DateTime monday;
         boolean isToday=true;
 
-        switch (LocalDate.now().getDayOfWeek()){
+        switch (DateTime.now().getDayOfWeek()){
             case SUNDAY:
                 monday = today.plusDays(1);
                 break;
@@ -82,7 +90,7 @@ public class MedicSideController extends GenericController {
         }
         if(newToday!=null){
             try{
-                today = LocalDate.parse(newToday);
+                today = DateTime.parse(newToday);
                 isToday = false;
             }catch (DateTimeParseException e){
 
@@ -90,7 +98,7 @@ public class MedicSideController extends GenericController {
         }
         if(week!=null){
             try{
-                long weekOffset = Long.parseLong(week);
+                int weekOffset = Integer.parseInt(week);
                 monday = monday.plusWeeks(weekOffset);
             }catch (NumberFormatException e){
 
@@ -103,8 +111,10 @@ public class MedicSideController extends GenericController {
         mav.addObject("today", today);
         mav.addObject("isToday",isToday);
         mav.addObject("monday", monday);
-        mav.addObject("todayAppointments", appointmentService.findToday(staff));
-        mav.addObject("appointments", appointmentService.find(staff)); // TODO: cambiar
+        mav.addObject("todayAppointments", appointmentService.findToday(userStaffs));
+        // Probablemente convenga una lista de appointments por semana, no por dia, y separarlos por dia en el jsp. Para la parte
+        // de mostrar cuantos turnos hay cada día. Y también liberar un poco la db
+        mav.addObject("appointments", appointmentService.findByDay(userStaffs, today)); // lista de turnos que se muestra en la agenda semanal
         mav.addObject("specialties", staffSpecialtyService.list());
         mav.addObject("localities", localityService.list());
         mav.setViewName("medicSide/homeMedico");

@@ -12,17 +12,7 @@
       <div class="row">
         <div class="col-5">
           <h4>
-            <spring:message code="AgendaFor"/>
-          <c:choose>
-            <c:when test="${isToday}">
-              <spring:message code="today"/>
-            </c:when>
-            <c:otherwise>
-              <%--TODO: revise--%>
-              <fmt:parseDate value="${today}" pattern="yyyy-MM-dd" var="parsedDate" type="date"/>
-              <fmt:formatDate value="${parsedDate}" type="date"/>
-            </c:otherwise>
-          </c:choose>
+            <spring:message code="AgendaFor"/> <spring:message code="today"/>
           </h4>
         </div>
         <div class="col">
@@ -48,7 +38,7 @@
                         <h5>${appointment.patient.user.firstName} ${appointment.patient.user.surname}</h5>
                       </div>
                       <div class="row">
-                        <p class="m-0">${appointment.fromDate.hours}:${appointment.fromDate.minutes} - ${appointment.toDate.hours}:${appointment.toDate.minutes}</p>
+                        <p class="m-0"><c:if test="${appointment.fromDate.hourOfDay < 10}">0</c:if>${appointment.fromDate.hourOfDay}:<c:if test="${appointment.fromDate.minuteOfHour < 10}">0</c:if>${appointment.fromDate.minuteOfHour} - <c:if test="${appointment.toDate.hourOfDay < 10}">0</c:if>${appointment.toDate.hourOfDay}:<c:if test="${appointment.toDate.hourOfDay < 10}">0</c:if>${appointment.toDate.minuteOfHour}</p>
                       </div>
                     </div>
                     <div class="col-2 justify-content-start">
@@ -86,33 +76,34 @@
 
                 <p class="mb-0">
                   <c:choose>
-                    <c:when test="${monday.plusDays(i).dayOfWeek.name() == 'MONDAY'}"><spring:message code="Monday"/></c:when>
-                    <c:when test="${monday.plusDays(i).dayOfWeek.name() == 'TUESDAY'}"><spring:message code="Tuesday"/></c:when>
-                    <c:when test="${monday.plusDays(i).dayOfWeek.name() == 'WEDNESDAY'}"><spring:message code="Wednesday"/></c:when>
-                    <c:when test="${monday.plusDays(i).dayOfWeek.name() == 'THURSDAY'}"><spring:message code="Thursday"/></c:when>
-                    <c:when test="${monday.plusDays(i).dayOfWeek.name() == 'FRIDAY'}"><spring:message code="Friday"/></c:when>
-                    <c:when test="${monday.plusDays(i).dayOfWeek.name() == 'SATURDAY'}"><spring:message code="Saturday"/></c:when>
-                    <c:when test="${monday.plusDays(i).dayOfWeek.name() == 'SUNDAY'}"><spring:message code="Sunday"/></c:when>
-                    <c:otherwise>${monday.plusDays(i).dayOfWeek.name()}</c:otherwise>
+                    <c:when test="${monday.plusDays(i).dayOfWeek == 1}"><spring:message code="Monday"/></c:when>
+                    <c:when test="${monday.plusDays(i).dayOfWeek == 2}"><spring:message code="Tuesday"/></c:when>
+                    <c:when test="${monday.plusDays(i).dayOfWeek == 3}"><spring:message code="Wednesday"/></c:when>
+                    <c:when test="${monday.plusDays(i).dayOfWeek == 4}"><spring:message code="Thursday"/></c:when>
+                    <c:when test="${monday.plusDays(i).dayOfWeek == 5}"><spring:message code="Friday"/></c:when>
+                    <c:when test="${monday.plusDays(i).dayOfWeek == 6}"><spring:message code="Saturday"/></c:when>
+                    <c:when test="${monday.plusDays(i).dayOfWeek == 7}"><spring:message code="Sunday"/></c:when>
+                    <c:otherwise>${monday.plusDays(i).dayOfWeek}</c:otherwise>
                   </c:choose>
                 </p>
                 <!-- day/month -->
                 <p class="my-0">${monday.plusDays(i).dayOfMonth} <spring:message code="of"/> <c:choose>
-                  <c:when test="${monday.plusDays(i).month.name() == 'JANUARY'}"><spring:message code="January"/></c:when>
-                  <c:when test="${monday.plusDays(i).month.name() == 'FEBRUARY'}"><spring:message code="February"/></c:when>
-                  <c:when test="${monday.plusDays(i).month.name() == 'MARCH'}"><spring:message code="March"/></c:when>
-                  <c:when test="${monday.plusDays(i).month.name() == 'APRIL'}"><spring:message code="April"/></c:when>
-                  <c:when test="${monday.plusDays(i).month.name() == 'MAY'}"><spring:message code="May"/></c:when>
-                  <c:when test="${monday.plusDays(i).month.name() == 'JUNE'}"><spring:message code="June"/></c:when>
-                  <c:when test="${monday.plusDays(i).month.name() == 'JULY'}"><spring:message code="July"/></c:when>
-                  <c:when test="${monday.plusDays(i).month.name() == 'AUGUST'}"><spring:message code="August"/></c:when>
-                  <c:when test="${monday.plusDays(i).month.name() == 'SEPTEMBER'}"><spring:message code="September"/></c:when>
-                  <c:when test="${monday.plusDays(i).month.name() == 'OCTOBER'}"><spring:message code="October"/></c:when>
-                  <c:when test="${monday.plusDays(i).month.name() == 'NOVEMBER'}"><spring:message code="November"/></c:when>
-                  <c:when test="${monday.plusDays(i).month.name() == 'DECEMBER'}"><spring:message code="December"/></c:when>
-                  <c:otherwise>${monday.plusDays(i).month.name()}</c:otherwise></c:choose></p>
-                <p>${todayAppointments.size()} <c:choose>
-                  <c:when test="${todayAppointments.size() == 1}"><spring:message code="appointment"/></c:when>
+                  <c:when test="${monday.plusDays(i).monthOfYear == 1}"><spring:message code="January"/></c:when>
+                  <c:when test="${monday.plusDays(i).monthOfYear == 2}"><spring:message code="February"/></c:when>
+                  <c:when test="${monday.plusDays(i).monthOfYear == 3}"><spring:message code="March"/></c:when>
+                  <c:when test="${monday.plusDays(i).monthOfYear == 4}"><spring:message code="April"/></c:when>
+                  <c:when test="${monday.plusDays(i).monthOfYear == 5}"><spring:message code="May"/></c:when>
+                  <c:when test="${monday.plusDays(i).monthOfYear == 6}"><spring:message code="June"/></c:when>
+                  <c:when test="${monday.plusDays(i).monthOfYear == 7}"><spring:message code="July"/></c:when>
+                  <c:when test="${monday.plusDays(i).monthOfYear == 8}"><spring:message code="August"/></c:when>
+                  <c:when test="${monday.plusDays(i).monthOfYear == 9}"><spring:message code="September"/></c:when>
+                  <c:when test="${monday.plusDays(i).monthOfYear == 10}"><spring:message code="October"/></c:when>
+                  <c:when test="${monday.plusDays(i).monthOfYear == 11}"><spring:message code="November"/></c:when>
+                  <c:when test="${monday.plusDays(i).monthOfYear == 12}"><spring:message code="December"/></c:when>
+                  <c:otherwise>${monday.plusDays(i).monthOfYear}</c:otherwise></c:choose></p>
+<%--                  TODO: HACER DINAMICO POR CADA DIA--%>
+                <p>${appointments.size()} <c:choose>
+                  <c:when test="${appointments.size() == 1}"><spring:message code="appointment"/></c:when>
                   <c:otherwise><spring:message code="appointments"/></c:otherwise>
                 </c:choose></p>
               </span>
@@ -123,7 +114,7 @@
           <div class="row justify-content-center">
             <!-- TODO: change items -->
             <ul class="list-group turno-list mr-2 w-50 overflow-auto">
-              <c:forEach var="appointment" items="${todayAppointments}">
+              <c:forEach var="appointment" items="${appointments}">
                 <li class="list-group-item turno-item mb-3">
                   <div class="container">
                     <div class="row">
@@ -139,7 +130,7 @@
                           <h5>${appointment.patient.user.firstName} ${appointment.patient.user.surname}</h5>
                         </div>
                         <div class="row">
-                          <p class="m-0">${appointment.fromDate.hours}:${appointment.fromDate.minutes} - ${appointment.toDate.hours}:${appointment.toDate.minutes}</p>
+                          <p class="m-0"><c:if test="${appointment.fromDate.hourOfDay < 10}">0</c:if>${appointment.fromDate.hourOfDay}:<c:if test="${appointment.fromDate.minuteOfHour < 10}">0</c:if>${appointment.fromDate.minuteOfHour} - <c:if test="${appointment.toDate.hourOfDay < 10}">0</c:if>${appointment.toDate.hourOfDay}:<c:if test="${appointment.toDate.hourOfDay < 10}">0</c:if>${appointment.toDate.minuteOfHour}</p>
                         </div>
                       </div>
                       <div class="col-2 justify-content-start">
