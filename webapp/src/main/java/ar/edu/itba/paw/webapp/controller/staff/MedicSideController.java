@@ -15,12 +15,9 @@ import org.springframework.web.servlet.ModelAndView;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
-import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import static org.joda.time.DateTimeConstants.*;
 
@@ -114,7 +111,7 @@ public class MedicSideController extends GenericController {
         mav.addObject("todayAppointments", appointmentService.findToday(userStaffs));
         // Probablemente convenga una lista de appointments por semana, no por dia, y separarlos por dia en el jsp. Para la parte
         // de mostrar cuantos turnos hay cada día. Y también liberar un poco la db
-        mav.addObject("appointments", appointmentService.findByDay(userStaffs, today)); // lista de turnos que se muestra en la agenda semanal
+        mav.addObject("appointments", appointmentService.findByStaffsAndDay(userStaffs, today)); // lista de turnos que se muestra en la agenda semanal
         mav.addObject("specialties", staffSpecialtyService.list());
         mav.addObject("localities", localityService.list());
         mav.setViewName("medicSide/homeMedico");

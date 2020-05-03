@@ -12,9 +12,11 @@ import java.util.List;
 public interface AppointmentDao extends GenericDao<Appointment, Integer> {
     List<Appointment> find(Patient patient);
 
+    List<Appointment> findByPatients(List<Patient> patient);
+
     List<Appointment> find(Staff staff);
 
-    List<Appointment> find(List<Staff> staffs);
+    List<Appointment> findByStaffs(List<Staff> staffs);
 
     List<Appointment> findPending(Patient patient);
 
@@ -22,7 +24,9 @@ public interface AppointmentDao extends GenericDao<Appointment, Integer> {
 
     List<Appointment> findPending(Patient patient, Staff staff);
 
-    List<Appointment> findByDate(Collection<Staff> staffs, DateTime date);
+    List<Appointment> findByStaffsAndDate(Collection<Staff> staffs, DateTime date);
+
+    List<Appointment> findByPatientsAndDate(Collection<Patient> patients, DateTime date);
 
     List<Appointment> findByDate(Patient patient, DateTime date);
 

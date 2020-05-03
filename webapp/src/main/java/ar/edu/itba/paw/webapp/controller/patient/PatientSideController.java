@@ -23,6 +23,7 @@ import javax.validation.Valid;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Optional;
 
 @Controller
@@ -55,15 +56,13 @@ public class PatientSideController extends GenericController {
         }
         ModelAndView mav = new ModelAndView();
 
-        Patient patient = new Patient();
-        patient.setUser(user.get());
+        List<Patient> patients = patientService.findByUser(user.get());
 
-        Optional<Appointment> appointment = this.appointmentService.findById(2);
         mav.addObject("user", user);
         if(isStaff()) {
             mav.addObject("staffs", staffService.findByUser(user.get().getId()));
         }
-        mav.addObject("appointments", appointmentService.find(patient));
+        mav.addObject("appointments", appointmentService.findByPatients(patients));
         mav.addObject("specialties", staffSpecialtyService.list());
         mav.addObject("localities", localityService.list());
 

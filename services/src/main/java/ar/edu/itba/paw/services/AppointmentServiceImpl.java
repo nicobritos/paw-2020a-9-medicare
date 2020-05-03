@@ -37,18 +37,23 @@ public class AppointmentServiceImpl extends GenericServiceImpl<AppointmentDao, A
     }
 
     @Override
-    public List<Appointment> find(List<Staff> staffs){
-        return this.repository.find(staffs).stream().peek(this::completeAppointment).collect(Collectors.toList());
+    public List<Appointment> findByStaffs(List<Staff> staffs){
+        return this.repository.findByStaffs(staffs).stream().peek(this::completeAppointment).collect(Collectors.toList());
     }
 
     @Override
     public List<Appointment> find(Patient patient) {
-        return this.repository.find(patient);
+        return this.repository.find(patient).stream().peek(this::completeAppointment).collect(Collectors.toList());
+    }
+
+    @Override
+    public List<Appointment> findByPatients(List<Patient> patients) {
+        return this.repository.findByPatients(patients).stream().peek(this::completeAppointment).collect(Collectors.toList());
     }
 
     @Override
     public List<Appointment> findToday(List<Staff> staffs){
-        return this.findByDay(staffs, DateTime.now());
+        return this.findByStaffsAndDay(staffs, DateTime.now());
     }
 
     @Override
@@ -58,13 +63,19 @@ public class AppointmentServiceImpl extends GenericServiceImpl<AppointmentDao, A
 
     @Override
     public List<Appointment> findByDay(Staff staff, DateTime date){
-        return this.repository.findByDate(Collections.singletonList(staff), date).stream().peek(this::completeAppointment).collect(Collectors.toList());
+        return this.repository.findByStaffsAndDate(Collections.singletonList(staff), date).stream().peek(this::completeAppointment).collect(Collectors.toList());
     }
 
     @Override
-    public List<Appointment> findByDay(List<Staff> staff, DateTime date){
-        return this.repository.findByDate(staff, date).stream().peek(this::completeAppointment).collect(Collectors.toList());
+    public List<Appointment> findByStaffsAndDay(List<Staff> staffs, DateTime date){
+        return this.repository.findByStaffsAndDate(staffs, date).stream().peek(this::completeAppointment).collect(Collectors.toList());
     }
+
+    @Override
+    public List<Appointment> findByPatientsAndDay(List<Patient> patients, DateTime date){
+        return this.repository.findByPatientsAndDate(patients, date).stream().peek(this::completeAppointment).collect(Collectors.toList());
+    }
+
 
     @Override
     public void setStatus(Appointment appointment, AppointmentStatus status) throws

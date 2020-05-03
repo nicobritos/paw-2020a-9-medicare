@@ -30,7 +30,7 @@
                     </div>
                     <div class="col-7">
                       <div class="row justify-content-start">
-                        <h5>Dr ${appointment.staff.firstName} ${appointment.staff.surname}</h5>
+                        <h5>${appointment.staff.firstName} ${appointment.staff.surname}</h5>
                       </div>
                       <div class="row">
                           <!-- TODO doctor specialty -->
@@ -42,8 +42,31 @@
                         <p class="m-0">${appointment.staff.office.street}</p>
                       </div>
                       <div class="row">
-                        <p class="m-0">${appointment.fromDate.day} de ${appointment.fromDate.month}
-                            ${appointment.fromDate.hours}:${appointment.fromDate.minutes} hasta ${appointment.toDate.hours}:${appointment.toDate.minutes}</p>
+                        <p class="m-0"><c:choose>
+                            <c:when test="${appointment.fromDate.dayOfWeek == 1}"><spring:message code="Monday"/></c:when>
+                            <c:when test="${appointment.fromDate.dayOfWeek == 2}"><spring:message code="Tuesday"/></c:when>
+                            <c:when test="${appointment.fromDate.dayOfWeek == 3}"><spring:message code="Wednesday"/></c:when>
+                            <c:when test="${appointment.fromDate.dayOfWeek == 4}"><spring:message code="Thursday"/></c:when>
+                            <c:when test="${appointment.fromDate.dayOfWeek == 5}"><spring:message code="Friday"/></c:when>
+                            <c:when test="${appointment.fromDate.dayOfWeek == 6}"><spring:message code="Saturday"/></c:when>
+                            <c:when test="${appointment.fromDate.dayOfWeek == 7}"><spring:message code="Sunday"/></c:when>
+                            <c:otherwise>${appointment.fromDate.dayOfWeek}</c:otherwise>
+                            </c:choose> ${appointment.fromDate.dayOfMonth} de <c:choose>
+                            <c:when test="${appointment.fromDate.monthOfYear == 1}"><spring:message code="January"/></c:when>
+                            <c:when test="${appointment.fromDate.monthOfYear == 2}"><spring:message code="February"/></c:when>
+                            <c:when test="${appointment.fromDate.monthOfYear == 3}"><spring:message code="March"/></c:when>
+                            <c:when test="${appointment.fromDate.monthOfYear == 4}"><spring:message code="April"/></c:when>
+                            <c:when test="${appointment.fromDate.monthOfYear == 5}"><spring:message code="May"/></c:when>
+                            <c:when test="${appointment.fromDate.monthOfYear == 6}"><spring:message code="June"/></c:when>
+                            <c:when test="${appointment.fromDate.monthOfYear == 7}"><spring:message code="July"/></c:when>
+                            <c:when test="${appointment.fromDate.monthOfYear == 8}"><spring:message code="August"/></c:when>
+                            <c:when test="${appointment.fromDate.monthOfYear == 9}"><spring:message code="September"/></c:when>
+                            <c:when test="${appointment.fromDate.monthOfYear == 10}"><spring:message code="October"/></c:when>
+                            <c:when test="${appointment.fromDate.monthOfYear == 11}"><spring:message code="November"/></c:when>
+                            <c:when test="${appointment.fromDate.monthOfYear == 12}"><spring:message code="December"/></c:when>
+                            <c:otherwise>${appointment.fromDate.monthOfYear}</c:otherwise></c:choose>
+
+                          <c:if test="${appointment.fromDate.hourOfDay < 10}">0</c:if>${appointment.fromDate.hourOfDay}:<c:if test="${appointment.fromDate.minuteOfHour < 10}">0</c:if>${appointment.fromDate.minuteOfHour}hs - <c:if test="${appointment.toDate.hourOfDay < 10}">0</c:if>${appointment.toDate.hourOfDay}:<c:if test="${appointment.toDate.hourOfDay < 10}">0</c:if>${appointment.toDate.minuteOfHour}hs
                       </div>
                     </div>
                     <div class="col-1 justify-content-start">

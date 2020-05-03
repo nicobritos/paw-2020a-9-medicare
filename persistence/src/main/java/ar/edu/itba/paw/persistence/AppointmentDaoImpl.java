@@ -71,6 +71,23 @@ public class AppointmentDaoImpl extends GenericDaoImpl<Appointment, Integer> imp
     }
 
     @Override
+    public List<Appointment> findByPatients(List<Patient> patients){
+        Map<String, Object> params = new HashMap<>();
+        JDBCWhereClauseBuilder patientsWhereClause = new JDBCWhereClauseBuilder();
+        putPatientsArguments(patients, params, patientsWhereClause);
+        MapSqlParameterSource parameterSource = new MapSqlParameterSource();
+        parameterSource.addValues(params);
+
+        JDBCSelectQueryBuilder queryBuilder = new JDBCSelectQueryBuilder()
+                .selectAll(Appointment.class)
+                .from(this.getTableName())
+                .where(patientsWhereClause);
+
+        return this.selectQuery(queryBuilder, parameterSource);
+    }
+
+
+    @Override
     public List<Appointment> find(Staff staff) {
         MapSqlParameterSource parameterSource = new MapSqlParameterSource();
         parameterSource.addValue("staff", staff.getId());
@@ -87,7 +104,7 @@ public class AppointmentDaoImpl extends GenericDaoImpl<Appointment, Integer> imp
     }
 
     @Override
-    public List<Appointment> find(List<Staff> staffs){
+    public List<Appointment> findByStaffs(List<Staff> staffs){
         Map<String, Object> params = new HashMap<>();
         JDBCWhereClauseBuilder staffsWhereClause = new JDBCWhereClauseBuilder();
         putStaffsArguments(staffs, params, staffsWhereClause);
@@ -163,7 +180,7 @@ public class AppointmentDaoImpl extends GenericDaoImpl<Appointment, Integer> imp
     }
 
     @Override
-    public List<Appointment> findByDate(Collection<Staff> staffs, DateTime date) {
+    public List<Appointment> findByStaffsAndDate(Collection<Staff> staffs, DateTime date) {
         Map<String, Object> parameters = new HashMap<>();
         JDBCWhereClauseBuilder staffWhereClause = new JDBCWhereClauseBuilder();
         putStaffsArguments(staffs, parameters, staffWhereClause);
@@ -200,6 +217,46 @@ public class AppointmentDaoImpl extends GenericDaoImpl<Appointment, Integer> imp
 
         return this.selectQuery(queryBuilder, parameterSource);
     }
+
+    @Override
+    public List<Appointment> findByPatientsAndDate(Collection<Patient> patients, DateTime date){
+        Map<String, Object> parameters = new HashMap<>();
+        JDBCWhereClauseBuilder patientWhereClause = new JDBCWhereClauseBuilder();
+        putPatientsArguments(patients, parameters, patientWhereClause);
+        MapSqlParameterSource parameterSource = new MapSqlParameterSource();
+        parameters.put("year", date.getYear());
+        parameters.put("month", date.getMonthOfYear());
+        parameters.put("day", date.getDayOfMonth());
+        parameterSource.addValues(parameters);
+
+
+
+        JDBCWhereClauseBuilder otherWhereClause = new JDBCWhereClauseBuilder()
+                .where(this.formatColumnFromName("from_date"), Operation.EQ, ":year", JDBCWhereClauseBuilder.ColumnTransformer.YEAR)
+                .and()
+                .where(this.formatColumnFromName("from_date"), Operation.EQ, ":month", JDBCWhereClauseBuilder.ColumnTransformer.MONTH)
+                .and()
+                .where(this.formatColumnFromName("from_date"), Operation.EQ, ":day", JDBCWhereClauseBuilder.ColumnTransformer.DAY);
+
+
+        JDBCWhereClauseBuilder whereClauseBuilder;
+        if(!otherWhereClause.toString().isEmpty()) {
+            whereClauseBuilder = otherWhereClause;
+            if(!patientWhereClause.toString().isEmpty()){
+                whereClauseBuilder.and(patientWhereClause);
+            }
+        } else {
+            whereClauseBuilder = patientWhereClause;
+        }
+
+        JDBCSelectQueryBuilder queryBuilder = new JDBCSelectQueryBuilder()
+                .selectAll(Appointment.class)
+                .from(this.getTableName())
+                .where(whereClauseBuilder);
+
+        return this.selectQuery(queryBuilder, parameterSource);
+    }
+
 
     @Override
     public List<Appointment> findByDate(Patient patient, DateTime date) {
@@ -504,7 +561,7 @@ public class AppointmentDaoImpl extends GenericDaoImpl<Appointment, Integer> imp
         Collection<String> arguments = new HashSet<>();
         int i = 0;
         for (Staff staff : staffs) {
-            String parameter = "_office_" + i;
+            String parameter = "_staff_" + i;
             argumentsValues.put(parameter, staff.getId());
             arguments.add(":" + parameter);
             i++;
@@ -513,6 +570,26 @@ public class AppointmentDaoImpl extends GenericDaoImpl<Appointment, Integer> imp
                 .and()
                 .in(
                         formatColumnFromName("staff_id", this.getTableAlias()),
+                        arguments
+                );
+    }
+
+    private void putPatientsArguments(Collection<Patient> patients, Map<String, Object> argumentsValues, JDBCWhereClauseBuilder whereClauseBuilder) {
+        if (patients.isEmpty())
+            return;
+
+        Collection<String> arguments = new HashSet<>();
+        int i = 0;
+        for (Patient patient : patients) {
+            String parameter = "_patient_" + i;
+            argumentsValues.put(parameter, patient.getId());
+            arguments.add(":" + parameter);
+            i++;
+        }
+        whereClauseBuilder
+                .and()
+                .in(
+                        formatColumnFromName("patient_id", this.getTableAlias()),
                         arguments
                 );
     }
