@@ -13,8 +13,7 @@
   <packaging>war</packaging>
 
   <name>webapp MediCare</name>
-  <!-- FIXME change it to the project's website -->
-  <url>http://www.example.com</url>
+  <url>http://pawserver.it.itba.edu.ar/paw-2020a-9/</url>
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>

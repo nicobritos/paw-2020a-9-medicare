@@ -4,8 +4,6 @@ import ar.edu.itba.paw.persistenceAnnotations.Column;
 import ar.edu.itba.paw.persistenceAnnotations.Table;
 import org.joda.time.DateTime;
 
-import java.time.LocalDateTime;
-
 @Table(name = "appointment", primaryKey = "appointment_id")
 public class Appointment extends GenericModel<Integer> {
     public static final int DURATION = 15;
@@ -49,18 +47,12 @@ public class Appointment extends GenericModel<Integer> {
         this.fromDate = fromDate;
     }
 
-    public LocalDateTime getToDate(){
-//        return LocalDateTime.ofEpochSecond(this.fromDate.toInstant().getEpochSecond(), 0, ZoneOffset.UTC);
-        return null;
+    public DateTime getToDate(){
+        return this.fromDate.plusMinutes(Appointment.DURATION);
     }
 
     @Override
     protected boolean isSameInstance(Object o) {
         return o instanceof Appointment;
-    }
-
-    public LocalDateTime getFromLocalDate() {
-//        return LocalDateTime.ofEpochSecond(this.fromDate.toInstant().getEpochSecond(), 0, ZoneOffset.UTC);
-        return null;
     }
 }

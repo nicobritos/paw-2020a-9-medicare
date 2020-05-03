@@ -41,6 +41,24 @@ public class WorkdayDaoImpl extends GenericDaoImpl<Workday, Integer> implements 
     }
 
     @Override
+    public List<Workday> findByUser(User user) {
+        MapSqlParameterSource parameterSource = new MapSqlParameterSource();
+        parameterSource.addValue("user", user.getId());
+
+        JDBCWhereClauseBuilder whereClauseBuilder = new JDBCWhereClauseBuilder()
+                .where(UserDaoImpl.PRIMARY_KEY_NAME, Operation.EQ, ":user");
+
+        JDBCSelectQueryBuilder queryBuilder = new JDBCSelectQueryBuilder()
+                .selectAll(Workday.class)
+                .from(this.getTableName())
+                .join("staff_id", StaffDaoImpl.TABLE_NAME, StaffDaoImpl.PRIMARY_KEY_NAME, null)
+                .join(StaffDaoImpl.TABLE_NAME, "user_id", UserDaoImpl.TABLE_NAME, UserDaoImpl.PRIMARY_KEY_NAME, null)
+                .where(whereClauseBuilder);
+
+        return this.selectQuery(queryBuilder, parameterSource);
+    }
+
+    @Override
     public List<Workday> findByStaff(Staff staff) {
         MapSqlParameterSource parameterSource = new MapSqlParameterSource();
         parameterSource.addValue("staff", staff.getId());

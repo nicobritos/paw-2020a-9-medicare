@@ -434,7 +434,6 @@ public abstract class GenericDaoImpl<M extends GenericModel<I>, I> implements Ge
 
                     ReflectionGetterSetter.set(model, field, value);
                 } catch (SQLException e2) {
-                    //TODO
                     e2.printStackTrace();
                 }
             }

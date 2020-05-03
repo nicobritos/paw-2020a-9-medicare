@@ -5,8 +5,8 @@ import ar.edu.itba.paw.interfaces.services.exceptions.AppointmentAlreadyComplete
 import ar.edu.itba.paw.interfaces.services.exceptions.InvalidAppointmentStatusChangeException;
 import ar.edu.itba.paw.interfaces.services.generic.GenericService;
 import ar.edu.itba.paw.models.*;
+import org.joda.time.DateTime;
 
-import java.time.LocalDate;
 import java.util.List;
 
 public interface AppointmentService extends GenericService<Appointment, Integer> {
@@ -18,14 +18,14 @@ public interface AppointmentService extends GenericService<Appointment, Integer>
 
     List<Appointment> findToday(Patient patient);
 
-    List<Appointment> findByDay(Staff staff, LocalDate date);
+    List<Appointment> findByDay(Staff staff, DateTime date);
 
     void setStatus(Appointment appointment, AppointmentStatus status) throws
             AppointmentAlreadyCancelledException,
             InvalidAppointmentStatusChangeException,
             AppointmentAlreadyCompletedException;
 
-    List<AppointmentTimeSlot> findAvailableTimeslots(Staff staff, LocalDate fromDate, LocalDate toDate);
+    List<AppointmentTimeSlot> findAvailableTimeslots(Staff staff, DateTime fromDate, DateTime toDate);
 
-    List<AppointmentTimeSlot> findAvailableTimeslots(Staff staff, LocalDate date);
+    List<AppointmentTimeSlot> findAvailableTimeslots(Staff staff, DateTime date);
 }
