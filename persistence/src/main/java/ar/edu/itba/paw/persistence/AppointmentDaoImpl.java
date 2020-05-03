@@ -8,6 +8,7 @@ import ar.edu.itba.paw.persistence.utils.builder.JDBCSelectQueryBuilder;
 import ar.edu.itba.paw.persistence.utils.builder.JDBCSelectQueryBuilder.JoinType;
 import ar.edu.itba.paw.persistence.utils.builder.JDBCUpdateQueryBuilder;
 import ar.edu.itba.paw.persistence.utils.builder.JDBCWhereClauseBuilder;
+import ar.edu.itba.paw.persistence.utils.builder.JDBCWhereClauseBuilder.ColumnTransformer;
 import ar.edu.itba.paw.persistence.utils.builder.JDBCWhereClauseBuilder.Operation;
 import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -198,6 +199,40 @@ public class AppointmentDaoImpl extends GenericDaoImpl<Appointment, Integer> imp
                 .where(this.formatColumnFromName("from_date"), Operation.EQ, ":month", JDBCWhereClauseBuilder.ColumnTransformer.MONTH)
                 .and()
                 .where(this.formatColumnFromName("from_date"), Operation.EQ, ":day", JDBCWhereClauseBuilder.ColumnTransformer.DAY);
+
+
+        JDBCWhereClauseBuilder whereClauseBuilder;
+        if(!otherWhereClause.toString().isEmpty()) {
+            whereClauseBuilder = otherWhereClause;
+            if(!staffWhereClause.toString().isEmpty()){
+                whereClauseBuilder.and(staffWhereClause);
+            }
+        } else {
+            whereClauseBuilder = staffWhereClause;
+        }
+
+        JDBCSelectQueryBuilder queryBuilder = new JDBCSelectQueryBuilder()
+                .selectAll(Appointment.class)
+                .from(this.getTableName())
+                .where(whereClauseBuilder);
+
+        return this.selectQuery(queryBuilder, parameterSource);
+    }
+
+    @Override
+    public List<Appointment> findByStaffsAndDate(Collection<Staff> staffs, DateTime fromDate, DateTime toDate) {
+        Map<String, Object> parameters = new HashMap<>();
+        JDBCWhereClauseBuilder staffWhereClause = new JDBCWhereClauseBuilder();
+        putStaffsArguments(staffs, parameters, staffWhereClause);
+        MapSqlParameterSource parameterSource = new MapSqlParameterSource();
+        parameterSource.addValues(parameters);
+
+        JDBCWhereClauseBuilder otherWhereClause = new JDBCWhereClauseBuilder()
+                .between(this.formatColumnFromName("from_date"), fromDate.getYear(), toDate.getYear(), ColumnTransformer.YEAR)
+                .and()
+                .between(this.formatColumnFromName("from_date"), fromDate.getMonthOfYear(), toDate.getMonthOfYear(), ColumnTransformer.MONTH)
+                .and()
+                .between(this.formatColumnFromName("from_date"), fromDate.getDayOfMonth(), toDate.getDayOfMonth(), ColumnTransformer.DAY);
 
 
         JDBCWhereClauseBuilder whereClauseBuilder;
