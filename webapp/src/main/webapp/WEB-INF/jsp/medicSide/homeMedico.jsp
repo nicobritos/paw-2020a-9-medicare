@@ -64,16 +64,12 @@
         </div>
         <div class="col">
           <div class="row d-flex justify-content-around">
-            <!-- TODO connect buttons and days -->
-            <!-- TODO the selected day should be font-weight-bold -->
             <button type="button" class="btn" id="prevWeekBtn"><</button>
             <!-- this is one -->
             <c:forEach var="i" begin="0" end="6">
               <span class="ml-1 mr-1 d-flex flex-column align-items-center">
                 <!-- day of the week -->
-                <span class="medicare-day-span" data-day="${monday.plusDays(i)}">
-
-
+                <span class="medicare-day-span" data-day="${monday.plusDays(i)}" <c:if test="${monday.plusDays(i).dayOfYear == today.dayOfYear && monday.plusDays(i).year == today.year}">style = "font-weight:bold"</c:if>>
                 <p class="mb-0">
                   <c:choose>
                     <c:when test="${monday.plusDays(i).dayOfWeek == 1}"><spring:message code="Monday"/></c:when>
@@ -101,9 +97,8 @@
                   <c:when test="${monday.plusDays(i).monthOfYear == 11}"><spring:message code="November"/></c:when>
                   <c:when test="${monday.plusDays(i).monthOfYear == 12}"><spring:message code="December"/></c:when>
                   <c:otherwise>${monday.plusDays(i).monthOfYear}</c:otherwise></c:choose></p>
-<%--                  TODO: HACER DINAMICO POR CADA DIA--%>
-                <p>${appointments.size()} <c:choose>
-                  <c:when test="${appointments.size() == 1}"><spring:message code="appointment"/></c:when>
+                <p>${weekAppointments.get(monday.plusDays(i).dayOfWeek).size()} <c:choose>
+                  <c:when test="${weekAppointments.get(monday.plusDays(i).dayOfWeek).size() == 1}"><spring:message code="appointment"/></c:when>
                   <c:otherwise><spring:message code="appointments"/></c:otherwise>
                 </c:choose></p>
               </span>
@@ -112,9 +107,8 @@
             <button type="button" class="btn" id="nextWeekBtn">></button>
           </div>
           <div class="row justify-content-center">
-            <!-- TODO: change items -->
             <ul class="list-group turno-list mr-2 w-50 overflow-auto">
-              <c:forEach var="appointment" items="${appointments}">
+              <c:forEach var="appointment" items="${weekAppointments.get(today.dayOfWeek)}">
                 <li class="list-group-item turno-item mb-3">
                   <div class="container">
                     <div class="row">
