@@ -61,10 +61,11 @@ public class MedicSideController extends GenericController {
         List<Staff> userStaffs = staffService.findByUser(user.get().getId());
         DateTime today = DateTime.now();
         DateTime monday;
+        DateTime selected = today;
         boolean isToday=true;
         if(newToday!=null){
             try{
-                today = DateTime.parse(newToday);
+                selected = DateTime.parse(newToday);
                 isToday = false;
             }catch (DateTimeParseException e){
 
@@ -78,7 +79,7 @@ public class MedicSideController extends GenericController {
 
             }
         }
-        monday = today.minusDays(today.getDayOfWeek() - 1);
+        monday = today.minusDays(selected.getDayOfWeek() - 1);
 
         mav.addObject("user", user);
         if(isStaff()) {

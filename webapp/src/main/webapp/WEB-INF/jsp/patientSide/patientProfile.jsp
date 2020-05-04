@@ -16,7 +16,7 @@
                 <!-- TODO connect-->
                 <%--            <a href="">Cambiar foto de perfil</a>--%>
                 <!-- TODO Connect-->
-                <a class="mt-3" href=""><spring:message code="ChangePassword"/></a>
+<%--                <a class="mt-3" href=""><spring:message code="ChangePassword"/></a>--%>
             </div>
             <div class="col-6">
                 <div class="container p-0 pt-4 m-0">

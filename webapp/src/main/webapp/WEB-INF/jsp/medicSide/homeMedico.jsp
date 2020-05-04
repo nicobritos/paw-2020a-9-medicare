@@ -38,7 +38,7 @@
                         <h5>${appointment.patient.user.firstName} ${appointment.patient.user.surname}</h5>
                       </div>
                       <div class="row">
-                        <p class="m-0"><c:if test="${appointment.fromDate.hourOfDay < 10}">0</c:if>${appointment.fromDate.hourOfDay}:<c:if test="${appointment.fromDate.minuteOfHour < 10}">0</c:if>${appointment.fromDate.minuteOfHour} - <c:if test="${appointment.toDate.hourOfDay < 10}">0</c:if>${appointment.toDate.hourOfDay}:<c:if test="${appointment.toDate.hourOfDay < 10}">0</c:if>${appointment.toDate.minuteOfHour}</p>
+                        <p class="m-0"><c:if test="${appointment.fromDate.hourOfDay < 10}">0</c:if>${appointment.fromDate.hourOfDay}:<c:if test="${appointment.fromDate.minuteOfHour < 10}">0</c:if>${appointment.fromDate.minuteOfHour} - <c:if test="${appointment.toDate.hourOfDay < 10}">0</c:if>${appointment.toDate.hourOfDay}:<c:if test="${appointment.toDate.minuteOfHour < 10}">0</c:if>${appointment.toDate.minuteOfHour}</p>
                       </div>
                     </div>
                     <div class="col-2 justify-content-start">
@@ -123,7 +123,7 @@
                           <h5>${appointment.patient.user.firstName} ${appointment.patient.user.surname}</h5>
                         </div>
                         <div class="row">
-                          <p class="m-0"><c:if test="${appointment.fromDate.hourOfDay < 10}">0</c:if>${appointment.fromDate.hourOfDay}:<c:if test="${appointment.fromDate.minuteOfHour < 10}">0</c:if>${appointment.fromDate.minuteOfHour} - <c:if test="${appointment.toDate.hourOfDay < 10}">0</c:if>${appointment.toDate.hourOfDay}:<c:if test="${appointment.toDate.hourOfDay < 10}">0</c:if>${appointment.toDate.minuteOfHour}</p>
+                          <p class="m-0"><c:if test="${appointment.fromDate.hourOfDay < 10}">0</c:if>${appointment.fromDate.hourOfDay}:<c:if test="${appointment.fromDate.minuteOfHour < 10}">0</c:if>${appointment.fromDate.minuteOfHour} - <c:if test="${appointment.toDate.hourOfDay < 10}">0</c:if>${appointment.toDate.hourOfDay}:<c:if test="${appointment.toDate.minuteOfHour < 10}">0</c:if>${appointment.toDate.minuteOfHour}</p>
                         </div>
                       </div>
                       <div class="col-2 justify-content-start">

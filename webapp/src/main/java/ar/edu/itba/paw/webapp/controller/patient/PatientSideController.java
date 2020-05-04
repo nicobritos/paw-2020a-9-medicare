@@ -157,7 +157,7 @@ public class PatientSideController extends GenericController {
         appointment.setFromDate(dateFrom);
 
         this.appointmentService.create(appointment);
-        return new ModelAndView("redirect:/patient/appointment/"+ staffId+"/"+year+"/"+month+"/"+day+"/"+hour+"/"+minute);
+        return new ModelAndView("redirect:/patient/home");
     }
 
     @RequestMapping("/patient/appointment/{staffId}/{year}/{month}/{day}/{hour}/{minute}")
