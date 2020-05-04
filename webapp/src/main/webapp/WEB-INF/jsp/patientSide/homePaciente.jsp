@@ -49,7 +49,7 @@
                             <c:when test="${appointment.fromDate.dayOfWeek == 6}"><spring:message code="Saturday"/></c:when>
                             <c:when test="${appointment.fromDate.dayOfWeek == 7}"><spring:message code="Sunday"/></c:when>
                             <c:otherwise>${appointment.fromDate.dayOfWeek}</c:otherwise>
-                            </c:choose> ${appointment.fromDate.dayOfMonth} de <c:choose>
+                            </c:choose> ${appointment.fromDate.dayOfMonth} <spring:message code="of"/> <c:choose>
                             <c:when test="${appointment.fromDate.monthOfYear == 1}"><spring:message code="January"/></c:when>
                             <c:when test="${appointment.fromDate.monthOfYear == 2}"><spring:message code="February"/></c:when>
                             <c:when test="${appointment.fromDate.monthOfYear == 3}"><spring:message code="March"/></c:when>

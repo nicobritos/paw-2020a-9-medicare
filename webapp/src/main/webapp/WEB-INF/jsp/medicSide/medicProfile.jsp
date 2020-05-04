@@ -89,7 +89,7 @@
                           <c:when test="${workday.day == 'SATURDAY'}"><spring:message code="Saturday"/></c:when>
                           <c:when test="${workday.day == 'SUNDAY'}"><spring:message code="Sunday"/></c:when>
                           <c:otherwise>${workday.day}</c:otherwise>
-                        </c:choose> de <c:if test="${workday.startHour < 10}">0</c:if>${workday.startHour}:<c:if test="${workday.startMinute < 10}">0</c:if>${workday.startMinute}hs a <c:if test="${workday.endHour < 10}">0</c:if>${workday.endHour}:<c:if test="${workday.endMinute < 10}">0</c:if>${workday.endMinute}hs - ${workday.staff.office.name}</p>
+                        </c:choose> <spring:message code="of"/> <c:if test="${workday.startHour < 10}">0</c:if>${workday.startHour}:<c:if test="${workday.startMinute < 10}">0</c:if>${workday.startMinute}hs a <c:if test="${workday.endHour < 10}">0</c:if>${workday.endHour}:<c:if test="${workday.endMinute < 10}">0</c:if>${workday.endMinute}hs - ${workday.staff.office.name}</p>
                         <a href='<c:url value="/staff/profile/workday/delete/${workday.id}"/> ' class="btn deleteWorkday">X</a>
                       </c:forEach>
                     </c:forEach>
