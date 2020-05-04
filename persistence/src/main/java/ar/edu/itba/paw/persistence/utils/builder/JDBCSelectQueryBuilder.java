@@ -1,10 +1,15 @@
 package ar.edu.itba.paw.persistence.utils.builder;
 
+import ar.edu.itba.paw.models.GenericModel;
+import ar.edu.itba.paw.persistence.utils.ReflectionGetterSetter;
 import ar.edu.itba.paw.persistence.utils.builder.JDBCWhereClauseBuilder.Operation;
+import ar.edu.itba.paw.persistenceAnnotations.Column;
+import ar.edu.itba.paw.persistenceAnnotations.Table;
 
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.stream.Collectors;
+import java.util.Map;
 
 public class JDBCSelectQueryBuilder extends JDBCQueryBuilder {
     public static final String ALL = " * ";
@@ -52,10 +57,12 @@ public class JDBCSelectQueryBuilder extends JDBCQueryBuilder {
         }
     }
 
+    private Map<String, Class<? extends GenericModel<?>>> joinColumns = new HashMap<>();
     private List<String> columns = new LinkedList<>();
     private List<String> joins = new LinkedList<>();
 
     private JDBCWhereClauseBuilder whereClauseBuilder;
+    private Class<? extends GenericModel<?>> mClass;
     private OrderCriteria orderCriteria;
     private boolean selectAll;
     private boolean distinct;
@@ -65,8 +72,9 @@ public class JDBCSelectQueryBuilder extends JDBCQueryBuilder {
     private int limit;
     private int offset;
 
-    public JDBCSelectQueryBuilder selectAll() {
+    public JDBCSelectQueryBuilder selectAll(Class<? extends GenericModel<?>> mClass) {
         this.selectAll = true;
+        this.mClass = mClass;
         return this;
     }
 
@@ -85,42 +93,63 @@ public class JDBCSelectQueryBuilder extends JDBCQueryBuilder {
         return this;
     }
 
-    public JDBCSelectQueryBuilder join(String columnLeft, String tableRight, String columnRight) {
-        return this.join(columnLeft, Operation.EQ, tableRight, columnRight, JoinType.INNER);
+    public JDBCSelectQueryBuilder join(String columnLeft, String tableRight, String columnRight, Class<? extends GenericModel<?>> mClass) {
+        return this.join(columnLeft, Operation.EQ, tableRight, columnRight, JoinType.INNER, mClass);
     }
 
-    public JDBCSelectQueryBuilder join(String columnLeft, String tableRight, String columnRight, JoinType joinType) {
-        return this.join(columnLeft, Operation.EQ, tableRight, columnRight, joinType);
+    public JDBCSelectQueryBuilder join(String columnLeft, String tableRight, String columnRight, JoinType joinType, Class<? extends GenericModel<?>> mClass) {
+        return this.join(columnLeft, Operation.EQ, tableRight, columnRight, joinType, mClass);
     }
 
-    public JDBCSelectQueryBuilder join(String columnLeft, Operation operation, String tableRight, String columnRight) {
-        return this.join(columnLeft, operation, tableRight, columnRight, JoinType.INNER);
+    public JDBCSelectQueryBuilder join(String columnLeft, Operation operation, String tableRight, String columnRight, Class<? extends GenericModel<?>> mClass) {
+        return this.join(columnLeft, operation, tableRight, columnRight, JoinType.INNER, mClass);
     }
 
-    public JDBCSelectQueryBuilder join(String columnLeft, Operation operation, String tableRight, String columnRight, JoinType joinType) {
-        return this.join(this.alias, columnLeft, operation, tableRight, columnRight, joinType);
+    public JDBCSelectQueryBuilder join(String columnLeft, Operation operation, String tableRight, String columnRight, JoinType joinType, Class<? extends GenericModel<?>> mClass) {
+        return this.join(this.alias, columnLeft, operation, tableRight, columnRight, joinType, mClass);
     }
 
-    public JDBCSelectQueryBuilder join(String tableLeft, String columnLeft, String tableRight, String columnRight) {
-        return this.join(tableLeft, columnLeft, Operation.EQ, tableRight, columnRight, JoinType.INNER);
+    public JDBCSelectQueryBuilder join(String tableLeft, String columnLeft, String tableRight, String columnRight, Class<? extends GenericModel<?>> mClass) {
+        return this.join(tableLeft, columnLeft, Operation.EQ, tableRight, columnRight, JoinType.INNER, mClass);
     }
 
-    public JDBCSelectQueryBuilder join(String tableLeft, String columnLeft, String tableRight, String columnRight, JoinType joinType) {
-        return this.join(tableLeft, columnLeft, Operation.EQ, tableRight, columnRight, joinType);
+    public JDBCSelectQueryBuilder join(String tableLeft, String columnLeft, String tableRight, String columnRight, JoinType joinType, Class<? extends GenericModel<?>> mClass) {
+        return this.join(tableLeft, columnLeft, Operation.EQ, tableRight, columnRight, joinType, mClass);
     }
 
-    public JDBCSelectQueryBuilder join(String tableLeft, String columnLeft, Operation operation, String tableRight, String columnRight) {
-        return this.join(tableLeft, columnLeft, operation, tableRight, columnRight, JoinType.INNER);
+    public JDBCSelectQueryBuilder join(String tableLeft, String columnLeft, Operation operation, String tableRight, String columnRight, Class<? extends GenericModel<?>> mClass) {
+        return this.join(tableLeft, columnLeft, operation, tableRight, columnRight, JoinType.INNER, mClass);
     }
 
-    public JDBCSelectQueryBuilder join(String tableLeft, String columnLeft, Operation operation, String tableRight, String columnRight, JoinType joinType) {
+    public JDBCSelectQueryBuilder join(String tableLeft, String columnLeft, Operation operation, String tableRight, String columnRight, JoinType joinType, Class<? extends GenericModel<?>> mClass) {
+        return this.joinAlias(tableLeft, columnLeft, operation, tableRight, tableRight, columnRight, joinType, mClass);
+    }
+
+    public JDBCSelectQueryBuilder joinAlias(String columnLeft, String tableRight, String aliasRight, String columnRight, Class<? extends GenericModel<?>> mClass) {
+        return this.joinAlias(this.alias, columnLeft, Operation.EQ, tableRight, aliasRight, columnRight, JoinType.INNER, mClass);
+    }
+
+    public JDBCSelectQueryBuilder joinAlias(String columnLeft, String tableRight, String aliasRight, String columnRight, JoinType joinType, Class<? extends GenericModel<?>> mClass) {
+        return this.joinAlias(this.alias, columnLeft, Operation.EQ, tableRight, aliasRight, columnRight, joinType, mClass);
+    }
+
+    public JDBCSelectQueryBuilder joinAlias(String tableLeft, String columnLeft, String tableRight, String aliasRight, String columnRight, JoinType joinType, Class<? extends GenericModel<?>> mClass) {
+        return this.joinAlias(tableLeft, columnLeft, Operation.EQ, tableRight, aliasRight, columnRight, joinType, mClass);
+    }
+
+    public JDBCSelectQueryBuilder joinAlias(String tableLeft, String columnLeft, Operation operation, String tableRight, String aliasRight, String columnRight, JoinType joinType, Class<? extends GenericModel<?>> mClass) {
         String string = joinType.getJoinType() +
                 " JOIN " +
                 tableRight +
+                " " +
+                aliasRight +
                 " ON " +
                 tableLeft + "." + columnLeft +
                 operation.getOperation() +
-                tableRight + "." + columnRight;
+                aliasRight + "." + columnRight;
+
+        if (mClass != null)
+            this.joinColumns.put(aliasRight, mClass);
 
         this.joins.add(string);
         return this;
@@ -163,12 +192,9 @@ public class JDBCSelectQueryBuilder extends JDBCQueryBuilder {
         if (this.distinct) stringBuilder.append(" DISTINCT ");
 
         if (this.columns.size() > 0) {
-            stringBuilder.append(this.joinColumns());
+            stringBuilder.append(this.joinStrings(this.columns));
         } else if (this.selectAll) {
-            stringBuilder
-                    .append(this.alias)
-                    .append(".")
-                    .append(ALL);
+            stringBuilder.append(this.generateColumns());
         } else {
             return null;
         }
@@ -217,7 +243,19 @@ public class JDBCSelectQueryBuilder extends JDBCQueryBuilder {
         return this.table;
     }
 
-    private String joinColumns() {
-        return this.columns.stream().map(s -> this.alias + "." + s).collect(Collectors.joining(","));
+    private String generateColumns() {
+        if (this.mClass != null)
+            this.joinColumns.put(this.alias, this.mClass);
+
+        List<String> columns = new LinkedList<>();
+        for (Map.Entry<String, Class<? extends GenericModel<?>>> entry : this.joinColumns.entrySet()) {
+            Table table = entry.getValue().getAnnotation(Table.class);
+            columns.add(entry.getKey() + "." + table.primaryKey() + " AS " + "\"" + entry.getKey() + "." + table.primaryKey() + "\"");
+            ReflectionGetterSetter.iterateFields(entry.getValue(), Column.class, field -> {
+                Column column = field.getAnnotation(Column.class);
+                columns.add(entry.getKey() + "." + column.name() + " AS " + "\"" + entry.getKey() + "." + column.name() + "\"");
+            });
+        }
+        return this.joinStrings(columns);
     }
 }

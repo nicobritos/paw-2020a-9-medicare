@@ -1,15 +1,13 @@
 package ar.edu.itba.paw.models;
 
 import ar.edu.itba.paw.persistenceAnnotations.Column;
-import ar.edu.itba.paw.persistenceAnnotations.ManyToMany;
-import ar.edu.itba.paw.persistenceAnnotations.ManyToOne;
 import ar.edu.itba.paw.persistenceAnnotations.Table;
 
 import java.util.Collection;
 import java.util.LinkedList;
 
 @Table(name = "staff", primaryKey = "staff_id")
-public class Staff extends GenericModel<Staff, Integer> {
+public class Staff extends GenericModel<Integer> {
     @Column(name = "first_name", required = true)
     private String firstName;
     @Column(name = "surname", required = true)
@@ -20,10 +18,9 @@ public class Staff extends GenericModel<Staff, Integer> {
     private String email;
     @Column(name = "registration_number")
     private Integer registrationNumber;
-    @ManyToMany(name = "staff_id", otherName = "specialty_id", tableName = "system_staff_specialty_staff", className = StaffSpecialty.class)
-    private Collection<StaffSpecialty> staffSpecialties = new LinkedList<>();
-    @ManyToOne(name = "office_id", inverse = true)
+    private User user;
     private Office office;
+    private Collection<StaffSpecialty> staffSpecialties = new LinkedList<>();
 
     public String getFirstName() {
         return this.firstName;
@@ -65,16 +62,28 @@ public class Staff extends GenericModel<Staff, Integer> {
         this.registrationNumber = registrationNumber;
     }
 
-    public Collection<StaffSpecialty> getStaffSpecialties() {
-        return this.staffSpecialties;
-    }
-
     public Office getOffice() {
         return this.office;
+    }
+
+    public User getUser() {
+        return this.user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
+    }
+
+    public void setOffice(Office office) {
+        this.office = office;
     }
 
     @Override
     protected boolean isSameInstance(Object o) {
         return o instanceof Staff;
+    }
+
+    public Collection<StaffSpecialty> getStaffSpecialties() {
+        return this.staffSpecialties;
     }
 }

@@ -1,14 +1,10 @@
 package ar.edu.itba.paw.models;
 
 import ar.edu.itba.paw.persistenceAnnotations.Column;
-import ar.edu.itba.paw.persistenceAnnotations.OneToMany;
 import ar.edu.itba.paw.persistenceAnnotations.Table;
 
-import java.util.Collection;
-import java.util.LinkedList;
-
 @Table(name = "users", primaryKey = "users_id")
-public class User extends GenericModel<User, Integer> {
+public class User extends GenericModel<Integer> {
     @Column(name = "email", required = true)
     private String email;
     @Column(name = "password", required = true)
@@ -17,10 +13,6 @@ public class User extends GenericModel<User, Integer> {
     private String firstName;
     @Column(name = "surname", required = true)
     private String surname;
-    @OneToMany(name = "staff_id", className = Staff.class)
-    private Collection<Staff> staffs = new LinkedList<>();
-    @OneToMany(name = "patient_id", className = Patient.class)
-    private Collection<Patient> patients = new LinkedList<>();
 
     public String getEmail() {
         return this.email;
@@ -28,14 +20,6 @@ public class User extends GenericModel<User, Integer> {
 
     public void setEmail(String email) {
         this.email = email;
-    }
-
-    public Collection<Staff> getStaffs() {
-        return this.staffs;
-    }
-
-    public Collection<Patient> getPatients() {
-        return this.patients;
     }
 
     public String getPassword() {

@@ -1,4 +1,4 @@
-create table system_country
+create table if not exists system_country
 (
     country_id varchar(2) default NULL::character varying not null
         constraint system_country_pk
@@ -6,10 +6,10 @@ create table system_country
     name text not null
 );
 
-create unique index system_country_country_id_uindex
+create unique index if not exists system_country_country_id_uindex
     on system_country (country_id);
 
-create table system_province
+create table if not exists system_province
 (
     province_id serial not null
         constraint system_province_pk
@@ -21,10 +21,10 @@ create table system_province
     name text not null
 );
 
-create unique index system_province_province_id_uindex
+create unique index if not exists system_province_province_id_uindex
     on system_province (province_id);
 
-create table system_staff_specialty
+create table if not exists system_staff_specialty
 (
     specialty_id serial not null
         constraint specialty_pk
@@ -32,10 +32,10 @@ create table system_staff_specialty
     name text not null
 );
 
-create unique index specialty_specialty_id_uindex
+create unique index if not exists specialty_specialty_id_uindex
     on system_staff_specialty (specialty_id);
 
-create table system_locality
+create table if not exists system_locality
 (
     province_id integer
         constraint system_locality_province
@@ -47,7 +47,7 @@ create table system_locality
             primary key
 );
 
-create table office
+create table if not exists office
 (
     office_id serial not null
         constraint office_pk
@@ -62,10 +62,10 @@ create table office
     email text
 );
 
-create unique index office_office_id_uindex
+create unique index if not exists office_office_id_uindex
     on office (office_id);
 
-create table staff
+create table if not exists staff
 (
     staff_id serial not null
         constraint staff_pk
@@ -81,10 +81,10 @@ create table staff
     registration_number integer
 );
 
-create unique index staff_staff_id_uindex
+create unique index if not exists staff_staff_id_uindex
     on staff (staff_id);
 
-create table system_staff_specialty_staff
+create table if not exists system_staff_specialty_staff
 (
     specialty_id integer not null
         constraint specialty_staff_system_specialty
@@ -98,6 +98,6 @@ create table system_staff_specialty_staff
         primary key (specialty_id, staff_id)
 );
 
-create unique index system_locality_locality_id_uindex
+create unique index if not exists system_locality_locality_id_uindex
     on system_locality (locality_id);
 

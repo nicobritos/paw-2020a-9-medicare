@@ -1,29 +1,19 @@
 package ar.edu.itba.paw.models;
 
 import ar.edu.itba.paw.persistenceAnnotations.Column;
-import ar.edu.itba.paw.persistenceAnnotations.ManyToOne;
-import ar.edu.itba.paw.persistenceAnnotations.OneToMany;
 import ar.edu.itba.paw.persistenceAnnotations.Table;
 
-import java.util.Collection;
-import java.util.LinkedList;
-
 @Table(name = "office", primaryKey = "office_id")
-public class Office extends GenericModel<Office, Integer> {
+public class Office extends GenericModel<Integer> {
     @Column(name = "phone")
     private String phone;
     @Column(name = "email")
     private String email;
     @Column(name = "name", required = true)
     private String name;
-    @ManyToOne(name = "locality_id", required = true)
     private Locality locality;
     @Column(name = "street", required = true)
     private String street;
-    @OneToMany(name = "office_id", className = Staff.class)
-    private Collection<Staff> staffs = new LinkedList<>();
-    @OneToMany(name = "patient_id", className = Patient.class)
-    private Collection<Patient> patients = new LinkedList<>();
     @Column(name = "url")
     private String url;
 
@@ -65,14 +55,6 @@ public class Office extends GenericModel<Office, Integer> {
 
     public void setLocality(Locality locality) {
         this.locality = locality;
-    }
-
-    public Collection<Staff> getStaffs() {
-        return this.staffs;
-    }
-
-    public Collection<Patient> getPatients() {
-        return patients;
     }
 
     public String getUrl() {

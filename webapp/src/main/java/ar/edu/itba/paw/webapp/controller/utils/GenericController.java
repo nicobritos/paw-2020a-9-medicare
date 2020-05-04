@@ -25,6 +25,10 @@ public abstract class GenericController {
     @Autowired
     private UserService userService;
 
+    protected boolean isStaff() {
+        return this.getUser().filter(value -> this.userService.isStaff(value)).isPresent();
+    }
+
     protected Optional<User> getUser() {
         Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         if (principal instanceof org.springframework.security.core.userdetails.User) {

@@ -1,11 +1,18 @@
 package ar.edu.itba.paw.persistence.utils.builder;
 
+import org.joda.time.DateTime;
+import org.joda.time.format.DateTimeFormat;
+import org.joda.time.format.DateTimeFormatter;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.function.BiPredicate;
 import java.util.stream.Collectors;
 
 public class JDBCWhereClauseBuilder {
+    private static final DateTimeFormatter dateFormatter = DateTimeFormat.forPattern("yyyy-MM-dd");
+    private static final DateTimeFormatter dateTimeFormatter = DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss");
+
     public enum Operation {
         EQ(" = ", (o1, o2) -> (o1 == null && o2 == null) || (o1 != null && o1.equals(o2))),
         NEQ(" <> ", (o1, o2) -> (o1 == null && o2 != null) || (o1 != null && !o1.equals(o2))),
@@ -39,7 +46,10 @@ public class JDBCWhereClauseBuilder {
 
     public enum ColumnTransformer {
         LENGTH(" LENGTH(", ") "),
-        LOWER(" unaccent(LOWER(", "))");
+        LOWER(" unaccent(LOWER(", "))"),
+        DAY("EXTRACT(DAY FROM ",")"),
+        MONTH("EXTRACT(MONTH FROM ",")"),
+        YEAR("EXTRACT(YEAR FROM ",")");
 
         private String prefix;
         private String suffix;
@@ -63,14 +73,6 @@ public class JDBCWhereClauseBuilder {
     }
 
     private StringBuilder clause = new StringBuilder();
-
-    public JDBCWhereClauseBuilder where(JDBCWhereClauseBuilder whereClauseBuilder) {
-        this.clause
-                .append(" (")
-                .append(whereClauseBuilder.toString())
-                .append(") ");
-        return this;
-    }
 
     public JDBCWhereClauseBuilder where(String columnName, Operation operation, String paramName) {
         return this.where(columnName, operation, paramName, null);
@@ -119,9 +121,37 @@ public class JDBCWhereClauseBuilder {
         return this;
     }
 
+    public JDBCWhereClauseBuilder and(JDBCWhereClauseBuilder whereClauseBuilder) {
+        String otherWhereClause = whereClauseBuilder.getClauseAsString();
+        if (otherWhereClause.isEmpty())
+            return this;
+
+        if (this.clause.length() > 0)
+            this.clause.append(" AND ");
+        this.clause
+                .append(" (")
+                .append(otherWhereClause)
+                .append(") ");
+        return this;
+    }
+
     public JDBCWhereClauseBuilder or() {
         if (this.clause.length() > 0)
             this.clause.append(" OR ");
+        return this;
+    }
+
+    public JDBCWhereClauseBuilder or(JDBCWhereClauseBuilder whereClauseBuilder) {
+        String otherWhereClause = whereClauseBuilder.getClauseAsString();
+        if (otherWhereClause.isEmpty())
+            return this;
+
+        if (this.clause.length() > 0)
+            this.clause.append(" OR ");
+        this.clause
+                .append(" (")
+                .append(otherWhereClause)
+                .append(") ");
         return this;
     }
 
@@ -144,6 +174,30 @@ public class JDBCWhereClauseBuilder {
                 .append(min)
                 .append(" AND ")
                 .append(max);
+
+        return this;
+    }
+
+    public JDBCWhereClauseBuilder between(String columnName, DateTime fromDate, DateTime toDate) {
+        return this.between(columnName, fromDate, toDate, null);
+    }
+
+    public JDBCWhereClauseBuilder between(String columnName, DateTime fromDate, DateTime toDate, ColumnTransformer columnTransformer) {
+        if (columnTransformer != null) {
+            this.clause
+                    .append(columnTransformer.getPrefix())
+                    .append(columnName)
+                    .append(columnTransformer.getSuffix());
+        } else {
+            this.clause.append(columnName);
+        }
+
+        this.clause
+                .append(" BETWEEN '")
+                .append(dateTimeFormatter.print(fromDate))
+                .append("' AND '")
+                .append(dateTimeFormatter.print(toDate))
+                .append("'");
 
         return this;
     }

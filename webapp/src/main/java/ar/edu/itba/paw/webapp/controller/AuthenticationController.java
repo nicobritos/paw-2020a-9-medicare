@@ -1,7 +1,10 @@
 package ar.edu.itba.paw.webapp.controller;
 
-import ar.edu.itba.paw.interfaces.MediCareException;
-import ar.edu.itba.paw.interfaces.services.*;
+import ar.edu.itba.paw.interfaces.services.CountryService;
+import ar.edu.itba.paw.interfaces.services.LocalityService;
+import ar.edu.itba.paw.interfaces.services.ProvinceService;
+import ar.edu.itba.paw.interfaces.services.UserService;
+import ar.edu.itba.paw.interfaces.services.exceptions.EmailAlreadyExistsException;
 import ar.edu.itba.paw.models.*;
 import ar.edu.itba.paw.webapp.controller.utils.GenericController;
 import ar.edu.itba.paw.webapp.controller.utils.JsonResponse;
@@ -35,10 +38,6 @@ public class AuthenticationController extends GenericController {
     private AuthenticationManager authenticationManager;
     @Autowired
     private UserService userService;
-    @Autowired
-    private OfficeService officeService;
-    @Autowired
-    private StaffService staffService;
     @Autowired
     private LocalityService localityService;
     @Autowired
@@ -95,8 +94,8 @@ public class AuthenticationController extends GenericController {
         office.setLocality(locality.get());
         office.setStreet(form.getAddress());
         try {
-            userService.create(newUser, office);
-        } catch (MediCareException e) {
+            this.userService.createAsStaff(newUser, office);
+        } catch (EmailAlreadyExistsException e) {
             errors.reject("EmailAlreadyTaken.signupForm.email", null, "Error");
             return this.signupStaffIndex(form);
         }
@@ -117,12 +116,12 @@ public class AuthenticationController extends GenericController {
         User newUser;
         try {
             newUser = this.userService.create(form.getAsUser());
-            this.authenticateSignedUpUser(newUser, form.getPassword(), request);
-        } catch (MediCareException e) {
+        } catch (EmailAlreadyExistsException e) {
             errors.reject("EmailAlreadyTaken.signupForm.email", null, "Error");
             return this.signupPatientIndex(form);
         }
 
+        this.authenticateSignedUpUser(newUser, form.getPassword(), request);
         return new ModelAndView("redirect:/patient/home");
     }
 

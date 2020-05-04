@@ -16,6 +16,10 @@ public interface StaffService extends GenericSearchableService<Staff, Integer> {
 
     List<Staff> findBy(Set<String> names, Set<String> surnames, Set<Office> offices, Set<StaffSpecialty> staffSpecialties, Set<Locality> localities, int page);
 
+    List<Staff> findBy(Set<String> names, Set<String> surnames, Set<Office> offices, Set<StaffSpecialty> staffSpecialties, Set<Locality> localities);
+
+    List<Staff> findByUser(Integer id);
+
     void addStaffSpecialty(Staff staff, StaffSpecialty staffSpecialty);
 
     void addStaffSpecialties(Staff staff, Set<StaffSpecialty> staffSpecialties);

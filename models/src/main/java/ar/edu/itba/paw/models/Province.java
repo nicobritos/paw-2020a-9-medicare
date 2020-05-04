@@ -1,20 +1,12 @@
 package ar.edu.itba.paw.models;
 
 import ar.edu.itba.paw.persistenceAnnotations.Column;
-import ar.edu.itba.paw.persistenceAnnotations.ManyToOne;
-import ar.edu.itba.paw.persistenceAnnotations.OneToMany;
 import ar.edu.itba.paw.persistenceAnnotations.Table;
 
-import java.util.Collection;
-import java.util.LinkedList;
-
 @Table(name = "system_province", primaryKey = "province_id")
-public class Province extends GenericModel<Province, Integer> {
+public class Province extends GenericModel<Integer> {
     @Column(name = "name", required = true)
     private String name;
-    @OneToMany(name = "locality_id", className = Locality.class)
-    private Collection<Locality> localities = new LinkedList<>();
-    @ManyToOne(name = "country_id", inverse = true)
     private Country country;
 
     public String getName() {
@@ -25,12 +17,12 @@ public class Province extends GenericModel<Province, Integer> {
         this.name = name;
     }
 
-    public Collection<Locality> getLocalities() {
-        return this.localities;
-    }
-
     public Country getCountry() {
         return this.country;
+    }
+
+    public void setCountry(Country country) {
+        this.country = country;
     }
 
     @Override
