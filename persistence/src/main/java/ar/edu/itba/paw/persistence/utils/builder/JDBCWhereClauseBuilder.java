@@ -11,7 +11,7 @@ import java.util.stream.Collectors;
 
 public class JDBCWhereClauseBuilder {
     private static final DateTimeFormatter dateFormatter = DateTimeFormat.forPattern("yyyy-MM-dd");
-    private static final DateTimeFormatter dateTimeFormatter = DateTimeFormat.forPattern("yyyy-mm-dd HH:mm:ss");
+    private static final DateTimeFormatter dateTimeFormatter = DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss");
 
     public enum Operation {
         EQ(" = ", (o1, o2) -> (o1 == null && o2 == null) || (o1 != null && o1.equals(o2))),
@@ -193,10 +193,11 @@ public class JDBCWhereClauseBuilder {
         }
 
         this.clause
-                .append(" BETWEEN ")
+                .append(" BETWEEN '")
                 .append(dateTimeFormatter.print(fromDate))
-                .append(" AND ")
-                .append(dateTimeFormatter.print(toDate));
+                .append("' AND '")
+                .append(dateTimeFormatter.print(toDate))
+                .append("'");
 
         return this;
     }
