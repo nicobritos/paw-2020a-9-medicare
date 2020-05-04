@@ -30,9 +30,9 @@ import java.nio.charset.StandardCharsets;
 @Configuration
 @EnableTransactionManagement
 public class WebConfig {
-    protected static final String DB_URL = "jdbc:postgresql://localhost:5432/paw-2020a-9";
-    protected static final String DB_USER = "postgres";
-    protected static final String DB_PASSWORD = "postgres";
+    protected static final String DB_URL = "jdbc:postgresql://10.16.1.110:5432:5432/paw-2020a-9/";
+    protected static final String DB_USER = "paw-2020a-9";
+    protected static final String DB_PASSWORD = "N4wC7cmxe";
     protected static final boolean CACHE_ENABLED = true;
     protected static final int CACHE_SIZE = 500;
 
