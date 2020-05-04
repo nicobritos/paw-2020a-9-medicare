@@ -2,16 +2,15 @@ package ar.edu.itba.paw.webapp.controller.patient;
 
 import ar.edu.itba.paw.interfaces.MediCareException;
 import ar.edu.itba.paw.interfaces.services.*;
-import ar.edu.itba.paw.models.Appointment;
-import ar.edu.itba.paw.models.Patient;
-import ar.edu.itba.paw.models.Staff;
-import ar.edu.itba.paw.models.User;
+import ar.edu.itba.paw.models.*;
 import ar.edu.itba.paw.webapp.controller.utils.GenericController;
 import ar.edu.itba.paw.webapp.controller.utils.JsonResponse;
 import ar.edu.itba.paw.webapp.form.RequestAppointmentForm;
 import ar.edu.itba.paw.webapp.form.UserProfileForm;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
@@ -157,5 +156,37 @@ public class PatientSideController extends GenericController {
             this.appointmentService.create(appointment);
             return new LinkedList<>();
         });
+    }
+
+    @RequestMapping(value = "/patient/appointment/{id}",method = RequestMethod.DELETE)
+    public ResponseEntity cancelAppointment(@PathVariable Integer id){
+        //get current user, check for null
+        Optional<User> user = getUser();
+        if(!user.isPresent()){
+            return new ResponseEntity(HttpStatus.UNAUTHORIZED);
+        }
+        //get patient for current user
+        List<Patient> patient = this.patientService.findByUser(user.get());
+        //get appointment to delete, check for "null"
+        Optional<Appointment> appointment = this.appointmentService.findById(id);
+        if(!appointment.isPresent()){
+            return new ResponseEntity(HttpStatus.BAD_REQUEST);
+        }
+        //check if user is allowed to cancel
+        boolean isAllowed = false;
+        for(Patient p : patient){
+            if(p.getId().equals(appointment.get().getPatientId())){
+                isAllowed = true;
+                break;
+            }
+        }
+        //return response code for not allow
+        if(!isAllowed){
+            return new ResponseEntity(HttpStatus.UNAUTHORIZED);
+        }
+        //cancel appointment
+        this.appointmentService.setStatus(appointment.get(), AppointmentStatus.CANCELLED);
+        //return success
+        return new ResponseEntity(HttpStatus.NO_CONTENT);
     }
 }

@@ -72,8 +72,8 @@
                             <!-- TODO connect icon -->
                             <img src='<c:url value="/img/moreOptions.svg"/>' class="moreOptionsButton" alt="nore options" data-toggle="dropdown">
                             <div class="dropdown-menu">
-                              <!-- TODO conect to the options -->
-                            <a class="dropdown-item" href="#"><spring:message code="Cancel"/></a>
+                              <%-- TODO conect to the options --%>
+                            <a class="dropdown-item cancelAppointmentBtn" href="<c:url value="/patient/appointment/${appointment.id}"/>"><spring:message code="Cancel"/></a>
                             <a class="dropdown-item" href="#"><spring:message code="Reprogram"/></a>
                           </div>
                         </div>
@@ -117,5 +117,6 @@
         </div>
       </div>
     </div>
+  <script src="<c:url value="/js/scripts/patient/homePatient.js"/>"></script>
   </body>
 </html>
