@@ -378,12 +378,21 @@ public abstract class GenericDaoImpl<M extends GenericModel<I>, I> implements Ge
                 if (column.required() && o == null)
                     throw new IllegalStateException("This field is marked as required but its value is null");
 
-                map.put(column.name(), new JDBCArgumentValue(prefix + column.name(), o));
+                if (field.getType().equals(DateTime.class)) {
+                    map.put(column.name(), new JDBCArgumentValue(prefix + column.name(), ((DateTime) o).toInstant()));
+                } else {
+                    map.put(column.name(), new JDBCArgumentValue(prefix + column.name(), o));
+                }
             });
         } else {
             ReflectionGetterSetter.iterateValues(model, Column.class, (field, o) -> {
                 Column column = field.getAnnotation(Column.class);
-                map.put(column.name(), new JDBCArgumentValue(prefix + column.name(), o));
+
+                if (field.getType().equals(DateTime.class)) {
+                    map.put(column.name(), new JDBCArgumentValue(prefix + column.name(), ((DateTime) o).toInstant()));
+                } else {
+                    map.put(column.name(), new JDBCArgumentValue(prefix + column.name(), o));
+                }
             });
         }
 
