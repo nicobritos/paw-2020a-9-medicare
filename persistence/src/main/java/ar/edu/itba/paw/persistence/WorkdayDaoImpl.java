@@ -99,9 +99,9 @@ public class WorkdayDaoImpl extends GenericDaoImpl<Workday, Integer> implements 
     public boolean isStaffWorking(Staff staff, AppointmentTimeSlot timeSlot) {
         MapSqlParameterSource parameterSource = new MapSqlParameterSource();
         parameterSource.addValue("staff", staff.getId());
-        parameterSource.addValue("day", WorkdayDay.from(timeSlot.getDate()));
-        parameterSource.addValue("from_hour", timeSlot.getDate().getHourOfDay());
-        parameterSource.addValue("to_hour", timeSlot.getToDate().getHourOfDay());
+        parameterSource.addValue("day", WorkdayDay.from(timeSlot.getDate()).name());
+        parameterSource.addValue("start_hour", timeSlot.getDate().getHourOfDay());
+        parameterSource.addValue("end_hour", timeSlot.getToDate().getHourOfDay());
 
         Operation toHourOperation;
         if (timeSlot.getToDate().getMinuteOfHour() == 0) {
@@ -113,9 +113,9 @@ public class WorkdayDaoImpl extends GenericDaoImpl<Workday, Integer> implements 
         JDBCWhereClauseBuilder whereClauseBuilder = new JDBCWhereClauseBuilder()
                 .where("day", Operation.EQ, ":day")
                 .and()
-                .where("from_hour", Operation.LEQ, ":from_hour")
+                .where("start_hour", Operation.LEQ, ":start_hour")
                 .and()
-                .where("to_hour", toHourOperation, ":to_hour")
+                .where("end_hour", toHourOperation, ":end_hour")
                 .and()
                 .where(this.formatColumnFromName("staff_id"), Operation.EQ, ":staff");
 
