@@ -222,7 +222,8 @@ public class PatientSideController extends GenericController {
             return new ResponseEntity(HttpStatus.UNAUTHORIZED);
         }
         //cancel appointment
-        this.appointmentService.setStatus(appointment.get(), AppointmentStatus.CANCELLED);
+        this.appointmentService.remove(appointment.get()); // TODO
+//        this.appointmentService.setStatus(appointment.get(), AppointmentStatus.CANCELLED);
         //return success
         return new ResponseEntity(HttpStatus.NO_CONTENT);
     }
