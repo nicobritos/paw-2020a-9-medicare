@@ -23,6 +23,7 @@ import javax.sql.DataSource;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
+import java.time.Instant;
 import java.util.*;
 import java.util.Map.Entry;
 
@@ -379,7 +380,7 @@ public abstract class GenericDaoImpl<M extends GenericModel<I>, I> implements Ge
                     throw new IllegalStateException("This field is marked as required but its value is null");
 
                 if (field.getType().equals(DateTime.class)) {
-                    map.put(column.name(), new JDBCArgumentValue(prefix + column.name(), ((DateTime) o).toInstant()));
+                    map.put(column.name(), new JDBCArgumentValue(prefix + column.name(), Timestamp.from(Instant.ofEpochMilli(((DateTime) o).getMillis()))));
                 } else {
                     map.put(column.name(), new JDBCArgumentValue(prefix + column.name(), o));
                 }
@@ -389,7 +390,7 @@ public abstract class GenericDaoImpl<M extends GenericModel<I>, I> implements Ge
                 Column column = field.getAnnotation(Column.class);
 
                 if (field.getType().equals(DateTime.class)) {
-                    map.put(column.name(), new JDBCArgumentValue(prefix + column.name(), ((DateTime) o).toInstant()));
+                    map.put(column.name(), new JDBCArgumentValue(prefix + column.name(), Timestamp.from(Instant.ofEpochMilli(((DateTime) o).getMillis()))));
                 } else {
                     map.put(column.name(), new JDBCArgumentValue(prefix + column.name(), o));
                 }
