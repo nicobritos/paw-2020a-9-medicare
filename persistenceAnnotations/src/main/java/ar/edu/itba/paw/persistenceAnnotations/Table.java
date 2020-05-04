@@ -25,5 +25,5 @@ public @interface Table {
      * If set to true then it allows the primary key to be user-set (and not automatically generated in the DB)
      * @return whether the PK can be manually set
      */
-    boolean customPrimaryKey() default false;
+    boolean manualPrimaryKey() default false;
 }

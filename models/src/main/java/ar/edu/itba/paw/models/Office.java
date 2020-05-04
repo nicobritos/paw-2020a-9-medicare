@@ -1,27 +1,21 @@
 package ar.edu.itba.paw.models;
 
 import ar.edu.itba.paw.persistenceAnnotations.Column;
-import ar.edu.itba.paw.persistenceAnnotations.ManyToOne;
-import ar.edu.itba.paw.persistenceAnnotations.OneToMany;
 import ar.edu.itba.paw.persistenceAnnotations.Table;
 
-import java.util.HashSet;
-import java.util.Set;
-
 @Table(name = "office", primaryKey = "office_id")
-public class Office extends GenericModel<Office, Integer> {
+public class Office extends GenericModel<Integer> {
     @Column(name = "phone")
     private String phone;
     @Column(name = "email")
     private String email;
     @Column(name = "name", required = true)
     private String name;
-    @ManyToOne(name = "locality_id", required = true)
     private Locality locality;
     @Column(name = "street", required = true)
     private String street;
-    @OneToMany(name = "office_id", className = Staff.class)
-    private Set<Staff> staffs = new HashSet<>();
+    @Column(name = "url")
+    private String url;
 
     public String getName() {
         return this.name;
@@ -63,8 +57,12 @@ public class Office extends GenericModel<Office, Integer> {
         this.locality = locality;
     }
 
-    public Set<Staff> getStaffs() {
-        return this.staffs;
+    public String getUrl() {
+        return url;
+    }
+
+    public void setUrl(String url) {
+        this.url = url;
     }
 
     @Override

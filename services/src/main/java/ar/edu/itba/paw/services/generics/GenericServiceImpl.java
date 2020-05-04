@@ -1,10 +1,11 @@
 package ar.edu.itba.paw.services.generics;
 
-import ar.edu.itba.paw.interfaces.daos.generic.GenericSearchableDao;
+import ar.edu.itba.paw.interfaces.daos.generic.GenericDao;
 import ar.edu.itba.paw.interfaces.services.generic.GenericService;
 import ar.edu.itba.paw.models.GenericModel;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -12,14 +13,14 @@ import java.util.Optional;
  * @param <M> the Service model type
  * @param <I> the Model's id type
  */
-public abstract class GenericServiceImpl<DAO extends GenericSearchableDao<M, I>, M extends GenericModel<M, I>, I> implements GenericService<M, I> {
+public abstract class GenericServiceImpl<DAO extends GenericDao<M, I>, M extends GenericModel<I>, I> implements GenericService<M, I> {
     @Override
     public Optional<M> findById(I id) {
         return this.getRepository().findById(id);
     }
 
     @Override
-    public Collection<M> findByIds(Collection<I> ids) {
+    public List<M> findByIds(Collection<I> ids) {
         return this.getRepository().findByIds(ids);
     }
 
@@ -44,7 +45,7 @@ public abstract class GenericServiceImpl<DAO extends GenericSearchableDao<M, I>,
     }
 
     @Override
-    public Collection<M> list() {
+    public List<M> list() {
         return this.getRepository().list();
     }
     
