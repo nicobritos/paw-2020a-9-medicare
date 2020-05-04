@@ -50,9 +50,8 @@
                           data-toggle="dropdown"
                         />
                         <div class="dropdown-menu">
-                          <!-- TODO conect to the options -->
-                          <a class="dropdown-item" href="#"><spring:message code="Cancel"/></a>
-                          <a class="dropdown-item" href="#"><spring:message code="Reprogram"/></a>
+                          <!-- TODO add reprogramar -->
+                          <a class="dropdown-item cancelAppointmentBtn" href="<c:url value="/staff/appointment/${appointment.id}"/>"><spring:message code="Cancel"/></a>
                         </div>
                       </div>
                     </div>
@@ -136,9 +135,8 @@
                             data-toggle="dropdown"
                           />
                           <div class="dropdown-menu">
-                            <!-- TODO conect to the options -->
-                            <a class="dropdown-item" href="#"><spring:message code="Cancel"/></a>
-                            <a class="dropdown-item" href="#"><spring:message code="Reprogram"/></a>
+                            <!-- TODO add reprogramar -->
+                            <a class="dropdown-item cancelAppointmentBtn" href="<c:url value="/staff/appointment/${appointment.id}"/>"><spring:message code="Cancel"/></a>
                           </div>
                         </div>
                       </div>

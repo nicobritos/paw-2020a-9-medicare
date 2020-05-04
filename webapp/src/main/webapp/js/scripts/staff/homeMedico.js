@@ -1,3 +1,4 @@
+//auxiliar functions
 function getParams(){
     let params = location.search.substring(1).split("&");
     let paramMap={};
@@ -31,14 +32,14 @@ function changeWeek(i){
     url = url.substring(0,url.length-2);
     location.replace(url);
 }
-
+//change week buttons
 document.getElementById("nextWeekBtn").onclick = function () {
     changeWeek(1);
 };
 document.getElementById("prevWeekBtn").onclick = function () {
     changeWeek(-1);
 };
-
+//change today auxiliar functions
 function changeToday(today) {
     let url=location.origin + location.pathname + "?";
     let params = getParams();
@@ -65,4 +66,29 @@ for(let s of document.querySelectorAll(".medicare-day-span")){
     }
     //TODO: use classes for better practice
     s.style.cursor = "pointer";
+}
+
+//cancel appointment
+function cancelAppointment(url,appointmentElement) {
+    fetch(url,{
+        method:"DELETE"
+    }).then(function (r) {
+        if (r.ok) {
+            appointmentElement.parentNode.removeChild(appointmentElement);
+        } else if (r.status === 500) {
+            App.showError();
+        }else if(r.status === 400) {
+            App.showError();
+        }else{
+            return Promise.reject();
+        }
+    }).catch(function () {
+        location.reload();
+    })
+}
+for(let cb of document.querySelectorAll(".cancelAppointmentBtn")){
+    cb.onclick = function (e) {
+        e.preventDefault();
+        cancelAppointment(cb.href,cb.closest("li"));
+    }
 }

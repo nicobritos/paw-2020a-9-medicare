@@ -12,7 +12,6 @@
 <form action="<c:url value="/mediclist/1"/>">
     <div class="container h-75">
         <div class="row mt-4 justify-content-center">
-            <%--TODO connect name search--%>
             <input class="form-control w-100" type="text" name="name" placeholder="<spring:message code="Name"/>"/>
         </div>
         <div class="row mt-4">
@@ -33,7 +32,6 @@
                     </select>
                 </div>
                 <div class="row mt-4">
-                    <%--TODO connect localidad search--%>
                     <select class="form-control w-100" type="text" name="localities" id="localidad">
                         <option value="-1" disabled selected><spring:message code="Locality"/></option>
                         <option value="-1"><spring:message code="Any"/></option>
@@ -77,10 +75,12 @@
                                         </div>
                                     </div>
                                     <div class="col d-flex justify-content-center align-items-center">
+                                        <a href="<c:url value="/appointment/${member.id}/0"/>">
                                         <button type="button" class="btn btn-info available-appointments-button"
                                                 data-id="${member.id}">
                                             <spring:message code="AvailableAppointments"/>
                                         </button>
+                                        </a>
                                     </div>
                                 </div>
                             </div>
@@ -106,8 +106,6 @@
     </div>
 </form>
 
-<%@ include file="partials/Modal.jsp" %>
-<%@ include file="partials/selectTurno.jsp" %>
 </body>
 <script src='<c:url value="/js/scripts/AppointmentRequest.js"/> '></script>
 <script src='<c:url value="/js/scripts/AppointmentList.js"/> '></script>

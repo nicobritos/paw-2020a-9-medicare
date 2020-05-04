@@ -172,14 +172,7 @@ public class AppointmentServiceImpl extends GenericServiceImpl<AppointmentDao, A
 
                 this.findByDay(staff, fromDate).forEach(appointment -> {
                             AppointmentTimeSlot appointmentTimeSlot = new AppointmentTimeSlot();
-                            appointmentTimeSlot.setDate(new DateTime(
-                                    appointment.getFromDate().getYear(),
-                                    appointment.getFromDate().getMonthOfYear(),
-                                    appointment.getFromDate().getDayOfMonth(),
-                                    appointment.getFromDate().getHourOfDay(),
-                                    appointment.getFromDate().getMinuteOfDay(),
-                                    appointment.getFromDate().getZone()
-                            ));
+                            appointmentTimeSlot.setDate(appointment.getFromDate());
                             appointmentTimeSlots.remove(appointmentTimeSlot);
                         });
             }
