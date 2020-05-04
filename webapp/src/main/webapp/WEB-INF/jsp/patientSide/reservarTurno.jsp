@@ -12,7 +12,8 @@
   <%@ include file="../navbar/navbarLogged.jsp" %>
   <div class="container fill-height">
       <div class="row mt-4">
-        <form:form modelAttribute="appointmentForm" class="col d-flex flex-column">
+        <c:url value="/patient/appointment/${staffId}/${year}/${month}/${day}/${hour}/${minute}" var="createAppointmentUrl"/>
+        <form:form modelAttribute="appointmentForm" action="${createAppointmentUrl}" method="post" class="col d-flex flex-column">
           <h4 class="text-muted"><spring:message code="ScheduleAppointment"/></h4>
           <p class="mt-3 text-muted"><spring:message code="Motive"/></p>
           <spring:message var="motivePlaceholder" code="Motive"/>

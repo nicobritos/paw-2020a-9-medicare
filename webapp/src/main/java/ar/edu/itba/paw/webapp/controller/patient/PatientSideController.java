@@ -122,42 +122,42 @@ public class PatientSideController extends GenericController {
         return mav;
     }
 
-    @RequestMapping(value = "/patient/appointment", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
-    @ResponseBody
-    public JsonResponse makeAppointment(
-            @Valid @RequestBody RequestAppointmentForm form,
-            final BindingResult errors){
-        return this.formatJsonResponse(errors, () -> {
-            Optional<Staff> staff = this.staffService.findById(form.getStaffId());
-            if (!staff.isPresent()) {
-                throw new MediCareException("No existe el staff solicitado");
-            }
-            LocalDate dateFrom = LocalDate.of(form.getYear(), form.getMonth(), form.getDay());
-            if (dateFrom.isBefore(LocalDate.now())) { // TODO: Check hour/minute
-                throw new MediCareException("No puede sacar un turno en el pasado");
-            }
+    @RequestMapping(value = "/patient/appointment/{staffId}/{year}/{month}/{day}/{hour}/{minute}", method = RequestMethod.POST)
+    public ModelAndView requestAppointment(@Valid @ModelAttribute("appointmentForm") RequestAppointmentForm form,
+                                           @PathVariable("staffId") final int staffId, @PathVariable("year") final int year,
+                                           @PathVariable("month") final int month, @PathVariable("day") final int day,
+                                           @PathVariable("hour") final int hour, @PathVariable("minute") final int minute,
+                                           final BindingResult errors){
+        Optional<Staff> staff = this.staffService.findById(form.getStaffId());
+        if (!staff.isPresent()) {
+            throw new MediCareException("No existe el staff solicitado");
+        }
+        DateTime dateFrom = new DateTime(form.getYear(), form.getMonth(), form.getDay(), form.getHour(), form.getMinute());
+        if (dateFrom.isBefore(DateTime.now())) {
+            throw new MediCareException("No puede sacar un turno en el pasado");
+        }
+        Optional<User> optionalUser = getUser();
+        if(!optionalUser.isPresent()) {
+            throw new MediCareException("Debe estar loggeado para sacar un turno");
+        }
+        Optional<Patient> patientOptional = this.patientService.findByUserAndOffice(optionalUser.get(), staff.get().getOffice());
+        Patient patient;
+        if (!patientOptional.isPresent()) {
+            patient = new Patient();
+            patient.setOffice(staff.get().getOffice());
+            patient.setUser(optionalUser.get());
+            patient = this.userService.createNewPatient(patient);
+        } else {
+            patient = patientOptional.get();
+        }
 
-            Optional<Patient> patientOptional = this.patientService.findByUserAndOffice(this.getUser().get(), staff.get().getOffice());
-            Patient patient;
-            if (!patientOptional.isPresent()) {
-                patient = new Patient();
-                patient.setOffice(staff.get().getOffice());
-                patient.setUser(this.getUser().get());
-                patient = this.userService.createNewPatient(patient);
-            } else {
-                patient = patientOptional.get();
-            }
+        Appointment appointment = new Appointment();
+        appointment.setStaff(staff.get());
+        appointment.setPatient(patient);
+        appointment.setFromDate(dateFrom);
 
-            LocalDateTime date = LocalDateTime.of(dateFrom.getYear(), dateFrom.getMonthValue(), dateFrom.getDayOfMonth(), form.getHour(), form.getMinute(), 0);
-            Appointment appointment = new Appointment();
-            appointment.setStaff(staff.get());
-            appointment.setPatient(patient);
-            // TODO
-//            appointment.setFromDate(Date.valueOf(date.toLocalDate()));
-
-            this.appointmentService.create(appointment);
-            return new LinkedList<>();
-        });
+        this.appointmentService.create(appointment);
+        return new ModelAndView("redirect:/patient/appointment/"+ staffId+"/"+year+"/"+month+"/"+day+"/"+hour+"/"+minute);
     }
 
     @RequestMapping("/patient/appointment/{staffId}/{year}/{month}/{day}/{hour}/{minute}")
