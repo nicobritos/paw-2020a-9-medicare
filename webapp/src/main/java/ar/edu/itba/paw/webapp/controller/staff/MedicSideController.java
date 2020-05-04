@@ -132,7 +132,7 @@ public class MedicSideController extends GenericController {
             return new ModelAndView("authentication/login");
         }
 
-        if (errors.hasErrors() || form.getPassword().length()<8 || !form.getPassword().equals(form.getRepeatPassword())) {
+        if (errors.hasErrors() || (!form.getPassword().isEmpty() && form.getPassword().length()<8) || !form.getPassword().equals(form.getRepeatPassword())) {
             return this.medicProfile(form);
         }
         Optional<User> userOptional = userService.findByUsername(form.getEmail());

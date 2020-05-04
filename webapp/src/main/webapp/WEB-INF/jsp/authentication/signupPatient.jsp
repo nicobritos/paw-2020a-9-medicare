@@ -67,7 +67,7 @@
         </div>
         <div class="form-row justify-content-between align-items-end mt-2">
             <a class="form-link" href="${loginUrl}"><spring:message code="Login"/></a>
-            <button type="submit" class="btn btn-primary"><spring:message code="Comfirm"/></button>
+            <button type="submit" class="btn btn-primary"><spring:message code="Confirm"/></button>
         </div>
 
         <form:errors path="*" cssClass="mt-4 mb-0 text-danger" element="p"/>
