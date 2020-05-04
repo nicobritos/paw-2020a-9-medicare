@@ -255,4 +255,36 @@ public class MedicSideController extends GenericController {
 
         return new ResponseEntity(HttpStatus.NO_CONTENT);
     }
+
+    @RequestMapping(value = "/staff/appointment/{id}",method = RequestMethod.DELETE)
+    public ResponseEntity cancelAppointment(@PathVariable Integer id){
+        //get current user, check for null
+        Optional<User> user = getUser();
+        if(!user.isPresent()){
+            return new ResponseEntity(HttpStatus.UNAUTHORIZED);
+        }
+        //get staff for current user
+        List<Staff> staff = this.staffService.findByUser(user.get().getId());
+        //get appointment to delete, check for "null"
+        Optional<Appointment> appointment = this.appointmentService.findById(id);
+        if(!appointment.isPresent()){
+            return new ResponseEntity(HttpStatus.BAD_REQUEST);
+        }
+        //check if user is allowed to cancel
+        boolean isAllowed = false;
+        for(Staff s : staff){
+            if(s.getId().equals(appointment.get().getStaffId())){
+                isAllowed = true;
+                break;
+            }
+        }
+        //return response code for not allow
+        if(!isAllowed){
+            return new ResponseEntity(HttpStatus.UNAUTHORIZED);
+        }
+        //cancel appointment
+        this.appointmentService.setStatus(appointment.get(), AppointmentStatus.CANCELLED);
+        //return success
+        return new ResponseEntity(HttpStatus.NO_CONTENT);
+    }
 }
