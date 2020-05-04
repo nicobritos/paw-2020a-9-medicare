@@ -14,6 +14,7 @@ import ar.edu.itba.paw.webapp.controller.utils.JsonResponse;
 import ar.edu.itba.paw.webapp.form.RequestTimeslotForm;
 import ar.edu.itba.paw.webapp.transformer.AppointmentTimeSlotTransformer;
 import org.joda.time.DateTime;
+import org.joda.time.DateTimeConstants;
 import org.joda.time.Days;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -29,6 +30,8 @@ import javax.validation.Valid;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
+
+import static org.joda.time.DateTimeConstants.*;
 
 @Controller
 public class MedicListController extends GenericController {
@@ -132,34 +135,8 @@ public class MedicListController extends GenericController {
         }
         ModelAndView mav = new ModelAndView();
 
-        LocalDate today = LocalDate.now();
-        LocalDate monday;
-
-        switch (LocalDate.now().getDayOfWeek()){
-            case SUNDAY:
-                monday = today.plusDays(1);
-                break;
-            case MONDAY:
-                monday = today;
-                break;
-            case TUESDAY:
-                monday = today.minusDays(1);
-                break;
-            case WEDNESDAY:
-                monday = today.minusDays(2);
-                break;
-            case THURSDAY:
-                monday = today.minusDays(3);
-                break;
-            case FRIDAY:
-                monday = today.minusDays(4);
-                break;
-            case SATURDAY:
-                monday = today.minusDays(5);
-                break;
-            default:
-                throw new RuntimeException();
-        }
+        DateTime today = DateTime.now();
+        DateTime monday = today.plusDays(today.getDayOfWeek() -1);
 
         mav.addObject("today", today);
         mav.addObject("monday", monday);
@@ -169,6 +146,11 @@ public class MedicListController extends GenericController {
             mav.addObject("staffs", staffService.findByUser(user.get().getId()));
         }
         mav.addObject("staff", staff.get());
+        mav.addObject("weekSlots", this.appointmentService.findAvailableTimeslots(
+                staff.get(),
+                monday,
+                monday.plusDays(7)
+        ));
         mav.setViewName("selectTurno");
         return mav;
     }

@@ -53,28 +53,28 @@
                 </div>
 
 
-                <c:forEach var="i" begin="0" end="4">
+                <c:forEach var="i" begin="0" end="6">
                     <div class="col-1 mr-4 p-0">
                         <a href="<c:url value="/patient/appointment/${staff.id}/${monday.plusDays(i).year}/${monday.plusDays(i).dayOfYear}"/>">
                             <span class="d-flex flex-column align-items-center">
                               <!-- day of the week -->
-                              <p class="mb-0">${monday.plusDays(i).dayOfWeek.name()}</p>
+                              <p class="mb-0">${monday.plusDays(i).dayOfWeek}</p>
                                 <!-- day/month -->
-                              <p class="my-0">${monday.plusDays(i).dayOfMonth} de ${monday.plusDays(i).month.name()}</p>
+                              <p class="my-0">${monday.plusDays(i).dayOfMonth} de ${monday.plusDays(i).monthOfYear}</p>
                                 <!-- TODO:connect boton para seleccionar dia-->
                             </span>
                         </a>
                         <div class="d-flex flex-vertical align-content-center">
                             <%-- TODO:connect workdays variables por dia --%>
-                            <c:forEach var="workday" items="${staff.workdays}">
-                                <button class="btn btn-sm btn-secondary mb-2">${workday.startHour}:${workday.startMinute}hs</button>
+                            <c:forEach var="timeslot" items="${weekSlots}">
+                                <button class="btn btn-sm btn-secondary mb-2">${timeslot.date.hourOfDay}:${timeslot.date.minuteOfHour}hs</button>
                             </c:forEach>
                         </div>
                     </div>
                 </c:forEach>
                 <%-- TODO:connect boton adelante --%>
                 <div class="col-1 p-0 flex-shrink-1">
-                    <button id="day-right" class="btn"><</button>
+                    <button id="day-right" class="btn">></button>
                 </div>
             </div>
         </div>
