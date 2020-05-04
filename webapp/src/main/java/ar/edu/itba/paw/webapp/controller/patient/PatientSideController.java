@@ -2,10 +2,7 @@ package ar.edu.itba.paw.webapp.controller.patient;
 
 import ar.edu.itba.paw.interfaces.MediCareException;
 import ar.edu.itba.paw.interfaces.services.*;
-import ar.edu.itba.paw.models.Appointment;
-import ar.edu.itba.paw.models.Patient;
-import ar.edu.itba.paw.models.Staff;
-import ar.edu.itba.paw.models.User;
+import ar.edu.itba.paw.models.*;
 import ar.edu.itba.paw.webapp.controller.utils.GenericController;
 import ar.edu.itba.paw.webapp.controller.utils.JsonResponse;
 import ar.edu.itba.paw.webapp.form.RequestAppointmentForm;
@@ -13,7 +10,9 @@ import ar.edu.itba.paw.webapp.form.UserProfileForm;
 import com.sun.org.apache.xpath.internal.operations.Mod;
 import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
@@ -165,7 +164,7 @@ public class PatientSideController extends GenericController {
     public ModelAndView requestAppointment(@ModelAttribute("appointmentForm") RequestAppointmentForm form,
                                         @PathVariable("staffId") final int staffId, @PathVariable("year") final int year,
                                            @PathVariable("month") final int month, @PathVariable("day") final int day,
-                                        @PathVariable("hour") final int hour, @PathVariable("minute") final int minute){
+                                        @PathVariable("hour") final int hour, @PathVariable("minute") final int minute) {
         Optional<User> userOptional = getUser();
         form.setDay(day);
         form.setMonth(month);
@@ -174,11 +173,11 @@ public class PatientSideController extends GenericController {
         form.setMinute(minute);
         form.setStaffId(staffId);
         Optional<Staff> staffOptional = staffService.findById(staffId);
-        if(!staffOptional.isPresent()){
+        if (!staffOptional.isPresent()) {
             return new ModelAndView("redirect:/mediclist/0");
         }
         staffOptional.get().getStaffSpecialties().stream().findFirst().ifPresent(specialty -> form.setMotive("Consulta de " + specialty.getName()));
-        userOptional.ifPresent(user ->{
+        userOptional.ifPresent(user -> {
             form.setEmail(user.getEmail());
             form.setFirstName(user.getFirstName());
             form.setSurname(user.getSurname());
@@ -187,12 +186,44 @@ public class PatientSideController extends GenericController {
         Optional<User> user = getUser();
         ModelAndView mav = new ModelAndView();
         mav.addObject("user", userOptional);
-        if(user.isPresent() && isStaff()) {
+        if (user.isPresent() && isStaff()) {
             mav.addObject("staffs", staffService.findByUser(user.get().getId()));
         }
         staffOptional.ifPresent(staff -> mav.addObject("staff", staff));
         mav.addObject("date", new DateTime(year, month, day, hour, minute));
         mav.setViewName("patientSide/reservarTurno");
         return mav;
+    }
+
+    @RequestMapping(value = "/patient/appointment/{id}",method = RequestMethod.DELETE)
+    public ResponseEntity cancelAppointment(@PathVariable Integer id){
+        //get current user, check for null
+        Optional<User> user = getUser();
+        if(!user.isPresent()){
+            return new ResponseEntity(HttpStatus.UNAUTHORIZED);
+        }
+        //get patient for current user
+        List<Patient> patient = this.patientService.findByUser(user.get());
+        //get appointment to delete, check for "null"
+        Optional<Appointment> appointment = this.appointmentService.findById(id);
+        if(!appointment.isPresent()){
+            return new ResponseEntity(HttpStatus.BAD_REQUEST);
+        }
+        //check if user is allowed to cancel
+        boolean isAllowed = false;
+        for(Patient p : patient){
+            if(p.getId().equals(appointment.get().getPatientId())){
+                isAllowed = true;
+                break;
+            }
+        }
+        //return response code for not allow
+        if(!isAllowed){
+            return new ResponseEntity(HttpStatus.UNAUTHORIZED);
+        }
+        //cancel appointment
+        this.appointmentService.setStatus(appointment.get(), AppointmentStatus.CANCELLED);
+        //return success
+        return new ResponseEntity(HttpStatus.NO_CONTENT);
     }
 }
