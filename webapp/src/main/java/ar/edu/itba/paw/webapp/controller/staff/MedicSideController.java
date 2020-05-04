@@ -79,7 +79,8 @@ public class MedicSideController extends GenericController {
 
             }
         }
-        monday = today.minusDays(selected.getDayOfWeek() - 1);
+        today = today.plusDays(selected.getDayOfWeek() - today.getDayOfWeek());
+        monday = today.minusDays(today.getDayOfWeek() - 1);
 
         mav.addObject("user", user);
         if(isStaff()) {
