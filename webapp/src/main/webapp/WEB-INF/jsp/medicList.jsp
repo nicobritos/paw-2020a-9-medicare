@@ -75,7 +75,7 @@
                                         </div>
                                     </div>
                                     <div class="col d-flex justify-content-center align-items-center">
-                                        <a href="<c:url value="/appointment/${member.id}"/>">
+                                        <a href="<c:url value="/appointment/${member.id}/0"/>">
                                         <button type="button" class="btn btn-info available-appointments-button"
                                                 data-id="${member.id}">
                                             <spring:message code="AvailableAppointments"/>

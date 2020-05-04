@@ -52,27 +52,47 @@
                     </div>
                 </div>
 
-
                 <c:forEach var="i" begin="0" end="6">
                     <div class="col-1 mr-4 p-0">
-                        <a href="<c:url value="/patient/appointment/${staff.id}/${monday.plusDays(i).year}/${monday.plusDays(i).dayOfYear}"/>">
                             <span class="d-flex flex-column align-items-center">
-                              <!-- day of the week -->
-                              <p class="mb-0">${monday.plusDays(i).dayOfWeek}</p>
+                                <p class="mb-0"><c:choose>
+                                        <c:when test="${monday.plusDays(i).dayOfWeek == 1}"><spring:message code="Monday"/></c:when>
+                                        <c:when test="${monday.plusDays(i).dayOfWeek == 2}"><spring:message code="Tuesday"/></c:when>
+                                        <c:when test="${monday.plusDays(i).dayOfWeek == 3}"><spring:message code="Wednesday"/></c:when>
+                                        <c:when test="${monday.plusDays(i).dayOfWeek == 4}"><spring:message code="Thursday"/></c:when>
+                                        <c:when test="${monday.plusDays(i).dayOfWeek == 5}"><spring:message code="Friday"/></c:when>
+                                        <c:when test="${monday.plusDays(i).dayOfWeek == 6}"><spring:message code="Saturday"/></c:when>
+                                        <c:when test="${monday.plusDays(i).dayOfWeek == 7}"><spring:message code="Sunday"/></c:when>
+                                        <c:otherwise>${monday.plusDays(i).dayOfWeek}</c:otherwise>
+                                    </c:choose>
+                                </p>
                                 <!-- day/month -->
-                              <p class="my-0">${monday.plusDays(i).dayOfMonth} de ${monday.plusDays(i).monthOfYear}</p>
-                                <!-- TODO:connect boton para seleccionar dia-->
+                                <p class="my-0">${monday.plusDays(i).dayOfMonth} <spring:message code="of"/> <c:choose>
+                                        <c:when test="${monday.plusDays(i).monthOfYear == 1}"><spring:message code="January"/></c:when>
+                                        <c:when test="${monday.plusDays(i).monthOfYear == 2}"><spring:message code="February"/></c:when>
+                                        <c:when test="${monday.plusDays(i).monthOfYear == 3}"><spring:message code="March"/></c:when>
+                                        <c:when test="${monday.plusDays(i).monthOfYear == 4}"><spring:message code="April"/></c:when>
+                                        <c:when test="${monday.plusDays(i).monthOfYear == 5}"><spring:message code="May"/></c:when>
+                                        <c:when test="${monday.plusDays(i).monthOfYear == 6}"><spring:message code="June"/></c:when>
+                                        <c:when test="${monday.plusDays(i).monthOfYear == 7}"><spring:message code="July"/></c:when>
+                                        <c:when test="${monday.plusDays(i).monthOfYear == 8}"><spring:message code="August"/></c:when>
+                                        <c:when test="${monday.plusDays(i).monthOfYear == 9}"><spring:message code="September"/></c:when>
+                                        <c:when test="${monday.plusDays(i).monthOfYear == 10}"><spring:message code="October"/></c:when>
+                                        <c:when test="${monday.plusDays(i).monthOfYear == 11}"><spring:message code="November"/></c:when>
+                                        <c:when test="${monday.plusDays(i).monthOfYear == 12}"><spring:message code="December"/></c:when>
+                                        <c:otherwise>${monday.plusDays(i).monthOfYear}</c:otherwise>
+                                    </c:choose>
+                                </p>
                             </span>
-                        </a>
-                        <div class="d-flex flex-vertical align-content-center">
-                            <%-- TODO:connect workdays variables por dia --%>
-                            <c:forEach var="timeslot" items="${weekSlots}">
-                                <button class="btn btn-sm btn-secondary mb-2">${timeslot.date.hourOfDay}:${timeslot.date.minuteOfHour}hs</button>
+                        <div class="d-flex flex-column align-content-center">
+                            <c:forEach var="timeslot" items="${weekSlots.get(monday.plusDays(i).dayOfWeek)}">
+                                <a href="<c:url value="/patient/appointment/${staff.id}/${timeslot.date.year}/${timeslot.date.monthOfYear}/${timeslot.date.dayOfMonth}/${timeslot.date.hourOfDay}/${timeslot.date.minuteOfHour}"/>" class="btn btn-sm btn-secondary mb-2">
+                                    <p class="m-0"><c:if test="${timeslot.date.hourOfDay < 10}">0</c:if>${timeslot.date.hourOfDay}:<c:if test="${timeslot.date.minuteOfHour < 10}">0</c:if>${timeslot.date.minuteOfHour}hs</p>
+                                </a>
                             </c:forEach>
                         </div>
                     </div>
                 </c:forEach>
-                <%-- TODO:connect boton adelante --%>
                 <div class="col-1 p-0 flex-shrink-1">
                     <button id="day-right" class="btn">></button>
                 </div>
@@ -82,3 +102,17 @@
 </div>
 </body>
 </html>
+<script>
+    let prevButton = document.getElementById("day-left");
+    let nextButton = document.getElementById("day-right");
+    if (prevButton != null) {
+        prevButton.onclick = () => {
+            location.href = "<c:url value="/appointment/${id}/${week-1}"/>" + location.search;
+        }
+    }
+    if (nextButton != null) {
+        nextButton.onclick = () => {
+            location.href = "<c:url value="/appointment/${id}/${week+1}"/>" + location.search;
+        }
+    }
+</script>

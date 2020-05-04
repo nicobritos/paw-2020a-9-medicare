@@ -5,10 +5,7 @@ import ar.edu.itba.paw.interfaces.services.AppointmentService;
 import ar.edu.itba.paw.interfaces.services.LocalityService;
 import ar.edu.itba.paw.interfaces.services.StaffService;
 import ar.edu.itba.paw.interfaces.services.StaffSpecialtyService;
-import ar.edu.itba.paw.models.Locality;
-import ar.edu.itba.paw.models.Staff;
-import ar.edu.itba.paw.models.StaffSpecialty;
-import ar.edu.itba.paw.models.User;
+import ar.edu.itba.paw.models.*;
 import ar.edu.itba.paw.webapp.controller.utils.GenericController;
 import ar.edu.itba.paw.webapp.controller.utils.JsonResponse;
 import ar.edu.itba.paw.webapp.form.RequestTimeslotForm;
@@ -127,8 +124,8 @@ public class MedicListController extends GenericController {
         return mav;
     }
 
-    @RequestMapping("/appointment/{id}")
-    public ModelAndView appointment(@PathVariable("id") final int id){
+    @RequestMapping("/appointment/{id}/{week}")
+    public ModelAndView appointment(@PathVariable("id") final int id, @PathVariable("week") final int week){
         Optional<Staff> staff = staffService.findById(id);
         if(!staff.isPresent()){
             return new ModelAndView("error/404"); //todo: throw status code instead of this
@@ -136,7 +133,8 @@ public class MedicListController extends GenericController {
         ModelAndView mav = new ModelAndView();
 
         DateTime today = DateTime.now();
-        DateTime monday = today.plusDays(today.getDayOfWeek() -1);
+        today = today.plusWeeks(week);
+        DateTime monday = today.minusDays(today.getDayOfWeek() -1);
 
         mav.addObject("today", today);
         mav.addObject("monday", monday);
@@ -146,11 +144,20 @@ public class MedicListController extends GenericController {
             mav.addObject("staffs", staffService.findByUser(user.get().getId()));
         }
         mav.addObject("staff", staff.get());
-        mav.addObject("weekSlots", this.appointmentService.findAvailableTimeslots(
-                staff.get(),
-                monday,
-                monday.plusDays(7)
-        ));
+
+        List<AppointmentTimeSlot> timeSlots = this.appointmentService.findAvailableTimeslots(staff.get(), monday, monday.plusDays(7));
+        List<List<AppointmentTimeSlot>> weekslots = new LinkedList<>();
+        for (int i=0; i<=7; i++){
+            weekslots.add(new LinkedList<>());
+        }
+        for(AppointmentTimeSlot timeSlot: timeSlots){
+            if(timeSlot.getDate().getDayOfWeek() < 1 && timeSlot.getDate().getDayOfWeek() > 7){
+                weekslots.get(0).add(timeSlot);
+            } else {
+                weekslots.get(timeSlot.getDate().getDayOfWeek()).add(timeSlot);
+            }
+        }
+        mav.addObject("weekSlots", weekslots);
         mav.setViewName("selectTurno");
         return mav;
     }
