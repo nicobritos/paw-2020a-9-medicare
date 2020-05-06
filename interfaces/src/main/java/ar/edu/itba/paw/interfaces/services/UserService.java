@@ -20,4 +20,6 @@ public interface UserService extends GenericSearchableService<User, Integer> {
     void update(User user) throws EmailAlreadyExistsException;
 
     Patient createNewPatient(Patient patient);
+
+    String generateVerificationToken(User user);
 }

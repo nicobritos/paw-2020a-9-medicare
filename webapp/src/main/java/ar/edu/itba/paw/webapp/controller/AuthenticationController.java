@@ -8,12 +8,14 @@ import ar.edu.itba.paw.interfaces.services.exceptions.EmailAlreadyExistsExceptio
 import ar.edu.itba.paw.models.*;
 import ar.edu.itba.paw.webapp.controller.utils.GenericController;
 import ar.edu.itba.paw.webapp.controller.utils.JsonResponse;
+import ar.edu.itba.paw.webapp.events.SignUpEvent;
 import ar.edu.itba.paw.webapp.form.authentication.PatientSignUpForm;
 import ar.edu.itba.paw.webapp.form.authentication.StaffSignUpForm;
 import ar.edu.itba.paw.webapp.form.authentication.UserLoginForm;
 import ar.edu.itba.paw.webapp.transformer.LocalityTransformer;
 import ar.edu.itba.paw.webapp.transformer.ProvinceTransformer;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.MediaType;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -48,6 +50,8 @@ public class AuthenticationController extends GenericController {
     private ProvinceTransformer provinceTransformer;
     @Autowired
     private LocalityTransformer localityTransformer;
+    @Autowired
+    private ApplicationEventPublisher eventPublisher;
 
     @RequestMapping(value = "/signup/staff/provinces/{id}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
@@ -116,6 +120,7 @@ public class AuthenticationController extends GenericController {
         User newUser;
         try {
             newUser = this.userService.create(form.getAsUser());
+            this.eventPublisher.publishEvent(new SignUpEvent(newUser, request.getContextPath() + "/signup/confirm", request.getLocale()));
         } catch (EmailAlreadyExistsException e) {
             errors.reject("EmailAlreadyTaken.signupForm.email", null, "Error");
             return this.signupPatientIndex(form);

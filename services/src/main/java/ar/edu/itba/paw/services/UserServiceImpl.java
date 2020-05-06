@@ -17,6 +17,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
+import java.util.UUID;
 
 @Service
 public class UserServiceImpl extends GenericSearchableServiceImpl<UserDao, User, Integer> implements UserService {
@@ -49,37 +50,26 @@ public class UserServiceImpl extends GenericSearchableServiceImpl<UserDao, User,
     @Override
     @Transactional
     public Patient createNewPatient(Patient patient) throws EmailAlreadyExistsException {
-        Patient newPatient = this.patientService.create(patient);
-        // TODO
-//        Office office = patient.getOffice();
-//        office.getPatients().add(newPatient);
-//        this.officeService.update(office);
-//        User user = patient.getUser();
-//        user.getPatients().add(newPatient);
-//        this.update(user);
-        return newPatient;
+        return this.patientService.create(patient);
     }
 
     @Override
     @Transactional
     public User createAsStaff(User user, Office office) throws EmailAlreadyExistsException {
-        User newUser;
-        newUser = this.create(user);
-
-        office = this.officeService.create(office);
+        User newUser = this.create(user);
+        Optional<Office> officeOptional = this.officeService.findById(office.getId());
+        if (!officeOptional.isPresent())
+            office = this.officeService.create(office);
+        else
+            office = officeOptional.get();
 
         Staff staff = new Staff();
         staff.setEmail(newUser.getEmail());
         staff.setFirstName(newUser.getFirstName());
         staff.setSurname(newUser.getSurname());
-        staff = this.staffService.create(staff);
-
-        // TODO
-//        office.getStaffs().add(staff);
-//        this.officeService.update(office);
-//
-//        newUser.getStaffs().add(staff);
-//        this.update(newUser);
+        staff.setUser(user);
+        staff.setOffice(office);
+        this.staffService.create(staff);
 
         return newUser;
     }
@@ -103,6 +93,13 @@ public class UserServiceImpl extends GenericSearchableServiceImpl<UserDao, User,
     @Override
     public Optional<User> findByUsername(String username) {
         return this.repository.findByEmail(username);
+    }
+
+    @Override
+    public String generateVerificationToken(User user) {
+        user.setToken(UUID.randomUUID().toString());
+        this.update(user);
+        return user.getToken();
     }
 
     @Override

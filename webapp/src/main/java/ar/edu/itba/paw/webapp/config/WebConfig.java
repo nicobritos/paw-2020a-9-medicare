@@ -25,7 +25,8 @@ import java.nio.charset.StandardCharsets;
         "ar.edu.itba.paw.webapp.controller",
         "ar.edu.itba.paw.services",
         "ar.edu.itba.paw.persistence",
-        "ar.edu.itba.paw.webapp.transformer"
+        "ar.edu.itba.paw.webapp.transformer",
+        "ar.edu.itba.paw.webapp.events"
 })
 @Configuration
 @EnableTransactionManagement
@@ -33,13 +34,12 @@ public class WebConfig {
     protected static final String DB_URL = "jdbc:postgresql://10.16.1.110:5432/paw-2020a-9?useUnicode=true&amp;characterEncoding=utf8";
     protected static final String DB_USER = "paw-2020a-9";
     protected static final String DB_PASSWORD = "N4wC7cmxe";
-    protected static final boolean CACHE_ENABLED = true;
-    protected static final int CACHE_SIZE = 500;
+    protected static final String APP_NAME = "MediCare";
 
     @Bean
     public MessageSource messageSource() {
         ReloadableResourceBundleMessageSource messageSource = new ReloadableResourceBundleMessageSource();
-        messageSource.setBasename("classpath:i18n/message ");
+        messageSource.setBasename("classpath:i18n/message");
         messageSource.setDefaultEncoding(StandardCharsets.UTF_8.displayName());
         messageSource.setCacheSeconds(5);
         return messageSource;
@@ -52,6 +52,7 @@ public class WebConfig {
         viewResolver.setViewClass(JstlView.class);
         viewResolver.setPrefix("/WEB-INF/jsp/");
         viewResolver.setSuffix(".jsp");
+        viewResolver.setContentType("text/html; charset=UTF-8");
 
         return viewResolver;
     }
@@ -69,16 +70,6 @@ public class WebConfig {
     }
 
     @Bean
-    public boolean isCacheEnabled() {
-        return CACHE_ENABLED;
-    }
-
-    @Bean
-    public int cacheSize() {
-        return CACHE_SIZE;
-    }
-
-    @Bean
     public ObjectMapper objectMapper() {
         ObjectMapper mapper = new ObjectMapper();
 
@@ -91,5 +82,10 @@ public class WebConfig {
     @Bean
     public PlatformTransactionManager transactionManager(final DataSource ds){
         return new DataSourceTransactionManager(ds);
+    }
+
+    @Bean
+    public String applicationName() {
+        return APP_NAME;
     }
 }

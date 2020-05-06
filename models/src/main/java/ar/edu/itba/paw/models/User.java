@@ -13,6 +13,10 @@ public class User extends GenericModel<Integer> {
     private String firstName;
     @Column(name = "surname", required = true)
     private String surname;
+    @Column(name = "verified")
+    private Boolean verified;
+    @Column(name = "token")
+    private String token;
 
     public String getEmail() {
         return this.email;
@@ -44,6 +48,22 @@ public class User extends GenericModel<Integer> {
 
     public void setSurname(String surname) {
         this.surname = surname;
+    }
+
+    public Boolean getVerified() {
+        return this.verified;
+    }
+
+    public void setVerified(Boolean verified) {
+        this.verified = verified;
+    }
+
+    public String getToken() {
+        return this.token;
+    }
+
+    public void setToken(String token) {
+        this.token = token;
     }
 
     @Override
