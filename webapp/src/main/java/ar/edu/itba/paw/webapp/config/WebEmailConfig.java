@@ -31,7 +31,7 @@ public class WebEmailConfig {
         properties.put("mail.transport.protocol", "smtp");
         properties.put("mail.smtp.auth", "true");
         properties.put("mail.smtp.starttls.enable", "true");
-        properties.put("mail.debug", "true"); // todo
+        properties.put("mail.debug", "false");
 
         return mailSender;
     }
