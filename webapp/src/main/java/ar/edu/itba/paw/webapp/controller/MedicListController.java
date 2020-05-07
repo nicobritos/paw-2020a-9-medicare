@@ -11,7 +11,6 @@ import ar.edu.itba.paw.webapp.controller.utils.JsonResponse;
 import ar.edu.itba.paw.webapp.form.RequestTimeslotForm;
 import ar.edu.itba.paw.webapp.transformer.AppointmentTimeSlotTransformer;
 import org.joda.time.DateTime;
-import org.joda.time.DateTimeConstants;
 import org.joda.time.Days;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -24,11 +23,9 @@ import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import javax.validation.Valid;
-import java.time.LocalDate;
-import java.time.temporal.ChronoUnit;
+import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
-
-import static org.joda.time.DateTimeConstants.*;
 
 @Controller
 public class MedicListController extends GenericController {
@@ -99,6 +96,11 @@ public class MedicListController extends GenericController {
         }
 
         if(name != null) {
+            try {
+                name = new String(name.getBytes(StandardCharsets.ISO_8859_1.name()), StandardCharsets.UTF_8.name()); //TODO: Find better way
+            } catch (UnsupportedEncodingException e) {
+                e.printStackTrace();
+            }
             Set<String> words = new HashSet<>(Arrays.asList(name.split(" ")));
             staffList = new HashSet<>(this.staffService.findBy(words, words, null, searchedSpecialties, searchedLocalities, page));
         } else{
