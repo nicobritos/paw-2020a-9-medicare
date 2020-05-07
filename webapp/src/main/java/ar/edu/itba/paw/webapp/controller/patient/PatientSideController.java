@@ -20,10 +20,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
@@ -92,6 +89,7 @@ public class PatientSideController extends GenericController {
     }
 
     @RequestMapping(value = "/patient/profile/confirm", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseBody
     public JsonResponse reverify(HttpServletRequest request, HttpServletResponse response) {
         return this.formatJsonResponse(() -> {
             Optional<User> user = getUser();
@@ -100,7 +98,9 @@ public class PatientSideController extends GenericController {
             }
 
             if (!user.get().getVerified()) {
-                this.createConfirmationEvent(request, user.get());
+                // Prevents jammering
+                if (user.get().getTokenCreatedDate() == null || DateTime.now().isAfter(user.get().getTokenCreatedDate().plusMinutes(1)))
+                    this.createConfirmationEvent(request, user.get());
                 return true;
             }
             return false;

@@ -12,6 +12,7 @@ import ar.edu.itba.paw.models.Patient;
 import ar.edu.itba.paw.models.Staff;
 import ar.edu.itba.paw.models.User;
 import ar.edu.itba.paw.services.generics.GenericSearchableServiceImpl;
+import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -119,8 +120,11 @@ public class UserServiceImpl extends GenericSearchableServiceImpl<UserDao, User,
     public String generateVerificationToken(User user) {
         if (user.getVerified())
             return null;
-        if (user.getToken() != null)
+        if (user.getToken() != null) {
+            user.setTokenCreatedDate(DateTime.now());
+            this.update(user);
             return user.getToken();
+        }
 
         boolean set = false;
         int tries = 10;
@@ -128,6 +132,7 @@ public class UserServiceImpl extends GenericSearchableServiceImpl<UserDao, User,
         do {
             try {
                 user.setToken(UUID.randomUUID().toString());
+                user.setTokenCreatedDate(DateTime.now());
                 this.update(user);
                 set = true;
             } catch (MediCareException ignored) {

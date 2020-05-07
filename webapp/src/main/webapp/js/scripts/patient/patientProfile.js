@@ -18,7 +18,7 @@ const Profile = function () {
                 if (value) {
                     App.showOk("Mail reenviado exitosamente. Chequee su casilla de mail o spam"); // TODO i18n
                 } else {
-                    App.showError("Su cuenta ya se encuentra verifiacda"); // TODO i18n
+                    App.showError("Su cuenta ya se encuentra verificada"); // TODO i18n
                 }
             })
         });

@@ -3,6 +3,8 @@ const App = function() {
         if (messages == null) {
             return;
         }
+        if (!$.isArray(messages))
+            messages = [messages];
 
         for (let message of messages) {
             $.notify({
@@ -13,7 +15,6 @@ const App = function() {
                 type: 'success',
                 newest_on_top: true,
                 timer: 300,
-                icon_type: 'fa'
             });
         }
     };
@@ -23,6 +24,8 @@ const App = function() {
             messages = ['Un error ha ocurrido'];
         }
 
+        if (!$.isArray(messages))
+            messages = [messages];
         for (let message of messages) {
             $.notify({
                 title: '<b>' + title + ': </b>',
