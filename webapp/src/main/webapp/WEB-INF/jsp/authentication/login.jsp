@@ -56,6 +56,20 @@
                 <spring:message code="InvalidCredentials.loginForm"/>
             </p>
         </c:if>
+        <c:if test="${not empty tokenError}">
+            <c:choose>
+                <c:when test="${not tokenError}">
+                    <p class="mt-4 mb-0 text-danger">
+                        <spring:message code="TokenError.loginForm"/>
+                    </p>
+                </c:when>
+                <c:otherwise>
+                    <p class="mt-4 mb-0 text-success">
+                        <spring:message code="TokenSuccess.loginForm"/>
+                    </p>
+                </c:otherwise>
+            </c:choose>
+        </c:if>
     </form:form>
 </div>
 <script src='<c:url value="/js/scripts/authentication/login.js"/> '></script>

@@ -18,9 +18,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.MediaType;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
@@ -98,12 +95,15 @@ public class AuthenticationController extends GenericController {
         office.setLocality(locality.get());
         office.setStreet(form.getAddress());
         try {
-            this.userService.createAsStaff(newUser, office);
+            newUser = this.userService.createAsStaff(newUser, office);
+            StringBuilder baseUrl = new StringBuilder(request.getRequestURL());
+            baseUrl.replace(request.getRequestURL().lastIndexOf(request.getRequestURI()), request.getRequestURL().length(), "");
+            this.eventPublisher.publishEvent(new SignUpEvent(baseUrl.toString(), newUser, request.getContextPath() + "/signup/confirm", request.getLocale()));
         } catch (EmailAlreadyExistsException e) {
             errors.reject("EmailAlreadyTaken.signupForm.email", null, "Error");
             return this.signupStaffIndex(form);
         }
-        this.authenticateSignedUpUser(newUser, form.getPassword(), request);
+
         return new ModelAndView("redirect:/staff/home");
     }
 
@@ -128,13 +128,12 @@ public class AuthenticationController extends GenericController {
             return this.signupPatientIndex(form);
         }
 
-        this.authenticateSignedUpUser(newUser, form.getPassword(), request);
         return new ModelAndView("redirect:/patient/home");
     }
 
     @RequestMapping(value = "/login", method = RequestMethod.GET)
     public ModelAndView loginIndex(@ModelAttribute("loginForm") final UserLoginForm form) {
-        return new ModelAndView("authentication/login");
+        return this.getLoginModelAndView();
     }
 
     @RequestMapping(value = "/signup/staff", method = RequestMethod.GET)
@@ -155,17 +154,20 @@ public class AuthenticationController extends GenericController {
         return new ModelAndView("authentication/signup");
     }
 
-    private void authenticateSignedUpUser(User user, String password, HttpServletRequest request) {
-        try {
-            String username = user.getEmail();
-            UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(username, password);
-            // generate session if one doesn't exist
-            request.getSession();
+    @RequestMapping(value = "/signup/confirm", method = RequestMethod.GET)
+    public ModelAndView confirm(@RequestParam(value = "token", required = false) String token) {
+        ModelAndView modelAndView = this.getLoginModelAndView();
 
-            Authentication authenticatedUser = this.authenticationManager.authenticate(token);
-            SecurityContextHolder.getContext().setAuthentication(authenticatedUser);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        boolean verified = false;
+        if (token != null && this.userService.confirm(token))
+            verified = true;
+
+        modelAndView.addObject("tokenError", verified);
+        modelAndView.addObject("loginForm", new UserLoginForm());
+        return modelAndView;
+    }
+
+    private ModelAndView getLoginModelAndView() {
+        return new ModelAndView("authentication/login");
     }
 }

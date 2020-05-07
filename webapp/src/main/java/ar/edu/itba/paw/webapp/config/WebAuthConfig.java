@@ -61,6 +61,7 @@ public class WebAuthConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("/").permitAll()
                 .antMatchers("/mediclist/**").hasAnyRole("ANONYMOUS", UserRole.PATIENT.name())
                 .antMatchers("/login").anonymous()
+                .antMatchers("/signup/confirm").permitAll()
                 .antMatchers("/signup/**").anonymous()
                 .antMatchers("/patient/**").hasRole(UserRole.PATIENT.name())
                 .antMatchers("/staff/**").hasRole(UserRole.STAFF.name())

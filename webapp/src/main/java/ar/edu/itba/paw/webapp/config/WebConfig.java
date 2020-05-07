@@ -10,6 +10,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.support.ReloadableResourceBundleMessageSource;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.jdbc.datasource.SimpleDriverDataSource;
+import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 import org.springframework.web.servlet.ViewResolver;
@@ -30,6 +31,7 @@ import java.nio.charset.StandardCharsets;
 })
 @Configuration
 @EnableTransactionManagement
+@EnableAsync
 public class WebConfig {
     protected static final String DB_URL = "jdbc:postgresql://10.16.1.110:5432/paw-2020a-9?useUnicode=true&amp;characterEncoding=utf8";
     protected static final String DB_USER = "paw-2020a-9";

@@ -105,6 +105,7 @@ public class UserServiceImpl extends GenericSearchableServiceImpl<UserDao, User,
     public String generateVerificationToken(User user) {
         boolean set = false;
         int tries = 10;
+        user.setVerified(false);
         do {
             try {
                 user.setToken(UUID.randomUUID().toString());
@@ -118,6 +119,23 @@ public class UserServiceImpl extends GenericSearchableServiceImpl<UserDao, User,
             throw new MediCareException("");
 
         return user.getToken();
+    }
+
+    @Override
+    @Transactional
+    public boolean confirm(String token) {
+        Optional<User> userOptional = this.repository.findByToken(token);
+        if (!userOptional.isPresent())
+            return false;
+        userOptional.get().setToken(null);
+        if (userOptional.get().isVerified()) {
+            this.update(userOptional.get());
+            return false;
+        } else {
+            userOptional.get().setVerified(true);
+            this.update(userOptional.get());
+            return true;
+        }
     }
 
     @Override

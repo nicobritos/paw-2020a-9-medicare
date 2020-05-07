@@ -22,4 +22,6 @@ public interface UserService extends GenericSearchableService<User, Integer> {
     Patient createNewPatient(Patient patient);
 
     String generateVerificationToken(User user);
+
+    boolean confirm(String token);
 }

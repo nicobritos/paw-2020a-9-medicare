@@ -2,6 +2,7 @@ package ar.edu.itba.paw.webapp.auth;
 
 import ar.edu.itba.paw.interfaces.services.UserService;
 import ar.edu.itba.paw.models.User;
+import ar.edu.itba.paw.webapp.exceptions.UserNotVerifiedException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -24,6 +25,9 @@ public class UserDetailsServiceImpl implements UserDetailsService {
         Optional<User> user = this.userService.findByUsername(username);
         if (!user.isPresent()) {
             throw new UsernameNotFoundException("Invalid credentials");
+        }
+        if (!user.get().isVerified()) {
+            throw new UserNotVerifiedException();
         }
 
         Collection<? extends GrantedAuthority> authorities;

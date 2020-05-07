@@ -50,7 +50,7 @@ public class User extends GenericModel<Integer> {
         this.surname = surname;
     }
 
-    public Boolean getVerified() {
+    public Boolean isVerified() {
         return this.verified;
     }
 
