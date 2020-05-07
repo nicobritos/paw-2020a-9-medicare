@@ -72,14 +72,9 @@ public class UserServiceImpl extends GenericSearchableServiceImpl<UserDao, User,
         staff.setEmail(newUser.getEmail());
         staff.setFirstName(newUser.getFirstName());
         staff.setSurname(newUser.getSurname());
+        staff.setUser(newUser);
+        staff.setOffice(office);
         staff = this.staffService.create(staff);
-
-        // TODO
-//        office.getStaffs().add(staff);
-//        this.officeService.update(office);
-//
-//        newUser.getStaffs().add(staff);
-//        this.update(newUser);
 
         return newUser;
     }
