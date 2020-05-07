@@ -2,6 +2,7 @@ package ar.edu.itba.paw.models;
 
 import ar.edu.itba.paw.persistenceAnnotations.Column;
 import ar.edu.itba.paw.persistenceAnnotations.Table;
+import org.joda.time.DateTime;
 
 @Table(name = "users", primaryKey = "users_id")
 public class User extends GenericModel<Integer> {
@@ -17,6 +18,8 @@ public class User extends GenericModel<Integer> {
     private Boolean verified = false;
     @Column(name = "token")
     private String token;
+    @Column(name = "token_created_date")
+    private DateTime tokenCreatedDate;
 
     public String getEmail() {
         return this.email;
@@ -50,7 +53,7 @@ public class User extends GenericModel<Integer> {
         this.surname = surname;
     }
 
-    public Boolean isVerified() {
+    public Boolean getVerified() {
         return this.verified;
     }
 
@@ -66,12 +69,20 @@ public class User extends GenericModel<Integer> {
         this.token = token;
     }
 
+    public String getDisplayName() {
+        return this.firstName + " " + this.surname;
+    }
+
+    public DateTime getTokenCreatedDate() {
+        return this.tokenCreatedDate;
+    }
+
+    public void setTokenCreatedDate(DateTime tokenCreatedDate) {
+        this.tokenCreatedDate = tokenCreatedDate;
+    }
+
     @Override
     protected boolean isSameInstance(Object o) {
         return o instanceof User;
-    }
-
-    public String getDisplayName() {
-        return this.firstName + " " + this.surname;
     }
 }

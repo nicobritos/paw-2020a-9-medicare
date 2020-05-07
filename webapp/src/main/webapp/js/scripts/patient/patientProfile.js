@@ -12,6 +12,16 @@ const Profile = function () {
                 }
             }
         }
+
+        $('#confirm-account-button').click(function () {
+            App.post('/patient/profile/confirm').then(value => {
+                if (value) {
+                    App.showOk("Mail reenviado exitosamente. Chequee su casilla de mail o spam"); // TODO i18n
+                } else {
+                    App.showError("Su cuenta ya se encuentra verifiacda"); // TODO i18n
+                }
+            })
+        });
     };
 
     let toggleVisibility = function () {

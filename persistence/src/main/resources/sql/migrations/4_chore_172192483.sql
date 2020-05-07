@@ -6,3 +6,6 @@ alter table users
 
 create unique index users_token_uindex
     on users (token);
+
+alter table users
+    add token_created_date timestamp;

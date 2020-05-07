@@ -86,11 +86,25 @@ public class UserServiceImpl extends GenericSearchableServiceImpl<UserDao, User,
     @Transactional
     public void update(User user){
         Optional<User> userOptional = this.repository.findByEmail(user.getEmail());
-        if (userOptional.isPresent() && !userOptional.get().equals(user)) {
-            throw new EmailAlreadyExistsException();
+        if (userOptional.isPresent()) {
+            if (!userOptional.get().equals(user)) {
+                throw new EmailAlreadyExistsException();
+            }
+            if (!userOptional.get().equals(user) && this.repository.existsToken(user.getToken())) {
+                throw new MediCareException("Confirmation token already exists");
+            }
+        } else {
+            // Already exists in DB, the email has changed
+            if (user.getId() != null && this.findById(user.getId()).isPresent()) {
+                user.setVerified(false);
+                user.setToken(null);
+            } else {
+                Optional<User> userToken = this.repository.findByToken(user.getToken());
+                if (userToken.isPresent() && !userToken.get().equals(user)){
+                    throw new MediCareException("Confirmation token already exists");
+                }
+            }
         }
-        if (this.repository.existsToken(user.getToken()))
-            throw new MediCareException("Confirmation token already exists");
 
         super.update(user);
     }
@@ -103,6 +117,11 @@ public class UserServiceImpl extends GenericSearchableServiceImpl<UserDao, User,
     @Override
     @Transactional
     public String generateVerificationToken(User user) {
+        if (user.getVerified())
+            return null;
+        if (user.getToken() != null)
+            return user.getToken();
+
         boolean set = false;
         int tries = 10;
         user.setVerified(false);
@@ -128,7 +147,7 @@ public class UserServiceImpl extends GenericSearchableServiceImpl<UserDao, User,
         if (!userOptional.isPresent())
             return false;
         userOptional.get().setToken(null);
-        if (userOptional.get().isVerified()) {
+        if (userOptional.get().getVerified()) {
             this.update(userOptional.get());
             return false;
         } else {

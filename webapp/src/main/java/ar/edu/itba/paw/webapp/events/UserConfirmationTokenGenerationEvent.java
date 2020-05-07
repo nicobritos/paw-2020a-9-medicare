@@ -5,13 +5,13 @@ import org.springframework.context.ApplicationEvent;
 
 import java.util.Locale;
 
-public class SignUpEvent extends ApplicationEvent {
+public class UserConfirmationTokenGenerationEvent extends ApplicationEvent {
     private User user;
     private String url;
     private Locale locale;
     private String baseUrl;
 
-    public SignUpEvent(String baseUrl, User user, String url, Locale locale) {
+    public UserConfirmationTokenGenerationEvent(String baseUrl, User user, String url, Locale locale) {
         super(user);
         this.baseUrl = baseUrl;
         this.user = user;

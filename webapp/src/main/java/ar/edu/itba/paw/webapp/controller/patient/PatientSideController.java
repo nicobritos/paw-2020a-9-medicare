@@ -2,51 +2,52 @@ package ar.edu.itba.paw.webapp.controller.patient;
 
 import ar.edu.itba.paw.interfaces.MediCareException;
 import ar.edu.itba.paw.interfaces.services.*;
-import ar.edu.itba.paw.models.*;
+import ar.edu.itba.paw.models.Appointment;
+import ar.edu.itba.paw.models.Patient;
+import ar.edu.itba.paw.models.Staff;
+import ar.edu.itba.paw.models.User;
 import ar.edu.itba.paw.webapp.controller.utils.GenericController;
 import ar.edu.itba.paw.webapp.controller.utils.JsonResponse;
+import ar.edu.itba.paw.webapp.events.UserConfirmationTokenGenerationEvent;
+import ar.edu.itba.paw.webapp.exceptions.UnAuthorizedAccess;
 import ar.edu.itba.paw.webapp.form.RequestAppointmentForm;
 import ar.edu.itba.paw.webapp.form.UserProfileForm;
-import com.sun.org.apache.xpath.internal.operations.Mod;
 import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 
 @Controller
 public class PatientSideController extends GenericController {
-
     @Autowired
     AppointmentService appointmentService;
-
     @Autowired
     StaffSpecialtyService staffSpecialtyService;
-
     @Autowired
     LocalityService localityService;
-
     @Autowired
     UserService userService;
-
     @Autowired
     private StaffService staffService;
-
     @Autowired
     private PatientService patientService;
+    @Autowired
+    private ApplicationEventPublisher eventPublisher;
 
 
     @RequestMapping("/patient/home")
@@ -85,8 +86,25 @@ public class PatientSideController extends GenericController {
             mav.addObject("patients", patientService.findByUser(user.get()));
         }
 
+        mav.addObject("verified", user.get().getVerified());
         mav.setViewName("patientSide/patientProfile");
         return mav;
+    }
+
+    @RequestMapping(value = "/patient/profile/confirm", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+    public JsonResponse reverify(HttpServletRequest request, HttpServletResponse response) {
+        return this.formatJsonResponse(() -> {
+            Optional<User> user = getUser();
+            if(!user.isPresent()) {
+                throw new UnAuthorizedAccess();
+            }
+
+            if (!user.get().getVerified()) {
+                this.createConfirmationEvent(request, user.get());
+                return true;
+            }
+            return false;
+        });
     }
 
     @RequestMapping(value="/patient/profile", method = RequestMethod.POST)
@@ -226,5 +244,18 @@ public class PatientSideController extends GenericController {
 //        this.appointmentService.setStatus(appointment.get(), AppointmentStatus.CANCELLED);
         //return success
         return new ResponseEntity(HttpStatus.NO_CONTENT);
+    }
+
+    private void createConfirmationEvent(HttpServletRequest request, User user) {
+        StringBuilder baseUrl = new StringBuilder(request.getRequestURL());
+        baseUrl.replace(request.getRequestURL().lastIndexOf(request.getRequestURI()), request.getRequestURL().length(), "");
+        this.eventPublisher.publishEvent(
+                new UserConfirmationTokenGenerationEvent(
+                        baseUrl.toString(),
+                        user,
+                        request.getContextPath() + "/signup/confirm",
+                        request.getLocale()
+                )
+        );
     }
 }

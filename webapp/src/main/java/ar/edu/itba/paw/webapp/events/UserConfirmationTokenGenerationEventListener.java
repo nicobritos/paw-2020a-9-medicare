@@ -23,7 +23,7 @@ import java.util.Locale;
 import java.util.Map;
 
 @Component
-public class SignUpListener implements ApplicationListener<SignUpEvent> {
+public class UserConfirmationTokenGenerationEventListener implements ApplicationListener<UserConfirmationTokenGenerationEvent> {
     private static final String MESSAGE_SOURCE_BODY_PREFIX = "signup.confirmation.email.body";
     private static final String MESSAGE_SOURCE_DISCLAIMER = "email.disclaimer";
 
@@ -36,19 +36,19 @@ public class SignUpListener implements ApplicationListener<SignUpEvent> {
 
     @Override
     @Async
-    public void onApplicationEvent(SignUpEvent signUpEvent) {
-        String token = this.userService.generateVerificationToken(signUpEvent.getUser());
+    public void onApplicationEvent(UserConfirmationTokenGenerationEvent userConfirmationTokenGenerationEvent) {
+        String token = this.userService.generateVerificationToken(userConfirmationTokenGenerationEvent.getUser());
 
-        String subject = this.messageSource.getMessage("signup.confirmation.email.subject", null, signUpEvent.getLocale());
+        String subject = this.messageSource.getMessage("signup.confirmation.email.subject", null, userConfirmationTokenGenerationEvent.getLocale());
         try {
-            String confirmationUrl = signUpEvent.getUrl() + "?token=" + URLEncoder.encode(token, StandardCharsets.UTF_8.name());
+            String confirmationUrl = userConfirmationTokenGenerationEvent.getUrl() + "?token=" + URLEncoder.encode(token, StandardCharsets.UTF_8.name());
 
             MimeMessage mimeMessage = this.mailSender.createMimeMessage();
             MimeMessageHelper mimeMessageHelper = new MimeMessageHelper(mimeMessage, true);
-            mimeMessageHelper.setText(this.getHTML(signUpEvent.getBaseUrl(), confirmationUrl, signUpEvent.getUser(), signUpEvent.getLocale()), true);
+            mimeMessageHelper.setText(this.getHTML(userConfirmationTokenGenerationEvent.getBaseUrl(), confirmationUrl, userConfirmationTokenGenerationEvent.getUser(), userConfirmationTokenGenerationEvent.getLocale()), true);
             mimeMessageHelper.setSubject(subject);
             mimeMessageHelper.setFrom(new InternetAddress("confirmation@medicare.com", "MediCare"));
-            mimeMessageHelper.setTo(signUpEvent.getUser().getEmail());
+            mimeMessageHelper.setTo(userConfirmationTokenGenerationEvent.getUser().getEmail());
 
             this.mailSender.send(mimeMessage);
         } catch (Exception e) {

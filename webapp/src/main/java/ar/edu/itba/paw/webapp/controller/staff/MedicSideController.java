@@ -3,11 +3,16 @@ package ar.edu.itba.paw.webapp.controller.staff;
 import ar.edu.itba.paw.interfaces.services.*;
 import ar.edu.itba.paw.models.*;
 import ar.edu.itba.paw.webapp.controller.utils.GenericController;
+import ar.edu.itba.paw.webapp.controller.utils.JsonResponse;
+import ar.edu.itba.paw.webapp.events.UserConfirmationTokenGenerationEvent;
+import ar.edu.itba.paw.webapp.exceptions.UnAuthorizedAccess;
 import ar.edu.itba.paw.webapp.form.UserProfileForm;
 import ar.edu.itba.paw.webapp.form.WorkdayForm;
 import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
@@ -22,33 +27,26 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 
-import static org.joda.time.DateTimeConstants.*;
-
 @Controller
 public class MedicSideController extends GenericController {
     @Autowired
     UserService userService;
-
     @Autowired
     AppointmentService appointmentService;
-
     @Autowired
     StaffSpecialtyService staffSpecialtyService;
-
     @Autowired
     StaffService staffService;
-
     @Autowired
     PatientService patientService;
-
     @Autowired
     LocalityService localityService;
-
     @Autowired
     OfficeService officeService;
-
     @Autowired
     WorkdayService workdayService;
+    @Autowired
+    private ApplicationEventPublisher eventPublisher;
 
     @RequestMapping("/staff/home")
     public ModelAndView medicHome(@RequestParam(defaultValue = "0") String week,@RequestParam(required = false, name = "today") String newToday){
@@ -122,6 +120,7 @@ public class MedicSideController extends GenericController {
             mav.addObject("staffs", staffService.findByUser(user.get().getId()));
             mav.addObject("workdays", workdayService.findByUser(user.get()));
         }
+        mav.addObject("verified", user.get().getVerified());
         mav.setViewName("medicSide/medicProfile");
         return mav;
     }
@@ -150,6 +149,9 @@ public class MedicSideController extends GenericController {
             editedUser.setPassword(form.getPassword());
         //TODO: PHONE
         userService.update(editedUser);
+        if (!editedUser.getEmail().equals(user.get().getEmail())) {
+            this.createConfirmationEvent(request, editedUser);
+        }
 
         ModelAndView mav = new ModelAndView();
         mav.addObject("user", user);
@@ -158,6 +160,22 @@ public class MedicSideController extends GenericController {
         }
         mav.setViewName("medicSide/medicProfile");
         return mav;
+    }
+
+    @RequestMapping(value = "/staff/profile/confirm", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+    public JsonResponse reverify(HttpServletRequest request, HttpServletResponse response) {
+        return this.formatJsonResponse(() -> {
+            Optional<User> user = getUser();
+            if(!user.isPresent()) {
+                throw new UnAuthorizedAccess();
+            }
+
+            if (!user.get().getVerified()) {
+                this.createConfirmationEvent(request, user.get());
+                return true;
+            }
+            return false;
+        });
     }
 
     @RequestMapping(value="/staff/profile/workday", method = RequestMethod.GET)
@@ -289,5 +307,18 @@ public class MedicSideController extends GenericController {
 //        this.appointmentService.setStatus(appointment.get(), AppointmentStatus.CANCELLED);
         //return success
         return new ResponseEntity(HttpStatus.NO_CONTENT);
+    }
+
+    private void createConfirmationEvent(HttpServletRequest request, User user) {
+        StringBuilder baseUrl = new StringBuilder(request.getRequestURL());
+        baseUrl.replace(request.getRequestURL().lastIndexOf(request.getRequestURI()), request.getRequestURL().length(), "");
+        this.eventPublisher.publishEvent(
+                new UserConfirmationTokenGenerationEvent(
+                        baseUrl.toString(),
+                        user,
+                        request.getContextPath() + "/signup/confirm",
+                        request.getLocale()
+                )
+        );
     }
 }

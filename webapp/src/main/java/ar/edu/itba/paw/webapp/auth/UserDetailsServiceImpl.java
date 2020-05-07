@@ -2,7 +2,6 @@ package ar.edu.itba.paw.webapp.auth;
 
 import ar.edu.itba.paw.interfaces.services.UserService;
 import ar.edu.itba.paw.models.User;
-import ar.edu.itba.paw.webapp.exceptions.UserNotVerifiedException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -26,15 +25,16 @@ public class UserDetailsServiceImpl implements UserDetailsService {
         if (!user.isPresent()) {
             throw new UsernameNotFoundException("Invalid credentials");
         }
-        if (!user.get().isVerified()) {
-            throw new UserNotVerifiedException();
-        }
 
         Collection<? extends GrantedAuthority> authorities;
-        if (this.userService.isStaff(user.get())) {
-            authorities = Collections.singletonList(new SimpleGrantedAuthority("ROLE_" + UserRole.STAFF.name()));
+        if (user.get().getVerified()) {
+            authorities = Collections.singletonList(new SimpleGrantedAuthority("ROLE_" + UserRole.UNVERIFIED.name()));
         } else {
-            authorities = Collections.singletonList(new SimpleGrantedAuthority("ROLE_" + UserRole.PATIENT.name()));
+            if (this.userService.isStaff(user.get())) {
+                authorities = Collections.singletonList(new SimpleGrantedAuthority("ROLE_" + UserRole.STAFF.name()));
+            } else {
+                authorities = Collections.singletonList(new SimpleGrantedAuthority("ROLE_" + UserRole.PATIENT.name()));
+            }
         }
 
         return new org.springframework.security.core.userdetails.User(username, user.get().getPassword(), authorities);

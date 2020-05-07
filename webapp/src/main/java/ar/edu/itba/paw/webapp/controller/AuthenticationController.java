@@ -8,7 +8,7 @@ import ar.edu.itba.paw.interfaces.services.exceptions.EmailAlreadyExistsExceptio
 import ar.edu.itba.paw.models.*;
 import ar.edu.itba.paw.webapp.controller.utils.GenericController;
 import ar.edu.itba.paw.webapp.controller.utils.JsonResponse;
-import ar.edu.itba.paw.webapp.events.SignUpEvent;
+import ar.edu.itba.paw.webapp.events.UserConfirmationTokenGenerationEvent;
 import ar.edu.itba.paw.webapp.form.authentication.PatientSignUpForm;
 import ar.edu.itba.paw.webapp.form.authentication.StaffSignUpForm;
 import ar.edu.itba.paw.webapp.form.authentication.UserLoginForm;
@@ -98,7 +98,14 @@ public class AuthenticationController extends GenericController {
             newUser = this.userService.createAsStaff(newUser, office);
             StringBuilder baseUrl = new StringBuilder(request.getRequestURL());
             baseUrl.replace(request.getRequestURL().lastIndexOf(request.getRequestURI()), request.getRequestURL().length(), "");
-            this.eventPublisher.publishEvent(new SignUpEvent(baseUrl.toString(), newUser, request.getContextPath() + "/signup/confirm", request.getLocale()));
+            this.eventPublisher.publishEvent(
+                    new UserConfirmationTokenGenerationEvent(
+                            baseUrl.toString(),
+                            newUser,
+                            request.getContextPath() + "/signup/confirm",
+                            request.getLocale()
+                    )
+            );
         } catch (EmailAlreadyExistsException e) {
             errors.reject("EmailAlreadyTaken.signupForm.email", null, "Error");
             return this.signupStaffIndex(form);
@@ -122,7 +129,7 @@ public class AuthenticationController extends GenericController {
             newUser = this.userService.create(form.getAsUser());
             StringBuilder baseUrl = new StringBuilder(request.getRequestURL());
             baseUrl.replace(request.getRequestURL().lastIndexOf(request.getRequestURI()), request.getRequestURL().length(), "");
-            this.eventPublisher.publishEvent(new SignUpEvent(baseUrl.toString(), newUser, request.getContextPath() + "/signup/confirm", request.getLocale()));
+            this.eventPublisher.publishEvent(new UserConfirmationTokenGenerationEvent(baseUrl.toString(), newUser, request.getContextPath() + "/signup/confirm", request.getLocale()));
         } catch (EmailAlreadyExistsException e) {
             errors.reject("EmailAlreadyTaken.signupForm.email", null, "Error");
             return this.signupPatientIndex(form);
