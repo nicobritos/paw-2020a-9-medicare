@@ -19,7 +19,7 @@
           <spring:message var="motivePlaceholder" code="Motive"/>
           <label for="motive"></label><form:input path="motive" placeholder="${motivePlaceholder}"  type="text" name="motive" id="motive" class="form-control w-50"/>
           <p class="mt-3 text-muted mb-1"><spring:message code="PersonalData"/></p>
-          <div class="container-fluid p-0 d-flex flex-row">
+          <div class="container-fluid p-0 mb-1 d-flex flex-row">
             <div class="col px-0">
               <spring:message var="firstNamePlaceholder" code="Name"/>
                 <form:input path="firstName" placeholder="${firstNamePlaceholder}"  type="text" name="firstName" id="firstName" class="form-control w-50"/>            </div>
@@ -28,12 +28,14 @@
                 <form:input path="surname" placeholder="${surnamePlaceholder}"  type="text" name="surname" id="surname" class="form-control w-50"/>            </div>
           </div>
           <spring:message var="phonePlaceholder" code="Phone"/>
-          <form:input path="phone" placeholder="${phonePlaceholder}"  type="text" name="phone" id="phone" class="form-control w-50"/>          <%-- TODO:connect email--%>
+          <form:input path="phone" placeholder="${phonePlaceholder}"  type="text" name="phone" id="phone" class="form-control w-50 mb-1"/>          <%-- TODO:connect email--%>
           <spring:message var="emailPlaceholder" code="Email"/>
-          <form:input path="email" placeholder="${emailPlaceholder}"  type="text" name="email" id="email" class="form-control w-50"/>          <%-- TODO:connect comentario--%>
+          <form:input path="email" placeholder="${emailPlaceholder}"  type="text" name="email" id="email" class="form-control w-50 mb-1"/>          <%-- TODO:connect comentario--%>
           <spring:message var="commentPlaceholder" code="OptionalComment"/>
           <form:textarea path="comment" placeholder="${commentPlaceholder}" class="form-control mt-3" name="comment" id="comment" cols="30" rows="5"/>
           <button type="submit" class="btn btn-info mt-3 w-100"><spring:message code="ScheduleAppointment"/></button>
+
+          <form:errors path="*" cssClass="mt-4 mb-0 text-danger" element="p"/>
         </form:form>
         <div class="col">
           <div class="container details-container mt-5 p-3 w-75">
@@ -81,7 +83,7 @@
                   <c:when test="${date.monthOfYear == 12}"><spring:message code="December"/></c:when>
                   <c:otherwise>${date.monthOfYear}</c:otherwise>
                 </c:choose>, <c:if test="${date.hourOfDay < 10}">0</c:if>${date.hourOfDay}:<c:if test="${date.minuteOfHour < 10}">0</c:if>${date.minuteOfHour}hs</p>
-                  <a href="<c:url value="/appointment/${staffId}"/> "><small class="white-text"><spring:message code="ChangeDate"/></small></a>
+                  <a href="<c:url value="/appointment/${staffId}/0"/> "><small class="white-text"><spring:message code="ChangeDate"/></small></a>
               </div>
             </div>
             <div class="row justify-content-center border-top border-light py-2">

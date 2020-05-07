@@ -78,6 +78,29 @@ public class JDBCWhereClauseBuilder {
         return this.where(columnName, operation, paramName, null);
     }
 
+    public JDBCWhereClauseBuilder where(String columnName, Operation operation, DateTime date) {
+        return this.where(columnName, operation, date, null);
+    }
+
+    public JDBCWhereClauseBuilder where(String columnName, Operation operation, DateTime date, ColumnTransformer columnTransformer) {
+        if (columnTransformer != null) {
+            this.clause
+                    .append(columnTransformer.getPrefix())
+                    .append(columnName)
+                    .append(columnTransformer.getSuffix());
+        } else {
+            this.clause.append(columnName);
+        }
+
+        this.clause
+                .append(operation.getOperation())
+                .append("'")
+                .append(dateTimeFormatter.print(date))
+                .append("'");
+
+        return this;
+    }
+
     public JDBCWhereClauseBuilder where(String columnName, Operation operation, String paramName, ColumnTransformer columnTransformer) {
         if (columnTransformer != null) {
             this.clause
@@ -229,5 +252,9 @@ public class JDBCWhereClauseBuilder {
                 .append(")");
 
         return this;
+    }
+
+    public static String encodeDate(DateTime date){
+        return dateTimeFormatter.print(date);
     }
 }

@@ -323,6 +323,26 @@ public class AppointmentDaoImpl extends GenericDaoImpl<Appointment, Integer> imp
     }
 
     @Override
+    public List<Appointment> findByPatientsFromDate(List<Patient> patients, DateTime from){
+        if(patients.isEmpty() || from == null)
+            return Collections.emptyList();
+        Map<String, Object> params = new HashMap<>();
+        JDBCWhereClauseBuilder patientsWhereClause = new JDBCWhereClauseBuilder();
+        putPatientsArguments(patients, params, patientsWhereClause);
+        MapSqlParameterSource parameterSource = new MapSqlParameterSource();
+        parameterSource.addValues(params);
+        patientsWhereClause
+                .and()
+                .where(this.formatColumnFromName("from_date"), Operation.GT, from);
+        JDBCSelectQueryBuilder queryBuilder = new JDBCSelectQueryBuilder()
+                .selectAll(Appointment.class)
+                .from(this.getTableName())
+                .where(patientsWhereClause);
+
+        return this.selectQuery(queryBuilder, parameterSource);
+    }
+
+    @Override
     protected Map<String, JDBCArgumentValue> getModelRelationsArgumentValue(Appointment model, String prefix) {
         Map<String, JDBCArgumentValue> map = new HashMap<>();
         map.put("staff_id", new JDBCArgumentValue(prefix + "staff_id", model.getStaff() != null ? model.getStaff().getId() : null));

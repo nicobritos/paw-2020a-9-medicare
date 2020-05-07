@@ -18,6 +18,8 @@ public interface AppointmentService extends GenericService<Appointment, Integer>
 
     List<Appointment> findByPatients(List<Patient> patients);
 
+    List<Appointment> findByPatientsFromDate(List<Patient> patients, DateTime from);
+
     List<Appointment> findToday(List<Staff> staff);
 
     List<Appointment> findToday(Patient patient);
