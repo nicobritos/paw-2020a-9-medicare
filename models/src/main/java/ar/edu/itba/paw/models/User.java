@@ -14,7 +14,7 @@ public class User extends GenericModel<Integer> {
     @Column(name = "surname", required = true)
     private String surname;
     @Column(name = "verified")
-    private Boolean verified;
+    private Boolean verified = false;
     @Column(name = "token")
     private String token;
 
@@ -69,5 +69,9 @@ public class User extends GenericModel<Integer> {
     @Override
     protected boolean isSameInstance(Object o) {
         return o instanceof User;
+    }
+
+    public String getDisplayName() {
+        return this.firstName + " " + this.surname;
     }
 }

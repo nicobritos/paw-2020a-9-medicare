@@ -34,7 +34,6 @@ public class WebConfig {
     protected static final String DB_URL = "jdbc:postgresql://10.16.1.110:5432/paw-2020a-9?useUnicode=true&amp;characterEncoding=utf8";
     protected static final String DB_USER = "paw-2020a-9";
     protected static final String DB_PASSWORD = "N4wC7cmxe";
-    protected static final String APP_NAME = "MediCare";
 
     @Bean
     public MessageSource messageSource() {
@@ -82,10 +81,5 @@ public class WebConfig {
     @Bean
     public PlatformTransactionManager transactionManager(final DataSource ds){
         return new DataSourceTransactionManager(ds);
-    }
-
-    @Bean
-    public String applicationName() {
-        return APP_NAME;
     }
 }

@@ -9,9 +9,11 @@ public class SignUpEvent extends ApplicationEvent {
     private User user;
     private String url;
     private Locale locale;
+    private String baseUrl;
 
-    public SignUpEvent(User user, String url, Locale locale) {
+    public SignUpEvent(String baseUrl, User user, String url, Locale locale) {
         super(user);
+        this.baseUrl = baseUrl;
         this.user = user;
         this.url = url;
         this.locale = locale;
@@ -27,5 +29,9 @@ public class SignUpEvent extends ApplicationEvent {
 
     public Locale getLocale() {
         return this.locale;
+    }
+
+    public String getBaseUrl() {
+        return this.baseUrl;
     }
 }

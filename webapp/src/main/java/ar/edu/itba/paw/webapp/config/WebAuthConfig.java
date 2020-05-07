@@ -66,7 +66,7 @@ public class WebAuthConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("/staff/**").hasRole(UserRole.STAFF.name())
                 .antMatchers("/**").authenticated()
             .and().formLogin()
-                .usernameParameter("email")
+                .usernameParameter("WEB-INF/email")
                 .passwordParameter("password")
                 .loginPage("/login")
                 .permitAll()

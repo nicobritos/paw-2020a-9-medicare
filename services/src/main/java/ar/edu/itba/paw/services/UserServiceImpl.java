@@ -1,5 +1,6 @@
 package ar.edu.itba.paw.services;
 
+import ar.edu.itba.paw.interfaces.MediCareException;
 import ar.edu.itba.paw.interfaces.daos.UserDao;
 import ar.edu.itba.paw.interfaces.services.OfficeService;
 import ar.edu.itba.paw.interfaces.services.PatientService;
@@ -33,6 +34,7 @@ public class UserServiceImpl extends GenericSearchableServiceImpl<UserDao, User,
     private PasswordEncoder passwordEncoder;
 
     @Override
+    @Transactional
     public User create(User user) throws EmailAlreadyExistsException {
         if (this.repository.existsEmail(user.getEmail())) {
             throw new EmailAlreadyExistsException();
@@ -81,11 +83,14 @@ public class UserServiceImpl extends GenericSearchableServiceImpl<UserDao, User,
     }
 
     @Override
+    @Transactional
     public void update(User user){
         Optional<User> userOptional = this.repository.findByEmail(user.getEmail());
         if (userOptional.isPresent() && !userOptional.get().equals(user)) {
             throw new EmailAlreadyExistsException();
         }
+        if (this.repository.existsToken(user.getToken()))
+            throw new MediCareException("Confirmation token already exists");
 
         super.update(user);
     }
@@ -96,9 +101,22 @@ public class UserServiceImpl extends GenericSearchableServiceImpl<UserDao, User,
     }
 
     @Override
+    @Transactional
     public String generateVerificationToken(User user) {
-        user.setToken(UUID.randomUUID().toString());
-        this.update(user);
+        boolean set = false;
+        int tries = 10;
+        do {
+            try {
+                user.setToken(UUID.randomUUID().toString());
+                this.update(user);
+                set = true;
+            } catch (MediCareException ignored) {
+                tries--;
+            }
+        } while (!set && tries > 0);
+        if (!set)
+            throw new MediCareException("");
+
         return user.getToken();
     }
 

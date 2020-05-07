@@ -120,7 +120,9 @@ public class AuthenticationController extends GenericController {
         User newUser;
         try {
             newUser = this.userService.create(form.getAsUser());
-            this.eventPublisher.publishEvent(new SignUpEvent(newUser, request.getContextPath() + "/signup/confirm", request.getLocale()));
+            StringBuilder baseUrl = new StringBuilder(request.getRequestURL());
+            baseUrl.replace(request.getRequestURL().lastIndexOf(request.getRequestURI()), request.getRequestURL().length(), "");
+            this.eventPublisher.publishEvent(new SignUpEvent(baseUrl.toString(), newUser, request.getContextPath() + "/signup/confirm", request.getLocale()));
         } catch (EmailAlreadyExistsException e) {
             errors.reject("EmailAlreadyTaken.signupForm.email", null, "Error");
             return this.signupPatientIndex(form);

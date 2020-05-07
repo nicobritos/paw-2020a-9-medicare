@@ -10,7 +10,8 @@ import java.util.Properties;
 
 @Configuration
 @ComponentScan({
-        "ar.edu.itba.paw.webapp.events"
+        "ar.edu.itba.paw.webapp.events",
+        "ar.edu.itba.paw.webapp.email"
 })
 public class WebEmailConfig {
     protected static final int EMAIL_PORT = 587;
