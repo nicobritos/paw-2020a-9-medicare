@@ -114,6 +114,8 @@ public class MedicListController extends GenericController {
         if(user.isPresent() && isStaff()) {
             mav.addObject("staffs", staffService.findByUser(user.get().getId()));
         }
+        mav.addObject("searchedLocalities", searchedLocalities);
+        mav.addObject("searchedSpecialties", searchedSpecialties);
         mav.addObject("staff", staffList);
         mav.addObject("specialties",specialtiesList);
         mav.addObject("localities",localitiesList);
