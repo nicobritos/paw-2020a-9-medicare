@@ -72,6 +72,8 @@ public class AppointmentDaoImpl extends GenericDaoImpl<Appointment, Integer> imp
 
     @Override
     public List<Appointment> findByPatients(List<Patient> patients){
+        if(patients.isEmpty())
+            return Collections.emptyList();
         Map<String, Object> params = new HashMap<>();
         JDBCWhereClauseBuilder patientsWhereClause = new JDBCWhereClauseBuilder();
         putPatientsArguments(patients, params, patientsWhereClause);
@@ -105,6 +107,8 @@ public class AppointmentDaoImpl extends GenericDaoImpl<Appointment, Integer> imp
 
     @Override
     public List<Appointment> findByStaffs(List<Staff> staffs){
+        if(staffs.isEmpty())
+            return Collections.emptyList();
         Map<String, Object> params = new HashMap<>();
         JDBCWhereClauseBuilder staffsWhereClause = new JDBCWhereClauseBuilder();
         putStaffsArguments(staffs, params, staffsWhereClause);
@@ -181,6 +185,8 @@ public class AppointmentDaoImpl extends GenericDaoImpl<Appointment, Integer> imp
 
     @Override
     public List<Appointment> findByStaffsAndDate(Collection<Staff> staffs, DateTime date) {
+        if(staffs.isEmpty())
+            return Collections.emptyList();
         Map<String, Object> parameters = new HashMap<>();
         JDBCWhereClauseBuilder staffWhereClause = new JDBCWhereClauseBuilder();
         putStaffsArguments(staffs, parameters, staffWhereClause);
@@ -220,6 +226,8 @@ public class AppointmentDaoImpl extends GenericDaoImpl<Appointment, Integer> imp
 
     @Override
     public List<Appointment> findByStaffsAndDate(Collection<Staff> staffs, DateTime fromDate, DateTime toDate) {
+        if(staffs.isEmpty())
+            return Collections.emptyList();
         Map<String, Object> parameters = new HashMap<>();
         JDBCWhereClauseBuilder staffWhereClause = new JDBCWhereClauseBuilder();
         putStaffsArguments(staffs, parameters, staffWhereClause);
@@ -249,6 +257,8 @@ public class AppointmentDaoImpl extends GenericDaoImpl<Appointment, Integer> imp
 
     @Override
     public List<Appointment> findByPatientsAndDate(Collection<Patient> patients, DateTime date){
+        if(patients.isEmpty())
+            return Collections.emptyList();
         Map<String, Object> parameters = new HashMap<>();
         JDBCWhereClauseBuilder patientWhereClause = new JDBCWhereClauseBuilder();
         putPatientsArguments(patients, parameters, patientWhereClause);
