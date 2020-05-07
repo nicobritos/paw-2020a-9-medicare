@@ -147,7 +147,7 @@ public class MedicListController extends GenericController {
         }
         mav.addObject("staff", staff.get());
 
-        List<AppointmentTimeSlot> timeSlots = this.appointmentService.findAvailableTimeslots(staff.get(), monday, monday.plusDays(7));
+        List<AppointmentTimeSlot> timeSlots = this.appointmentService.findAvailableTimeslots(staff.get(), monday, monday.plusDays(6).withTime(23,59,59,999));
         List<List<AppointmentTimeSlot>> weekslots = new LinkedList<>();
         for (int i=0; i<=7; i++){
             weekslots.add(new LinkedList<>());
