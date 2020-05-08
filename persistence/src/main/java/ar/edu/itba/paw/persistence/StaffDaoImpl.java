@@ -163,12 +163,20 @@ public class StaffDaoImpl extends GenericSearchableDaoImpl<Staff, Integer> imple
         if (names == null) {
             names = Collections.emptyList();
         } else {
-            names = names.stream().map(String::toLowerCase).collect(Collectors.toList());
+            names = names.stream().map(name->{
+                name = name.toLowerCase();
+                name = StringUtils.stripAccents(name);
+                return name;
+            }).collect(Collectors.toList());
         }
         if (surnames == null) {
             surnames = Collections.emptyList();
         } else {
-            surnames = surnames.stream().map(String::toLowerCase).collect(Collectors.toList());
+            surnames = surnames.stream().map(surname->{
+                surname = surname.toLowerCase();
+                surname = StringUtils.stripAccents(surname);
+                return surname;
+            }).collect(Collectors.toList());
         }
         if (offices == null) {
             offices = Collections.emptyList();
@@ -224,12 +232,20 @@ public class StaffDaoImpl extends GenericSearchableDaoImpl<Staff, Integer> imple
         if (names == null) {
             names = Collections.emptyList();
         } else {
-            names = names.stream().map(String::toLowerCase).collect(Collectors.toList());
+            names = names.stream().map(name -> {
+                name = name.toLowerCase();
+                name = StringUtils.stripAccents(name);
+                return name;
+            }).collect(Collectors.toList());
         }
         if (surnames == null) {
             surnames = Collections.emptyList();
         } else {
-            surnames = surnames.stream().map(String::toLowerCase).collect(Collectors.toList());
+            surnames = surnames.stream().map(surname -> {
+                surname = surname.toLowerCase();
+                surname = StringUtils.stripAccents(surname);
+                return surname;
+            }).collect(Collectors.toList());
         }
         if (offices == null) {
             offices = Collections.emptyList();

@@ -10,8 +10,8 @@ import ar.edu.itba.paw.webapp.controller.utils.GenericController;
 import ar.edu.itba.paw.webapp.controller.utils.JsonResponse;
 import ar.edu.itba.paw.webapp.form.RequestTimeslotForm;
 import ar.edu.itba.paw.webapp.transformer.AppointmentTimeSlotTransformer;
+import org.apache.tika.parser.txt.CharsetDetector;
 import org.joda.time.DateTime;
-import org.joda.time.DateTimeConstants;
 import org.joda.time.Days;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -24,11 +24,9 @@ import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import javax.validation.Valid;
-import java.time.LocalDate;
-import java.time.temporal.ChronoUnit;
+import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
-
-import static org.joda.time.DateTimeConstants.*;
 
 @Controller
 public class MedicListController extends GenericController {
@@ -99,6 +97,8 @@ public class MedicListController extends GenericController {
         }
 
         if(name != null) {
+            CharsetDetector detector = new CharsetDetector();
+            name = detector.getString(name.getBytes(), StandardCharsets.UTF_8.name()); //TODO: Find better way
             Set<String> words = new HashSet<>(Arrays.asList(name.split(" ")));
             staffList = new HashSet<>(this.staffService.findBy(words, words, null, searchedSpecialties, searchedLocalities, page));
         } else{
@@ -114,6 +114,8 @@ public class MedicListController extends GenericController {
         if(user.isPresent() && isStaff()) {
             mav.addObject("staffs", staffService.findByUser(user.get().getId()));
         }
+        mav.addObject("searchedLocalities", searchedLocalities);
+        mav.addObject("searchedSpecialties", searchedSpecialties);
         mav.addObject("staff", staffList);
         mav.addObject("specialties",specialtiesList);
         mav.addObject("localities",localitiesList);
@@ -145,7 +147,7 @@ public class MedicListController extends GenericController {
         }
         mav.addObject("staff", staff.get());
 
-        List<AppointmentTimeSlot> timeSlots = this.appointmentService.findAvailableTimeslots(staff.get(), monday, monday.plusDays(7));
+        List<AppointmentTimeSlot> timeSlots = this.appointmentService.findAvailableTimeslots(staff.get(), monday, monday.plusDays(6).withTime(23,59,59,999));
         List<List<AppointmentTimeSlot>> weekslots = new LinkedList<>();
         for (int i=0; i<=7; i++){
             weekslots.add(new LinkedList<>());

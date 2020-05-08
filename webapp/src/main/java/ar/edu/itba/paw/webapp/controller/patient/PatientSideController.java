@@ -2,6 +2,8 @@ package ar.edu.itba.paw.webapp.controller.patient;
 
 import ar.edu.itba.paw.interfaces.MediCareException;
 import ar.edu.itba.paw.interfaces.services.*;
+import ar.edu.itba.paw.interfaces.services.exceptions.InvalidAppointmentDateException;
+import ar.edu.itba.paw.interfaces.services.exceptions.InvalidMinutesException;
 import ar.edu.itba.paw.models.*;
 import ar.edu.itba.paw.webapp.controller.utils.GenericController;
 import ar.edu.itba.paw.webapp.controller.utils.JsonResponse;
@@ -63,7 +65,7 @@ public class PatientSideController extends GenericController {
         if(isStaff()) {
             mav.addObject("staffs", staffService.findByUser(user.get().getId()));
         }
-        mav.addObject("appointments", appointmentService.findByPatients(patients));
+        mav.addObject("appointments", appointmentService.findByPatientsFromDate(patients, DateTime.now()));
         mav.addObject("specialties", staffSpecialtyService.list());
         mav.addObject("localities", localityService.list());
 
@@ -130,15 +132,18 @@ public class PatientSideController extends GenericController {
                                            final BindingResult errors){
         Optional<Staff> staff = this.staffService.findById(form.getStaffId());
         if (!staff.isPresent()) {
-            throw new MediCareException("No existe el staff solicitado");
+            errors.reject("NotFound.requestAppointment.staff", null, "Error");
+            return this.requestAppointment(form, staffId, year, month, day, hour, minute);
         }
         DateTime dateFrom = new DateTime(form.getYear(), form.getMonth(), form.getDay(), form.getHour(), form.getMinute());
         if (dateFrom.isBefore(DateTime.now())) {
-            throw new MediCareException("No puede sacar un turno en el pasado");
+            errors.reject("PastRequest.requestAppointment.date", null, "Error");
+            return this.requestAppointment(form, staffId, year, month, day, hour, minute);
         }
         Optional<User> optionalUser = getUser();
         if(!optionalUser.isPresent()) {
-            throw new MediCareException("Debe estar loggeado para sacar un turno");
+            errors.reject("NotNull.requestAppointment.user", null, "Error");
+            return this.requestAppointment(form, staffId, year, month, day, hour, minute);
         }
         Optional<Patient> patientOptional = this.patientService.findByUserAndOffice(optionalUser.get(), staff.get().getOffice());
         Patient patient;
@@ -155,8 +160,15 @@ public class PatientSideController extends GenericController {
         appointment.setStaff(staff.get());
         appointment.setPatient(patient);
         appointment.setFromDate(dateFrom);
-
-        this.appointmentService.create(appointment);
+        try {
+            this.appointmentService.create(appointment);
+        } catch (InvalidMinutesException e){
+            errors.reject("InvalidValue.requestAppointment.date", null, "Error");
+            return this.requestAppointment(form, staffId, year, month, day, hour, minute);
+        } catch (InvalidAppointmentDateException e){
+            errors.reject("MedicNotWorking.requestAppointment.date", null, "Error");
+            return this.requestAppointment(form, staffId, year, month, day, hour, minute);
+        }
         return new ModelAndView("redirect:/patient/home");
     }
 

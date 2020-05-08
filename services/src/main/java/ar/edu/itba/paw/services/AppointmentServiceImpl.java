@@ -50,6 +50,11 @@ public class AppointmentServiceImpl extends GenericServiceImpl<AppointmentDao, A
     }
 
     @Override
+    public List<Appointment> findByPatientsFromDate(List<Patient> patients, DateTime from) {
+        return this.repository.findByPatientsFromDate(patients, from);
+    }
+
+        @Override
     public List<Appointment> findToday(List<Staff> staffs){
         return this.findByStaffsAndDay(staffs, DateTime.now());
     }
@@ -79,7 +84,6 @@ public class AppointmentServiceImpl extends GenericServiceImpl<AppointmentDao, A
         return this.repository.findByPatientsAndDate(patients, date);
     }
 
-
     @Override
     public void setStatus(Appointment appointment, AppointmentStatus status) throws
             AppointmentAlreadyCancelledException,
@@ -100,7 +104,9 @@ public class AppointmentServiceImpl extends GenericServiceImpl<AppointmentDao, A
         this.repository.update(appointment);
     }
 
-    public Appointment create(Appointment model) throws InvalidAppointmentDateException, InvalidAppointmentDurationException {
+    public Appointment create(Appointment model) throws InvalidAppointmentDateException {
+        if(model.getFromDate().getMinuteOfHour() % 15 != 0)
+            throw new InvalidMinutesException();
         if (!this.isValidDate(model.getStaff(), model.getFromDate()))
             throw new InvalidAppointmentDateException();
 
@@ -120,70 +126,70 @@ public class AppointmentServiceImpl extends GenericServiceImpl<AppointmentDao, A
     public List<AppointmentTimeSlot> findAvailableTimeslots(Staff staff, DateTime fromDate, DateTime toDate) {
         DateTime now = DateTime.now();
         List<AppointmentTimeSlot> appointmentTimeSlots = new LinkedList<>();
-        if (now.isBefore(fromDate)) {
+        if (now.isAfter(fromDate)) {
             fromDate = now;
         }
-
+        int hour = fromDate.getHourOfDay();
+        int minute = fromDate.getMinuteOfHour();
+        minute = (int)Math.ceil((double)minute/Appointment.DURATION) * Appointment.DURATION;
+        if(minute == 60) {
+            hour += 1;
+            minute = 0;
+            if (hour == 24) {
+                fromDate.plusDays(1);
+                hour = 0;
+            }
+        }
+        fromDate = fromDate.withTime(hour, minute, 0, 0);
         while (toDate.isAfter(fromDate)) {
             WorkdayDay workdayDay = WorkdayDay.from(fromDate);
             List<Workday> workdays = this.workdayService.findByStaff(staff, workdayDay); // Los horarios de ese día
             for (Workday workday : workdays) {
-                // Primera hora
-                for (int j = workday.getStartMinute(); j < 60; j += Appointment.DURATION) {
-                    AppointmentTimeSlot appointmentTimeSlot = new AppointmentTimeSlot();
-                    appointmentTimeSlot.setDate(new DateTime(
-                            fromDate.getYear(),
-                            fromDate.getMonthOfYear(),
-                            fromDate.getDayOfMonth(),
-                            workday.getStartHour(),
-                            j,
-                            fromDate.getZone()
-                    ));
-                    appointmentTimeSlots.add(appointmentTimeSlot);
+                int startHour = workday.getStartHour();
+                int firstStartMinute = workday.getStartMinute();
+                if (fromDate.getHourOfDay() > workday.getStartHour() || (fromDate.getHourOfDay() == workday.getStartHour() && fromDate.getMinuteOfHour() > workday.getStartMinute())) {
+                    startHour = fromDate.getHourOfDay();
+                    firstStartMinute = fromDate.getMinuteOfHour();
                 }
-                // Resto de las horas menos la última
-                for (int i = workday.getStartHour() + 1; i < workday.getEndHour(); i++) {
-                    for (int j = 0; j < 60; j += Appointment.DURATION) {
+                for (int ihour = startHour; ihour <= workday.getEndHour(); ihour++) {
+
+                    int startMinute = 0;
+                    if(ihour == startHour){
+                        startMinute = firstStartMinute;
+                    }
+                    int endMinute = 60;
+                    if (ihour == workday.getEndHour()) {
+                        endMinute = workday.getEndMinute();
+                    }
+                    for (int imin = startMinute; imin < endMinute; imin += Appointment.DURATION) {
                         AppointmentTimeSlot appointmentTimeSlot = new AppointmentTimeSlot();
                         appointmentTimeSlot.setDate(new DateTime(
                                 fromDate.getYear(),
                                 fromDate.getMonthOfYear(),
                                 fromDate.getDayOfMonth(),
-                                i,
-                                j,
+                                ihour,
+                                imin,
                                 fromDate.getZone()
                         ));
                         appointmentTimeSlots.add(appointmentTimeSlot);
                     }
                 }
-                //Ultima hora
-                for (int j = 0; j < workday.getEndMinute(); j += Appointment.DURATION) {
-                    AppointmentTimeSlot appointmentTimeSlot = new AppointmentTimeSlot();
-                    appointmentTimeSlot.setDate(new DateTime(
-                            fromDate.getYear(),
-                            fromDate.getMonthOfYear(),
-                            fromDate.getDayOfMonth(),
-                            workday.getEndHour(),
-                            j,
-                            fromDate.getZone()
-                    ));
-                    appointmentTimeSlots.add(appointmentTimeSlot);
-                }
 
                 this.findByDay(staff, fromDate).forEach(appointment -> {
-                            AppointmentTimeSlot appointmentTimeSlot = new AppointmentTimeSlot();
-                            appointmentTimeSlot.setDate(appointment.getFromDate());
-                            appointmentTimeSlots.remove(appointmentTimeSlot);
-                        });
+                    AppointmentTimeSlot appointmentTimeSlot = new AppointmentTimeSlot();
+                    appointmentTimeSlot.setDate(appointment.getFromDate());
+                    appointmentTimeSlots.remove(appointmentTimeSlot);
+                });
             }
             fromDate = fromDate.plusDays(1);
+            fromDate = fromDate.withTime(0,0,0,0);
         }
         return appointmentTimeSlots;
     }
 
     @Override
     public List<AppointmentTimeSlot> findAvailableTimeslots(Staff staff, DateTime date) {
-        return this.findAvailableTimeslots(staff, date, date);
+        return this.findAvailableTimeslots(staff, date, date.withTime(23,59,59,999));
     }
 
     @Override
