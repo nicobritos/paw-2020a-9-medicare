@@ -238,15 +238,11 @@ public class JDBCSelectQueryBuilder extends JDBCQueryBuilder {
     }
 
     private String generateOrderBy() {
-        StringBuilder stringBuilder = new StringBuilder();
+        List<String> strings = new LinkedList<>();
         for (OrderBy orderBy : this.orderBy) {
-            stringBuilder
-                    .append(orderBy.getColumnName())
-                    .append(" ")
-                    .append(orderBy.getCriteria().getCriteria())
-                    .append(" ");
+            strings.add(orderBy.getColumnName() + " " + orderBy.getCriteria().getCriteria());
         }
-        return stringBuilder.toString();
+        return this.joinStrings(strings, ", ");
     }
 
     private static class OrderBy implements Comparable<OrderBy> {
