@@ -14,11 +14,11 @@
         <div class="col-4 align-items-start d-flex flex-column">
             <!-- TODO connect imagen -->
             <div class="picture-container no-select">
-                <img id="profilePic" src="https://fonts.gstatic.com/s/i/materialicons/account_circle/v4/24px.svg"
+                <img id="profilePic" src="<c:url value="/profilePics/${user.get().id}"/>"
                      alt="">
                 <div class="picture-overlay d-flex flex-column align-items-center justify-content-end pb-3">
                     <input id="profile-picture-input" style="display: none;" type="file"
-                           accept="image/tiff, image/svg+xml, image/png, image/jpeg, image/bmp, image/webp, image/heic, image/">
+                           accept="image/jpeg">
                     <i class="fas fa-pencil-alt"></i>
                 </div>
             </div>

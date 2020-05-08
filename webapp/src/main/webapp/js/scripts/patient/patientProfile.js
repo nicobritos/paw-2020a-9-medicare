@@ -13,29 +13,36 @@ const Profile = function () {
             }
         }
 
+        //get profile input
         let profilePictureInput = $('#profile-picture-input');
         $('.picture-overlay i').click(function() {
             profilePictureInput.trigger('click');
         });
+        //append to onchange event
         profilePictureInput.change(function(e){
+            //get profile pic file and check type
             let file = e.target.files[0];
-            let formData = new FormData();
-            formData.append("pic",file);
             if(file.type!=="image/jpeg"){
                 App.showError();
                 return;
             }
+            //append it to form
+            let formData = new FormData();
+            formData.append("pic",file);
+            //post to baseurl/profilePics/set
             fetch($("#baseUrl").attr("href") + "profilePics/set",{
                     method:"POST",
                     body:formData
             }).then((r)=>{
-                if(r.statusCode === 200){
+                if(r.ok){
                     //TODO:show better message
                     App.showOk();
                 }else{
+                    //TODO:show better message
                     App.showError();
                 }
             }).catch((e)=>{
+                //TODO:show better message
                 App.showError();
             });
         })

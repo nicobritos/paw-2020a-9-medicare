@@ -26,7 +26,7 @@ public class ProfilePicController extends GenericController {
 
     //TODO:correct path
 
-    private String defaultImagePath = "/img/calendarIcon.svg";
+    private String defaultImagePath = "/img/defaultProfilePic.svg";
     private String defaultImageType = "image/svg+xml";
     private String acceptedImageType = "image/jpeg";
 
