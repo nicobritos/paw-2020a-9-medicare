@@ -9,6 +9,7 @@ import ar.edu.itba.paw.persistence.utils.builder.*;
 import ar.edu.itba.paw.persistence.utils.builder.JDBCWhereClauseBuilder.ColumnTransformer;
 import ar.edu.itba.paw.persistence.utils.builder.JDBCWhereClauseBuilder.Operation;
 import ar.edu.itba.paw.persistenceAnnotations.Column;
+import ar.edu.itba.paw.persistenceAnnotations.OrderBy;
 import ar.edu.itba.paw.persistenceAnnotations.Table;
 import org.joda.time.DateTime;
 import org.springframework.jdbc.core.ResultSetExtractor;
@@ -261,11 +262,13 @@ public abstract class GenericDaoImpl<M extends GenericModel<I>, I> implements Ge
 
     protected List<M> selectQuery(JDBCSelectQueryBuilder selectQueryBuilder) {
         this.populateJoins(selectQueryBuilder);
+        this.insertOrderBy(selectQueryBuilder);
         return new LinkedList<>(this.jdbcTemplate.query(selectQueryBuilder.getQueryAsString(), this.getResultSetExtractor()));
     }
 
     protected List<M> selectQuery(JDBCSelectQueryBuilder selectQueryBuilder, MapSqlParameterSource args) {
         this.populateJoins(selectQueryBuilder);
+        this.insertOrderBy(selectQueryBuilder);
         return new LinkedList<>(this.jdbcTemplate.query(selectQueryBuilder.getQueryAsString(), args, this.getResultSetExtractor()));
     }
 
@@ -277,7 +280,20 @@ public abstract class GenericDaoImpl<M extends GenericModel<I>, I> implements Ge
      */
     protected void selectQuery(JDBCSelectQueryBuilder selectQueryBuilder, MapSqlParameterSource args, RowCallbackHandler callbackHandler) {
         this.populateJoins(selectQueryBuilder);
+        this.insertOrderBy(selectQueryBuilder);
         this.jdbcTemplate.query(selectQueryBuilder.getQueryAsString(), args, callbackHandler);
+    }
+
+    protected Optional<M> selectQuerySingle(JDBCSelectQueryBuilder selectQueryBuilder) {
+        this.populateJoins(selectQueryBuilder);
+        this.insertOrderBy(selectQueryBuilder);
+        return this.jdbcTemplate.query(selectQueryBuilder.getQueryAsString(), this.getResultSetExtractor()).stream().findFirst();
+    }
+
+    protected Optional<M> selectQuerySingle(JDBCSelectQueryBuilder selectQueryBuilder, MapSqlParameterSource args) {
+        this.populateJoins(selectQueryBuilder);
+        this.insertOrderBy(selectQueryBuilder);
+        return this.jdbcTemplate.query(selectQueryBuilder.getQueryAsString(), args, this.getResultSetExtractor()).stream().findFirst();
     }
 
     /**
@@ -287,16 +303,6 @@ public abstract class GenericDaoImpl<M extends GenericModel<I>, I> implements Ge
      */
     protected void updateQuery(String query, MapSqlParameterSource args) {
         this.jdbcTemplate.update(query, args);
-    }
-
-    protected Optional<M> selectQuerySingle(JDBCSelectQueryBuilder selectQueryBuilder) {
-        this.populateJoins(selectQueryBuilder);
-        return this.jdbcTemplate.query(selectQueryBuilder.getQueryAsString(), this.getResultSetExtractor()).stream().findFirst();
-    }
-
-    protected Optional<M> selectQuerySingle(JDBCSelectQueryBuilder selectQueryBuilder, MapSqlParameterSource args) {
-        this.populateJoins(selectQueryBuilder);
-        return this.jdbcTemplate.query(selectQueryBuilder.getQueryAsString(), args, this.getResultSetExtractor()).stream().findFirst();
     }
 
     protected M insertQuery(M model, MapSqlParameterSource args) {
@@ -354,10 +360,6 @@ public abstract class GenericDaoImpl<M extends GenericModel<I>, I> implements Ge
         return this.primaryKeyName;
     }
 
-    protected abstract ResultSetExtractor<List<M>> getResultSetExtractor();
-
-    protected abstract void populateJoins(JDBCSelectQueryBuilder selectQueryBuilder);
-
     /**
      * Returns a map associating column name with an argument name and the value in the model
      * associated with that field. The arguments may be prefixed to avoid name collisions.
@@ -402,6 +404,24 @@ public abstract class GenericDaoImpl<M extends GenericModel<I>, I> implements Ge
             map.putAll(relationsMap);
         return map;
     }
+
+    private void insertOrderBy(JDBCSelectQueryBuilder selectQueryBuilder) {
+        if (selectQueryBuilder.hasOrderBy())
+            return;
+
+        ReflectionGetterSetter.iterateFields(this.mClass, OrderBy.class, field -> {
+            OrderBy orderBy = field.getAnnotation(OrderBy.class);
+            Column column = field.getAnnotation(Column.class);
+            if (column == null)
+                return;
+
+            selectQueryBuilder.orderBy(column.name(), orderBy.value(), orderBy.priority());
+        });
+    }
+
+    protected abstract ResultSetExtractor<List<M>> getResultSetExtractor();
+
+    protected abstract void populateJoins(JDBCSelectQueryBuilder selectQueryBuilder);
 
     protected abstract Map<String, JDBCArgumentValue> getModelRelationsArgumentValue(M model, String prefix);
 

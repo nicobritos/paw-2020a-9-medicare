@@ -4,35 +4,13 @@ import ar.edu.itba.paw.models.GenericModel;
 import ar.edu.itba.paw.persistence.utils.ReflectionGetterSetter;
 import ar.edu.itba.paw.persistence.utils.builder.JDBCWhereClauseBuilder.Operation;
 import ar.edu.itba.paw.persistenceAnnotations.Column;
+import ar.edu.itba.paw.persistenceAnnotations.OrderCriteria;
 import ar.edu.itba.paw.persistenceAnnotations.Table;
 
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class JDBCSelectQueryBuilder extends JDBCQueryBuilder {
     public static final String ALL = " * ";
-
-    public enum OrderCriteria {
-        ASC(" ASC "),
-        DESC(" DESC ");
-
-        private String criteria;
-
-        OrderCriteria(String criteria) {
-            this.criteria = criteria;
-        }
-
-        public String getCriteria() {
-            return this.criteria;
-        }
-
-        @Override
-        public String toString() {
-            return this.criteria;
-        }
-    }
 
     public enum JoinType {
         INNER(" "),
@@ -58,15 +36,14 @@ public class JDBCSelectQueryBuilder extends JDBCQueryBuilder {
     }
 
     private Map<String, Class<? extends GenericModel<?>>> joinColumns = new HashMap<>();
+    private SortedSet<OrderBy> orderBy = new TreeSet<>();
     private List<String> columns = new LinkedList<>();
     private List<String> joins = new LinkedList<>();
 
     private JDBCWhereClauseBuilder whereClauseBuilder;
     private Class<? extends GenericModel<?>> mClass;
-    private OrderCriteria orderCriteria;
     private boolean selectAll;
     private boolean distinct;
-    private String orderBy;
     private String table;
     private String alias;
     private int limit;
@@ -155,10 +132,13 @@ public class JDBCSelectQueryBuilder extends JDBCQueryBuilder {
         return this;
     }
 
-    public JDBCSelectQueryBuilder orderBy(String columnName, OrderCriteria orderCriteria) {
-        this.orderCriteria = orderCriteria;
-        this.orderBy = columnName;
+    public JDBCSelectQueryBuilder orderBy(String columnName, OrderCriteria orderCriteria, int priority) {
+        this.orderBy.add(new OrderBy(columnName, orderCriteria, priority));
         return this;
+    }
+
+    public boolean hasOrderBy() {
+        return !this.orderBy.isEmpty();
     }
 
     public JDBCSelectQueryBuilder distinct() {
@@ -213,12 +193,10 @@ public class JDBCSelectQueryBuilder extends JDBCQueryBuilder {
                     .append(this.whereClauseBuilder.getClauseAsString());
         }
 
-        if (this.orderBy != null) {
+        if (!this.orderBy.isEmpty()) {
             stringBuilder
                     .append(" ORDER BY ")
-                    .append(this.orderBy);
-
-            if (this.orderCriteria != null) stringBuilder.append(this.orderCriteria.getCriteria());
+                    .append(this.generateOrderBy());
         }
 
         if (this.limit > 0) {
@@ -257,5 +235,48 @@ public class JDBCSelectQueryBuilder extends JDBCQueryBuilder {
             });
         }
         return this.joinStrings(columns);
+    }
+
+    private String generateOrderBy() {
+        StringBuilder stringBuilder = new StringBuilder();
+        for (OrderBy orderBy : this.orderBy) {
+            stringBuilder
+                    .append(orderBy.getColumnName())
+                    .append(" ")
+                    .append(orderBy.getCriteria().getCriteria())
+                    .append(" ");
+        }
+        return stringBuilder.toString();
+    }
+
+    private static class OrderBy implements Comparable<OrderBy> {
+        private final OrderCriteria criteria;
+        private final String columnName;
+        private final int priority;
+
+        public OrderBy(String columnName, OrderCriteria criteria, int priority) {
+            this.columnName = columnName;
+            this.criteria = criteria;
+            this.priority = priority;
+        }
+
+        public OrderCriteria getCriteria() {
+            return this.criteria;
+        }
+
+        public String getColumnName() {
+            return this.columnName;
+        }
+
+        public int getPriority() {
+            return this.priority;
+        }
+
+        @Override
+        public int compareTo(OrderBy o) {
+            if (o == null)
+                throw new NullPointerException();
+            return Integer.compare(this.priority, o.priority);
+        }
     }
 }
