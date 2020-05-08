@@ -37,12 +37,14 @@
         <c:choose>
           <c:when test="${staffs == null}">
             <a href="<c:url value="/patient/profile"/>">
-              <img id="navbarPatientUserImage" class="ml-2" src="https://fonts.gstatic.com/s/i/materialicons/account_circle/v4/24px.svg" alt="">
+              <%-- TODO:move style to css --%>
+              <img id="navbarPatientUserImage" class="ml-2" src="<c:url value="/profilePics/${user.get().id}"/>" alt="" style="height: 1em;">
             </a>
           </c:when>
           <c:otherwise>
             <a href="<c:url value="/staff/profile"/>">
-              <img id="navbarStaffUserImage" class="ml-2" src="https://fonts.gstatic.com/s/i/materialicons/account_circle/v4/24px.svg" alt="">
+                <%-- TODO:move style to css --%>
+              <img id="navbarStaffUserImage" class="ml-2" src="<c:url value="/profilePics/${user.get().id}"/>" alt="" style="height: 1em;">
             </a>
           </c:otherwise>
         </c:choose>

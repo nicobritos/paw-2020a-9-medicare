@@ -13,9 +13,32 @@ const Profile = function () {
             }
         }
 
+        let profilePictureInput = $('#profile-picture-input');
         $('.picture-overlay i').click(function() {
-            $('#profile-picture-input').trigger('click');
+            profilePictureInput.trigger('click');
         });
+        profilePictureInput.change(function(e){
+            let file = e.target.files[0];
+            let formData = new FormData();
+            formData.append("pic",file);
+            if(file.type!=="image/jpeg"){
+                App.showError();
+                return;
+            }
+            fetch($("#baseUrl").attr("href") + "profilePics/set",{
+                    method:"POST",
+                    body:formData
+            }).then((r)=>{
+                if(r.statusCode === 200){
+                    //TODO:show better message
+                    App.showOk();
+                }else{
+                    App.showError();
+                }
+            }).catch((e)=>{
+                App.showError();
+            });
+        })
     };
 
     let toggleVisibility = function () {
