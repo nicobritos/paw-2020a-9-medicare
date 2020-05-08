@@ -415,7 +415,7 @@ public abstract class GenericDaoImpl<M extends GenericModel<I>, I> implements Ge
             if (column == null)
                 return;
 
-            selectQueryBuilder.orderBy(column.name(), orderBy.value(), orderBy.priority());
+            selectQueryBuilder.orderBy(this.formatColumnFromAlias(column.name()), orderBy.value(), orderBy.priority());
         });
     }
 
