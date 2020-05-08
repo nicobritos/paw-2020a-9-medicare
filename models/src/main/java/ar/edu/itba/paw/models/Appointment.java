@@ -1,6 +1,8 @@
 package ar.edu.itba.paw.models;
 
 import ar.edu.itba.paw.persistenceAnnotations.Column;
+import ar.edu.itba.paw.persistenceAnnotations.OrderBy;
+import ar.edu.itba.paw.persistenceAnnotations.OrderCriteria;
 import ar.edu.itba.paw.persistenceAnnotations.Table;
 import org.joda.time.DateTime;
 
@@ -10,6 +12,7 @@ public class Appointment extends GenericModel<Integer> {
 
     @Column(name = "status", required = true)
     private String appointmentStatus;
+    @OrderBy(OrderCriteria.DESC)
     @Column(name = "from_date", required = true)
     private DateTime fromDate;
     @Column(name = "patient_id", required = true)

@@ -1,6 +1,8 @@
 package ar.edu.itba.paw.models;
 
 import ar.edu.itba.paw.persistenceAnnotations.Column;
+import ar.edu.itba.paw.persistenceAnnotations.OrderBy;
+import ar.edu.itba.paw.persistenceAnnotations.OrderCriteria;
 import ar.edu.itba.paw.persistenceAnnotations.Table;
 
 import java.util.Collection;
@@ -8,8 +10,10 @@ import java.util.LinkedList;
 
 @Table(name = "staff", primaryKey = "staff_id")
 public class Staff extends GenericModel<Integer> {
+    @OrderBy(OrderCriteria.ASC)
     @Column(name = "first_name", required = true)
     private String firstName;
+    @OrderBy(value = OrderCriteria.ASC, priority = 1)
     @Column(name = "surname", required = true)
     private String surname;
     @Column(name = "phone")
