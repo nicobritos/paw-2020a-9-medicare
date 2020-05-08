@@ -15,6 +15,7 @@
                 <div class="picture-container no-select">
                     <img id="profilePic" src="https://fonts.gstatic.com/s/i/materialicons/account_circle/v4/24px.svg" alt="">
                     <div class="picture-overlay d-flex flex-column align-items-center justify-content-end pb-3">
+                        <input id="profile-picture-input" style="display: none;" type="file" accept="image/tiff, image/svg+xml, image/png, image/jpeg, image/bmp, image/webp, image/heic, image/">
                         <i class="fas fa-pencil-alt"></i>
                     </div>
                 </div>

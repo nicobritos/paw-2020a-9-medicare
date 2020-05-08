@@ -91,7 +91,6 @@ html,body{
 
 .picture-container .picture-overlay {
     z-index: 1;
-    background: #aaaaaa77;
     width: 100%;
     height: 100%;
     border-radius: 10em;

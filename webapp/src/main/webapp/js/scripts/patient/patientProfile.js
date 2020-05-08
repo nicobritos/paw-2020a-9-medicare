@@ -12,6 +12,10 @@ const Profile = function () {
                 }
             }
         }
+
+        $('.picture-overlay i').click(function() {
+            $('#profile-picture-input').trigger('click');
+        });
     };
 
     let toggleVisibility = function () {
