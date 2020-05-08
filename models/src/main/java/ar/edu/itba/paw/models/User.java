@@ -13,6 +13,8 @@ public class User extends GenericModel<Integer> {
     private String firstName;
     @Column(name = "surname", required = true)
     private String surname;
+    @Column(name = "picture")
+    private byte[] picture;
 
     public String getEmail() {
         return this.email;
@@ -44,6 +46,18 @@ public class User extends GenericModel<Integer> {
 
     public void setSurname(String surname) {
         this.surname = surname;
+    }
+
+    public byte[] getPicture() {
+        return this.picture;
+    }
+
+    public String getPictureAsHex() {
+        return this.picture == null ? null : StringHelper.byteToHex(this.picture);
+    }
+
+    public void setPicture(byte[] picture) {
+        this.picture = picture;
     }
 
     @Override
