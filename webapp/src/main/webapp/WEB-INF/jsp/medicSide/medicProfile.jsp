@@ -13,9 +13,12 @@
         <div class="row">
           <div class="col-4 align-items-start d-flex flex-column">
             <!-- TODO connect imagen -->
-            <img id="profilePic" src="https://fonts.gstatic.com/s/i/materialicons/account_circle/v4/24px.svg" alt="">
-            <!-- TODO connect-->
-<%--            <a href="">Cambiar foto de perfil</a>--%>
+            <div class="picture-container no-select">
+              <img id="profilePic" src="https://fonts.gstatic.com/s/i/materialicons/account_circle/v4/24px.svg" alt="">
+              <div class="picture-overlay d-flex flex-column align-items-center justify-content-end pb-3">
+                <i class="fas fa-pencil-alt"></i>
+              </div>
+            </div>
             <!-- TODO Connect-->
             <%--<a class="mt-3" href=""><spring:message code="ChangePassword"/></a>--%>
           </div>
