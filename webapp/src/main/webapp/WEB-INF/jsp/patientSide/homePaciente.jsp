@@ -21,6 +21,7 @@
                 <div class="container">
                   <div class="row">
                     <div class="col-4">
+                      <%--TODO:connect image--%>
                       <img
                         class="w-100"
                         src="https://fonts.gstatic.com/s/i/materialicons/account_circle/v4/24px.svg"
@@ -69,7 +70,6 @@
                     </div>
                     <div class="col-1 justify-content-start">
                         <div class="dropdown">
-                            <!-- TODO connect icon -->
                             <img src='<c:url value="/img/moreOptions.svg"/>' class="moreOptionsButton" alt="nore options" data-toggle="dropdown">
                             <div class="dropdown-menu">
                               <%-- TODO add reprogramar --%>

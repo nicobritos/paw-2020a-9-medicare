@@ -38,13 +38,15 @@
           <c:when test="${staffs == null}">
             <a href="<c:url value="/patient/profile"/>">
               <%-- TODO:move style to css --%>
-              <img id="navbarPatientUserImage" class="ml-2" src="<c:url value="/profilePics/${user.get().id}"/>" alt="" style="height: 1em;">
+              <%-- TODO: connect image--%>
+              <img id="navbarPatientUserImage" class="ml-2 rounded-circle" src="<c:url value="/profilePics/${user.get().id}"/>" alt="" style="height: 2em;">
             </a>
           </c:when>
           <c:otherwise>
             <a href="<c:url value="/staff/profile"/>">
                 <%-- TODO:move style to css --%>
-              <img id="navbarStaffUserImage" class="ml-2" src="<c:url value="/profilePics/${user.get().id}"/>" alt="" style="height: 1em;">
+                <%-- TODO: connect image--%>
+              <img id="navbarStaffUserImage" class="ml-2 rounded-circle" src="<c:url value="/profilePics/${user.get().id}"/>" alt="" style="height: 2em;">
             </a>
           </c:otherwise>
         </c:choose>

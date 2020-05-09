@@ -45,6 +45,7 @@ const Profile = function () {
                 if(r.ok){
                     //TODO:show better message
                     App.showOk();
+                    location.reload();
                 }else{
                     //TODO:show better message
                     App.showError();

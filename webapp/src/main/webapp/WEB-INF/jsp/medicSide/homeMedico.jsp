@@ -27,6 +27,7 @@
                 <div class="container">
                   <div class="row">
                     <div class="col-4">
+                      <%-- TODO: connect image--%>
                       <img
                         class="w-100"
                         src="https://fonts.gstatic.com/s/i/materialicons/account_circle/v4/24px.svg"
@@ -112,6 +113,7 @@
                   <div class="container">
                     <div class="row">
                       <div class="col-4">
+                          <%-- TODO: connect image--%>
                         <img
                           class="w-100"
                           src="https://fonts.gstatic.com/s/i/materialicons/account_circle/v4/24px.svg"
