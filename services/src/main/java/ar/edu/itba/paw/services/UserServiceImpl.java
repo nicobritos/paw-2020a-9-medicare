@@ -116,6 +116,11 @@ public class UserServiceImpl extends GenericSearchableServiceImpl<UserDao, User,
     }
 
     @Override
+    public Optional<User> findByToken(String token){
+        return this.repository.findByToken(token);
+    }
+
+    @Override
     @Transactional
     public String generateVerificationToken(User user) {
         if (user.getVerified())
@@ -147,18 +152,19 @@ public class UserServiceImpl extends GenericSearchableServiceImpl<UserDao, User,
 
     @Override
     @Transactional
-    public boolean confirm(String token) {
-        Optional<User> userOptional = this.repository.findByToken(token);
-        if (!userOptional.isPresent())
+    public boolean confirm(User user, String token) {
+        if(user.getVerified()){
             return false;
-        userOptional.get().setToken(null);
-        if (userOptional.get().getVerified()) {
-            this.update(userOptional.get());
-            return false;
-        } else {
-            userOptional.get().setVerified(true);
-            this.update(userOptional.get());
+        }
+        if(user.getToken().equals(token)){
+            user.setVerified(true);
+            user.setToken(null);
+            user.setTokenCreatedDate(null);
+            this.update(user);
             return true;
+        }
+        else {
+            return false;
         }
     }
 

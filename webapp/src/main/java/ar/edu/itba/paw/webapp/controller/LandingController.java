@@ -45,4 +45,20 @@ public class LandingController extends GenericController{
         mav.addObject("localities",localitiesList);
         return mav;
     }
+    
+    @RequestMapping("/home")
+    public ModelAndView home(){
+        Optional<User> userOptional = getUser();
+        if(!userOptional.isPresent()) {
+            return new ModelAndView("redirect:/");
+        }
+        if(!userOptional.get().getVerified()){
+            return new ModelAndView("redirect:/verifyEmail");
+        }
+        if(isStaff()) {
+            return new ModelAndView("redirect:staff/home");
+        }  else {
+            return new ModelAndView("redirect:patient/home");
+        }
+    }
 }

@@ -15,6 +15,10 @@
             <h4><spring:message code="UntilVerifiedCantContinue"/></h4>
         </div>
     </div>
-
+    <c:if test="${tokenError}">
+        <p class="mt-4 mb-0 text-danger">
+            <spring:message code="TokenError.loginForm"/>
+        </p>
+    </c:if>
   </body>
 </html>

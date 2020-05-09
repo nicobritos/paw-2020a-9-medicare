@@ -9,7 +9,7 @@ import ar.edu.itba.paw.models.User;
 import ar.edu.itba.paw.webapp.controller.utils.GenericController;
 import ar.edu.itba.paw.webapp.controller.utils.JsonResponse;
 import ar.edu.itba.paw.webapp.events.UserConfirmationTokenGenerationEvent;
-import ar.edu.itba.paw.webapp.exceptions.UnAuthorizedAccess;
+import ar.edu.itba.paw.webapp.exceptions.UnAuthorizedAccessException;
 import ar.edu.itba.paw.webapp.form.RequestAppointmentForm;
 import ar.edu.itba.paw.webapp.form.UserProfileForm;
 import org.joda.time.DateTime;
@@ -51,7 +51,7 @@ public class PatientSideController extends GenericController {
     public ModelAndView patientHome(){
         Optional<User> user = this.getUser();
         if(!user.isPresent()) {
-            return new ModelAndView("authentication/login");
+            return new ModelAndView("redirect:login");
         }
         ModelAndView mav = new ModelAndView();
 
@@ -73,7 +73,7 @@ public class PatientSideController extends GenericController {
     public ModelAndView patientProfile(@ModelAttribute("patientProfileForm") final UserProfileForm form){
         Optional<User> user = getUser();
         if(!user.isPresent()) {
-            return new ModelAndView("authentication/login");
+            return new ModelAndView("redirect:login");
         }
         ModelAndView mav = new ModelAndView();
         mav.addObject("user", user);
@@ -94,7 +94,7 @@ public class PatientSideController extends GenericController {
         return this.formatJsonResponse(() -> {
             Optional<User> user = getUser();
             if(!user.isPresent()) {
-                throw new UnAuthorizedAccess();
+                throw new UnAuthorizedAccessException();
             }
 
             if (!user.get().getVerified()) {
@@ -111,7 +111,7 @@ public class PatientSideController extends GenericController {
     public ModelAndView editMedicUser(@Valid @ModelAttribute("patientProfileForm") final UserProfileForm form, final BindingResult errors, HttpServletRequest request, HttpServletResponse response){
         Optional<User> user = getUser();
         if(!user.isPresent()) {
-            return new ModelAndView("authentication/login");
+            return new ModelAndView("redirect:login");
         }
 
         if (errors.hasErrors() || (!form.getPassword().isEmpty() && form.getPassword().length()<8) || !form.getPassword().equals(form.getRepeatPassword())) {
@@ -253,7 +253,7 @@ public class PatientSideController extends GenericController {
                 new UserConfirmationTokenGenerationEvent(
                         baseUrl.toString(),
                         user,
-                        request.getContextPath() + "/signup/confirm",
+                        request.getContextPath() + "/verifyEmail",
                         request.getLocale()
                 )
         );

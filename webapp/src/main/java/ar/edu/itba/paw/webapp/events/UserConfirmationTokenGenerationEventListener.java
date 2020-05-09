@@ -61,12 +61,12 @@ public class UserConfirmationTokenGenerationEventListener implements Application
         values.put("url", url);
         values.put("baseUrl", baseUrl);
         values.put("year", String.valueOf(DateTime.now().getYear()));
-        values.put("button", this.messageSource.getMessage(MESSAGE_SOURCE_BODY_PREFIX + "." + "button", null, locale));
-        values.put("button_url", this.messageSource.getMessage(MESSAGE_SOURCE_BODY_PREFIX + "." + "button_url", null, locale));
-        values.put("body", this.messageSource.getMessage(MESSAGE_SOURCE_BODY_PREFIX + "." + "body", null, locale));
+        values.put("button", this.messageSource.getMessage(MESSAGE_SOURCE_BODY_PREFIX + ".button", null, locale));
+        values.put("button_url", this.messageSource.getMessage(MESSAGE_SOURCE_BODY_PREFIX + ".button_url", null, locale));
+        values.put("body", this.messageSource.getMessage(MESSAGE_SOURCE_BODY_PREFIX + ".body", null, locale));
         values.put("disclaimer", this.messageSource.getMessage(MESSAGE_SOURCE_DISCLAIMER, null, locale));
-        values.put("title", this.messageSource.getMessage(MESSAGE_SOURCE_BODY_PREFIX + "." + "title", new Object[] {user.getFirstName()}, locale));
-        values.put("subtitle", this.messageSource.getMessage(MESSAGE_SOURCE_BODY_PREFIX + "." + "subtitle", new Object[] {user.getFirstName()}, locale));
+        values.put("title", this.messageSource.getMessage(MESSAGE_SOURCE_BODY_PREFIX + ".title", new Object[] {user.getFirstName()}, locale));
+        values.put("subtitle", this.messageSource.getMessage(MESSAGE_SOURCE_BODY_PREFIX + ".subtitle", new Object[] {user.getFirstName()}, locale));
 
         EmailFormatter emailFormatter = new EmailFormatter();
         String html = emailFormatter.format(emailFormatter.getHTMLFromFilename("signup"));

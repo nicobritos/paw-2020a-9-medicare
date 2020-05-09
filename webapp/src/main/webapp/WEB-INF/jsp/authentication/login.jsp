@@ -8,7 +8,14 @@
 </head>
 <body>
 <div class="container w-100 h-100 d-flex flex-column justify-content-center align-items-center">
-    <c:url value="/login" var="loginUrl"/>
+    <c:choose>
+        <c:when test="${token != null}">
+            <c:url value="/login?token=${token}" var="loginUrl"/>
+        </c:when>
+        <c:otherwise>
+            <c:url value="/login" var="loginUrl"/>
+        </c:otherwise>
+    </c:choose>
     <c:url value="/signup" var="signupUrl"/>
     <form:form modelAttribute="loginForm" class="register-form border p-5 rounded" action="${loginUrl}" method="POST"
                enctype="application/x-www-form-urlencoded">
@@ -55,20 +62,6 @@
             <p class="mt-4 mb-0 text-danger">
                 <spring:message code="InvalidCredentials.loginForm"/>
             </p>
-        </c:if>
-        <c:if test="${not empty tokenError}">
-            <c:choose>
-                <c:when test="${not tokenError}">
-                    <p class="mt-4 mb-0 text-danger">
-                        <spring:message code="TokenError.loginForm"/>
-                    </p>
-                </c:when>
-                <c:otherwise>
-                    <p class="mt-4 mb-0 text-success">
-                        <spring:message code="TokenSuccess.loginForm"/>
-                    </p>
-                </c:otherwise>
-            </c:choose>
         </c:if>
     </form:form>
 </div>

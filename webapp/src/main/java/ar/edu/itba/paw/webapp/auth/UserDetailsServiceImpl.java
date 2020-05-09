@@ -27,7 +27,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
         }
 
         Collection<? extends GrantedAuthority> authorities;
-        if (user.get().getVerified()) {
+        if (!user.get().getVerified()) {
             authorities = Collections.singletonList(new SimpleGrantedAuthority("ROLE_" + UserRole.UNVERIFIED.name()));
         } else {
             if (this.userService.isStaff(user.get())) {

@@ -5,7 +5,7 @@ import ar.edu.itba.paw.models.*;
 import ar.edu.itba.paw.webapp.controller.utils.GenericController;
 import ar.edu.itba.paw.webapp.controller.utils.JsonResponse;
 import ar.edu.itba.paw.webapp.events.UserConfirmationTokenGenerationEvent;
-import ar.edu.itba.paw.webapp.exceptions.UnAuthorizedAccess;
+import ar.edu.itba.paw.webapp.exceptions.UnAuthorizedAccessException;
 import ar.edu.itba.paw.webapp.form.UserProfileForm;
 import ar.edu.itba.paw.webapp.form.WorkdayForm;
 import org.joda.time.DateTime;
@@ -52,7 +52,7 @@ public class MedicSideController extends GenericController {
     public ModelAndView medicHome(@RequestParam(defaultValue = "0") String week,@RequestParam(required = false, name = "today") String newToday){
         Optional<User> user = this.getUser();
         if(!user.isPresent()) {
-            return new ModelAndView("authentication/login");
+            return new ModelAndView("redirect:login");
         }
         ModelAndView mav = new ModelAndView();
 
@@ -112,7 +112,7 @@ public class MedicSideController extends GenericController {
     public ModelAndView medicProfile(@ModelAttribute("medicProfileForm") final UserProfileForm form){
         Optional<User> user = getUser();
         if(!user.isPresent()) {
-            return new ModelAndView("authentication/login");
+            return new ModelAndView("redirect:login");
         }
         ModelAndView mav = new ModelAndView();
         mav.addObject("user", user);
@@ -129,7 +129,7 @@ public class MedicSideController extends GenericController {
     public ModelAndView editMedicUser(@Valid @ModelAttribute("medicProfileForm") final UserProfileForm form, final BindingResult errors, HttpServletRequest request, HttpServletResponse response){
         Optional<User> user = getUser();
         if(!user.isPresent()) {
-            return new ModelAndView("authentication/login");
+            return new ModelAndView("redirect:login");
         }
 
         if (errors.hasErrors() || (!form.getPassword().isEmpty() && form.getPassword().length()<8) || !form.getPassword().equals(form.getRepeatPassword())) {
@@ -168,7 +168,7 @@ public class MedicSideController extends GenericController {
         return this.formatJsonResponse(() -> {
             Optional<User> user = getUser();
             if(!user.isPresent()) {
-                throw new UnAuthorizedAccess();
+                throw new UnAuthorizedAccessException();
             }
 
             if (!user.get().getVerified()) {
@@ -185,7 +185,7 @@ public class MedicSideController extends GenericController {
     public ModelAndView addWorkday(@ModelAttribute("workdayForm") final WorkdayForm form){
         Optional<User> user = getUser();
         if(!user.isPresent()) {
-            return new ModelAndView("authentication/login");
+            return new ModelAndView("redirect:login");
         }
 
         ModelAndView mav = new ModelAndView();
@@ -201,7 +201,7 @@ public class MedicSideController extends GenericController {
     public ModelAndView addWorkdayAction(@Valid @ModelAttribute("workdayForm") final WorkdayForm form, final BindingResult errors, HttpServletRequest request, HttpServletResponse response){
         Optional<User> user = getUser();
         if(!user.isPresent()) {
-            return new ModelAndView("authentication/login");
+            return new ModelAndView("redirect:login");
         }
 
         if (errors.hasErrors()) {
@@ -319,7 +319,7 @@ public class MedicSideController extends GenericController {
                 new UserConfirmationTokenGenerationEvent(
                         baseUrl.toString(),
                         user,
-                        request.getContextPath() + "/signup/confirm",
+                        request.getContextPath() + "/verifyEmail" ,
                         request.getLocale()
                 )
         );

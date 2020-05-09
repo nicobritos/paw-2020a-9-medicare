@@ -6,6 +6,7 @@ import ar.edu.itba.paw.interfaces.services.ProvinceService;
 import ar.edu.itba.paw.interfaces.services.UserService;
 import ar.edu.itba.paw.interfaces.services.exceptions.EmailAlreadyExistsException;
 import ar.edu.itba.paw.models.*;
+import ar.edu.itba.paw.webapp.auth.UserRole;
 import ar.edu.itba.paw.webapp.controller.utils.GenericController;
 import ar.edu.itba.paw.webapp.controller.utils.JsonResponse;
 import ar.edu.itba.paw.webapp.events.UserConfirmationTokenGenerationEvent;
@@ -18,6 +19,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.MediaType;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.AuthorityUtils;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
@@ -26,9 +34,7 @@ import org.springframework.web.servlet.ModelAndView;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
-import java.util.Collection;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Controller
@@ -50,26 +56,26 @@ public class AuthenticationController extends GenericController {
     @Autowired
     private ApplicationEventPublisher eventPublisher;
 
-    @RequestMapping(value = "/signup/staff/provinces/{id}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-    @ResponseBody
-    public JsonResponse getProvinces(@PathVariable String id) {
-        return this.formatJsonResponse(() -> {
-            Country country = new Country();
-            country.setId(id);
-            Collection<Province> provinces = this.provinceService.findByCountry(country);
-            return this.provinceTransformer.transform(provinces);
-        });
+    @RequestMapping(value = "/login", method = RequestMethod.GET)
+    public ModelAndView loginIndex(@ModelAttribute("loginForm") final UserLoginForm form, @RequestParam(value = "token", required = false) String token) {
+        ModelAndView mav = new ModelAndView();
+        mav.addObject("token", token);
+        mav.setViewName("authentication/login");
+        return mav;
     }
 
-    @RequestMapping(value = "/signup/staff/localities/{id}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-    @ResponseBody
-    public JsonResponse getLocalities(@PathVariable Integer id) {
-        return this.formatJsonResponse(() -> {
-            Province province = new Province();
-            province.setId(id);
-            Collection<Locality> localities = this.localityService.findByProvince(province);
-            return this.localityTransformer.transform(localities);
-        });
+    @RequestMapping(value = "/signup", method = RequestMethod.GET)
+    public ModelAndView signupIndex() {
+        return new ModelAndView("authentication/signup");
+    }
+
+    // Sign up del medico
+    @RequestMapping(value = "/signup/staff", method = RequestMethod.GET)
+    public ModelAndView signupStaffIndex(@ModelAttribute("signupForm") final StaffSignUpForm form) {
+        Map<String, String> countryMap = this.countryService.list().stream().collect(Collectors.toMap(Country::getId, Country::getName));
+        ModelAndView modelAndView = new ModelAndView("authentication/signupStaff");
+        modelAndView.addObject("countryMap", countryMap);
+        return modelAndView;
     }
 
     @RequestMapping(value = "/signup/staff", method = RequestMethod.POST)
@@ -96,22 +102,21 @@ public class AuthenticationController extends GenericController {
         office.setStreet(form.getAddress());
         try {
             newUser = this.userService.createAsStaff(newUser, office);
-            StringBuilder baseUrl = new StringBuilder(request.getRequestURL());
-            baseUrl.replace(request.getRequestURL().lastIndexOf(request.getRequestURI()), request.getRequestURL().length(), "");
-            this.eventPublisher.publishEvent(
-                    new UserConfirmationTokenGenerationEvent(
-                            baseUrl.toString(),
-                            newUser,
-                            request.getContextPath() + "/signup/confirm",
-                            request.getLocale()
-                    )
-            );
         } catch (EmailAlreadyExistsException e) {
             errors.reject("EmailAlreadyTaken.signupForm.email", null, "Error");
             return this.signupStaffIndex(form);
         }
+        StringBuilder baseUrl = new StringBuilder(request.getRequestURL());
+        baseUrl.replace(request.getRequestURL().lastIndexOf(request.getRequestURI()), request.getRequestURL().length(), "");
+        this.eventPublisher.publishEvent(new UserConfirmationTokenGenerationEvent(baseUrl.toString(), newUser, request.getContextPath() + "/verifyEmail", request.getLocale()));
+        authenticateSignedUpUser(form.getAsUser(), form.getPassword(), request);
+        return new ModelAndView("redirect:/verifyEmail");
+    }
 
-        return new ModelAndView("redirect:/staff/home");
+    // Sign up del paciente
+    @RequestMapping(value = "/signup/patient", method = RequestMethod.GET)
+    public ModelAndView signupPatientIndex(@ModelAttribute("signupForm") final PatientSignUpForm form) {
+        return new ModelAndView("authentication/signupPatient");
     }
 
     @RequestMapping(value = "/signup/patient", method = RequestMethod.POST)
@@ -127,54 +132,103 @@ public class AuthenticationController extends GenericController {
         User newUser;
         try {
             newUser = this.userService.create(form.getAsUser());
-            StringBuilder baseUrl = new StringBuilder(request.getRequestURL());
-            baseUrl.replace(request.getRequestURL().lastIndexOf(request.getRequestURI()), request.getRequestURL().length(), "");
-            this.eventPublisher.publishEvent(new UserConfirmationTokenGenerationEvent(baseUrl.toString(), newUser, request.getContextPath() + "/signup/confirm", request.getLocale()));
         } catch (EmailAlreadyExistsException e) {
             errors.reject("EmailAlreadyTaken.signupForm.email", null, "Error");
             return this.signupPatientIndex(form);
         }
+        StringBuilder baseUrl = new StringBuilder(request.getRequestURL());
+        baseUrl.replace(request.getRequestURL().lastIndexOf(request.getRequestURI()), request.getRequestURL().length(), "");
+        this.eventPublisher.publishEvent(new UserConfirmationTokenGenerationEvent(baseUrl.toString(), newUser, request.getContextPath() + "/verifyEmail", request.getLocale()));
+        authenticateSignedUpUser(form.getAsUser(), form.getPassword(), request);
 
-        return new ModelAndView("redirect:/patient/home");
+
+        return new ModelAndView("redirect:/verifyEmail");
     }
 
-    @RequestMapping(value = "/login", method = RequestMethod.GET)
-    public ModelAndView loginIndex(@ModelAttribute("loginForm") final UserLoginForm form) {
-        return this.getLoginModelAndView();
+    // Página en la que paran las cuentas sin verificacion del mail
+    @RequestMapping(value = "/verifyEmail", method = RequestMethod.GET)
+    public ModelAndView verifyEmail(@RequestParam(value = "token", required = false) String token) {
+        ModelAndView mav = new ModelAndView();
+        Optional<User> userOptional = getUser();
+        if(!userOptional.isPresent()){
+            mav.setViewName("redirect:/login?token=" + token);
+            return mav;
+        }
+        boolean tokenError;
+        if(token == null){
+            tokenError = false;
+        } else if (!this.userService.confirm(userOptional.get(), token)) {
+            tokenError = true;
+        } else {
+            updateRole(userOptional.get());
+            mav.addObject("user", userOptional);
+            mav.setViewName("redirect:/home");
+            return mav;
+        }
+        mav.addObject("user", getUser());
+        mav.addObject("tokenError", tokenError);
+        mav.setViewName("unverified");
+        return mav;
     }
 
-    @RequestMapping(value = "/signup/staff", method = RequestMethod.GET)
-    public ModelAndView signupStaffIndex(@ModelAttribute("signupForm") final StaffSignUpForm form) {
-        Map<String, String> countryMap = this.countryService.list().stream().collect(Collectors.toMap(Country::getId, Country::getName));
-        ModelAndView modelAndView = new ModelAndView("authentication/signupStaff");
-        modelAndView.addObject("countryMap", countryMap);
-        return modelAndView;
+
+    // FUNCIONES AUXILIARES DEL SIGNUP DEL MEDICO
+    @RequestMapping(value = "/signup/staff/provinces/{id}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseBody
+    public JsonResponse getProvinces(@PathVariable String id) {
+        return this.formatJsonResponse(() -> {
+            Country country = new Country();
+            country.setId(id);
+            Collection<Province> provinces = this.provinceService.findByCountry(country);
+            return this.provinceTransformer.transform(provinces);
+        });
     }
 
-    @RequestMapping(value = "/signup/patient", method = RequestMethod.GET)
-    public ModelAndView signupPatientIndex(@ModelAttribute("signupForm") final PatientSignUpForm form) {
-        return new ModelAndView("authentication/signupPatient");
+    @RequestMapping(value = "/signup/staff/localities/{id}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseBody
+    public JsonResponse getLocalities(@PathVariable Integer id) {
+        return this.formatJsonResponse(() -> {
+            Province province = new Province();
+            province.setId(id);
+            Collection<Locality> localities = this.localityService.findByProvince(province);
+            return this.localityTransformer.transform(localities);
+        });
     }
 
-    @RequestMapping(value = "/signup", method = RequestMethod.GET)
-    public ModelAndView signupIndex() {
-        return new ModelAndView("authentication/signup");
+
+    // Funcion que autentifica al usuario
+    private void authenticateSignedUpUser(User user, String password, HttpServletRequest request) {
+        try {
+            String username = user.getEmail();
+            UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(username, password, AuthorityUtils.commaSeparatedStringToAuthorityList(getRoles(user)));
+            // generate session if one doesn't exist
+            request.getSession();
+            Authentication authenticatedUser;
+            authenticatedUser = this.authenticationManager.authenticate(token);
+            SecurityContextHolder.getContext().setAuthentication(authenticatedUser);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
-    @RequestMapping(value = "/signup/confirm", method = RequestMethod.GET)
-    public ModelAndView confirm(@RequestParam(value = "token", required = false) String token) {
-        ModelAndView modelAndView = this.getLoginModelAndView();
+    /** Devuelve una lista de roles en formato de csv con delimitador ',' **/
+    private String getRoles(User user){
+        String prefix = "ROLE_";
+        if(!user.getVerified()){
+            return prefix + UserRole.UNVERIFIED;
+        }
+        if(userService.isStaff(user)){
+            return prefix + UserRole.STAFF;
+        } else {
+            return prefix + UserRole.PATIENT;
+        }
 
-        boolean verified = false;
-        if (token != null && this.userService.confirm(token))
-            verified = true;
-
-        modelAndView.addObject("tokenError", verified);
-        modelAndView.addObject("loginForm", new UserLoginForm());
-        return modelAndView;
     }
 
-    private ModelAndView getLoginModelAndView() {
-        return new ModelAndView("authentication/login");
+    private void updateRole(User user){
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        List<GrantedAuthority> updatedAuthorities = AuthorityUtils.commaSeparatedStringToAuthorityList(getRoles(user));
+        Authentication newAuth = new UsernamePasswordAuthenticationToken(auth.getPrincipal(), auth.getCredentials(), updatedAuthorities);
+        SecurityContextHolder.getContext().setAuthentication(newAuth);
     }
 }

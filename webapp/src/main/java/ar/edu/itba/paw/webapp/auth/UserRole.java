@@ -1,6 +1,7 @@
 package ar.edu.itba.paw.webapp.auth;
 
 public enum UserRole {
+    ANONYMOUS,
     UNVERIFIED,
     PATIENT,
     STAFF;
