@@ -48,6 +48,16 @@ public class UserDaoImpl extends GenericSearchableDaoImpl<User, Integer> impleme
     }
 
     @Override
+    public boolean existsToken(String token) {
+        return !this.findByField("token", token).isEmpty();
+    }
+
+    @Override
+    public Optional<User> findByToken(String token) {
+        return this.findByField("token", token).stream().findFirst();
+    }
+
+    @Override
     protected ResultSetExtractor<List<User>> getResultSetExtractor() {
         return resultSet -> {
             Map<Integer, User> entityMap = new HashMap<>();

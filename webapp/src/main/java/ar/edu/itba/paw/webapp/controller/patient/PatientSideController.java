@@ -1,17 +1,18 @@
 package ar.edu.itba.paw.webapp.controller.patient;
 
-import ar.edu.itba.paw.interfaces.MediCareException;
 import ar.edu.itba.paw.interfaces.services.*;
 import ar.edu.itba.paw.interfaces.services.exceptions.InvalidAppointmentDateException;
 import ar.edu.itba.paw.interfaces.services.exceptions.InvalidMinutesException;
 import ar.edu.itba.paw.models.*;
 import ar.edu.itba.paw.webapp.controller.utils.GenericController;
 import ar.edu.itba.paw.webapp.controller.utils.JsonResponse;
+import ar.edu.itba.paw.webapp.events.UserConfirmationTokenGenerationEvent;
+import ar.edu.itba.paw.webapp.exceptions.UnAuthorizedAccessException;
 import ar.edu.itba.paw.webapp.form.RequestAppointmentForm;
 import ar.edu.itba.paw.webapp.form.UserProfileForm;
-import com.sun.org.apache.xpath.internal.operations.Mod;
 import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -23,39 +24,32 @@ import org.springframework.web.servlet.ModelAndView;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 
 @Controller
 public class PatientSideController extends GenericController {
-
     @Autowired
     AppointmentService appointmentService;
-
     @Autowired
     StaffSpecialtyService staffSpecialtyService;
-
     @Autowired
     LocalityService localityService;
-
     @Autowired
     UserService userService;
-
     @Autowired
     private StaffService staffService;
-
     @Autowired
     private PatientService patientService;
+    @Autowired
+    private ApplicationEventPublisher eventPublisher;
 
 
     @RequestMapping("/patient/home")
     public ModelAndView patientHome(){
         Optional<User> user = this.getUser();
         if(!user.isPresent()) {
-            return new ModelAndView("authentication/login");
+            return new ModelAndView("redirect:login");
         }
         ModelAndView mav = new ModelAndView();
 
@@ -77,7 +71,7 @@ public class PatientSideController extends GenericController {
     public ModelAndView patientProfile(@ModelAttribute("patientProfileForm") final UserProfileForm form){
         Optional<User> user = getUser();
         if(!user.isPresent()) {
-            return new ModelAndView("authentication/login");
+            return new ModelAndView("redirect:login");
         }
         ModelAndView mav = new ModelAndView();
         mav.addObject("user", user);
@@ -87,15 +81,35 @@ public class PatientSideController extends GenericController {
             mav.addObject("patients", patientService.findByUser(user.get()));
         }
 
+        mav.addObject("verified", user.get().getVerified());
         mav.setViewName("patientSide/patientProfile");
         return mav;
+    }
+
+    @RequestMapping(value = "/patient/profile/confirm", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseBody
+    public JsonResponse reverify(HttpServletRequest request, HttpServletResponse response) {
+        return this.formatJsonResponse(() -> {
+            Optional<User> user = getUser();
+            if(!user.isPresent()) {
+                throw new UnAuthorizedAccessException();
+            }
+
+            if (!user.get().getVerified()) {
+                // Prevents jammering
+                if (user.get().getTokenCreatedDate() == null || DateTime.now().isAfter(user.get().getTokenCreatedDate().plusMinutes(1)))
+                    this.createConfirmationEvent(request, user.get());
+                return true;
+            }
+            return false;
+        });
     }
 
     @RequestMapping(value="/patient/profile", method = RequestMethod.POST)
     public ModelAndView editMedicUser(@Valid @ModelAttribute("patientProfileForm") final UserProfileForm form, final BindingResult errors, HttpServletRequest request, HttpServletResponse response){
         Optional<User> user = getUser();
         if(!user.isPresent()) {
-            return new ModelAndView("authentication/login");
+            return new ModelAndView("redirect:login");
         }
 
         if (errors.hasErrors() || (!form.getPassword().isEmpty() && form.getPassword().length()<8) || !form.getPassword().equals(form.getRepeatPassword())) {
@@ -238,5 +252,18 @@ public class PatientSideController extends GenericController {
 //        this.appointmentService.setStatus(appointment.get(), AppointmentStatus.CANCELLED);
         //return success
         return new ResponseEntity(HttpStatus.NO_CONTENT);
+    }
+
+    private void createConfirmationEvent(HttpServletRequest request, User user) {
+        StringBuilder baseUrl = new StringBuilder(request.getRequestURL());
+        baseUrl.replace(request.getRequestURL().lastIndexOf(request.getRequestURI()), request.getRequestURL().length(), "");
+        this.eventPublisher.publishEvent(
+                new UserConfirmationTokenGenerationEvent(
+                        baseUrl.toString(),
+                        user,
+                        request.getContextPath() + "/verifyEmail",
+                        request.getLocale()
+                )
+        );
     }
 }

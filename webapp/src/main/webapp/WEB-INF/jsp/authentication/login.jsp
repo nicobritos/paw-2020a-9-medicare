@@ -8,7 +8,14 @@
 </head>
 <body>
 <div class="container w-100 h-100 d-flex flex-column justify-content-center align-items-center">
-    <c:url value="/login" var="loginUrl"/>
+    <c:choose>
+        <c:when test="${token != null}">
+            <c:url value="/login?token=${token}" var="loginUrl"/>
+        </c:when>
+        <c:otherwise>
+            <c:url value="/login" var="loginUrl"/>
+        </c:otherwise>
+    </c:choose>
     <c:url value="/signup" var="signupUrl"/>
     <form:form modelAttribute="loginForm" class="register-form border p-5 rounded" action="${loginUrl}" method="POST"
                enctype="application/x-www-form-urlencoded">

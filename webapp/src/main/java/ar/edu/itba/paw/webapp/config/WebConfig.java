@@ -10,6 +10,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.support.ReloadableResourceBundleMessageSource;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.jdbc.datasource.SimpleDriverDataSource;
+import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 import org.springframework.web.servlet.ViewResolver;
@@ -25,10 +26,12 @@ import java.nio.charset.StandardCharsets;
         "ar.edu.itba.paw.webapp.controller",
         "ar.edu.itba.paw.services",
         "ar.edu.itba.paw.persistence",
-        "ar.edu.itba.paw.webapp.transformer"
+        "ar.edu.itba.paw.webapp.transformer",
+        "ar.edu.itba.paw.webapp.events"
 })
 @Configuration
 @EnableTransactionManagement
+@EnableAsync
 public class WebConfig {
     protected static final String DB_URL = "jdbc:postgresql://10.16.1.110:5432/paw-2020a-9?useUnicode=true&amp;characterEncoding=utf8";
     protected static final String DB_USER = "paw-2020a-9";
@@ -37,7 +40,7 @@ public class WebConfig {
     @Bean
     public MessageSource messageSource() {
         ReloadableResourceBundleMessageSource messageSource = new ReloadableResourceBundleMessageSource();
-        messageSource.setBasename("classpath:i18n/message ");
+        messageSource.setBasename("classpath:i18n/message");
         messageSource.setDefaultEncoding(StandardCharsets.UTF_8.displayName());
         messageSource.setCacheSeconds(5);
         return messageSource;
@@ -50,6 +53,7 @@ public class WebConfig {
         viewResolver.setViewClass(JstlView.class);
         viewResolver.setPrefix("/WEB-INF/jsp/");
         viewResolver.setSuffix(".jsp");
+        viewResolver.setContentType("text/html; charset=UTF-8");
 
         return viewResolver;
     }

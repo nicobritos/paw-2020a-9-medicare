@@ -60,6 +60,7 @@ public abstract class UserSignUpForm {
         user.setPassword(this.password);
         user.setFirstName(this.firstName);
         user.setSurname(this.surname);
+        user.setVerified(false);
         return user;
     }
 

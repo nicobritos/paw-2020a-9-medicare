@@ -11,6 +11,8 @@ import java.util.Optional;
 public interface UserService extends GenericSearchableService<User, Integer> {
     Optional<User> findByUsername(String username);
 
+    Optional<User> findByToken(String token);
+
     boolean isStaff(User user);
 
     User createAsStaff(User user, Office office) throws EmailAlreadyExistsException;
@@ -20,4 +22,8 @@ public interface UserService extends GenericSearchableService<User, Integer> {
     void update(User user) throws EmailAlreadyExistsException;
 
     Patient createNewPatient(Patient patient);
+
+    String generateVerificationToken(User user);
+
+    boolean confirm(User user, String token);
 }

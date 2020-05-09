@@ -10,9 +10,13 @@
     <%@ include file="../navbar/navbarLogged.jsp" %>
     <div class="container flex-fill mx-5 pl-5 mt-3 w-100">
         <div class="row">
-            <div class="col-4 align-items-start d-flex flex-column">
+            <div class="col-4 align-items-center d-flex flex-column">
                 <!-- TODO connect imagen -->
                 <img id="profilePic" src="https://fonts.gstatic.com/s/i/materialicons/account_circle/v4/24px.svg" alt="">
+                <c:if test="${not verified}">
+                    <p class="mb-2 text-danger"><spring:message code="UserNotVerified"/></p>
+                    <button id="confirm-account-button" class="btn btn-info"><spring:message code="ConfirmAccount"/></button>
+                </c:if>
                 <!-- TODO connect-->
                 <%--            <a href="">Cambiar foto de perfil</a>--%>
                 <!-- TODO Connect-->
@@ -25,7 +29,7 @@
                         <div class="row">
                             <div class="col p-0 m-0">
                                 <!-- TODO Connect image function-->
-                                <h3><spring:message code="Name"/> <label for="firstName" class="toggle-readonly"><img type="button" src='<c:url value="/img/editPencil.svg"/>' alt="editar"/></label></h3>
+                                <h3><spring:message code="Name"/> <label for="firstName" class="toggle-readonly"><img type="button" src="<c:url value="/img/editPencil.svg"/>" alt="editar"/></label></h3>
                                 <form:input class="form-control mb-3 w-75" id="firstName" name="firstName" value="${user.get().firstName}" path="firstName" readonly="true"/>
                             </div>
                             <div class="col p-0 m-0">

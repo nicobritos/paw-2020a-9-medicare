@@ -2,6 +2,7 @@ package ar.edu.itba.paw.models;
 
 import ar.edu.itba.paw.persistenceAnnotations.Column;
 import ar.edu.itba.paw.persistenceAnnotations.Table;
+import org.joda.time.DateTime;
 
 @Table(name = "users", primaryKey = "users_id")
 public class User extends GenericModel<Integer> {
@@ -13,6 +14,12 @@ public class User extends GenericModel<Integer> {
     private String firstName;
     @Column(name = "surname", required = true)
     private String surname;
+    @Column(name = "verified")
+    private Boolean verified = false;
+    @Column(name = "token")
+    private String token;
+    @Column(name = "token_created_date")
+    private DateTime tokenCreatedDate;
 
     public String getEmail() {
         return this.email;
@@ -44,6 +51,34 @@ public class User extends GenericModel<Integer> {
 
     public void setSurname(String surname) {
         this.surname = surname;
+    }
+
+    public Boolean getVerified() {
+        return this.verified;
+    }
+
+    public void setVerified(Boolean verified) {
+        this.verified = verified;
+    }
+
+    public String getToken() {
+        return this.token;
+    }
+
+    public void setToken(String token) {
+        this.token = token;
+    }
+
+    public String getDisplayName() {
+        return this.firstName + " " + this.surname;
+    }
+
+    public DateTime getTokenCreatedDate() {
+        return this.tokenCreatedDate;
+    }
+
+    public void setTokenCreatedDate(DateTime tokenCreatedDate) {
+        this.tokenCreatedDate = tokenCreatedDate;
     }
 
     @Override

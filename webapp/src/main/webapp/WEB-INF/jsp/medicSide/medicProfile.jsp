@@ -16,6 +16,10 @@
             <img id="profilePic" src="https://fonts.gstatic.com/s/i/materialicons/account_circle/v4/24px.svg" alt="">
             <!-- TODO connect-->
 <%--            <a href="">Cambiar foto de perfil</a>--%>
+            <c:if test="${not verified}">
+              <p class="mt-4 mb-0 text-danger"><spring:message code="UserNotVerified"/></p>
+              <button onclick="App.post(<c:url value="/staff/profile/confirm"/>)" class="btn btn-info"><spring:message code="ConfirmAccount"/></button>
+            </c:if>
             <!-- TODO Connect-->
             <%--<a class="mt-3" href=""><spring:message code="ChangePassword"/></a>--%>
           </div>
@@ -25,7 +29,7 @@
               <form:form modelAttribute="medicProfileForm" action="${staffProfileUrl}" method="post">
               <div class="row">
                 <div class="col p-0 m-0">
-                    <h3><spring:message code="Name"/> <label for="firstName" class="toggle-readonly"><img type="button" src='<c:url value="/img/editPencil.svg"/>' alt="editar"/></label></h3>
+                    <h3><spring:message code="Name"/> <label for="firstName" class="toggle-readonly"><img type="button" src="<c:url value="/img/editPencil.svg"/>' alt="editar"/></label></h3>
                   <form:input class="form-control mb-3 w-75" id="firstName" name="firstName" value="${user.get().firstName}" path="firstName" readonly="true"/>
                 </div>
                 <div class="col p-0 m-0">
