@@ -156,7 +156,7 @@ public class UserServiceImpl extends GenericSearchableServiceImpl<UserDao, User,
         if(user.getVerified()){
             return false;
         }
-        if(user.getToken().equals(token)){
+        if(user.getToken() != null && user.getToken().equals(token)){
             user.setVerified(true);
             user.setToken(null);
             user.setTokenCreatedDate(null);
