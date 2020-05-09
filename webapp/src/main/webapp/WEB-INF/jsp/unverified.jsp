@@ -16,9 +16,9 @@
         </div>
     </div>
     <c:if test="${tokenError}">
-        <p class="mt-4 mb-0 text-danger">
+        <div class="alert alert-danger medicare-alert-error">
             <spring:message code="TokenError.loginForm"/>
-        </p>
+        </div>
     </c:if>
   </body>
 </html>

@@ -67,7 +67,17 @@ html,body{
     cursor: pointer;
 }
 
+.white-text{
+    color: white!important;
+}
+
 .styled-container{
     background-color: rgba(150, 149, 149, 0.404);
     border-radius: 1em;
+}
+
+.medicare-alert-error{
+    position: fixed;
+    top: 5em;
+    right: .5em;
 }
