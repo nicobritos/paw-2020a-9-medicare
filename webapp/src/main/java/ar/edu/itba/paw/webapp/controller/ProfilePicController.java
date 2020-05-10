@@ -67,27 +67,18 @@ public class ProfilePicController extends GenericController {
     }
 
 
-    //receives UserId returns profile pic
+    //receives pictureId returns profile pic
     @RequestMapping(value = "/{id}",method = RequestMethod.GET)
     public ResponseEntity<byte[]> getProfilePic(@PathVariable("id") Integer id){
-        //get user
-        Optional<User> user  = this.userService.findById(id);
-        if(!user.isPresent()){
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
-        //get user picture
+        Optional<Picture> optPic = this.pictureService.findById(id);
         ResponseEntity<byte[]> res;
         HttpHeaders headers = new HttpHeaders();
-        //if there is a pic return the
-        byte[] pic;
-        if (user.get().getProfileId() != null) {
-            Optional<Picture> picture = this.pictureService.findById(user.get().getProfileId());
-            pic = picture.map(Picture::getData).orElse(null);
-        } else {
-            pic = null;
+        byte[] pic=null;
+        if (optPic.isPresent()) {
+            pic = optPic.get().getData();
         }
-
-        if (pic != null) {
+        if(pic !=null){
+            headers.add("content-type",optPic.get().getMimeType());
             res = new ResponseEntity<>(pic, headers, HttpStatus.OK);
         }
         //else return a common pic
@@ -103,7 +94,7 @@ public class ProfilePicController extends GenericController {
         return res;
     }
 
-    //receives UserId returns profile pic
+    //returns default image
     @RequestMapping(value = "/",method = RequestMethod.GET)
     public ResponseEntity<byte[]> getProfilePic(){
         ResponseEntity<byte[]> res;

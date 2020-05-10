@@ -55,7 +55,7 @@
                                             <%--TODO check image--%>
                                         <img
                                                 class="w-75 rounded-circle"
-                                                src="<c:url value="/profilePics/${member.user.id}"/>"
+                                                src="<c:url value="/profilePics/${member.user.profileId}"/>"
                                                 alt=""
                                         />
                                     </div>

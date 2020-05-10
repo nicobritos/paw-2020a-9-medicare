@@ -14,7 +14,7 @@
             <div class="row mt-4">
                 <div class="col-4">
                     <%-- TODO:check image--%>
-                    <img class="w-100 rounded-circle" src="<c:url value="/profilePics/${staff.user.id}"/>"
+                    <img class="w-100 rounded-circle" src="<c:url value="/profilePics/${staff.user.profileId}"/>"
                          alt="">
                 </div>
                 <div class="col mr-3">

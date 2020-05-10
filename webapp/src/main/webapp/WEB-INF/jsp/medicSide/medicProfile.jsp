@@ -14,11 +14,11 @@
         <div class="col-4 align-items-start d-flex flex-column">
             <!-- TODO check imagen -->
             <div class="picture-container no-select">
-                <img id="profilePic" class="rounded-circle" src="<c:url value="/profilePics/${user.get().id}"/>"
+                <img id="profilePic" class="rounded-circle" src="<c:url value="/profilePics/${user.get().profileId}"/>"
                      alt="">
                 <div class="picture-overlay d-flex flex-column align-items-center justify-content-end pb-3">
                     <input id="profile-picture-input" style="display: none;" type="file"
-                           accept="image/jpeg">
+                           accept="image/*">
                     <i class="fas fa-pencil-alt"></i>
                 </div>
             </div>

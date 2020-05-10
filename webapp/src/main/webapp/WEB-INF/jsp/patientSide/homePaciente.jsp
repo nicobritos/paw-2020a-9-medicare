@@ -24,7 +24,7 @@
                       <%--TODO:check image--%>
                       <img
                         class="w-100 rounded-circle"
-                          src="<c:url value="/profilePics/${appointment.staff.user.id}"/>"
+                          src="<c:url value="/profilePics/${appointment.staff.user.profileId}"/>"
                         alt=""
                       />
                     </div>

@@ -30,7 +30,7 @@
                       <%-- TODO: check image--%>
                       <img
                         class="w-100 rounded-circle"
-                        src="<c:url value="/profilePics/${appointment.patient.userId}"/>"
+                        src="<c:url value="/profilePics/${appointment.patient.user.profileId}"/>"
                         alt=""
                       />
                     </div>
@@ -116,7 +116,7 @@
                           <%-- TODO: check image--%>
                         <img
                           class="w-100 rounded-circle"
-                          src="<c:url value="/profilePics/${appointment.patient.userId}"/>"
+                          src="<c:url value="/profilePics/${appointment.patient.user.profileId}"/>"
                           alt=""
                         />
                       </div>
