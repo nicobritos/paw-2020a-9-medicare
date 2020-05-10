@@ -10,15 +10,15 @@
     <%@ include file="../navbar/navbarLogged.jsp" %>
     <div class="container flex-fill mx-5 pl-5 mt-3 w-100">
         <div class="row">
-            <div class="col-4 align-items-center d-flex flex-column">
-                <!-- TODO connect imagen -->
-                <img id="profilePic" src="https://fonts.gstatic.com/s/i/materialicons/account_circle/v4/24px.svg" alt="">
-                <c:if test="${not verified}">
-                    <p class="mb-2 text-danger"><spring:message code="UserNotVerified"/></p>
-                    <button id="confirm-account-button" class="btn btn-info"><spring:message code="ConfirmAccount"/></button>
-                </c:if>
-                <!-- TODO connect-->
-                <%--            <a href="">Cambiar foto de perfil</a>--%>
+            <div class="col-4 align-items-start d-flex flex-column">
+                <!-- TODO check imagen -->
+                <div class="picture-container no-select">
+                    <img id="profilePic" class="rounded-circle" src="<c:url value="/profilePics/${user.get().profileId}"/> " alt="">
+                    <div class="picture-overlay d-flex flex-column align-items-center justify-content-end pb-3">
+                        <input id="profile-picture-input" style="display: none;" type="file" accept="image/*">
+                        <i class="fas fa-pencil-alt"></i>
+                    </div>
+                </div>
                 <!-- TODO Connect-->
 <%--                <a class="mt-3" href=""><spring:message code="ChangePassword"/></a>--%>
             </div>

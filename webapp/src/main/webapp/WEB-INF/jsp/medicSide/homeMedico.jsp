@@ -27,9 +27,10 @@
                 <div class="container">
                   <div class="row">
                     <div class="col-4">
+                      <%-- TODO: check image--%>
                       <img
-                        class="w-100"
-                        src="https://fonts.gstatic.com/s/i/materialicons/account_circle/v4/24px.svg"
+                        class="w-100 rounded-circle"
+                        src="<c:url value="/profilePics/${appointment.patient.user.profileId}"/>"
                         alt=""
                       />
                     </div>
@@ -112,9 +113,10 @@
                   <div class="container">
                     <div class="row">
                       <div class="col-4">
+                          <%-- TODO: check image--%>
                         <img
-                          class="w-100"
-                          src="https://fonts.gstatic.com/s/i/materialicons/account_circle/v4/24px.svg"
+                          class="w-100 rounded-circle"
+                          src="<c:url value="/profilePics/${appointment.patient.user.profileId}"/>"
                           alt=""
                         />
                       </div>

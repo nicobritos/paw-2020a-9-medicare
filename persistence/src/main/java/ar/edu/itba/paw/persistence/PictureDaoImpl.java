@@ -1,8 +1,8 @@
 package ar.edu.itba.paw.persistence;
 
-import ar.edu.itba.paw.interfaces.daos.StaffSpecialtyDao;
-import ar.edu.itba.paw.models.StaffSpecialty;
-import ar.edu.itba.paw.persistence.generics.GenericSearchableDaoImpl;
+import ar.edu.itba.paw.interfaces.daos.PictureDao;
+import ar.edu.itba.paw.models.Picture;
+import ar.edu.itba.paw.persistence.generics.GenericDaoImpl;
 import ar.edu.itba.paw.persistence.utils.JDBCArgumentValue;
 import ar.edu.itba.paw.persistence.utils.RowMapperAlias;
 import ar.edu.itba.paw.persistence.utils.builder.JDBCSelectQueryBuilder;
@@ -18,30 +18,30 @@ import java.util.List;
 import java.util.Map;
 
 @Repository
-public class StaffSpecialtyDaoImpl extends GenericSearchableDaoImpl<StaffSpecialty, Integer> implements StaffSpecialtyDao {
-    public static final RowMapperAlias<StaffSpecialty> ROW_MAPPER = (prefix, resultSet) -> {
-        StaffSpecialty staffSpecialty = new StaffSpecialty();
+public class PictureDaoImpl extends GenericDaoImpl<Picture, Integer> implements PictureDao {
+    public static final RowMapperAlias<Picture> ROW_MAPPER = (prefix, resultSet) -> {
+        Picture picture = new Picture();
         try {
-            staffSpecialty.setId(resultSet.getInt(formatColumnFromName(StaffSpecialtyDaoImpl.PRIMARY_KEY_NAME, prefix)));
+            picture.setId(resultSet.getInt(formatColumnFromName(PictureDaoImpl.PRIMARY_KEY_NAME, prefix)));
         } catch (SQLException e) {
-            staffSpecialty.setId(resultSet.getInt(StaffSpecialtyDaoImpl.PRIMARY_KEY_NAME));
+            picture.setId(resultSet.getInt(PictureDaoImpl.PRIMARY_KEY_NAME));
         }
-        populateEntity(staffSpecialty, resultSet, prefix);
-        return staffSpecialty;
+        populateEntity(picture, resultSet, prefix);
+        return picture;
     };
-    public static final String TABLE_NAME = getTableNameFromModel(StaffSpecialty.class);
-    public static final String PRIMARY_KEY_NAME = getPrimaryKeyNameFromModel(StaffSpecialty.class);
+    public static final String TABLE_NAME = getTableNameFromModel(Picture.class);
+    public static final String PRIMARY_KEY_NAME = getPrimaryKeyNameFromModel(Picture.class);
 
     @Autowired
-    public StaffSpecialtyDaoImpl(DataSource dataSource) {
-        super(dataSource, StaffSpecialty.class);
+    public PictureDaoImpl(DataSource dataSource) {
+        super(dataSource, Picture.class);
     }
 
     @Override
-    protected ResultSetExtractor<List<StaffSpecialty>> getResultSetExtractor() {
+    protected ResultSetExtractor<List<Picture>> getResultSetExtractor() {
         return resultSet -> {
-            Map<Integer, StaffSpecialty> entityMap = new HashMap<>();
-            List<StaffSpecialty> sortedEntities = new LinkedList<>();
+            Map<Integer, Picture> entityMap = new HashMap<>();
+            List<Picture> sortedEntities = new LinkedList<>();
             while (resultSet.next()) {
                 int id;
                 try {
@@ -53,7 +53,7 @@ public class StaffSpecialtyDaoImpl extends GenericSearchableDaoImpl<StaffSpecial
                     continue;
                 entityMap.computeIfAbsent(id, string -> {
                     try {
-                        StaffSpecialty newEntity = ROW_MAPPER.mapRow(this.getTableAlias(), resultSet);
+                        Picture newEntity = ROW_MAPPER.mapRow(this.getTableAlias(), resultSet);
                         sortedEntities.add(newEntity);
                         return newEntity;
                     } catch (SQLException e) {
@@ -67,10 +67,11 @@ public class StaffSpecialtyDaoImpl extends GenericSearchableDaoImpl<StaffSpecial
 
     @Override
     protected void populateJoins(JDBCSelectQueryBuilder selectQueryBuilder) {
+
     }
 
     @Override
-    protected Map<String, JDBCArgumentValue> getModelRelationsArgumentValue(StaffSpecialty model, String prefix) {
+    protected Map<String, JDBCArgumentValue> getModelRelationsArgumentValue(Picture model, String prefix) {
         return null;
     }
 }

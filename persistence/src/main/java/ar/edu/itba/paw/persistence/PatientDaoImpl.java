@@ -36,7 +36,7 @@ public class PatientDaoImpl extends GenericSearchableDaoImpl<Patient, Integer> i
 
     @Autowired
     public PatientDaoImpl(DataSource dataSource) {
-        super(dataSource, Patient.class, Integer.class);
+        super(dataSource, Patient.class);
     }
 
     @Override

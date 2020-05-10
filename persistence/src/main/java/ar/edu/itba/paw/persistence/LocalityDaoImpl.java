@@ -42,7 +42,7 @@ public class LocalityDaoImpl extends GenericSearchableDaoImpl<Locality, Integer>
 
     @Autowired
     public LocalityDaoImpl(DataSource dataSource) {
-        super(dataSource, Locality.class, Integer.class);
+        super(dataSource, Locality.class);
     }
 
     @Override

@@ -21,9 +21,10 @@
                 <div class="container">
                   <div class="row">
                     <div class="col-4">
+                      <%--TODO:check image--%>
                       <img
-                        class="w-100"
-                        src="https://fonts.gstatic.com/s/i/materialicons/account_circle/v4/24px.svg"
+                        class="w-100 rounded-circle"
+                          src="<c:url value="/profilePics/${appointment.staff.user.profileId}"/>"
                         alt=""
                       />
                     </div>
@@ -69,7 +70,6 @@
                     </div>
                     <div class="col-1 justify-content-start">
                         <div class="dropdown">
-                            <!-- TODO connect icon -->
                             <img src='<c:url value="/img/moreOptions.svg"/>' class="moreOptionsButton" alt="nore options" data-toggle="dropdown">
                             <div class="dropdown-menu">
                               <%-- TODO add reprogramar --%>
