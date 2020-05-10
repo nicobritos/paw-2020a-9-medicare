@@ -46,9 +46,8 @@ public class ProfilePicController extends GenericController {
             //TODO:revise status code
             return new ResponseEntity<>(HttpStatus.FORBIDDEN);
         }
-
         //check its a valid pic
-        if(pic==null||!pic.getContentType().equals(this.acceptedImageType)){
+        if(pic==null||!pic.getContentType().contains("image")){
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
         //update user
