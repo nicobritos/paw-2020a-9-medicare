@@ -1,15 +1,9 @@
 package ar.edu.itba.paw.services;
 
 import ar.edu.itba.paw.interfaces.daos.UserDao;
-import ar.edu.itba.paw.interfaces.services.OfficeService;
-import ar.edu.itba.paw.interfaces.services.PatientService;
-import ar.edu.itba.paw.interfaces.services.StaffService;
-import ar.edu.itba.paw.interfaces.services.UserService;
+import ar.edu.itba.paw.interfaces.services.*;
 import ar.edu.itba.paw.interfaces.services.exceptions.EmailAlreadyExistsException;
-import ar.edu.itba.paw.models.Office;
-import ar.edu.itba.paw.models.Patient;
-import ar.edu.itba.paw.models.Staff;
-import ar.edu.itba.paw.models.User;
+import ar.edu.itba.paw.models.*;
 import ar.edu.itba.paw.services.generics.GenericSearchableServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -28,6 +22,8 @@ public class UserServiceImpl extends GenericSearchableServiceImpl<UserDao, User,
     private StaffService staffService;
     @Autowired
     private PatientService patientService;
+    @Autowired
+    private PictureService pictureService;
     @Autowired
     private PasswordEncoder passwordEncoder;
 
@@ -77,6 +73,17 @@ public class UserServiceImpl extends GenericSearchableServiceImpl<UserDao, User,
         staff = this.staffService.create(staff);
 
         return newUser;
+    }
+
+    @Override
+    @Transactional
+    public void setProfile(User user, Picture picture) {
+        if (picture.getId() == null) {
+            picture = this.pictureService.create(picture);
+        }
+
+        user.setProfileId(picture.getId());
+        this.update(user);
     }
 
     @Override

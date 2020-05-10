@@ -32,7 +32,7 @@ public class UserDaoImpl extends GenericSearchableDaoImpl<User, Integer> impleme
 
     @Autowired
     public UserDaoImpl(DataSource dataSource) {
-        super(dataSource, User.class, Integer.class);
+        super(dataSource, User.class);
     }
 
     @Override

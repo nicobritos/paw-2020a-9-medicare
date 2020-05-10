@@ -1,13 +1,20 @@
 package ar.edu.itba.paw.webapp.controller;
 
+import ar.edu.itba.paw.interfaces.services.PictureService;
 import ar.edu.itba.paw.interfaces.services.UserService;
+import ar.edu.itba.paw.models.Picture;
 import ar.edu.itba.paw.models.User;
 import ar.edu.itba.paw.webapp.controller.utils.GenericController;
 import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.*;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.ServletContext;
@@ -18,7 +25,8 @@ import java.util.Optional;
 @Controller
 @RequestMapping("/profilePics")
 public class ProfilePicController extends GenericController {
-
+    @Autowired
+    private PictureService pictureService;
     @Autowired
     UserService userService;
     @Autowired
@@ -46,8 +54,12 @@ public class ProfilePicController extends GenericController {
         //update user
         User updatedUser = user.get();
         try{
-            updatedUser.setPicture(pic.getBytes());
-            this.userService.update(updatedUser);
+            Picture picture = new Picture();
+            picture.setData(pic.getBytes());
+            picture.setName(pic.getOriginalFilename());
+            picture.setSize(pic.getSize());
+            picture.setMimeType(pic.getContentType());
+            this.userService.setProfile(updatedUser, picture);
         }catch (Exception e){
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
@@ -64,21 +76,26 @@ public class ProfilePicController extends GenericController {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
         //get user picture
-        byte[] pic= user.get().getPicture();
         ResponseEntity<byte[]> res;
         HttpHeaders headers = new HttpHeaders();
         //if there is a pic return the
-        if(pic!=null){
-            headers.add("content-type",this.acceptedImageType);
-            res = new ResponseEntity<byte[]>(pic,headers,HttpStatus.OK);
+        byte[] pic;
+        if (user.get().getProfileId() != null) {
+            Optional<Picture> picture = this.pictureService.findById(user.get().getProfileId());
+            pic = picture.map(Picture::getData).orElse(null);
+        } else {
+            pic = null;
+        }
+
+        if (pic != null) {
+            res = new ResponseEntity<>(pic, headers, HttpStatus.OK);
         }
         //else return a common pic
         else{
             try{
                 InputStream in = context.getResourceAsStream(this.defaultImagePath);
                 headers.add("content-type",this.defaultImageType);
-                byte[] bytepic = IOUtils.toByteArray(in);
-                res = new ResponseEntity<byte[]>(bytepic,headers,HttpStatus.OK);
+                res = new ResponseEntity<>(IOUtils.toByteArray(in), headers, HttpStatus.OK);
             }catch (Exception e){
                 return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
             }
