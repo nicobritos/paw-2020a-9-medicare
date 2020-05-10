@@ -1,7 +1,6 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jstl/core_rt"%>
 <html>
 <head>
-    <!-- TODO: check ortografia -->
     <%@ include file = "head.jsp" %>
     <link rel="stylesheet" type="text/css" href='<c:url value="/css/landing.css"/>'>
 </head>

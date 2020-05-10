@@ -67,9 +67,9 @@ public class ProfilePicController extends GenericController {
         byte[] pic= user.get().getPicture();
         ResponseEntity<byte[]> res;
         HttpHeaders headers = new HttpHeaders();
-        headers.add("content-type",this.acceptedImageType);
         //if there is a pic return the
         if(pic!=null){
+            headers.add("content-type",this.acceptedImageType);
             res = new ResponseEntity<byte[]>(pic,headers,HttpStatus.OK);
         }
         //else return a common pic
@@ -82,6 +82,23 @@ public class ProfilePicController extends GenericController {
             }catch (Exception e){
                 return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
             }
+        }
+        return res;
+    }
+
+    //receives UserId returns profile pic
+    @RequestMapping(value = "/",method = RequestMethod.GET)
+    public ResponseEntity<byte[]> getProfilePic(){
+        ResponseEntity<byte[]> res;
+        HttpHeaders headers = new HttpHeaders();
+        //if there is a pic return the
+        try{
+            InputStream in = context.getResourceAsStream(this.defaultImagePath);
+            headers.add("content-type",this.defaultImageType);
+            byte[] bytepic = IOUtils.toByteArray(in);
+            res = new ResponseEntity<byte[]>(bytepic,headers,HttpStatus.OK);
+        }catch (Exception e){
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
         return res;
     }

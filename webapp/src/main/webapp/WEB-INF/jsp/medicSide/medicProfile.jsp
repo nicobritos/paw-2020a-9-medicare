@@ -12,9 +12,9 @@
 <div class="container flex-fill mx-5 pl-5 mt-3 w-100">
     <div class="row">
         <div class="col-4 align-items-start d-flex flex-column">
-            <!-- TODO connect imagen -->
+            <!-- TODO check imagen -->
             <div class="picture-container no-select">
-                <img id="profilePic" src="<c:url value="/profilePics/${user.get().id}"/>"
+                <img id="profilePic" class="rounded-circle" src="<c:url value="/profilePics/${user.get().id}"/>"
                      alt="">
                 <div class="picture-overlay d-flex flex-column align-items-center justify-content-end pb-3">
                     <input id="profile-picture-input" style="display: none;" type="file"
