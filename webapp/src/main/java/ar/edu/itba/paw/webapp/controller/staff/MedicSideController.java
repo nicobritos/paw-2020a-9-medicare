@@ -4,6 +4,7 @@ import ar.edu.itba.paw.interfaces.services.*;
 import ar.edu.itba.paw.models.*;
 import ar.edu.itba.paw.webapp.controller.utils.GenericController;
 import ar.edu.itba.paw.webapp.controller.utils.JsonResponse;
+import ar.edu.itba.paw.webapp.events.AppointmentCancelEvent;
 import ar.edu.itba.paw.webapp.events.UserConfirmationTokenGenerationEvent;
 import ar.edu.itba.paw.webapp.exceptions.UnAuthorizedAccessException;
 import ar.edu.itba.paw.webapp.form.UserProfileForm;
@@ -88,7 +89,13 @@ public class MedicSideController extends GenericController {
         mav.addObject("isToday",isToday);
         mav.addObject("monday", monday);
         mav.addObject("todayAppointments", appointmentService.findToday(userStaffs));
-        List<Appointment> appointments =  appointmentService.findByStaffsAndDay(userStaffs, monday, monday.plusDays(7));
+
+        List<Appointment> appointments;
+        if(monday.isAfter(DateTime.now())){
+            appointments = appointmentService.findByStaffsAndDay(userStaffs, DateTime.now(), monday.plusDays(7));
+        } else {
+            appointments = appointmentService.findByStaffsAndDay(userStaffs, monday, monday.plusDays(7));
+        }
         List<List<Appointment>> weekAppointments = new LinkedList<>();
         for(int i=0; i<=7; i++){
             weekAppointments.add(new LinkedList<>());
@@ -280,7 +287,7 @@ public class MedicSideController extends GenericController {
     }
 
     @RequestMapping(value = "/staff/appointment/{id}",method = RequestMethod.DELETE)
-    public ResponseEntity cancelAppointment(@PathVariable Integer id){
+    public ResponseEntity cancelAppointment(@PathVariable Integer id, HttpServletRequest request){
         //get current user, check for null
         Optional<User> user = getUser();
         if(!user.isPresent()){
@@ -307,6 +314,9 @@ public class MedicSideController extends GenericController {
         }
         //cancel appointment
         this.appointmentService.remove(appointment.get()); // TODO
+        StringBuilder baseUrl = new StringBuilder(request.getRequestURL());
+        baseUrl.replace(request.getRequestURL().lastIndexOf(request.getServletPath()), request.getRequestURL().length(), "");
+        this.eventPublisher.publishEvent(new AppointmentCancelEvent(user.get(), true, appointment.get().getPatient().getUser(), appointment.get(), request.getLocale(), baseUrl.toString()));
 //        this.appointmentService.setStatus(appointment.get(), AppointmentStatus.CANCELLED);
         //return success
         return new ResponseEntity(HttpStatus.NO_CONTENT);

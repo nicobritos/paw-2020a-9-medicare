@@ -8,6 +8,7 @@ import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.MessageSource;
+import org.springframework.core.io.FileSystemResource;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.scheduling.annotation.Async;
@@ -15,6 +16,8 @@ import org.springframework.stereotype.Component;
 
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
+import javax.servlet.ServletContext;
+import java.io.File;
 import java.io.IOException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
@@ -33,6 +36,10 @@ public class UserConfirmationTokenGenerationEventListener implements Application
     private MessageSource messageSource;
     @Autowired
     private JavaMailSender mailSender;
+    @Autowired
+    private ServletContext context;
+    private String logoPath = "img/whiteLogo.svg";
+    private String logoImageType = "image/svg+xml";
 
     @Override
     @Async
@@ -44,12 +51,11 @@ public class UserConfirmationTokenGenerationEventListener implements Application
             String confirmationUrl = userConfirmationTokenGenerationEvent.getUrl() + "?token=" + URLEncoder.encode(token, StandardCharsets.UTF_8.name());
 
             MimeMessage mimeMessage = this.mailSender.createMimeMessage();
-            MimeMessageHelper mimeMessageHelper = new MimeMessageHelper(mimeMessage, true);
-            mimeMessageHelper.setText(this.getHTML(userConfirmationTokenGenerationEvent.getBaseUrl(), confirmationUrl, userConfirmationTokenGenerationEvent.getUser(), userConfirmationTokenGenerationEvent.getLocale()), true);
+            MimeMessageHelper mimeMessageHelper = new MimeMessageHelper(mimeMessage, true, "UTF-8");
             mimeMessageHelper.setSubject(subject);
             mimeMessageHelper.setFrom(new InternetAddress("confirmation@medicare.com", "MediCare"));
             mimeMessageHelper.setTo(userConfirmationTokenGenerationEvent.getUser().getEmail());
-
+            mimeMessageHelper.setText(this.getHTML(userConfirmationTokenGenerationEvent.getBaseUrl(), confirmationUrl, userConfirmationTokenGenerationEvent.getUser(), userConfirmationTokenGenerationEvent.getLocale()), true);
             this.mailSender.send(mimeMessage);
         } catch (Exception e) {
             e.printStackTrace(); // TODO

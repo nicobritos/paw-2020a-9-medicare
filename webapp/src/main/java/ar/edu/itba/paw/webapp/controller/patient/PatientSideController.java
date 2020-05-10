@@ -6,6 +6,7 @@ import ar.edu.itba.paw.interfaces.services.exceptions.InvalidMinutesException;
 import ar.edu.itba.paw.models.*;
 import ar.edu.itba.paw.webapp.controller.utils.GenericController;
 import ar.edu.itba.paw.webapp.controller.utils.JsonResponse;
+import ar.edu.itba.paw.webapp.events.AppointmentCancelEvent;
 import ar.edu.itba.paw.webapp.events.UserConfirmationTokenGenerationEvent;
 import ar.edu.itba.paw.webapp.exceptions.UnAuthorizedAccessException;
 import ar.edu.itba.paw.webapp.form.RequestAppointmentForm;
@@ -222,7 +223,7 @@ public class PatientSideController extends GenericController {
     }
 
     @RequestMapping(value = "/patient/appointment/{id}",method = RequestMethod.DELETE)
-    public ResponseEntity cancelAppointment(@PathVariable Integer id){
+    public ResponseEntity cancelAppointment(@PathVariable Integer id, HttpServletRequest request){
         //get current user, check for null
         Optional<User> user = getUser();
         if(!user.isPresent()){
@@ -249,6 +250,9 @@ public class PatientSideController extends GenericController {
         }
         //cancel appointment
         this.appointmentService.remove(appointment.get()); // TODO
+        StringBuilder baseUrl = new StringBuilder(request.getRequestURL());
+        baseUrl.replace(request.getRequestURL().lastIndexOf(request.getServletPath()), request.getRequestURL().length(), "");
+        this.eventPublisher.publishEvent(new AppointmentCancelEvent(user.get(), false, appointment.get().getStaff().getUser(), appointment.get(), request.getLocale(), baseUrl.toString()));
 //        this.appointmentService.setStatus(appointment.get(), AppointmentStatus.CANCELLED);
         //return success
         return new ResponseEntity(HttpStatus.NO_CONTENT);

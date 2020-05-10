@@ -12,7 +12,7 @@ public class Appointment extends GenericModel<Integer> {
 
     @Column(name = "status", required = true)
     private String appointmentStatus;
-    @OrderBy(OrderCriteria.DESC)
+    @OrderBy(OrderCriteria.ASC)
     @Column(name = "from_date", required = true)
     private DateTime fromDate;
     @Column(name = "patient_id", required = true)
