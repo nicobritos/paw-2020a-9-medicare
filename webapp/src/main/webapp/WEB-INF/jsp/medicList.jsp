@@ -52,10 +52,10 @@
                             <div class="container">
                                 <div class="row">
                                     <div class="col-3 d-flex align-items-center">
-                                            <%--TODO connect image--%>
+                                            <%--TODO check image--%>
                                         <img
-                                                class="w-75"
-                                                src="https://fonts.gstatic.com/s/i/materialicons/account_circle/v4/24px.svg"
+                                                class="w-75 rounded-circle"
+                                                src="<c:url value="/profilePics/${member.user.profileId}"/>"
                                                 alt=""
                                         />
                                     </div>

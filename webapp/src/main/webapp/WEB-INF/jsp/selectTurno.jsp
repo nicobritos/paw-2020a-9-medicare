@@ -13,8 +13,8 @@
             <%-- TODO:connect--%>
             <div class="row mt-4">
                 <div class="col-4">
-                    <%-- TODO:conect image--%>
-                    <img class="w-100" src="https://fonts.gstatic.com/s/i/materialicons/account_circle/v4/24px.svg"
+                    <%-- TODO:check image--%>
+                    <img class="w-100 rounded-circle" src="<c:url value="/profilePics/${staff.user.profileId}"/>"
                          alt="">
                 </div>
                 <div class="col mr-3">

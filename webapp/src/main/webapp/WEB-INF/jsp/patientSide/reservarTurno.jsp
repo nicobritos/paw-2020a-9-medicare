@@ -44,8 +44,8 @@
             </div>
             <div class="row justify-content-center border-top border-light py-2">
               <div class="col-3">
-                <%-- TODO: connect profile pic --%>
-                <img src="https://fonts.gstatic.com/s/i/materialicons/account_circle/v4/24px.svg" class="w-100" alt="profile pic">
+                <%-- TODO: check profile pic --%>
+                <img src="<c:url value="/profilePics/${staff.user.profileId}"/>" class="w-100 rounded-circle" alt="profile pic">
               </div>
               <div class="col p-0">
                 <p class="m-0 white-text">${staff.firstName} ${staff.surname}</p>

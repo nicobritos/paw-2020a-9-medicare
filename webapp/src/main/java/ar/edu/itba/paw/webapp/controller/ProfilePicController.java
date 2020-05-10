@@ -46,9 +46,8 @@ public class ProfilePicController extends GenericController {
             //TODO:revise status code
             return new ResponseEntity<>(HttpStatus.FORBIDDEN);
         }
-
         //check its a valid pic
-        if(pic==null||!pic.getContentType().equals(this.acceptedImageType)){
+        if(pic==null||!pic.getContentType().contains("image")){
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
         //update user
@@ -67,28 +66,18 @@ public class ProfilePicController extends GenericController {
     }
 
 
-    //receives UserId returns profile pic
+    //receives pictureId returns profile pic
     @RequestMapping(value = "/{id}",method = RequestMethod.GET)
     public ResponseEntity<byte[]> getProfilePic(@PathVariable("id") Integer id){
-        //get user
-        Optional<User> user  = this.userService.findById(id);
-        if(!user.isPresent()){
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
-        //get user picture
+        Optional<Picture> optPic = this.pictureService.findById(id);
         ResponseEntity<byte[]> res;
         HttpHeaders headers = new HttpHeaders();
-        headers.add("content-type",this.acceptedImageType);
-        //if there is a pic return the
-        byte[] pic;
-        if (user.get().getProfileId() != null) {
-            Optional<Picture> picture = this.pictureService.findById(user.get().getProfileId());
-            pic = picture.map(Picture::getData).orElse(null);
-        } else {
-            pic = null;
+        byte[] pic=null;
+        if (optPic.isPresent()) {
+            pic = optPic.get().getData();
         }
-
-        if (pic != null) {
+        if(pic !=null){
+            headers.add("content-type",optPic.get().getMimeType());
             res = new ResponseEntity<>(pic, headers, HttpStatus.OK);
         }
         //else return a common pic
@@ -100,6 +89,23 @@ public class ProfilePicController extends GenericController {
             }catch (Exception e){
                 return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
             }
+        }
+        return res;
+    }
+
+    //returns default image
+    @RequestMapping(value = "/",method = RequestMethod.GET)
+    public ResponseEntity<byte[]> getProfilePic(){
+        ResponseEntity<byte[]> res;
+        HttpHeaders headers = new HttpHeaders();
+        //if there is a pic return the
+        try{
+            InputStream in = context.getResourceAsStream(this.defaultImagePath);
+            headers.add("content-type",this.defaultImageType);
+            byte[] bytepic = IOUtils.toByteArray(in);
+            res = new ResponseEntity<byte[]>(bytepic,headers,HttpStatus.OK);
+        }catch (Exception e){
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
         return res;
     }
