@@ -5,6 +5,8 @@ import ar.edu.itba.paw.models.User;
 import ar.edu.itba.paw.webapp.email.EmailFormatter;
 import org.apache.commons.lang3.text.StrSubstitutor;
 import org.joda.time.DateTime;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.MessageSource;
@@ -29,6 +31,7 @@ import java.util.Map;
 public class UserConfirmationTokenGenerationEventListener implements ApplicationListener<UserConfirmationTokenGenerationEvent> {
     private static final String MESSAGE_SOURCE_BODY_PREFIX = "signup.confirmation.email.body";
     private static final String MESSAGE_SOURCE_DISCLAIMER = "email.disclaimer";
+    private static final Logger LOGGER = LoggerFactory.getLogger(UserConfirmationTokenGenerationEventListener.class);
 
     @Autowired
     private UserService userService;
@@ -58,7 +61,7 @@ public class UserConfirmationTokenGenerationEventListener implements Application
             mimeMessageHelper.setText(this.getHTML(userConfirmationTokenGenerationEvent.getBaseUrl(), confirmationUrl, userConfirmationTokenGenerationEvent.getUser(), userConfirmationTokenGenerationEvent.getLocale()), true);
             this.mailSender.send(mimeMessage);
         } catch (Exception e) {
-            e.printStackTrace(); // TODO
+            LOGGER.error("Error sending email: ", e);
         }
     }
 

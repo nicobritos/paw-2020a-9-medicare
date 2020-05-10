@@ -15,6 +15,8 @@ import ar.edu.itba.paw.webapp.form.authentication.StaffSignUpForm;
 import ar.edu.itba.paw.webapp.form.authentication.UserLoginForm;
 import ar.edu.itba.paw.webapp.transformer.LocalityTransformer;
 import ar.edu.itba.paw.webapp.transformer.ProvinceTransformer;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.MediaType;
@@ -23,9 +25,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.AuthorityUtils;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
@@ -39,6 +39,8 @@ import java.util.stream.Collectors;
 
 @Controller
 public class AuthenticationController extends GenericController {
+    private static final Logger LOGGER = LoggerFactory.getLogger(AuthenticationController.class);
+
     @Autowired
     private AuthenticationManager authenticationManager;
     @Autowired
@@ -206,7 +208,7 @@ public class AuthenticationController extends GenericController {
             authenticatedUser = this.authenticationManager.authenticate(token);
             SecurityContextHolder.getContext().setAuthentication(authenticatedUser);
         } catch (Exception e) {
-            e.printStackTrace();
+            LOGGER.error("Error authenticating user {} after signup with stacktrace: \n{}", user.getEmail(), Arrays.toString(e.getStackTrace()));
         }
     }
 
