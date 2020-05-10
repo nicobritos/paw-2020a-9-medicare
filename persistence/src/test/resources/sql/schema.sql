@@ -127,17 +127,61 @@ create table appointment
     from_date date not null
 );
 
+
 create table workday
 (
-    workday_id identity not null
-        constraint workday_pk
-            primary key,
-    staff_id integer
+    workday_id identity not null,
+    staff_id int not null
         constraint workday_staff_staff_id_fk
-            references staff,
-    start_hour integer not null,
-    end_hour integer not null,
-    day varchar(255) not null,
-    start_minute integer default 0 not null,
-    end_minute integer default 0 not null
+            references staff
+            on delete cascade,
+    start_hour int not null,
+    end_hour int not null,
+    start_minute int not null default 0,
+    end_minute int not null default 0,
+    day varchar(255) not null
 );
+
+alter table workday
+    add constraint workday_pk
+        primary key (workday_id);
+
+alter table appointment
+    add constraint appointment_staff_staff_id_fk
+        foreign key (staff_id) references staff
+            on update set null on delete set null;
+
+alter table appointment alter column from_date type timestamp;
+
+alter table users
+    add verified boolean default false;
+
+alter table users
+    add token varchar(1023);
+
+alter table users
+    add token_created_date timestamp;
+
+create table picture
+(
+    picture_id identity not null,
+    name varchar(1023),
+    mime_type varchar(255) not null,
+    size bigint not null default 0,
+    data varbinary(65535) not null
+);
+
+create unique index picture_picture_id_uindex
+    on picture (picture_id);
+
+alter table picture
+    add constraint picture_pk
+        primary key (picture_id);
+
+alter table users
+    add profile_id int;
+
+alter table users
+    add constraint users_picture_picture_id_fk
+        foreign key (profile_id) references picture
+            on delete set null;
