@@ -1,5 +1,7 @@
 package ar.edu.itba.paw.persistence.utils;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 
 import java.beans.IntrospectionException;
@@ -25,6 +27,8 @@ import java.util.function.Predicate;
  * Every method access an object fields and its parents
  */
 public abstract class ReflectionGetterSetter {
+    private static final Logger LOGGER = LoggerFactory.getLogger(ReflectionGetterSetter.class);
+
     public static Map<String, ?> listValues(Object object) {
         Map<String, Object> map = new HashMap<>();
 
@@ -153,7 +157,7 @@ public abstract class ReflectionGetterSetter {
                 }
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            LOGGER.error("Error accessing getter for field {} of object {} in {}direct mode", field.getName(), object.toString(), direct ? "" : "in");
         }
         return null;
     }
@@ -205,7 +209,7 @@ public abstract class ReflectionGetterSetter {
                 }
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            LOGGER.error("Error accessing setter for field {} of object {} with value {} in {}direct mode", field.getName(), object.toString(), value.toString(), direct ? "" : "in");
         }
     }
 

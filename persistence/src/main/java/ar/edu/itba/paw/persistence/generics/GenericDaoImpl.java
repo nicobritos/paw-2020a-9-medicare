@@ -12,6 +12,8 @@ import ar.edu.itba.paw.persistenceAnnotations.Column;
 import ar.edu.itba.paw.persistenceAnnotations.OrderBy;
 import ar.edu.itba.paw.persistenceAnnotations.Table;
 import org.joda.time.DateTime;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.core.ResultSetExtractor;
 import org.springframework.jdbc.core.RowCallbackHandler;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
@@ -34,6 +36,7 @@ import java.util.Map.Entry;
  * @param <I> the Model's id type
  */
 public abstract class GenericDaoImpl<M extends GenericModel<I>, I> implements GenericDao<M, I> {
+    private static final Logger LOGGER = LoggerFactory.getLogger(GenericDaoImpl.class);
     private static final String ARGUMENT_PREFIX = "_r_";
     protected TransactionTemplate transactionTemplate;
     protected NamedParameterJdbcTemplate jdbcTemplate;
@@ -467,7 +470,7 @@ public abstract class GenericDaoImpl<M extends GenericModel<I>, I> implements Ge
 
                     ReflectionGetterSetter.set(model, field, value);
                 } catch (SQLException e2) {
-                    e2.printStackTrace();
+                    LOGGER.error("Column name {} not found in resultset for model classname: {}", column.name(), model.getClass().toString());
                 }
             }
         });
