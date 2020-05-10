@@ -3,7 +3,7 @@ create table picture
     picture_id serial not null,
     name text,
     mime_type text not null,
-    extension text not null,
+    size bigint not null default 0,
     data bytea not null
 );
 
