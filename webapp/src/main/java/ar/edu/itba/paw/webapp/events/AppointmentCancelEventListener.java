@@ -1,18 +1,15 @@
 package ar.edu.itba.paw.webapp.events;
 
-import ar.edu.itba.paw.interfaces.services.UserService;
 import ar.edu.itba.paw.models.Appointment;
 import ar.edu.itba.paw.models.User;
 import ar.edu.itba.paw.webapp.email.EmailFormatter;
 import org.apache.commons.lang3.text.StrSubstitutor;
 import org.joda.time.DateTime;
-import org.joda.time.DateTimeConstants;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.MessageSource;
-import org.springframework.core.io.ClassPathResource;
-import org.springframework.core.io.Resource;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.scheduling.annotation.Async;
@@ -29,11 +26,10 @@ import static org.joda.time.DateTimeConstants.*;
 
 @Component
 public class AppointmentCancelEventListener implements ApplicationListener<AppointmentCancelEvent> {
+    private static final Logger LOGGER = LoggerFactory.getLogger(AppointmentCancelEventListener.class);
     private static final String MESSAGE_SOURCE_BODY_PREFIX = "appointment.cancel.email.body";
     private static final String MESSAGE_SOURCE_DISCLAIMER = "email.disclaimer";
 
-    @Autowired
-    private UserService userService;
     @Autowired
     private MessageSource messageSource;
     @Autowired
@@ -129,7 +125,7 @@ public class AppointmentCancelEventListener implements ApplicationListener<Appoi
             mimeMessageHelper.setTo(appointmentCancelEvent.getUserCancelled().getEmail());
             this.mailSender.send(mimeMessage);
         } catch (Exception e) {
-            e.printStackTrace(); // TODO
+            LOGGER.error("Error sending appointment cancellation email: ", e);
         }
     }
 

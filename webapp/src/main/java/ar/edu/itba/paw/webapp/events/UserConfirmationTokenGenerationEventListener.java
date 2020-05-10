@@ -10,7 +10,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.MessageSource;
-import org.springframework.core.io.FileSystemResource;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.scheduling.annotation.Async;
@@ -19,7 +18,6 @@ import org.springframework.stereotype.Component;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 import javax.servlet.ServletContext;
-import java.io.File;
 import java.io.IOException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
@@ -61,7 +59,7 @@ public class UserConfirmationTokenGenerationEventListener implements Application
             mimeMessageHelper.setText(this.getHTML(userConfirmationTokenGenerationEvent.getBaseUrl(), confirmationUrl, userConfirmationTokenGenerationEvent.getUser(), userConfirmationTokenGenerationEvent.getLocale()), true);
             this.mailSender.send(mimeMessage);
         } catch (Exception e) {
-            LOGGER.error("Error sending email: ", e);
+            LOGGER.error("Error sending confirmation email: ", e);
         }
     }
 
