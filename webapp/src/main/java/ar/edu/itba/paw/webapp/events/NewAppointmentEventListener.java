@@ -6,12 +6,10 @@ import ar.edu.itba.paw.models.User;
 import ar.edu.itba.paw.webapp.email.EmailFormatter;
 import org.apache.commons.lang3.text.StrSubstitutor;
 import org.joda.time.DateTime;
-import org.joda.time.DateTimeConstants;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.MessageSource;
-import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
@@ -28,12 +26,10 @@ import java.util.Map;
 import static org.joda.time.DateTimeConstants.*;
 
 @Component
-public class AppointmentCancelEventListener implements ApplicationListener<AppointmentCancelEvent> {
-    private static final String MESSAGE_SOURCE_BODY_PREFIX = "appointment.cancel.email.body";
+public class NewAppointmentEventListener implements ApplicationListener<NewAppointmentEvent> {
+    private static final String MESSAGE_SOURCE_BODY_PREFIX = "appointment.new.email.body";
     private static final String MESSAGE_SOURCE_DISCLAIMER = "email.disclaimer";
 
-    @Autowired
-    private UserService userService;
     @Autowired
     private MessageSource messageSource;
     @Autowired
@@ -41,14 +37,13 @@ public class AppointmentCancelEventListener implements ApplicationListener<Appoi
 
     @Override
     @Async
-    public void onApplicationEvent(AppointmentCancelEvent appointmentCancelEvent) {
-        String subject = this.messageSource.getMessage("appointment.cancel.email.subject", null, appointmentCancelEvent.getLocale());
+    public void onApplicationEvent(NewAppointmentEvent newAppointmentEvent) {
+        String subject = this.messageSource.getMessage("appointment.new.email.subject", null, newAppointmentEvent.getLocale());
         try {
             MimeMessage mimeMessage = this.mailSender.createMimeMessage();
             MimeMessageHelper mimeMessageHelper = new MimeMessageHelper(mimeMessage, true);
-            String userTitle = appointmentCancelEvent.isCancellingStaff()? this.messageSource.getMessage("doctor", null, appointmentCancelEvent.getLocale()) : this.messageSource.getMessage("patient", null, appointmentCancelEvent.getLocale());
             String dowMessage;
-            switch (appointmentCancelEvent.getAppointment().getFromDate().getDayOfWeek()){
+            switch (newAppointmentEvent.getAppointment().getFromDate().getDayOfWeek()){
                 case MONDAY:
                     dowMessage = "Monday";
                     break;
@@ -74,7 +69,7 @@ public class AppointmentCancelEventListener implements ApplicationListener<Appoi
                     dowMessage = null;
             }
             String month;
-            switch (appointmentCancelEvent.getAppointment().getFromDate().getMonthOfYear()){
+            switch (newAppointmentEvent.getAppointment().getFromDate().getMonthOfYear()){
                 case JANUARY:
                     month = "January";
                     break;
@@ -116,31 +111,31 @@ public class AppointmentCancelEventListener implements ApplicationListener<Appoi
             }
             mimeMessageHelper.setText(
                     this.getHTML(
-                            appointmentCancelEvent.getBaseUrl(),
-                            appointmentCancelEvent.getUserCancelling(),
-                            userTitle,
-                            appointmentCancelEvent.getAppointment(),
-                            this.messageSource.getMessage(dowMessage, null, appointmentCancelEvent.getLocale()),
-                            this.messageSource.getMessage(month, null, appointmentCancelEvent.getLocale()),
-                            appointmentCancelEvent.getLocale()),
+                            newAppointmentEvent.getBaseUrl(),
+                            newAppointmentEvent.getDoctor(),
+                            newAppointmentEvent.getPatient(),
+                            newAppointmentEvent.getAppointment(),
+                            this.messageSource.getMessage(dowMessage, null, newAppointmentEvent.getLocale()),
+                            this.messageSource.getMessage(month, null, newAppointmentEvent.getLocale()),
+                            newAppointmentEvent.getLocale()),
                     true);
             mimeMessageHelper.setSubject(subject);
             mimeMessageHelper.setFrom(new InternetAddress("notifications@medicare.com", "MediCare"));
-            mimeMessageHelper.setTo(appointmentCancelEvent.getUserCancelled().getEmail());
+            mimeMessageHelper.setTo(newAppointmentEvent.getDoctor().getEmail());
             this.mailSender.send(mimeMessage);
         } catch (Exception e) {
             e.printStackTrace(); // TODO
         }
     }
 
-    private String getHTML(String baseUrl, User userCancelling, String userTitle, Appointment appointment, String dow, String month, Locale locale) throws IOException {
+    private String getHTML(String baseUrl, User doctor, User patient, Appointment appointment, String dow, String month, Locale locale) throws IOException {
         Map<String, String> values = new HashMap<>();
         values.put("baseUrl", baseUrl);
         values.put("year", String.valueOf(DateTime.now().getYear()));
         values.put("body", this.messageSource.getMessage(MESSAGE_SOURCE_BODY_PREFIX + ".body",
                 new Object[]{
-                        userTitle,
-                        userCancelling.getDisplayName(),
+                        doctor.getFirstName(),
+                        patient.getDisplayName(),
                         dow,
                         appointment.getFromDate().getDayOfMonth(),
                         month,
@@ -155,7 +150,7 @@ public class AppointmentCancelEventListener implements ApplicationListener<Appoi
         values.put("title", this.messageSource.getMessage(MESSAGE_SOURCE_BODY_PREFIX + ".title", null, locale));
 
         EmailFormatter emailFormatter = new EmailFormatter();
-        String html = emailFormatter.format(emailFormatter.getHTMLFromFilename("cancel"));
+        String html = emailFormatter.format(emailFormatter.getHTMLFromFilename("newAppointment"));
         StrSubstitutor substitutor = new StrSubstitutor(values, "${", "}");
         return substitutor.replace(html);
     }
