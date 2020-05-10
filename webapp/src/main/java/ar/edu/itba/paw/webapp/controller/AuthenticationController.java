@@ -107,8 +107,8 @@ public class AuthenticationController extends GenericController {
             return this.signupStaffIndex(form);
         }
         StringBuilder baseUrl = new StringBuilder(request.getRequestURL());
-        baseUrl.replace(request.getRequestURL().lastIndexOf(request.getRequestURI()), request.getRequestURL().length(), "");
-        this.eventPublisher.publishEvent(new UserConfirmationTokenGenerationEvent(baseUrl.toString(), newUser, request.getContextPath() + "/verifyEmail", request.getLocale()));
+        baseUrl.replace(request.getRequestURL().lastIndexOf(request.getServletPath()), request.getRequestURL().length(), "");
+        this.eventPublisher.publishEvent(new UserConfirmationTokenGenerationEvent(baseUrl.toString(), newUser, "/verifyEmail", request.getLocale()));
         authenticateSignedUpUser(form.getAsUser(), form.getPassword(), request);
         return new ModelAndView("redirect:/verifyEmail");
     }
@@ -137,17 +137,16 @@ public class AuthenticationController extends GenericController {
             return this.signupPatientIndex(form);
         }
         StringBuilder baseUrl = new StringBuilder(request.getRequestURL());
-        baseUrl.replace(request.getRequestURL().lastIndexOf(request.getRequestURI()), request.getRequestURL().length(), "");
-        this.eventPublisher.publishEvent(new UserConfirmationTokenGenerationEvent(baseUrl.toString(), newUser, request.getContextPath() + "/verifyEmail", request.getLocale()));
+        baseUrl.replace(request.getRequestURL().lastIndexOf(request.getServletPath()), request.getRequestURL().length(), "");
+        this.eventPublisher.publishEvent(new UserConfirmationTokenGenerationEvent(baseUrl.toString(), newUser, "/verifyEmail", request.getLocale()));
         authenticateSignedUpUser(form.getAsUser(), form.getPassword(), request);
-
 
         return new ModelAndView("redirect:/verifyEmail");
     }
 
     // Página en la que paran las cuentas sin verificacion del mail
     @RequestMapping(value = "/verifyEmail", method = RequestMethod.GET)
-    public ModelAndView verifyEmail(@RequestParam(value = "token", required = false) String token) {
+    public ModelAndView verifyEmail(@RequestParam(value = "token", required = false) String token, HttpServletRequest request) {
         ModelAndView mav = new ModelAndView();
         Optional<User> userOptional = getUser();
         if(!userOptional.isPresent()){

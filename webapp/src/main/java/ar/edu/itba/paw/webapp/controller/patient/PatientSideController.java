@@ -6,6 +6,8 @@ import ar.edu.itba.paw.interfaces.services.exceptions.InvalidMinutesException;
 import ar.edu.itba.paw.models.*;
 import ar.edu.itba.paw.webapp.controller.utils.GenericController;
 import ar.edu.itba.paw.webapp.controller.utils.JsonResponse;
+import ar.edu.itba.paw.webapp.events.AppointmentCancelEvent;
+import ar.edu.itba.paw.webapp.events.NewAppointmentEvent;
 import ar.edu.itba.paw.webapp.events.UserConfirmationTokenGenerationEvent;
 import ar.edu.itba.paw.webapp.exceptions.UnAuthorizedAccessException;
 import ar.edu.itba.paw.webapp.form.RequestAppointmentForm;
@@ -143,7 +145,7 @@ public class PatientSideController extends GenericController {
                                            @PathVariable("staffId") final int staffId, @PathVariable("year") final int year,
                                            @PathVariable("month") final int month, @PathVariable("day") final int day,
                                            @PathVariable("hour") final int hour, @PathVariable("minute") final int minute,
-                                           final BindingResult errors){
+                                           final BindingResult errors, HttpServletRequest request){
         Optional<Staff> staff = this.staffService.findById(form.getStaffId());
         if (!staff.isPresent()) {
             errors.reject("NotFound.requestAppointment.staff", null, "Error");
@@ -175,7 +177,10 @@ public class PatientSideController extends GenericController {
         appointment.setPatient(patient);
         appointment.setFromDate(dateFrom);
         try {
-            this.appointmentService.create(appointment);
+            appointment = this.appointmentService.create(appointment);
+            StringBuilder baseUrl = new StringBuilder(request.getRequestURL());
+            baseUrl.replace(request.getRequestURL().lastIndexOf(request.getServletPath()), request.getRequestURL().length(), "");
+            this.eventPublisher.publishEvent(new NewAppointmentEvent(optionalUser.get(), staff.get().getUser(), appointment, request.getLocale(), baseUrl.toString()));
         } catch (InvalidMinutesException e){
             errors.reject("InvalidValue.requestAppointment.date", null, "Error");
             return this.requestAppointment(form, staffId, year, month, day, hour, minute);
@@ -222,7 +227,7 @@ public class PatientSideController extends GenericController {
     }
 
     @RequestMapping(value = "/patient/appointment/{id}",method = RequestMethod.DELETE)
-    public ResponseEntity cancelAppointment(@PathVariable Integer id){
+    public ResponseEntity cancelAppointment(@PathVariable Integer id, HttpServletRequest request){
         //get current user, check for null
         Optional<User> user = getUser();
         if(!user.isPresent()){
@@ -249,6 +254,9 @@ public class PatientSideController extends GenericController {
         }
         //cancel appointment
         this.appointmentService.remove(appointment.get()); // TODO
+        StringBuilder baseUrl = new StringBuilder(request.getRequestURL());
+        baseUrl.replace(request.getRequestURL().lastIndexOf(request.getServletPath()), request.getRequestURL().length(), "");
+        this.eventPublisher.publishEvent(new AppointmentCancelEvent(user.get(), false, appointment.get().getStaff().getUser(), appointment.get(), request.getLocale(), baseUrl.toString()));
 //        this.appointmentService.setStatus(appointment.get(), AppointmentStatus.CANCELLED);
         //return success
         return new ResponseEntity(HttpStatus.NO_CONTENT);

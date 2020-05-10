@@ -29,7 +29,7 @@
                         <div class="row">
                             <div class="col p-0 m-0">
                                 <!-- TODO Connect image function-->
-                                <h3><spring:message code="Name"/> <label for="firstName" class="toggle-readonly"><img type="button" src="<c:url value="/img/editPencil.svg"/>" alt="editar"/></label></h3>
+                                <h3><spring:message code="Name"/> <label for="firstName" class="toggle-readonly"><img type="button" src='<c:url value="/img/editPencil.svg"/>' alt="editar"/></label></h3>
                                 <form:input class="form-control mb-3 w-75" id="firstName" name="firstName" value="${user.get().firstName}" path="firstName" readonly="true"/>
                             </div>
                             <div class="col p-0 m-0">
