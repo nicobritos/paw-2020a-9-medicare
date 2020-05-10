@@ -38,16 +38,16 @@ html,body{
 }
 
 .filter-form{
-	background-color: #00C4BA;
-	border-radius: 1em;
+    background-color: #00C4BA;
+    border-radius: 1em;
 }
 
 .form-title{
-	color: white;
+    color: white;
 }
 
 .form-control{
-	background-color: rgba(214, 214, 214);
+    background-color: rgba(214, 214, 214);
 }
 .white-text{
     color:white!important;
