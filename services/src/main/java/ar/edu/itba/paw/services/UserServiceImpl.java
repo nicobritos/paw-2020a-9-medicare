@@ -76,14 +76,14 @@ public class UserServiceImpl extends GenericSearchableServiceImpl<UserDao, User,
     @Override
     @Transactional
     public void setProfile(User user, Picture picture) {
-        // We DON'T reuse profile pictures
-        picture = this.pictureService.create(picture);
-        if (user.getProfileId() != null) {
-            // As we don't reuse them, we can safely delete the old one
-            this.pictureService.remove(picture.getId());
+        if (user.getProfileId() == null) {
+            picture = this.pictureService.create(picture);
+            user.setProfileId(picture.getId());
+            this.update(user);
+        } else {
+            picture.setId(user.getProfileId());
+            this.pictureService.update(picture);
         }
-        user.setProfileId(picture.getId());
-        this.update(user);
     }
 
     @Override

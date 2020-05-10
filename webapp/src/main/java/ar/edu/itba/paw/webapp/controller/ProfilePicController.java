@@ -36,7 +36,6 @@ public class ProfilePicController extends GenericController {
 
     private String defaultImagePath = "/img/defaultProfilePic.svg";
     private String defaultImageType = "image/svg+xml";
-    private String acceptedImageType = "image/jpeg";
 
     @RequestMapping(value = "/set",method = RequestMethod.POST)
     public ResponseEntity<String> setProfilePic(@RequestParam MultipartFile pic, HttpServletRequest req){
