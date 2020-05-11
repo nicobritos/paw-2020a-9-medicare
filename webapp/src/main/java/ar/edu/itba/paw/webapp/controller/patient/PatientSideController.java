@@ -215,7 +215,7 @@ public class PatientSideController extends GenericController {
             form.setEmail(user.getEmail());
             form.setFirstName(user.getFirstName());
             form.setSurname(user.getSurname());
-            form.setPhone(null); //todo: phone
+            form.setPhone(user.getPhone());
         });
         Optional<User> user = getUser();
         ModelAndView mav = new ModelAndView();
