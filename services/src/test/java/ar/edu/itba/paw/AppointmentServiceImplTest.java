@@ -9,9 +9,15 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -47,7 +53,7 @@ public class AppointmentServiceImplTest {
     private AppointmentServiceImpl appointmentService = new AppointmentServiceImpl();
 
     @Mock
-    private AppointmentDao appointmentDao;
+    private AppointmentDao mockDao;
 
     private User userModel(){
         User user = new User();
@@ -112,6 +118,14 @@ public class AppointmentServiceImplTest {
     }
 
     @Test
+    public void mockExample(){
+        Staff staff = staffModel();
+        Mockito.when(mockDao.find(Mockito.eq(staff))).thenReturn(Collections.singletonList(appointmentModel()));
+        List<Appointment> appointments = appointmentService.find(staff);
+        assertEquals(appointments,Collections.singletonList(appointmentModel()));
+    }
+
+    @Test
     public void changeToPossibleStatusOfPendingAppointmentTest(){
         Appointment appointment = appointmentModel();
         AppointmentStatus status = AppointmentStatus.PENDING;
@@ -136,5 +150,4 @@ public class AppointmentServiceImplTest {
         appointment.setAppointmentStatus(status.name());
         appointmentService.setStatus(appointment, changeToStatus);
     }
-
 }
