@@ -21,6 +21,10 @@ public class Appointment extends GenericModel<Integer> {
     @Column(name = "staff_id", required = true)
     private int staffId;
     private Staff staff;
+    @Column(name = "message")
+    private String message;
+    @Column(name = "motive")
+    private String motive;
 
     public String getAppointmentStatus() {
         return this.appointmentStatus;
@@ -81,6 +85,22 @@ public class Appointment extends GenericModel<Integer> {
         if(this.staff != null && !this.staff.getId().equals(staffId)){
             staff = null;
         }
+    }
+
+    public String getMessage() {
+        return this.message;
+    }
+
+    public void setMessage(String message) {
+        this.message = message;
+    }
+
+    public String getMotive() {
+        return this.motive;
+    }
+
+    public void setMotive(String motive) {
+        this.motive = motive;
     }
 
     @Override
