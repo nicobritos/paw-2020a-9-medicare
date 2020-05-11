@@ -9,11 +9,15 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
-import java.time.LocalDate;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -36,6 +40,8 @@ public class AppointmentServiceImplTest {
     private static final int YEAR = 2020;
     private static final int MONTH = 1;
     private static final int DAY_OF_MONTH = 29;
+    private static final int HOUR = 12;
+    private static final int MINUTE = 0;
     private static final String STAFF_PHONE = "1111223344";
     private static final String STAFF_EMAIL = "staffemail@testmail.com";
     private static final String STAFF_SURNAME = "StSurname";
@@ -47,33 +53,7 @@ public class AppointmentServiceImplTest {
     private AppointmentServiceImpl appointmentService = new AppointmentServiceImpl();
 
     @Mock
-    private AppointmentDao appointmentDao;
-
-    @Test
-    public void changeToPossibleStatusOfPendingAppointmentTest(){
-        Appointment appointment = appointmentModel();
-        AppointmentStatus status = AppointmentStatus.PENDING;
-        AppointmentStatus changeToStatus = AppointmentStatus.CANCELLED;
-        try{
-            appointment.setAppointmentStatus(status.name());
-            appointmentService.setStatus(appointment, changeToStatus);
-
-            changeToStatus = AppointmentStatus.WAITING;
-            appointment.setAppointmentStatus(AppointmentStatus.PENDING.name());
-            appointmentService.setStatus(appointment, changeToStatus);
-        }catch (Exception e){
-            fail("Failed to set appointment to status:" + changeToStatus.name() + " because exception " + e.getClass().getName() + " was thrown with message:\n" + e.getMessage());
-        }
-    }
-
-    @Test(expected = InvalidAppointmentStatusChangeException.class)
-    public void changeToSeeingStatusOfPendingAppointmentTest(){
-        Appointment appointment = appointmentModel();
-        AppointmentStatus status = AppointmentStatus.PENDING;
-        AppointmentStatus changeToStatus = AppointmentStatus.SEEN;
-        appointment.setAppointmentStatus(status.name());
-        appointmentService.setStatus(appointment, changeToStatus);
-    }
+    private AppointmentDao mockDao;
 
     private User userModel(){
         User user = new User();
@@ -124,8 +104,7 @@ public class AppointmentServiceImplTest {
     }
 
     private DateTime dateModel(){
-        LocalDate localDate = LocalDate.of(YEAR, MONTH, DAY_OF_MONTH);
-        return new DateTime(localDate);
+        return new DateTime(YEAR, MONTH, DAY_OF_MONTH, HOUR, MINUTE);
     }
 
     private Appointment appointmentModel(){
@@ -136,5 +115,39 @@ public class AppointmentServiceImplTest {
         appointment.setId(APPOINTMENT_ID);
         appointment.setAppointmentStatus(AppointmentStatus.PENDING.name());
         return appointment;
+    }
+
+    @Test
+    public void mockExample(){
+        Staff staff = staffModel();
+        Mockito.when(mockDao.find(Mockito.eq(staff))).thenReturn(Collections.singletonList(appointmentModel()));
+        List<Appointment> appointments = appointmentService.find(staff);
+        assertEquals(appointments,Collections.singletonList(appointmentModel()));
+    }
+
+    @Test
+    public void changeToPossibleStatusOfPendingAppointmentTest(){
+        Appointment appointment = appointmentModel();
+        AppointmentStatus status = AppointmentStatus.PENDING;
+        AppointmentStatus changeToStatus = AppointmentStatus.CANCELLED;
+        try{
+            appointment.setAppointmentStatus(status.name());
+            appointmentService.setStatus(appointment, changeToStatus);
+
+            changeToStatus = AppointmentStatus.WAITING;
+            appointment.setAppointmentStatus(AppointmentStatus.PENDING.name());
+            appointmentService.setStatus(appointment, changeToStatus);
+        }catch (Exception e){
+            fail("Failed to set appointment to status:" + changeToStatus.name() + " because exception " + e.getClass().getName() + " was thrown with message:\n" + e.getMessage());
+        }
+    }
+
+    @Test(expected = InvalidAppointmentStatusChangeException.class)
+    public void changeToSeeingStatusOfPendingAppointmentTest(){
+        Appointment appointment = appointmentModel();
+        AppointmentStatus status = AppointmentStatus.PENDING;
+        AppointmentStatus changeToStatus = AppointmentStatus.SEEN;
+        appointment.setAppointmentStatus(status.name());
+        appointmentService.setStatus(appointment, changeToStatus);
     }
 }

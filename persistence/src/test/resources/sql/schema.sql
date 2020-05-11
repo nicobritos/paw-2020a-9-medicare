@@ -1,4 +1,4 @@
-create table system_country
+create table if not exists system_country
 (
     country_id varchar(2) not null
         constraint system_country_pk
@@ -6,19 +6,18 @@ create table system_country
     name varchar(255) not null
 );
 
-create table system_province
+create table if not exists system_province
 (
     province_id identity not null
         constraint system_province_pk
             primary key,
     country_id varchar(2)
         constraint system_province_country
-            references system_country
-            ,
+            references system_country,
     name varchar(255) not null
 );
 
-create table system_staff_specialty
+create table if not exists system_staff_specialty
 (
     specialty_id identity not null
         constraint specialty_pk
@@ -26,19 +25,18 @@ create table system_staff_specialty
     name varchar(255) not null
 );
 
-create table system_locality
+create table if not exists system_locality
 (
     province_id integer
         constraint system_locality_province
-            references system_province
-            ,
+            references system_province,
     name varchar(255) not null,
     locality_id identity not null
         constraint system_locality_pk
             primary key
 );
 
-create table office
+create table if not exists office
 (
     office_id identity not null
         constraint office_pk
@@ -47,14 +45,22 @@ create table office
     street varchar(255),
     locality_id integer
         constraint office_province_id
-            references system_locality
-            ,
+            references system_locality,
     phone varchar(255),
     email varchar(255),
     url varchar(255)
 );
 
-create table users
+create table if not exists picture
+(
+    picture_id identity not null primary key,
+    name varchar(1023),
+    mime_type varchar(255) not null,
+    size bigint not null default 0,
+    data varbinary(65535) not null
+);
+
+create table if not exists users
 (
     email varchar(255) not null,
     password varchar(255) not null,
@@ -63,10 +69,16 @@ create table users
             primary key,
     first_name varchar(255) not null,
     surname varchar(255) not null,
-    phone varchar(255)
+    phone varchar(255),
+    verified boolean default false,
+    token varchar(1023),
+    token_created_date timestamp,
+    profile_id int constraint users_picture_picture_id_fk
+        foreign key references picture
+            on delete set null
 );
 
-create table staff
+create table if not exists staff
 (
     staff_id identity not null
         constraint staff_pk
@@ -85,7 +97,7 @@ create table staff
             references users
 );
 
-create table system_staff_specialty_staff
+create table if not exists system_staff_specialty_staff
 (
     specialty_id integer not null
         constraint specialty_staff_system_specialty
@@ -99,7 +111,7 @@ create table system_staff_specialty_staff
         primary key (specialty_id, staff_id)
 );
 
-create table patient
+create table if not exists patient
 (
     user_id integer
         constraint patient_user_user_id_fk
@@ -113,7 +125,7 @@ create table patient
             primary key
 );
 
-create table appointment
+create table if not exists appointment
 (
     appointment_id identity not null
         constraint appointment_pk
@@ -123,14 +135,15 @@ create table appointment
         constraint appointment_patient_patient_id_fk
             references patient
             ,
-    staff_id integer not null,
-    from_date date not null
+    staff_id integer not null constraint appointment_staff_staff_id_fk
+        foreign key references staff
+            on delete cascade,
+    from_date timestamp not null
 );
 
-
-create table workday
+create table if not exists workday
 (
-    workday_id identity not null,
+    workday_id identity not null primary key,
     staff_id int not null
         constraint workday_staff_staff_id_fk
             references staff
@@ -142,46 +155,9 @@ create table workday
     day varchar(255) not null
 );
 
-alter table workday
-    add constraint workday_pk
-        primary key (workday_id);
-
-alter table appointment
-    add constraint appointment_staff_staff_id_fk
-        foreign key (staff_id) references staff
-            on update set null on delete set null;
-
-alter table appointment alter column from_date type timestamp;
-
-alter table users
-    add verified boolean default false;
-
-alter table users
-    add token varchar(1023);
-
-alter table users
-    add token_created_date timestamp;
-
-create table picture
-(
-    picture_id identity not null,
-    name varchar(1023),
-    mime_type varchar(255) not null,
-    size bigint not null default 0,
-    data varbinary(65535) not null
-);
-
-create unique index picture_picture_id_uindex
-    on picture (picture_id);
-
-alter table picture
-    add constraint picture_pk
-        primary key (picture_id);
-
-alter table users
-    add profile_id int;
-
-alter table users
-    add constraint users_picture_picture_id_fk
-        foreign key (profile_id) references picture
-            on delete set null;
+drop function unaccent if exists;
+create function unaccent(t varchar(255))
+returns varchar(255)
+return translate(t,
+            'âãäåāăąÁÂÃÄÅĀĂĄèééêëēĕėęěĒĔĖĘĚìíîïìĩīĭÌÍÎÏÌĨĪĬóôõöōŏőÒÓÔÕÖŌŎŐùúûüũūŭůÙÚÛÜŨŪŬŮ',
+            'aaaaaaaaaaaaaaaeeeeeeeeeeeeeeeiiiiiiiiiiiiiiiiooooooooooooooouuuuuuuuuuuuuuuu');
