@@ -141,11 +141,10 @@ public class PatientSideController extends GenericController {
     }
 
     @RequestMapping(value = "/patient/appointment/{staffId}/{year}/{month}/{day}/{hour}/{minute}", method = RequestMethod.POST)
-    public ModelAndView requestAppointment(@Valid @ModelAttribute("appointmentForm") RequestAppointmentForm form,
+    public ModelAndView requestAppointment(@Valid @ModelAttribute("appointmentForm") RequestAppointmentForm form, final BindingResult errors,
                                            @PathVariable("staffId") final int staffId, @PathVariable("year") final int year,
                                            @PathVariable("month") final int month, @PathVariable("day") final int day,
-                                           @PathVariable("hour") final int hour, @PathVariable("minute") final int minute,
-                                           final BindingResult errors, HttpServletRequest request){
+                                           @PathVariable("hour") final int hour, @PathVariable("minute") final int minute, HttpServletRequest request){
         if(errors.hasErrors()){
             return requestAppointment(form, staffId, year, month, day, hour, minute);
         }
