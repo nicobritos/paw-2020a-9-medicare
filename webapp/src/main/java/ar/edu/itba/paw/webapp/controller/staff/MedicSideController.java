@@ -150,11 +150,10 @@ public class MedicSideController extends GenericController {
         User editedUser = user.get();
         editedUser.setFirstName(form.getFirstName());
         editedUser.setSurname(form.getSurname());
-
         editedUser.setEmail(form.getEmail());
+        editedUser.setPhone(form.getPhone());
         if(!form.getPassword().isEmpty())
             editedUser.setPassword(form.getPassword());
-        //TODO: PHONE
         userService.update(editedUser);
         if (!editedUser.getEmail().equals(user.get().getEmail())) {
             this.createConfirmationEvent(request, editedUser);

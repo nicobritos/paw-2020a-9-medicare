@@ -43,11 +43,10 @@
                     </div>
                     <div class="row">
                         <div class="col p-0 m-0">
-                            <h3><spring:message code="Phone"/></h3>
-                            <c:forEach var="staff" items="${staffs}">
-                                <label for="phone"></label><input class="form-control mb-3 w-75" id="phone" name="phone"
-                                                                  value="${staff.office.phone}" readonly/>
-                            </c:forEach>
+                            <h3><spring:message code="Phone"/><label for="phone" class="toggle-readonly"><img
+                                    type="button" src='<c:url value="/img/editPencil.svg"/>' alt="editar"/></label></h3>
+                            <label for="phone"></label><form:input class="form-control mb-3 w-75" id="phone" name="phone"
+                                                                  value="${user.get().phone}" path="phone" readonly="true"/>
                         </div>
                         <div class="col p-0 m-0">
                             <h3><spring:message code="Email"/> <label for="email" class="toggle-readonly"><img
@@ -87,7 +86,7 @@
                     <c:forEach var="staff" items="${staffs}">
                         <div class="container p-0 m-0 pl-3">
                             <div class="row d-flex align-items-center justify-content-between">
-                                <p class="m-0">- ${staff.office.name}</p>
+                                <p class="m-0">- ${staff.office.name} - TEL: ${staff.office.phone}</p>
                             </div>
                         </div>
                     </c:forEach>

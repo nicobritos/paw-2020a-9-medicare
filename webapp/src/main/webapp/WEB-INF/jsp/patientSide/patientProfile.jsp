@@ -39,16 +39,11 @@
                             </div>
                         </div>
                         <div class="row">
-<%--                            <div class="col p-0 m-0">--%>
-<%--                                <!-- TODO Connect image function-->--%>
-<%--                                <h3><spring:message code="Phone"/><img type="button" src='<c:url value="/img/editPencil.svg"/>' alt="editar"></h3>--%>
-<%--                                <!-- TODO Connect telefono-->--%>
-<%--                                <c:forEach var="patient" items="${patients}">--%>
-<%--                                    <label for="phone"></label><input class="form-control mb-3 w-75" id="phone" name="phone" value="${user.get().phone}" readonly/>--%>
-<%--                                </c:forEach>--%>
-<%--                            </div>--%>
                             <div class="col p-0 m-0">
-                                <!-- TODO Connect image function-->
+                                <h3><spring:message code="Phone"/><img type="button" src='<c:url value="/img/editPencil.svg"/>' alt="editar"></h3>
+                                <label for="phone"></label><form:input path="phone" class="form-control mb-3 w-75" id="phone" name="phone" value="${user.get().phone}" readonly="true"/>
+                            </div>
+                            <div class="col p-0 m-0">
                                 <h3><spring:message code="Email"/> <label for="email" class="toggle-readonly"><img type="button" src='<c:url value="/img/editPencil.svg"/>' alt="editar"/></label></h3>
                                 <form:input class="form-control mb-3 w-75" id="email" name="email" value="${user.get().email}" path="email" readonly="true"/>
                             </div>

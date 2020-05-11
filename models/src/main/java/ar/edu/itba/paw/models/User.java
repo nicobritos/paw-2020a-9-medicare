@@ -22,6 +22,8 @@ public class User extends GenericModel<Integer> {
     private DateTime tokenCreatedDate;
     @Column(name = "profile_id")
     private Integer profileId;
+    @Column(name = "phone")
+    private String phone;
 
     public String getEmail() {
         return this.email;
@@ -89,6 +91,14 @@ public class User extends GenericModel<Integer> {
 
     public void setProfileId(Integer profileId) {
         this.profileId = profileId;
+    }
+
+    public String getPhone() {
+        return phone;
+    }
+
+    public void setPhone(String phone) {
+        this.phone = phone;
     }
 
     @Override
