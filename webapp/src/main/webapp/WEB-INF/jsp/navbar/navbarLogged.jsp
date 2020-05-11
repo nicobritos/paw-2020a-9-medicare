@@ -1,4 +1,3 @@
-<%@ taglib prefix="spring" uri="http://www.springframework.org/tags" %>
 <nav class="navbar navbar-expand header">
   <!-- TODO -->
   <div class="container w-100 justify-content-start">

@@ -1,4 +1,5 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jstl/core_rt" %>
+<%@ taglib prefix="spring" uri="http://www.springframework.org/tags" %>
 <%--TODO--%>
 <%--<link rel="stylesheet" href='<c:url value="/css/styles.css"/> '>--%>
 <script src='<c:url value="/js/plugins/jquery-3.5.0.min.js"/>'></script>
@@ -9,12 +10,13 @@
 <script>
     App.init();
 </script>
+<meta name="support-button-msg" content="<spring:message code="HereToHelp"/>">
 <script type="text/javascript">
-    (function () {
+    function button() {
         var options = {
             facebook: "1112883855467682", // Facebook page ID
             whatsapp: "+54 9 11 6939-7444", // WhatsApp number
-            call_to_action: "Estamos para ayudarte", // Call to action
+            call_to_action: getMetaContent('support-button-msg'), // Call to action
             button_color: "#333", // Color of button
             position: "right", // Position may be 'right' or 'left'
             order: "whatsapp", // Order of buttons
@@ -23,7 +25,19 @@
         var s = document.createElement('script'); s.type = 'text/javascript'; s.async = true; s.src = url + '/widget-send-button/js/init.js';
         s.onload = function () { WhWidgetSendButton.init(host, proto, options); };
         var x = document.getElementsByTagName('script')[0]; x.parentNode.insertBefore(s, x);
-    })();
+    }
+
+    function getMetaContent(metaName) {
+        let metas = document.getElementsByTagName('meta');
+        for (let i = 0; i < metas.length; i++){
+            if(metas[i].getAttribute('name') === metaName){
+                return metas[i].getAttribute('content');
+            }
+        }
+        return '';
+    }
+
+    button();
 </script>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>

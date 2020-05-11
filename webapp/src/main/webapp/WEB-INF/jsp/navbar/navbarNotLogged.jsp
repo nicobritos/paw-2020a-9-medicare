@@ -1,4 +1,3 @@
-<%@ taglib prefix="spring" uri="http://www.springframework.org/tags" %>
 <nav class="navbar navbar-expand header">
     <div class="container w-100 justify-content-start">
         <img class="navbar-brand" src='<c:url value="/img/whiteLogo.svg"/>' alt="logo" id="navbar-logo">
