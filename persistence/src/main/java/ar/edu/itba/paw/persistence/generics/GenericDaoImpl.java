@@ -89,7 +89,8 @@ public abstract class GenericDaoImpl<M extends GenericModel<I>, I> implements Ge
         for (I id : ids) {
             String parameter = "_id_" + i;
             idsParameters.add(":" + parameter);
-            parameters.put(":" + parameter, id);
+            parameters.put(parameter, id);
+            i++;
         }
 
         JDBCSelectQueryBuilder selectQueryBuilder = new JDBCSelectQueryBuilder()

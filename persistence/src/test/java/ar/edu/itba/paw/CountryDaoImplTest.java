@@ -20,7 +20,7 @@ import java.util.*;
 import static org.junit.Assert.*;
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@Sql(scripts = "classpath:sql/schema.sql")
+@Sql("classpath:sql/schema.sql")
 @ContextConfiguration(classes = TestConfig.class)
 public class CountryDaoImplTest
 {
