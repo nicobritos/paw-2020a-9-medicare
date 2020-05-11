@@ -22,6 +22,7 @@ public class Staff extends GenericModel<Integer> {
     private String email;
     @Column(name = "registration_number")
     private Integer registrationNumber;
+
     private User user;
     private Office office;
     private Collection<StaffSpecialty> staffSpecialties = new LinkedList<>();

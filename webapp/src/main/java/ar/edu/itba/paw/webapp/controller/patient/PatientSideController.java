@@ -250,7 +250,7 @@ public class PatientSideController extends GenericController {
         //check if user is allowed to cancel
         boolean isAllowed = false;
         for(Patient p : patient){
-            if(p.getId().equals(appointment.get().getPatientId())){
+            if(p.equals(appointment.get().getPatient())){
                 isAllowed = true;
                 break;
             }

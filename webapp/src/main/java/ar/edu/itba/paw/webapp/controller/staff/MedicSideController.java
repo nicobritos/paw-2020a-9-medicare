@@ -302,7 +302,7 @@ public class MedicSideController extends GenericController {
         //check if user is allowed to cancel
         boolean isAllowed = false;
         for(Staff s : staff){
-            if(s.getId().equals(appointment.get().getStaffId())){
+            if(s.equals(appointment.get().getStaff())){
                 isAllowed = true;
                 break;
             }

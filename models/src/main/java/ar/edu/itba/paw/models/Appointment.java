@@ -15,16 +15,13 @@ public class Appointment extends GenericModel<Integer> {
     @OrderBy(OrderCriteria.ASC)
     @Column(name = "from_date", required = true)
     private DateTime fromDate;
-    @Column(name = "patient_id", required = true)
-    private int patientId;
-    private Patient patient;
-    @Column(name = "staff_id", required = true)
-    private int staffId;
-    private Staff staff;
     @Column(name = "message")
     private String message;
     @Column(name = "motive")
     private String motive;
+
+    private Patient patient;
+    private Staff staff;
 
     public String getAppointmentStatus() {
         return this.appointmentStatus;
@@ -40,7 +37,6 @@ public class Appointment extends GenericModel<Integer> {
 
     public void setPatient(Patient patient) {
         this.patient = patient;
-        this.patientId = patient.getId();
     }
 
     public Staff getStaff() {
@@ -49,7 +45,6 @@ public class Appointment extends GenericModel<Integer> {
 
     public void setStaff(Staff staff) {
         this.staff = staff;
-        this.staffId = staff.getId();
     }
 
     public DateTime getFromDate() {
@@ -62,29 +57,6 @@ public class Appointment extends GenericModel<Integer> {
 
     public DateTime getToDate(){
         return this.fromDate.plusMinutes(Appointment.DURATION);
-    }
-
-    public int getPatientId() {
-        return patientId;
-    }
-
-    public void setPatientId(int patientId) {
-        this.patientId = patientId;
-        if(this.patient != null && !this.patient.getId().equals(patientId)){
-            patient = null;
-        }
-
-    }
-
-    public int getStaffId() {
-        return staffId;
-    }
-
-    public void setStaffId(int staffId) {
-        this.staffId = staffId;
-        if(this.staff != null && !this.staff.getId().equals(staffId)){
-            staff = null;
-        }
     }
 
     public String getMessage() {

@@ -10,6 +10,7 @@ public class Province extends GenericModel<Integer> {
     @OrderBy(OrderCriteria.ASC)
     @Column(name = "name", required = true)
     private String name;
+
     private Country country;
 
     public String getName() {
