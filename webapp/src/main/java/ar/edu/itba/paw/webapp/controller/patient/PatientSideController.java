@@ -3,10 +3,7 @@ package ar.edu.itba.paw.webapp.controller.patient;
 import ar.edu.itba.paw.interfaces.services.*;
 import ar.edu.itba.paw.interfaces.services.exceptions.InvalidAppointmentDateException;
 import ar.edu.itba.paw.interfaces.services.exceptions.InvalidMinutesException;
-import ar.edu.itba.paw.models.Appointment;
-import ar.edu.itba.paw.models.Patient;
-import ar.edu.itba.paw.models.Staff;
-import ar.edu.itba.paw.models.User;
+import ar.edu.itba.paw.models.*;
 import ar.edu.itba.paw.webapp.controller.utils.GenericController;
 import ar.edu.itba.paw.webapp.controller.utils.JsonResponse;
 import ar.edu.itba.paw.webapp.events.AppointmentCancelEvent;
@@ -149,6 +146,9 @@ public class PatientSideController extends GenericController {
                                            @PathVariable("month") final int month, @PathVariable("day") final int day,
                                            @PathVariable("hour") final int hour, @PathVariable("minute") final int minute,
                                            final BindingResult errors, HttpServletRequest request){
+        if(errors.hasErrors()){
+            return requestAppointment(form, staffId, year, month, day, hour, minute);
+        }
         Optional<Staff> staff = this.staffService.findById(form.getStaffId());
         if (!staff.isPresent()) {
             errors.reject("NotFound.requestAppointment.staff", null, "Error");
@@ -183,7 +183,7 @@ public class PatientSideController extends GenericController {
             appointment = this.appointmentService.create(appointment);
             StringBuilder baseUrl = new StringBuilder(request.getRequestURL());
             baseUrl.replace(request.getRequestURL().lastIndexOf(request.getServletPath()), request.getRequestURL().length(), "");
-            this.eventPublisher.publishEvent(new NewAppointmentEvent(optionalUser.get(), staff.get().getUser(), appointment, request.getLocale(), baseUrl.toString()));
+            this.eventPublisher.publishEvent(new NewAppointmentEvent(optionalUser.get(), staff.get().getUser(), appointment, request.getLocale(), baseUrl.toString(), form.getMotive(), form.getComment()));
         } catch (InvalidMinutesException e){
             errors.reject("InvalidValue.requestAppointment.date", null, "Error");
             return this.requestAppointment(form, staffId, year, month, day, hour, minute);
@@ -210,7 +210,12 @@ public class PatientSideController extends GenericController {
         if (!staffOptional.isPresent()) {
             return new ModelAndView("redirect:/mediclist/0");
         }
-        staffOptional.get().getStaffSpecialties().stream().findFirst().ifPresent(specialty -> form.setMotive("Consulta de " + specialty.getName()));
+        Optional<StaffSpecialty> staffSpecialty = staffOptional.get().getStaffSpecialties().stream().findFirst();
+        if(staffSpecialty.isPresent()){
+            form.setMotive("Consulta de " + staffSpecialty.get().getName());
+        } else {
+            form.setMotive("Consulta");
+        }
         userOptional.ifPresent(user -> {
             form.setEmail(user.getEmail());
             form.setFirstName(user.getFirstName());

@@ -1,9 +1,11 @@
 package ar.edu.itba.paw.webapp.form;
 
 import org.hibernate.validator.constraints.Email;
+import org.hibernate.validator.constraints.NotEmpty;
 
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
+import javax.validation.constraints.Size;
 
 public class RequestAppointmentForm {
     @Min(0)
@@ -20,13 +22,17 @@ public class RequestAppointmentForm {
     @Max(23)
     private int hour;
     @Min(0)
-    @Max(60)
+    @Max(59)
     private int minute;
+    @NotEmpty
     private String firstName;
+    @NotEmpty
     private String surname;
+    @NotEmpty
     private String motive;
     private String comment;
     @Email
+    @NotEmpty
     private String email;
     private String phone;
 

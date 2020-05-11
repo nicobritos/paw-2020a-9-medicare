@@ -19,15 +19,15 @@ function changeWeek(i){
     let weekAdded = false;
     for(let k in params){
         if(k !== "week"){
-            url += k + "=" + params[k] + "&&";
+            url += k + "=" + params[k] + "&";
         }else{
             let week = parseInt(params[k]);
-            url += k + "=" + (isNaN(week)?i:week+i) + "&&";
+            url += k + "=" + (isNaN(week)?i:week+i) + "&";
             weekAdded=true;
         }
     }
     if(!weekAdded){
-        url+="week=" + i + "&&";
+        url+="week=" + i + "&";
     }
     url = url.substring(0,url.length-2);
     location.replace(url);
@@ -46,14 +46,14 @@ function changeToday(today) {
     let todayAdded = false;
     for(let k in params){
         if(k !== "today"){
-            url += k + "=" + params[k] + "&&";
+            url += k + "=" + params[k] + "&";
         }else{
-            url += k + "=" + today + "&&";
+            url += k + "=" + today + "&";
             todayAdded=true;
         }
     }
     if(!todayAdded){
-        url+="today=" + today + "&&";
+        url+="today=" + today + "&";
     }
     url = url.substring(0,url.length-2);
     location.replace(url);

@@ -12,14 +12,18 @@ public class NewAppointmentEvent extends ApplicationEvent {
     private Appointment appointment;
     private Locale locale;
     private String baseUrl;
+    private String motive;
+    private String comment;
 
-    public NewAppointmentEvent(User patient, User doctor, Appointment appointment, Locale locale, String baseUrl) {
+    public NewAppointmentEvent(User patient, User doctor, Appointment appointment, Locale locale, String baseUrl, String motive, String comment) {
         super(patient);
         this.baseUrl = baseUrl;
         this.patient = patient;
         this.doctor = doctor;
         this.appointment = appointment;
         this.locale = locale;
+        this.motive = motive;
+        this.comment = comment;
     }
 
     public User getPatient() {
@@ -40,5 +44,13 @@ public class NewAppointmentEvent extends ApplicationEvent {
 
     public String getBaseUrl() {
         return baseUrl;
+    }
+
+    public String getMotive() {
+        return motive;
+    }
+
+    public String getComment() {
+        return comment;
     }
 }
