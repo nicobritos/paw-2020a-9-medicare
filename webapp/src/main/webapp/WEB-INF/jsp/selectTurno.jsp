@@ -32,7 +32,9 @@
                 <p><spring:message code="Address"/>: ${staff.office.street} - ${staff.office.locality.name}</p>
             </div>
             <div class="row pl-4">
-                <p><spring:message code="Phones"/>/s:</p>
+                <p><spring:message code="Phones"/>:</p>
+            </div>
+            <div class="row pl-4">
                 <ul>
                     <c:if test="${user.get().phone != null}"><li>${user.get().phone} (<spring:message code="Personal"/>)</li></c:if>
                     <c:if test="${staff.office.phone != null}"><li>${staff.office.phone} (${staff.office.name})</li></c:if>
