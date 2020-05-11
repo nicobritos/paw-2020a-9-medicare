@@ -34,7 +34,7 @@
             <div class="row pl-4">
                 <p><spring:message code="Phones"/>/s:</p>
                 <ul>
-                    <c:if test="${staff.get().phone != null}"><li>${user.get().phone} (<spring:message code="Personal"/>)</li></c:if>
+                    <c:if test="${user.get().phone != null}"><li>${user.get().phone} (<spring:message code="Personal"/>)</li></c:if>
                     <c:if test="${staff.office.phone != null}"><li>${staff.office.phone} (${staff.office.name})</li></c:if>
                 </ul>
             </div>
