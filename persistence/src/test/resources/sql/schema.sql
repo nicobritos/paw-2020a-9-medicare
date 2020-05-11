@@ -138,7 +138,9 @@ create table if not exists appointment
     staff_id integer not null constraint appointment_staff_staff_id_fk
         foreign key references staff
             on delete cascade,
-    from_date timestamp not null
+    from_date timestamp not null,
+    motive varchar(65535),
+    message varchar(65535)
 );
 
 create table if not exists workday
@@ -161,9 +163,3 @@ returns varchar(255)
 return translate(t,
             'âãäåāăąÁÂÃÄÅĀĂĄèééêëēĕėęěĒĔĖĘĚìíîïìĩīĭÌÍÎÏÌĨĪĬóôõöōŏőÒÓÔÕÖŌŎŐùúûüũūŭůÙÚÛÜŨŪŬŮ',
             'aaaaaaaaaaaaaaaeeeeeeeeeeeeeeeiiiiiiiiiiiiiiiiooooooooooooooouuuuuuuuuuuuuuuu');
-
-alter table appointment
-    add motive varchar(65535);
-
-alter table appointment
-    add message varchar(65535);
