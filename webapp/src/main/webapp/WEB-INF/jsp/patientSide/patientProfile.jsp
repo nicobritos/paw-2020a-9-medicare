@@ -40,8 +40,8 @@
                         </div>
                         <div class="row">
                             <div class="col p-0 m-0">
-                                <h3><spring:message code="Phone"/><img type="button" src='<c:url value="/img/editPencil.svg"/>' alt="editar"></h3>
-                                <label for="phone"></label><form:input path="phone" class="form-control mb-3 w-75" id="phone" name="phone" value="${user.get().phone}" readonly="true"/>
+                                <h3><spring:message code="Phone"/><label for="phone" class="toggle-readonly"><img type="button" src='<c:url value="/img/editPencil.svg"/>' alt="editar"></label></h3>
+                                <form:input path="phone" class="form-control mb-3 w-75" id="phone" name="phone" value="${user.get().phone}" readonly="true"/>
                             </div>
                             <div class="col p-0 m-0">
                                 <h3><spring:message code="Email"/> <label for="email" class="toggle-readonly"><img type="button" src='<c:url value="/img/editPencil.svg"/>' alt="editar"/></label></h3>
