@@ -117,7 +117,9 @@ public class NewAppointmentEventListener implements ApplicationListener<NewAppoi
                             newAppointmentEvent.getAppointment(),
                             this.messageSource.getMessage(dowMessage, null, newAppointmentEvent.getLocale()),
                             this.messageSource.getMessage(month, null, newAppointmentEvent.getLocale()),
-                            newAppointmentEvent.getLocale()),
+                            newAppointmentEvent.getLocale(),
+                            newAppointmentEvent.getMotive(),
+                            newAppointmentEvent.getComment()),
                     true);
             mimeMessageHelper.setSubject(subject);
             mimeMessageHelper.setFrom(new InternetAddress("notifications@medicare.com", "MediCare"));
@@ -128,7 +130,7 @@ public class NewAppointmentEventListener implements ApplicationListener<NewAppoi
         }
     }
 
-    private String getHTML(String baseUrl, User doctor, User patient, Appointment appointment, String dow, String month, Locale locale) throws IOException {
+    private String getHTML(String baseUrl, User doctor, User patient, Appointment appointment, String dow, String month, Locale locale, String motive, String comment) throws IOException {
         Map<String, String> values = new HashMap<>();
         values.put("baseUrl", baseUrl);
         values.put("year", String.valueOf(DateTime.now().getYear()));
@@ -143,14 +145,21 @@ public class NewAppointmentEventListener implements ApplicationListener<NewAppoi
                         ((appointment.getFromDate().getHourOfDay() < 10)?"0":"") + appointment.getFromDate().getHourOfDay(),
                         ((appointment.getFromDate().getMinuteOfHour() < 10)?"0":"") + appointment.getFromDate().getMinuteOfHour(),
                         ((appointment.getToDate().getHourOfDay() < 10)?"0":"") + appointment.getToDate().getHourOfDay(),
-                        ((appointment.getToDate().getMinuteOfHour() < 10)?"0":"") + appointment.getToDate().getMinuteOfHour()
+                        ((appointment.getToDate().getMinuteOfHour() < 10)?"0":"") + appointment.getToDate().getMinuteOfHour(),
+                        motive
                 },
                 locale));
+        values.put("comment", this.messageSource.getMessage(MESSAGE_SOURCE_BODY_PREFIX + ".comment", new Object[]{comment}, locale));
         values.put("disclaimer", this.messageSource.getMessage(MESSAGE_SOURCE_DISCLAIMER, null, locale));
         values.put("title", this.messageSource.getMessage(MESSAGE_SOURCE_BODY_PREFIX + ".title", null, locale));
 
         EmailFormatter emailFormatter = new EmailFormatter();
-        String html = emailFormatter.format(emailFormatter.getHTMLFromFilename("newAppointment"));
+        String html;
+        if(comment != null && !comment.isEmpty()){
+            html = emailFormatter.format(emailFormatter.getHTMLFromFilename("newAppointmentWithComment"));
+        } else {
+            html = emailFormatter.format(emailFormatter.getHTMLFromFilename("newAppointment"));
+        }
         StrSubstitutor substitutor = new StrSubstitutor(values, "${", "}");
         return substitutor.replace(html);
     }
