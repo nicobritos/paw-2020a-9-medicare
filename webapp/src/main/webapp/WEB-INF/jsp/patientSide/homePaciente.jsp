@@ -21,7 +21,6 @@
                 <div class="container">
                   <div class="row">
                     <div class="col-4">
-                      <%--TODO:check image--%>
                       <img
                         class="w-100 rounded-circle"
                           src="<c:url value="/profilePics/${appointment.staff.user.profileId}"/>"
@@ -34,7 +33,7 @@
                       </div>
                       <div class="row">
                         <c:forEach var="specialty" items="${appointment.staff.staffSpecialties}">
-                          <p class="m-0">${specialty.name}</p>
+                          <p class="m-0">${specialty.name} </p>
                         </c:forEach>
                       </div>
                       <div class="row">
