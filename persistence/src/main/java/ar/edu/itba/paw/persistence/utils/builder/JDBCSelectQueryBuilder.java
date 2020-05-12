@@ -210,6 +210,20 @@ public class JDBCSelectQueryBuilder extends JDBCQueryBuilder {
         return columns;
     }
 
+    protected List<String> getModelColumnsAsList() {
+        List<String> columns = new LinkedList<>();
+        if (this.mClass == null)
+            return columns;
+
+        Table table = this.mClass.getAnnotation(Table.class);
+        columns.add(this.alias + "." + table.primaryKey() + " AS " + "\"" + this.alias + "." + table.primaryKey() + "\"");
+        ReflectionGetterSetter.iterateFields(this.mClass, Column.class, field -> {
+            Column column = field.getAnnotation(Column.class);
+            columns.add(this.alias + "." + column.name() + " AS " + "\"" + this.alias + "." + column.name() + "\"");
+        });
+        return columns;
+    }
+
     protected String getQueryAsSubqueryString(boolean onlyColumnsFromTable) {
         StringBuilder stringBuilder = new StringBuilder("SELECT ");
 
@@ -274,7 +288,7 @@ public class JDBCSelectQueryBuilder extends JDBCQueryBuilder {
     private String generateColumns() {
         List<String> columns = this.getColumnsAsList();
         if (this.fromQueryBuilder != null) {
-            columns.addAll(this.fromQueryBuilder.getColumnsAsList());
+            columns.addAll(this.fromQueryBuilder.getModelColumnsAsList());
         }
         return this.joinStrings(columns);
     }
