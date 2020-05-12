@@ -559,7 +559,7 @@ public class AppointmentDaoImpl extends GenericDaoImpl<Appointment, Integer> imp
                     }
                     if (userStaff != null)
                         staff.setUser(userStaff);
-                    if (staffSpecialty != null)
+                    if (staffSpecialty != null && !staff.getStaffSpecialties().contains(staffSpecialty))
                         staff.getStaffSpecialties().add(staffSpecialty);
                 }
                 if (localityStaff != null && provinceStaff != null) {

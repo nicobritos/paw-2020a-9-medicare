@@ -440,7 +440,7 @@ public class StaffDaoImpl extends GenericSearchableDaoImpl<Staff, Integer> imple
                 }
                 if (user != null)
                     staff.setUser(user);
-                if (staffSpecialty != null)
+                if (staffSpecialty != null && !staff.getStaffSpecialties().contains(staffSpecialty))
                     staff.getStaffSpecialties().add(staffSpecialty);
                 if (locality != null && province != null) {
                     locality.setProvince(province);

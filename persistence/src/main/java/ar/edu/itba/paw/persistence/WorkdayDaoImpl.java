@@ -267,7 +267,7 @@ public class WorkdayDaoImpl extends GenericDaoImpl<Workday, Integer> implements 
                     }
                     if (user != null)
                         staff.setUser(user);
-                    if (staffSpecialty != null)
+                    if (staffSpecialty != null && !staff.getStaffSpecialties().contains(staffSpecialty))
                         staff.getStaffSpecialties().add(staffSpecialty);
                 }
 
