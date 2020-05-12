@@ -51,7 +51,10 @@
                         />
                         <div class="dropdown-menu">
                           <!-- TODO add reprogramar -->
-                          <a class="dropdown-item cancelAppointmentBtn" href="<c:url value="/staff/appointment/${appointment.id}"/>"><spring:message code="Cancel"/></a>
+
+                          <form action="<c:url value="/staff/appointment/${appointment.id}${query}"/>" method="post">
+                            <button type="submit" class="dropdown-item"><spring:message code="Cancel"/></button>
+                          </form>
                         </div>
                       </div>
                     </div>
@@ -112,7 +115,6 @@
                   <div class="container">
                     <div class="row">
                       <div class="col-4">
-                          <%-- TODO: check image--%>
                         <img
                           class="w-100 rounded-circle"
                           src="<c:url value="/profilePics/${appointment.patient.user.profileId}"/>"
@@ -137,7 +139,9 @@
                           />
                           <div class="dropdown-menu">
                             <!-- TODO add reprogramar -->
-                            <a class="dropdown-item cancelAppointmentBtn" href="<c:url value="/staff/appointment/${appointment.id}"/>"><spring:message code="Cancel"/></a>
+                            <form action="<c:url value="/staff/appointment/${appointment.id}${query}"/>" method="post">
+                              <button type="submit" class="dropdown-item"><spring:message code="Cancel"/></button>
+                            </form>
                           </div>
                         </div>
                       </div>
