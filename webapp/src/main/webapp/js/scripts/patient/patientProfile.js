@@ -22,7 +22,7 @@ const Profile = function () {
         profilePictureInput.change(function(e){
             //get profile pic file and check type
             let file = e.target.files[0];
-            if(file.type!=="image/jpeg"){
+            if(!file.type.includes("image")){
                 App.showError();
                 return;
             }
