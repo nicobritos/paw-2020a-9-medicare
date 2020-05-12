@@ -45,8 +45,15 @@
               <h4 class="white-text"><spring:message code="AppointmentDetails"/></h4>
             </div>
             <div class="row justify-content-center border-top border-light py-2">
-              <div class="col-3">
-                <img src="<c:url value="/profilePics/${staff.user.profileId}"/>" class="w-100 rounded-circle" alt="profile pic">
+              <div class="col-3 d-flex flex-column justify-content-center">
+                <div class="profile-picture-container">
+                  <div style="margin-top: 100%;"></div>
+                  <img
+                          class="profile-picture rounded-circle"
+                          src="<c:url value="/profilePics/${staff.user.profileId}"/>"
+                          alt=""
+                  />
+                </div>
               </div>
               <div class="col p-0">
                 <p class="m-0 white-text"><c:out value="${staff.firstName} ${staff.surname}"/></p>

@@ -11,9 +11,15 @@
     <div class="row h-100">
         <div class="col-4 h-100 grey-background">
             <div class="row mt-4">
-                <div class="col-4">
-                    <img class="w-100 rounded-circle" src="<c:url value="/profilePics/${staff.user.profileId}"/>"
-                         alt="">
+                <div class="col-3 d-flex flex-column justify-content-center">
+                    <div class="profile-picture-container">
+                        <div style="margin-top: 100%;"></div>
+                        <img
+                                class="profile-picture rounded-circle"
+                                src="<c:url value="/profilePics/${staff.user.profileId}"/>"
+                                alt=""
+                        />
+                    </div>
                 </div>
                 <div class="col mr-3">
                     <div class="row mt-2">

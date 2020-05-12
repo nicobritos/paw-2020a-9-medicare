@@ -34,15 +34,34 @@
           <c:when test="${staffs == null}">
             <a href="<c:url value="/patient/profile"/>">
               <%-- TODO:move style to css --%>
-              <%-- TODO: check image--%>
-              <img id="navbarPatientUserImage" class="ml-2 rounded-circle" src="<c:url value="/profilePics/${user.get().profileId}"/>" alt="" style="height: 2em;">
+                <div style="width: 2em;" class="d-flex flex-column justify-content-center">
+                  <div class="profile-picture-container">
+                    <div style="margin-top: 100%;"></div>
+                    <img
+                            id="navbarPatientUserImage"
+                            class="profile-picture rounded-circle"
+                            src="<c:url value="/profilePics/${user.get().profileId}"/>"
+                            alt=""
+                    />
+                  </div>
+                </div>
             </a>
           </c:when>
           <c:otherwise>
             <a href="<c:url value="/staff/profile"/>">
                 <%-- TODO:move style to css --%>
                 <%-- TODO: check image--%>
-              <img id="navbarStaffUserImage" class="ml-2 rounded-circle" src="<c:url value="/profilePics/${user.get().profileId}"/>" alt="" style="height: 2em;">
+              <div style="width: 2em;" class="d-flex flex-column justify-content-center">
+                <div class="profile-picture-container">
+                  <div style="margin-top: 100%;"></div>
+                  <img
+                          id="navbarStaffUserImage"
+                          class="profile-picture rounded-circle"
+                          src="<c:url value="/profilePics/${user.get().profileId}"/>"
+                          alt=""
+                  />
+                </div>
+              </div>
             </a>
           </c:otherwise>
         </c:choose>

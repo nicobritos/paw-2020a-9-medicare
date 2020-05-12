@@ -20,12 +20,15 @@
               <li class="list-group-item turno-item mb-3">
                 <div class="container">
                   <div class="row">
-                    <div class="col-4">
-                      <img
-                        class="w-100 rounded-circle"
-                          src="<c:url value="/profilePics/${appointment.staff.user.profileId}"/>"
-                        alt=""
-                      />
+                    <div class="col-4 d-flex flex-column justify-content-center">
+                      <div class="profile-picture-container">
+                        <div style="margin-top: 100%;"></div>
+                        <img
+                                class="profile-picture rounded-circle"
+                                src="<c:url value="/profilePics/${appointment.staff.user.profileId}"/>"
+                                alt=""
+                        />
+                      </div>
                     </div>
                     <div class="col-7">
                       <div class="row justify-content-start">

@@ -51,13 +51,15 @@
                         <li class="list-group-item turno-item mb-3">
                             <div class="container">
                                 <div class="row">
-                                    <div class="col-3 d-flex align-items-center">
-                                            <%--TODO check image--%>
-                                        <img
-                                                class="w-75 rounded-circle"
-                                                src="<c:url value="/profilePics/${member.user.profileId}"/>"
-                                                alt=""
-                                        />
+                                    <div class="col-3 d-flex flex-column justify-content-center">
+                                        <div class="profile-picture-container">
+                                            <div style="margin-top: 100%;"></div>
+                                            <img
+                                                    class="profile-picture rounded-circle"
+                                                    src="<c:url value="/profilePics/${member.user.profileId}"/>"
+                                                    alt=""
+                                            />
+                                        </div>
                                     </div>
                                     <div class="col-6">
                                         <div class="row justify-content-start">
