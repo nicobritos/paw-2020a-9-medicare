@@ -3,17 +3,14 @@ package ar.edu.itba.paw.webapp.controller.staff;
 import ar.edu.itba.paw.interfaces.services.*;
 import ar.edu.itba.paw.models.*;
 import ar.edu.itba.paw.webapp.controller.utils.GenericController;
-import ar.edu.itba.paw.webapp.controller.utils.JsonResponse;
 import ar.edu.itba.paw.webapp.events.AppointmentCancelEvent;
 import ar.edu.itba.paw.webapp.events.UserConfirmationTokenGenerationEvent;
-import ar.edu.itba.paw.webapp.exceptions.UnAuthorizedAccessException;
 import ar.edu.itba.paw.webapp.form.UserProfileForm;
 import ar.edu.itba.paw.webapp.form.WorkdayForm;
 import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
@@ -53,7 +50,7 @@ public class MedicSideController extends GenericController {
     public ModelAndView medicHome(@RequestParam(defaultValue = "0") String week,@RequestParam(required = false, name = "today") String newToday, HttpServletRequest request){
         Optional<User> user = this.getUser();
         if(!user.isPresent()) {
-            return new ModelAndView("redirect:login");
+            return new ModelAndView("redirect:/login");
         }
         ModelAndView mav = new ModelAndView();
 
@@ -124,7 +121,7 @@ public class MedicSideController extends GenericController {
     public ModelAndView medicProfile(@ModelAttribute("medicProfileForm") final UserProfileForm form){
         Optional<User> user = getUser();
         if(!user.isPresent()) {
-            return new ModelAndView("redirect:login");
+            return new ModelAndView("redirect:/login");
         }
         ModelAndView mav = new ModelAndView();
         mav.addObject("user", user);
@@ -141,7 +138,7 @@ public class MedicSideController extends GenericController {
     public ModelAndView editMedicUser(@Valid @ModelAttribute("medicProfileForm") final UserProfileForm form, final BindingResult errors, HttpServletRequest request, HttpServletResponse response){
         Optional<User> user = getUser();
         if(!user.isPresent()) {
-            return new ModelAndView("redirect:login");
+            return new ModelAndView("redirect:/login");
         }
 
         if (errors.hasErrors()) {
@@ -172,7 +169,7 @@ public class MedicSideController extends GenericController {
         if(isStaff()) {
             mav.addObject("staffs", staffService.findByUser(user.get().getId()));
         }
-        mav.setViewName("medicSide/medicProfile");
+        mav.setViewName("redirect:/staff/profile");
         return mav;
     }
 
@@ -180,7 +177,7 @@ public class MedicSideController extends GenericController {
     public ModelAndView addWorkday(@ModelAttribute("workdayForm") final WorkdayForm form){
         Optional<User> user = getUser();
         if(!user.isPresent()) {
-            return new ModelAndView("redirect:login");
+            return new ModelAndView("redirect:/login");
         }
 
         ModelAndView mav = new ModelAndView();
@@ -196,7 +193,7 @@ public class MedicSideController extends GenericController {
     public ModelAndView addWorkdayAction(@Valid @ModelAttribute("workdayForm") final WorkdayForm form, final BindingResult errors, HttpServletRequest request, HttpServletResponse response){
         Optional<User> user = getUser();
         if(!user.isPresent()) {
-            return new ModelAndView("redirect:login");
+            return new ModelAndView("redirect:/login");
         }
 
         if (errors.hasErrors()) {
@@ -232,7 +229,7 @@ public class MedicSideController extends GenericController {
 
         Workday workday = new Workday();
         switch (form.getDow()){
-            case 0:
+            case 7:
                 workday.setDay(WorkdayDay.SUNDAY.name());
                 break;
             case 1:
@@ -272,20 +269,20 @@ public class MedicSideController extends GenericController {
         return mav;
     }
 
-    @RequestMapping(value="/staff/profile/workday/delete/{workdayId}", method = RequestMethod.DELETE)
-    public ResponseEntity deleteWorkday(@PathVariable("workdayId") final int workdayId){
+    @RequestMapping(value="/staff/profile/workday/delete/{workdayId}", method = RequestMethod.POST)
+    public ModelAndView deleteWorkday(@PathVariable("workdayId") final int workdayId){
         Optional<User> user = getUser();
         if(!user.isPresent()) {
-            return new ResponseEntity(HttpStatus.UNAUTHORIZED); //TODO:check status code
+            return new ModelAndView("redirect:/login");
         }
         Optional<Workday> workday = workdayService.findById(workdayId);
         if(!workday.isPresent() || !workday.get().getStaff().getUser().equals(user.get())){
-            return new ResponseEntity(HttpStatus.FORBIDDEN);//TODO: check status code
+            return new ModelAndView("redirect:/staff/profile");
         }
 
         workdayService.remove(workdayId);
 
-        return new ResponseEntity(HttpStatus.NO_CONTENT);
+        return new ModelAndView("redirect:/staff/profile");
     }
 
     @RequestMapping(value = "/staff/appointment/{id}",method = RequestMethod.POST)
