@@ -5,7 +5,7 @@ import javax.validation.constraints.Min;
 import javax.validation.constraints.Pattern;
 
 public class WorkdayForm {
-    @Min(0)
+    @Min(1)
     @Max(7)
     private int dow;
 

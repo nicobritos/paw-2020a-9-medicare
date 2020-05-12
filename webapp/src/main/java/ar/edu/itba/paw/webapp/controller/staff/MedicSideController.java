@@ -139,11 +139,16 @@ public class MedicSideController extends GenericController {
             return new ModelAndView("redirect:login");
         }
 
-        if (errors.hasErrors() || (!form.getPassword().isEmpty() && form.getPassword().length()<8) || !form.getPassword().equals(form.getRepeatPassword())) {
+        if (errors.hasErrors()) {
+            return this.medicProfile(form);
+        }
+        if((!form.getPassword().isEmpty() && form.getPassword().length()<8) || !form.getPassword().equals(form.getRepeatPassword())){
+            errors.reject("Min.medicProfileForm.password", null, "Error");
             return this.medicProfile(form);
         }
         Optional<User> userOptional = userService.findByUsername(form.getEmail());
         if(userOptional.isPresent() && !userOptional.get().equals(user.get())){ // si se edito el email pero ya existe cuenta con ese email
+            errors.reject("AlreadyExists.medicProfileForm.email", null, "Error");
             return this.medicProfile(form);
         }
 
@@ -155,9 +160,7 @@ public class MedicSideController extends GenericController {
         if(!form.getPassword().isEmpty())
             editedUser.setPassword(form.getPassword());
         userService.update(editedUser);
-        if (!editedUser.getEmail().equals(user.get().getEmail())) {
-            this.createConfirmationEvent(request, editedUser);
-        }
+        this.createConfirmationEvent(request, editedUser);
 
         ModelAndView mav = new ModelAndView();
         mav.addObject("user", user);
@@ -217,11 +220,27 @@ public class MedicSideController extends GenericController {
 
         Optional<Office> office = officeService.findById(form.getOfficeId());
         if(!office.isPresent()){
+            errors.reject("NotFound.workdayForm.office", null, "Error");
             return this.addWorkday(form);
         }
 
         Optional<Staff> realStaff = staffService.findByUser(user.get().getId()).stream().filter(staff -> staff.getOffice().equals(office.get())).findAny();
         if(!realStaff.isPresent()){
+            errors.reject("NotFound.workdayForm.staff", null, "Error");
+            return this.addWorkday(form);
+        }
+        String[] startTime = form.getStartHour().split(":");
+        String[] endTime = form.getEndHour().split(":");
+        int startHour = Integer.parseInt(startTime[0]);
+        int endHour = Integer.parseInt(endTime[0]);
+        int startMin = Integer.parseInt(startTime[1]);
+        int endMin = Integer.parseInt(endTime[1]);
+
+        if(startHour > endHour){
+            errors.reject("Invalid.workdayForm.workhours", null, "Error");
+            return this.addWorkday(form);
+        } else if ((startHour == endHour) && (startMin >= endMin)){
+            errors.reject("Invalid.workdayForm.workhours", null, "Error");
             return this.addWorkday(form);
         }
 
@@ -251,12 +270,10 @@ public class MedicSideController extends GenericController {
             default:
                 return this.addWorkday(form);
         }
-        String[] startTime = form.getStartHour().split(":");
-        workday.setStartHour(Integer.parseInt(startTime[0]));
-        workday.setStartMinute(Integer.parseInt(startTime[1]));
-        String[] endTime = form.getEndHour().split(":");
-        workday.setEndHour(Integer.parseInt(endTime[0]));
-        workday.setEndMinute(Integer.parseInt(endTime[1]));
+        workday.setStartHour(startHour);
+        workday.setStartMinute(startMin);
+        workday.setEndHour(endHour);
+        workday.setEndMinute(endMin);
         workday.setStaff(realStaff.get());
         workday = workdayService.create(workday);
 

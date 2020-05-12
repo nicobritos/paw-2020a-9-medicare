@@ -114,11 +114,16 @@ public class PatientSideController extends GenericController {
             return new ModelAndView("redirect:login");
         }
 
-        if (errors.hasErrors() || (!form.getPassword().isEmpty() && form.getPassword().length()<8) || !form.getPassword().equals(form.getRepeatPassword())) {
+        if (errors.hasErrors()) {
+            return this.patientProfile(form);
+        }
+        if((!form.getPassword().isEmpty() && form.getPassword().length()<8) || !form.getPassword().equals(form.getRepeatPassword())){
+            errors.reject("Min.patientProfileForm.password", null, "Error");
             return this.patientProfile(form);
         }
         Optional<User> userOptional = userService.findByUsername(form.getEmail());
         if(userOptional.isPresent() && !userOptional.get().equals(user.get())){ // si se edito el email pero ya existe cuenta con ese email
+            errors.reject("AlreadyExists.patientProfileForm.email", null, "Error");
             return this.patientProfile(form);
         }
 
