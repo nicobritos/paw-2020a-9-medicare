@@ -88,25 +88,6 @@ public class PatientSideController extends GenericController {
         return mav;
     }
 
-    @RequestMapping(value = "/patient/profile/confirm", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-    @ResponseBody
-    public JsonResponse reverify(HttpServletRequest request, HttpServletResponse response) {
-        return this.formatJsonResponse(() -> {
-            Optional<User> user = getUser();
-            if(!user.isPresent()) {
-                throw new UnAuthorizedAccessException();
-            }
-
-            if (!user.get().getVerified()) {
-                // Prevents jammering
-                if (user.get().getTokenCreatedDate() == null || DateTime.now().isAfter(user.get().getTokenCreatedDate().plusMinutes(1)))
-                    this.createConfirmationEvent(request, user.get());
-                return true;
-            }
-            return false;
-        });
-    }
-
     @RequestMapping(value="/patient/profile", method = RequestMethod.POST)
     public ModelAndView editMedicUser(@Valid @ModelAttribute("patientProfileForm") final UserProfileForm form, final BindingResult errors, HttpServletRequest request, HttpServletResponse response){
         Optional<User> user = getUser();

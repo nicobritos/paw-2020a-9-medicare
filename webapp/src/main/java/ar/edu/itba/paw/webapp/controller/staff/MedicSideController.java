@@ -50,7 +50,7 @@ public class MedicSideController extends GenericController {
     private ApplicationEventPublisher eventPublisher;
 
     @RequestMapping("/staff/home")
-    public ModelAndView medicHome(@RequestParam(defaultValue = "0") String week,@RequestParam(required = false, name = "today") String newToday){
+    public ModelAndView medicHome(@RequestParam(defaultValue = "0") String week,@RequestParam(required = false, name = "today") String newToday, HttpServletRequest request){
         Optional<User> user = this.getUser();
         if(!user.isPresent()) {
             return new ModelAndView("redirect:login");
@@ -108,6 +108,11 @@ public class MedicSideController extends GenericController {
                 weekAppointments.get(appointment.getFromDate().getDayOfWeek()).add(appointment);
             }
         }
+        String query = request.getQueryString();
+        if(query != null && !query.isEmpty()){
+            query = "?" + query;
+        }
+        mav.addObject("query", query);
         mav.addObject("weekAppointments", weekAppointments); // lista de turnos que se muestra en la agenda semanal
         mav.addObject("specialties", staffSpecialtyService.list());
         mav.addObject("localities", localityService.list());
@@ -169,25 +174,6 @@ public class MedicSideController extends GenericController {
         }
         mav.setViewName("medicSide/medicProfile");
         return mav;
-    }
-
-    @RequestMapping(value = "/staff/profile/confirm", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-    @ResponseBody
-    public JsonResponse reverify(HttpServletRequest request, HttpServletResponse response) {
-        return this.formatJsonResponse(() -> {
-            Optional<User> user = getUser();
-            if(!user.isPresent()) {
-                throw new UnAuthorizedAccessException();
-            }
-
-            if (!user.get().getVerified()) {
-                // Prevents jammering
-                if (user.get().getTokenCreatedDate() == null || DateTime.now().isAfter(user.get().getTokenCreatedDate().plusMinutes(1)))
-                    this.createConfirmationEvent(request, user.get());
-                return true;
-            }
-            return false;
-        });
     }
 
     @RequestMapping(value="/staff/profile/workday", method = RequestMethod.GET)
@@ -302,19 +288,25 @@ public class MedicSideController extends GenericController {
         return new ResponseEntity(HttpStatus.NO_CONTENT);
     }
 
-    @RequestMapping(value = "/staff/appointment/{id}",method = RequestMethod.DELETE)
-    public ResponseEntity cancelAppointment(@PathVariable Integer id, HttpServletRequest request){
+    @RequestMapping(value = "/staff/appointment/{id}",method = RequestMethod.POST)
+    public ModelAndView cancelAppointment(@PathVariable Integer id, HttpServletRequest request, @RequestParam(defaultValue = "0") String week, @RequestParam(required = false, name = "today") String newToday){
         //get current user, check for null
+        String query;
+        if(newToday != null){
+            query = "?today=" + newToday + "&week=" + week;
+        } else {
+            query = "?week=" + week;
+        }
         Optional<User> user = getUser();
         if(!user.isPresent()){
-            return new ResponseEntity(HttpStatus.UNAUTHORIZED);
+            return new ModelAndView("redirect:/login");
         }
         //get staff for current user
         List<Staff> staff = this.staffService.findByUser(user.get().getId());
         //get appointment to delete, check for "null"
         Optional<Appointment> appointment = this.appointmentService.findById(id);
         if(!appointment.isPresent()){
-            return new ResponseEntity(HttpStatus.BAD_REQUEST);
+            return new ModelAndView("redirect:/staff/home"+ query);
         }
         //check if user is allowed to cancel
         boolean isAllowed = false;
@@ -326,7 +318,7 @@ public class MedicSideController extends GenericController {
         }
         //return response code for not allow
         if(!isAllowed){
-            return new ResponseEntity(HttpStatus.UNAUTHORIZED);
+            return new ModelAndView("redirect:/staff/home" + query);
         }
         //cancel appointment
         this.appointmentService.remove(appointment.get()); // TODO
@@ -335,7 +327,7 @@ public class MedicSideController extends GenericController {
         this.eventPublisher.publishEvent(new AppointmentCancelEvent(user.get(), true, appointment.get().getPatient().getUser(), appointment.get(), request.getLocale(), baseUrl.toString()));
 //        this.appointmentService.setStatus(appointment.get(), AppointmentStatus.CANCELLED);
         //return success
-        return new ResponseEntity(HttpStatus.NO_CONTENT);
+        return new ModelAndView("redirect:/staff/home" + query);
     }
 
     private void createConfirmationEvent(HttpServletRequest request, User user) {
