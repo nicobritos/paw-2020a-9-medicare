@@ -80,7 +80,6 @@ html,body{
     height: 10em;
     width: 10em;
     border-radius: 10em;
-    cursor: pointer;
 }
 
 .picture-container > * {
@@ -109,6 +108,7 @@ html,body{
     border-radius: 50px;
     font-size: 20px;
     color: #ffffff;
+    cursor: pointer;
 }
 
 #profilePic{
