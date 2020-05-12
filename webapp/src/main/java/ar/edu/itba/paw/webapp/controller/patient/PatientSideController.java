@@ -219,19 +219,19 @@ public class PatientSideController extends GenericController {
         return mav;
     }
 
-    @RequestMapping(value = "/patient/appointment/{id}",method = RequestMethod.DELETE)
-    public ResponseEntity cancelAppointment(@PathVariable Integer id, HttpServletRequest request){
+    @RequestMapping(value = "/patient/appointment/{id}", method = RequestMethod.POST)
+    public ModelAndView cancelAppointment(@PathVariable Integer id, HttpServletRequest request){
         //get current user, check for null
         Optional<User> user = getUser();
         if(!user.isPresent()){
-            return new ResponseEntity(HttpStatus.UNAUTHORIZED);
+            return new ModelAndView("redirect:/login");
         }
         //get patient for current user
         List<Patient> patient = this.patientService.findByUser(user.get());
         //get appointment to delete, check for "null"
         Optional<Appointment> appointment = this.appointmentService.findById(id);
         if(!appointment.isPresent()){
-            return new ResponseEntity(HttpStatus.BAD_REQUEST);
+            return new ModelAndView("redirect:/patient/home");
         }
         //check if user is allowed to cancel
         boolean isAllowed = false;
@@ -243,7 +243,7 @@ public class PatientSideController extends GenericController {
         }
         //return response code for not allow
         if(!isAllowed){
-            return new ResponseEntity(HttpStatus.UNAUTHORIZED);
+            return new ModelAndView("redirect:/patient/home");
         }
         //cancel appointment
         this.appointmentService.remove(appointment.get()); // TODO
@@ -252,7 +252,7 @@ public class PatientSideController extends GenericController {
         this.eventPublisher.publishEvent(new AppointmentCancelEvent(user.get(), false, appointment.get().getStaff().getUser(), appointment.get(), request.getLocale(), baseUrl.toString()));
 //        this.appointmentService.setStatus(appointment.get(), AppointmentStatus.CANCELLED);
         //return success
-        return new ResponseEntity(HttpStatus.NO_CONTENT);
+        return new ModelAndView("redirect:/patient/home");
     }
 
     private void createConfirmationEvent(HttpServletRequest request, User user) {
