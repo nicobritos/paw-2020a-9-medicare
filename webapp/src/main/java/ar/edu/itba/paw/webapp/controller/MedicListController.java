@@ -10,7 +10,6 @@ import ar.edu.itba.paw.webapp.controller.utils.GenericController;
 import ar.edu.itba.paw.webapp.controller.utils.JsonResponse;
 import ar.edu.itba.paw.webapp.form.RequestTimeslotForm;
 import ar.edu.itba.paw.webapp.transformer.AppointmentTimeSlotTransformer;
-import org.apache.tika.parser.txt.CharsetDetector;
 import org.joda.time.DateTime;
 import org.joda.time.Days;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -96,8 +95,6 @@ public class MedicListController extends GenericController {
         }
 
         if(name != null) {
-            CharsetDetector detector = new CharsetDetector();
-            name = detector.getString(name.getBytes(), StandardCharsets.UTF_8.name()); //TODO: Find better way
             Set<String> words = new HashSet<>(Arrays.asList(name.split(" ")));
             staffList = new HashSet<>(this.staffService.findBy(words, words, null, searchedSpecialties, searchedLocalities, page));
         } else{
