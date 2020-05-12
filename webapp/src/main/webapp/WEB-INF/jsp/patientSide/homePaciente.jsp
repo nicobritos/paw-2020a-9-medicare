@@ -74,7 +74,9 @@
                             <img src='<c:url value="/img/moreOptions.svg"/>' class="moreOptionsButton" alt="nore options" data-toggle="dropdown">
                             <div class="dropdown-menu">
                               <%-- TODO add reprogramar --%>
-                            <a class="dropdown-item cancelAppointmentBtn" href="<c:url value="/patient/appointment/${appointment.id}"/>"><spring:message code="Cancel"/></a>
+                              <form action="<c:url value="/patient/appointment/${appointment.id}"/>" method="post">
+                                <button type="submit" class="dropdown-item"><spring:message code="Cancel"/></button>
+                              </form>
                           </div>
                         </div>
                     </div>
@@ -117,6 +119,5 @@
         </div>
       </div>
     </div>
-  <script src="<c:url value="/js/scripts/patient/homePatient.js"/>"></script>
   </body>
 </html>
