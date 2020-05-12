@@ -265,14 +265,30 @@ public abstract class GenericDaoImpl<M extends GenericModel<I>, I> implements Ge
     }
 
     protected List<M> selectQuery(JDBCSelectQueryBuilder selectQueryBuilder) {
-        this.populateJoins(selectQueryBuilder);
-        this.insertOrderBy(selectQueryBuilder);
+        selectQueryBuilder = this.wrapSelectQueryBuilder(selectQueryBuilder);
         return new LinkedList<>(this.jdbcTemplate.query(selectQueryBuilder.getQueryAsString(), this.getResultSetExtractor()));
     }
 
+    /**
+     * Fixes LIMIT selects wrapping it inside of other select
+     */
+    private JDBCSelectQueryBuilder wrapSelectQueryBuilder(JDBCSelectQueryBuilder selectQueryBuilder) {
+        JDBCSelectQueryBuilder wrapper;
+        if (selectQueryBuilder.hasLimit() || selectQueryBuilder.hasOffset()) {
+            wrapper = new JDBCSelectQueryBuilder();
+            wrapper.from(selectQueryBuilder);
+            this.insertOrderBy(selectQueryBuilder);  // We need them in both
+        } else {
+            wrapper = selectQueryBuilder;
+        }
+
+        this.insertOrderBy(wrapper);
+        this.populateJoins(wrapper);
+        return wrapper;
+    }
+
     protected List<M> selectQuery(JDBCSelectQueryBuilder selectQueryBuilder, MapSqlParameterSource args) {
-        this.populateJoins(selectQueryBuilder);
-        this.insertOrderBy(selectQueryBuilder);
+        selectQueryBuilder = this.wrapSelectQueryBuilder(selectQueryBuilder);
         return new LinkedList<>(this.jdbcTemplate.query(selectQueryBuilder.getQueryAsString(), args, this.getResultSetExtractor()));
     }
 
@@ -283,20 +299,17 @@ public abstract class GenericDaoImpl<M extends GenericModel<I>, I> implements Ge
      * @param callbackHandler the ResultSet handler
      */
     protected void selectQuery(JDBCSelectQueryBuilder selectQueryBuilder, MapSqlParameterSource args, RowCallbackHandler callbackHandler) {
-        this.populateJoins(selectQueryBuilder);
-        this.insertOrderBy(selectQueryBuilder);
+        selectQueryBuilder = this.wrapSelectQueryBuilder(selectQueryBuilder);
         this.jdbcTemplate.query(selectQueryBuilder.getQueryAsString(), args, callbackHandler);
     }
 
     protected Optional<M> selectQuerySingle(JDBCSelectQueryBuilder selectQueryBuilder) {
-        this.populateJoins(selectQueryBuilder);
-        this.insertOrderBy(selectQueryBuilder);
+        selectQueryBuilder = this.wrapSelectQueryBuilder(selectQueryBuilder);
         return this.jdbcTemplate.query(selectQueryBuilder.getQueryAsString(), this.getResultSetExtractor()).stream().findFirst();
     }
 
     protected Optional<M> selectQuerySingle(JDBCSelectQueryBuilder selectQueryBuilder, MapSqlParameterSource args) {
-        this.populateJoins(selectQueryBuilder);
-        this.insertOrderBy(selectQueryBuilder);
+        selectQueryBuilder = this.wrapSelectQueryBuilder(selectQueryBuilder);
         return this.jdbcTemplate.query(selectQueryBuilder.getQueryAsString(), args, this.getResultSetExtractor()).stream().findFirst();
     }
 

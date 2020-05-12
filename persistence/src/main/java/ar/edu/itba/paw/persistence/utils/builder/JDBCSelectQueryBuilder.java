@@ -19,7 +19,7 @@ public class JDBCSelectQueryBuilder extends JDBCQueryBuilder {
         FULL_OUTER(" FULL OUTER "),
         CROSS_OUTER(" CROSS OUTER ");
 
-        private String joinType;
+        private final String joinType;
 
         JoinType(String joinType) {
             this.joinType = joinType;
@@ -35,12 +35,13 @@ public class JDBCSelectQueryBuilder extends JDBCQueryBuilder {
         }
     }
 
-    private Map<String, Class<? extends GenericModel<?>>> joinColumns = new HashMap<>();
-    private SortedSet<OrderBy> orderBy = new TreeSet<>();
-    private List<String> columns = new LinkedList<>();
-    private List<String> joins = new LinkedList<>();
+    private final Map<String, Class<? extends GenericModel<?>>> joinColumns = new HashMap<>();
+    private final SortedSet<OrderBy> orderBy = new TreeSet<>();
+    private final List<String> columns = new LinkedList<>();
+    private final List<String> joins = new LinkedList<>();
 
     private JDBCWhereClauseBuilder whereClauseBuilder;
+    private JDBCSelectQueryBuilder fromQueryBuilder;
     private Class<? extends GenericModel<?>> mClass;
     private boolean selectAll;
     private boolean distinct;
@@ -68,6 +69,16 @@ public class JDBCSelectQueryBuilder extends JDBCQueryBuilder {
         this.table = tableName + " AS " + alias;
         this.alias = alias;
         return this;
+    }
+
+    public JDBCSelectQueryBuilder from(JDBCSelectQueryBuilder selectQueryBuilder) {
+        this.from(selectQueryBuilder.getTable(), selectQueryBuilder.getAlias());
+        this.fromQueryBuilder = selectQueryBuilder;
+        return this;
+    }
+
+    public String getAlias() {
+        return this.alias;
     }
 
     public JDBCSelectQueryBuilder join(String columnLeft, String tableRight, String columnRight, Class<? extends GenericModel<?>> mClass) {
@@ -151,9 +162,17 @@ public class JDBCSelectQueryBuilder extends JDBCQueryBuilder {
         return this;
     }
 
+    public boolean hasLimit() {
+        return this.limit > 0;
+    }
+
     public JDBCSelectQueryBuilder offset(int offset) {
         this.offset = offset;
         return this;
+    }
+
+    public boolean hasOffset() {
+        return this.offset > 0;
     }
 
     public JDBCSelectQueryBuilder where(JDBCWhereClauseBuilder whereClauseBuilder) {
@@ -167,21 +186,59 @@ public class JDBCSelectQueryBuilder extends JDBCQueryBuilder {
 
     @Override
     public String getQueryAsString() {
+        return this.getQueryAsSubqueryString(false) + ";";
+    }
+
+    @Override
+    public String getTable() {
+        return this.table;
+    }
+
+    protected List<String> getColumnsAsList() {
+        if (this.mClass != null && !this.joinColumns.containsKey(this.alias))
+            this.joinColumns.put(this.alias, this.mClass);
+
+        List<String> columns = new LinkedList<>();
+        for (Map.Entry<String, Class<? extends GenericModel<?>>> entry : this.joinColumns.entrySet()) {
+            Table table = entry.getValue().getAnnotation(Table.class);
+            columns.add(entry.getKey() + "." + table.primaryKey() + " AS " + "\"" + entry.getKey() + "." + table.primaryKey() + "\"");
+            ReflectionGetterSetter.iterateFields(entry.getValue(), Column.class, field -> {
+                Column column = field.getAnnotation(Column.class);
+                columns.add(entry.getKey() + "." + column.name() + " AS " + "\"" + entry.getKey() + "." + column.name() + "\"");
+            });
+        }
+        return columns;
+    }
+
+    protected String getQueryAsSubqueryString(boolean onlyColumnsFromTable) {
         StringBuilder stringBuilder = new StringBuilder("SELECT ");
 
         if (this.distinct) stringBuilder.append(" DISTINCT ");
 
-        if (this.columns.size() > 0) {
-            stringBuilder.append(this.joinStrings(this.columns));
-        } else if (this.selectAll) {
-            stringBuilder.append(this.generateColumns());
+        if (onlyColumnsFromTable) {
+            stringBuilder
+                    .append(this.alias)
+                    .append(".*");
         } else {
-            return null;
+            if (this.columns.size() > 0) {
+                stringBuilder.append(this.joinStrings(this.columns));
+            } else if (this.selectAll || this.fromQueryBuilder != null) {
+                stringBuilder.append(this.generateColumns());
+            } else {
+                return null;
+            }
         }
 
-        stringBuilder
-                .append(" FROM ")
-                .append(this.table);
+        stringBuilder.append(" FROM ");
+        if (this.fromQueryBuilder != null) {
+            stringBuilder
+                    .append(" ( ")
+                    .append(this.fromQueryBuilder.getQueryAsSubqueryString(true))
+                    .append(" ) AS ")
+                    .append(this.fromQueryBuilder.getAlias());
+        } else {
+            stringBuilder.append(this.table);
+        }
 
         if (this.joins.size() > 0) {
             stringBuilder.append(this.joinStrings(this.joins, " "));
@@ -211,28 +268,13 @@ public class JDBCSelectQueryBuilder extends JDBCQueryBuilder {
                     .append(this.offset);
         }
 
-        stringBuilder.append(";");
-
         return stringBuilder.toString();
     }
 
-    @Override
-    protected String getTable() {
-        return this.table;
-    }
-
     private String generateColumns() {
-        if (this.mClass != null)
-            this.joinColumns.put(this.alias, this.mClass);
-
-        List<String> columns = new LinkedList<>();
-        for (Map.Entry<String, Class<? extends GenericModel<?>>> entry : this.joinColumns.entrySet()) {
-            Table table = entry.getValue().getAnnotation(Table.class);
-            columns.add(entry.getKey() + "." + table.primaryKey() + " AS " + "\"" + entry.getKey() + "." + table.primaryKey() + "\"");
-            ReflectionGetterSetter.iterateFields(entry.getValue(), Column.class, field -> {
-                Column column = field.getAnnotation(Column.class);
-                columns.add(entry.getKey() + "." + column.name() + " AS " + "\"" + entry.getKey() + "." + column.name() + "\"");
-            });
+        List<String> columns = this.getColumnsAsList();
+        if (this.fromQueryBuilder != null) {
+            columns.addAll(this.fromQueryBuilder.getColumnsAsList());
         }
         return this.joinStrings(columns);
     }
