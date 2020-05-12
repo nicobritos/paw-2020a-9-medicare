@@ -49,10 +49,12 @@
                 <img src="<c:url value="/profilePics/${staff.user.profileId}"/>" class="w-100 rounded-circle" alt="profile pic">
               </div>
               <div class="col p-0">
-                <p class="m-0 white-text">${staff.firstName} ${staff.surname}</p>
-                <c:forEach var="specialty" items="${staff.staffSpecialties}">
-                  <small class="white-text">${specialty.name}</small>
-                </c:forEach>
+                <p class="m-0 white-text"><c:out value="${staff.firstName} ${staff.surname}"/></p>
+                <small class="white-text">
+                  <c:forEach var="specialty" items="${staff.staffSpecialties}">
+                    <c:out value="${specialty.name} "/>
+                  </c:forEach>
+                </small>
               </div>
             </div>
             <div class="row justify-content-center border-top border-light py-2">
@@ -68,8 +70,8 @@
                   <c:when test="${date.dayOfWeek == 5}"><spring:message code="Friday"/></c:when>
                   <c:when test="${date.dayOfWeek == 6}"><spring:message code="Saturday"/></c:when>
                   <c:when test="${date.dayOfWeek == 7}"><spring:message code="Sunday"/></c:when>
-                  <c:otherwise>${date.dayOfWeek}</c:otherwise>
-                </c:choose> ${date.dayOfMonth} <spring:message code="of"/> <c:choose>
+                  <c:otherwise><c:out value="${date.dayOfWeek}"/></c:otherwise>
+                </c:choose><c:out value="${date.dayOfMonth} "/><spring:message code="of"/> <c:choose>
                   <c:when test="${date.monthOfYear == 1}"><spring:message code="January"/></c:when>
                   <c:when test="${date.monthOfYear == 2}"><spring:message code="February"/></c:when>
                   <c:when test="${date.monthOfYear == 3}"><spring:message code="March"/></c:when>
@@ -82,8 +84,8 @@
                   <c:when test="${date.monthOfYear == 10}"><spring:message code="October"/></c:when>
                   <c:when test="${date.monthOfYear == 11}"><spring:message code="November"/></c:when>
                   <c:when test="${date.monthOfYear == 12}"><spring:message code="December"/></c:when>
-                  <c:otherwise>${date.monthOfYear}</c:otherwise>
-                </c:choose>, <c:if test="${date.hourOfDay < 10}">0</c:if>${date.hourOfDay}:<c:if test="${date.minuteOfHour < 10}">0</c:if>${date.minuteOfHour}hs</p>
+                  <c:otherwise><c:out value="${date.monthOfYear}"/></c:otherwise>
+                </c:choose>, <c:if test="${date.hourOfDay < 10}">0</c:if><c:out value="${date.hourOfDay}"/>:<c:if test="${date.minuteOfHour < 10}">0</c:if><c:out value="${date.minuteOfHour}hs"/></p>
                   <a href="<c:url value="/appointment/${staffId}/0"/> "><small class="white-text"><spring:message code="ChangeDate"/></small></a>
               </div>
             </div>
@@ -92,8 +94,8 @@
                 <img src='<c:url value="/img/mapIcon.svg"/> ' class="w-75" alt="map icon">
               </div>
               <div class="col p-0">
-                <p class="m-0 white-text">${staff.office.street}</p>
-                  <small class="white-text">${staff.office.locality.name}</small>
+                <p class="m-0 white-text"><c:out value="${staff.office.street}"/></p>
+                  <small class="white-text"><c:out value="${staff.office.locality.name}"/></small>
               </div>
             </div>
           </div>

@@ -13,7 +13,7 @@
     <form:form modelAttribute="signupForm" class="register-form border p-5 rounded" action="${signupUrl}" method="POST"
                enctype="application/x-www-form-urlencoded">
         <div class="row">
-            <h6>Medicare <img src='<c:url value="/img/logo.svg"/>' id="logo"/></h6>
+            <h6>Medicare <img src='<c:url value="/img/logo.svg"/>' id="logo" alt="logo"/></h6>
         </div>
         <div class="row justify-content-start">
             <h1 class="register-form-title"><spring:message code="CreateAccount"/></h1>

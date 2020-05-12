@@ -18,25 +18,29 @@
         </div>
         <div class="form-row justify-content-center justify-content-around mt-3">
             <div class="col-5 pl-5">
-                <input class="w-100 form-control" type="text" name="name" id="name" placeholder="<spring:message code="NameAndOrSurname"/>">
+                <label for="name"></label><input class="w-100 form-control" type="text" name="name" id="name" placeholder="<spring:message code="NameAndOrSurname"/>">
             </div>
             <div class="col">
-                <select name="specialties" class="form-control">
-                    <option value="-1" disabled selected><spring:message code="Specialty"/></option>
-                    <option value="-1"><spring:message code="Any"/></option>
-                    <c:forEach var="specialty" items="${specialties}">
-                        <option value="<c:out value="${specialty.id}"/>"><c:out value="${specialty.name}"/></option>
-                    </c:forEach>
-                </select>
+                <label>
+                    <select name="specialties" class="form-control">
+                        <option value="-1" disabled selected><spring:message code="Specialty"/></option>
+                        <option value="-1"><spring:message code="Any"/></option>
+                        <c:forEach var="specialty" items="${specialties}">
+                            <option value="<c:out value="${specialty.id}"/>"><c:out value="${specialty.name}"/></option>
+                        </c:forEach>
+                    </select>
+                </label>
             </div>
             <div class="col pr-5">
-                <select name="localities" class="form-control">
-                    <option value="-1" disabled selected><spring:message code="Locality"/></option>
-                    <option value="-1"><spring:message code="Any"/></option>
-                    <c:forEach var="locality" items="${localities}">
-                        <option value="<c:out value="${locality.id}"/>"><c:out value="${locality.name}"/></option>
-                    </c:forEach>
-                </select>
+                <label>
+                    <select name="localities" class="form-control">
+                        <option value="-1" disabled selected><spring:message code="Locality"/></option>
+                        <option value="-1"><spring:message code="Any"/></option>
+                        <c:forEach var="locality" items="${localities}">
+                            <option value="<c:out value="${locality.id}"/>"><c:out value="${locality.name}"/></option>
+                        </c:forEach>
+                    </select>
+                </label>
             </div>
         </div>
         <div class="form-row px-5 mt-4 mb-3">

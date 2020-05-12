@@ -9,19 +9,16 @@
   </head>
   <body>
     <div class="container w-100 h-100 d-flex flex-column justify-content-center align-items-center">
-      <!-- TODO: Agregar url -->
       <c:url var="addTurnUrl" value="/staff/profile/workday"/>
       <form:form modelAttribute="workdayForm" class="addturn-form border p-5 rounded" action="${addTurnUrl}" method="post">
         
         
         <div class="row">
-          <h6>Medicare <img src='<c:url value="/img/logo.svg"/> ' id="logo"/></h6>
+          <h6>Medicare <img src='<c:url value="/img/logo.svg"/> ' id="logo" alt="logo"/></h6>
         </div>
         <div class="row justify-content-start">
           <h1 class="addturn-form-title"><spring:message code="AddTurno"/></h1>
         </div>
-
-
 
         <div class="form-group row">
           <div class="col">
@@ -39,9 +36,7 @@
             </form:select>
           </div>
         </div>
-        
-        
-        
+
         <div class="form-group row">
           <div class="col">
             <label for="startHour"><spring:message code="StartingHour"/></label>
@@ -50,9 +45,7 @@
             <form:input class="form-control" type="time" name="startHour" id="startHour" path="startHour"/>
           </div>
         </div>
-        
-        
-        
+
         <div class="form-group row">
           <div class="col">
             <label for="endHour"><spring:message code="FinishingHour"/></label>
@@ -62,7 +55,6 @@
           </div>
         </div>
 
-
         <div class="form-group row">
           <div class="col">
             <label for="officeId"><spring:message code="Office"/></label>
@@ -70,7 +62,7 @@
           <div class="col-8">
             <form:select class="form-control" name="officeId" id="officeId" path="officeId">
               <c:forEach items="${staffs}" var="staff">
-                <form:option value="${staff.office.id}">${staff.office.name}</form:option>
+                <form:option value="${staff.office.id}"><c:out value="${staff.office.name}"/></form:option>
               </c:forEach>
             </form:select>
           </div>

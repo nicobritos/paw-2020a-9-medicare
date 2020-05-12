@@ -35,10 +35,10 @@
                     </div>
                     <div class="col-6">
                       <div class="row justify-content-start">
-                        <h5>${appointment.patient.user.firstName} ${appointment.patient.user.surname}</h5>
+                        <h5><c:out value="${appointment.patient.user.firstName} ${appointment.patient.user.surname}"/></h5>
                       </div>
                       <div class="row">
-                        <p class="m-0"><c:if test="${appointment.fromDate.hourOfDay < 10}">0</c:if>${appointment.fromDate.hourOfDay}:<c:if test="${appointment.fromDate.minuteOfHour < 10}">0</c:if>${appointment.fromDate.minuteOfHour} - <c:if test="${appointment.toDate.hourOfDay < 10}">0</c:if>${appointment.toDate.hourOfDay}:<c:if test="${appointment.toDate.minuteOfHour < 10}">0</c:if>${appointment.toDate.minuteOfHour}</p>
+                        <p class="m-0"><c:if test="${appointment.fromDate.hourOfDay < 10}">0</c:if><c:out value="${appointment.fromDate.hourOfDay}"/>:<c:if test="${appointment.fromDate.minuteOfHour < 10}">0</c:if><c:out value="${appointment.fromDate.minuteOfHour}"/> - <c:if test="${appointment.toDate.hourOfDay < 10}">0</c:if><c:out value="${appointment.toDate.hourOfDay}"/>:<c:if test="${appointment.toDate.minuteOfHour < 10}">0</c:if><c:out value="${appointment.toDate.minuteOfHour}"/></p>
                       </div>
                     </div>
                     <div class="col-2 justify-content-start">
@@ -68,7 +68,7 @@
             <c:forEach var="i" begin="0" end="6">
               <span class="ml-1 mr-1 d-flex flex-column align-items-center">
                 <!-- day of the week -->
-                <span class="medicare-day-span" data-day="${monday.plusDays(i)}" <c:if test="${monday.plusDays(i).dayOfYear == today.dayOfYear && monday.plusDays(i).year == today.year}">style = "font-weight:bold"</c:if>>
+                <span class="medicare-day-span" data-day="<c:out value="${monday.plusDays(i)}"/>" <c:if test="${monday.plusDays(i).dayOfYear == today.dayOfYear && monday.plusDays(i).year == today.year}">style = "font-weight:bold"</c:if>>
                 <p class="mb-0">
                   <c:choose>
                     <c:when test="${monday.plusDays(i).dayOfWeek == 1}"><spring:message code="Monday"/></c:when>
@@ -78,11 +78,11 @@
                     <c:when test="${monday.plusDays(i).dayOfWeek == 5}"><spring:message code="Friday"/></c:when>
                     <c:when test="${monday.plusDays(i).dayOfWeek == 6}"><spring:message code="Saturday"/></c:when>
                     <c:when test="${monday.plusDays(i).dayOfWeek == 7}"><spring:message code="Sunday"/></c:when>
-                    <c:otherwise>${monday.plusDays(i).dayOfWeek}</c:otherwise>
+                    <c:otherwise><c:out value="${monday.plusDays(i).dayOfWeek}"/></c:otherwise>
                   </c:choose>
                 </p>
                 <!-- day/month -->
-                <p class="my-0">${monday.plusDays(i).dayOfMonth} <spring:message code="of"/> <c:choose>
+                <p class="my-0"><c:out value="${monday.plusDays(i).dayOfMonth}"/> <spring:message code="of"/> <c:choose>
                   <c:when test="${monday.plusDays(i).monthOfYear == 1}"><spring:message code="January"/></c:when>
                   <c:when test="${monday.plusDays(i).monthOfYear == 2}"><spring:message code="February"/></c:when>
                   <c:when test="${monday.plusDays(i).monthOfYear == 3}"><spring:message code="March"/></c:when>
@@ -96,7 +96,7 @@
                   <c:when test="${monday.plusDays(i).monthOfYear == 11}"><spring:message code="November"/></c:when>
                   <c:when test="${monday.plusDays(i).monthOfYear == 12}"><spring:message code="December"/></c:when>
                   <c:otherwise>${monday.plusDays(i).monthOfYear}</c:otherwise></c:choose></p>
-                <p>${weekAppointments.get(monday.plusDays(i).dayOfWeek).size()} <c:choose>
+                <p><c:out value="${weekAppointments.get(monday.plusDays(i).dayOfWeek).size()}"/><c:choose>
                   <c:when test="${weekAppointments.get(monday.plusDays(i).dayOfWeek).size() == 1}"><spring:message code="appointment"/></c:when>
                   <c:otherwise><spring:message code="appointments"/></c:otherwise>
                 </c:choose></p>
@@ -121,10 +121,10 @@
                       </div>
                       <div class="col-6">
                         <div class="row justify-content-start">
-                          <h5>${appointment.patient.user.firstName} ${appointment.patient.user.surname}</h5>
+                          <h5><c:out value="${appointment.patient.user.firstName} ${appointment.patient.user.surname}"/></h5>
                         </div>
                         <div class="row">
-                          <p class="m-0"><c:if test="${appointment.fromDate.hourOfDay < 10}">0</c:if>${appointment.fromDate.hourOfDay}:<c:if test="${appointment.fromDate.minuteOfHour < 10}">0</c:if>${appointment.fromDate.minuteOfHour} - <c:if test="${appointment.toDate.hourOfDay < 10}">0</c:if>${appointment.toDate.hourOfDay}:<c:if test="${appointment.toDate.minuteOfHour < 10}">0</c:if>${appointment.toDate.minuteOfHour}</p>
+                          <p class="m-0"><c:if test="${appointment.fromDate.hourOfDay < 10}">0</c:if><c:out value="${appointment.fromDate.hourOfDay}"/>:<c:if test="${appointment.fromDate.minuteOfHour < 10}">0</c:if><c:out value="${appointment.fromDate.minuteOfHour}"/> - <c:if test="${appointment.toDate.hourOfDay < 10}">0</c:if><c:out value="${appointment.toDate.hourOfDay}"/>:<c:if test="${appointment.toDate.minuteOfHour < 10}">0</c:if><c:out value="${appointment.toDate.minuteOfHour}"/></p>
                         </div>
                       </div>
                       <div class="col-2 justify-content-start">
@@ -132,7 +132,7 @@
                           <img
                             src='<c:url value="/img/moreOptions.svg"/> '
                             class="moreOptionsButton"
-                            alt=""
+                            alt="more options"
                             data-toggle="dropdown"
                           />
                           <div class="dropdown-menu">

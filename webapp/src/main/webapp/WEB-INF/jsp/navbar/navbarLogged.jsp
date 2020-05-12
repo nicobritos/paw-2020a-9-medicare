@@ -1,5 +1,4 @@
 <nav class="navbar navbar-expand header">
-  <!-- TODO -->
   <div class="container w-100 justify-content-start">
     <img
       class="navbar-brand"
@@ -24,7 +23,7 @@
     </c:if>
 
     <div class="d-inline-flex flex-column align-items-end">
-      <p style="font-weight: 400;" class="m-0 p-0 text-muted white-text">${user.get().firstName} ${user.get().surname}</p>
+      <p style="font-weight: 400;" class="m-0 p-0 text-muted white-text"><c:out value="${user.get().firstName} ${user.get().surname}"/></p>
       <a href="<c:url value="/logout"/>" class="m-0 p-0 header-a-element"><small class="m-0 p-0"><spring:message code="Logout"/></small></a>
     </div>
     <%--TODO:connect correct image--%>

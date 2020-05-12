@@ -12,7 +12,7 @@
 <form action="<c:url value="/mediclist/1"/>">
     <div class="container h-75">
         <div class="row mt-4 justify-content-center">
-            <input class="form-control w-100" type="text" name="name" value="${name}" placeholder="<spring:message code="Name"/>"/>
+            <input class="form-control w-100" type="text" name="name" value="<c:out value="${name}"/>" placeholder="<spring:message code="Name"/>"/>
         </div>
         <div class="row mt-4">
             <div class="col-4 px-3">
@@ -61,7 +61,7 @@
                                     </div>
                                     <div class="col-6">
                                         <div class="row justify-content-start">
-                                            <h5>${member.firstName} ${member.surname}</h5>
+                                            <h5><c:out value="${member.firstName} ${member.surname}"/></h5>
                                         </div>
                                         <div class="row">
                                             <p class="m-0">
@@ -71,7 +71,7 @@
                                             </p>
                                         </div>
                                         <div class="row">
-                                            <p class="m-0">${member.office.street}</p>
+                                            <p class="m-0"><c:out value="${member.office.street}"/></p>
                                         </div>
                                     </div>
                                     <div class="col d-flex justify-content-center align-items-center">
@@ -94,7 +94,7 @@
                         </div>
                     </c:if>
 
-                    <p class="d-inline mx-2">Página <c:out value="${page}"/></p>
+                    <p class="d-inline mx-2"><spring:message code="Page"/> <c:out value="${page}"/></p>
                     <c:if test="${staff.size() == 10}">
                         <div>
                             <button type="button" class="btn btn-info btn-sm" id="nextButton">></button>

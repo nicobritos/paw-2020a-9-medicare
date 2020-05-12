@@ -10,34 +10,34 @@
 <div class="container ml-0 mr-0 pr-0 fill-height">
     <div class="row h-100">
         <div class="col-4 h-100 grey-background">
-            <%-- TODO:connect--%>
             <div class="row mt-4">
                 <div class="col-4">
-                    <%-- TODO:check image--%>
                     <img class="w-100 rounded-circle" src="<c:url value="/profilePics/${staff.user.profileId}"/>"
                          alt="">
                 </div>
                 <div class="col mr-3">
                     <div class="row mt-2">
-                        <h5>${staff.firstName} ${staff.surname} </h5>
+                        <h5><c:out value="${staff.firstName} ${staff.surname}"/></h5>
                     </div>
                     <div class="row mt-3 d-flex justify-content-start">
-                        <c:forEach items="${staff.staffSpecialties}" var="specialty">
-                            <p>${specialty.name}</p>
-                        </c:forEach>
+                        <p>
+                            <c:forEach items="${staff.staffSpecialties}" var="specialty">
+                                <c:out value="${specialty.name} "/>
+                            </c:forEach>
+                        </p>
                     </div>
                 </div>
             </div>
             <div class="row mt-3 pl-4">
-                <p><spring:message code="Address"/>: ${staff.office.street} - ${staff.office.locality.name}</p>
+                <p><spring:message code="Address"/>: <c:out value="${staff.office.street} - ${staff.office.locality.name}"/></p>
             </div>
             <div class="row pl-4">
                 <p><spring:message code="Phones"/>:</p>
             </div>
             <div class="row pl-4">
                 <ul>
-                    <c:if test="${staff.user.phone != null}"><li>${staff.user.phone} (<spring:message code="Personal"/>)</li></c:if>
-                    <c:if test="${staff.office.phone != null}"><li>${staff.office.phone} (${staff.office.name})</li></c:if>
+                    <c:if test="${staff.user.phone != null}"><li><c:out value="${staff.user.phone}"/> (<spring:message code="Personal"/>)</li></c:if>
+                    <c:if test="${staff.office.phone != null}"><li><c:out value="${staff.office.phone} (${staff.office.name})"/></li></c:if>
                 </ul>
             </div>
             <div class="row pl-4">
@@ -69,11 +69,11 @@
                                         <c:when test="${monday.plusDays(i).dayOfWeek == 5}"><spring:message code="Friday"/></c:when>
                                         <c:when test="${monday.plusDays(i).dayOfWeek == 6}"><spring:message code="Saturday"/></c:when>
                                         <c:when test="${monday.plusDays(i).dayOfWeek == 7}"><spring:message code="Sunday"/></c:when>
-                                        <c:otherwise>${monday.plusDays(i).dayOfWeek}</c:otherwise>
+                                        <c:otherwise><c:out value="${monday.plusDays(i).dayOfWeek}"/></c:otherwise>
                                     </c:choose>
                                 </p>
                                 <!-- day/month -->
-                                <p class="my-0">${monday.plusDays(i).dayOfMonth} <spring:message code="of"/> <c:choose>
+                                <p class="my-0"><c:out value="${monday.plusDays(i).dayOfMonth}"/> <spring:message code="of"/> <c:choose>
                                         <c:when test="${monday.plusDays(i).monthOfYear == 1}"><spring:message code="January"/></c:when>
                                         <c:when test="${monday.plusDays(i).monthOfYear == 2}"><spring:message code="February"/></c:when>
                                         <c:when test="${monday.plusDays(i).monthOfYear == 3}"><spring:message code="March"/></c:when>
@@ -86,14 +86,14 @@
                                         <c:when test="${monday.plusDays(i).monthOfYear == 10}"><spring:message code="October"/></c:when>
                                         <c:when test="${monday.plusDays(i).monthOfYear == 11}"><spring:message code="November"/></c:when>
                                         <c:when test="${monday.plusDays(i).monthOfYear == 12}"><spring:message code="December"/></c:when>
-                                        <c:otherwise>${monday.plusDays(i).monthOfYear}</c:otherwise>
+                                        <c:otherwise><c:out value="${monday.plusDays(i).monthOfYear}"/></c:otherwise>
                                     </c:choose>
                                 </p>
                             </span>
                         <div class="d-flex flex-column align-content-center">
                             <c:forEach var="timeslot" items="${weekSlots.get(monday.plusDays(i).dayOfWeek)}">
                                 <a href="<c:url value="/patient/appointment/${staff.id}/${timeslot.date.year}/${timeslot.date.monthOfYear}/${timeslot.date.dayOfMonth}/${timeslot.date.hourOfDay}/${timeslot.date.minuteOfHour}"/>" class="btn btn-sm btn-secondary mb-2">
-                                    <p class="m-0"><c:if test="${timeslot.date.hourOfDay < 10}">0</c:if>${timeslot.date.hourOfDay}:<c:if test="${timeslot.date.minuteOfHour < 10}">0</c:if>${timeslot.date.minuteOfHour}hs</p>
+                                    <p class="m-0"><c:if test="${timeslot.date.hourOfDay < 10}">0</c:if><c:out value="${timeslot.date.hourOfDay}:"/><c:if test="${timeslot.date.minuteOfHour < 10}">0</c:if><c:out value="${timeslot.date.minuteOfHour}hs"/></p>
                                 </a>
                             </c:forEach>
                         </div>

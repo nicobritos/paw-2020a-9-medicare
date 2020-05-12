@@ -12,7 +12,7 @@
     <form:form modelAttribute="signupForm" class="register-form border p-5 rounded" action="${signupUrl}" method="POST"
                enctype="application/x-www-form-urlencoded">
         <div class="row">
-            <h6>Medicare <img src='<c:url value="/img/logo.svg"/>' id="logo"/></h6>
+            <h6>Medicare <img src='<c:url value="/img/logo.svg"/>' id="logo" alt="logo"/></h6>
         </div>
         <div class="row justify-content-start">
             <h1 class="register-form-title"><spring:message code="CreateAccount"/></h1>
@@ -48,8 +48,8 @@
             <div class="col-8">
                 <form:input path="password" class="form-control pr-5" type="password" name="medicare_password" id="medicare_password"/>
                 <!-- For this to work for must be the id of the password input -->
-                <label for="medicare_password" class="toggle-visibility"><img src='<c:url value="/img/eye.svg"/> '><img
-                        src='<c:url value="/img/noeye.svg"/>' style="display: none;"></label>
+                <label for="medicare_password" class="toggle-visibility"><img src='<c:url value="/img/eye.svg"/> ' alt="not visible password"><img
+                        src='<c:url value="/img/noeye.svg"/>' style="display: none;" alt="visible password"></label>
             </div>
         </div>
         <div class="form-group row">
@@ -60,8 +60,8 @@
                 <form:input path="repeatPassword" class="form-control pr-5" type="password" name="medicare_repeatPassword"
                             id="medicare_repeatPassword"/>
                 <!-- For this to work for must be the id of the password input -->
-                <label for="medicare_repeatPassword" class="toggle-visibility"><img src='<c:url value="/img/eye.svg"/> '><img
-                        src='<c:url value="/img/noeye.svg"/> ' style="display: none;"></label>
+                <label for="medicare_repeatPassword" class="toggle-visibility"><img src='<c:url value="/img/eye.svg"/> ' alt="not visible password"><img
+                        src='<c:url value="/img/noeye.svg"/> ' style="display: none;" alt="visible password"></label>
             </div>
         </div>
         <div class="form-group row">
