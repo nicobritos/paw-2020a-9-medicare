@@ -60,9 +60,9 @@ public class LandingController extends GenericController{
             return new ModelAndView("redirect:/verifyEmail");
         }
         if(isStaff()) {
-            return new ModelAndView("redirect:staff/home");
+            return new ModelAndView("redirect:/staff/home");
         }  else {
-            return new ModelAndView("redirect:patient/home");
+            return new ModelAndView("redirect:/patient/home");
         }
     }
 }

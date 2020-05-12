@@ -32,7 +32,7 @@
               <form:option value="4"><spring:message code="Thursday"/></form:option>
               <form:option value="5"><spring:message code="Friday"/></form:option>
               <form:option value="6"><spring:message code="Saturday"/></form:option>
-              <form:option value="0"><spring:message code="Sunday"/></form:option>
+              <form:option value="7"><spring:message code="Sunday"/></form:option>
             </form:select>
           </div>
         </div>
@@ -72,6 +72,7 @@
           <a href="<c:url value="/staff/profile"/>">
             <form:button class="form-atras-btn btn" type="button"><spring:message code="Back"/></form:button></a><form:button type="submit" class="btn btn-primary"><spring:message code="Add"/></form:button>
         </div>
+        <form:errors path="*" cssClass="mt-4 mb-0 text-danger" element="p"/>
       </form:form>
     </div>
   </body>

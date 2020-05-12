@@ -129,8 +129,9 @@
                                             test="${workday.startMinute < 10}">0</c:if><c:out value="${workday.startMinute}hs a "/><c:if
                                             test="${workday.endHour < 10}">0</c:if><c:out value="${workday.endHour}:"/><c:if
                                             test="${workday.endMinute < 10}">0</c:if><c:out value="${workday.endMinute}hs - ${workday.staff.office.name}"/></p>
-                                    <a href='<c:url value="/staff/profile/workday/delete/${workday.id}"/> '
-                                       class="btn deleteWorkday">X</a>
+                                    <form action="<c:url value="/staff/profile/workday/delete/${workday.id}"/>" method="post">
+                                        <button class="btn" type="submit">X</button>
+                                    </form>
                                 </c:forEach>
                             </c:forEach>
                         </div>
