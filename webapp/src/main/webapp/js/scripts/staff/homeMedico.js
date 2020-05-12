@@ -29,7 +29,7 @@ function changeWeek(i){
     if(!weekAdded){
         url+="week=" + i + "&";
     }
-    url = url.substring(0,url.length-2);
+    url = url.substring(0,url.length-1);
     location.replace(url);
 }
 //change week buttons
@@ -55,7 +55,7 @@ function changeToday(today) {
     if(!todayAdded){
         url+="today=" + today + "&";
     }
-    url = url.substring(0,url.length-2);
+    url = url.substring(0,url.length-1);
     location.replace(url);
 }
 
