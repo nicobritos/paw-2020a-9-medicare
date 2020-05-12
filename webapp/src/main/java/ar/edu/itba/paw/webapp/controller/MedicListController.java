@@ -23,7 +23,6 @@ import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import javax.validation.Valid;
-import java.nio.charset.StandardCharsets;
 import java.util.*;
 
 @Controller
@@ -41,22 +40,22 @@ public class MedicListController extends GenericController {
     private AppointmentTimeSlotTransformer appointmentTimeSlotTransformer;
 
     @RequestMapping("/mediclist")
-    public ModelAndView medicList(@RequestParam(value = "name",required = false)String name, @RequestParam(value = "specialties",required = false) String specialties, @RequestParam(value = "localities",required = false) String localities){
+    public ModelAndView medicList(@RequestParam(value = "name", required = false) String name, @RequestParam(value = "specialties", required = false) String specialties, @RequestParam(value = "localities", required = false) String localities) {
         MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
-        if(name != null)
+        if (name != null)
             params.add("name", name);
-        if(specialties != null)
+        if (specialties != null)
             params.add("specialties", specialties);
-        if(localities != null)
+        if (localities != null)
             params.add("localities", localities);
         UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromUriString("/mediclist/1")
                 .queryParams(params);
-        return new ModelAndView("redirect:"+ uriBuilder.toUriString());
+        return new ModelAndView("redirect:" + uriBuilder.toUriString());
     }
 
     @RequestMapping(value = "/mediclist/{page}")
-    public ModelAndView medicsList(@RequestParam(value = "name",required = false)String name, @RequestParam(value = "specialties",required = false) String specialties, @RequestParam(value = "localities",required = false) String localities, @PathVariable("page") int page){
-        if(page<=0){
+    public ModelAndView medicsList(@RequestParam(value = "name", required = false) String name, @RequestParam(value = "specialties", required = false) String specialties, @RequestParam(value = "localities", required = false) String localities, @PathVariable("page") int page) {
+        if (page <= 0) {
             return medicList(name, specialties, localities);
         }
         //get modelandview from medicList.jsp
@@ -94,10 +93,10 @@ public class MedicListController extends GenericController {
             }
         }
 
-        if(name != null) {
+        if (name != null && !(name = name.trim()).equals("")) {
             Set<String> words = new HashSet<>(Arrays.asList(name.split(" ")));
-            staffList = new HashSet<>(this.staffService.findBy(words, words, null, searchedSpecialties, searchedLocalities, page));
-        } else{
+            staffList = this.staffService.findBy(words, words, null, searchedSpecialties, searchedLocalities, page);
+        } else {
             staffList = this.staffService.findBy((String) null, null, null, searchedSpecialties, searchedLocalities, page);
         }
 
@@ -107,14 +106,14 @@ public class MedicListController extends GenericController {
         // pass objects to model and view
         Optional<User> user = getUser();
         mav.addObject("user", user);
-        if(user.isPresent() && isStaff()) {
+        if (user.isPresent() && isStaff()) {
             mav.addObject("staffs", staffService.findByUser(user.get().getId()));
         }
         mav.addObject("searchedLocalities", searchedLocalities);
         mav.addObject("searchedSpecialties", searchedSpecialties);
         mav.addObject("staff", staffList);
-        mav.addObject("specialties",specialtiesList);
-        mav.addObject("localities",localitiesList);
+        mav.addObject("specialties", specialtiesList);
+        mav.addObject("localities", localitiesList);
         mav.addObject("name", name);
         mav.addObject("selSpeciality", specialties);
         mav.addObject("selLocality", localities);
@@ -123,33 +122,33 @@ public class MedicListController extends GenericController {
     }
 
     @RequestMapping("/appointment/{id}/{week}")
-    public ModelAndView appointment(@PathVariable("id") final int id, @PathVariable("week") final int week){
+    public ModelAndView appointment(@PathVariable("id") final int id, @PathVariable("week") final int week) {
         Optional<Staff> staff = staffService.findById(id);
-        if(!staff.isPresent()){
+        if (!staff.isPresent()) {
             return new ModelAndView("error/404"); //todo: throw status code instead of this
         }
         ModelAndView mav = new ModelAndView();
 
         DateTime today = DateTime.now();
         today = today.plusWeeks(week);
-        DateTime monday = today.minusDays(today.getDayOfWeek() -1);
+        DateTime monday = today.minusDays(today.getDayOfWeek() - 1);
 
         mav.addObject("today", today);
         mav.addObject("monday", monday);
         Optional<User> user = getUser();
         mav.addObject("user", user);
-        if(user.isPresent() && isStaff()) {
+        if (user.isPresent() && isStaff()) {
             mav.addObject("staffs", staffService.findByUser(user.get().getId()));
         }
         mav.addObject("staff", staff.get());
 
-        List<AppointmentTimeSlot> timeSlots = this.appointmentService.findAvailableTimeslots(staff.get(), monday, monday.plusDays(6).withTime(23,59,59,999));
+        List<AppointmentTimeSlot> timeSlots = this.appointmentService.findAvailableTimeslots(staff.get(), monday, monday.plusDays(6).withTime(23, 59, 59, 999));
         List<List<AppointmentTimeSlot>> weekslots = new LinkedList<>();
-        for (int i=0; i<=7; i++){
+        for (int i = 0; i <= 7; i++) {
             weekslots.add(new LinkedList<>());
         }
-        for(AppointmentTimeSlot timeSlot: timeSlots){
-            if(timeSlot.getDate().getDayOfWeek() < 1 && timeSlot.getDate().getDayOfWeek() > 7){
+        for (AppointmentTimeSlot timeSlot : timeSlots) {
+            if (timeSlot.getDate().getDayOfWeek() < 1 && timeSlot.getDate().getDayOfWeek() > 7) {
                 weekslots.get(0).add(timeSlot);
             } else {
                 weekslots.get(timeSlot.getDate().getDayOfWeek()).add(timeSlot);
@@ -166,14 +165,14 @@ public class MedicListController extends GenericController {
             @PathVariable("id") final int id,
             @Valid @RequestBody RequestTimeslotForm form,
             final BindingResult errors
-            ){
+    ) {
         return this.formatJsonResponse(errors, () -> {
             Optional<Staff> staff = this.staffService.findById(id);
             if (!staff.isPresent()) {
                 throw new MediCareException("No existe el staff solicitado");
             }
-            DateTime dateFrom = new DateTime(form.getFromYear(), form.getFromMonth(), form.getFromDay(), 0,0);
-            DateTime dateTo = new DateTime(form.getToYear(), form.getToMonth(), form.getToDay(), 23, 59, 59,999);
+            DateTime dateFrom = new DateTime(form.getFromYear(), form.getFromMonth(), form.getFromDay(), 0, 0);
+            DateTime dateTo = new DateTime(form.getToYear(), form.getToMonth(), form.getToDay(), 23, 59, 59, 999);
             long daysBetween = Days.daysBetween(dateFrom.toLocalDate(), dateTo.toLocalDate()).getDays();
             if (daysBetween > MAX_DAYS_APPOINTMENTS || dateTo.isBefore(dateFrom)) {
                 throw new MediCareException("Fechas invalidas");
