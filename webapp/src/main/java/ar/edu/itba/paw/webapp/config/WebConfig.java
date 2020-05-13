@@ -109,7 +109,7 @@ public class WebConfig {
     public SimpleMappingExceptionResolver simpleMappingExceptionResolver() {
         SimpleMappingExceptionResolver exceptionResolver = new MappingExceptionResolver();
         Properties properties = new Properties();
-        properties.setProperty(Exception.class.getName(), "errors/500");
+        properties.setProperty(Exception.class.getName(), "error/500");
 
         exceptionResolver.setExceptionMappings(properties);
         exceptionResolver.setDefaultStatusCode(500);

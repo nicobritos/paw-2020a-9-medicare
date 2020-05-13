@@ -11,7 +11,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 @Component
 public class CustomApplicationListener implements ApplicationListener<ContextRefreshedEvent> {
-    private static final Logger LOGGER = LoggerFactory.getLogger("Application");
+    private static final Logger LOGGER = LoggerFactory.getLogger(CustomApplicationListener.class);
     private final AtomicBoolean ran = new AtomicBoolean();
 
     @Override
