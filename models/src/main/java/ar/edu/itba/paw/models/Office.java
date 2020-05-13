@@ -1,6 +1,8 @@
 package ar.edu.itba.paw.models;
 
 import ar.edu.itba.paw.persistenceAnnotations.Column;
+import ar.edu.itba.paw.persistenceAnnotations.OrderBy;
+import ar.edu.itba.paw.persistenceAnnotations.OrderCriteria;
 import ar.edu.itba.paw.persistenceAnnotations.Table;
 
 @Table(name = "office", primaryKey = "office_id")
@@ -9,13 +11,15 @@ public class Office extends GenericModel<Integer> {
     private String phone;
     @Column(name = "email")
     private String email;
+    @OrderBy(OrderCriteria.ASC)
     @Column(name = "name", required = true)
     private String name;
-    private Locality locality;
     @Column(name = "street", required = true)
     private String street;
     @Column(name = "url")
     private String url;
+
+    private Locality locality;
 
     public String getName() {
         return this.name;

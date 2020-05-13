@@ -1,7 +1,7 @@
 package ar.edu.itba.paw.webapp.config;
 
-import ar.edu.itba.paw.webapp.auth.AuthenticationSuccessHandlerImpl;
 import ar.edu.itba.paw.webapp.auth.UserRole;
+import ar.edu.itba.paw.webapp.handlers.AuthenticationSuccessHandlerImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -28,7 +28,7 @@ import java.util.concurrent.TimeUnit;
 
 @EnableWebSecurity
 @Configuration
-@ComponentScan(basePackages = { "ar.edu.itba.paw.webapp.auth" })
+@ComponentScan(basePackages = {"ar.edu.itba.paw.webapp.auth", "ar.edu.itba.paw.webapp.handlers"})
 public class WebAuthConfig extends WebSecurityConfigurerAdapter {
     @Autowired
     private UserDetailsService userDetailsService;
@@ -57,33 +57,36 @@ public class WebAuthConfig extends WebSecurityConfigurerAdapter {
     protected void configure(HttpSecurity http) throws Exception {
         http.sessionManagement()
                 .invalidSessionUrl("/")
-            .and().authorizeRequests()
+                .and().authorizeRequests()
                 .antMatchers("/").permitAll()
-                .antMatchers("/mediclist/**").hasAnyRole("ANONYMOUS", UserRole.PATIENT.name())
+                .antMatchers("/verifyEmail").permitAll()
+                .antMatchers("/mediclist/**").hasAnyRole(UserRole.ANONYMOUS.name(), UserRole.PATIENT.name())
                 .antMatchers("/login").anonymous()
                 .antMatchers("/signup/**").anonymous()
                 .antMatchers("/patient/**").hasRole(UserRole.PATIENT.name())
                 .antMatchers("/staff/**").hasRole(UserRole.STAFF.name())
+                .antMatchers("/img/**").permitAll()
+                .antMatchers("/profilePics/**").permitAll()
                 .antMatchers("/**").authenticated()
-            .and().formLogin()
+                .and().formLogin()
                 .usernameParameter("email")
                 .passwordParameter("password")
                 .loginPage("/login")
                 .permitAll()
                 .successHandler(new AuthenticationSuccessHandlerImpl())
-            .and().rememberMe()
+                .and().rememberMe()
                 .rememberMeParameter("rememberMe")
                 .userDetailsService(this.userDetailsService)
                 .key(this.getSecretKey())
                 .tokenValiditySeconds((int) TimeUnit.DAYS.toSeconds(30))
-            .and().logout()
+                .and().logout()
                 .logoutUrl("/logout")
                 .logoutSuccessUrl("/")
                 .invalidateHttpSession(true)
                 .permitAll()
-            .and().exceptionHandling()
+                .and().exceptionHandling()
                 .accessDeniedPage("/403")
-            .and().csrf()
+                .and().csrf()
                 .disable();
     }
 
@@ -97,7 +100,7 @@ public class WebAuthConfig extends WebSecurityConfigurerAdapter {
         BufferedReader reader = new BufferedReader(streamReader);
 
         StringBuilder stringBuilder = new StringBuilder();
-        for (String line; (line = reader.readLine()) != null;) {
+        for (String line; (line = reader.readLine()) != null; ) {
             stringBuilder.append(line);
         }
         return stringBuilder.toString();

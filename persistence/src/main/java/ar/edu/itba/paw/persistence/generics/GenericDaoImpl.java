@@ -9,8 +9,11 @@ import ar.edu.itba.paw.persistence.utils.builder.*;
 import ar.edu.itba.paw.persistence.utils.builder.JDBCWhereClauseBuilder.ColumnTransformer;
 import ar.edu.itba.paw.persistence.utils.builder.JDBCWhereClauseBuilder.Operation;
 import ar.edu.itba.paw.persistenceAnnotations.Column;
+import ar.edu.itba.paw.persistenceAnnotations.OrderBy;
 import ar.edu.itba.paw.persistenceAnnotations.Table;
 import org.joda.time.DateTime;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.core.ResultSetExtractor;
 import org.springframework.jdbc.core.RowCallbackHandler;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
@@ -33,6 +36,7 @@ import java.util.Map.Entry;
  * @param <I> the Model's id type
  */
 public abstract class GenericDaoImpl<M extends GenericModel<I>, I> implements GenericDao<M, I> {
+    private static final Logger LOGGER = LoggerFactory.getLogger(GenericDaoImpl.class);
     private static final String ARGUMENT_PREFIX = "_r_";
     protected TransactionTemplate transactionTemplate;
     protected NamedParameterJdbcTemplate jdbcTemplate;
@@ -85,7 +89,8 @@ public abstract class GenericDaoImpl<M extends GenericModel<I>, I> implements Ge
         for (I id : ids) {
             String parameter = "_id_" + i;
             idsParameters.add(":" + parameter);
-            parameters.put(":" + parameter, id);
+            parameters.put(parameter, id);
+            i++;
         }
 
         JDBCSelectQueryBuilder selectQueryBuilder = new JDBCSelectQueryBuilder()
@@ -260,12 +265,30 @@ public abstract class GenericDaoImpl<M extends GenericModel<I>, I> implements Ge
     }
 
     protected List<M> selectQuery(JDBCSelectQueryBuilder selectQueryBuilder) {
-        this.populateJoins(selectQueryBuilder);
+        selectQueryBuilder = this.wrapSelectQueryBuilder(selectQueryBuilder);
         return new LinkedList<>(this.jdbcTemplate.query(selectQueryBuilder.getQueryAsString(), this.getResultSetExtractor()));
     }
 
+    /**
+     * Fixes LIMIT selects wrapping it inside of other select
+     */
+    private JDBCSelectQueryBuilder wrapSelectQueryBuilder(JDBCSelectQueryBuilder selectQueryBuilder) {
+        JDBCSelectQueryBuilder wrapper;
+        if (selectQueryBuilder.hasLimit() || selectQueryBuilder.hasOffset()) {
+            wrapper = new JDBCSelectQueryBuilder();
+            wrapper.from(selectQueryBuilder);
+            this.insertOrderBy(selectQueryBuilder);  // We need them in both
+        } else {
+            wrapper = selectQueryBuilder;
+        }
+
+        this.insertOrderBy(wrapper);
+        this.populateJoins(wrapper);
+        return wrapper;
+    }
+
     protected List<M> selectQuery(JDBCSelectQueryBuilder selectQueryBuilder, MapSqlParameterSource args) {
-        this.populateJoins(selectQueryBuilder);
+        selectQueryBuilder = this.wrapSelectQueryBuilder(selectQueryBuilder);
         return new LinkedList<>(this.jdbcTemplate.query(selectQueryBuilder.getQueryAsString(), args, this.getResultSetExtractor()));
     }
 
@@ -276,8 +299,18 @@ public abstract class GenericDaoImpl<M extends GenericModel<I>, I> implements Ge
      * @param callbackHandler the ResultSet handler
      */
     protected void selectQuery(JDBCSelectQueryBuilder selectQueryBuilder, MapSqlParameterSource args, RowCallbackHandler callbackHandler) {
-        this.populateJoins(selectQueryBuilder);
+        selectQueryBuilder = this.wrapSelectQueryBuilder(selectQueryBuilder);
         this.jdbcTemplate.query(selectQueryBuilder.getQueryAsString(), args, callbackHandler);
+    }
+
+    protected Optional<M> selectQuerySingle(JDBCSelectQueryBuilder selectQueryBuilder) {
+        selectQueryBuilder = this.wrapSelectQueryBuilder(selectQueryBuilder);
+        return this.jdbcTemplate.query(selectQueryBuilder.getQueryAsString(), this.getResultSetExtractor()).stream().findFirst();
+    }
+
+    protected Optional<M> selectQuerySingle(JDBCSelectQueryBuilder selectQueryBuilder, MapSqlParameterSource args) {
+        selectQueryBuilder = this.wrapSelectQueryBuilder(selectQueryBuilder);
+        return this.jdbcTemplate.query(selectQueryBuilder.getQueryAsString(), args, this.getResultSetExtractor()).stream().findFirst();
     }
 
     /**
@@ -287,16 +320,6 @@ public abstract class GenericDaoImpl<M extends GenericModel<I>, I> implements Ge
      */
     protected void updateQuery(String query, MapSqlParameterSource args) {
         this.jdbcTemplate.update(query, args);
-    }
-
-    protected Optional<M> selectQuerySingle(JDBCSelectQueryBuilder selectQueryBuilder) {
-        this.populateJoins(selectQueryBuilder);
-        return this.jdbcTemplate.query(selectQueryBuilder.getQueryAsString(), this.getResultSetExtractor()).stream().findFirst();
-    }
-
-    protected Optional<M> selectQuerySingle(JDBCSelectQueryBuilder selectQueryBuilder, MapSqlParameterSource args) {
-        this.populateJoins(selectQueryBuilder);
-        return this.jdbcTemplate.query(selectQueryBuilder.getQueryAsString(), args, this.getResultSetExtractor()).stream().findFirst();
     }
 
     protected M insertQuery(M model, MapSqlParameterSource args) {
@@ -354,10 +377,6 @@ public abstract class GenericDaoImpl<M extends GenericModel<I>, I> implements Ge
         return this.primaryKeyName;
     }
 
-    protected abstract ResultSetExtractor<List<M>> getResultSetExtractor();
-
-    protected abstract void populateJoins(JDBCSelectQueryBuilder selectQueryBuilder);
-
     /**
      * Returns a map associating column name with an argument name and the value in the model
      * associated with that field. The arguments may be prefixed to avoid name collisions.
@@ -379,7 +398,7 @@ public abstract class GenericDaoImpl<M extends GenericModel<I>, I> implements Ge
                 if (column.required() && o == null)
                     throw new IllegalStateException("This field is marked as required but its value is null");
 
-                if (field.getType().equals(DateTime.class)) {
+                if (field.getType().equals(DateTime.class) && o != null) {
                     map.put(column.name(), new JDBCArgumentValue(prefix + column.name(), Timestamp.from(Instant.ofEpochMilli(((DateTime) o).getMillis()))));
                 } else {
                     map.put(column.name(), new JDBCArgumentValue(prefix + column.name(), o));
@@ -389,7 +408,7 @@ public abstract class GenericDaoImpl<M extends GenericModel<I>, I> implements Ge
             ReflectionGetterSetter.iterateValues(model, Column.class, (field, o) -> {
                 Column column = field.getAnnotation(Column.class);
 
-                if (field.getType().equals(DateTime.class)) {
+                if (field.getType().equals(DateTime.class) && o != null) {
                     map.put(column.name(), new JDBCArgumentValue(prefix + column.name(), Timestamp.from(Instant.ofEpochMilli(((DateTime) o).getMillis()))));
                 } else {
                     map.put(column.name(), new JDBCArgumentValue(prefix + column.name(), o));
@@ -402,6 +421,24 @@ public abstract class GenericDaoImpl<M extends GenericModel<I>, I> implements Ge
             map.putAll(relationsMap);
         return map;
     }
+
+    private void insertOrderBy(JDBCSelectQueryBuilder selectQueryBuilder) {
+        if (selectQueryBuilder.hasOrderBy())
+            return;
+
+        ReflectionGetterSetter.iterateFields(this.mClass, OrderBy.class, field -> {
+            OrderBy orderBy = field.getAnnotation(OrderBy.class);
+            Column column = field.getAnnotation(Column.class);
+            if (column == null)
+                return;
+
+            selectQueryBuilder.orderBy(this.formatColumnFromAlias(column.name()), orderBy.value(), orderBy.priority());
+        });
+    }
+
+    protected abstract ResultSetExtractor<List<M>> getResultSetExtractor();
+
+    protected abstract void populateJoins(JDBCSelectQueryBuilder selectQueryBuilder);
 
     protected abstract Map<String, JDBCArgumentValue> getModelRelationsArgumentValue(M model, String prefix);
 
@@ -447,7 +484,7 @@ public abstract class GenericDaoImpl<M extends GenericModel<I>, I> implements Ge
 
                     ReflectionGetterSetter.set(model, field, value);
                 } catch (SQLException e2) {
-                    e2.printStackTrace();
+                    LOGGER.error("Column name {} not found in resultset for model classname: {}", column.name(), model.getClass().toString());
                 }
             }
         });

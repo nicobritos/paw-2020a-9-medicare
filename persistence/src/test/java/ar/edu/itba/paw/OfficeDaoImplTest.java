@@ -155,6 +155,7 @@ public class OfficeDaoImplTest
         assertEquals(1, JdbcTestUtils.countRowsInTable(this.jdbcTemplate, OFFICE_TABLE));
         assertEquals(NAME, office.getName());
         assertEquals(0, (int)office.getId()); // Identity de HSQLDB empieza en 0
+        assertEquals(localityModel(), office.getLocality());
     }
 
     @Test

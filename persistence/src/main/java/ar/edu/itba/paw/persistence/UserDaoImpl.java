@@ -32,7 +32,7 @@ public class UserDaoImpl extends GenericSearchableDaoImpl<User, Integer> impleme
 
     @Autowired
     public UserDaoImpl(DataSource dataSource) {
-        super(dataSource, User.class, Integer.class);
+        super(dataSource, User.class);
     }
 
     @Override
@@ -45,6 +45,16 @@ public class UserDaoImpl extends GenericSearchableDaoImpl<User, Integer> impleme
     @Override
     public Optional<User> findByEmail(String email) {
         return this.findByField("email", Operation.EQ, email).stream().findFirst();
+    }
+
+    @Override
+    public boolean existsToken(String token) {
+        return !this.findByField("token", token).isEmpty();
+    }
+
+    @Override
+    public Optional<User> findByToken(String token) {
+        return this.findByField("token", token).stream().findFirst();
     }
 
     @Override

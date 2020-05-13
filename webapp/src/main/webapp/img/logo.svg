@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
 <svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="403px" height="339px"
-     viewBox="0 0 403 339" enable-background="new 0 0 403 339" xml:space="preserve">  <image id="image0" width="403" height="339" x="0" y="0"
-                                                                                                                                                                                                        href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAZMAAAFTCAYAAAD89OHVAAAABGdBTUEAALGPC/xhBQAAACBjSFJN
+     viewBox="0 0 403 339" enable-background="new 0 0 403 339" xml:space="preserve">  <image id="image0" width="403"
+                                                                                             height="339" x="0" y="0"
+                                                                                             href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAZMAAAFTCAYAAAD89OHVAAAABGdBTUEAALGPC/xhBQAAACBjSFJN
 AAB6JgAAgIQAAPoAAACA6AAAdTAAAOpgAAA6mAAAF3CculE8AAAABmJLR0QA/wD/AP+gvaeTAAAA
 CXBIWXMAAAsSAAALEgHS3X78AAAAB3RJTUUH5AQOFQgB8W35wgAAG/p6VFh0UmF3IHByb2ZpbGUg
 dHlwZSA4YmltAAB4nO2dR5Iju5Ku51jFXUJAA8uBNOvB2/+0P0dQBEUys6rus2aaMXmKIgLCtf8O
@@ -442,5 +443,5 @@ ZjI0NWZunM8AAABLdEVYdHhtcE1NOkRvY3VtZW50SUQAYWRvYmU6ZG9jaWQ6cGhvdG9zaG9wOjYy
 OWE3YjM1LTkxOGMtM2E0Yi1iNzM4LTJiY2Q4MzI0Njc4NtHZ1OwAAAA9dEVYdHhtcE1NOkluc3Rh
 bmNlSUQAeG1wLmlpZDo5OWFjMzg4NC00ZTNhLTQ1NzUtOWM2ZS0zNzE5ODIyZDkwOTHy5fznAAAA
 RXRFWHR4bXBNTTpPcmlnaW5hbERvY3VtZW50SUQAeG1wLmRpZDo1OGJjNzUxOC01NTJjLTQ5ZDkt
-OTI4NS0yNDRiZGY1N2YyNDVQ0w7sAAAAAElFTkSuQmCC" />
+OTI4NS0yNDRiZGY1N2YyNDVQ0w7sAAAAAElFTkSuQmCC"/>
 </svg>

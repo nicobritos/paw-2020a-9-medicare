@@ -27,10 +27,14 @@ public class UserDetailsServiceImpl implements UserDetailsService {
         }
 
         Collection<? extends GrantedAuthority> authorities;
-        if (this.userService.isStaff(user.get())) {
-            authorities = Collections.singletonList(new SimpleGrantedAuthority("ROLE_" + UserRole.STAFF.name()));
+        if (!user.get().getVerified()) {
+            authorities = Collections.singletonList(new SimpleGrantedAuthority("ROLE_" + UserRole.UNVERIFIED.name()));
         } else {
-            authorities = Collections.singletonList(new SimpleGrantedAuthority("ROLE_" + UserRole.PATIENT.name()));
+            if (this.userService.isStaff(user.get())) {
+                authorities = Collections.singletonList(new SimpleGrantedAuthority("ROLE_" + UserRole.STAFF.name()));
+            } else {
+                authorities = Collections.singletonList(new SimpleGrantedAuthority("ROLE_" + UserRole.PATIENT.name()));
+            }
         }
 
         return new org.springframework.security.core.userdetails.User(username, user.get().getPassword(), authorities);

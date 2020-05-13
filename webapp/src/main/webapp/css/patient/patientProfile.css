@@ -1,80 +1,141 @@
 /*TODO: fusionar con medicprofile*/
-html,body{
+html, body {
     height: 100%;
 }
-.header{
+
+.header {
     background-color: #00C4BA;
 }
 
-.header-brand{
+.header-brand {
     font-weight: bold;
-}
-.header-brand:hover{
-    font-weight: bold;
-    color: white!important;
 }
 
-.header-a-element{
+.header-brand:hover {
+    font-weight: bold;
+    color: white !important;
+}
+
+.header-a-element {
     color: white;
 }
-.header-a-element:hover{
+
+.header-a-element:hover {
     color: #e0e0e0;
 }
-.header-btn-element{
+
+.header-btn-element {
     color: #00C4BA;
     font-weight: bold;
 }
-.header-btn-element:hover{
+
+.header-btn-element:hover {
     color: rgb(0, 160, 152);
     font-weight: bold;
 }
 
-.green-text{
-    color:#00C4BA;
+.green-text {
+    color: #00C4BA;
 }
 
-#navbar-logo{
+#navbar-logo {
     width: 2em;
 }
 
-.filter-form{
-	background-color: #00C4BA;
-	border-radius: 1em;
+.filter-form {
+    background-color: #00C4BA;
+    border-radius: 1em;
 }
 
-.form-title{
-	color: white;
+.form-title {
+    color: white;
 }
 
-.form-control{
-	background-color: rgba(214, 214, 214);
-}
-.white-text{
-    color:white!important;
-}
-
-#navbarUserImage{
-    width: 3em;
-}
-.turno-item{
-    border-radius: 2em!important;
+.form-control {
     background-color: rgba(214, 214, 214);
 }
 
-.turno-list{
+.white-text {
+    color: white !important;
+}
+
+#navbarUserImage {
+    width: 3em;
+}
+
+.turno-item {
+    border-radius: 2em !important;
+    background-color: rgba(214, 214, 214);
+}
+
+.turno-list {
     -ms-overflow-style: none;
     scrollbar-width: none;
 }
 
-.turno-list::-webkit-scrollbar{
+.turno-list::-webkit-scrollbar {
     display: none;
 }
 
-.moreOptionsButton{
+.moreOptionsButton {
     height: 1.5em;
     cursor: pointer;
 }
 
-#profilePic{
+.picture-container {
+    position: relative;
     height: 10em;
+    width: 10em;
+    border-radius: 10em;
+}
+
+.picture-container > * {
+    position: absolute;
+    top: 0;
+    left: 0;
+}
+
+.picture-container .picture-overlay {
+    z-index: 1;
+    width: 100%;
+    height: 100%;
+    border-radius: 10em;
+    opacity: 0;
+    transition: opacity 0.1s ease-in-out 0s;
+}
+
+.picture-container:hover .picture-overlay,
+.picture-container:active .picture-overlay {
+    opacity: 100%;
+}
+
+.picture-container .picture-overlay > i {
+    padding: 10px;
+    background: #333333bb;
+    border-radius: 50px;
+    font-size: 20px;
+    color: #ffffff;
+    cursor: pointer;
+}
+
+#profilePic {
+    height: 100%;
+    border-radius: 10em;
+}
+
+.profile-picture-container {
+    display: inline-block;
+    position: relative;
+    width: 100%;
+}
+
+.profile-picture {
+    object-fit: cover;
+    height: 100%;
+    width: 100%;
+    top: 0;
+    bottom: 0;
+    right: 0;
+    left: 0;
+    position: absolute;
 }

@@ -1,8 +1,10 @@
-const App = function() {
+const App = function () {
     let showOk = function (messages, title = 'Exito') {
         if (messages == null) {
             return;
         }
+        if (!$.isArray(messages))
+            messages = [messages];
 
         for (let message of messages) {
             $.notify({
@@ -13,7 +15,6 @@ const App = function() {
                 type: 'success',
                 newest_on_top: true,
                 timer: 300,
-                icon_type: 'fa'
             });
         }
     };
@@ -23,6 +24,8 @@ const App = function() {
             messages = ['Un error ha ocurrido'];
         }
 
+        if (!$.isArray(messages))
+            messages = [messages];
         for (let message of messages) {
             $.notify({
                 title: '<b>' + title + ': </b>',
@@ -36,7 +39,7 @@ const App = function() {
         }
     };
 
-    let ajax = function(url, parameters, method = 'GET') {
+    let ajax = function (url, parameters, method = 'GET') {
         return new Promise((resolve, reject) => {
             let errorCallback = function (data) {
                 showError(data.status.messages);
@@ -107,14 +110,14 @@ const App = function() {
     };
 
     let baseUrl = $("base")[0].href;
-    baseUrl = baseUrl.substring(0,baseUrl.length-1);
+    baseUrl = baseUrl.substring(0, baseUrl.length - 1);
     return {
-        init: function() {
+        init: function () {
             // First, checks if it isn't implemented yet.
             if (!String.prototype.format) {
-                String.prototype.format = function() {
+                String.prototype.format = function () {
                     var args = arguments;
-                    return this.replace(/{(\d+)}/g, function(match, number) {
+                    return this.replace(/{(\d+)}/g, function (match, number) {
                         return typeof args[number] != 'undefined'
                             ? args[number]
                             : match
@@ -123,17 +126,17 @@ const App = function() {
                 };
             }
         },
-        get: function(url, parameters = {}) {
-            if(url[0] === "/"){
+        get: function (url, parameters = {}) {
+            if (url[0] === "/") {
                 return ajax(baseUrl + url, parameters);
-            }else{
+            } else {
                 return ajax(url, parameters);
             }
         },
         post: function (url, parameters = {}) {
-            if(url[0] === "/"){
+            if (url[0] === "/") {
                 return ajax(baseUrl + url, parameters, 'POST');
-            }else{
+            } else {
                 return ajax(url, parameters, 'POST');
             }
         },
@@ -143,9 +146,9 @@ const App = function() {
             history.back();
         },
         goto: function (url) {
-            if(url[0] === "/"){
+            if (url[0] === "/") {
                 return goto(baseUrl + url)
-            }else{
+            } else {
                 return goto(url);
             }
         }

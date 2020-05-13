@@ -9,4 +9,8 @@ public interface UserDao extends GenericSearchableDao<User, Integer> {
     boolean existsEmail(String email);
 
     Optional<User> findByEmail(String email);
+
+    boolean existsToken(String token);
+
+    Optional<User> findByToken(String token);
 }

@@ -12,7 +12,8 @@
 <form action="<c:url value="/mediclist/1"/>">
     <div class="container h-75">
         <div class="row mt-4 justify-content-center">
-            <input class="form-control w-100" type="text" name="name" value="${name}" placeholder="<spring:message code="Name"/>"/>
+            <input class="form-control w-100" type="text" name="name" value="<c:out value="${name}"/>"
+                   placeholder="<spring:message code="Name"/>"/>
         </div>
         <div class="row mt-4">
             <div class="col-4 px-3">
@@ -24,24 +25,31 @@
                 <%--          </div>--%>
                 <div class="row mt-4">
                     <select class="form-control w-100" type="text" name="specialties" id="selEspecialidad">
-                        <option value="-1" disabled <c:if test="${searchedSpecialties.isEmpty()}">selected</c:if>><spring:message code="Specialty"/></option>
+                        <option value="-1" disabled <c:if test="${searchedSpecialties.isEmpty()}">selected</c:if>>
+                            <spring:message code="Specialty"/></option>
                         <option value="-1"><spring:message code="Any"/></option>
                         <c:forEach var="specialty" items="${specialties}">
-                            <option value="<c:out value="${specialty.id}" />" <c:if test="${searchedSpecialties.contains(specialty)}">selected</c:if>><c:out value="${specialty.name}"/></option>
+                            <option value="<c:out value="${specialty.id}" />"
+                                    <c:if test="${searchedSpecialties.contains(specialty)}">selected</c:if>><c:out
+                                    value="${specialty.name}"/></option>
                         </c:forEach>
                     </select>
                 </div>
                 <div class="row mt-4">
                     <select class="form-control w-100" type="text" name="localities" id="localidad">
-                        <option value="-1" disabled <c:if test="${searchedLocalities.isEmpty()}">selected</c:if>><spring:message code="Locality"/></option>
+                        <option value="-1" disabled <c:if test="${searchedLocalities.isEmpty()}">selected</c:if>>
+                            <spring:message code="Locality"/></option>
                         <option value="-1"><spring:message code="Any"/></option>
                         <c:forEach var="locality" items="${localities}">
-                            <option value="<c:out value="${locality.id}"/>" <c:if test="${searchedLocalities.contains(locality)}">selected</c:if>><c:out value="${locality.name}"/></option>
+                            <option value="<c:out value="${locality.id}"/>"
+                                    <c:if test="${searchedLocalities.contains(locality)}">selected</c:if>><c:out
+                                    value="${locality.name}"/></option>
                         </c:forEach>
                     </select>
                 </div>
                 <div class="row mt-4">
-                    <button type="submit" class="btn btn-info w-100 rounded-pill"><spring:message code="Filter"/></button>
+                    <button type="submit" class="btn btn-info w-100 rounded-pill"><spring:message
+                            code="Filter"/></button>
                 </div>
             </div>
             <div class="col-1"></div>
@@ -51,17 +59,19 @@
                         <li class="list-group-item turno-item mb-3">
                             <div class="container">
                                 <div class="row">
-                                    <div class="col-3 d-flex align-items-center">
-                                            <%--TODO connect image--%>
-                                        <img
-                                                class="w-75"
-                                                src="https://fonts.gstatic.com/s/i/materialicons/account_circle/v4/24px.svg"
-                                                alt=""
-                                        />
+                                    <div class="col-3 d-flex flex-column justify-content-center">
+                                        <div class="profile-picture-container">
+                                            <div style="margin-top: 100%;"></div>
+                                            <img
+                                                    class="profile-picture rounded-circle"
+                                                    src="<c:url value="/profilePics/${member.user.profileId}"/>"
+                                                    alt=""
+                                            />
+                                        </div>
                                     </div>
                                     <div class="col-6">
                                         <div class="row justify-content-start">
-                                            <h5>${member.firstName} ${member.surname}</h5>
+                                            <h5><c:out value="${member.firstName} ${member.surname}"/></h5>
                                         </div>
                                         <div class="row">
                                             <p class="m-0">
@@ -71,15 +81,15 @@
                                             </p>
                                         </div>
                                         <div class="row">
-                                            <p class="m-0">${member.office.street}</p>
+                                            <p class="m-0"><c:out value="${member.office.street}"/></p>
                                         </div>
                                     </div>
                                     <div class="col d-flex justify-content-center align-items-center">
                                         <a href="<c:url value="/appointment/${member.id}/0"/>">
-                                        <button type="button" class="btn btn-info available-appointments-button"
-                                                data-id="${member.id}">
-                                            <spring:message code="AvailableAppointments"/>
-                                        </button>
+                                            <button type="button" class="btn btn-info available-appointments-button"
+                                                    data-id="${member.id}">
+                                                <spring:message code="AvailableAppointments"/>
+                                            </button>
                                         </a>
                                     </div>
                                 </div>
@@ -94,7 +104,7 @@
                         </div>
                     </c:if>
 
-                    <p class="d-inline mx-2">Página <c:out value="${page}"/></p>
+                    <p class="d-inline mx-2"><spring:message code="Page"/> <c:out value="${page}"/></p>
                     <c:if test="${staff.size() == 10}">
                         <div>
                             <button type="button" class="btn btn-info btn-sm" id="nextButton">></button>

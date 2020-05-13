@@ -1,10 +1,13 @@
 package ar.edu.itba.paw.models;
 
 import ar.edu.itba.paw.persistenceAnnotations.Column;
+import ar.edu.itba.paw.persistenceAnnotations.OrderBy;
+import ar.edu.itba.paw.persistenceAnnotations.OrderCriteria;
 import ar.edu.itba.paw.persistenceAnnotations.Table;
 
 @Table(name = "system_locality", primaryKey = "locality_id")
 public class Locality extends GenericModel<Integer> {
+    @OrderBy(OrderCriteria.ASC)
     @Column(name = "name", required = true)
     private String name;
     private Province province;

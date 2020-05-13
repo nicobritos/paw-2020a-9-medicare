@@ -51,7 +51,7 @@ const Register = function () {
         }
     };
 
-    let getProvinces = function(countryId) {
+    let getProvinces = function (countryId) {
         App.get('/signup/staff/provinces/' + countryId).then(provinces => {
             let provinceSelect = $('#province');
             if (provinces.length > 0) {
@@ -67,7 +67,7 @@ const Register = function () {
         });
     };
 
-    let getLocalities = function(provinceId) {
+    let getLocalities = function (provinceId) {
         App.get('/signup/staff/localities/' + provinceId).then(localities => {
             let localitySelect = $('#locality');
             if (localities.length > 0) {
@@ -82,7 +82,7 @@ const Register = function () {
         });
     };
 
-    let emptyProvinces = function() {
+    let emptyProvinces = function () {
         emptyLocalities();
 
         let provinceSelect = $('#province');
@@ -90,7 +90,7 @@ const Register = function () {
         provinceSelect.children('option').remove();
     };
 
-    let emptyLocalities = function() {
+    let emptyLocalities = function () {
         let localitySelect = $('#locality');
         localitySelect.hide();
         localitySelect.children('option').remove();

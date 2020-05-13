@@ -4,35 +4,13 @@ import ar.edu.itba.paw.models.GenericModel;
 import ar.edu.itba.paw.persistence.utils.ReflectionGetterSetter;
 import ar.edu.itba.paw.persistence.utils.builder.JDBCWhereClauseBuilder.Operation;
 import ar.edu.itba.paw.persistenceAnnotations.Column;
+import ar.edu.itba.paw.persistenceAnnotations.OrderCriteria;
 import ar.edu.itba.paw.persistenceAnnotations.Table;
 
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class JDBCSelectQueryBuilder extends JDBCQueryBuilder {
     public static final String ALL = " * ";
-
-    public enum OrderCriteria {
-        ASC(" ASC "),
-        DESC(" DESC ");
-
-        private String criteria;
-
-        OrderCriteria(String criteria) {
-            this.criteria = criteria;
-        }
-
-        public String getCriteria() {
-            return this.criteria;
-        }
-
-        @Override
-        public String toString() {
-            return this.criteria;
-        }
-    }
 
     public enum JoinType {
         INNER(" "),
@@ -41,7 +19,7 @@ public class JDBCSelectQueryBuilder extends JDBCQueryBuilder {
         FULL_OUTER(" FULL OUTER "),
         CROSS_OUTER(" CROSS OUTER ");
 
-        private String joinType;
+        private final String joinType;
 
         JoinType(String joinType) {
             this.joinType = joinType;
@@ -57,16 +35,16 @@ public class JDBCSelectQueryBuilder extends JDBCQueryBuilder {
         }
     }
 
-    private Map<String, Class<? extends GenericModel<?>>> joinColumns = new HashMap<>();
-    private List<String> columns = new LinkedList<>();
-    private List<String> joins = new LinkedList<>();
+    private final Map<String, Class<? extends GenericModel<?>>> joinColumns = new HashMap<>();
+    private final SortedSet<OrderBy> orderBy = new TreeSet<>();
+    private final List<String> columns = new LinkedList<>();
+    private final List<String> joins = new LinkedList<>();
 
     private JDBCWhereClauseBuilder whereClauseBuilder;
+    private JDBCSelectQueryBuilder fromQueryBuilder;
     private Class<? extends GenericModel<?>> mClass;
-    private OrderCriteria orderCriteria;
     private boolean selectAll;
     private boolean distinct;
-    private String orderBy;
     private String table;
     private String alias;
     private int limit;
@@ -91,6 +69,16 @@ public class JDBCSelectQueryBuilder extends JDBCQueryBuilder {
         this.table = tableName + " AS " + alias;
         this.alias = alias;
         return this;
+    }
+
+    public JDBCSelectQueryBuilder from(JDBCSelectQueryBuilder selectQueryBuilder) {
+        this.from(selectQueryBuilder.getTable(), selectQueryBuilder.getAlias());
+        this.fromQueryBuilder = selectQueryBuilder;
+        return this;
+    }
+
+    public String getAlias() {
+        return this.alias;
     }
 
     public JDBCSelectQueryBuilder join(String columnLeft, String tableRight, String columnRight, Class<? extends GenericModel<?>> mClass) {
@@ -155,10 +143,13 @@ public class JDBCSelectQueryBuilder extends JDBCQueryBuilder {
         return this;
     }
 
-    public JDBCSelectQueryBuilder orderBy(String columnName, OrderCriteria orderCriteria) {
-        this.orderCriteria = orderCriteria;
-        this.orderBy = columnName;
+    public JDBCSelectQueryBuilder orderBy(String columnName, OrderCriteria orderCriteria, int priority) {
+        this.orderBy.add(new OrderBy(columnName, orderCriteria, priority));
         return this;
+    }
+
+    public boolean hasOrderBy() {
+        return !this.orderBy.isEmpty();
     }
 
     public JDBCSelectQueryBuilder distinct() {
@@ -171,9 +162,17 @@ public class JDBCSelectQueryBuilder extends JDBCQueryBuilder {
         return this;
     }
 
+    public boolean hasLimit() {
+        return this.limit > 0;
+    }
+
     public JDBCSelectQueryBuilder offset(int offset) {
         this.offset = offset;
         return this;
+    }
+
+    public boolean hasOffset() {
+        return this.offset > 0;
     }
 
     public JDBCSelectQueryBuilder where(JDBCWhereClauseBuilder whereClauseBuilder) {
@@ -187,21 +186,73 @@ public class JDBCSelectQueryBuilder extends JDBCQueryBuilder {
 
     @Override
     public String getQueryAsString() {
+        return this.getQueryAsSubqueryString(false) + ";";
+    }
+
+    @Override
+    public String getTable() {
+        return this.table;
+    }
+
+    protected List<String> getColumnsAsList() {
+        if (this.mClass != null && !this.joinColumns.containsKey(this.alias))
+            this.joinColumns.put(this.alias, this.mClass);
+
+        List<String> columns = new LinkedList<>();
+        for (Map.Entry<String, Class<? extends GenericModel<?>>> entry : this.joinColumns.entrySet()) {
+            Table table = entry.getValue().getAnnotation(Table.class);
+            columns.add(entry.getKey() + "." + table.primaryKey() + " AS " + "\"" + entry.getKey() + "." + table.primaryKey() + "\"");
+            ReflectionGetterSetter.iterateFields(entry.getValue(), Column.class, field -> {
+                Column column = field.getAnnotation(Column.class);
+                columns.add(entry.getKey() + "." + column.name() + " AS " + "\"" + entry.getKey() + "." + column.name() + "\"");
+            });
+        }
+        return columns;
+    }
+
+    protected List<String> getModelColumnsAsList() {
+        List<String> columns = new LinkedList<>();
+        if (this.mClass == null)
+            return columns;
+
+        Table table = this.mClass.getAnnotation(Table.class);
+        columns.add(this.alias + "." + table.primaryKey() + " AS " + "\"" + this.alias + "." + table.primaryKey() + "\"");
+        ReflectionGetterSetter.iterateFields(this.mClass, Column.class, field -> {
+            Column column = field.getAnnotation(Column.class);
+            columns.add(this.alias + "." + column.name() + " AS " + "\"" + this.alias + "." + column.name() + "\"");
+        });
+        return columns;
+    }
+
+    protected String getQueryAsSubqueryString(boolean onlyColumnsFromTable) {
         StringBuilder stringBuilder = new StringBuilder("SELECT ");
 
         if (this.distinct) stringBuilder.append(" DISTINCT ");
 
-        if (this.columns.size() > 0) {
-            stringBuilder.append(this.joinStrings(this.columns));
-        } else if (this.selectAll) {
-            stringBuilder.append(this.generateColumns());
+        if (onlyColumnsFromTable) {
+            stringBuilder
+                    .append(this.alias)
+                    .append(".*");
         } else {
-            return null;
+            if (this.columns.size() > 0) {
+                stringBuilder.append(this.joinStrings(this.columns));
+            } else if (this.selectAll || this.fromQueryBuilder != null) {
+                stringBuilder.append(this.generateColumns());
+            } else {
+                return null;
+            }
         }
 
-        stringBuilder
-                .append(" FROM ")
-                .append(this.table);
+        stringBuilder.append(" FROM ");
+        if (this.fromQueryBuilder != null) {
+            stringBuilder
+                    .append(" ( ")
+                    .append(this.fromQueryBuilder.getQueryAsSubqueryString(true))
+                    .append(" ) AS ")
+                    .append(this.fromQueryBuilder.getAlias());
+        } else {
+            stringBuilder.append(this.table);
+        }
 
         if (this.joins.size() > 0) {
             stringBuilder.append(this.joinStrings(this.joins, " "));
@@ -213,12 +264,10 @@ public class JDBCSelectQueryBuilder extends JDBCQueryBuilder {
                     .append(this.whereClauseBuilder.getClauseAsString());
         }
 
-        if (this.orderBy != null) {
+        if (!this.orderBy.isEmpty()) {
             stringBuilder
                     .append(" ORDER BY ")
-                    .append(this.orderBy);
-
-            if (this.orderCriteria != null) stringBuilder.append(this.orderCriteria.getCriteria());
+                    .append(this.generateOrderBy());
         }
 
         if (this.limit > 0) {
@@ -233,29 +282,53 @@ public class JDBCSelectQueryBuilder extends JDBCQueryBuilder {
                     .append(this.offset);
         }
 
-        stringBuilder.append(";");
-
         return stringBuilder.toString();
     }
 
-    @Override
-    protected String getTable() {
-        return this.table;
-    }
-
     private String generateColumns() {
-        if (this.mClass != null)
-            this.joinColumns.put(this.alias, this.mClass);
-
-        List<String> columns = new LinkedList<>();
-        for (Map.Entry<String, Class<? extends GenericModel<?>>> entry : this.joinColumns.entrySet()) {
-            Table table = entry.getValue().getAnnotation(Table.class);
-            columns.add(entry.getKey() + "." + table.primaryKey() + " AS " + "\"" + entry.getKey() + "." + table.primaryKey() + "\"");
-            ReflectionGetterSetter.iterateFields(entry.getValue(), Column.class, field -> {
-                Column column = field.getAnnotation(Column.class);
-                columns.add(entry.getKey() + "." + column.name() + " AS " + "\"" + entry.getKey() + "." + column.name() + "\"");
-            });
+        List<String> columns = this.getColumnsAsList();
+        if (this.fromQueryBuilder != null) {
+            columns.addAll(this.fromQueryBuilder.getModelColumnsAsList());
         }
         return this.joinStrings(columns);
+    }
+
+    private String generateOrderBy() {
+        List<String> strings = new LinkedList<>();
+        for (OrderBy orderBy : this.orderBy) {
+            strings.add(orderBy.getColumnName() + " " + orderBy.getCriteria().getCriteria());
+        }
+        return this.joinStrings(strings, ", ");
+    }
+
+    private static class OrderBy implements Comparable<OrderBy> {
+        private final OrderCriteria criteria;
+        private final String columnName;
+        private final int priority;
+
+        public OrderBy(String columnName, OrderCriteria criteria, int priority) {
+            this.columnName = columnName;
+            this.criteria = criteria;
+            this.priority = priority;
+        }
+
+        public OrderCriteria getCriteria() {
+            return this.criteria;
+        }
+
+        public String getColumnName() {
+            return this.columnName;
+        }
+
+        public int getPriority() {
+            return this.priority;
+        }
+
+        @Override
+        public int compareTo(OrderBy o) {
+            if (o == null)
+                throw new NullPointerException();
+            return Integer.compare(this.priority, o.priority);
+        }
     }
 }

@@ -1,9 +1,9 @@
-<%@ taglib prefix="c" uri="http://java.sun.com/jstl/core_rt"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jstl/core_rt" %>
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags" %>
 <html>
 <head>
-    <%@ include file = "../head.jsp" %>
-    <link rel="stylesheet" href="<c:url value="/css/errorPage.css"/>" />
+    <%@ include file="../head.jsp" %>
+    <link rel="stylesheet" href="<c:url value="/css/errorPage.css"/>"/>
 </head>
 <body>
 <div class="container h-100 d-flex flex-column justify-content-center align-items-center">

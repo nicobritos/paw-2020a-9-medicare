@@ -38,7 +38,7 @@ public class OfficeDaoImpl extends GenericSearchableDaoImpl<Office, Integer> imp
 
     @Autowired
     public OfficeDaoImpl(DataSource dataSource) {
-        super(dataSource, Office.class, Integer.class);
+        super(dataSource, Office.class);
     }
 
     @Override

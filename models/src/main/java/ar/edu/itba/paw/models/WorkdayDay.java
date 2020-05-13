@@ -3,8 +3,6 @@ package ar.edu.itba.paw.models;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeConstants;
 
-import java.time.DayOfWeek;
-import java.time.LocalDate;
 import java.util.Calendar;
 
 public enum WorkdayDay {

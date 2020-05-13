@@ -2,6 +2,8 @@ package ar.edu.itba.paw;
 
 import ar.edu.itba.paw.models.*;
 import ar.edu.itba.paw.persistence.WorkdayDaoImpl;
+import org.joda.time.DateTime;
+import org.joda.time.LocalTime;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -14,10 +16,10 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.jdbc.JdbcTestUtils;
 
 import javax.sql.DataSource;
-import java.util.HashMap;
-import java.util.Map;
+import java.time.DayOfWeek;
+import java.util.*;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.*;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @Sql(scripts = "classpath:sql/schema.sql")
@@ -45,6 +47,10 @@ public class WorkdayDaoImplTest
     private static final Integer END_HOUR = 18;
     private static final Integer START_MINUTE = 30;
     private static final Integer END_MINUTE = 15;
+    private static final Integer END_MINUTE_2 = 30;
+    private static final String DAY_OF_WEEK = DayOfWeek.MONDAY.name();
+    private static final String DAY_OF_WEEK_2 = DayOfWeek.TUESDAY.name();
+
 
     private static final String OFFICE_TABLE = "office";
     private static final String LOCALITY_TABLE = "system_locality";
@@ -60,6 +66,7 @@ public class WorkdayDaoImplTest
     private SimpleJdbcInsert provinceJdbcInsert;
     private SimpleJdbcInsert countryJdbcInsert;
     private SimpleJdbcInsert staffJdbcInsert;
+    private SimpleJdbcInsert workdayJdbcInsert;
 
     @Autowired
     private DataSource ds;
@@ -82,6 +89,9 @@ public class WorkdayDaoImplTest
         this.staffJdbcInsert = new SimpleJdbcInsert(this.ds)
                 .withTableName(STAFF_TABLE)
                 .usingGeneratedKeyColumns("staff_id");
+        this.workdayJdbcInsert = new SimpleJdbcInsert(this.ds)
+                .withTableName(WORKDAY_TABLE)
+                .usingGeneratedKeyColumns("workday_id");
     }
     
     private void cleanAllTables(){
@@ -120,19 +130,9 @@ public class WorkdayDaoImplTest
         officeJdbcInsert.execute(officeMap);
     }
 
-    private void insertAnotherOffice(){
-        Map<String, Object> officeMap = new HashMap<>();
-        officeMap.put("name", NAME_2);
-        officeMap.put("email", OFFICE_EMAIL);
-        officeMap.put("phone", OFFICE_PHONE);
-        officeMap.put("locality_id", 0); // Identity de HSQLDB empieza en 0
-        officeMap.put("street", OFFICE_STREET);
-        officeMap.put("street_number", OFFICE_STREET_NUMBER);
-        officeJdbcInsert.execute(officeMap);
-    }
-
     private Staff staffModel() {
         Staff staff = new Staff();
+        staff.setId(0);
         staff.setFirstName(STAFF_NAME);
         staff.setSurname(STAFF_SURNAME);
         staff.setEmail(STAFF_EMAIL);
@@ -152,6 +152,29 @@ public class WorkdayDaoImplTest
         staffMap.put("phone", STAFF_PHONE);
         staffMap.put("registration_number", STAFF_REGISTRATION_NUMBER); // Identity de HSQLDB empieza en 0
         this.staffJdbcInsert.execute(staffMap);
+    }
+
+    private void insertWorkday(){
+        insertStaff();
+        Map<String, Object> workdayMap = new HashMap<>();
+        workdayMap.put("staff_id", 0);
+        workdayMap.put("start_hour", START_HOUR);
+        workdayMap.put("start_minute", START_MINUTE);
+        workdayMap.put("end_hour", END_HOUR);
+        workdayMap.put("end_minute", END_MINUTE);
+        workdayMap.put("day", DAY_OF_WEEK);
+        this.workdayJdbcInsert.execute(workdayMap);
+    }
+
+    private void insertAnotherWorkday(){
+        Map<String, Object> workdayMap = new HashMap<>();
+        workdayMap.put("staff_id", 0);
+        workdayMap.put("start_hour", START_HOUR);
+        workdayMap.put("start_minute", START_MINUTE);
+        workdayMap.put("end_hour", END_HOUR);
+        workdayMap.put("end_minute", END_MINUTE);
+        workdayMap.put("day", DAY_OF_WEEK_2);
+        this.workdayJdbcInsert.execute(workdayMap);
     }
 
     private Country countryModel(){
@@ -179,10 +202,10 @@ public class WorkdayDaoImplTest
         return o;
     }
 
-    private Workday workdayModel(WorkdayDay workdayDay){
+    private Workday workdayModel(){
         Workday workday = new Workday();
         workday.setId(0);
-        workday.setDay(workdayDay.name());
+        workday.setDay(DAY_OF_WEEK);
         workday.setStartHour(START_HOUR);
         workday.setEndHour(END_HOUR);
         workday.setStartMinute(START_MINUTE);
@@ -196,230 +219,146 @@ public class WorkdayDaoImplTest
     {
         // 1. Precondiciones
         cleanAllTables();
-        Workday workday = this.workdayModel(WorkdayDay.MONDAY);
+        insertStaff();
+        Workday workday = this.workdayModel();
 
         // 2. Ejercitar
         workday = this.workdayDao.create(workday);
 
         // 3. Postcondiciones
         assertEquals(1, JdbcTestUtils.countRowsInTable(this.jdbcTemplate, WORKDAY_TABLE));
-        assertEquals(WorkdayDay.MONDAY.name(), workday.getDay());
+        assertEquals(DAY_OF_WEEK, workday.getDay());
     }
 
-//    @Test
-//    public void testFindById(){
-//        // 1. Precondiciones
-//        cleanAllTables();
-//        insertOffice();
-//
-//        // 2. Ejercitar
-//        Optional<Office> maybeOffice = officeDao.findById(0); // Identity de HSQLDB empieza en 0
-//
-//        // 3. Postcondiciones
-//        assertTrue(maybeOffice.isPresent());
-//        assertEquals(0, (int)maybeOffice.get().getId());
-//        assertEquals(OFFICE_NAME, maybeOffice.get().getName());
-//    }
-//
-//    @Test
-//    public void testFindByIdDoesntExist(){
-//        // 1. Precondiciones
-//        cleanAllTables();
-//
-//        // 2. Ejercitar
-//        Optional<Office> maybeOffice = officeDao.findById(0); // Identity de HSQLDB empieza en 0
-//
-//        // 3. Postcondiciones
-//        assertFalse(maybeOffice.isPresent());
-//    }
-//
-//    @Test
-//    public void testFindByIds(){
-//        // 1. Precondiciones
-//        cleanAllTables();
-//        insertOffice();
-//        insertAnotherOffice();
-//
-//        // 2. Ejercitar
-//        Collection<Office> offices = officeDao.findByIds(Arrays.asList(0,1,2)); // Identity de HSQLDB empieza en 0
-//
-//        // 3. Postcondiciones
-//        assertNotNull(offices);
-//        assertEquals(2, offices.size());
-//    }
-//
-//    @Test
-//    public void testFindByIdsDoesntExist(){
-//        // 1. Precondiciones
-//        cleanAllTables();
-//
-//        // 2. Ejercitar
-//        Collection<Office> offices = officeDao.findByIds(Arrays.asList(0,1,2)); // Identity de HSQLDB empieza en 0
-//
-//        // 3. Postcondiciones
-//        assertNotNull(offices);
-//        assertTrue(offices.isEmpty());
-//    }
-//
-//    @Test
-//    public void testFindByName(){
-//        // 1. Precondiciones
-//        cleanAllTables();
-//        insertOffice();
-//        insertAnotherOffice();
-//
-//        // 2. Ejercitar
-//        Collection<Office> offices = officeDao.findByName(OFFICE_NAME);
-//        Collection<Office> offices2 = officeDao.findByName(NAME_2);
-//
-//        // 3. Postcondiciones
-//        assertNotNull(offices);
-//        assertEquals(2, offices.size());
-//        assertEquals(1, offices2.size());
-//    }
-//
-//    @Test
-//    public void testFindByNameDoesntExist(){
-//        // 1. Precondiciones
-//        cleanAllTables();
-//
-//        // 2. Ejercitar
-//        Collection<Office> offices = officeDao.findByName(OFFICE_NAME);
-//
-//        // 3. Postcondiciones
-//        assertNotNull(offices);
-//        assertTrue(offices.isEmpty());
-//    }
-//
-//    @Test
-//    public void testList(){
-//        // 1. Precondiciones
-//        // Vaciar tablas
-//        cleanAllTables();
-//        insertOffice();
-//        insertAnotherOffice();
-//
-//        // 2. Ejercitar
-//        Collection<Office> offices = officeDao.list();
-//
-//        // 3. Postcondiciones
-//        assertNotNull(offices);
-//        assertEquals(2, offices.size());
-//    }
-//
-//    @Test
-//    public void testEmptyList(){
-//        // 1. Precondiciones
-//        cleanAllTables();
-//
-//        // 2. Ejercitar
-//        Collection<Office> offices = officeDao.list();
-//
-//        // 3. Postcondiciones
-//        assertNotNull(offices);
-//        assertTrue(offices.isEmpty());
-//    }
-//
-//    @Test
-//    public void testFindByCountry(){
-//        // 1. Precondiciones
-//        cleanAllTables();
-//
-//        insertOffice();
-//
-//        // Insertar pais 2
-//        Map<String, Object> countryMap = new HashMap<>();
-//        countryMap.put("name", COUNTRY + "_1");
-//        countryMap.put("country_id", "C1");
-//        countryJdbcInsert.execute(countryMap);
-//
-//        // Insertar provincia 2
-//        Map<String, Object> provinceMap = new HashMap<>();
-//        provinceMap.put("name", PROVINCE + "_1");
-//        provinceMap.put("country_id", "C1");
-//        provinceJdbcInsert.execute(provinceMap);
-//
-//        // Insertar oficina 2
-//        Map<String, Object> officeMap = new HashMap<>();
-//        officeMap.put("name", OFFICE_NAME + "_1");
-//        officeMap.put("email", OFFICE_EMAIL);
-//        officeMap.put("phone", OFFICE_PHONE);
-//        officeMap.put("province_id", 1); // Identity de HSQLDB empieza en 0
-//        officeMap.put("street", OFFICE_STREET);
-//        officeMap.put("street_number", OFFICE_STREET_NUMBER);
-//        officeJdbcInsert.execute(officeMap);
-//
-//        Country c = countryModel();
-//
-//        // 2. Ejercitar
-//        Collection<Office> offices = officeDao.findByCountry(c);
-//
-//        // 3. Postcondiciones
-//        assertNotNull(offices);
-//        assertEquals(1, offices.size());
-//    }
-//
-//    @Test
-//    public void testFindByCountryDoesntExists(){
-//        // 1. Precondiciones
-//        cleanAllTables();
-//
-//        //Crear Country modelo
-//        Country c = countryModel();
-//
-//        // 2. Ejercitar
-//        Collection<Office> offices = officeDao.findByCountry(c);
-//
-//        // 3. Postcondiciones
-//        assertNotNull(offices);
-//        assertTrue(offices.isEmpty());
-//    }
-//
-//    @Test
-//    public void testRemoveById(){
-//        // 1. Precondiciones
-//        cleanAllTables();
-//        insertOffice();
-//        insertAnotherOffice();
-//
-//        // 2. Ejercitar
-//        officeDao.remove(0);
-//
-//        // 3. Postcondiciones
-//        assertEquals(1, JdbcTestUtils.countRowsInTable(this.jdbcTemplate, OFFICE_TABLE));
-//    }
-//
-//    @Test
-//    public void testRemoveByModel(){
-//        // 1. Precondiciones
-//        cleanAllTables();
-//        insertOffice();
-//        insertAnotherOffice();
-//
-//        // 2. Ejercitar
-//        officeDao.remove(officeModel());
-//
-//        // 3. Postcondiciones
-//        assertEquals(1, JdbcTestUtils.countRowsInTable(this.jdbcTemplate, OFFICE_TABLE));
-//    }
-//
-//    @Test
-//    public void testUpdate(){
-//        // 1. Precondiciones
-//        cleanAllTables();
-//        insertOffice();
-//
-//        // Modelo de la oficina a crear
-//        Office o = this.officeDao.findById(officeModel().getId()).get();
-//        o.setName(OFFICE_NAME + " (updated)");
-//
-//        // 2. Ejercitar
-//        officeDao.update(o);
-//
-//        // 3. Postcondiciones
-//        assertEquals(1, JdbcTestUtils.countRowsInTable(this.jdbcTemplate, OFFICE_TABLE));
-//        assertEquals(1, JdbcTestUtils.countRowsInTableWhere(jdbcTemplate, OFFICE_TABLE, "name = '" + OFFICE_NAME + " (updated)'"));
-//        assertEquals(0, JdbcTestUtils.countRowsInTableWhere(jdbcTemplate, OFFICE_TABLE, "name = '" + OFFICE_NAME + "'"));
-//
-//    }
+    @Test
+    public void testFindById(){
+        // 1. Precondiciones
+        cleanAllTables();
+        insertWorkday();
+
+        // 2. Ejercitar
+        Optional<Workday> maybeWorkday = workdayDao.findById(0); // Identity de HSQLDB empieza en 0
+
+        // 3. Postcondiciones
+        assertTrue(maybeWorkday.isPresent());
+        assertEquals(0, (int)maybeWorkday.get().getId());
+        assertEquals(DAY_OF_WEEK, maybeWorkday.get().getDay());
+    }
+
+    @Test
+    public void testFindByIdDoesntExist(){
+        // 1. Precondiciones
+        cleanAllTables();
+
+        // 2. Ejercitar
+        Optional<Workday> maybeWorkday = workdayDao.findById(0); // Identity de HSQLDB empieza en 0
+
+        // 3. Postcondiciones
+        assertFalse(maybeWorkday.isPresent());
+    }
+
+    @Test
+    public void testFindByIds(){
+        // 1. Precondiciones
+        cleanAllTables();
+        insertWorkday();
+        insertAnotherWorkday();
+
+        // 2. Ejercitar
+        Collection<Workday> workdays = workdayDao.findByIds(Arrays.asList(0,1,2)); // Identity de HSQLDB empieza en 0
+
+        // 3. Postcondiciones
+        assertNotNull(workdays);
+        assertEquals(2, workdays.size());
+    }
+
+    @Test
+    public void testFindByIdsDoesntExist(){
+        // 1. Precondiciones
+        cleanAllTables();
+
+        // 2. Ejercitar
+        Collection<Workday> workdays = workdayDao.findByIds(Arrays.asList(0,1,2)); // Identity de HSQLDB empieza en 0
+
+        // 3. Postcondiciones
+        assertNotNull(workdays);
+        assertTrue(workdays.isEmpty());
+    }
+
+    @Test
+    public void testList(){
+        // 1. Precondiciones
+        // Vaciar tablas
+        cleanAllTables();
+        insertWorkday();
+        insertAnotherWorkday();
+
+        // 2. Ejercitar
+        Collection<Workday> workdays = workdayDao.list();
+
+        // 3. Postcondiciones
+        assertNotNull(workdays);
+        assertEquals(2, workdays.size());
+    }
+
+    @Test
+    public void testEmptyList(){
+        // 1. Precondiciones
+        cleanAllTables();
+
+        // 2. Ejercitar
+        Collection<Workday> workdays = workdayDao.list();
+
+        // 3. Postcondiciones
+        assertNotNull(workdays);
+        assertTrue(workdays.isEmpty());
+    }
+
+    @Test
+    public void testRemoveById(){
+        // 1. Precondiciones
+        cleanAllTables();
+        insertWorkday();
+        insertAnotherWorkday();
+
+        // 2. Ejercitar
+        workdayDao.remove(0);
+
+        // 3. Postcondiciones
+        assertEquals(1, JdbcTestUtils.countRowsInTable(this.jdbcTemplate, WORKDAY_TABLE));
+    }
+
+    @Test
+    public void testRemoveByModel(){
+        // 1. Precondiciones
+        cleanAllTables();
+        insertWorkday();
+        insertAnotherWorkday();
+
+        // 2. Ejercitar
+        workdayDao.remove(workdayModel());
+
+        // 3. Postcondiciones
+        assertEquals(1, JdbcTestUtils.countRowsInTable(this.jdbcTemplate, OFFICE_TABLE));
+    }
+
+    @Test
+    public void testUpdate(){
+        // 1. Precondiciones
+        cleanAllTables();
+        insertWorkday();
+
+        // Modelo de la oficina a crear
+        Workday w = this.workdayDao.findById(workdayModel().getId()).get();
+        w.setEndMinute(END_MINUTE_2);
+
+        // 2. Ejercitar
+        workdayDao.update(w);
+
+        // 3. Postcondiciones
+        assertEquals(1, JdbcTestUtils.countRowsInTable(this.jdbcTemplate, WORKDAY_TABLE));
+        assertEquals(1, JdbcTestUtils.countRowsInTableWhere(jdbcTemplate, WORKDAY_TABLE, "end_minute = " + END_MINUTE_2));
+        assertEquals(0, JdbcTestUtils.countRowsInTableWhere(jdbcTemplate, WORKDAY_TABLE, "end_minute = " + END_MINUTE));
+
+    }
 }

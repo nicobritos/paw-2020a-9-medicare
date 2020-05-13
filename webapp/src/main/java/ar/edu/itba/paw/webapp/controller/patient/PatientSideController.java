@@ -1,68 +1,62 @@
 package ar.edu.itba.paw.webapp.controller.patient;
 
-import ar.edu.itba.paw.interfaces.MediCareException;
 import ar.edu.itba.paw.interfaces.services.*;
 import ar.edu.itba.paw.interfaces.services.exceptions.InvalidAppointmentDateException;
 import ar.edu.itba.paw.interfaces.services.exceptions.InvalidMinutesException;
 import ar.edu.itba.paw.models.*;
 import ar.edu.itba.paw.webapp.controller.utils.GenericController;
-import ar.edu.itba.paw.webapp.controller.utils.JsonResponse;
+import ar.edu.itba.paw.webapp.events.events.AppointmentCancelEvent;
+import ar.edu.itba.paw.webapp.events.events.NewAppointmentEvent;
+import ar.edu.itba.paw.webapp.events.events.UserConfirmationTokenGenerationEvent;
 import ar.edu.itba.paw.webapp.form.RequestAppointmentForm;
 import ar.edu.itba.paw.webapp.form.UserProfileForm;
-import com.sun.org.apache.xpath.internal.operations.Mod;
 import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 
 @Controller
 public class PatientSideController extends GenericController {
-
     @Autowired
     AppointmentService appointmentService;
-
     @Autowired
     StaffSpecialtyService staffSpecialtyService;
-
     @Autowired
     LocalityService localityService;
-
     @Autowired
     UserService userService;
-
     @Autowired
     private StaffService staffService;
-
     @Autowired
     private PatientService patientService;
+    @Autowired
+    private ApplicationEventPublisher eventPublisher;
 
 
     @RequestMapping("/patient/home")
-    public ModelAndView patientHome(){
+    public ModelAndView patientHome() {
         Optional<User> user = this.getUser();
-        if(!user.isPresent()) {
-            return new ModelAndView("authentication/login");
+        if (!user.isPresent()) {
+            return new ModelAndView("redirect:/login");
         }
         ModelAndView mav = new ModelAndView();
 
         List<Patient> patients = patientService.findByUser(user.get());
 
         mav.addObject("user", user);
-        if(isStaff()) {
+        if (isStaff()) {
             mav.addObject("staffs", staffService.findByUser(user.get().getId()));
         }
         mav.addObject("appointments", appointmentService.findByPatientsFromDate(patients, DateTime.now()));
@@ -74,35 +68,41 @@ public class PatientSideController extends GenericController {
     }
 
     @RequestMapping(value = "/patient/profile", method = RequestMethod.GET)
-    public ModelAndView patientProfile(@ModelAttribute("patientProfileForm") final UserProfileForm form){
+    public ModelAndView patientProfile(@ModelAttribute("patientProfileForm") final UserProfileForm form) {
         Optional<User> user = getUser();
-        if(!user.isPresent()) {
-            return new ModelAndView("authentication/login");
+        if (!user.isPresent()) {
+            return new ModelAndView("redirect:/login");
         }
         ModelAndView mav = new ModelAndView();
         mav.addObject("user", user);
-        if(isStaff()) {
+        if (isStaff()) {
             mav.addObject("staffs", staffService.findByUser(user.get().getId()));
         } else {
             mav.addObject("patients", patientService.findByUser(user.get()));
         }
 
+        mav.addObject("verified", user.get().getVerified());
         mav.setViewName("patientSide/patientProfile");
         return mav;
     }
 
-    @RequestMapping(value="/patient/profile", method = RequestMethod.POST)
-    public ModelAndView editMedicUser(@Valid @ModelAttribute("patientProfileForm") final UserProfileForm form, final BindingResult errors, HttpServletRequest request, HttpServletResponse response){
+    @RequestMapping(value = "/patient/profile", method = RequestMethod.POST)
+    public ModelAndView editMedicUser(@Valid @ModelAttribute("patientProfileForm") final UserProfileForm form, final BindingResult errors, HttpServletRequest request, HttpServletResponse response) {
         Optional<User> user = getUser();
-        if(!user.isPresent()) {
-            return new ModelAndView("authentication/login");
+        if (!user.isPresent()) {
+            return new ModelAndView("redirect:/login");
         }
 
-        if (errors.hasErrors() || (!form.getPassword().isEmpty() && form.getPassword().length()<8) || !form.getPassword().equals(form.getRepeatPassword())) {
+        if (errors.hasErrors()) {
+            return this.patientProfile(form);
+        }
+        if ((!form.getPassword().isEmpty() && form.getPassword().length() < 8) || !form.getPassword().equals(form.getRepeatPassword())) {
+            errors.reject("Min.patientProfileForm.password", null, "Error");
             return this.patientProfile(form);
         }
         Optional<User> userOptional = userService.findByUsername(form.getEmail());
-        if(userOptional.isPresent() && !userOptional.get().equals(user.get())){ // si se edito el email pero ya existe cuenta con ese email
+        if (userOptional.isPresent() && !userOptional.get().equals(user.get())) { // si se edito el email pero ya existe cuenta con ese email
+            errors.reject("AlreadyExists.patientProfileForm.email", null, "Error");
             return this.patientProfile(form);
         }
 
@@ -110,14 +110,14 @@ public class PatientSideController extends GenericController {
         editedUser.setFirstName(form.getFirstName());
         editedUser.setSurname(form.getSurname());
         editedUser.setEmail(form.getEmail());
-        if(!form.getPassword().isEmpty())
+        editedUser.setPhone(form.getPhone());
+        if (!form.getPassword().isEmpty())
             editedUser.setPassword(form.getPassword());
-        //TODO: PHONE
         userService.update(editedUser);
 
         ModelAndView mav = new ModelAndView();
         mav.addObject("user", user);
-        if(isStaff()) {
+        if (isStaff()) {
             mav.addObject("staffs", staffService.findByUser(user.get().getId()));
         }
         mav.setViewName("patientSide/patientProfile");
@@ -125,11 +125,13 @@ public class PatientSideController extends GenericController {
     }
 
     @RequestMapping(value = "/patient/appointment/{staffId}/{year}/{month}/{day}/{hour}/{minute}", method = RequestMethod.POST)
-    public ModelAndView requestAppointment(@Valid @ModelAttribute("appointmentForm") RequestAppointmentForm form,
+    public ModelAndView requestAppointment(@Valid @ModelAttribute("appointmentForm") RequestAppointmentForm form, final BindingResult errors,
                                            @PathVariable("staffId") final int staffId, @PathVariable("year") final int year,
                                            @PathVariable("month") final int month, @PathVariable("day") final int day,
-                                           @PathVariable("hour") final int hour, @PathVariable("minute") final int minute,
-                                           final BindingResult errors){
+                                           @PathVariable("hour") final int hour, @PathVariable("minute") final int minute, HttpServletRequest request) {
+        if (errors.hasErrors()) {
+            return requestAppointment(form, staffId, year, month, day, hour, minute);
+        }
         Optional<Staff> staff = this.staffService.findById(form.getStaffId());
         if (!staff.isPresent()) {
             errors.reject("NotFound.requestAppointment.staff", null, "Error");
@@ -141,7 +143,7 @@ public class PatientSideController extends GenericController {
             return this.requestAppointment(form, staffId, year, month, day, hour, minute);
         }
         Optional<User> optionalUser = getUser();
-        if(!optionalUser.isPresent()) {
+        if (!optionalUser.isPresent()) {
             errors.reject("NotNull.requestAppointment.user", null, "Error");
             return this.requestAppointment(form, staffId, year, month, day, hour, minute);
         }
@@ -161,11 +163,14 @@ public class PatientSideController extends GenericController {
         appointment.setPatient(patient);
         appointment.setFromDate(dateFrom);
         try {
-            this.appointmentService.create(appointment);
-        } catch (InvalidMinutesException e){
+            appointment = this.appointmentService.create(appointment);
+            StringBuilder baseUrl = new StringBuilder(request.getRequestURL());
+            baseUrl.replace(request.getRequestURL().lastIndexOf(request.getServletPath()), request.getRequestURL().length(), "");
+            this.eventPublisher.publishEvent(new NewAppointmentEvent(optionalUser.get(), staff.get().getUser(), appointment, request.getLocale(), baseUrl.toString(), form.getMotive(), form.getComment()));
+        } catch (InvalidMinutesException e) {
             errors.reject("InvalidValue.requestAppointment.date", null, "Error");
             return this.requestAppointment(form, staffId, year, month, day, hour, minute);
-        } catch (InvalidAppointmentDateException e){
+        } catch (InvalidAppointmentDateException e) {
             errors.reject("MedicNotWorking.requestAppointment.date", null, "Error");
             return this.requestAppointment(form, staffId, year, month, day, hour, minute);
         }
@@ -174,9 +179,9 @@ public class PatientSideController extends GenericController {
 
     @RequestMapping("/patient/appointment/{staffId}/{year}/{month}/{day}/{hour}/{minute}")
     public ModelAndView requestAppointment(@ModelAttribute("appointmentForm") RequestAppointmentForm form,
-                                        @PathVariable("staffId") final int staffId, @PathVariable("year") final int year,
+                                           @PathVariable("staffId") final int staffId, @PathVariable("year") final int year,
                                            @PathVariable("month") final int month, @PathVariable("day") final int day,
-                                        @PathVariable("hour") final int hour, @PathVariable("minute") final int minute) {
+                                           @PathVariable("hour") final int hour, @PathVariable("minute") final int minute) {
         Optional<User> userOptional = getUser();
         form.setDay(day);
         form.setMonth(month);
@@ -188,12 +193,17 @@ public class PatientSideController extends GenericController {
         if (!staffOptional.isPresent()) {
             return new ModelAndView("redirect:/mediclist/0");
         }
-        staffOptional.get().getStaffSpecialties().stream().findFirst().ifPresent(specialty -> form.setMotive("Consulta de " + specialty.getName()));
+        Optional<StaffSpecialty> staffSpecialty = staffOptional.get().getStaffSpecialties().stream().findFirst();
+        if (staffSpecialty.isPresent()) {
+            form.setMotive("Consulta de " + staffSpecialty.get().getName());
+        } else {
+            form.setMotive("Consulta");
+        }
         userOptional.ifPresent(user -> {
             form.setEmail(user.getEmail());
             form.setFirstName(user.getFirstName());
             form.setSurname(user.getSurname());
-            form.setPhone(null); //todo: phone
+            form.setPhone(user.getPhone());
         });
         Optional<User> user = getUser();
         ModelAndView mav = new ModelAndView();
@@ -207,36 +217,52 @@ public class PatientSideController extends GenericController {
         return mav;
     }
 
-    @RequestMapping(value = "/patient/appointment/{id}",method = RequestMethod.DELETE)
-    public ResponseEntity cancelAppointment(@PathVariable Integer id){
+    @RequestMapping(value = "/patient/appointment/{id}", method = RequestMethod.POST)
+    public ModelAndView cancelAppointment(@PathVariable Integer id, HttpServletRequest request) {
         //get current user, check for null
         Optional<User> user = getUser();
-        if(!user.isPresent()){
-            return new ResponseEntity(HttpStatus.UNAUTHORIZED);
+        if (!user.isPresent()) {
+            return new ModelAndView("redirect:/login");
         }
         //get patient for current user
         List<Patient> patient = this.patientService.findByUser(user.get());
         //get appointment to delete, check for "null"
         Optional<Appointment> appointment = this.appointmentService.findById(id);
-        if(!appointment.isPresent()){
-            return new ResponseEntity(HttpStatus.BAD_REQUEST);
+        if (!appointment.isPresent()) {
+            return new ModelAndView("redirect:/patient/home");
         }
         //check if user is allowed to cancel
         boolean isAllowed = false;
-        for(Patient p : patient){
-            if(p.getId().equals(appointment.get().getPatientId())){
+        for (Patient p : patient) {
+            if (p.equals(appointment.get().getPatient())) {
                 isAllowed = true;
                 break;
             }
         }
         //return response code for not allow
-        if(!isAllowed){
-            return new ResponseEntity(HttpStatus.UNAUTHORIZED);
+        if (!isAllowed) {
+            return new ModelAndView("redirect:/patient/home");
         }
         //cancel appointment
         this.appointmentService.remove(appointment.get()); // TODO
+        StringBuilder baseUrl = new StringBuilder(request.getRequestURL());
+        baseUrl.replace(request.getRequestURL().lastIndexOf(request.getServletPath()), request.getRequestURL().length(), "");
+        this.eventPublisher.publishEvent(new AppointmentCancelEvent(user.get(), false, appointment.get().getStaff().getUser(), appointment.get(), request.getLocale(), baseUrl.toString()));
 //        this.appointmentService.setStatus(appointment.get(), AppointmentStatus.CANCELLED);
         //return success
-        return new ResponseEntity(HttpStatus.NO_CONTENT);
+        return new ModelAndView("redirect:/patient/home");
+    }
+
+    private void createConfirmationEvent(HttpServletRequest request, User user) {
+        StringBuilder baseUrl = new StringBuilder(request.getRequestURL());
+        baseUrl.replace(request.getRequestURL().lastIndexOf(request.getRequestURI()), request.getRequestURL().length(), "");
+        this.eventPublisher.publishEvent(
+                new UserConfirmationTokenGenerationEvent(
+                        baseUrl.toString(),
+                        user,
+                        request.getContextPath() + "/verifyEmail",
+                        request.getLocale()
+                )
+        );
     }
 }
