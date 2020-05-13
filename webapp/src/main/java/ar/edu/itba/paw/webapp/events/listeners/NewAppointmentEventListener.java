@@ -44,7 +44,7 @@ public class NewAppointmentEventListener implements ApplicationListener<NewAppoi
             MimeMessage mimeMessage = this.mailSender.createMimeMessage();
             MimeMessageHelper mimeMessageHelper = new MimeMessageHelper(mimeMessage, true);
             String dowMessage;
-            switch (newAppointmentEvent.getAppointment().getFromDate().getDayOfWeek()){
+            switch (newAppointmentEvent.getAppointment().getFromDate().getDayOfWeek()) {
                 case MONDAY:
                     dowMessage = "Monday";
                     break;
@@ -70,7 +70,7 @@ public class NewAppointmentEventListener implements ApplicationListener<NewAppoi
                     dowMessage = null;
             }
             String month;
-            switch (newAppointmentEvent.getAppointment().getFromDate().getMonthOfYear()){
+            switch (newAppointmentEvent.getAppointment().getFromDate().getMonthOfYear()) {
                 case JANUARY:
                     month = "January";
                     break;
@@ -143,10 +143,10 @@ public class NewAppointmentEventListener implements ApplicationListener<NewAppoi
                         appointment.getFromDate().getDayOfMonth(),
                         month,
                         Integer.toString(appointment.getFromDate().getYear()),
-                        ((appointment.getFromDate().getHourOfDay() < 10)?"0":"") + appointment.getFromDate().getHourOfDay(),
-                        ((appointment.getFromDate().getMinuteOfHour() < 10)?"0":"") + appointment.getFromDate().getMinuteOfHour(),
-                        ((appointment.getToDate().getHourOfDay() < 10)?"0":"") + appointment.getToDate().getHourOfDay(),
-                        ((appointment.getToDate().getMinuteOfHour() < 10)?"0":"") + appointment.getToDate().getMinuteOfHour(),
+                        ((appointment.getFromDate().getHourOfDay() < 10) ? "0" : "") + appointment.getFromDate().getHourOfDay(),
+                        ((appointment.getFromDate().getMinuteOfHour() < 10) ? "0" : "") + appointment.getFromDate().getMinuteOfHour(),
+                        ((appointment.getToDate().getHourOfDay() < 10) ? "0" : "") + appointment.getToDate().getHourOfDay(),
+                        ((appointment.getToDate().getMinuteOfHour() < 10) ? "0" : "") + appointment.getToDate().getMinuteOfHour(),
                         motive
                 },
                 locale));
@@ -156,7 +156,7 @@ public class NewAppointmentEventListener implements ApplicationListener<NewAppoi
 
         EmailFormatter emailFormatter = new EmailFormatter();
         String html;
-        if(comment != null && !comment.isEmpty()){
+        if (comment != null && !comment.isEmpty()) {
             html = emailFormatter.format(emailFormatter.getHTMLFromFilename("newAppointmentWithComment"));
         } else {
             html = emailFormatter.format(emailFormatter.getHTMLFromFilename("newAppointment"));

@@ -1,4 +1,4 @@
-var AppointmentRequest = function() {
+var AppointmentRequest = function () {
     let staffId = null;
 
     let bindElements = function () {
@@ -34,7 +34,7 @@ var AppointmentRequest = function() {
                         timeslot.hour + ':' + timeslot.minute +
                         '</button>'
                     );
-                    button.click(function() {
+                    button.click(function () {
                         let $this = $(this);
                         requestAppointment(
                             $this.data('year'),
@@ -61,7 +61,7 @@ var AppointmentRequest = function() {
         });
     };
 
-    let requestAppointment = function(year, month, day, hour, minute) {
+    let requestAppointment = function (year, month, day, hour, minute) {
         App.post('/patient/appointment', {
             staffId: staffId,
             year: year,

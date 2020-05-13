@@ -20,18 +20,18 @@ public class EmailFormatter implements ApplicationContextAware {
 
     private static final String HEAD =
             "<head>" +
-                "<meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\" />" +
-                "<title>MediCare</title>" +
-                "<meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\"/>" +
-            "</head>";
+                    "<meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\" />" +
+                    "<title>MediCare</title>" +
+                    "<meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\"/>" +
+                    "</head>";
 
     public String format(String body) {
-        return  "<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Transitional//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd\">" +
+        return "<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Transitional//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd\">" +
                 "<html xmlns=\"http://www.w3.org/1999/xhtml\">" +
-                    HEAD +
-                    "<body style=\"margin: 0; padding: 0;\">" +
-                        body +
-                    "</body>" +
+                HEAD +
+                "<body style=\"margin: 0; padding: 0;\">" +
+                body +
+                "</body>" +
                 "</html>";
     }
 
@@ -40,7 +40,7 @@ public class EmailFormatter implements ApplicationContextAware {
         BufferedReader reader = new BufferedReader(streamReader);
 
         StringBuilder stringBuilder = new StringBuilder();
-        for (String line; (line = reader.readLine()) != null;) {
+        for (String line; (line = reader.readLine()) != null; ) {
             stringBuilder.append(line);
         }
         return stringBuilder.toString();

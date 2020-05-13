@@ -151,12 +151,12 @@ public class AuthenticationController extends GenericController {
     public ModelAndView verifyEmail(@RequestParam(value = "token", required = false) String token, HttpServletRequest request) {
         ModelAndView mav = new ModelAndView();
         Optional<User> userOptional = this.getUser();
-        if(!userOptional.isPresent()){
+        if (!userOptional.isPresent()) {
             mav.setViewName("redirect:/login?token=" + token);
             return mav;
         }
         boolean tokenError;
-        if(token == null){
+        if (token == null) {
             tokenError = false;
         } else if (!this.userService.confirm(userOptional.get(), token)) {
             tokenError = true;
@@ -212,13 +212,15 @@ public class AuthenticationController extends GenericController {
         }
     }
 
-    /** Devuelve una lista de roles en formato de csv con delimitador ',' **/
-    private String getRoles(User user){
+    /**
+     * Devuelve una lista de roles en formato de csv con delimitador ','
+     **/
+    private String getRoles(User user) {
         String prefix = "ROLE_";
-        if(!user.getVerified()){
+        if (!user.getVerified()) {
             return prefix + UserRole.UNVERIFIED;
         }
-        if(this.userService.isStaff(user)){
+        if (this.userService.isStaff(user)) {
             return prefix + UserRole.STAFF;
         } else {
             return prefix + UserRole.PATIENT;
@@ -226,7 +228,7 @@ public class AuthenticationController extends GenericController {
 
     }
 
-    private void updateRole(User user){
+    private void updateRole(User user) {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         List<GrantedAuthority> updatedAuthorities = AuthorityUtils.commaSeparatedStringToAuthorityList(this.getRoles(user));
         Authentication newAuth = new UsernamePasswordAuthenticationToken(auth.getPrincipal(), auth.getCredentials(), updatedAuthorities);

@@ -16,7 +16,7 @@ import java.util.Collection;
 import java.util.Optional;
 
 @Controller
-public class LandingController extends GenericController{
+public class LandingController extends GenericController {
     @Autowired
     StaffService staffService;
 
@@ -27,13 +27,13 @@ public class LandingController extends GenericController{
     LocalityService localityService;
 
     @RequestMapping("/")
-    public ModelAndView landingPage(){
+    public ModelAndView landingPage() {
         final ModelAndView mav = new ModelAndView("landing");
         Optional<User> user = getUser();
-        if(user.isPresent()){
-            if(!user.get().getVerified()) {
+        if (user.isPresent()) {
+            if (!user.get().getVerified()) {
                 return new ModelAndView("redirect:/verifyEmail");
-            } else if(this.isStaff()){
+            } else if (this.isStaff()) {
                 return new ModelAndView("redirect:/staff/home");
             }
         }
@@ -42,26 +42,26 @@ public class LandingController extends GenericController{
 
         // pass objects to model and view
         mav.addObject("user", user);
-        if(user.isPresent() && isStaff()) {
+        if (user.isPresent() && isStaff()) {
             mav.addObject("staffs", staffService.findByUser(user.get().getId()));
         }
-        mav.addObject("specialties",specialtiesList);
-        mav.addObject("localities",localitiesList);
+        mav.addObject("specialties", specialtiesList);
+        mav.addObject("localities", localitiesList);
         return mav;
     }
-    
+
     @RequestMapping("/home")
-    public ModelAndView home(){
+    public ModelAndView home() {
         Optional<User> userOptional = getUser();
-        if(!userOptional.isPresent()) {
+        if (!userOptional.isPresent()) {
             return new ModelAndView("redirect:/");
         }
-        if(!userOptional.get().getVerified()){
+        if (!userOptional.get().getVerified()) {
             return new ModelAndView("redirect:/verifyEmail");
         }
-        if(isStaff()) {
+        if (isStaff()) {
             return new ModelAndView("redirect:/staff/home");
-        }  else {
+        } else {
             return new ModelAndView("redirect:/patient/home");
         }
     }

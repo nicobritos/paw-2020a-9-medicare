@@ -46,9 +46,9 @@ public class PatientSideController extends GenericController {
 
 
     @RequestMapping("/patient/home")
-    public ModelAndView patientHome(){
+    public ModelAndView patientHome() {
         Optional<User> user = this.getUser();
-        if(!user.isPresent()) {
+        if (!user.isPresent()) {
             return new ModelAndView("redirect:/login");
         }
         ModelAndView mav = new ModelAndView();
@@ -56,7 +56,7 @@ public class PatientSideController extends GenericController {
         List<Patient> patients = patientService.findByUser(user.get());
 
         mav.addObject("user", user);
-        if(isStaff()) {
+        if (isStaff()) {
             mav.addObject("staffs", staffService.findByUser(user.get().getId()));
         }
         mav.addObject("appointments", appointmentService.findByPatientsFromDate(patients, DateTime.now()));
@@ -68,14 +68,14 @@ public class PatientSideController extends GenericController {
     }
 
     @RequestMapping(value = "/patient/profile", method = RequestMethod.GET)
-    public ModelAndView patientProfile(@ModelAttribute("patientProfileForm") final UserProfileForm form){
+    public ModelAndView patientProfile(@ModelAttribute("patientProfileForm") final UserProfileForm form) {
         Optional<User> user = getUser();
-        if(!user.isPresent()) {
+        if (!user.isPresent()) {
             return new ModelAndView("redirect:/login");
         }
         ModelAndView mav = new ModelAndView();
         mav.addObject("user", user);
-        if(isStaff()) {
+        if (isStaff()) {
             mav.addObject("staffs", staffService.findByUser(user.get().getId()));
         } else {
             mav.addObject("patients", patientService.findByUser(user.get()));
@@ -86,22 +86,22 @@ public class PatientSideController extends GenericController {
         return mav;
     }
 
-    @RequestMapping(value="/patient/profile", method = RequestMethod.POST)
-    public ModelAndView editMedicUser(@Valid @ModelAttribute("patientProfileForm") final UserProfileForm form, final BindingResult errors, HttpServletRequest request, HttpServletResponse response){
+    @RequestMapping(value = "/patient/profile", method = RequestMethod.POST)
+    public ModelAndView editMedicUser(@Valid @ModelAttribute("patientProfileForm") final UserProfileForm form, final BindingResult errors, HttpServletRequest request, HttpServletResponse response) {
         Optional<User> user = getUser();
-        if(!user.isPresent()) {
+        if (!user.isPresent()) {
             return new ModelAndView("redirect:/login");
         }
 
         if (errors.hasErrors()) {
             return this.patientProfile(form);
         }
-        if((!form.getPassword().isEmpty() && form.getPassword().length()<8) || !form.getPassword().equals(form.getRepeatPassword())){
+        if ((!form.getPassword().isEmpty() && form.getPassword().length() < 8) || !form.getPassword().equals(form.getRepeatPassword())) {
             errors.reject("Min.patientProfileForm.password", null, "Error");
             return this.patientProfile(form);
         }
         Optional<User> userOptional = userService.findByUsername(form.getEmail());
-        if(userOptional.isPresent() && !userOptional.get().equals(user.get())){ // si se edito el email pero ya existe cuenta con ese email
+        if (userOptional.isPresent() && !userOptional.get().equals(user.get())) { // si se edito el email pero ya existe cuenta con ese email
             errors.reject("AlreadyExists.patientProfileForm.email", null, "Error");
             return this.patientProfile(form);
         }
@@ -111,13 +111,13 @@ public class PatientSideController extends GenericController {
         editedUser.setSurname(form.getSurname());
         editedUser.setEmail(form.getEmail());
         editedUser.setPhone(form.getPhone());
-        if(!form.getPassword().isEmpty())
+        if (!form.getPassword().isEmpty())
             editedUser.setPassword(form.getPassword());
         userService.update(editedUser);
 
         ModelAndView mav = new ModelAndView();
         mav.addObject("user", user);
-        if(isStaff()) {
+        if (isStaff()) {
             mav.addObject("staffs", staffService.findByUser(user.get().getId()));
         }
         mav.setViewName("patientSide/patientProfile");
@@ -128,8 +128,8 @@ public class PatientSideController extends GenericController {
     public ModelAndView requestAppointment(@Valid @ModelAttribute("appointmentForm") RequestAppointmentForm form, final BindingResult errors,
                                            @PathVariable("staffId") final int staffId, @PathVariable("year") final int year,
                                            @PathVariable("month") final int month, @PathVariable("day") final int day,
-                                           @PathVariable("hour") final int hour, @PathVariable("minute") final int minute, HttpServletRequest request){
-        if(errors.hasErrors()){
+                                           @PathVariable("hour") final int hour, @PathVariable("minute") final int minute, HttpServletRequest request) {
+        if (errors.hasErrors()) {
             return requestAppointment(form, staffId, year, month, day, hour, minute);
         }
         Optional<Staff> staff = this.staffService.findById(form.getStaffId());
@@ -143,7 +143,7 @@ public class PatientSideController extends GenericController {
             return this.requestAppointment(form, staffId, year, month, day, hour, minute);
         }
         Optional<User> optionalUser = getUser();
-        if(!optionalUser.isPresent()) {
+        if (!optionalUser.isPresent()) {
             errors.reject("NotNull.requestAppointment.user", null, "Error");
             return this.requestAppointment(form, staffId, year, month, day, hour, minute);
         }
@@ -167,10 +167,10 @@ public class PatientSideController extends GenericController {
             StringBuilder baseUrl = new StringBuilder(request.getRequestURL());
             baseUrl.replace(request.getRequestURL().lastIndexOf(request.getServletPath()), request.getRequestURL().length(), "");
             this.eventPublisher.publishEvent(new NewAppointmentEvent(optionalUser.get(), staff.get().getUser(), appointment, request.getLocale(), baseUrl.toString(), form.getMotive(), form.getComment()));
-        } catch (InvalidMinutesException e){
+        } catch (InvalidMinutesException e) {
             errors.reject("InvalidValue.requestAppointment.date", null, "Error");
             return this.requestAppointment(form, staffId, year, month, day, hour, minute);
-        } catch (InvalidAppointmentDateException e){
+        } catch (InvalidAppointmentDateException e) {
             errors.reject("MedicNotWorking.requestAppointment.date", null, "Error");
             return this.requestAppointment(form, staffId, year, month, day, hour, minute);
         }
@@ -179,9 +179,9 @@ public class PatientSideController extends GenericController {
 
     @RequestMapping("/patient/appointment/{staffId}/{year}/{month}/{day}/{hour}/{minute}")
     public ModelAndView requestAppointment(@ModelAttribute("appointmentForm") RequestAppointmentForm form,
-                                        @PathVariable("staffId") final int staffId, @PathVariable("year") final int year,
+                                           @PathVariable("staffId") final int staffId, @PathVariable("year") final int year,
                                            @PathVariable("month") final int month, @PathVariable("day") final int day,
-                                        @PathVariable("hour") final int hour, @PathVariable("minute") final int minute) {
+                                           @PathVariable("hour") final int hour, @PathVariable("minute") final int minute) {
         Optional<User> userOptional = getUser();
         form.setDay(day);
         form.setMonth(month);
@@ -194,7 +194,7 @@ public class PatientSideController extends GenericController {
             return new ModelAndView("redirect:/mediclist/0");
         }
         Optional<StaffSpecialty> staffSpecialty = staffOptional.get().getStaffSpecialties().stream().findFirst();
-        if(staffSpecialty.isPresent()){
+        if (staffSpecialty.isPresent()) {
             form.setMotive("Consulta de " + staffSpecialty.get().getName());
         } else {
             form.setMotive("Consulta");
@@ -218,29 +218,29 @@ public class PatientSideController extends GenericController {
     }
 
     @RequestMapping(value = "/patient/appointment/{id}", method = RequestMethod.POST)
-    public ModelAndView cancelAppointment(@PathVariable Integer id, HttpServletRequest request){
+    public ModelAndView cancelAppointment(@PathVariable Integer id, HttpServletRequest request) {
         //get current user, check for null
         Optional<User> user = getUser();
-        if(!user.isPresent()){
+        if (!user.isPresent()) {
             return new ModelAndView("redirect:/login");
         }
         //get patient for current user
         List<Patient> patient = this.patientService.findByUser(user.get());
         //get appointment to delete, check for "null"
         Optional<Appointment> appointment = this.appointmentService.findById(id);
-        if(!appointment.isPresent()){
+        if (!appointment.isPresent()) {
             return new ModelAndView("redirect:/patient/home");
         }
         //check if user is allowed to cancel
         boolean isAllowed = false;
-        for(Patient p : patient){
-            if(p.equals(appointment.get().getPatient())){
+        for (Patient p : patient) {
+            if (p.equals(appointment.get().getPatient())) {
                 isAllowed = true;
                 break;
             }
         }
         //return response code for not allow
-        if(!isAllowed){
+        if (!isAllowed) {
             return new ModelAndView("redirect:/patient/home");
         }
         //cancel appointment

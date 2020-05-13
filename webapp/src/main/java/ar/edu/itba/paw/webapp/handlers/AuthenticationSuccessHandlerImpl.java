@@ -29,8 +29,8 @@ public class AuthenticationSuccessHandlerImpl implements AuthenticationSuccessHa
         boolean isPatient = false;
         for (GrantedAuthority authority : authorities) {
             if (authority.getAuthority().equals("ROLE_" + UserRole.UNVERIFIED.name())) {
-                String query= request.getQueryString();
-                return "/verifyEmail" + ((query == null)?"":("?" + query));
+                String query = request.getQueryString();
+                return "/verifyEmail" + ((query == null) ? "" : ("?" + query));
             }
             if (authority.getAuthority().equals("ROLE_" + UserRole.STAFF.name())) {
                 return "/staff/home";

@@ -1,11 +1,12 @@
-body, html{
+body, html {
     height: 100%;
 }
 
-.logo-for-error{
+.logo-for-error {
     height: 1em;
 }
-#homeBtn{
+
+#homeBtn {
     margin-top: 10px;
     margin-bottom: 50px;
 }

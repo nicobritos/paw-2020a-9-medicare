@@ -12,7 +12,8 @@
 <form action="<c:url value="/mediclist/1"/>">
     <div class="container h-75">
         <div class="row mt-4 justify-content-center">
-            <input class="form-control w-100" type="text" name="name" value="<c:out value="${name}"/>" placeholder="<spring:message code="Name"/>"/>
+            <input class="form-control w-100" type="text" name="name" value="<c:out value="${name}"/>"
+                   placeholder="<spring:message code="Name"/>"/>
         </div>
         <div class="row mt-4">
             <div class="col-4 px-3">
@@ -24,24 +25,31 @@
                 <%--          </div>--%>
                 <div class="row mt-4">
                     <select class="form-control w-100" type="text" name="specialties" id="selEspecialidad">
-                        <option value="-1" disabled <c:if test="${searchedSpecialties.isEmpty()}">selected</c:if>><spring:message code="Specialty"/></option>
+                        <option value="-1" disabled <c:if test="${searchedSpecialties.isEmpty()}">selected</c:if>>
+                            <spring:message code="Specialty"/></option>
                         <option value="-1"><spring:message code="Any"/></option>
                         <c:forEach var="specialty" items="${specialties}">
-                            <option value="<c:out value="${specialty.id}" />" <c:if test="${searchedSpecialties.contains(specialty)}">selected</c:if>><c:out value="${specialty.name}"/></option>
+                            <option value="<c:out value="${specialty.id}" />"
+                                    <c:if test="${searchedSpecialties.contains(specialty)}">selected</c:if>><c:out
+                                    value="${specialty.name}"/></option>
                         </c:forEach>
                     </select>
                 </div>
                 <div class="row mt-4">
                     <select class="form-control w-100" type="text" name="localities" id="localidad">
-                        <option value="-1" disabled <c:if test="${searchedLocalities.isEmpty()}">selected</c:if>><spring:message code="Locality"/></option>
+                        <option value="-1" disabled <c:if test="${searchedLocalities.isEmpty()}">selected</c:if>>
+                            <spring:message code="Locality"/></option>
                         <option value="-1"><spring:message code="Any"/></option>
                         <c:forEach var="locality" items="${localities}">
-                            <option value="<c:out value="${locality.id}"/>" <c:if test="${searchedLocalities.contains(locality)}">selected</c:if>><c:out value="${locality.name}"/></option>
+                            <option value="<c:out value="${locality.id}"/>"
+                                    <c:if test="${searchedLocalities.contains(locality)}">selected</c:if>><c:out
+                                    value="${locality.name}"/></option>
                         </c:forEach>
                     </select>
                 </div>
                 <div class="row mt-4">
-                    <button type="submit" class="btn btn-info w-100 rounded-pill"><spring:message code="Filter"/></button>
+                    <button type="submit" class="btn btn-info w-100 rounded-pill"><spring:message
+                            code="Filter"/></button>
                 </div>
             </div>
             <div class="col-1"></div>
@@ -78,10 +86,10 @@
                                     </div>
                                     <div class="col d-flex justify-content-center align-items-center">
                                         <a href="<c:url value="/appointment/${member.id}/0"/>">
-                                        <button type="button" class="btn btn-info available-appointments-button"
-                                                data-id="${member.id}">
-                                            <spring:message code="AvailableAppointments"/>
-                                        </button>
+                                            <button type="button" class="btn btn-info available-appointments-button"
+                                                    data-id="${member.id}">
+                                                <spring:message code="AvailableAppointments"/>
+                                            </button>
                                         </a>
                                     </div>
                                 </div>

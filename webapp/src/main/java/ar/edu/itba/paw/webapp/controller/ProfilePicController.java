@@ -37,28 +37,28 @@ public class ProfilePicController extends GenericController {
     private String defaultImagePath = "/img/defaultProfilePic.svg";
     private String defaultImageType = "image/svg+xml";
 
-    @RequestMapping(value = "/set",method = RequestMethod.POST)
-    public ResponseEntity<String> setProfilePic(@RequestParam MultipartFile pic, HttpServletRequest req){
+    @RequestMapping(value = "/set", method = RequestMethod.POST)
+    public ResponseEntity<String> setProfilePic(@RequestParam MultipartFile pic, HttpServletRequest req) {
         //get current user
         Optional<User> user = getUser();
-        if(!user.isPresent()) {
+        if (!user.isPresent()) {
             //TODO:revise status code
             return new ResponseEntity<>(HttpStatus.FORBIDDEN);
         }
         //check its a valid pic
-        if(pic==null||!pic.getContentType().contains("image")){
+        if (pic == null || !pic.getContentType().contains("image")) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
         //update user
         User updatedUser = user.get();
-        try{
+        try {
             Picture picture = new Picture();
             picture.setData(pic.getBytes());
             picture.setName(pic.getOriginalFilename());
             picture.setSize(pic.getSize());
             picture.setMimeType(pic.getContentType());
             this.userService.setProfile(updatedUser, picture);
-        }catch (Exception e){
+        } catch (Exception e) {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
         return new ResponseEntity<>(HttpStatus.CREATED);
@@ -66,26 +66,26 @@ public class ProfilePicController extends GenericController {
 
 
     //receives pictureId returns profile pic
-    @RequestMapping(value = "/{id}",method = RequestMethod.GET)
-    public ResponseEntity<byte[]> getProfilePic(@PathVariable("id") Integer id){
+    @RequestMapping(value = "/{id}", method = RequestMethod.GET)
+    public ResponseEntity<byte[]> getProfilePic(@PathVariable("id") Integer id) {
         Optional<Picture> optPic = this.pictureService.findById(id);
         ResponseEntity<byte[]> res;
         HttpHeaders headers = new HttpHeaders();
-        byte[] pic=null;
+        byte[] pic = null;
         if (optPic.isPresent()) {
             pic = optPic.get().getData();
         }
-        if(pic !=null){
-            headers.add("content-type",optPic.get().getMimeType());
+        if (pic != null) {
+            headers.add("content-type", optPic.get().getMimeType());
             res = new ResponseEntity<>(pic, headers, HttpStatus.OK);
         }
         //else return a common pic
-        else{
-            try{
+        else {
+            try {
                 InputStream in = context.getResourceAsStream(this.defaultImagePath);
-                headers.add("content-type",this.defaultImageType);
+                headers.add("content-type", this.defaultImageType);
                 res = new ResponseEntity<>(IOUtils.toByteArray(in), headers, HttpStatus.OK);
-            }catch (Exception e){
+            } catch (Exception e) {
                 return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
             }
         }
@@ -93,17 +93,17 @@ public class ProfilePicController extends GenericController {
     }
 
     //returns default image
-    @RequestMapping(value = "/",method = RequestMethod.GET)
-    public ResponseEntity<byte[]> getProfilePic(){
+    @RequestMapping(value = "/", method = RequestMethod.GET)
+    public ResponseEntity<byte[]> getProfilePic() {
         ResponseEntity<byte[]> res;
         HttpHeaders headers = new HttpHeaders();
         //if there is a pic return the
-        try{
+        try {
             InputStream in = context.getResourceAsStream(this.defaultImagePath);
-            headers.add("content-type",this.defaultImageType);
+            headers.add("content-type", this.defaultImageType);
             byte[] bytepic = IOUtils.toByteArray(in);
-            res = new ResponseEntity<byte[]>(bytepic,headers,HttpStatus.OK);
-        }catch (Exception e){
+            res = new ResponseEntity<byte[]>(bytepic, headers, HttpStatus.OK);
+        } catch (Exception e) {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
         return res;

@@ -1,4 +1,4 @@
-const Modal = function() {
+const Modal = function () {
     let create = function (title, body, footer = '', confirmCallback = null, cancelCallback = null) {
         let isDefaultFooter = footer == '';
 
@@ -12,11 +12,11 @@ const Modal = function() {
         let modal = $($('#modal-generic-modal').html().format(title, body.html(), footer.html()));
         if (isDefaultFooter) {
             if (confirmCallback) {
-                modal.find('#modal-generic-modal-footer-confirm').click(function() {
+                modal.find('#modal-generic-modal-footer-confirm').click(function () {
                     confirmCallback();
                 });
             }
-            modal.find('#modal-generic-modal-footer-cancel').click(function() {
+            modal.find('#modal-generic-modal-footer-cancel').click(function () {
                 if (cancelCallback) cancelCallback();
                 else destroy(modal);
             });
@@ -24,11 +24,11 @@ const Modal = function() {
         return $(modal);
     };
 
-    let destroy = function(modal) {
+    let destroy = function (modal) {
         modal = $(modal);
         modal.on(
             'hidden.bs.modal',
-            function() {
+            function () {
                 modal.remove();
             }
         );

@@ -1,11 +1,11 @@
-<%@ taglib prefix="c" uri="http://java.sun.com/jstl/core_rt"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jstl/core_rt" %>
 <html>
 <head>
-    <%@ include file = "head.jsp" %>
+    <%@ include file="head.jsp" %>
     <link rel="stylesheet" type="text/css" href='<c:url value="/css/landing.css"/>'>
 </head>
 <body>
-<%@ include file = "navbar/navbar.jsp" %>
+<%@ include file="navbar/navbar.jsp" %>
 <div class="container w-100 ml-4 mb-5">
     <h2 class="display-5 mt-5 green-text"><spring:message code="FindingMedicQuickAndEasy"/></h2>
 </div>
@@ -18,7 +18,8 @@
         </div>
         <div class="form-row justify-content-center justify-content-around mt-3">
             <div class="col-5 pl-5">
-                <label for="name"></label><input class="w-100 form-control" type="text" name="name" id="name" placeholder="<spring:message code="NameAndOrSurname"/>">
+                <label for="name"></label><input class="w-100 form-control" type="text" name="name" id="name"
+                                                 placeholder="<spring:message code="NameAndOrSurname"/>">
             </div>
             <div class="col">
                 <label for="specialties">
@@ -45,7 +46,8 @@
             </div>
         </div>
         <div class="form-row px-5 mt-4 mb-3">
-            <button class="w-100 btn rounded-pill btn-light header-btn-element"><spring:message code="SearchMedics"/></button>
+            <button class="w-100 btn rounded-pill btn-light header-btn-element"><spring:message
+                    code="SearchMedics"/></button>
         </div>
     </form>
 </div>

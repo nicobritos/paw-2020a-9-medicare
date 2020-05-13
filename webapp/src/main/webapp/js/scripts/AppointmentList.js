@@ -1,9 +1,9 @@
-var AppointmentList = function(){
+var AppointmentList = function () {
     let bindElements = function () {
         let buttons = $('.available-appointments-button');
-        buttons.each(function() {
+        buttons.each(function () {
             let $this = $(this);
-            $this.click(function() {
+            $this.click(function () {
                 AppointmentRequest.init($this.data('id'));
             });
         });

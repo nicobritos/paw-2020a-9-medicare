@@ -1,50 +1,51 @@
-body,html{
+body, html {
     min-height: 100%;
     background-color: rgba(0, 196, 186, 0.205);
 }
 
-.register-form{
+.register-form {
     background-color: #fff;
-    border-radius: 1em!important;
+    border-radius: 1em !important;
     box-shadow: 10px 9px 12px 0px rgba(0, 196, 186, 0.205);
     box-sizing: border-box;
 }
 
 
-.form-link:hover{
+.form-link:hover {
     text-decoration: none;
 }
 
-.register-form input,.register-form select{
+.register-form input, .register-form select {
     background-color: #f0f0f0;
 }
 
-.register-form input:focus,.register-form select:focus{
+.register-form input:focus, .register-form select:focus {
     background-color: #e0e0e0;
 }
 
-.register-form-title{
+.register-form-title {
     margin-bottom: 1em;
 }
 
-.register-form #logo{
+.register-form #logo {
     width: 1em;
 }
 
-.register-form button{
+.register-form button {
     background-color: #00C4BA;
-    color:white;
+    color: white;
 }
-.register-form button:hover{
+
+.register-form button:hover {
     background-color: rgb(1, 150, 142);
     color: #fafafa;
 }
 
-.form-password{
+.form-password {
     position: relative;
 }
 
-.toggle-visibility{
+.toggle-visibility {
     position: absolute;
     right: 2em;
     top: 0.6em;
@@ -55,22 +56,23 @@ body,html{
     cursor: pointer;
 }
 
-.form-back-btn{
-    background-color: grey!important;
-    color:white;
+.form-back-btn {
+    background-color: grey !important;
+    color: white;
 }
-.form-back-btn:hover{
-    background-color: rgb(94, 94, 94)!important;
-    color:white;
+
+.form-back-btn:hover {
+    background-color: rgb(94, 94, 94) !important;
+    color: white;
 }
 
 .card.card-shadow {
-    box-shadow: 0 1px 2px rgba(0,0,0,0.15);
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.15);
     transition: box-shadow 0.3s ease-in-out;
 }
 
 .card.card-shadow:hover {
-    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
 }
 
 .pointer {

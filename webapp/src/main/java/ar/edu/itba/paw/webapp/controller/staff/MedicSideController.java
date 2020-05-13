@@ -45,9 +45,9 @@ public class MedicSideController extends GenericController {
     private ApplicationEventPublisher eventPublisher;
 
     @RequestMapping("/staff/home")
-    public ModelAndView medicHome(@RequestParam(defaultValue = "0") String week,@RequestParam(required = false, name = "today") String newToday, HttpServletRequest request){
+    public ModelAndView medicHome(@RequestParam(defaultValue = "0") String week, @RequestParam(required = false, name = "today") String newToday, HttpServletRequest request) {
         Optional<User> user = this.getUser();
-        if(!user.isPresent()) {
+        if (!user.isPresent()) {
             return new ModelAndView("redirect:/login");
         }
         ModelAndView mav = new ModelAndView();
@@ -56,20 +56,20 @@ public class MedicSideController extends GenericController {
         DateTime today = DateTime.now();
         DateTime monday;
         DateTime selected = today;
-        boolean isToday=true;
-        if(newToday!=null){
-            try{
+        boolean isToday = true;
+        if (newToday != null) {
+            try {
                 selected = DateTime.parse(newToday);
                 isToday = false;
-            }catch (DateTimeParseException e){
+            } catch (DateTimeParseException e) {
 
             }
         }
-        if(week!=null){
-            try{
+        if (week != null) {
+            try {
                 int weekOffset = Integer.parseInt(week);
                 today = today.plusWeeks(weekOffset);
-            }catch (NumberFormatException e){
+            } catch (NumberFormatException e) {
 
             }
         }
@@ -77,34 +77,34 @@ public class MedicSideController extends GenericController {
         monday = today.minusDays(today.getDayOfWeek() - 1);
 
         mav.addObject("user", user);
-        if(isStaff()) {
+        if (isStaff()) {
             mav.addObject("staffs", staffService.findByUser(user.get().getId()));
         }
         mav.addObject("today", today);
-        mav.addObject("isToday",isToday);
+        mav.addObject("isToday", isToday);
         mav.addObject("monday", monday);
         mav.addObject("todayAppointments", appointmentService.findToday(userStaffs));
 
         List<Appointment> appointments;
-        if(monday.isAfter(DateTime.now())){
+        if (monday.isAfter(DateTime.now())) {
             appointments = appointmentService.findByStaffsAndDay(userStaffs, DateTime.now(), monday.plusDays(7));
         } else {
             appointments = appointmentService.findByStaffsAndDay(userStaffs, monday, monday.plusDays(7));
         }
         List<List<Appointment>> weekAppointments = new LinkedList<>();
-        for(int i=0; i<=7; i++){
+        for (int i = 0; i <= 7; i++) {
             weekAppointments.add(new LinkedList<>());
         }
 
-        for (Appointment appointment : appointments){
-            if(appointment.getFromDate().getDayOfWeek() < 1 || appointment.getFromDate().getDayOfWeek() > 7) {
+        for (Appointment appointment : appointments) {
+            if (appointment.getFromDate().getDayOfWeek() < 1 || appointment.getFromDate().getDayOfWeek() > 7) {
                 weekAppointments.get(0).add(appointment);
             } else {
                 weekAppointments.get(appointment.getFromDate().getDayOfWeek()).add(appointment);
             }
         }
         String query = request.getQueryString();
-        if(query != null && !query.isEmpty()){
+        if (query != null && !query.isEmpty()) {
             query = "?" + query;
         }
         mav.addObject("query", query);
@@ -116,14 +116,14 @@ public class MedicSideController extends GenericController {
     }
 
     @RequestMapping(value = "/staff/profile", method = RequestMethod.GET)
-    public ModelAndView medicProfile(@ModelAttribute("medicProfileForm") final UserProfileForm form){
+    public ModelAndView medicProfile(@ModelAttribute("medicProfileForm") final UserProfileForm form) {
         Optional<User> user = getUser();
-        if(!user.isPresent()) {
+        if (!user.isPresent()) {
             return new ModelAndView("redirect:/login");
         }
         ModelAndView mav = new ModelAndView();
         mav.addObject("user", user);
-        if(isStaff()) {
+        if (isStaff()) {
             mav.addObject("staffs", staffService.findByUser(user.get().getId()));
             mav.addObject("workdays", workdayService.findByUser(user.get()));
         }
@@ -132,22 +132,22 @@ public class MedicSideController extends GenericController {
         return mav;
     }
 
-    @RequestMapping(value="/staff/profile", method = RequestMethod.POST)
-    public ModelAndView editMedicUser(@Valid @ModelAttribute("medicProfileForm") final UserProfileForm form, final BindingResult errors, HttpServletRequest request, HttpServletResponse response){
+    @RequestMapping(value = "/staff/profile", method = RequestMethod.POST)
+    public ModelAndView editMedicUser(@Valid @ModelAttribute("medicProfileForm") final UserProfileForm form, final BindingResult errors, HttpServletRequest request, HttpServletResponse response) {
         Optional<User> user = getUser();
-        if(!user.isPresent()) {
+        if (!user.isPresent()) {
             return new ModelAndView("redirect:/login");
         }
 
         if (errors.hasErrors()) {
             return this.medicProfile(form);
         }
-        if((!form.getPassword().isEmpty() && form.getPassword().length()<8) || !form.getPassword().equals(form.getRepeatPassword())){
+        if ((!form.getPassword().isEmpty() && form.getPassword().length() < 8) || !form.getPassword().equals(form.getRepeatPassword())) {
             errors.reject("Min.medicProfileForm.password", null, "Error");
             return this.medicProfile(form);
         }
         Optional<User> userOptional = userService.findByUsername(form.getEmail());
-        if(userOptional.isPresent() && !userOptional.get().equals(user.get())){ // si se edito el email pero ya existe cuenta con ese email
+        if (userOptional.isPresent() && !userOptional.get().equals(user.get())) { // si se edito el email pero ya existe cuenta con ese email
             errors.reject("AlreadyExists.medicProfileForm.email", null, "Error");
             return this.medicProfile(form);
         }
@@ -157,40 +157,40 @@ public class MedicSideController extends GenericController {
         editedUser.setSurname(form.getSurname());
         editedUser.setEmail(form.getEmail());
         editedUser.setPhone(form.getPhone());
-        if(!form.getPassword().isEmpty())
+        if (!form.getPassword().isEmpty())
             editedUser.setPassword(form.getPassword());
         userService.update(editedUser);
         this.createConfirmationEvent(request, editedUser);
 
         ModelAndView mav = new ModelAndView();
         mav.addObject("user", user);
-        if(isStaff()) {
+        if (isStaff()) {
             mav.addObject("staffs", staffService.findByUser(user.get().getId()));
         }
         mav.setViewName("redirect:/staff/profile");
         return mav;
     }
 
-    @RequestMapping(value="/staff/profile/workday", method = RequestMethod.GET)
-    public ModelAndView addWorkday(@ModelAttribute("workdayForm") final WorkdayForm form){
+    @RequestMapping(value = "/staff/profile/workday", method = RequestMethod.GET)
+    public ModelAndView addWorkday(@ModelAttribute("workdayForm") final WorkdayForm form) {
         Optional<User> user = getUser();
-        if(!user.isPresent()) {
+        if (!user.isPresent()) {
             return new ModelAndView("redirect:/login");
         }
 
         ModelAndView mav = new ModelAndView();
         mav.addObject("user", user);
-        if(isStaff()) {
+        if (isStaff()) {
             mav.addObject("staffs", staffService.findByUser(user.get().getId()));
         }
         mav.setViewName("medicSide/addTurno");
         return mav;
     }
 
-    @RequestMapping(value="/staff/profile/workday", method = RequestMethod.POST)
-    public ModelAndView addWorkdayAction(@Valid @ModelAttribute("workdayForm") final WorkdayForm form, final BindingResult errors, HttpServletRequest request, HttpServletResponse response){
+    @RequestMapping(value = "/staff/profile/workday", method = RequestMethod.POST)
+    public ModelAndView addWorkdayAction(@Valid @ModelAttribute("workdayForm") final WorkdayForm form, final BindingResult errors, HttpServletRequest request, HttpServletResponse response) {
         Optional<User> user = getUser();
-        if(!user.isPresent()) {
+        if (!user.isPresent()) {
             return new ModelAndView("redirect:/login");
         }
 
@@ -200,13 +200,13 @@ public class MedicSideController extends GenericController {
 
 
         Optional<Office> office = officeService.findById(form.getOfficeId());
-        if(!office.isPresent()){
+        if (!office.isPresent()) {
             errors.reject("NotFound.workdayForm.office", null, "Error");
             return this.addWorkday(form);
         }
 
         Optional<Staff> realStaff = staffService.findByUser(user.get().getId()).stream().filter(staff -> staff.getOffice().equals(office.get())).findAny();
-        if(!realStaff.isPresent()){
+        if (!realStaff.isPresent()) {
             errors.reject("NotFound.workdayForm.staff", null, "Error");
             return this.addWorkday(form);
         }
@@ -217,16 +217,16 @@ public class MedicSideController extends GenericController {
         int startMin = Integer.parseInt(startTime[1]);
         int endMin = Integer.parseInt(endTime[1]);
 
-        if(startHour > endHour){
+        if (startHour > endHour) {
             errors.reject("Invalid.workdayForm.workhours", null, "Error");
             return this.addWorkday(form);
-        } else if ((startHour == endHour) && (startMin >= endMin)){
+        } else if ((startHour == endHour) && (startMin >= endMin)) {
             errors.reject("Invalid.workdayForm.workhours", null, "Error");
             return this.addWorkday(form);
         }
 
         Workday workday = new Workday();
-        switch (form.getDow()){
+        switch (form.getDow()) {
             case 7:
                 workday.setDay(WorkdayDay.SUNDAY.name());
                 break;
@@ -260,21 +260,21 @@ public class MedicSideController extends GenericController {
 
         ModelAndView mav = new ModelAndView();
         mav.addObject("user", user);
-        if(isStaff()) {
+        if (isStaff()) {
             mav.addObject("staffs", staffService.findByUser(user.get().getId()));
         }
         mav.setViewName("redirect:/staff/profile");
         return mav;
     }
 
-    @RequestMapping(value="/staff/profile/workday/delete/{workdayId}", method = RequestMethod.POST)
-    public ModelAndView deleteWorkday(@PathVariable("workdayId") final int workdayId){
+    @RequestMapping(value = "/staff/profile/workday/delete/{workdayId}", method = RequestMethod.POST)
+    public ModelAndView deleteWorkday(@PathVariable("workdayId") final int workdayId) {
         Optional<User> user = getUser();
-        if(!user.isPresent()) {
+        if (!user.isPresent()) {
             return new ModelAndView("redirect:/login");
         }
         Optional<Workday> workday = workdayService.findById(workdayId);
-        if(!workday.isPresent() || !workday.get().getStaff().getUser().equals(user.get())){
+        if (!workday.isPresent() || !workday.get().getStaff().getUser().equals(user.get())) {
             return new ModelAndView("redirect:/staff/profile");
         }
 
@@ -283,36 +283,36 @@ public class MedicSideController extends GenericController {
         return new ModelAndView("redirect:/staff/profile");
     }
 
-    @RequestMapping(value = "/staff/appointment/{id}",method = RequestMethod.POST)
-    public ModelAndView cancelAppointment(@PathVariable Integer id, HttpServletRequest request, @RequestParam(defaultValue = "0") String week, @RequestParam(required = false, name = "today") String newToday){
+    @RequestMapping(value = "/staff/appointment/{id}", method = RequestMethod.POST)
+    public ModelAndView cancelAppointment(@PathVariable Integer id, HttpServletRequest request, @RequestParam(defaultValue = "0") String week, @RequestParam(required = false, name = "today") String newToday) {
         //get current user, check for null
         String query;
-        if(newToday != null){
+        if (newToday != null) {
             query = "?today=" + newToday + "&week=" + week;
         } else {
             query = "?week=" + week;
         }
         Optional<User> user = getUser();
-        if(!user.isPresent()){
+        if (!user.isPresent()) {
             return new ModelAndView("redirect:/login");
         }
         //get staff for current user
         List<Staff> staff = this.staffService.findByUser(user.get().getId());
         //get appointment to delete, check for "null"
         Optional<Appointment> appointment = this.appointmentService.findById(id);
-        if(!appointment.isPresent()){
-            return new ModelAndView("redirect:/staff/home"+ query);
+        if (!appointment.isPresent()) {
+            return new ModelAndView("redirect:/staff/home" + query);
         }
         //check if user is allowed to cancel
         boolean isAllowed = false;
-        for(Staff s : staff){
-            if(s.equals(appointment.get().getStaff())){
+        for (Staff s : staff) {
+            if (s.equals(appointment.get().getStaff())) {
                 isAllowed = true;
                 break;
             }
         }
         //return response code for not allow
-        if(!isAllowed){
+        if (!isAllowed) {
             return new ModelAndView("redirect:/staff/home" + query);
         }
         //cancel appointment
@@ -332,7 +332,7 @@ public class MedicSideController extends GenericController {
                 new UserConfirmationTokenGenerationEvent(
                         baseUrl.toString(),
                         user,
-                        request.getContextPath() + "/verifyEmail" ,
+                        request.getContextPath() + "/verifyEmail",
                         request.getLocale()
                 )
         );

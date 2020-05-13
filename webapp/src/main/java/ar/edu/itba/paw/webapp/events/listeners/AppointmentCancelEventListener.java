@@ -43,9 +43,9 @@ public class AppointmentCancelEventListener implements ApplicationListener<Appoi
         try {
             MimeMessage mimeMessage = this.mailSender.createMimeMessage();
             MimeMessageHelper mimeMessageHelper = new MimeMessageHelper(mimeMessage, true);
-            String userTitle = appointmentCancelEvent.isCancellingStaff()? this.messageSource.getMessage("doctor", null, appointmentCancelEvent.getLocale()) : this.messageSource.getMessage("patient", null, appointmentCancelEvent.getLocale());
+            String userTitle = appointmentCancelEvent.isCancellingStaff() ? this.messageSource.getMessage("doctor", null, appointmentCancelEvent.getLocale()) : this.messageSource.getMessage("patient", null, appointmentCancelEvent.getLocale());
             String dowMessage;
-            switch (appointmentCancelEvent.getAppointment().getFromDate().getDayOfWeek()){
+            switch (appointmentCancelEvent.getAppointment().getFromDate().getDayOfWeek()) {
                 case MONDAY:
                     dowMessage = "Monday";
                     break;
@@ -71,7 +71,7 @@ public class AppointmentCancelEventListener implements ApplicationListener<Appoi
                     dowMessage = null;
             }
             String month;
-            switch (appointmentCancelEvent.getAppointment().getFromDate().getMonthOfYear()){
+            switch (appointmentCancelEvent.getAppointment().getFromDate().getMonthOfYear()) {
                 case JANUARY:
                     month = "January";
                     break;
@@ -142,10 +142,10 @@ public class AppointmentCancelEventListener implements ApplicationListener<Appoi
                         appointment.getFromDate().getDayOfMonth(),
                         month,
                         Integer.toString(appointment.getFromDate().getYear()),
-                        ((appointment.getFromDate().getHourOfDay() < 10)?"0":"") + appointment.getFromDate().getHourOfDay(),
-                        ((appointment.getFromDate().getMinuteOfHour() < 10)?"0":"") + appointment.getFromDate().getMinuteOfHour(),
-                        ((appointment.getToDate().getHourOfDay() < 10)?"0":"") + appointment.getToDate().getHourOfDay(),
-                        ((appointment.getToDate().getMinuteOfHour() < 10)?"0":"") + appointment.getToDate().getMinuteOfHour()
+                        ((appointment.getFromDate().getHourOfDay() < 10) ? "0" : "") + appointment.getFromDate().getHourOfDay(),
+                        ((appointment.getFromDate().getMinuteOfHour() < 10) ? "0" : "") + appointment.getFromDate().getMinuteOfHour(),
+                        ((appointment.getToDate().getHourOfDay() < 10) ? "0" : "") + appointment.getToDate().getHourOfDay(),
+                        ((appointment.getToDate().getMinuteOfHour() < 10) ? "0" : "") + appointment.getToDate().getMinuteOfHour()
                 },
                 locale));
         values.put("disclaimer", this.messageSource.getMessage(MESSAGE_SOURCE_DISCLAIMER, null, locale));

@@ -38,7 +38,8 @@
                 <label for="medicare_password"><spring:message code="Password"/></label>
             </div>
             <div class="col-8">
-                <form:input path="password" class="form-control pr-5" type="password" name="medicare_password" id="medicare_password"/>
+                <form:input path="password" class="form-control pr-5" type="password" name="medicare_password"
+                            id="medicare_password"/>
                 <!-- For this to work for must be the id of the password input -->
                 <label for="medicare_password" class="toggle-visibility"><img src='<c:url value="/img/eye.svg"/> '><img
                         src='<c:url value="/img/noeye.svg"/>' style="display: none;"></label>

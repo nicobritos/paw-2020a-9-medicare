@@ -55,8 +55,10 @@
                         <div class="col p-0 m-0">
                             <h3><spring:message code="Phone"/><label for="phone" class="toggle-readonly"><img
                                     type="button" src='<c:url value="/img/editPencil.svg"/>' alt="editar"/></label></h3>
-                            <label for="phone"></label><form:input class="form-control mb-3 w-75" id="phone" name="phone"
-                                                                  value="${user.get().phone}" path="phone" readonly="true"/>
+                            <label for="phone"></label><form:input class="form-control mb-3 w-75" id="phone"
+                                                                   name="phone"
+                                                                   value="${user.get().phone}" path="phone"
+                                                                   readonly="true"/>
                         </div>
                         <div class="col p-0 m-0">
                             <h3><spring:message code="Email"/> <label for="email" class="toggle-readonly"><img
@@ -125,11 +127,16 @@
                                                 code="Sunday"/></c:when>
                                         <c:otherwise>${workday.day}</c:otherwise>
                                     </c:choose> <spring:message code="of"/> <c:if
-                                            test="${workday.startHour < 10}">0</c:if><c:out value="${workday.startHour}"/>:<c:if
-                                            test="${workday.startMinute < 10}">0</c:if><c:out value="${workday.startMinute}hs a "/><c:if
-                                            test="${workday.endHour < 10}">0</c:if><c:out value="${workday.endHour}:"/><c:if
-                                            test="${workday.endMinute < 10}">0</c:if><c:out value="${workday.endMinute}hs - ${workday.staff.office.name}"/></p>
-                                    <form action="<c:url value="/staff/profile/workday/delete/${workday.id}"/>" method="post">
+                                            test="${workday.startHour < 10}">0</c:if><c:out
+                                            value="${workday.startHour}"/>:<c:if
+                                            test="${workday.startMinute < 10}">0</c:if><c:out
+                                            value="${workday.startMinute}hs a "/><c:if
+                                            test="${workday.endHour < 10}">0</c:if><c:out
+                                            value="${workday.endHour}:"/><c:if
+                                            test="${workday.endMinute < 10}">0</c:if><c:out
+                                            value="${workday.endMinute}hs - ${workday.staff.office.name}"/></p>
+                                    <form action="<c:url value="/staff/profile/workday/delete/${workday.id}"/>"
+                                          method="post">
                                         <button class="btn" type="submit">X</button>
                                     </form>
                                 </c:forEach>

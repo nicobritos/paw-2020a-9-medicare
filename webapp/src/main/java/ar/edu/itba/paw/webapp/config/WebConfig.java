@@ -90,13 +90,13 @@ public class WebConfig {
     }
 
     @Bean
-    public PlatformTransactionManager transactionManager(final DataSource ds){
+    public PlatformTransactionManager transactionManager(final DataSource ds) {
         return new DataSourceTransactionManager(ds);
     }
 
     //TODO:set max size upload maybe?
     @Bean(name = "multipartResolver")
-    public MultipartResolver multipartResolver(){
+    public MultipartResolver multipartResolver() {
         //final long maxSize = 100000;
         CommonsMultipartResolver cmr = new CommonsMultipartResolver();
         //cmr.setMaxUploadSize(maxSize);

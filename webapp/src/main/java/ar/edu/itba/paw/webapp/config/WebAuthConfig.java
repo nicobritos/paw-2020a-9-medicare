@@ -28,7 +28,7 @@ import java.util.concurrent.TimeUnit;
 
 @EnableWebSecurity
 @Configuration
-@ComponentScan(basePackages = { "ar.edu.itba.paw.webapp.auth", "ar.edu.itba.paw.webapp.handlers" })
+@ComponentScan(basePackages = {"ar.edu.itba.paw.webapp.auth", "ar.edu.itba.paw.webapp.handlers"})
 public class WebAuthConfig extends WebSecurityConfigurerAdapter {
     @Autowired
     private UserDetailsService userDetailsService;
@@ -57,7 +57,7 @@ public class WebAuthConfig extends WebSecurityConfigurerAdapter {
     protected void configure(HttpSecurity http) throws Exception {
         http.sessionManagement()
                 .invalidSessionUrl("/")
-            .and().authorizeRequests()
+                .and().authorizeRequests()
                 .antMatchers("/").permitAll()
                 .antMatchers("/verifyEmail").hasAnyRole(UserRole.ANONYMOUS.name(), UserRole.UNVERIFIED.name())
                 .antMatchers("/mediclist/**").hasAnyRole(UserRole.ANONYMOUS.name(), UserRole.PATIENT.name())
@@ -68,25 +68,25 @@ public class WebAuthConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("/img/**").permitAll()
                 .antMatchers("/profilePics/**").permitAll()
                 .antMatchers("/**").authenticated()
-            .and().formLogin()
+                .and().formLogin()
                 .usernameParameter("email")
                 .passwordParameter("password")
                 .loginPage("/login")
                 .permitAll()
                 .successHandler(new AuthenticationSuccessHandlerImpl())
-            .and().rememberMe()
+                .and().rememberMe()
                 .rememberMeParameter("rememberMe")
                 .userDetailsService(this.userDetailsService)
                 .key(this.getSecretKey())
                 .tokenValiditySeconds((int) TimeUnit.DAYS.toSeconds(30))
-            .and().logout()
+                .and().logout()
                 .logoutUrl("/logout")
                 .logoutSuccessUrl("/")
                 .invalidateHttpSession(true)
                 .permitAll()
-            .and().exceptionHandling()
+                .and().exceptionHandling()
                 .accessDeniedPage("/403")
-            .and().csrf()
+                .and().csrf()
                 .disable();
     }
 
@@ -100,7 +100,7 @@ public class WebAuthConfig extends WebSecurityConfigurerAdapter {
         BufferedReader reader = new BufferedReader(streamReader);
 
         StringBuilder stringBuilder = new StringBuilder();
-        for (String line; (line = reader.readLine()) != null;) {
+        for (String line; (line = reader.readLine()) != null; ) {
             stringBuilder.append(line);
         }
         return stringBuilder.toString();

@@ -9,10 +9,10 @@ public class WorkdayForm {
     @Max(7)
     private int dow;
 
-    @Pattern(regexp="(2[0-3]|[01][0-9]):[0-5][0-9]")
+    @Pattern(regexp = "(2[0-3]|[01][0-9]):[0-5][0-9]")
     private String startHour;
 
-    @Pattern(regexp="(2[0-3]|[01][0-9]):[0-5][0-9]")
+    @Pattern(regexp = "(2[0-3]|[01][0-9]):[0-5][0-9]")
     private String endHour;
 
     @Min(0)
