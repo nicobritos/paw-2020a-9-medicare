@@ -1,8 +1,9 @@
-package ar.edu.itba.paw.webapp.events;
+package ar.edu.itba.paw.webapp.events.listeners;
 
 import ar.edu.itba.paw.models.Appointment;
 import ar.edu.itba.paw.models.User;
 import ar.edu.itba.paw.webapp.email.EmailFormatter;
+import ar.edu.itba.paw.webapp.events.events.NewAppointmentEvent;
 import org.apache.commons.lang3.text.StrSubstitutor;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;

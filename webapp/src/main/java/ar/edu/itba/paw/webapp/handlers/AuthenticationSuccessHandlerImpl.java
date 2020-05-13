@@ -1,5 +1,6 @@
-package ar.edu.itba.paw.webapp.auth;
+package ar.edu.itba.paw.webapp.handlers;
 
+import ar.edu.itba.paw.webapp.auth.UserRole;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.web.DefaultRedirectStrategy;
@@ -13,7 +14,6 @@ import java.io.IOException;
 import java.util.Collection;
 
 public class AuthenticationSuccessHandlerImpl implements AuthenticationSuccessHandler {
-
     private RedirectStrategy redirectStrategy = new DefaultRedirectStrategy();
 
     @Override

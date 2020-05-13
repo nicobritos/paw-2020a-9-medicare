@@ -1,7 +1,7 @@
 package ar.edu.itba.paw.webapp.config;
 
-import ar.edu.itba.paw.webapp.auth.AuthenticationSuccessHandlerImpl;
 import ar.edu.itba.paw.webapp.auth.UserRole;
+import ar.edu.itba.paw.webapp.handlers.AuthenticationSuccessHandlerImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -28,7 +28,7 @@ import java.util.concurrent.TimeUnit;
 
 @EnableWebSecurity
 @Configuration
-@ComponentScan(basePackages = { "ar.edu.itba.paw.webapp.auth" })
+@ComponentScan(basePackages = { "ar.edu.itba.paw.webapp.auth", "ar.edu.itba.paw.webapp.handlers" })
 public class WebAuthConfig extends WebSecurityConfigurerAdapter {
     @Autowired
     private UserDetailsService userDetailsService;

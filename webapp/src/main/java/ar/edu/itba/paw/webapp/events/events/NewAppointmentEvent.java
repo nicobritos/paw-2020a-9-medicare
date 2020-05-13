@@ -1,4 +1,4 @@
-package ar.edu.itba.paw.webapp.events;
+package ar.edu.itba.paw.webapp.events.events;
 
 import ar.edu.itba.paw.models.Appointment;
 import ar.edu.itba.paw.models.User;

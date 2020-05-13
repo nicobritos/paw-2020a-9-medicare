@@ -3,6 +3,8 @@ package ar.edu.itba.paw.webapp.config;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
@@ -15,13 +17,19 @@ import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 import org.springframework.web.multipart.MultipartResolver;
 import org.springframework.web.multipart.commons.CommonsMultipartResolver;
+import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.ViewResolver;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
+import org.springframework.web.servlet.handler.SimpleMappingExceptionResolver;
 import org.springframework.web.servlet.view.InternalResourceViewResolver;
 import org.springframework.web.servlet.view.JstlView;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.sql.DataSource;
 import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
+import java.util.Properties;
 
 @EnableWebMvc
 @ComponentScan({
@@ -29,7 +37,8 @@ import java.nio.charset.StandardCharsets;
         "ar.edu.itba.paw.services",
         "ar.edu.itba.paw.persistence",
         "ar.edu.itba.paw.webapp.transformer",
-        "ar.edu.itba.paw.webapp.events"
+        "ar.edu.itba.paw.webapp.events",
+        "ar.edu.itba.paw.webapp.handlers"
 })
 @Configuration
 @EnableTransactionManagement
@@ -86,6 +95,7 @@ public class WebConfig {
     public PlatformTransactionManager transactionManager(final DataSource ds){
         return new DataSourceTransactionManager(ds);
     }
+
     //TODO:set max size upload maybe?
     @Bean(name = "multipartResolver")
     public MultipartResolver multipartResolver(){
@@ -93,5 +103,29 @@ public class WebConfig {
         CommonsMultipartResolver cmr = new CommonsMultipartResolver();
         //cmr.setMaxUploadSize(maxSize);
         return cmr;
+    }
+
+    @Bean
+    public SimpleMappingExceptionResolver simpleMappingExceptionResolver() {
+        SimpleMappingExceptionResolver exceptionResolver = new MappingExceptionResolver();
+        Properties properties = new Properties();
+        properties.setProperty(Exception.class.getName(), "errors/500");
+
+        exceptionResolver.setExceptionMappings(properties);
+        exceptionResolver.setDefaultStatusCode(500);
+        exceptionResolver.setDefaultErrorView("error/500");
+        exceptionResolver.setExceptionAttribute("ex");
+        return exceptionResolver;
+    }
+
+    private static class MappingExceptionResolver extends SimpleMappingExceptionResolver {
+        private static final Logger LOGGER = LoggerFactory.getLogger(MappingExceptionResolver.class);
+
+        @Override
+        protected ModelAndView doResolveException(HttpServletRequest request, HttpServletResponse response, Object handler, Exception ex) {
+            ModelAndView modelAndView = super.doResolveException(request, response, handler, ex);
+            LOGGER.error("Request: {} raised: {}", request.getRequestURL(), Arrays.toString(ex.getStackTrace()));
+            return modelAndView;
+        }
     }
 }

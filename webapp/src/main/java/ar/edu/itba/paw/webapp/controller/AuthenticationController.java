@@ -9,7 +9,7 @@ import ar.edu.itba.paw.models.*;
 import ar.edu.itba.paw.webapp.auth.UserRole;
 import ar.edu.itba.paw.webapp.controller.utils.GenericController;
 import ar.edu.itba.paw.webapp.controller.utils.JsonResponse;
-import ar.edu.itba.paw.webapp.events.UserConfirmationTokenGenerationEvent;
+import ar.edu.itba.paw.webapp.events.events.UserConfirmationTokenGenerationEvent;
 import ar.edu.itba.paw.webapp.form.authentication.PatientSignUpForm;
 import ar.edu.itba.paw.webapp.form.authentication.StaffSignUpForm;
 import ar.edu.itba.paw.webapp.form.authentication.UserLoginForm;
@@ -111,7 +111,7 @@ public class AuthenticationController extends GenericController {
         StringBuilder baseUrl = new StringBuilder(request.getRequestURL());
         baseUrl.replace(request.getRequestURL().lastIndexOf(request.getServletPath()), request.getRequestURL().length(), "");
         this.eventPublisher.publishEvent(new UserConfirmationTokenGenerationEvent(baseUrl.toString(), newUser, "/verifyEmail", request.getLocale()));
-        authenticateSignedUpUser(form.getAsUser(), form.getPassword(), request);
+        this.authenticateSignedUpUser(form.getAsUser(), form.getPassword(), request);
         return new ModelAndView("redirect:/verifyEmail");
     }
 
@@ -141,7 +141,7 @@ public class AuthenticationController extends GenericController {
         StringBuilder baseUrl = new StringBuilder(request.getRequestURL());
         baseUrl.replace(request.getRequestURL().lastIndexOf(request.getServletPath()), request.getRequestURL().length(), "");
         this.eventPublisher.publishEvent(new UserConfirmationTokenGenerationEvent(baseUrl.toString(), newUser, "/verifyEmail", request.getLocale()));
-        authenticateSignedUpUser(form.getAsUser(), form.getPassword(), request);
+        this.authenticateSignedUpUser(form.getAsUser(), form.getPassword(), request);
 
         return new ModelAndView("redirect:/verifyEmail");
     }
@@ -150,7 +150,7 @@ public class AuthenticationController extends GenericController {
     @RequestMapping(value = "/verifyEmail", method = RequestMethod.GET)
     public ModelAndView verifyEmail(@RequestParam(value = "token", required = false) String token, HttpServletRequest request) {
         ModelAndView mav = new ModelAndView();
-        Optional<User> userOptional = getUser();
+        Optional<User> userOptional = this.getUser();
         if(!userOptional.isPresent()){
             mav.setViewName("redirect:/login?token=" + token);
             return mav;
@@ -161,12 +161,12 @@ public class AuthenticationController extends GenericController {
         } else if (!this.userService.confirm(userOptional.get(), token)) {
             tokenError = true;
         } else {
-            updateRole(userOptional.get());
+            this.updateRole(userOptional.get());
             mav.addObject("user", userOptional);
             mav.setViewName("redirect:/home");
             return mav;
         }
-        mav.addObject("user", getUser());
+        mav.addObject("user", this.getUser());
         mav.addObject("tokenError", tokenError);
         mav.setViewName("unverified");
         return mav;
@@ -201,7 +201,7 @@ public class AuthenticationController extends GenericController {
     private void authenticateSignedUpUser(User user, String password, HttpServletRequest request) {
         try {
             String username = user.getEmail();
-            UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(username, password, AuthorityUtils.commaSeparatedStringToAuthorityList(getRoles(user)));
+            UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(username, password, AuthorityUtils.commaSeparatedStringToAuthorityList(this.getRoles(user)));
             // generate session if one doesn't exist
             request.getSession();
             Authentication authenticatedUser;
@@ -218,7 +218,7 @@ public class AuthenticationController extends GenericController {
         if(!user.getVerified()){
             return prefix + UserRole.UNVERIFIED;
         }
-        if(userService.isStaff(user)){
+        if(this.userService.isStaff(user)){
             return prefix + UserRole.STAFF;
         } else {
             return prefix + UserRole.PATIENT;
@@ -228,7 +228,7 @@ public class AuthenticationController extends GenericController {
 
     private void updateRole(User user){
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        List<GrantedAuthority> updatedAuthorities = AuthorityUtils.commaSeparatedStringToAuthorityList(getRoles(user));
+        List<GrantedAuthority> updatedAuthorities = AuthorityUtils.commaSeparatedStringToAuthorityList(this.getRoles(user));
         Authentication newAuth = new UsernamePasswordAuthenticationToken(auth.getPrincipal(), auth.getCredentials(), updatedAuthorities);
         SecurityContextHolder.getContext().setAuthentication(newAuth);
     }
