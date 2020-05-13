@@ -17,7 +17,6 @@ import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 import org.springframework.web.multipart.MultipartResolver;
 import org.springframework.web.multipart.commons.CommonsMultipartResolver;
-import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.ViewResolver;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 import org.springframework.web.servlet.handler.SimpleMappingExceptionResolver;
@@ -25,7 +24,6 @@ import org.springframework.web.servlet.view.InternalResourceViewResolver;
 import org.springframework.web.servlet.view.JstlView;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import javax.sql.DataSource;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
@@ -122,10 +120,8 @@ public class WebConfig {
         private static final Logger LOGGER = LoggerFactory.getLogger(MappingExceptionResolver.class);
 
         @Override
-        protected ModelAndView doResolveException(HttpServletRequest request, HttpServletResponse response, Object handler, Exception ex) {
-            ModelAndView modelAndView = super.doResolveException(request, response, handler, ex);
+        protected void logException(Exception ex, HttpServletRequest request) {
             LOGGER.error("Request: {} raised: {}", request.getRequestURL(), Arrays.toString(ex.getStackTrace()));
-            return modelAndView;
         }
     }
 }
