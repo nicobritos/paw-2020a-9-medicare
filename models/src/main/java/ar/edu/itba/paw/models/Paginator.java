@@ -36,4 +36,8 @@ public class Paginator<M extends GenericModel<?>> {
     public int getPage() {
         return this.page;
     }
+
+    public int getTotalPages() {
+        return this.remainingPages + this.page;
+    }
 }

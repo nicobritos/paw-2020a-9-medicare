@@ -58,6 +58,7 @@ public class MedicListController extends GenericController {
         if (page <= 0) {
             return medicList(name, specialties, localities);
         }
+
         //get modelandview from medicList.jsp
         final ModelAndView mav = new ModelAndView("medicList");
         //staff variable that will be passed to the jsp
@@ -72,7 +73,9 @@ public class MedicListController extends GenericController {
                 try {
                     StaffSpecialty specialty = new StaffSpecialty();
                     specialty.setId(Integer.parseInt(s));
-                    searchedSpecialties.add(specialty);
+                    if(specialty.getId() >= 0) {
+                        searchedSpecialties.add(specialty);
+                    }
                 } catch (NumberFormatException e) {
                 }
             }
@@ -87,7 +90,9 @@ public class MedicListController extends GenericController {
                 try {
                     Locality locality = new Locality();
                     locality.setId(Integer.parseInt(s));
-                    searchedLocalities.add(locality);
+                    if(locality.getId() >= 0){
+                        searchedLocalities.add(locality);
+                    }
                 } catch (NumberFormatException e) {
                 }
             }
@@ -110,10 +115,10 @@ public class MedicListController extends GenericController {
         if (user.isPresent() && isStaff()) {
             mav.addObject("staffs", staffService.findByUser(user.get().getId()));
         }
-        // TODO: Add number of pages (see #staffPaginator) and more metadata
         mav.addObject("searchedLocalities", searchedLocalities);
         mav.addObject("searchedSpecialties", searchedSpecialties);
         mav.addObject("staff", staffPaginator.getModels());
+        mav.addObject("paginator", staffPaginator);
         mav.addObject("specialties", specialtiesList);
         mav.addObject("localities", localitiesList);
         mav.addObject("name", name);
