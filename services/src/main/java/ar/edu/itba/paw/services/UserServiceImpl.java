@@ -24,7 +24,6 @@ import java.util.*;
 @Service
 public class UserServiceImpl extends GenericSearchableServiceImpl<UserDao, User, Integer> implements UserService {
     private static final Logger LOGGER = LoggerFactory.getLogger(UserServiceImpl.class);
-    private static Set<String> invalidEmailDomains = new HashSet<>();
 
     @Autowired
     private UserDao repository;
@@ -39,12 +38,14 @@ public class UserServiceImpl extends GenericSearchableServiceImpl<UserDao, User,
     @Autowired
     private PasswordEncoder passwordEncoder;
 
+    private Set<String> invalidEmailDomains = new HashSet<>();
+
     public UserServiceImpl() {
         Resource invalidEmailDomainsFile = new ClassPathResource("/invalidEmailDomains.json");
         try {
-            invalidEmailDomains = new HashSet<>(Arrays.asList(new ObjectMapper().readValue(invalidEmailDomainsFile.getInputStream(), String[].class)));
+            this.invalidEmailDomains = new HashSet<>(Arrays.asList(new ObjectMapper().readValue(invalidEmailDomainsFile.getInputStream(), String[].class)));
         } catch (NullPointerException | IOException e) {
-            LOGGER.error("Reading InvalidEmailDomains file. File present: {}", invalidEmailDomainsFile != null ? (invalidEmailDomainsFile.exists() ? "YES" : "NO") : "NO");
+            LOGGER.error("Reading InvalidEmailDomains file. File present: {}", invalidEmailDomainsFile.exists() ? "YES" : "NO");
         }
     }
 
@@ -203,6 +204,6 @@ public class UserServiceImpl extends GenericSearchableServiceImpl<UserDao, User,
 
     private boolean isValidEmailDomain(String email) {
         String domain = email.substring(email.lastIndexOf("@") + 1);
-        return invalidEmailDomains.contains(domain);
+        return this.invalidEmailDomains.contains(domain);
     }
 }
