@@ -3,6 +3,7 @@ package ar.edu.itba.paw.webapp.handlers;
 import ar.edu.itba.paw.webapp.auth.UserRole;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.DefaultRedirectStrategy;
 import org.springframework.security.web.RedirectStrategy;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
@@ -14,11 +15,12 @@ import java.io.IOException;
 import java.util.Collection;
 
 public class AuthenticationSuccessHandlerImpl implements AuthenticationSuccessHandler {
-    private RedirectStrategy redirectStrategy = new DefaultRedirectStrategy();
+    private final RedirectStrategy redirectStrategy = new DefaultRedirectStrategy();
 
     @Override
     public void onAuthenticationSuccess(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse, Authentication authentication) throws IOException, ServletException {
         String targetUrl = this.getTargetUrl(authentication, httpServletRequest);
+        CustomSecurityRepository.onLogin(SecurityContextHolder.getContext());
         if (!httpServletResponse.isCommitted()) {
             this.redirectStrategy.sendRedirect(httpServletRequest, httpServletResponse, targetUrl);
         }

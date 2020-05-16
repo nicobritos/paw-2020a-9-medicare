@@ -13,6 +13,7 @@ import ar.edu.itba.paw.webapp.events.events.UserConfirmationTokenGenerationEvent
 import ar.edu.itba.paw.webapp.form.authentication.PatientSignUpForm;
 import ar.edu.itba.paw.webapp.form.authentication.StaffSignUpForm;
 import ar.edu.itba.paw.webapp.form.authentication.UserLoginForm;
+import ar.edu.itba.paw.webapp.handlers.CustomSecurityRepository;
 import ar.edu.itba.paw.webapp.transformer.LocalityTransformer;
 import ar.edu.itba.paw.webapp.transformer.ProvinceTransformer;
 import org.slf4j.Logger;
@@ -235,7 +236,9 @@ public class AuthenticationController extends GenericController {
     private void updateRole(User user) {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         List<GrantedAuthority> updatedAuthorities = AuthorityUtils.commaSeparatedStringToAuthorityList(this.getRoles(user));
+
         Authentication newAuth = new UsernamePasswordAuthenticationToken(auth.getPrincipal(), auth.getCredentials(), updatedAuthorities);
         SecurityContextHolder.getContext().setAuthentication(newAuth);
+        CustomSecurityRepository.propagateAuthorities((org.springframework.security.core.userdetails.User) auth.getPrincipal(), updatedAuthorities);
     }
 }

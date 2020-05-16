@@ -2,6 +2,7 @@ package ar.edu.itba.paw.webapp.config;
 
 import ar.edu.itba.paw.webapp.auth.UserRole;
 import ar.edu.itba.paw.webapp.handlers.AuthenticationSuccessHandlerImpl;
+import ar.edu.itba.paw.webapp.handlers.LogoutSuccessHandlerImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -84,6 +85,7 @@ public class WebAuthConfig extends WebSecurityConfigurerAdapter {
                 .logoutSuccessUrl("/")
                 .invalidateHttpSession(true)
                 .permitAll()
+                .logoutSuccessHandler(new LogoutSuccessHandlerImpl())
                 .and().exceptionHandling()
                 .accessDeniedPage("/403")
                 .and().csrf()
