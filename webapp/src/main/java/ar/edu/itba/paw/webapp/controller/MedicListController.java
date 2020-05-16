@@ -93,11 +93,12 @@ public class MedicListController extends GenericController {
             }
         }
 
+        Paginator<Staff> staffPaginator;
         if (name != null && !(name = name.trim()).equals("")) {
             Set<String> words = new HashSet<>(Arrays.asList(name.split(" ")));
-            staffList = this.staffService.findBy(words, words, null, searchedSpecialties, searchedLocalities, page);
+            staffPaginator = this.staffService.findBy(words, words, null, searchedSpecialties, searchedLocalities, page);
         } else {
-            staffList = this.staffService.findBy((String) null, null, null, searchedSpecialties, searchedLocalities, page);
+            staffPaginator = this.staffService.findBy((String) null, null, null, searchedSpecialties, searchedLocalities, page);
         }
 
         Collection<StaffSpecialty> specialtiesList = this.specialityService.list();
@@ -109,9 +110,10 @@ public class MedicListController extends GenericController {
         if (user.isPresent() && isStaff()) {
             mav.addObject("staffs", staffService.findByUser(user.get().getId()));
         }
+        // TODO: Add number of pages (see #staffPaginator) and more metadata
         mav.addObject("searchedLocalities", searchedLocalities);
         mav.addObject("searchedSpecialties", searchedSpecialties);
-        mav.addObject("staff", staffList);
+        mav.addObject("staff", staffPaginator.getModels());
         mav.addObject("specialties", specialtiesList);
         mav.addObject("localities", localitiesList);
         mav.addObject("name", name);

@@ -2,13 +2,11 @@ package ar.edu.itba.paw.services;
 
 import ar.edu.itba.paw.interfaces.daos.StaffDao;
 import ar.edu.itba.paw.interfaces.services.StaffService;
-import ar.edu.itba.paw.models.Locality;
-import ar.edu.itba.paw.models.Office;
-import ar.edu.itba.paw.models.Staff;
-import ar.edu.itba.paw.models.StaffSpecialty;
+import ar.edu.itba.paw.models.*;
 import ar.edu.itba.paw.services.generics.GenericSearchableServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Set;
@@ -26,12 +24,14 @@ public class StaffServiceImpl extends GenericSearchableServiceImpl<StaffDao, Sta
     }
 
     @Override
-    public List<Staff> findBy(String name, String surname, Set<Office> offices, Set<StaffSpecialty> staffSpecialties, Set<Locality> localities, int page) {
+    @Transactional
+    public Paginator<Staff> findBy(String name, String surname, Set<Office> offices, Set<StaffSpecialty> staffSpecialties, Set<Locality> localities, int page) {
         return this.repository.findBy(name, surname, offices, staffSpecialties, localities, page, PAGE_SIZE);
     }
 
     @Override
-    public List<Staff> findBy(Set<String> name, Set<String> surname, Set<Office> offices, Set<StaffSpecialty> staffSpecialties, Set<Locality> localities, int page) {
+    @Transactional
+    public Paginator<Staff> findBy(Set<String> name, Set<String> surname, Set<Office> offices, Set<StaffSpecialty> staffSpecialties, Set<Locality> localities, int page) {
         return this.repository.findBy(name, surname, offices, staffSpecialties, localities, page, PAGE_SIZE);
     }
 

@@ -10,7 +10,10 @@ import ar.edu.itba.paw.persistenceAnnotations.Table;
 import java.util.*;
 
 public class JDBCSelectQueryBuilder extends JDBCQueryBuilder {
-    public static final String ALL = " * ";
+    public static final String MIN_COLUMN = "min";
+    public static final String MAX_COLUMN = "max";
+    public static final String COUNT_COLUMN = "count";
+    private static final String ALL = "*";
 
     public enum JoinType {
         INNER(" "),
@@ -47,6 +50,8 @@ public class JDBCSelectQueryBuilder extends JDBCQueryBuilder {
     private boolean distinct;
     private String table;
     private String alias;
+    private String count;
+    private String max, min;
     private int limit;
     private int offset;
 
@@ -59,6 +64,30 @@ public class JDBCSelectQueryBuilder extends JDBCQueryBuilder {
     public JDBCSelectQueryBuilder select(String columnName) {
         this.columns.add(columnName);
         return this;
+    }
+
+    public JDBCSelectQueryBuilder count() {
+        this.count = ALL;
+        return this;
+    }
+
+    public JDBCSelectQueryBuilder count(String columnName) {
+        this.count = columnName;
+        return this;
+    }
+
+    public JDBCSelectQueryBuilder max(String columnName) {
+        this.max = columnName;
+        return this;
+    }
+
+    public JDBCSelectQueryBuilder min(String columnName) {
+        this.min = columnName;
+        return this;
+    }
+
+    public boolean isMetadata() {
+        return this.count != null || this.min != null || this.max != null;
     }
 
     public JDBCSelectQueryBuilder from(String tableName) {
@@ -229,17 +258,44 @@ public class JDBCSelectQueryBuilder extends JDBCQueryBuilder {
 
         if (this.distinct) stringBuilder.append(" DISTINCT ");
 
-        if (onlyColumnsFromTable) {
-            stringBuilder
-                    .append(this.alias)
-                    .append(".*");
-        } else {
-            if (this.columns.size() > 0) {
-                stringBuilder.append(this.joinStrings(this.columns));
-            } else if (this.selectAll || this.fromQueryBuilder != null) {
-                stringBuilder.append(this.generateColumns());
+        if (this.isMetadata()) {
+            if (this.count != null) {
+                stringBuilder
+                        .append(" COUNT(")
+                        .append(this.fromQueryBuilder == null ? this.alias : this.fromQueryBuilder.getAlias())
+                        .append(".")
+                        .append(this.count)
+                        .append(") ");
+            }
+            if (this.min != null) {
+                stringBuilder
+                        .append(" MIN(")
+                        .append(this.fromQueryBuilder == null ? this.alias : this.fromQueryBuilder.getAlias())
+                        .append(".")
+                        .append(this.min)
+                        .append(") ");
+            }
+            if (this.max != null) {
+                stringBuilder
+                        .append(" MAX(")
+                        .append(this.fromQueryBuilder == null ? this.alias : this.fromQueryBuilder.getAlias())
+                        .append(".")
+                        .append(this.max)
+                        .append(") ");
+            }
+        } else  {
+            if (onlyColumnsFromTable) {
+                stringBuilder
+                        .append(this.alias)
+                        .append(".*");
             } else {
-                return null;
+                if (this.columns.size() > 0) {
+                    stringBuilder.append(this.joinStrings(this.columns));
+                } else if (this.selectAll || this.fromQueryBuilder != null) {
+                    stringBuilder.append(this.generateColumns());
+                } else {
+                    return null;
+                }
             }
         }
 
