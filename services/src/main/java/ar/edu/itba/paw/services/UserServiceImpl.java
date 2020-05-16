@@ -4,19 +4,27 @@ import ar.edu.itba.paw.interfaces.MediCareException;
 import ar.edu.itba.paw.interfaces.daos.UserDao;
 import ar.edu.itba.paw.interfaces.services.*;
 import ar.edu.itba.paw.interfaces.services.exceptions.EmailAlreadyExistsException;
+import ar.edu.itba.paw.interfaces.services.exceptions.InvalidEmailDomain;
 import ar.edu.itba.paw.models.*;
 import ar.edu.itba.paw.services.generics.GenericSearchableServiceImpl;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.joda.time.DateTime;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.Resource;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Optional;
-import java.util.UUID;
+import java.io.IOException;
+import java.util.*;
 
 @Service
 public class UserServiceImpl extends GenericSearchableServiceImpl<UserDao, User, Integer> implements UserService {
+    private static final Logger LOGGER = LoggerFactory.getLogger(UserServiceImpl.class);
+
     @Autowired
     private UserDao repository;
     @Autowired
@@ -30,12 +38,24 @@ public class UserServiceImpl extends GenericSearchableServiceImpl<UserDao, User,
     @Autowired
     private PasswordEncoder passwordEncoder;
 
+    private Set<String> invalidEmailDomains = new HashSet<>();
+
+    public UserServiceImpl() {
+        Resource invalidEmailDomainsFile = new ClassPathResource("/invalidEmailDomains.json");
+        try {
+            this.invalidEmailDomains = new HashSet<>(Arrays.asList(new ObjectMapper().readValue(invalidEmailDomainsFile.getInputStream(), String[].class)));
+        } catch (NullPointerException | IOException e) {
+            LOGGER.error("Reading InvalidEmailDomains file. File present: {}", invalidEmailDomainsFile.exists() ? "YES" : "NO");
+        }
+    }
+
     @Override
     @Transactional
     public User create(User user) throws EmailAlreadyExistsException {
-        if (this.repository.existsEmail(user.getEmail())) {
+        if (this.repository.existsEmail(user.getEmail()))
             throw new EmailAlreadyExistsException();
-        }
+        if (!this.isValidEmailDomain(user.getEmail()))
+            throw new InvalidEmailDomain();
 
         user.setPassword(this.passwordEncoder.encode(user.getPassword()));
         return super.create(user);
@@ -98,14 +118,14 @@ public class UserServiceImpl extends GenericSearchableServiceImpl<UserDao, User,
         Optional<User> userOptional = this.repository.findByEmail(user.getEmail());
         if (userOptional.isPresent()) {
             if (!userOptional.get().equals(user)) {
+                // The email belongs to another user
                 throw new EmailAlreadyExistsException();
             }
-            if (!userOptional.get().equals(user) && this.repository.existsToken(user.getToken())) {
-                throw new MediCareException("Confirmation token already exists");
-            }
         } else {
-            // Already exists in DB, the email has changed
             if (user.getId() != null && this.findById(user.getId()).isPresent()) {
+                // Already exists in DB, the email has changed
+                if (!this.isValidEmailDomain(user.getEmail()))
+                    throw new InvalidEmailDomain();
                 user.setVerified(false);
                 user.setToken(null);
             } else {
@@ -180,5 +200,10 @@ public class UserServiceImpl extends GenericSearchableServiceImpl<UserDao, User,
     @Override
     protected UserDao getRepository() {
         return this.repository;
+    }
+
+    private boolean isValidEmailDomain(String email) {
+        String domain = email.substring(email.lastIndexOf("@") + 1);
+        return this.invalidEmailDomains.contains(domain);
     }
 }
