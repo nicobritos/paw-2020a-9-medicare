@@ -30,8 +30,8 @@
                         <option value="-1"><spring:message code="Any"/></option>
                         <c:forEach var="specialty" items="${specialties}">
                             <option value="<c:out value="${specialty.id}" />"
-                                    <c:if test="${searchedSpecialties.contains(specialty)}">selected</c:if>><c:out
-                                    value="${specialty.name}"/></option>
+                                <c:if test="${searchedSpecialties.contains(specialty)}">selected</c:if>><c:out
+                                value="${specialty.name}"/></option>
                         </c:forEach>
                     </select>
                 </div>
@@ -103,9 +103,8 @@
                             <button type="button" class="btn btn-info btn-sm" id="prevButton"><</button>
                         </div>
                     </c:if>
-
-                    <p class="d-inline mx-2"><spring:message code="Page"/> <c:out value="${page}"/></p>
-                    <c:if test="${staff.size() == 10}">
+                    <p class="d-inline mx-2"><spring:message code="Page"/> <c:out value="${page}"/> <spring:message code="of"/> <c:out value="${paginator.totalPages}"/></p>
+                    <c:if test="${paginator.remainingPages != 0}">
                         <div>
                             <button type="button" class="btn btn-info btn-sm" id="nextButton">></button>
                         </div>

@@ -1,6 +1,7 @@
 package ar.edu.itba.paw.interfaces.daos.generic;
 
 import ar.edu.itba.paw.models.GenericModel;
+import ar.edu.itba.paw.models.ModelMetadata;
 
 import java.util.Collection;
 import java.util.List;
@@ -25,6 +26,8 @@ public interface GenericDao<M extends GenericModel<I>, I> {
     void remove(I id);
 
     List<M> list();
+
+    ModelMetadata count();
 
     Class<M> getModelClass();
 

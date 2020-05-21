@@ -58,6 +58,7 @@ public class MedicListController extends GenericController {
         if (page <= 0) {
             return medicList(name, specialties, localities);
         }
+
         //get modelandview from medicList.jsp
         final ModelAndView mav = new ModelAndView("medicList");
         //staff variable that will be passed to the jsp
@@ -72,7 +73,9 @@ public class MedicListController extends GenericController {
                 try {
                     StaffSpecialty specialty = new StaffSpecialty();
                     specialty.setId(Integer.parseInt(s));
-                    searchedSpecialties.add(specialty);
+                    if(specialty.getId() >= 0) {
+                        searchedSpecialties.add(specialty);
+                    }
                 } catch (NumberFormatException e) {
                 }
             }
@@ -87,17 +90,20 @@ public class MedicListController extends GenericController {
                 try {
                     Locality locality = new Locality();
                     locality.setId(Integer.parseInt(s));
-                    searchedLocalities.add(locality);
+                    if(locality.getId() >= 0){
+                        searchedLocalities.add(locality);
+                    }
                 } catch (NumberFormatException e) {
                 }
             }
         }
 
+        Paginator<Staff> staffPaginator;
         if (name != null && !(name = name.trim()).equals("")) {
             Set<String> words = new HashSet<>(Arrays.asList(name.split(" ")));
-            staffList = this.staffService.findBy(words, words, null, searchedSpecialties, searchedLocalities, page);
+            staffPaginator = this.staffService.findBy(words, words, null, searchedSpecialties, searchedLocalities, page);
         } else {
-            staffList = this.staffService.findBy((String) null, null, null, searchedSpecialties, searchedLocalities, page);
+            staffPaginator = this.staffService.findBy((String) null, null, null, searchedSpecialties, searchedLocalities, page);
         }
 
         Collection<StaffSpecialty> specialtiesList = this.specialityService.list();
@@ -111,7 +117,8 @@ public class MedicListController extends GenericController {
         }
         mav.addObject("searchedLocalities", searchedLocalities);
         mav.addObject("searchedSpecialties", searchedSpecialties);
-        mav.addObject("staff", staffList);
+        mav.addObject("staff", staffPaginator.getModels());
+        mav.addObject("paginator", staffPaginator);
         mav.addObject("specialties", specialtiesList);
         mav.addObject("localities", localitiesList);
         mav.addObject("name", name);

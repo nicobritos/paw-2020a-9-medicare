@@ -97,7 +97,7 @@ public class StaffDaoImpl extends GenericSearchableDaoImpl<Staff, Integer> imple
     }
 
     @Override
-    public List<Staff> findBy(String name, String surname, Collection<Office> offices, Collection<StaffSpecialty> staffSpecialties, Collection<Locality> localities, int page, int pageSize) {
+    public Paginator<Staff> findBy(String name, String surname, Collection<Office> offices, Collection<StaffSpecialty> staffSpecialties, Collection<Locality> localities, int page, int pageSize) {
         if(page<=0)
             page = 1;
 
@@ -149,11 +149,25 @@ public class StaffDaoImpl extends GenericSearchableDaoImpl<Staff, Integer> imple
         if(!localities.isEmpty()){
             queryBuilder.join("office_id", OfficeDaoImpl.TABLE_NAME, "office_id", Office.class);
         }
-        return this.selectQuery(queryBuilder, parameterSource);
+        List<Staff> staffs = this.selectQuery(queryBuilder, parameterSource);
+
+        JDBCSelectQueryBuilder countQueryBuilder = new JDBCSelectQueryBuilder()
+                .count(StaffDaoImpl.PRIMARY_KEY_NAME)
+                .from(this.getTableAlias())
+                .where(whereClauseBuilder)
+                .distinct();
+        if(!staffSpecialties.isEmpty()) {
+            countQueryBuilder.join("staff_id", this.getSpecialtiesIntermediateTableName(), "staff_id", null);
+        }
+        if(!localities.isEmpty()){
+            countQueryBuilder.join("office_id", OfficeDaoImpl.TABLE_NAME, "office_id", Office.class);
+        }
+
+        return new Paginator<>(staffs, page, pageSize, this.selectQueryMetadata(countQueryBuilder, parameterSource).getCount());
     }
 
     @Override
-    public List<Staff> findBy(Collection<String> names, Collection<String> surnames, Collection<Office> offices, Collection<StaffSpecialty> staffSpecialties, Collection<Locality> localities, int page, int pageSize) {
+    public Paginator<Staff> findBy(Collection<String> names, Collection<String> surnames, Collection<Office> offices, Collection<StaffSpecialty> staffSpecialties, Collection<Locality> localities, int page, int pageSize) {
         if(page<=0)
             page = 1;
 
@@ -224,7 +238,21 @@ public class StaffDaoImpl extends GenericSearchableDaoImpl<Staff, Integer> imple
         if(!localities.isEmpty()){
             queryBuilder.join("office_id", OfficeDaoImpl.TABLE_NAME, "office_id", Office.class);
         }
-        return this.selectQuery(queryBuilder, parameterSource);
+        List<Staff> staffs = this.selectQuery(queryBuilder, parameterSource);
+
+        JDBCSelectQueryBuilder countQueryBuilder = new JDBCSelectQueryBuilder()
+                .count(StaffDaoImpl.PRIMARY_KEY_NAME)
+                .from(this.getTableAlias())
+                .where(whereClauseBuilder)
+                .distinct();
+        if(!staffSpecialties.isEmpty()) {
+            countQueryBuilder.join("staff_id", this.getSpecialtiesIntermediateTableName(), "staff_id", null);
+        }
+        if(!localities.isEmpty()){
+            countQueryBuilder.join("office_id", OfficeDaoImpl.TABLE_NAME, "office_id", Office.class);
+        }
+
+        return new Paginator<>(staffs, page, pageSize, this.selectQueryMetadata(countQueryBuilder, parameterSource).getCount());
     }
 
     @Override
@@ -591,9 +619,5 @@ public class StaffDaoImpl extends GenericSearchableDaoImpl<Staff, Integer> imple
 
     private String getSpecialtiesIntermediateTableName() {
         return "system_staff_specialty_staff";
-    }
-
-    private String getOfficeTable() {
-        return "office";
     }
 }

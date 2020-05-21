@@ -1,7 +1,9 @@
 package ar.edu.itba.paw.persistence.generics;
 
+import ar.edu.itba.paw.interfaces.MediCareException;
 import ar.edu.itba.paw.interfaces.daos.generic.GenericDao;
 import ar.edu.itba.paw.models.GenericModel;
+import ar.edu.itba.paw.models.ModelMetadata;
 import ar.edu.itba.paw.persistence.utils.JDBCArgumentValue;
 import ar.edu.itba.paw.persistence.utils.ReflectionGetterSetter;
 import ar.edu.itba.paw.persistence.utils.StringSearchType;
@@ -38,6 +40,30 @@ import java.util.Map.Entry;
 public abstract class GenericDaoImpl<M extends GenericModel<I>, I> implements GenericDao<M, I> {
     private static final Logger LOGGER = LoggerFactory.getLogger(GenericDaoImpl.class);
     private static final String ARGUMENT_PREFIX = "_r_";
+    private static final ResultSetExtractor<ModelMetadata> modelMetadataExtractor = resultSet -> {
+        Integer min, max, count;
+        try {
+            min = resultSet.getInt(JDBCSelectQueryBuilder.MIN_COLUMN);
+        } catch (SQLException e) {
+            min = null;
+            LOGGER.info("No 'min' column found when extracting metadata");
+        }
+        try {
+            max = resultSet.getInt(JDBCSelectQueryBuilder.MAX_COLUMN);
+        } catch (SQLException e) {
+            max = null;
+            LOGGER.info("No 'max' column found when extracting metadata");
+        }
+        try {
+            count = resultSet.getInt(JDBCSelectQueryBuilder.COUNT_COLUMN);
+        } catch (SQLException e) {
+            count = null;
+            LOGGER.info("No 'count' column found when extracting metadata");
+        }
+
+        return new ModelMetadata(count, min, max);
+    };
+
     protected TransactionTemplate transactionTemplate;
     protected NamedParameterJdbcTemplate jdbcTemplate;
     protected SimpleJdbcInsert jdbcInsert;
@@ -179,11 +205,20 @@ public abstract class GenericDaoImpl<M extends GenericModel<I>, I> implements Ge
 
     @Override
     public List<M> list() {
-        JDBCSelectQueryBuilder selectQueryBuilder = new JDBCSelectQueryBuilder()
-                .selectAll(this.mClass)
-                .from(this.getTableAlias());
-        MapSqlParameterSource parameterSource = new MapSqlParameterSource();
-        return this.selectQuery(selectQueryBuilder, parameterSource);
+        return this.selectQuery(
+                new JDBCSelectQueryBuilder()
+                        .selectAll(this.mClass)
+                        .from(this.getTableAlias())
+        );
+    }
+
+    @Override
+    public ModelMetadata count() {
+        return this.selectQueryMetadata(
+                new JDBCSelectQueryBuilder()
+                        .count(this.getIdColumnName())
+                        .from(this.getTableAlias())
+        );
     }
 
     @Override
@@ -269,24 +304,6 @@ public abstract class GenericDaoImpl<M extends GenericModel<I>, I> implements Ge
         return new LinkedList<>(this.jdbcTemplate.query(selectQueryBuilder.getQueryAsString(), this.getResultSetExtractor()));
     }
 
-    /**
-     * Fixes LIMIT selects wrapping it inside of other select
-     */
-    private JDBCSelectQueryBuilder wrapSelectQueryBuilder(JDBCSelectQueryBuilder selectQueryBuilder) {
-        JDBCSelectQueryBuilder wrapper;
-        if (selectQueryBuilder.hasLimit() || selectQueryBuilder.hasOffset()) {
-            wrapper = new JDBCSelectQueryBuilder();
-            wrapper.from(selectQueryBuilder);
-            this.insertOrderBy(selectQueryBuilder);  // We need them in both
-        } else {
-            wrapper = selectQueryBuilder;
-        }
-
-        this.insertOrderBy(wrapper);
-        this.populateJoins(wrapper);
-        return wrapper;
-    }
-
     protected List<M> selectQuery(JDBCSelectQueryBuilder selectQueryBuilder, MapSqlParameterSource args) {
         selectQueryBuilder = this.wrapSelectQueryBuilder(selectQueryBuilder);
         return new LinkedList<>(this.jdbcTemplate.query(selectQueryBuilder.getQueryAsString(), args, this.getResultSetExtractor()));
@@ -311,6 +328,26 @@ public abstract class GenericDaoImpl<M extends GenericModel<I>, I> implements Ge
     protected Optional<M> selectQuerySingle(JDBCSelectQueryBuilder selectQueryBuilder, MapSqlParameterSource args) {
         selectQueryBuilder = this.wrapSelectQueryBuilder(selectQueryBuilder);
         return this.jdbcTemplate.query(selectQueryBuilder.getQueryAsString(), args, this.getResultSetExtractor()).stream().findFirst();
+    }
+
+    protected ModelMetadata selectQueryMetadata(JDBCSelectQueryBuilder selectQueryBuilder) {
+        if (!selectQueryBuilder.isMetadata()) {
+            LOGGER.error("JDBCSelectQueryBuilder is not of metadata type: \n{}", selectQueryBuilder.getQueryAsString());
+            throw new MediCareException("JDBCSelectQueryBuilder is not of metadata type");
+        }
+
+        selectQueryBuilder = this.wrapSelectQueryBuilder(selectQueryBuilder);
+        return this.jdbcTemplate.query(selectQueryBuilder.getQueryAsString(), modelMetadataExtractor);
+    }
+
+    protected ModelMetadata selectQueryMetadata(JDBCSelectQueryBuilder selectQueryBuilder, MapSqlParameterSource args) {
+        if (!selectQueryBuilder.isMetadata()) {
+            LOGGER.error("JDBCSelectQueryBuilder is not of metadata type: \n{}", selectQueryBuilder.getQueryAsString());
+            throw new MediCareException("JDBCSelectQueryBuilder is not of metadata type");
+        }
+
+        selectQueryBuilder = this.wrapSelectQueryBuilder(selectQueryBuilder);
+        return this.jdbcTemplate.query(selectQueryBuilder.getQueryAsString(), args, modelMetadataExtractor);
     }
 
     /**
@@ -434,6 +471,24 @@ public abstract class GenericDaoImpl<M extends GenericModel<I>, I> implements Ge
 
             selectQueryBuilder.orderBy(this.formatColumnFromAlias(column.name()), orderBy.value(), orderBy.priority());
         });
+    }
+
+    /**
+     * Fixes LIMIT selects wrapping it inside of other select
+     */
+    private JDBCSelectQueryBuilder wrapSelectQueryBuilder(JDBCSelectQueryBuilder selectQueryBuilder) {
+        JDBCSelectQueryBuilder wrapper;
+        if (selectQueryBuilder.hasLimit() || selectQueryBuilder.hasOffset()) {
+            wrapper = new JDBCSelectQueryBuilder();
+            wrapper.from(selectQueryBuilder);
+            this.insertOrderBy(selectQueryBuilder);  // We need them in both
+        } else {
+            wrapper = selectQueryBuilder;
+        }
+
+        this.insertOrderBy(wrapper);
+        this.populateJoins(wrapper);
+        return wrapper;
     }
 
     protected abstract ResultSetExtractor<List<M>> getResultSetExtractor();
