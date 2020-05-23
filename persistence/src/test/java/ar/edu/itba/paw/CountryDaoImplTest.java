@@ -486,7 +486,9 @@ public class CountryDaoImplTest
     public void testCountryEmptyList()
     {
         // 1. Precondiciones
-        cleanAllTables();// 2. Ejercitar
+        cleanAllTables();
+
+        // 2. Ejercitar
         Collection<Country> countries = this.countryDao.list();
 
         // 3. Postcondiciones
@@ -529,7 +531,7 @@ public class CountryDaoImplTest
 
         // 3. Postcondiciones
         // Que el metodo tire NullPointerException
-        assertEquals(1,JdbcTestUtils.countRowsInTable(jdbcTemplate, COUNTRIES_TABLE));
+        assertEquals(2,JdbcTestUtils.countRowsInTable(jdbcTemplate, COUNTRIES_TABLE));
     }
 
     @Test
@@ -562,6 +564,7 @@ public class CountryDaoImplTest
 
         // 3. Postcondiciones
         assertEquals(1,JdbcTestUtils.countRowsInTable(jdbcTemplate, COUNTRIES_TABLE));
+        assertEquals(countryModel(), c);
     }
 
     @Test
