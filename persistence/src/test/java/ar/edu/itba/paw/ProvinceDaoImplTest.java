@@ -62,6 +62,8 @@ public class ProvinceDaoImplTest
                 .withTableName(COUNTRIES_TABLE);
     }
 
+    /* ---------------------- FUNCIONES AUXILIARES ---------------------------------------------------------------- */
+
     private void cleanAllTables(){
         this.jdbcTemplate.execute("TRUNCATE SCHEMA PUBLIC RESTART IDENTITY AND COMMIT NO CHECK");
     }
@@ -125,7 +127,7 @@ public class ProvinceDaoImplTest
         assertEquals(1, JdbcTestUtils.countRowsInTable(this.jdbcTemplate, PROVINCES_TABLE));
         assertEquals(PROVINCE, province.getName());
         assertEquals(COUNTRY_ID, province.getCountry().getId());
-        assertEquals(0, (int) province.getId());
+        assertEquals(STARTING_ID, (int) province.getId());
     }
 
     @Test
@@ -145,7 +147,7 @@ public class ProvinceDaoImplTest
         assertEquals(2, JdbcTestUtils.countRowsInTable(this.jdbcTemplate, PROVINCES_TABLE));
         assertEquals(1, JdbcTestUtils.countRowsInTable(this.jdbcTemplate, COUNTRIES_TABLE));
         assertEquals(PROVINCE_2, province.getName());
-        assertEquals(COUNTRY_ID, province.getCountry().getId());
+        assertEquals(countryModel(), province.getCountry());
     }
 
     @Test
@@ -163,7 +165,7 @@ public class ProvinceDaoImplTest
     }
 
     @Test
-    public void testCreateCountryEmptyProvinceFail()
+    public void testCreateProvinceEmptyProvinceFail()
     {
         // 1. Precondiciones
         cleanAllTables();
@@ -244,7 +246,7 @@ public class ProvinceDaoImplTest
     }
 
     @Test
-    public void testFindCountryByIdNull()
+    public void testFindProvinceByIdNull()
     {
         // 1. Precondiciones
         cleanAllTables();
@@ -279,7 +281,7 @@ public class ProvinceDaoImplTest
     }
 
     @Test
-    public void testFindCountryByIdsNotAllPresent()
+    public void testFindProvincesByIdsNotAllPresent()
     {
         // 1. Precondiciones
         cleanAllTables();
@@ -303,15 +305,14 @@ public class ProvinceDaoImplTest
         cleanAllTables();
 
         // 2. Ejercitar
-        Collection<Province> provinces = this.provinceDao.findByIds(Arrays.asList(0, 1));
+        Collection<Province> provinces = this.provinceDao.findByIds(Arrays.asList(STARTING_ID, STARTING_ID+1));
 
         // 3. Postcondiciones
         assertNotNull(provinces);
         assertTrue(provinces.isEmpty());
-
     }
 
-    /* --------------------- MÉTODO: countryDao.findByName(String) -------------------------------------------- */
+    /* --------------------- MÉTODO: provinceDao.findByName(String) -------------------------------------------- */
 
     @Test
     public void testFindProvincesByName()
@@ -352,7 +353,7 @@ public class ProvinceDaoImplTest
     }
 
     @Test
-    public void testFindCountryByNameNull()
+    public void testFindProvinceByNameNull()
     {
         // 1. Precondiciones
         cleanAllTables();
@@ -368,7 +369,7 @@ public class ProvinceDaoImplTest
     }
 
     @Test
-    public void testFindCountryByContainingName()
+    public void testFindProvinceByContainingName()
     {
         // 1. Precondiciones
         cleanAllTables();
@@ -419,7 +420,7 @@ public class ProvinceDaoImplTest
         assertTrue(provinces.isEmpty());
     }
 
-    /* --------------------- MÉTODO: countryDao.update(Country) -------------------------------------------- */
+    /* --------------------- MÉTODO: provinceDao.update(Province) -------------------------------------------- */
 
     @Test
     public void testProvinceUpdate()
@@ -489,12 +490,12 @@ public class ProvinceDaoImplTest
         this.provinceDao.update(p);
 
         // 3. Postcondiciones
-        assertEquals(1,JdbcTestUtils.countRowsInTable(jdbcTemplate, COUNTRIES_TABLE));
+        assertEquals(1,JdbcTestUtils.countRowsInTable(jdbcTemplate, PROVINCES_TABLE));
         assertEquals(provinceModel(), p);
     }
 
     @Test
-    public void testCountryUpdateCountryWithNullId()
+    public void testProvinceUpdateProvinceWithNullId()
     {
         // 1. Precondiciones
         cleanAllTables();
@@ -554,7 +555,7 @@ public class ProvinceDaoImplTest
         assertEquals(1,JdbcTestUtils.countRowsInTable(jdbcTemplate, PROVINCES_TABLE));
     }
 
-    /* --------------------- MÉTODO: countryDao.remove(Country) -------------------------------------------- */
+    /* --------------------- MÉTODO: provinceDao.remove(Province) -------------------------------------------- */
 
     @Test
     public void testProvinceRemoveByModel()
@@ -637,7 +638,7 @@ public class ProvinceDaoImplTest
         System.out.println(modelMetadata.getMin()); // No se que devuelve esto
     }
 
-    /* --------------------- MÉTODO: countryDao.findByField() -------------------------------------------- */
+    /* --------------------- MÉTODO: localityDao.findByField(field, value) -------------------------------------------- */
 
     @Test
     public void testProvinceFindByFieldName()
@@ -692,7 +693,7 @@ public class ProvinceDaoImplTest
         assertNotNull(provinces);
         assertEquals(2, provinces.size());
         for (Province p : provinces){
-            assertEquals(COUNTRY_ID, p.getCountry().getId());
+            assertEquals(countryModel(), p.getCountry());
         }
     }
 
@@ -808,7 +809,7 @@ public class ProvinceDaoImplTest
         assertTrue(provinces.isEmpty());
     }
 
-    /* --------------------- MÉTODO: countryDao.findByCountryAndName(Country, String) -------------------------------------------- */
+    /* --------------------- MÉTODO: provinceDao.findByCountryAndName(Country, String) -------------------------------------------- */
 
     @Test
     public void testProvinceFindByCountryAndName(){
