@@ -1,33 +1,57 @@
 package ar.edu.itba.paw.models;
 
-import ar.edu.itba.paw.persistenceAnnotations.Column;
-import ar.edu.itba.paw.persistenceAnnotations.OrderBy;
-import ar.edu.itba.paw.persistenceAnnotations.OrderCriteria;
-import ar.edu.itba.paw.persistenceAnnotations.Table;
 import org.joda.time.DateTime;
 
-@Table(name = "appointment", primaryKey = "appointment_id")
+import javax.persistence.*;
+
+@Entity
+@Table(
+        name = "appointment",
+        indexes = {
+                @Index(columnList = "appointment_id", name = "appointment_appointment_id_uindex", unique = true),
+                @Index(columnList = "status", name = "appointment_status_status_index"),
+                @Index(columnList = "from_date", name = "appointment_from_date_to_date_index")
+        }
+)
 public class Appointment extends GenericModel<Integer> {
     public static final int DURATION = 15;
 
-    @Column(name = "status", required = true)
-    private String appointmentStatus;
-    @OrderBy(OrderCriteria.ASC)
-    @Column(name = "from_date", required = true)
+    @Id
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "appointment_pk")
+    @SequenceGenerator(sequenceName = "appointment_pk", name = "appointment_pk", allocationSize = 1)
+    @Column(name = "appointment_id")
+    private Integer id;
+    @Column(name = "status", nullable = false)
+    @Enumerated(value = EnumType.STRING)
+    private AppointmentStatus appointmentStatus;
+    @Column(name = "from_date", nullable = false)
     private DateTime fromDate;
     @Column(name = "message")
     private String message;
     @Column(name = "motive")
     private String motive;
-
+    @ManyToOne(fetch = FetchType.EAGER, optional = false)
+    @JoinColumn(name = "patient_id")
     private Patient patient;
+    @ManyToOne(fetch = FetchType.EAGER, optional = false)
+    @JoinColumn(name = "staff_id")
     private Staff staff;
 
-    public String getAppointmentStatus() {
+    @Override
+    public Integer getId() {
+        return this.id;
+    }
+
+    @Override
+    public void setId(Integer id) {
+        this.id = id;
+    }
+
+    public AppointmentStatus getAppointmentStatus() {
         return this.appointmentStatus;
     }
 
-    public void setAppointmentStatus(String appointmentStatus) {
+    public void setAppointmentStatus(AppointmentStatus appointmentStatus) {
         this.appointmentStatus = appointmentStatus;
     }
 
@@ -55,7 +79,7 @@ public class Appointment extends GenericModel<Integer> {
         this.fromDate = fromDate;
     }
 
-    public DateTime getToDate(){
+    public DateTime getToDate() {
         return this.fromDate.plusMinutes(Appointment.DURATION);
     }
 

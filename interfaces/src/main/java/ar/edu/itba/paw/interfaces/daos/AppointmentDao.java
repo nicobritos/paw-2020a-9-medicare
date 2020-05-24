@@ -32,5 +32,5 @@ public interface AppointmentDao extends GenericDao<Appointment, Integer> {
 
     List<Appointment> findByDate(Patient patient, DateTime date);
 
-    List<Appointment> findByPatientsFromDate(List<Patient> patients, DateTime from);
+    List<Appointment> findByPatientsFromDate(Collection<Patient> patients, DateTime from);
 }

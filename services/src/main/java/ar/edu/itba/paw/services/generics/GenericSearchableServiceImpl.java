@@ -10,6 +10,7 @@ import java.util.List;
  * This provides a generic Service abstract class
  * This class should be extended by all Services that
  * support searching data by name
+ *
  * @param <M> the Service model type
  * @param <I> the Model's id type
  */

@@ -4,24 +4,19 @@ import java.util.Objects;
 
 /**
  * This class provides a generic implementation of a model.
+ *
  * @param <I>
  */
 public abstract class GenericModel<I> {
-    protected I id;
+    public abstract I getId();
 
-    public I getId() {
-        return this.id;
-    }
-
-    public void setId(I id) {
-        this.id = id;
-    }
+    public abstract void setId(I id);
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (!this.isSameInstance(o)) return false;
-        return this.getId().equals(((GenericModel<Object>) o).getId());
+        return this.getId().equals(((GenericModel<?>) o).getId());
     }
 
     @Override

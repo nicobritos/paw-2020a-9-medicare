@@ -1,25 +1,43 @@
 package ar.edu.itba.paw.models;
 
-import ar.edu.itba.paw.persistenceAnnotations.Column;
-import ar.edu.itba.paw.persistenceAnnotations.OrderBy;
-import ar.edu.itba.paw.persistenceAnnotations.OrderCriteria;
-import ar.edu.itba.paw.persistenceAnnotations.Table;
+import javax.persistence.*;
 
-@Table(name = "office", primaryKey = "office_id")
+@Entity
+@Table(
+        name = "office",
+        indexes = {
+                @Index(columnList = "office_id", name = "office_office_id_uindex", unique = true),
+        }
+)
 public class Office extends GenericModel<Integer> {
+    @Id
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "office_pk")
+    @SequenceGenerator(sequenceName = "office_pk", name = "office_pk", allocationSize = 1)
+    @Column(name = "office_id")
+    private Integer id;
     @Column(name = "phone")
     private String phone;
     @Column(name = "email")
     private String email;
-    @OrderBy(OrderCriteria.ASC)
-    @Column(name = "name", required = true)
+    @Column(name = "name", nullable = false)
     private String name;
-    @Column(name = "street", required = true)
+    @Column(name = "street", nullable = false)
     private String street;
     @Column(name = "url")
     private String url;
-
+    @JoinColumn(name = "locality_id")
+    @ManyToOne(fetch = FetchType.EAGER)
     private Locality locality;
+
+    @Override
+    public Integer getId() {
+        return this.id;
+    }
+
+    @Override
+    public void setId(Integer id) {
+        this.id = id;
+    }
 
     public String getName() {
         return this.name;

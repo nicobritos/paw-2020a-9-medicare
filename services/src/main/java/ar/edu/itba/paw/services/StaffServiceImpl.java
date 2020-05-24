@@ -8,8 +8,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Collection;
 import java.util.List;
-import java.util.Set;
 
 @Service
 public class StaffServiceImpl extends GenericSearchableServiceImpl<StaffDao, Staff, Integer> implements StaffService {
@@ -19,42 +19,30 @@ public class StaffServiceImpl extends GenericSearchableServiceImpl<StaffDao, Sta
     private StaffDao repository;
 
     @Override
-    public List<Staff> findBy(String name, String surname, Set<Office> offices, Set<StaffSpecialty> staffSpecialties, Set<Locality> localities) {
+    public List<Staff> findBy(String name, String surname, Collection<Office> offices, Collection<StaffSpecialty> staffSpecialties, Collection<Locality> localities) {
+        return this.repository.findBy(name, surname, offices, staffSpecialties, localities);
+    }
+
+    @Override
+    public List<Staff> findBy(Collection<String> name, Collection<String> surname, Collection<Office> offices, Collection<StaffSpecialty> staffSpecialties, Collection<Locality> localities) {
         return this.repository.findBy(name, surname, offices, staffSpecialties, localities);
     }
 
     @Override
     @Transactional
-    public Paginator<Staff> findBy(String name, String surname, Set<Office> offices, Set<StaffSpecialty> staffSpecialties, Set<Locality> localities, int page) {
+    public Paginator<Staff> findBy(String name, String surname, Collection<Office> offices, Collection<StaffSpecialty> staffSpecialties, Collection<Locality> localities, int page) {
         return this.repository.findBy(name, surname, offices, staffSpecialties, localities, page, PAGE_SIZE);
     }
 
     @Override
     @Transactional
-    public Paginator<Staff> findBy(Set<String> name, Set<String> surname, Set<Office> offices, Set<StaffSpecialty> staffSpecialties, Set<Locality> localities, int page) {
+    public Paginator<Staff> findBy(Collection<String> name, Collection<String> surname, Collection<Office> offices, Collection<StaffSpecialty> staffSpecialties, Collection<Locality> localities, int page) {
         return this.repository.findBy(name, surname, offices, staffSpecialties, localities, page, PAGE_SIZE);
     }
 
     @Override
-    public List<Staff> findBy(Set<String> name, Set<String> surname, Set<Office> offices, Set<StaffSpecialty> staffSpecialties, Set<Locality> localities) {
-        return this.repository.findBy(name, surname, offices, staffSpecialties, localities);
-    }
-
-    @Override
-    public List<Staff> findByUser(Integer id) {
-        return this.repository.findByField("user_id", id);
-    }
-
-    @Override
-    public void addStaffSpecialty(Staff staff, StaffSpecialty staffSpecialty) {
-        staff.getStaffSpecialties().add(staffSpecialty);
-        this.repository.update(staff);
-    }
-
-    @Override
-    public void addStaffSpecialties(Staff staff, Set<StaffSpecialty> staffSpecialties) {
-        staff.getStaffSpecialties().addAll(staffSpecialties);
-        this.repository.update(staff);
+    public List<Staff> findByUser(User user) {
+        return this.repository.findByUser(user);
     }
 
     @Override

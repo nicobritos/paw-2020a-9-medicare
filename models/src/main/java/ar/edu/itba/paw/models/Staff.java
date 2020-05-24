@@ -1,20 +1,26 @@
 package ar.edu.itba.paw.models;
 
-import ar.edu.itba.paw.persistenceAnnotations.Column;
-import ar.edu.itba.paw.persistenceAnnotations.OrderBy;
-import ar.edu.itba.paw.persistenceAnnotations.OrderCriteria;
-import ar.edu.itba.paw.persistenceAnnotations.Table;
-
+import javax.persistence.*;
 import java.util.Collection;
 import java.util.LinkedList;
 
-@Table(name = "staff", primaryKey = "staff_id")
+@Entity
+@Table(
+        name = "staff",
+        indexes = {
+                @Index(columnList = "staff_id", name = "staff_staff_id_uindex", unique = true),
+                @Index(columnList = "user_id", name = "staff_user_id_index")
+        }
+)
 public class Staff extends GenericModel<Integer> {
-    @OrderBy(OrderCriteria.ASC)
-    @Column(name = "first_name", required = true)
+    @Id
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "staff_pk")
+    @SequenceGenerator(sequenceName = "staff_pk", name = "staff_pk", allocationSize = 1)
+    @Column(name = "staff_id")
+    private Integer id;
+    @Column(name = "first_name", nullable = false)
     private String firstName;
-    @OrderBy(value = OrderCriteria.ASC, priority = 1)
-    @Column(name = "surname", required = true)
+    @Column(name = "surname", nullable = false)
     private String surname;
     @Column(name = "phone")
     private String phone;
@@ -22,10 +28,31 @@ public class Staff extends GenericModel<Integer> {
     private String email;
     @Column(name = "registration_number")
     private Integer registrationNumber;
-
+    @JoinColumn(name = "user_id")
+    @ManyToOne(fetch = FetchType.LAZY)
     private User user;
+    @JoinColumn(name = "office_id")
+    @ManyToOne(fetch = FetchType.EAGER)
     private Office office;
+    @JoinColumn(name = "user_id")
+    @ManyToMany(fetch = FetchType.EAGER)
+    @JoinTable(
+            name = "system_staff_specialty_staff",
+            joinColumns = @JoinColumn(name = "specialty_id"),
+            inverseJoinColumns = @JoinColumn(name = "staff_id")
+    )
+    @OrderBy("name ASC")
     private Collection<StaffSpecialty> staffSpecialties = new LinkedList<>();
+
+    @Override
+    public Integer getId() {
+        return this.id;
+    }
+
+    @Override
+    public void setId(Integer id) {
+        this.id = id;
+    }
 
     public String getFirstName() {
         return this.firstName;
@@ -83,12 +110,16 @@ public class Staff extends GenericModel<Integer> {
         this.office = office;
     }
 
+    public Collection<StaffSpecialty> getStaffSpecialties() {
+        return this.staffSpecialties;
+    }
+
+    public void setStaffSpecialties(Collection<StaffSpecialty> staffSpecialties) {
+        this.staffSpecialties = staffSpecialties;
+    }
+
     @Override
     protected boolean isSameInstance(Object o) {
         return o instanceof Staff;
-    }
-
-    public Collection<StaffSpecialty> getStaffSpecialties() {
-        return this.staffSpecialties;
     }
 }
