@@ -9,18 +9,9 @@
 <body>
 <%@ include file="../navbar/navbarLogged.jsp" %>
 <div class="container h-75 w-100 mt-5">
-    <div class="row">
-        <div class="col-5">
-            <h4>
-                <spring:message code="AgendaFor"/> <spring:message code="today"/>
-            </h4>
-        </div>
-        <div class="col">
-            <h4><spring:message code="WeeklyAgenda"/></h4>
-        </div>
-    </div>
     <div class="row h-100">
         <div class="col-4 h-100 pl-0 mr-3 w-100">
+            <h4><spring:message code="AgendaFor"/> <spring:message code="today"/></h4>
             <ul class="list-group turno-list mr-2 w-100 h-100 overflow-auto">
                 <c:forEach var="appointment" items="${todayAppointments}">
                     <li class="list-group-item turno-item mb-3" id="lit">
@@ -79,6 +70,7 @@
             </ul>
         </div>
         <div class="col">
+            <h4><spring:message code="WeeklyAgenda"/></h4>
             <div class="row d-flex justify-content-around">
                 <button type="button" class="btn" id="prevWeekBtn"><</button>
                 <!-- this is one -->
@@ -89,35 +81,35 @@
                       <c:if test="${monday.plusDays(i).dayOfYear == today.dayOfYear && monday.plusDays(i).year == today.year}">style="font-weight:bold"</c:if>>
                 <p class="mb-0">
                   <c:choose>
-                      <c:when test="${monday.plusDays(i).dayOfWeek == 1}"><spring:message code="Monday"/></c:when>
-                      <c:when test="${monday.plusDays(i).dayOfWeek == 2}"><spring:message code="Tuesday"/></c:when>
-                      <c:when test="${monday.plusDays(i).dayOfWeek == 3}"><spring:message code="Wednesday"/></c:when>
-                      <c:when test="${monday.plusDays(i).dayOfWeek == 4}"><spring:message code="Thursday"/></c:when>
-                      <c:when test="${monday.plusDays(i).dayOfWeek == 5}"><spring:message code="Friday"/></c:when>
-                      <c:when test="${monday.plusDays(i).dayOfWeek == 6}"><spring:message code="Saturday"/></c:when>
-                      <c:when test="${monday.plusDays(i).dayOfWeek == 7}"><spring:message code="Sunday"/></c:when>
+                      <c:when test="${monday.plusDays(i).dayOfWeek == 1}"><spring:message code="MondayAbbreviated"/></c:when>
+                      <c:when test="${monday.plusDays(i).dayOfWeek == 2}"><spring:message code="TuesdayAbbreviated"/></c:when>
+                      <c:when test="${monday.plusDays(i).dayOfWeek == 3}"><spring:message code="WednesdayAbbreviated"/></c:when>
+                      <c:when test="${monday.plusDays(i).dayOfWeek == 4}"><spring:message code="ThursdayAbbreviated"/></c:when>
+                      <c:when test="${monday.plusDays(i).dayOfWeek == 5}"><spring:message code="FridayAbbreviated"/></c:when>
+                      <c:when test="${monday.plusDays(i).dayOfWeek == 6}"><spring:message code="SaturdayAbbreviated"/></c:when>
+                      <c:when test="${monday.plusDays(i).dayOfWeek == 7}"><spring:message code="SundayAbbreviated"/></c:when>
                       <c:otherwise><c:out value="${monday.plusDays(i).dayOfWeek}"/></c:otherwise>
                   </c:choose>
                 </p>
                     <!-- day/month -->
                 <p class="my-0"><c:out value="${monday.plusDays(i).dayOfMonth}"/> <spring:message code="of"/> <c:choose>
-                    <c:when test="${monday.plusDays(i).monthOfYear == 1}"><spring:message code="January"/></c:when>
-                    <c:when test="${monday.plusDays(i).monthOfYear == 2}"><spring:message code="February"/></c:when>
-                    <c:when test="${monday.plusDays(i).monthOfYear == 3}"><spring:message code="March"/></c:when>
-                    <c:when test="${monday.plusDays(i).monthOfYear == 4}"><spring:message code="April"/></c:when>
-                    <c:when test="${monday.plusDays(i).monthOfYear == 5}"><spring:message code="May"/></c:when>
-                    <c:when test="${monday.plusDays(i).monthOfYear == 6}"><spring:message code="June"/></c:when>
-                    <c:when test="${monday.plusDays(i).monthOfYear == 7}"><spring:message code="July"/></c:when>
-                    <c:when test="${monday.plusDays(i).monthOfYear == 8}"><spring:message code="August"/></c:when>
-                    <c:when test="${monday.plusDays(i).monthOfYear == 9}"><spring:message code="September"/></c:when>
-                    <c:when test="${monday.plusDays(i).monthOfYear == 10}"><spring:message code="October"/></c:when>
-                    <c:when test="${monday.plusDays(i).monthOfYear == 11}"><spring:message code="November"/></c:when>
-                    <c:when test="${monday.plusDays(i).monthOfYear == 12}"><spring:message code="December"/></c:when>
+                    <c:when test="${monday.plusDays(i).monthOfYear == 1}"><spring:message code="JanuaryAbbreviated"/></c:when>
+                    <c:when test="${monday.plusDays(i).monthOfYear == 2}"><spring:message code="FebruaryAbbreviated"/></c:when>
+                    <c:when test="${monday.plusDays(i).monthOfYear == 3}"><spring:message code="MarchAbbreviated"/></c:when>
+                    <c:when test="${monday.plusDays(i).monthOfYear == 4}"><spring:message code="AprilAbbreviated"/></c:when>
+                    <c:when test="${monday.plusDays(i).monthOfYear == 5}"><spring:message code="MayAbbreviated"/></c:when>
+                    <c:when test="${monday.plusDays(i).monthOfYear == 6}"><spring:message code="JuneAbbreviated"/></c:when>
+                    <c:when test="${monday.plusDays(i).monthOfYear == 7}"><spring:message code="JulyAbbreviated"/></c:when>
+                    <c:when test="${monday.plusDays(i).monthOfYear == 8}"><spring:message code="AugustAbbreviated"/></c:when>
+                    <c:when test="${monday.plusDays(i).monthOfYear == 9}"><spring:message code="SeptemberAbbreviated"/></c:when>
+                    <c:when test="${monday.plusDays(i).monthOfYear == 10}"><spring:message code="OctoberAbbreviated"/></c:when>
+                    <c:when test="${monday.plusDays(i).monthOfYear == 11}"><spring:message code="NovemberAbbreviated"/></c:when>
+                    <c:when test="${monday.plusDays(i).monthOfYear == 12}"><spring:message code="DecemberAbbreviated"/></c:when>
                     <c:otherwise>${monday.plusDays(i).monthOfYear}</c:otherwise></c:choose></p>
                 <p><c:out value="${weekAppointments.get(monday.plusDays(i).dayOfWeek).size()}"/><c:choose>
                     <c:when test="${weekAppointments.get(monday.plusDays(i).dayOfWeek).size() == 1}"><spring:message
-                            code="appointment"/></c:when>
-                    <c:otherwise><spring:message code="appointments"/></c:otherwise>
+                            code="appointmentAbbreviated"/></c:when>
+                    <c:otherwise><spring:message code="appointmentsAbbreviated"/></c:otherwise>
                 </c:choose></p>
               </span>
                 </span>
