@@ -152,7 +152,6 @@ public class LocalityDaoImplTest
         assertEquals(1, JdbcTestUtils.countRowsInTable(this.jdbcTemplate, LOCALITIES_TABLE));
         assertEquals(LOCALITY, locality.getName());
         assertEquals(provinceModel(), locality.getProvince());
-        assertEquals(STARTING_ID, (int) locality.getId());
     }
 
     @Test
@@ -190,7 +189,7 @@ public class LocalityDaoImplTest
     }
 
     @Test
-    public void testCreateProvinceEmptyLocalityFail()
+    public void testCreateLocalityEmptyLocalityFail()
     {
         // 1. Precondiciones
         cleanAllTables();
@@ -238,7 +237,7 @@ public class LocalityDaoImplTest
         // Que el metodo tire IllegalStateException
     }
 
-    /* --------------------- MÉTODO: provinceDao.findById(int) -------------------------------------------- */
+    /* --------------------- MÉTODO: localityDao.findById(int) -------------------------------------------- */
 
     @Test
     public void testFindLocalityById()
@@ -516,7 +515,6 @@ public class LocalityDaoImplTest
 
         // 3. Postcondiciones
         assertEquals(1,JdbcTestUtils.countRowsInTable(jdbcTemplate, LOCALITIES_TABLE));
-        assertEquals(localityModel(), l);
     }
 
     @Test
@@ -812,8 +810,10 @@ public class LocalityDaoImplTest
         map.put("name", "Santa Ana");
         localityJdbcInsert.execute(map);
 
+        Province p = provinceModel();
+        p.setId(STARTING_ID + 1);
         // 2. Ejercitar
-        List<Locality> localities = this.localityDao.findByProvince(provinceModel());
+        List<Locality> localities = this.localityDao.findByProvince(p);
 
         // 3. Postcondiciones
         assertNotNull(localities);

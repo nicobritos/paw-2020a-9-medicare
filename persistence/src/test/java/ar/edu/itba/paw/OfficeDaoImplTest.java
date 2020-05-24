@@ -1,13 +1,15 @@
 package ar.edu.itba.paw;
 
-import ar.edu.itba.paw.models.Country;
-import ar.edu.itba.paw.models.Locality;
-import ar.edu.itba.paw.models.Office;
+import ar.edu.itba.paw.models.*;
 import ar.edu.itba.paw.persistence.OfficeDaoImpl;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.jdbc.BadSqlGrammarException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.test.context.ContextConfiguration;
@@ -25,21 +27,22 @@ import static org.junit.Assert.*;
 @ContextConfiguration(classes = TestConfig.class)
 public class OfficeDaoImplTest
 {
-    private static final String NAME = "Hospital Nacional";
-    public static final String NAME_2 = NAME + "_1";
-    private static final String STREET = "Av 9 de Julio";
-    private static final String PROVINCE = "Buenos Aires";
+    private static final String OFFICE = "Hospital Nacional";
+    public static final String OFFICE_2 = "Sanatorio Provincial";
+    private static final String STREET = "Av 9 de Julio 123";
     private static final String LOCALITY = "Capital Federal";
-    private static final String PHONE = "1234567890";
-    private static final String EMAIL = "test@test.com";
-    private static final int STREET_NUMBER = 123;
+    private static final String PROVINCE = "Buenos Aires";
     private static final String COUNTRY = "Argentina";
     private static final String COUNTRY_ID = "AR";
+    private static final String PHONE = "1234567890";
+    private static final String EMAIL = "test@test.com";
+    private static final String URL = "www.hnacional.com";
+    private static final int STARTING_ID = 0;
 
-    private static final String OFFICE_TABLE = "office";
-    private static final String LOCALITY_TABLE = "system_locality";
-    private static final String PROVINCE_TABLE = "system_province";
-    private static final String COUNTRY_TABLE = "system_country";
+    private static final String OFFICES_TABLE = "office";
+    private static final String LOCALITIES_TABLE = "system_locality";
+    private static final String PROVINCES_TABLE = "system_province";
+    private static final String COUNTRIES_TABLE = "system_country";
 
     private OfficeDaoImpl officeDao;
     private JdbcTemplate jdbcTemplate;
@@ -47,6 +50,9 @@ public class OfficeDaoImplTest
     private SimpleJdbcInsert localityJdbcInsert;
     private SimpleJdbcInsert provinceJdbcInsert;
     private SimpleJdbcInsert countryJdbcInsert;
+
+    @Rule
+    public ExpectedException expectedException = ExpectedException.none();
 
     @Autowired
     private DataSource ds;
@@ -56,65 +62,44 @@ public class OfficeDaoImplTest
         this.officeDao = new OfficeDaoImpl(this.ds);
         this.jdbcTemplate = new JdbcTemplate(this.ds);
         this.officeJdbcInsert = new SimpleJdbcInsert(this.ds)
-                .withTableName(OFFICE_TABLE)
+                .withTableName(OFFICES_TABLE)
                 .usingGeneratedKeyColumns("office_id");
         this.localityJdbcInsert = new SimpleJdbcInsert(this.ds)
-                .withTableName(LOCALITY_TABLE)
+                .withTableName(LOCALITIES_TABLE)
                 .usingGeneratedKeyColumns("locality_id");
         this.provinceJdbcInsert = new SimpleJdbcInsert(this.ds)
-                .withTableName(PROVINCE_TABLE)
+                .withTableName(PROVINCES_TABLE)
                 .usingGeneratedKeyColumns("province_id");
         this.countryJdbcInsert = new SimpleJdbcInsert(this.ds)
-                .withTableName(COUNTRY_TABLE);
+                .withTableName(COUNTRIES_TABLE);
     }
-    
+
+    /* ---------------------- FUNCIONES AUXILIARES ---------------------------------------------------------------- */
+
     private void cleanAllTables(){
         this.jdbcTemplate.execute("TRUNCATE SCHEMA PUBLIC RESTART IDENTITY AND COMMIT NO CHECK");
     }
 
-    private void insertLocality(){
-        // Insertar pais
-        Map<String, Object> countryMap = new HashMap<>();
-        countryMap.put("name", COUNTRY);
-        countryMap.put("country_id", COUNTRY_ID);
-        countryJdbcInsert.execute(countryMap);
 
-        // Insertar provincia
-        Map<String, Object> provinceMap = new HashMap<>();
-        provinceMap.put("name", PROVINCE);
-        provinceMap.put("country_id", COUNTRY_ID);
-        provinceJdbcInsert.execute(provinceMap);
-
-        Map<String, Object> localityMap = new HashMap<>();
-        localityMap.put("name", LOCALITY);
-        localityMap.put("province_id", 0);
-        localityJdbcInsert.execute(localityMap);
+    /** Devuelve una locality con id=STARTING_ID, name=PROVINCE y como country el devuelto en countryModel() **/
+    private Locality localityModel(){
+        Locality l = new Locality();
+        l.setName(LOCALITY);
+        l.setProvince(provinceModel());
+        l.setId(STARTING_ID);
+        return l;
     }
 
-    private void insertOffice(){
-        insertLocality();
-
-        Map<String, Object> officeMap = new HashMap<>();
-        officeMap.put("name", NAME);
-        officeMap.put("email", EMAIL);
-        officeMap.put("phone", PHONE);
-        officeMap.put("locality_id", 0); // Identity de HSQLDB empieza en 0
-        officeMap.put("street", STREET);
-        officeMap.put("street_number", STREET_NUMBER);
-        officeJdbcInsert.execute(officeMap);
+    /** Devuelve una province con id=STARTING_ID, name=PROVINCE y como country el devuelto en countryModel() **/
+    private Province provinceModel(){
+        Province p = new Province();
+        p.setId(STARTING_ID);
+        p.setCountry(countryModel());
+        p.setName(PROVINCE);
+        return p;
     }
 
-    private void insertAnotherOffice(){
-        Map<String, Object> officeMap = new HashMap<>();
-        officeMap.put("name", NAME_2);
-        officeMap.put("email", EMAIL);
-        officeMap.put("phone", PHONE);
-        officeMap.put("locality_id", 0); // Identity de HSQLDB empieza en 0
-        officeMap.put("street", STREET);
-        officeMap.put("street_number", STREET_NUMBER);
-        officeJdbcInsert.execute(officeMap);
-    }
-
+    /** Devuelve un country con id=COUNTRY_ID y name=COUNTRY **/
     private Country countryModel(){
         Country c = new Country();
         c.setName(COUNTRY);
@@ -122,26 +107,90 @@ public class OfficeDaoImplTest
         return c;
     }
 
-    private Locality localityModel(){
-        Locality l = new Locality();
-        l.setName(LOCALITY);
-        l.setId(0); // Identity de HSQLDB empieza en 0
-        return l;
-    }
-
+    /** Devuelve un office con
+     * id=STARTING_ID
+     * name=OFFICE
+     * email=EMAIL
+     * phone=PHONE
+     * street=STREET
+     * url=URL
+     * y como locality toma el devuelto por localityModel()
+     **/
     private Office officeModel(){
         Office o = new Office();
-        o.setId(0);
-        o.setName(NAME);
+        o.setId(STARTING_ID);
+        o.setName(OFFICE);
         o.setEmail(EMAIL);
         o.setPhone(PHONE);
         o.setLocality(localityModel());
         o.setStreet(STREET);
+        o.setUrl(URL);
         return o;
     }
 
+    /** Inserta en la db el pais con id=COUNTRY_ID y name=COUNTRY **/
+    private void insertCountry(){
+        Map<String, Object> map = new HashMap<>();
+        map.put("country_id", COUNTRY_ID);
+        map.put("name", COUNTRY);
+        countryJdbcInsert.execute(map);
+    }
+
+    /** Inserta en la db la provincia con country_id=COUNTRY_ID y name=PROVINCE **/
+    private void insertProvince(){
+        insertCountry();
+        Map<String, Object> map = new HashMap<>();
+        map.put("country_id", COUNTRY_ID);
+        map.put("name", PROVINCE);
+        provinceJdbcInsert.execute(map);
+    }
+
+    /** Inserta en la db la localidad con country_id=STARTING_ID y name=LOCALITY **/
+    private void insertLocality(){
+        insertProvince();
+        Map<String, Object> map = new HashMap<>();
+        map.put("province_id", STARTING_ID);
+        map.put("name", LOCALITY);
+        localityJdbcInsert.execute(map);
+    }
+
+    /** Inserta en la db la localidad con
+     * id=STARTING_ID
+     * name=OFFICE
+     * email=EMAIL
+     * phone=PHONE
+     * street=STREET
+     * url=URL
+     * localityId=STARTING_ID
+     **/
+    private void insertOffice(){
+        insertLocality();
+
+        Map<String, Object> officeMap = new HashMap<>();
+        officeMap.put("name", OFFICE);
+        officeMap.put("email", EMAIL);
+        officeMap.put("phone", PHONE);
+        officeMap.put("locality_id", STARTING_ID); // Identity de HSQLDB empieza en 0
+        officeMap.put("street", STREET);
+        officeMap.put("url", URL);
+        officeJdbcInsert.execute(officeMap);
+    }
+
+    private void insertAnotherOffice(){
+        Map<String, Object> officeMap = new HashMap<>();
+        officeMap.put("name", OFFICE_2);
+        officeMap.put("email", EMAIL);
+        officeMap.put("phone", PHONE);
+        officeMap.put("locality_id", STARTING_ID); // Identity de HSQLDB empieza en 0
+        officeMap.put("street", STREET);
+        officeMap.put("url", URL);
+        officeJdbcInsert.execute(officeMap);
+    }
+
+    /* --------------------- MÉTODO: officeDao.create(Office) -------------------------------------------- */
+
     @Test
-    public void testCreateOffice()
+    public void testCreateOfficeSuccessfully()
     {
         // 1. Precondiciones
         cleanAllTables();
@@ -152,61 +201,234 @@ public class OfficeDaoImplTest
         Office office = this.officeDao.create(o);
 
         // 3. Postcondiciones
-        assertEquals(1, JdbcTestUtils.countRowsInTable(this.jdbcTemplate, OFFICE_TABLE));
-        assertEquals(NAME, office.getName());
-        assertEquals(0, (int)office.getId()); // Identity de HSQLDB empieza en 0
+        assertEquals(1, JdbcTestUtils.countRowsInTable(this.jdbcTemplate, OFFICES_TABLE));
+        assertEquals(OFFICE, office.getName());
         assertEquals(localityModel(), office.getLocality());
+        assertEquals(PHONE, office.getPhone());
+        assertEquals(STREET, office.getStreet());
+        assertEquals(EMAIL, office.getEmail());
+        assertEquals(URL, office.getUrl());
     }
 
     @Test
-    public void testFindById(){
+    public void testCreateAnotherOfficeSuccessfully()
+    {
         // 1. Precondiciones
         cleanAllTables();
         insertOffice();
+        Office o = officeModel();
+        o.setName(OFFICE_2);
 
         // 2. Ejercitar
-        Optional<Office> maybeOffice = officeDao.findById(0); // Identity de HSQLDB empieza en 0
+        Office office = this.officeDao.create(o);
 
         // 3. Postcondiciones
-        assertTrue(maybeOffice.isPresent());
-        assertEquals(0, (int)maybeOffice.get().getId());
-        assertEquals(NAME, maybeOffice.get().getName());
+        assertEquals(2, JdbcTestUtils.countRowsInTable(this.jdbcTemplate, OFFICES_TABLE));
+        assertEquals(1, JdbcTestUtils.countRowsInTable(this.jdbcTemplate, LOCALITIES_TABLE));
+        assertEquals(OFFICE_2, office.getName());
+        assertEquals(localityModel(), office.getLocality());
+        assertEquals(PHONE, office.getPhone());
+        assertEquals(STREET, office.getStreet());
+        assertEquals(EMAIL, office.getEmail());
+        assertEquals(URL, office.getUrl());
     }
 
     @Test
-    public void testFindByIdDoesntExist(){
+    public void testCreateOfficeNullFail()
+    {
         // 1. Precondiciones
         cleanAllTables();
+        expectedException.expect(NullPointerException.class);
 
         // 2. Ejercitar
-        Optional<Office> maybeOffice = officeDao.findById(0); // Identity de HSQLDB empieza en 0
+        Office office = this.officeDao.create(null);
 
         // 3. Postcondiciones
-        assertFalse(maybeOffice.isPresent());
+        // Que el metodo tire NullPointerException
     }
 
     @Test
-    public void testFindByIds(){
+    public void testCreateOfficeEmptyOfficeFail()
+    {
+        // 1. Precondiciones
+        cleanAllTables();
+        Office o = new Office();
+        expectedException.expect(IllegalStateException.class);
+
+        // 2. Ejercitar
+        Office office = this.officeDao.create(o);
+
+        // 3. Postcondiciones
+        // Que el metodo tire IllegalStateException (no name)
+    }
+
+    @Test
+    public void testCreateOfficeEmptyLocalityFail() // TODO: Tirar un error si no se especifica country
+    {
+        // 1. Precondiciones
+        cleanAllTables();
+        Office o = new Office();
+        o.setName(OFFICE);
+        expectedException.expect(DataIntegrityViolationException.class); // TODO: chequear esta excepcion (poco descriptiva)
+
+
+        // 2. Ejercitar
+        Office office = this.officeDao.create(o);
+
+        // 3. Postcondiciones
+        // Que el metodo tire DataIntegrityViolationException
+    }
+
+    @Test
+    public void testCreateLocalityEmptyNameFail()
+    {
+        // 1. Precondiciones
+        cleanAllTables();
+        insertLocality();
+        Office o = new Office();
+        o.setLocality(localityModel());
+        expectedException.expect(IllegalStateException.class); // TODO: chequear esta excepcion (poco descriptiva)
+
+        // 2. Ejercitar
+        Office office = this.officeDao.create(o);
+
+        // 3. Postcondiciones
+        // Que el metodo tire IllegalStateException
+    }
+
+    /* --------------------- MÉTODO: officeDao.findById(int) -------------------------------------------- */
+
+    @Test
+    public void testFindOfficeById()
+    {
         // 1. Precondiciones
         cleanAllTables();
         insertOffice();
         insertAnotherOffice();
 
         // 2. Ejercitar
-        Collection<Office> offices = officeDao.findByIds(Arrays.asList(0,1,2)); // Identity de HSQLDB empieza en 0
+        Optional<Office> office = this.officeDao.findById(STARTING_ID);
+
+        // 3. Postcondiciones
+        assertTrue(office.isPresent());
+        assertEquals(OFFICE, office.get().getName());
+    }
+
+    @Test
+    public void testFindOfficeByIdDoesntExist()
+    {
+        // 1. Precondiciones
+        cleanAllTables();
+        insertOffice();
+
+        // 2. Ejercitar
+        Optional<Office> office = this.officeDao.findById(STARTING_ID + 1);
+
+        // 3. Postcondiciones
+        assertFalse(office.isPresent());
+    }
+
+    @Test
+    public void testFindOfficeByIdNull()
+    {
+        // 1. Precondiciones
+        cleanAllTables();
+        insertLocality();
+
+        // 2. Ejercitar
+        Optional<Office> office = this.officeDao.findById(null);
+
+        // 3. Postcondiciones
+        assertFalse(office.isPresent());
+    }
+
+    /* --------------------- MÉTODO: officeDao.findByIds(Collection<Integer>) -------------------------------------------- */
+
+    @Test
+    public void testFindOfficesByIds()
+    {
+        // 1. Precondiciones
+        cleanAllTables();
+        insertOffice();
+        insertAnotherOffice();
+
+        // 2. Ejercitar
+        Collection<Office> offices = this.officeDao.findByIds(Arrays.asList(STARTING_ID, STARTING_ID + 1));
 
         // 3. Postcondiciones
         assertNotNull(offices);
         assertEquals(2, offices.size());
+        for (Office o : offices){
+            assertTrue(o.getId().equals(STARTING_ID) || o.getId().equals(STARTING_ID+1));
+        }
     }
 
     @Test
-    public void testFindByIdsDoesntExist(){
+    public void testFindOfficesByIdsNotAllPresent()
+    {
+        // 1. Precondiciones
+        cleanAllTables();
+        insertOffice();
+
+        // 2. Ejercitar
+        Collection<Office> offices = this.officeDao.findByIds(Arrays.asList(STARTING_ID, STARTING_ID+1));
+
+        // 3. Postcondiciones
+        assertNotNull(offices);
+        assertEquals(1, offices.size());
+        for (Office o : offices){
+            assertEquals(officeModel(), o);
+        }
+    }
+
+    @Test
+    public void testFindOfficesByIdsDoesntExist()
+    {
         // 1. Precondiciones
         cleanAllTables();
 
         // 2. Ejercitar
-        Collection<Office> offices = officeDao.findByIds(Arrays.asList(0,1,2)); // Identity de HSQLDB empieza en 0
+        Collection<Office> offices = this.officeDao.findByIds(Arrays.asList(STARTING_ID, STARTING_ID+1));
+
+        // 3. Postcondiciones
+        assertNotNull(offices);
+        assertTrue(offices.isEmpty());
+    }
+
+    /* --------------------- MÉTODO: officeDao.findByName(String) -------------------------------------------- */
+
+    @Test
+    public void testFindOfficesByName()
+    {
+        // 1. Precondiciones
+        cleanAllTables();
+        insertOffice();
+        insertAnotherOffice();
+        Map<String, Object> map = new HashMap<>();
+        map.put("name", OFFICE);
+        map.put("locality_id", STARTING_ID);
+        localityJdbcInsert.execute(map);
+
+        // 2. Ejercitar
+        Collection<Office> offices = this.officeDao.findByName(OFFICE);
+
+        // 3. Postcondiciones
+        assertNotNull(offices);
+        assertEquals(1, offices.size());
+        for (Office o : offices){
+            assertEquals(OFFICE, o.getName());
+        }
+    }
+
+    @Test
+    public void testFindOfficesByNameDoesntExist()
+    {
+        // 1. Precondiciones
+        cleanAllTables();
+        insertOffice();
+
+        // 2. Ejercitar
+        Collection<Office> offices = this.officeDao.findByName(OFFICE_2);
 
         // 3. Postcondiciones
         assertNotNull(offices);
@@ -214,29 +436,391 @@ public class OfficeDaoImplTest
     }
 
     @Test
-    public void testFindByName(){
+    public void testFindOfficeByNameNull()
+    {
+        // 1. Precondiciones
+        cleanAllTables();
+        insertOffice();
+        insertAnotherOffice();
+        expectedException.expect(NullPointerException.class);
+
+        // 2. Ejercitar
+        this.officeDao.findByName(null);
+
+        // 3. Postcondiciones
+        // Que el metodo tire NullPointerException
+    }
+
+    @Test
+    public void testFindOfficeByContainingName()
+    {
+        // 1. Precondiciones
+        cleanAllTables();
+        insertOffice();
+        insertAnotherOffice();
+        Map<String, Object> map = new HashMap<>();
+        map.put("locality_id", STARTING_ID);
+        map.put("name", OFFICE);
+        officeJdbcInsert.execute(map);
+
+        // 2. Ejercitar
+        Collection<Office> offices = this.officeDao.findByName("hosp");
+
+        // 3. Postcondiciones
+        assertEquals(2, offices.size());
+    }
+
+    /* --------------------- MÉTODO: officeDao.list() -------------------------------------------- */
+
+    @Test
+    public void testOfficeList()
+    {
         // 1. Precondiciones
         cleanAllTables();
         insertOffice();
         insertAnotherOffice();
 
         // 2. Ejercitar
-        Collection<Office> offices = officeDao.findByName(NAME);
-        Collection<Office> offices2 = officeDao.findByName(NAME_2);
+        Collection<Office> offices = this.officeDao.list();
 
         // 3. Postcondiciones
         assertNotNull(offices);
         assertEquals(2, offices.size());
-        assertEquals(1, offices2.size());
     }
 
     @Test
-    public void testFindByNameDoesntExist(){
+    public void testOfficesEmptyList()
+    {
         // 1. Precondiciones
         cleanAllTables();
 
         // 2. Ejercitar
-        Collection<Office> offices = officeDao.findByName(NAME);
+        Collection<Office> offices = this.officeDao.list();
+
+        // 3. Postcondiciones
+        assertNotNull(offices);
+        assertTrue(offices.isEmpty());
+    }
+
+    /* --------------------- MÉTODO: officeDao.update(Office) -------------------------------------------- */
+
+
+    @Test
+    public void testOfficeUpdate()
+    {
+        // 1. Precondiciones
+        cleanAllTables();
+        insertOffice();
+        insertAnotherOffice();
+        Office o = officeModel();
+        o.setName("Consultorio");
+
+        // 2. Ejercitar
+        this.officeDao.update(o);
+
+        // 3. Postcondiciones
+        assertEquals(2,JdbcTestUtils.countRowsInTable(jdbcTemplate, OFFICES_TABLE));
+        assertEquals(1,JdbcTestUtils.countRowsInTableWhere(jdbcTemplate, OFFICES_TABLE, "name = 'Consultorio'"));
+        assertEquals(0,JdbcTestUtils.countRowsInTableWhere(jdbcTemplate, OFFICES_TABLE, "name = '" + OFFICE + "'"));
+
+    }
+
+    @Test
+    public void testOfficeUpdateNull()
+    {
+        // 1. Precondiciones
+        cleanAllTables();
+        insertOffice();
+        insertAnotherOffice();
+        expectedException.expect(NullPointerException.class);
+
+        // 2. Ejercitar
+        this.officeDao.update(null);
+
+        // 3. Postcondiciones
+        // Que el metodo tire NullPointerException
+        assertEquals(2,JdbcTestUtils.countRowsInTable(jdbcTemplate, OFFICES_TABLE));
+    }
+
+    @Test
+    public void testOfficeUpdateNotExistentOffice()
+    {
+        // 1. Precondiciones
+        cleanAllTables();
+        insertLocality();
+        insertAnotherOffice();
+        expectedException.expect(Exception.class);  // <-- TODO: Insert exception class here
+
+        // 2. Ejercitar
+        this.officeDao.update(officeModel()); // TODO: NO HACE NADA, DEBERIA TIRAR EXCEPCION QUE NO EXISTE EL COUNTRY CON ESE ID
+
+        // 3. Postcondiciones
+        assertEquals(1,JdbcTestUtils.countRowsInTable(jdbcTemplate, PROVINCES_TABLE));
+    }
+
+    @Test
+    public void testOfficeUpdateOfficeWithNullName()
+    {
+        // 1. Precondiciones
+        cleanAllTables();
+        insertOffice();
+        Office o = officeModel();
+        o.setName(null);
+        expectedException.expect(IllegalStateException.class);
+
+        // 2. Ejercitar
+        this.officeDao.update(o);
+
+        // 3. Postcondiciones
+        assertEquals(1,JdbcTestUtils.countRowsInTable(jdbcTemplate, OFFICES_TABLE));
+    }
+
+    @Test
+    public void testOfficeUpdateOfficeWithNullId()
+    {
+        // 1. Precondiciones
+        cleanAllTables();
+        insertOffice();
+        Office o = officeModel();
+        o.setId(null);
+        expectedException.expect(Exception.class);
+
+        // 2. Ejercitar
+        this.officeDao.update(o);
+
+        // 3. Postcondiciones
+        assertEquals(1,JdbcTestUtils.countRowsInTable(jdbcTemplate, OFFICES_TABLE));
+    }
+
+    @Test
+    public void testOfficeUpdateOfficeWithNullStreet()
+    {
+        // 1. Precondiciones
+        cleanAllTables();
+        insertOffice();
+        Office o = officeModel();
+        o.setStreet(null);
+        expectedException.expect(IllegalStateException.class);
+
+        // 2. Ejercitar
+        this.officeDao.update(o);
+
+        // 3. Postcondiciones
+        assertEquals(1,JdbcTestUtils.countRowsInTable(jdbcTemplate, OFFICES_TABLE));
+    }
+
+    @Test
+    public void testOfficeUpdateOfficeWithNullNotRequired()
+    {
+        // 1. Precondiciones
+        cleanAllTables();
+        insertOffice();
+        Office o = new Office();
+        o.setName(OFFICE);
+        o.setStreet(STREET);
+
+        // 2. Ejercitar
+        this.officeDao.update(o);
+
+        // 3. Postcondiciones
+        assertEquals(1,JdbcTestUtils.countRowsInTable(jdbcTemplate, OFFICES_TABLE));
+    }
+
+    /* --------------------- MÉTODO: officeDao.remove(int id) -------------------------------------------- */
+
+    @Test
+    public void testOfficeRemoveById()
+    {
+        // 1. Precondiciones
+        cleanAllTables();
+        insertOffice();
+
+        // 2. Ejercitar
+        this.officeDao.remove(STARTING_ID);
+
+        // 3. Postcondiciones
+        assertEquals(0,JdbcTestUtils.countRowsInTable(jdbcTemplate, OFFICES_TABLE));
+    }
+
+    @Test
+    public void testLocalityRemoveByIdNotExistent()
+    {
+        // 1. Precondiciones
+        cleanAllTables();
+        insertOffice();
+
+        // 2. Ejercitar
+        this.officeDao.remove(STARTING_ID + 1);
+
+        // 3. Postcondiciones
+        assertEquals(1,JdbcTestUtils.countRowsInTable(jdbcTemplate, OFFICES_TABLE));
+    }
+
+    @Test
+    public void testLocalityRemoveByNullId()
+    {
+        // 1. Precondiciones
+        cleanAllTables();
+        insertOffice();
+
+        // 2. Ejercitar
+        this.officeDao.remove((Integer) null);
+
+        // 3. Postcondiciones
+        assertEquals(1,JdbcTestUtils.countRowsInTable(jdbcTemplate, OFFICES_TABLE));
+    }
+
+    /* --------------------- MÉTODO: officeDao.remove(Office) -------------------------------------------- */
+
+    @Test
+    public void testLocalityRemoveByModel()
+    {
+        // 1. Precondiciones
+        cleanAllTables();
+        insertOffice();
+        Office o = officeModel();
+
+        // 2. Ejercitar
+        this.officeDao.remove(o);
+
+        // 3. Postcondiciones
+        assertEquals(0,JdbcTestUtils.countRowsInTable(jdbcTemplate, OFFICES_TABLE));
+    }
+
+    @Test
+    public void testOfficeRemoveByModelNotExistent()
+    {
+        // 1. Precondiciones
+        cleanAllTables();
+        insertLocality();
+        insertAnotherOffice();
+        Office o = officeModel();
+        o.setId(STARTING_ID + 1);
+
+        // 2. Ejercitar
+        this.officeDao.remove(o);
+
+        // 3. Postcondiciones
+        assertEquals(1,JdbcTestUtils.countRowsInTable(jdbcTemplate, OFFICES_TABLE));
+    }
+
+    @Test
+    public void testOfficeRemoveByNullModel()
+    {
+        // 1. Precondiciones
+        cleanAllTables();
+        insertOffice();
+        expectedException.expect(NullPointerException.class);
+
+        // 2. Ejercitar
+        this.officeDao.remove((Office) null);
+
+        // 3. Postcondiciones
+        assertEquals(1,JdbcTestUtils.countRowsInTable(jdbcTemplate, OFFICES_TABLE));
+    }
+
+    /* --------------------- MÉTODO: countryDao.count() -------------------------------------------- */
+
+    @Test
+    public void testOfficeCount()
+    {
+        // 1. Precondiciones
+        cleanAllTables();
+        insertOffice();
+        insertAnotherOffice();
+
+        // 2. Ejercitar
+        ModelMetadata modelMetadata = this.officeDao.count();
+
+        // 3. Postcondiciones
+        assertEquals(2, (int) modelMetadata.getCount()); // TODO: fix
+        System.out.println(modelMetadata.getMax()); // No se que devuelve esto
+        System.out.println(modelMetadata.getMin()); // No se que devuelve esto
+    }
+
+    @Test
+    public void testOfficeCountEmptyTable()
+    {
+        // 1. Precondiciones
+        cleanAllTables();
+
+        // 2. Ejercitar
+        ModelMetadata modelMetadata = this.officeDao.count();
+
+        // 3. Postcondiciones
+        assertEquals(2, (int) modelMetadata.getCount()); // TODO: fix
+        System.out.println(modelMetadata.getMax()); // No se que devuelve esto
+        System.out.println(modelMetadata.getMin()); // No se que devuelve esto
+    }
+
+    /* --------------------- MÉTODO: officeDao.findByField(field, value) -------------------------------------------- */
+
+    @Test
+    public void testOfficeFindByFieldName()
+    {
+        // 1. Precondiciones
+        cleanAllTables();
+        insertOffice();
+        insertAnotherOffice();
+
+        // 2. Ejercitar
+        List<Office> offices = this.officeDao.findByField("name", OFFICE);
+
+        // 3. Postcondiciones
+        assertNotNull(offices);
+        assertEquals(1, offices.size());
+        for (Office o : offices){
+            assertEquals(OFFICE, o.getName());
+        }
+    }
+
+    @Test
+    public void testOfficeFindByFieldId()
+    {
+        // 1. Precondiciones
+        cleanAllTables();
+        insertOffice();
+        insertAnotherOffice();
+
+        // 2. Ejercitar
+        List<Office> offices = this.officeDao.findByField("office_id", STARTING_ID);
+
+        // 3. Postcondiciones
+        assertNotNull(offices);
+        assertEquals(1, offices.size());
+        for (Office o : offices){
+            assertEquals(STARTING_ID, (int) o.getId());
+        }
+    }
+
+    @Test
+    public void testOfficeFindByFieldLocality()
+    {
+        // 1. Precondiciones
+        cleanAllTables();
+        insertOffice();
+        insertAnotherOffice();
+
+        // 2. Ejercitar
+        List<Office> offices = this.officeDao.findByField("locality_id", STARTING_ID);
+
+        // 3. Postcondiciones
+        assertNotNull(offices);
+        assertEquals(2, offices.size());
+        for (Office o : offices){
+            assertEquals(localityModel(), o.getLocality());
+        }
+    }
+
+    @Test
+    public void testOfficeFindByFieldNull() {
+        // 1. Precondiciones
+        cleanAllTables();
+        insertOffice();
+        insertAnotherOffice();
+
+        // 2. Ejercitar
+        List<Office> offices = this.officeDao.findByField("office_id", null); //TODO: Deberia tirar NullPointer (?)
 
         // 3. Postcondiciones
         assertNotNull(offices);
@@ -244,34 +828,38 @@ public class OfficeDaoImplTest
     }
 
     @Test
-    public void testList(){
+    public void testOfficeFindByFieldNotExistent() {
         // 1. Precondiciones
-        // Vaciar tablas
         cleanAllTables();
         insertOffice();
         insertAnotherOffice();
+        expectedException.expect(BadSqlGrammarException.class);
 
         // 2. Ejercitar
-        Collection<Office> offices = officeDao.list();
-
-        // 3. Postcondiciones
-        assertNotNull(offices);
-        assertEquals(2, offices.size());
-    }
-
-    @Test
-    public void testEmptyList(){
-        // 1. Precondiciones
-        cleanAllTables();
-
-        // 2. Ejercitar
-        Collection<Office> offices = officeDao.list();
+        List<Office> offices = this.officeDao.findByField("office_id_no_existo", STARTING_ID); //TODO: Deberia tirar otro tipo de error (?)
 
         // 3. Postcondiciones
         assertNotNull(offices);
         assertTrue(offices.isEmpty());
     }
 
+    @Test
+    public void testLocalityFindByFieldContentNotExistent()
+    {
+        // 1. Precondiciones
+        cleanAllTables();
+        insertOffice();
+        insertAnotherOffice();
+
+        // 2. Ejercitar
+        List<Office> offices = this.officeDao.findByField("office_id", -1); //TODO: Deberia tirar NullPointer (?)
+
+        // 3. Postcondiciones
+        assertNotNull(offices);
+        assertTrue(offices.isEmpty());
+    }
+
+    /* --------------------- MÉTODO: officeDao.findByCountry(Country) -------------------------------------------- */
     @Test
     public void testFindByCountry(){
         // 1. Precondiciones
@@ -281,24 +869,30 @@ public class OfficeDaoImplTest
 
         // Insertar pais 2
         Map<String, Object> countryMap = new HashMap<>();
-        countryMap.put("name", COUNTRY + "_1");
-        countryMap.put("country_id", "C1");
+        countryMap.put("name", "Brasil");
+        countryMap.put("country_id", "BR");
         countryJdbcInsert.execute(countryMap);
 
         // Insertar provincia 2
         Map<String, Object> provinceMap = new HashMap<>();
-        provinceMap.put("name", PROVINCE + "_1");
-        provinceMap.put("country_id", "C1");
+        provinceMap.put("name", "Brasilia");
+        provinceMap.put("country_id", "BR");
         provinceJdbcInsert.execute(provinceMap);
+
+        // Insertar localidad 2
+        Map<String, Object> localityMap = new HashMap<>();
+        localityMap.put("name", "Fabella");
+        localityMap.put("province_id", STARTING_ID + 1);
+        localityJdbcInsert.execute(localityMap);
 
         // Insertar oficina 2
         Map<String, Object> officeMap = new HashMap<>();
-        officeMap.put("name", NAME + "_1");
+        officeMap.put("name", OFFICE_2);
         officeMap.put("email", EMAIL);
         officeMap.put("phone", PHONE);
-        officeMap.put("province_id", 1); // Identity de HSQLDB empieza en 0
+        officeMap.put("locality_id", STARTING_ID + 1); // Identity de HSQLDB empieza en 0
         officeMap.put("street", STREET);
-        officeMap.put("street_number", STREET_NUMBER);
+        officeMap.put("url", URL);
         officeJdbcInsert.execute(officeMap);
 
         Country c = countryModel();
@@ -315,9 +909,12 @@ public class OfficeDaoImplTest
     public void testFindByCountryDoesntExists(){
         // 1. Precondiciones
         cleanAllTables();
+        insertOffice();
 
         //Crear Country modelo
-        Country c = countryModel();
+        Country c = new Country();
+        c.setName("Brasil");
+        c.setId("BR");
 
         // 2. Ejercitar
         Collection<Office> offices = officeDao.findByCountry(c);
@@ -328,50 +925,159 @@ public class OfficeDaoImplTest
     }
 
     @Test
-    public void testRemoveById(){
+    public void testFindByCountryCountryNull(){
         // 1. Precondiciones
         cleanAllTables();
         insertOffice();
-        insertAnotherOffice();
+        expectedException.expect(NullPointerException.class);
 
         // 2. Ejercitar
-        officeDao.remove(0);
+        Collection<Office> offices = officeDao.findByCountry(null);
 
         // 3. Postcondiciones
-        assertEquals(1, JdbcTestUtils.countRowsInTable(this.jdbcTemplate, OFFICE_TABLE));
+        assertNotNull(offices);
+        assertTrue(offices.isEmpty());
+    }
+
+    /* --------------------- MÉTODO: officeDao.findByProvince(Province) -------------------------------------------- */
+    @Test
+    public void testFindByProvince(){
+        // 1. Precondiciones
+        cleanAllTables();
+
+        insertOffice();
+
+        // Insertar provincia 2
+        Map<String, Object> provinceMap = new HashMap<>();
+        provinceMap.put("name", "Brasilia");
+        provinceMap.put("country_id", COUNTRY_ID);
+        provinceJdbcInsert.execute(provinceMap);
+
+        // Insertar localidad 2
+        Map<String, Object> localityMap = new HashMap<>();
+        localityMap.put("name", "Fabella");
+        localityMap.put("province_id", STARTING_ID + 1);
+        localityJdbcInsert.execute(localityMap);
+
+        // Insertar oficina 2
+        Map<String, Object> officeMap = new HashMap<>();
+        officeMap.put("name", OFFICE_2);
+        officeMap.put("email", EMAIL);
+        officeMap.put("phone", PHONE);
+        officeMap.put("locality_id", STARTING_ID + 1); // Identity de HSQLDB empieza en 0
+        officeMap.put("street", STREET);
+        officeMap.put("url", URL);
+        officeJdbcInsert.execute(officeMap);
+
+        Province p = provinceModel();
+
+        // 2. Ejercitar
+        Collection<Office> offices = officeDao.findByProvince(p);
+
+        // 3. Postcondiciones
+        assertNotNull(offices);
+        assertEquals(1, offices.size());
     }
 
     @Test
-    public void testRemoveByModel(){
+    public void testFindByProvinceDoesntExists(){
         // 1. Precondiciones
         cleanAllTables();
         insertOffice();
-        insertAnotherOffice();
+
+        //Crear Country modelo
+        Province p = provinceModel();
+        p.setId(STARTING_ID + 1);
+        p.setName("Brasilia");
 
         // 2. Ejercitar
-        officeDao.remove(officeModel());
+        Collection<Office> offices = officeDao.findByProvince(p);
 
         // 3. Postcondiciones
-        assertEquals(1, JdbcTestUtils.countRowsInTable(this.jdbcTemplate, OFFICE_TABLE));
+        assertNotNull(offices);
+        assertTrue(offices.isEmpty());
     }
 
     @Test
-    public void testUpdate(){
+    public void testFindByProvinceProvinceNull(){
+        // 1. Precondiciones
+        cleanAllTables();
+        insertOffice();
+        expectedException.expect(NullPointerException.class);
+
+        // 2. Ejercitar
+        Collection<Office> offices = officeDao.findByProvince(null);
+
+        // 3. Postcondiciones
+        assertNotNull(offices);
+        assertTrue(offices.isEmpty());
+    }
+
+    /* --------------------- MÉTODO: officeDao.findByLocality(Locality) -------------------------------------------- */
+    @Test
+    public void testFindByLocality(){
+        // 1. Precondiciones
+        cleanAllTables();
+
+        insertOffice();
+
+        // Insertar localidad 2
+        Map<String, Object> localityMap = new HashMap<>();
+        localityMap.put("name", "Fabella");
+        localityMap.put("province_id", STARTING_ID);
+        localityJdbcInsert.execute(localityMap);
+
+        // Insertar oficina 2
+        Map<String, Object> officeMap = new HashMap<>();
+        officeMap.put("name", OFFICE_2);
+        officeMap.put("email", EMAIL);
+        officeMap.put("phone", PHONE);
+        officeMap.put("locality_id", STARTING_ID + 1); // Identity de HSQLDB empieza en 0
+        officeMap.put("street", STREET);
+        officeMap.put("url", URL);
+        officeJdbcInsert.execute(officeMap);
+
+        Locality l = localityModel();
+
+        // 2. Ejercitar
+        Collection<Office> offices = officeDao.findByLocality(l);
+
+        // 3. Postcondiciones
+        assertNotNull(offices);
+        assertEquals(1, offices.size());
+    }
+
+    @Test
+    public void testFindByLocalityDoesntExists(){
         // 1. Precondiciones
         cleanAllTables();
         insertOffice();
 
-        // Modelo de la oficina a crear
-        Office o = this.officeDao.findById(officeModel().getId()).get();
-        o.setName(NAME + " (updated)");
+        //Crear Country modelo
+        Locality l = localityModel();
+        l.setId(STARTING_ID + 1);
+        l.setName("Brasilia");
 
         // 2. Ejercitar
-        officeDao.update(o);
+        Collection<Office> offices = officeDao.findByLocality(l);
 
         // 3. Postcondiciones
-        assertEquals(1, JdbcTestUtils.countRowsInTable(this.jdbcTemplate, OFFICE_TABLE));
-        assertEquals(1, JdbcTestUtils.countRowsInTableWhere(jdbcTemplate, OFFICE_TABLE, "name = '" + NAME + " (updated)'"));
-        assertEquals(0, JdbcTestUtils.countRowsInTableWhere(jdbcTemplate, OFFICE_TABLE, "name = '" + NAME + "'"));
+        assertNotNull(offices);
+        assertTrue(offices.isEmpty());
+    }
 
+    @Test
+    public void testFindByLocalityLocalityNull(){
+        // 1. Precondiciones
+        cleanAllTables();
+        insertOffice();
+        expectedException.expect(NullPointerException.class);
+
+        // 2. Ejercitar
+        Collection<Office> offices = officeDao.findByLocality(null);
+
+        // 3. Postcondiciones
+        assertNotNull(offices);
+        assertTrue(offices.isEmpty());
     }
 }
