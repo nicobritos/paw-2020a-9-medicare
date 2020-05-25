@@ -43,7 +43,7 @@
                             <img
                                     id="navbarPatientUserImage"
                                     class="profile-picture rounded-circle"
-                                    src="<c:url value="/profilePics/${user.get().profileId}"/>"
+                                    src="<c:url value="/profilePics/${user.get().profilePicture.id}"/>"
                                     alt=""
                             />
                         </div>
@@ -60,7 +60,7 @@
                             <img
                                     id="navbarStaffUserImage"
                                     class="profile-picture rounded-circle"
-                                    src="<c:url value="/profilePics/${user.get().profileId}"/>"
+                                    src="<c:url value="/profilePics/${user.get().profilePicture.id}"/>"
                                     alt=""
                             />
                         </div>

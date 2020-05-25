@@ -16,7 +16,7 @@ public class Patient extends GenericModel<Integer> {
     @Column(name = "patient_id")
     private Integer id;
     @JoinColumn(name = "user_id")
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     private User user;
     @JoinColumn(name = "office_id")
     @ManyToOne(fetch = FetchType.EAGER)

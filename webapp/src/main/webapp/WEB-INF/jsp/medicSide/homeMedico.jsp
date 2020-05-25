@@ -31,7 +31,7 @@
                                         <div style="margin-top: 100%;"></div>
                                         <img
                                                 class="profile-picture rounded-circle"
-                                                src="<c:url value="/profilePics/${appointment.patient.user.profileId}"/>"
+                                                src="<c:url value="/profilePics/${appointment.patient.user.profilePicture.id}"/>"
                                                 alt=""
                                         />
                                     </div>
@@ -135,7 +135,7 @@
                                             <div style="margin-top: 100%;"></div>
                                             <img
                                                     class="profile-picture rounded-circle"
-                                                    src="<c:url value="/profilePics/${appointment.patient.user.profileId}"/>"
+                                                    src="<c:url value="/profilePics/${appointment.patient.user.profilePicture.id}"/>"
                                                     alt=""
                                             />
                                         </div>

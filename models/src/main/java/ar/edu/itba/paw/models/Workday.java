@@ -28,7 +28,7 @@ public class Workday extends GenericModel<Integer> {
     @Enumerated(EnumType.STRING)
     private WorkdayDay day;
     @JoinColumn(name = "staff_id", nullable = false)
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     private Staff staff;
 
     @Override

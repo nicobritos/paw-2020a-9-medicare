@@ -27,9 +27,21 @@ public abstract class GenericDaoImpl<M extends GenericModel<I>, I> implements Ge
     private static final Function<Tuple, ModelMetadata> modelMetadataExtractor = tuple -> {
         Long count;
         Object min, max;
-        count = (Long) tuple.get("count");
-        max = tuple.get("max");
-        min = tuple.get("min");
+        try {
+            count = (Long) tuple.get("count");
+        } catch (Exception e) {
+            count = null;
+        }
+        try {
+            max = tuple.get("max");
+        } catch (Exception e) {
+            max = null;
+        }
+        try {
+            min = tuple.get("min");
+        } catch (Exception e) {
+            min = null;
+        }
 
         return new ModelMetadata(count, min, max);
     };

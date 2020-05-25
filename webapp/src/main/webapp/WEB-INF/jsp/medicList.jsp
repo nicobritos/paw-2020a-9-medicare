@@ -64,7 +64,7 @@
                                             <div style="margin-top: 100%;"></div>
                                             <img
                                                     class="profile-picture rounded-circle"
-                                                    src="<c:url value="/profilePics/${member.user.profileId}"/>"
+                                                    src="<c:url value="/profilePics/${member.user.profilePicture.id}"/>"
                                                     alt=""
                                             />
                                         </div>

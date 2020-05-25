@@ -101,8 +101,7 @@ public class UserServiceImpl extends GenericSearchableServiceImpl<UserDao, User,
             user.setProfilePicture(picture);
             this.update(user);
         } else {
-            // TODO
-//            picture.setId(user.getProfileId());
+            picture.setId(user.getProfilePicture().getId());
             this.pictureService.update(picture);
         }
     }

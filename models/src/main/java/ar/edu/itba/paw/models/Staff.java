@@ -29,7 +29,7 @@ public class Staff extends GenericModel<Integer> {
     @Column(name = "registration_number")
     private Integer registrationNumber;
     @JoinColumn(name = "user_id")
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     private User user;
     @JoinColumn(name = "office_id")
     @ManyToOne(fetch = FetchType.EAGER)
