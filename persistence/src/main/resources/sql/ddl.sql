@@ -3,7 +3,7 @@ create table if not exists system_country
     country_id varchar(2) default NULL::character varying not null
         constraint system_country_pk
             primary key,
-    name text not null
+    name       text                                       not null
 );
 
 create unique index if not exists system_country_country_id_uindex
@@ -14,11 +14,11 @@ create table if not exists system_province
     province_id serial not null
         constraint system_province_pk
             primary key,
-    country_id varchar(2)
+    country_id  varchar(2)
         constraint system_province_country
             references system_country
             on update restrict on delete cascade,
-    name text not null
+    name        text   not null
 );
 
 create unique index if not exists system_province_province_id_uindex
@@ -29,7 +29,7 @@ create table if not exists system_staff_specialty
     specialty_id serial not null
         constraint specialty_pk
             primary key,
-    name text not null
+    name         text   not null
 );
 
 create unique index if not exists specialty_specialty_id_uindex
@@ -41,7 +41,7 @@ create table if not exists system_locality
         constraint system_locality_province
             references system_province
             on update restrict on delete restrict,
-    name text not null,
+    name        text   not null,
     locality_id serial not null
         constraint system_locality_pk
             primary key
@@ -49,17 +49,17 @@ create table if not exists system_locality
 
 create table if not exists office
 (
-    office_id serial not null
+    office_id   serial  not null
         constraint office_pk
             primary key,
-    name text not null,
-    street text,
+    name        text    not null,
+    street      text,
     locality_id integer not null
         constraint office_province_id
             references system_locality
             on update restrict on delete restrict,
-    phone text,
-    email text
+    phone       text,
+    email       text
 );
 
 create unique index if not exists office_office_id_uindex
@@ -67,17 +67,17 @@ create unique index if not exists office_office_id_uindex
 
 create table if not exists staff
 (
-    staff_id serial not null
+    staff_id            serial not null
         constraint staff_pk
             primary key,
-    office_id integer
+    office_id           integer
         constraint staff_office
             references office
             on update restrict on delete cascade,
-    first_name text not null,
-    surname text not null,
-    phone text,
-    email text,
+    first_name          text   not null,
+    surname             text   not null,
+    phone               text,
+    email               text,
     registration_number integer
 );
 
@@ -90,7 +90,7 @@ create table if not exists system_staff_specialty_staff
         constraint specialty_staff_system_specialty
             references system_staff_specialty
             on update restrict on delete restrict,
-    staff_id integer not null
+    staff_id     integer not null
         constraint specialty_staff_staff
             references staff
             on update restrict on delete cascade,

@@ -1,18 +1,38 @@
 package ar.edu.itba.paw.models;
 
-import ar.edu.itba.paw.persistenceAnnotations.Column;
-import ar.edu.itba.paw.persistenceAnnotations.Table;
+import javax.persistence.*;
 
-@Table(name = "picture", primaryKey = "picture_id")
+@Entity
+@Table(
+        name = "picture",
+        indexes = {
+                @Index(columnList = "picture_id", name = "picture_picture_id_uindex", unique = true)
+        }
+)
 public class Picture extends GenericModel<Integer> {
+    @Id
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "picture_pk")
+    @SequenceGenerator(sequenceName = "picture_pk", name = "picture_pk", allocationSize = 1)
+    @Column(name = "picture_id")
+    private Integer id;
     @Column(name = "name")
     private String name;
-    @Column(name = "mime_type", required = true)
+    @Column(name = "mime_type", nullable = false)
     private String mimeType;
-    @Column(name = "size", required = true)
+    @Column(name = "size", nullable = false)
     private Long size;
-    @Column(name = "data", required = true)
+    @Column(name = "data", nullable = false)
     private byte[] data;
+
+    @Override
+    public Integer getId() {
+        return this.id;
+    }
+
+    @Override
+    public void setId(Integer id) {
+        this.id = id;
+    }
 
     public String getName() {
         return this.name;

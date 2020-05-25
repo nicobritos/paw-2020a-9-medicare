@@ -3,4 +3,5 @@ alter table appointment
         foreign key (staff_id) references staff
             on update set null on delete set null;
 
-alter table appointment alter column from_date type timestamp using from_date::timestamp;
+alter table appointment
+    alter column from_date type timestamp using from_date::timestamp;

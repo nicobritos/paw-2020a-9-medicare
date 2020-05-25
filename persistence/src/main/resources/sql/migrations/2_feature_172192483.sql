@@ -1,18 +1,19 @@
 create table appointment
 (
-    appointment_id serial not null
+    appointment_id serial  not null
         constraint appointment_pk
             primary key,
-    status text not null,
-    patient_id integer not null
+    status         text    not null,
+    patient_id     integer not null
         constraint appointment_patient_patient_id_fk
             references patient
             on update restrict on delete restrict,
-    staff_id integer not null,
-    from_date date not null
+    staff_id       integer not null,
+    from_date      date    not null
 );
 
-alter table appointment owner to postgres;
+alter table appointment
+    owner to postgres;
 
 create unique index appointment_appointment_id_uindex
     on appointment (appointment_id);
@@ -25,16 +26,16 @@ create index appointment_status_status_index
 
 create table workday
 (
-    workday_id serial not null,
-    staff_id int not null
+    workday_id   serial not null,
+    staff_id     int    not null
         constraint workday_staff_staff_id_fk
             references staff
             on update restrict on delete cascade,
-    start_hour int not null,
-    end_hour int not null,
-    start_minute int not null default 0,
-    end_minute int not null default 0,
-    day text not null
+    start_hour   int    not null,
+    end_hour     int    not null,
+    start_minute int    not null default 0,
+    end_minute   int    not null default 0,
+    day          text   not null
 );
 
 create index workday_day_index

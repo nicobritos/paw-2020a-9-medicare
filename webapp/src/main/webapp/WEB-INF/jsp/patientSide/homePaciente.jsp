@@ -25,7 +25,7 @@
                                         <div style="margin-top: 100%;"></div>
                                         <img
                                                 class="profile-picture rounded-circle"
-                                                src="<c:url value="/profilePics/${appointment.staff.user.profileId}"/>"
+                                                src="<c:url value="/profilePics/${appointment.staff.user.profilePicture.id}"/>"
                                                 alt=""
                                         />
                                     </div>
@@ -48,83 +48,83 @@
                                     <div class="row">
                                         <p class="m-0">
                                             <c:choose>
-                                                <c:when test="${appointment.fromDate.dayOfWeek == 1}">
-                                                    <spring:message code="Monday"/>
-                                                </c:when>
-                                                <c:when test="${appointment.fromDate.dayOfWeek == 2}">
-                                                    <spring:message code="Tuesday"/>
-                                                </c:when>
-                                                <c:when test="${appointment.fromDate.dayOfWeek == 3}">
-                                                    <spring:message code="Wednesday"/>
-                                                </c:when>
-                                                <c:when test="${appointment.fromDate.dayOfWeek == 4}">
-                                                    <spring:message code="Thursday"/>
-                                                </c:when>
-                                                <c:when test="${appointment.fromDate.dayOfWeek == 5}">
-                                                    <spring:message code="Friday"/>
-                                                </c:when>
-                                                <c:when test="${appointment.fromDate.dayOfWeek == 6}">
-                                                    <spring:message code="Saturday"/>
-                                                </c:when>
-                                                <c:when test="${appointment.fromDate.dayOfWeek == 7}">
-                                                    <spring:message code="Sunday"/>
-                                                </c:when>
-                                                <c:otherwise>
-                                                    <c:out value="${appointment.fromDate.dayOfWeek}"/>
-                                                </c:otherwise>
-                                                </c:choose>
+                                            <c:when test="${appointment.fromDate.dayOfWeek == 1}">
+                                                <spring:message code="Monday"/>
+                                            </c:when>
+                                            <c:when test="${appointment.fromDate.dayOfWeek == 2}">
+                                                <spring:message code="Tuesday"/>
+                                            </c:when>
+                                            <c:when test="${appointment.fromDate.dayOfWeek == 3}">
+                                                <spring:message code="Wednesday"/>
+                                            </c:when>
+                                            <c:when test="${appointment.fromDate.dayOfWeek == 4}">
+                                                <spring:message code="Thursday"/>
+                                            </c:when>
+                                            <c:when test="${appointment.fromDate.dayOfWeek == 5}">
+                                                <spring:message code="Friday"/>
+                                            </c:when>
+                                            <c:when test="${appointment.fromDate.dayOfWeek == 6}">
+                                                <spring:message code="Saturday"/>
+                                            </c:when>
+                                            <c:when test="${appointment.fromDate.dayOfWeek == 7}">
+                                                <spring:message code="Sunday"/>
+                                            </c:when>
+                                            <c:otherwise>
+                                                <c:out value="${appointment.fromDate.dayOfWeek}"/>
+                                            </c:otherwise>
+                                            </c:choose>
                                                 <c:out value=" ${appointment.fromDate.dayOfMonth} "/>
                                                 <spring:message code="of"/>
                                             <c:choose>
-                                                <c:when test="${appointment.fromDate.monthOfYear == 1}">
-                                                    <spring:message code="January"/>
-                                                </c:when>
-                                                <c:when test="${appointment.fromDate.monthOfYear == 2}">
-                                                    <spring:message code="February"/>
-                                                </c:when>
-                                                <c:when test="${appointment.fromDate.monthOfYear == 3}">
-                                                    <spring:message code="March"/>
-                                                </c:when>
-                                                <c:when test="${appointment.fromDate.monthOfYear == 4}">
-                                                    <spring:message code="April"/>
-                                                </c:when>
-                                                <c:when test="${appointment.fromDate.monthOfYear == 5}">
-                                                    <spring:message code="May"/>
-                                                </c:when>
-                                                <c:when test="${appointment.fromDate.monthOfYear == 6}">
-                                                    <spring:message code="June"/>
-                                                </c:when>
-                                                <c:when test="${appointment.fromDate.monthOfYear == 7}">
-                                                    <spring:message code="July"/>
-                                                </c:when>
-                                                <c:when test="${appointment.fromDate.monthOfYear == 8}">
-                                                    <spring:message code="August"/>
-                                                </c:when>
-                                                <c:when test="${appointment.fromDate.monthOfYear == 9}">
-                                                    <spring:message code="September"/>
-                                                </c:when>
-                                                <c:when test="${appointment.fromDate.monthOfYear == 10}">
-                                                    <spring:message code="October"/>
-                                                </c:when>
-                                                <c:when test="${appointment.fromDate.monthOfYear == 11}">
-                                                    <spring:message code="November"/>
-                                                </c:when>
-                                                <c:when test="${appointment.fromDate.monthOfYear == 12}">
-                                                    <spring:message code="December"/>
-                                                </c:when>
-                                                <c:otherwise>
-                                                    <c:out value="${appointment.fromDate.monthOfYear}"/>
-                                                </c:otherwise>
+                                            <c:when test="${appointment.fromDate.monthOfYear == 1}">
+                                                <spring:message code="January"/>
+                                            </c:when>
+                                            <c:when test="${appointment.fromDate.monthOfYear == 2}">
+                                                <spring:message code="February"/>
+                                            </c:when>
+                                            <c:when test="${appointment.fromDate.monthOfYear == 3}">
+                                                <spring:message code="March"/>
+                                            </c:when>
+                                            <c:when test="${appointment.fromDate.monthOfYear == 4}">
+                                                <spring:message code="April"/>
+                                            </c:when>
+                                            <c:when test="${appointment.fromDate.monthOfYear == 5}">
+                                                <spring:message code="May"/>
+                                            </c:when>
+                                            <c:when test="${appointment.fromDate.monthOfYear == 6}">
+                                                <spring:message code="June"/>
+                                            </c:when>
+                                            <c:when test="${appointment.fromDate.monthOfYear == 7}">
+                                                <spring:message code="July"/>
+                                            </c:when>
+                                            <c:when test="${appointment.fromDate.monthOfYear == 8}">
+                                                <spring:message code="August"/>
+                                            </c:when>
+                                            <c:when test="${appointment.fromDate.monthOfYear == 9}">
+                                                <spring:message code="September"/>
+                                            </c:when>
+                                            <c:when test="${appointment.fromDate.monthOfYear == 10}">
+                                                <spring:message code="October"/>
+                                            </c:when>
+                                            <c:when test="${appointment.fromDate.monthOfYear == 11}">
+                                                <spring:message code="November"/>
+                                            </c:when>
+                                            <c:when test="${appointment.fromDate.monthOfYear == 12}">
+                                                <spring:message code="December"/>
+                                            </c:when>
+                                            <c:otherwise>
+                                                <c:out value="${appointment.fromDate.monthOfYear}"/>
+                                            </c:otherwise>
                                             </c:choose>
 
                                             <c:if test="${appointment.fromDate.hourOfDay < 10}">0</c:if>
-                                            <c:out value="${appointment.fromDate.hourOfDay}"/>:<c:if
+                                                <c:out value="${appointment.fromDate.hourOfDay}"/>:<c:if
                                                 test="${appointment.fromDate.minuteOfHour < 10}">0</c:if>
-                                            <c:out value="${appointment.fromDate.minuteOfHour}hs"/> -
+                                                <c:out value="${appointment.fromDate.minuteOfHour}hs"/> -
                                             <c:if test="${appointment.toDate.hourOfDay < 10}">0</c:if>
-                                            <c:out value="${appointment.toDate.hourOfDay}:"/>
+                                                <c:out value="${appointment.toDate.hourOfDay}:"/>
                                             <c:if test="${appointment.toDate.minuteOfHour < 10}">0</c:if>
-                                            <c:out value="${appointment.toDate.minuteOfHour}hs"/>
+                                                <c:out value="${appointment.toDate.minuteOfHour}hs"/>
                                     </div>
                                 </div>
                                 <div class="col-1 justify-content-start">

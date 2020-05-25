@@ -1,547 +1,269 @@
 package ar.edu.itba.paw.persistence.generics;
 
-import ar.edu.itba.paw.interfaces.MediCareException;
 import ar.edu.itba.paw.interfaces.daos.generic.GenericDao;
 import ar.edu.itba.paw.models.GenericModel;
 import ar.edu.itba.paw.models.ModelMetadata;
-import ar.edu.itba.paw.persistence.utils.JDBCArgumentValue;
-import ar.edu.itba.paw.persistence.utils.ReflectionGetterSetter;
+import ar.edu.itba.paw.models.Paginator;
 import ar.edu.itba.paw.persistence.utils.StringSearchType;
-import ar.edu.itba.paw.persistence.utils.builder.*;
-import ar.edu.itba.paw.persistence.utils.builder.JDBCWhereClauseBuilder.ColumnTransformer;
-import ar.edu.itba.paw.persistence.utils.builder.JDBCWhereClauseBuilder.Operation;
-import ar.edu.itba.paw.persistenceAnnotations.Column;
-import ar.edu.itba.paw.persistenceAnnotations.OrderBy;
-import ar.edu.itba.paw.persistenceAnnotations.Table;
-import org.joda.time.DateTime;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.jdbc.core.ResultSetExtractor;
-import org.springframework.jdbc.core.RowCallbackHandler;
-import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
-import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
-import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
-import org.springframework.jdbc.datasource.DataSourceTransactionManager;
-import org.springframework.transaction.support.TransactionTemplate;
 
-import javax.sql.DataSource;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Timestamp;
-import java.time.Instant;
-import java.util.*;
-import java.util.Map.Entry;
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
+import javax.persistence.Tuple;
+import javax.persistence.criteria.*;
+import javax.persistence.metamodel.SingularAttribute;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.function.Function;
 
 /**
  * This provides a generic DAO implementation with lots of useful methods
+ *
  * @param <M> the DAO model type
  * @param <I> the Model's id type
  */
 public abstract class GenericDaoImpl<M extends GenericModel<I>, I> implements GenericDao<M, I> {
-    private static final Logger LOGGER = LoggerFactory.getLogger(GenericDaoImpl.class);
-    private static final String ARGUMENT_PREFIX = "_r_";
-    private static final ResultSetExtractor<ModelMetadata> modelMetadataExtractor = resultSet -> {
-        Integer min, max, count;
+    private static final Function<Tuple, ModelMetadata> modelMetadataExtractor = tuple -> {
+        Long count;
+        Object min, max;
         try {
-            min = resultSet.getInt(JDBCSelectQueryBuilder.MIN_COLUMN);
-        } catch (SQLException e) {
-            min = null;
-            LOGGER.info("No 'min' column found when extracting metadata");
-        }
-        try {
-            max = resultSet.getInt(JDBCSelectQueryBuilder.MAX_COLUMN);
-        } catch (SQLException e) {
-            max = null;
-            LOGGER.info("No 'max' column found when extracting metadata");
-        }
-        try {
-            count = resultSet.getInt(JDBCSelectQueryBuilder.COUNT_COLUMN);
-        } catch (SQLException e) {
+            count = (Long) tuple.get("count");
+        } catch (Exception e) {
             count = null;
-            LOGGER.info("No 'count' column found when extracting metadata");
+        }
+        try {
+            max = tuple.get("max");
+        } catch (Exception e) {
+            max = null;
+        }
+        try {
+            min = tuple.get("min");
+        } catch (Exception e) {
+            min = null;
         }
 
         return new ModelMetadata(count, min, max);
     };
 
-    protected TransactionTemplate transactionTemplate;
-    protected NamedParameterJdbcTemplate jdbcTemplate;
-    protected SimpleJdbcInsert jdbcInsert;
-    private boolean customPrimaryKey;
-    private String primaryKeyName;
+    @PersistenceContext
+    private EntityManager entityManager;
+
     private final Class<M> mClass;
-    private String tableName;
+    private final SingularAttribute<? super M, I> idAttribute;
 
-    public GenericDaoImpl(DataSource dataSource, Class<M> mClass) {
-        this.transactionTemplate = new TransactionTemplate(new DataSourceTransactionManager(dataSource));
-        this.jdbcTemplate = new NamedParameterJdbcTemplate(dataSource);
+    public GenericDaoImpl(Class<M> mClass, SingularAttribute<? super M, I> idAttribute) {
         this.mClass = mClass;
-
-        if (mClass.isAnnotationPresent(Table.class)) {
-            Table table = mClass.getAnnotation(Table.class);
-            this.tableName = table.name();
-            this.primaryKeyName = table.primaryKey();
-            this.customPrimaryKey = table.manualPrimaryKey();
-            this.jdbcInsert = new SimpleJdbcInsert(dataSource).withTableName(this.tableName);
-            if (!this.customPrimaryKey)
-                this.jdbcInsert.usingGeneratedKeyColumns(this.primaryKeyName);
-        }
+        this.idAttribute = idAttribute;
     }
 
     @Override
     public Optional<M> findById(I id) {
-        JDBCSelectQueryBuilder selectQueryBuilder = new JDBCSelectQueryBuilder()
-                .selectAll(this.mClass)
-                .from(this.getTableAlias())
-                .where(new JDBCWhereClauseBuilder()
-                        .where(this.formatColumnFromAlias(this.getIdColumnName()), Operation.EQ, ":id")
-                );
-
-        MapSqlParameterSource args = new MapSqlParameterSource();
-        // Note that "parameterName" should NOT be preceded by a semicolon (as it is in the query)
-        args.addValue("id", id);
-
-        return this.selectQuerySingle(selectQueryBuilder, args);
+        return Optional.of(this.entityManager.find(this.mClass, id));
     }
 
     @Override
     public List<M> findByIds(Collection<I> ids) {
-        if (ids.isEmpty())
-            return new LinkedList<>();
+        CriteriaBuilder builder = this.entityManager.getCriteriaBuilder();
+        CriteriaQuery<M> query = builder.createQuery(this.mClass);
+        Root<M> root = query.from(this.mClass);
 
-        Map<String, Object> parameters = new HashMap<>();
-        Collection<String> idsParameters = new LinkedList<>();
-        int i = 0;
-        for (I id : ids) {
-            String parameter = "_id_" + i;
-            idsParameters.add(":" + parameter);
-            parameters.put(parameter, id);
-            i++;
-        }
+        query.select(root);
+        Path<I> expression = root.get(this.idAttribute);
+        Predicate predicate = expression.in(ids);
+        query.where(predicate);
 
-        JDBCSelectQueryBuilder selectQueryBuilder = new JDBCSelectQueryBuilder()
-                .selectAll(this.mClass)
-                .from(this.getTableAlias())
-                .where(new JDBCWhereClauseBuilder()
-                        .in(this.formatColumnFromAlias(this.getIdColumnName()), idsParameters)
-                );
-
-        MapSqlParameterSource args = new MapSqlParameterSource();
-        args.addValues(parameters);
-
-        return this.selectQuery(selectQueryBuilder, args);
+        return this.selectQuery(builder, query, root);
     }
 
     @Override
-    public synchronized M create(M model) {
-        Map<String, JDBCArgumentValue> columnsArgumentValue = this.getModelColumnsArgumentValue(model, "", true);
-        if (this.customPrimaryKey) {
-            columnsArgumentValue.put(this.getIdColumnName(), new JDBCArgumentValue(this.getIdColumnName(), model.getId()));
-        }
-
-        Map<String, Object> argumentsValues = new HashMap<>();
-        for (Entry<String, JDBCArgumentValue> columnArgumentValue : columnsArgumentValue.entrySet()) {
-            argumentsValues.put(columnArgumentValue.getKey(), columnArgumentValue.getValue().getValue());
-        }
-
-        MapSqlParameterSource parameterSource = new MapSqlParameterSource();
-        parameterSource.addValues(argumentsValues);
-
-        return this.transactionTemplate.execute(transactionStatus -> {
-            M newModel = this.insertQuery(model, parameterSource);
-            return this.findById(newModel.getId()).get();
-        });
-    }
-
-    /**
-     * Updates ALL the information inside the model (with the exception of the ID) including relations
-     * @param model the model
-     */
-    @Override
-    public synchronized void update(M model) {
-        Map<String, JDBCArgumentValue> columnsArgumentValue = this.getModelColumnsArgumentValue(model, ARGUMENT_PREFIX, true);
-
-        Map<String, String> columnsArguments = new HashMap<>();
-        Map<String, Object> argumentsValues = new HashMap<>();
-        for (Entry<String, JDBCArgumentValue> columnArgumentValue : columnsArgumentValue.entrySet()) {
-            columnsArguments.put(columnArgumentValue.getKey(), columnArgumentValue.getValue().getArgument());
-            argumentsValues.put(ARGUMENT_PREFIX + columnArgumentValue.getKey(), columnArgumentValue.getValue().getValue());
-        }
-
-        String argumentName = ARGUMENT_PREFIX + "id";
-        JDBCQueryBuilder queryBuilder = new JDBCUpdateQueryBuilder()
-                .update(this.getTableAlias())
-                .values(columnsArguments)
-                .where(new JDBCWhereClauseBuilder()
-                        .where(formatColumnFromName(this.getIdColumnName(), this.getTableAlias()), Operation.EQ, ":" + argumentName)
-                );
-
-        argumentsValues.put(argumentName, model.getId());
-
-        MapSqlParameterSource parameterSource = new MapSqlParameterSource();
-        parameterSource.addValues(argumentsValues);
-
-        this.updateQuery(queryBuilder.getQueryAsString(), parameterSource);
+    public M create(M model) {
+        this.entityManager.persist(model);
+        return model;
     }
 
     @Override
-    public synchronized void remove(M model) {
+    public void update(M model) {
+        this.entityManager.persist(model);
+    }
+
+    @Override
+    public void remove(M model) {
         this.remove(model.getId());
     }
 
     @Override
-    public synchronized void remove(I id) {
-        JDBCQueryBuilder queryBuilder = new JDBCDeleteQueryBuilder()
-                .from(this.getTableAlias())
-                .where(new JDBCWhereClauseBuilder()
-                        .where(this.formatColumnFromAlias(this.getIdColumnName()), Operation.EQ, ":id")
-                );
-
-        MapSqlParameterSource parameterSource = new MapSqlParameterSource();
-        parameterSource.addValue("id", id);
-
-        this.updateQuery(queryBuilder.getQueryAsString(), parameterSource);
+    public void remove(I id) {
+        M model = this.entityManager.find(this.mClass, id);
+        this.entityManager.getTransaction().begin();
+        this.entityManager.remove(model);
+        this.entityManager.getTransaction().commit();
     }
 
     @Override
     public List<M> list() {
-        return this.selectQuery(
-                new JDBCSelectQueryBuilder()
-                        .selectAll(this.mClass)
-                        .from(this.getTableAlias())
-        );
+        CriteriaBuilder builder = this.entityManager.getCriteriaBuilder();
+        CriteriaQuery<M> query = builder.createQuery(this.mClass);
+        Root<M> root = query.from(this.mClass);
+
+        query.select(root);
+
+        return this.selectQuery(builder, query, root);
     }
 
     @Override
     public ModelMetadata count() {
-        return this.selectQueryMetadata(
-                new JDBCSelectQueryBuilder()
-                        .count(this.getIdColumnName())
-                        .from(this.getTableAlias())
+        CriteriaBuilder builder = this.entityManager.getCriteriaBuilder();
+        CriteriaQuery<Tuple> query = builder.createQuery(Tuple.class);
+        Root<M> root = query.from(this.mClass);
+
+        query.multiselect(builder.count(root).alias("count"));
+        query.distinct(true);
+
+        return modelMetadataExtractor.apply(this.entityManager.createQuery(query).getSingleResult());
+    }
+
+    @Override
+    public ModelMetadata count(Map<SingularAttribute<? super M, ?>, Object> parametersValues) {
+        CriteriaBuilder builder = this.entityManager.getCriteriaBuilder();
+        CriteriaQuery<Tuple> query = builder.createQuery(Tuple.class);
+        Root<M> root = query.from(this.mClass);
+        Predicate[] predicates = new Predicate[parametersValues.size()];
+
+        int i = 0;
+        for (Map.Entry<SingularAttribute<? super M, ?>, Object> parameter : parametersValues.entrySet()) {
+            predicates[i++] = builder.equal(root.get(parameter.getKey()), parameter.getValue());
+        }
+
+        query.where(builder.and(predicates));
+        return this.count(builder, query, root);
+    }
+
+    protected ModelMetadata metadata(SingularAttribute<? super M, ?> countAttribute, SingularAttribute<? super M, Number> minMaxAttribute) {
+        CriteriaBuilder builder = this.entityManager.getCriteriaBuilder();
+        CriteriaQuery<Tuple> query = builder.createQuery(Tuple.class);
+        Root<M> root = query.from(this.mClass);
+
+        query.multiselect(
+                builder.count(root.get(countAttribute)).alias("count"),
+                builder.min(root.get(minMaxAttribute)).alias("min"),
+                builder.max(root.get(minMaxAttribute)).alias("max")
         );
+
+        return modelMetadataExtractor.apply(this.entityManager.createQuery(query).getSingleResult());
     }
 
-    @Override
-    public Class<M> getModelClass() {
-        return this.mClass;
+    protected List<M> findBy(SingularAttribute<? super M, ?> attribute, Object value) {
+        CriteriaBuilder builder = this.entityManager.getCriteriaBuilder();
+        CriteriaQuery<M> query = builder.createQuery(this.mClass);
+        Root<M> root = query.from(this.mClass);
+
+        query.select(root);
+        query.where(builder.equal(root.get(attribute), value));
+
+        return this.selectQuery(builder, query, root);
     }
 
-    @Override
-    public List<M> findByField(String field, Object value) {
-        return this.findByField(field, Operation.EQ, value);
+    protected List<M> findBy(Map<SingularAttribute<? super M, ?>, Object> parametersValues) {
+        CriteriaBuilder builder = this.entityManager.getCriteriaBuilder();
+        CriteriaQuery<M> query = builder.createQuery(this.mClass);
+        Root<M> root = query.from(this.mClass);
+        Predicate[] predicates = new Predicate[parametersValues.size()];
+        int i = 0;
+        for (Map.Entry<SingularAttribute<? super M, ?>, ?> parameter : parametersValues.entrySet()) {
+            predicates[i++] = builder.equal(root.get(parameter.getKey()), parameter.getValue());
+        }
+
+        query.select(root);
+        query.where(builder.and(predicates));
+
+        return this.selectQuery(builder, query, root);
     }
 
-    @Override
-    public Optional<?> findFieldById(I id, String field) {
-        JDBCWhereClauseBuilder whereClauseBuilder = new JDBCWhereClauseBuilder()
-                .where(this.formatColumnFromAlias(this.getIdColumnName()), Operation.EQ, ":id");
+    protected List<M> findByIn(SingularAttribute<? super M, ?> attribute, Collection<?> values) {
+        CriteriaBuilder builder = this.entityManager.getCriteriaBuilder();
+        CriteriaQuery<M> query = builder.createQuery(this.mClass);
+        Root<M> root = query.from(this.mClass);
 
-        MapSqlParameterSource parameterSource = new MapSqlParameterSource();
-        parameterSource.addValue("id", id);
+        query.select(root);
+        Path<?> expression = root.get(attribute);
+        Predicate predicate = expression.in(values);
+        query.where(predicate);
 
-        JDBCSelectQueryBuilder selectQueryBuilder = new JDBCSelectQueryBuilder()
-                .select(field)
-                .from(this.getTableAlias())
-                .where(whereClauseBuilder);
+        return this.selectQuery(builder, query, root);
+    }
 
-        Collection<Object> values = new LinkedList<>();
-        this.selectQuery(
-                selectQueryBuilder,
-                parameterSource,
-                rs -> values.add(rs.getObject(field))
+    protected List<M> findByIgnoreCase(SingularAttribute<? super M, ?> attribute, String value) {
+        return this.findByIgnoreCase(attribute, value, StringSearchType.CONTAINS_NO_ACC);
+    }
+
+    protected List<M> findByIgnoreCase(SingularAttribute<? super M, ?> attribute, String value, StringSearchType stringSearchType) {
+        CriteriaBuilder builder = this.entityManager.getCriteriaBuilder();
+        CriteriaQuery<M> query = builder.createQuery(this.mClass);
+        Root<M> root = query.from(this.mClass);
+
+        query.select(root);
+        query.where(
+                builder.like(
+                        builder.lower(root.get(attribute).as(String.class)),
+                        stringSearchType.transform(value.toLowerCase())
+                )
         );
 
-        return values.stream().findFirst();
+        return this.selectQuery(builder, query, root);
     }
 
-    /**
-     * @param columnName
-     * @param operation
-     * @param value if value is a generic model then it will use its id
-     * @return
-     */
-    public List<M> findByField(String columnName, Operation operation, Object value) {
-        JDBCWhereClauseBuilder whereClauseBuilder = new JDBCWhereClauseBuilder()
-                .where(this.formatColumnFromAlias(columnName), operation, ":argument");
-
-        MapSqlParameterSource parameterSource = new MapSqlParameterSource();
-        if (value instanceof GenericModel) {
-            parameterSource.addValue("argument", ((GenericModel) value).getId());
-        } else {
-            parameterSource.addValue("argument", value);
-        }
-
-        JDBCSelectQueryBuilder selectQueryBuilder = new JDBCSelectQueryBuilder()
-                .selectAll(this.mClass)
-                .from(this.getTableAlias())
-                .where(whereClauseBuilder);
-
-        return this.selectQuery(selectQueryBuilder, parameterSource);
+    protected List<M> selectQuery(CriteriaBuilder builder, CriteriaQuery<M> query, Root<M> root) {
+        this.insertOrderBy(builder, query, root);
+        return this.entityManager.createQuery(query).getResultList();
     }
 
-    protected List<M> findByFieldIgnoreCase(String columnName, Operation operation, String value) {
-        return this.findByFieldIgnoreCase(columnName, operation, value, StringSearchType.CONTAINS_NO_ACC);
+    protected Paginator<M> selectQuery(CriteriaBuilder builder, CriteriaQuery<M> query, CriteriaQuery<Tuple> tupleQuery, Root<M> root, int page, int pageSize) {
+        this.insertOrderBy(builder, query, root);
+
+        List<M> list = this.entityManager.createQuery(query)
+                .setFirstResult((page - 1) * pageSize)
+                .setMaxResults(pageSize)
+                .getResultList();
+
+        return new Paginator<>(list, page, pageSize, this.selectQueryMetadata(tupleQuery, root).getCount());
     }
 
-    protected List<M> findByFieldIgnoreCase(String columnName, Operation operation, String value, StringSearchType stringSearchType) {
-        JDBCWhereClauseBuilder whereClauseBuilder = new JDBCWhereClauseBuilder()
-                .where(this.formatColumnFromAlias(columnName), operation, ":argument", ColumnTransformer.LOWER);
-
-        value = value.toLowerCase();
-        MapSqlParameterSource parameterSource = new MapSqlParameterSource();
-        parameterSource.addValue("argument", stringSearchType.transform(value));
-
-        JDBCSelectQueryBuilder selectQueryBuilder = new JDBCSelectQueryBuilder()
-                .selectAll(this.mClass)
-                .from(this.getTableAlias())
-                .where(whereClauseBuilder);
-
-        return this.selectQuery(selectQueryBuilder, parameterSource);
+    protected Optional<M> selectSingleQuery(CriteriaBuilder builder, CriteriaQuery<M> query, Root<M> root) {
+        this.insertOrderBy(builder, query, root);
+        return Optional.of(this.entityManager.createQuery(query).getSingleResult());
     }
 
-    protected List<M> selectQuery(JDBCSelectQueryBuilder selectQueryBuilder) {
-        selectQueryBuilder = this.wrapSelectQueryBuilder(selectQueryBuilder);
-        return new LinkedList<>(this.jdbcTemplate.query(selectQueryBuilder.getQueryAsString(), this.getResultSetExtractor()));
+    protected ModelMetadata selectQueryMetadata(CriteriaQuery<Tuple> query, Root<?> root) {
+        CriteriaBuilder builder = this.entityManager.getCriteriaBuilder();
+
+        query.multiselect(builder.count(root).alias("count"));
+        if (query.getRoots().isEmpty())
+            query.from(this.mClass);
+
+        return modelMetadataExtractor.apply(this.entityManager.createQuery(query).getSingleResult());
     }
 
-    protected List<M> selectQuery(JDBCSelectQueryBuilder selectQueryBuilder, MapSqlParameterSource args) {
-        selectQueryBuilder = this.wrapSelectQueryBuilder(selectQueryBuilder);
-        return new LinkedList<>(this.jdbcTemplate.query(selectQueryBuilder.getQueryAsString(), args, this.getResultSetExtractor()));
+    protected boolean exists(Map<SingularAttribute<? super M, ?>, Object> parametersValues) {
+        return this.count(parametersValues).getCount() > 0;
     }
 
-    /**
-     * Runs a query handled by a specific handler
-     * @param selectQueryBuilder the query
-     * @param args the arguments (can be empty)
-     * @param callbackHandler the ResultSet handler
-     */
-    protected void selectQuery(JDBCSelectQueryBuilder selectQueryBuilder, MapSqlParameterSource args, RowCallbackHandler callbackHandler) {
-        selectQueryBuilder = this.wrapSelectQueryBuilder(selectQueryBuilder);
-        this.jdbcTemplate.query(selectQueryBuilder.getQueryAsString(), args, callbackHandler);
+    protected <T> ModelMetadata count(CriteriaBuilder builder, CriteriaQuery<Tuple> query, Root<T> root) {
+        query.multiselect(builder.count(root).alias("count"));
+        query.distinct(true);
+        if (query.getRoots().isEmpty())
+            query.from(this.mClass);
+
+        return modelMetadataExtractor.apply(this.entityManager.createQuery(query).getSingleResult());
     }
 
-    protected Optional<M> selectQuerySingle(JDBCSelectQueryBuilder selectQueryBuilder) {
-        selectQueryBuilder = this.wrapSelectQueryBuilder(selectQueryBuilder);
-        return this.jdbcTemplate.query(selectQueryBuilder.getQueryAsString(), this.getResultSetExtractor()).stream().findFirst();
+    protected <T> boolean exists(CriteriaBuilder builder, CriteriaQuery<Tuple> query, Root<T> root) {
+        return this.count(builder, query, root).getCount() > 0;
     }
 
-    protected Optional<M> selectQuerySingle(JDBCSelectQueryBuilder selectQueryBuilder, MapSqlParameterSource args) {
-        selectQueryBuilder = this.wrapSelectQueryBuilder(selectQueryBuilder);
-        return this.jdbcTemplate.query(selectQueryBuilder.getQueryAsString(), args, this.getResultSetExtractor()).stream().findFirst();
+    protected EntityManager getEntityManager() {
+        return this.entityManager;
     }
 
-    protected ModelMetadata selectQueryMetadata(JDBCSelectQueryBuilder selectQueryBuilder) {
-        if (!selectQueryBuilder.isMetadata()) {
-            LOGGER.error("JDBCSelectQueryBuilder is not of metadata type: \n{}", selectQueryBuilder.getQueryAsString());
-            throw new MediCareException("JDBCSelectQueryBuilder is not of metadata type");
-        }
-
-        selectQueryBuilder = this.wrapSelectQueryBuilder(selectQueryBuilder);
-        return this.jdbcTemplate.query(selectQueryBuilder.getQueryAsString(), modelMetadataExtractor);
-    }
-
-    protected ModelMetadata selectQueryMetadata(JDBCSelectQueryBuilder selectQueryBuilder, MapSqlParameterSource args) {
-        if (!selectQueryBuilder.isMetadata()) {
-            LOGGER.error("JDBCSelectQueryBuilder is not of metadata type: \n{}", selectQueryBuilder.getQueryAsString());
-            throw new MediCareException("JDBCSelectQueryBuilder is not of metadata type");
-        }
-
-        selectQueryBuilder = this.wrapSelectQueryBuilder(selectQueryBuilder);
-        return this.jdbcTemplate.query(selectQueryBuilder.getQueryAsString(), args, modelMetadataExtractor);
-    }
-
-    /**
-     * Runs an Insert/Update/Delete query
-     * @param query the query
-     * @param args the arguments
-     */
-    protected void updateQuery(String query, MapSqlParameterSource args) {
-        this.jdbcTemplate.update(query, args);
-    }
-
-    protected M insertQuery(M model, MapSqlParameterSource args) {
-        I id;
-        if (!this.customPrimaryKey) {
-            id = (I) this.jdbcInsert.executeAndReturnKey(args);
-        } else {
-            this.jdbcInsert.execute(args);
-            id = model.getId();
-        }
-        return this.findById(id).get();
-    }
-
-    protected boolean exists(Map<String, ?> columnsValues) {
-        MapSqlParameterSource parameterSource = new MapSqlParameterSource();
-        parameterSource.addValues(columnsValues);
-        JDBCWhereClauseBuilder whereClauseBuilder = new JDBCWhereClauseBuilder();
-        for (String column : columnsValues.keySet()) {
-            whereClauseBuilder
-                    .and()
-                    .where(column, Operation.EQ, ":" + column);
-        }
-
-        JDBCSelectQueryBuilder selectQueryBuilder = new JDBCSelectQueryBuilder()
-                .select(this.getIdColumnName())
-                .from(this.getTableName())
-                .where(whereClauseBuilder)
-                .limit(1);
-
-        return this.jdbcTemplate.query(selectQueryBuilder.getQueryAsString(), parameterSource, ResultSet::next);
-    }
-
-    /**
-     * It returns the table name
-     * Can be overwritten to return a table alias
-     * @return the table alias
-     */
-    protected String getTableAlias() {
-        return this.getTableName();
-    }
-
-    protected String formatColumnFromAlias(String columnName) {
-        return formatColumnFromName(columnName, this.getTableAlias());
-    }
-
-    protected String formatColumnFromName(String columnName) {
-        return formatColumnFromName(columnName, this.getTableName());
-    }
-
-    protected String getTableName() {
-        return this.tableName;
-    }
-
-    protected String getIdColumnName() {
-        return this.primaryKeyName;
-    }
-
-    /**
-     * Returns a map associating column name with an argument name and the value in the model
-     * associated with that field. The arguments may be prefixed to avoid name collisions.
-     * Only Column fields are included
-     * @param model the model
-     * @param prefix the arguments' prefix (can be empty)
-     * @param checkRequired if true then an exception will be thrown when a column has the "required" column argument
-     *                     set to true and the model has a null value associated with that field
-     * @return the map
-     */
-    protected Map<String, JDBCArgumentValue> getModelColumnsArgumentValue(M model, String prefix, boolean checkRequired) {
-        Map<String, JDBCArgumentValue> map = new HashMap<>();
-
-        // This code is duplicated so as to not be checking another variable in every loop, thus making it more
-        // time efficient at the expense of having duplicated code.
-        if (checkRequired) {
-            ReflectionGetterSetter.iterateValues(model, Column.class, (field, o) -> {
-                Column column = field.getAnnotation(Column.class);
-                if (column.required() && o == null)
-                    throw new IllegalStateException("This field is marked as required but its value is null");
-
-                if (field.getType().equals(DateTime.class) && o != null) {
-                    map.put(column.name(), new JDBCArgumentValue(prefix + column.name(), Timestamp.from(Instant.ofEpochMilli(((DateTime) o).getMillis()))));
-                } else {
-                    map.put(column.name(), new JDBCArgumentValue(prefix + column.name(), o));
-                }
-            });
-        } else {
-            ReflectionGetterSetter.iterateValues(model, Column.class, (field, o) -> {
-                Column column = field.getAnnotation(Column.class);
-
-                if (field.getType().equals(DateTime.class) && o != null) {
-                    map.put(column.name(), new JDBCArgumentValue(prefix + column.name(), Timestamp.from(Instant.ofEpochMilli(((DateTime) o).getMillis()))));
-                } else {
-                    map.put(column.name(), new JDBCArgumentValue(prefix + column.name(), o));
-                }
-            });
-        }
-
-        Map<String, JDBCArgumentValue> relationsMap = this.getModelRelationsArgumentValue(model, prefix);
-        if (relationsMap != null)
-            map.putAll(relationsMap);
-        return map;
-    }
-
-    private void insertOrderBy(JDBCSelectQueryBuilder selectQueryBuilder) {
-        if (selectQueryBuilder.hasOrderBy())
-            return;
-
-        ReflectionGetterSetter.iterateFields(this.mClass, OrderBy.class, field -> {
-            OrderBy orderBy = field.getAnnotation(OrderBy.class);
-            Column column = field.getAnnotation(Column.class);
-            if (column == null)
-                return;
-
-            selectQueryBuilder.orderBy(this.formatColumnFromAlias(column.name()), orderBy.value(), orderBy.priority());
-        });
-    }
-
-    /**
-     * Fixes LIMIT selects wrapping it inside of other select
-     */
-    private JDBCSelectQueryBuilder wrapSelectQueryBuilder(JDBCSelectQueryBuilder selectQueryBuilder) {
-        JDBCSelectQueryBuilder wrapper;
-        if (selectQueryBuilder.hasLimit() || selectQueryBuilder.hasOffset()) {
-            wrapper = new JDBCSelectQueryBuilder();
-            wrapper.from(selectQueryBuilder);
-            this.insertOrderBy(selectQueryBuilder);  // We need them in both
-        } else {
-            wrapper = selectQueryBuilder;
-        }
-
-        this.insertOrderBy(wrapper);
-        this.populateJoins(wrapper);
-        return wrapper;
-    }
-
-    protected abstract ResultSetExtractor<List<M>> getResultSetExtractor();
-
-    protected abstract void populateJoins(JDBCSelectQueryBuilder selectQueryBuilder);
-
-    protected abstract Map<String, JDBCArgumentValue> getModelRelationsArgumentValue(M model, String prefix);
-
-    protected static String formatColumnFromName(String columnName, String tableName) {
-        return tableName + "." + columnName;
-    }
-
-    protected static <M extends GenericModel<I>, I> String getTableNameFromModel(Class<M> mClass) {
-        if (mClass.isAnnotationPresent(Table.class)) {
-            return mClass.getAnnotation(Table.class).name();
-        }
-        return null;
-    }
-
-    protected static <M extends GenericModel<I>, I> String getPrimaryKeyNameFromModel(Class<M> mClass) {
-        if (mClass.isAnnotationPresent(Table.class)) {
-            return mClass.getAnnotation(Table.class).primaryKey();
-        }
-        return null;
-    }
-
-    protected static <M extends GenericModel<I>, I> void populateEntity(M model, ResultSet resultSet, String columnPrefix) {
-        ReflectionGetterSetter.iterateFields(model.getClass(), Column.class, field -> {
-            Column column = field.getAnnotation(Column.class);
-            Object value;
-            try {
-                if (field.getType().equals(DateTime.class)) {
-                    Timestamp sqlTimestamp = resultSet.getTimestamp(formatColumnFromName(column.name(), columnPrefix));
-                    value = new DateTime(sqlTimestamp);
-                } else {
-                    value = resultSet.getObject(formatColumnFromName(column.name(), columnPrefix));
-                }
-
-                ReflectionGetterSetter.set(model, field, value);
-            } catch (SQLException e) {
-                try {
-                    if (field.getType().equals(DateTime.class)) {
-                        Timestamp sqlTimestamp = resultSet.getTimestamp(column.name());
-                        value = new DateTime(sqlTimestamp);
-                    } else {
-                        value = resultSet.getObject(column.name());
-                    }
-
-                    ReflectionGetterSetter.set(model, field, value);
-                } catch (SQLException e2) {
-                    LOGGER.error("Column name {} not found in resultset for model classname: {}", column.name(), model.getClass().toString());
-                }
-            }
-        });
-    }
+    protected abstract void insertOrderBy(CriteriaBuilder builder, CriteriaQuery<M> query, Root<M> root);
 }

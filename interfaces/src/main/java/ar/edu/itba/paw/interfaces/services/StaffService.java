@@ -3,21 +3,17 @@ package ar.edu.itba.paw.interfaces.services;
 import ar.edu.itba.paw.interfaces.services.generic.GenericSearchableService;
 import ar.edu.itba.paw.models.*;
 
+import java.util.Collection;
 import java.util.List;
-import java.util.Set;
 
 public interface StaffService extends GenericSearchableService<Staff, Integer> {
-    List<Staff> findBy(String name, String surname, Set<Office> offices, Set<StaffSpecialty> staffSpecialties, Set<Locality> localities);
+    List<Staff> findBy(String name, String surname, Collection<Office> offices, Collection<StaffSpecialty> staffSpecialties, Collection<Locality> localities);
 
-    Paginator<Staff> findBy(String name, String surname, Set<Office> offices, Set<StaffSpecialty> staffSpecialties, Set<Locality> localities, int page);
+    List<Staff> findBy(Collection<String> names, Collection<String> surnames, Collection<Office> offices, Collection<StaffSpecialty> staffSpecialties, Collection<Locality> localities);
 
-    Paginator<Staff> findBy(Set<String> names, Set<String> surnames, Set<Office> offices, Set<StaffSpecialty> staffSpecialties, Set<Locality> localities, int page);
+    Paginator<Staff> findBy(String name, String surname, Collection<Office> offices, Collection<StaffSpecialty> staffSpecialties, Collection<Locality> localities, int page);
 
-    List<Staff> findBy(Set<String> names, Set<String> surnames, Set<Office> offices, Set<StaffSpecialty> staffSpecialties, Set<Locality> localities);
+    Paginator<Staff> findBy(Collection<String> names, Collection<String> surnames, Collection<Office> offices, Collection<StaffSpecialty> staffSpecialties, Collection<Locality> localities, int page);
 
-    List<Staff> findByUser(Integer id);
-
-    void addStaffSpecialty(Staff staff, StaffSpecialty staffSpecialty);
-
-    void addStaffSpecialties(Staff staff, Set<StaffSpecialty> staffSpecialties);
+    List<Staff> findByUser(User user);
 }

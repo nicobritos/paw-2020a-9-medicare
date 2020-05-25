@@ -63,7 +63,7 @@ public class UserServiceImpl extends GenericSearchableServiceImpl<UserDao, User,
 
     @Override
     public boolean isStaff(User user) {
-        return !this.staffService.findByUser(user.getId()).isEmpty();
+        return !this.staffService.findByUser(user).isEmpty();
     }
 
     @Override
@@ -96,12 +96,12 @@ public class UserServiceImpl extends GenericSearchableServiceImpl<UserDao, User,
     @Override
     @Transactional
     public void setProfile(User user, Picture picture) {
-        if (user.getProfileId() == null) {
+        if (user.getProfilePicture() == null) {
             picture = this.pictureService.create(picture);
-            user.setProfileId(picture.getId());
+            user.setProfilePicture(picture);
             this.update(user);
         } else {
-            picture.setId(user.getProfileId());
+            picture.setId(user.getProfilePicture().getId());
             this.pictureService.update(picture);
         }
     }
@@ -114,7 +114,7 @@ public class UserServiceImpl extends GenericSearchableServiceImpl<UserDao, User,
 
     @Override
     @Transactional
-    public void update(User user){
+    public void update(User user) {
         Optional<User> userOptional = this.repository.findByEmail(user.getEmail());
         if (userOptional.isPresent()) {
             if (!userOptional.get().equals(user)) {
@@ -130,7 +130,7 @@ public class UserServiceImpl extends GenericSearchableServiceImpl<UserDao, User,
                 user.setToken(null);
             } else {
                 Optional<User> userToken = this.repository.findByToken(user.getToken());
-                if (userToken.isPresent() && !userToken.get().equals(user)){
+                if (userToken.isPresent() && !userToken.get().equals(user)) {
                     throw new MediCareException("Confirmation token already exists");
                 }
             }
@@ -145,7 +145,7 @@ public class UserServiceImpl extends GenericSearchableServiceImpl<UserDao, User,
     }
 
     @Override
-    public Optional<User> findByToken(String token){
+    public Optional<User> findByToken(String token) {
         return this.repository.findByToken(token);
     }
 
@@ -182,17 +182,16 @@ public class UserServiceImpl extends GenericSearchableServiceImpl<UserDao, User,
     @Override
     @Transactional
     public boolean confirm(User user, String token) {
-        if(user.getVerified()){
+        if (user.getVerified()) {
             return false;
         }
-        if(user.getToken() != null && user.getToken().equals(token)){
+        if (user.getToken() != null && user.getToken().equals(token)) {
             user.setVerified(true);
             user.setToken(null);
             user.setTokenCreatedDate(null);
             this.update(user);
             return true;
-        }
-        else {
+        } else {
             return false;
         }
     }

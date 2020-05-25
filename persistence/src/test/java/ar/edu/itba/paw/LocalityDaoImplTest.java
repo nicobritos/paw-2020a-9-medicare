@@ -21,8 +21,7 @@ import static org.junit.Assert.*;
 @RunWith(SpringJUnit4ClassRunner.class)
 @Sql(scripts = "classpath:sql/schema.sql")
 @ContextConfiguration(classes = TestConfig.class)
-public class LocalityDaoImplTest
-{
+public class LocalityDaoImplTest {
     private static final String LOCALITY = "Capital Federal";
     private static final String PROVINCE = "Buenos Aires";
 
@@ -38,8 +37,8 @@ public class LocalityDaoImplTest
     private DataSource ds;
 
     @Before
-    public void setUp(){
-        this.localityDao = new LocalityDaoImpl(this.ds);
+    public void setUp() {
+        this.localityDao = new LocalityDaoImpl();
         this.jdbcTemplate = new JdbcTemplate(this.ds);
         this.localityJdbcInsert = new SimpleJdbcInsert(this.ds)
                 .withTableName(LOCALITIES_TABLE)
@@ -49,25 +48,25 @@ public class LocalityDaoImplTest
                 .usingGeneratedKeyColumns("province_id");
     }
 
-    private void cleanAllTables(){
+    private void cleanAllTables() {
         this.jdbcTemplate.execute("TRUNCATE SCHEMA PUBLIC RESTART IDENTITY AND COMMIT NO CHECK");
     }
 
-    private Locality localityModel(){
+    private Locality localityModel() {
         Locality p = new Locality();
         p.setName(LOCALITY);
         p.setId(0);
         return p;
     }
 
-    private void insertProvince(){
+    private void insertProvince() {
         Map<String, Object> map = new HashMap<>();
         map.put("province_id", 0);
         map.put("name", PROVINCE);
         provinceJdbcInsert.execute(map);
     }
 
-    private void insertLocality(){
+    private void insertLocality() {
         insertProvince();
         Map<String, Object> map = new HashMap<>();
         map.put("province_id", 0);
@@ -83,8 +82,7 @@ public class LocalityDaoImplTest
     }
 
     @Test
-    public void testCreateLocality()
-    {
+    public void testCreateLocality() {
         // 1. Precondiciones
         cleanAllTables();
         insertProvince();
@@ -100,8 +98,7 @@ public class LocalityDaoImplTest
     }
 
     @Test
-    public void testFindLocalityById()
-    {
+    public void testFindLocalityById() {
         // 1. Precondiciones
         cleanAllTables();
         insertLocality();
@@ -115,8 +112,7 @@ public class LocalityDaoImplTest
     }
 
     @Test
-    public void testFindLocalityByIdDoesntExist()
-    {
+    public void testFindLocalityByIdDoesntExist() {
         // 1. Precondiciones
         cleanAllTables();
 
@@ -128,8 +124,7 @@ public class LocalityDaoImplTest
     }
 
     @Test
-    public void testFindLocalitysByIds()
-    {
+    public void testFindLocalitysByIds() {
         // 1. Precondiciones
         cleanAllTables();
         insertLocality();
@@ -141,14 +136,13 @@ public class LocalityDaoImplTest
         // 3. Postcondiciones
         assertNotNull(localitys);
         assertEquals(2, localitys.size());
-        for (Locality p : localitys){
+        for (Locality p : localitys) {
             assertTrue(p.getName().equals(LOCALITY) || p.getName().equals("Palermo"));
         }
     }
 
     @Test
-    public void testFindLocalitysByIdsDoesntExist()
-    {
+    public void testFindLocalitysByIdsDoesntExist() {
         // 1. Precondiciones
         cleanAllTables();
 
@@ -162,8 +156,7 @@ public class LocalityDaoImplTest
     }
 
     @Test
-    public void testFindLocalitysByName()
-    {
+    public void testFindLocalitysByName() {
         // 1. Precondiciones
         cleanAllTables();
         insertLocality();
@@ -174,14 +167,13 @@ public class LocalityDaoImplTest
         // 3. Postcondiciones
         assertNotNull(localitys);
         assertEquals(1, localitys.size());
-        for (Locality p : localitys){
+        for (Locality p : localitys) {
             assertEquals(LOCALITY, p.getName());
         }
     }
 
     @Test
-    public void testFindLocalitysByNameDoesntExist()
-    {
+    public void testFindLocalitysByNameDoesntExist() {
         // 1. Precondiciones
         cleanAllTables();
 
@@ -194,8 +186,7 @@ public class LocalityDaoImplTest
     }
 
     @Test
-    public void testLocalityList()
-    {
+    public void testLocalityList() {
         // 1. Precondiciones
         cleanAllTables();
         insertLocality();
@@ -210,8 +201,7 @@ public class LocalityDaoImplTest
     }
 
     @Test
-    public void testLocalitysEmptyList()
-    {
+    public void testLocalitysEmptyList() {
         // 1. Precondiciones
         cleanAllTables();
 
@@ -224,8 +214,7 @@ public class LocalityDaoImplTest
     }
 
     @Test
-    public void testLocalityUpdate()
-    {
+    public void testLocalityUpdate() {
         // 1. Precondiciones
         cleanAllTables();
         insertLocality();
@@ -236,15 +225,14 @@ public class LocalityDaoImplTest
         this.localityDao.update(p);
 
         // 3. Postcondiciones
-        assertEquals(1,JdbcTestUtils.countRowsInTable(jdbcTemplate, LOCALITIES_TABLE));
-        assertEquals(1,JdbcTestUtils.countRowsInTableWhere(jdbcTemplate, LOCALITIES_TABLE, "name = 'Palermo'"));
-        assertEquals(0,JdbcTestUtils.countRowsInTableWhere(jdbcTemplate, LOCALITIES_TABLE, "name = '" + LOCALITY + "'"));
+        assertEquals(1, JdbcTestUtils.countRowsInTable(jdbcTemplate, LOCALITIES_TABLE));
+        assertEquals(1, JdbcTestUtils.countRowsInTableWhere(jdbcTemplate, LOCALITIES_TABLE, "name = 'Palermo'"));
+        assertEquals(0, JdbcTestUtils.countRowsInTableWhere(jdbcTemplate, LOCALITIES_TABLE, "name = '" + LOCALITY + "'"));
 
     }
 
     @Test
-    public void testLocalityRemoveById()
-    {
+    public void testLocalityRemoveById() {
         // 1. Precondiciones
         cleanAllTables();
         insertLocality();
@@ -253,12 +241,11 @@ public class LocalityDaoImplTest
         this.localityDao.remove(0);
 
         // 3. Postcondiciones
-        assertEquals(0,JdbcTestUtils.countRowsInTable(jdbcTemplate, LOCALITIES_TABLE));
+        assertEquals(0, JdbcTestUtils.countRowsInTable(jdbcTemplate, LOCALITIES_TABLE));
     }
 
     @Test
-    public void testProvinceRemoveByModel()
-    {
+    public void testProvinceRemoveByModel() {
         // 1. Precondiciones
         cleanAllTables();
         insertLocality();
@@ -268,6 +255,6 @@ public class LocalityDaoImplTest
         this.localityDao.remove(p);
 
         // 3. Postcondiciones
-        assertEquals(0,JdbcTestUtils.countRowsInTable(jdbcTemplate, LOCALITIES_TABLE));
+        assertEquals(0, JdbcTestUtils.countRowsInTable(jdbcTemplate, LOCALITIES_TABLE));
     }
 }

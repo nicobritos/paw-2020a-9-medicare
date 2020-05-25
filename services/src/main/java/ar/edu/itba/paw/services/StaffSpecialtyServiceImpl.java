@@ -8,7 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
-public class StaffSpecialtyServiceImpl extends GenericSearchableServiceImpl<StaffSpecialtyDao, StaffSpecialty,Integer> implements StaffSpecialtyService {
+public class StaffSpecialtyServiceImpl extends GenericSearchableServiceImpl<StaffSpecialtyDao, StaffSpecialty, Integer> implements StaffSpecialtyService {
     @Autowired
     private StaffSpecialtyDao repository;
 

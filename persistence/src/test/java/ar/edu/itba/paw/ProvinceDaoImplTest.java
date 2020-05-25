@@ -21,8 +21,7 @@ import static org.junit.Assert.*;
 @RunWith(SpringJUnit4ClassRunner.class)
 @Sql(scripts = "classpath:sql/schema.sql")
 @ContextConfiguration(classes = TestConfig.class)
-public class ProvinceDaoImplTest
-{
+public class ProvinceDaoImplTest {
     private static final String PROVINCE = "Buenos Aires";
     private static final String COUNTRY = "Argentina";
     private static final String COUNTRY_ID = "AR";
@@ -39,8 +38,8 @@ public class ProvinceDaoImplTest
     private DataSource ds;
 
     @Before
-    public void setUp(){
-        this.provinceDao = new ProvinceDaoImpl(this.ds);
+    public void setUp() {
+        this.provinceDao = new ProvinceDaoImpl();
         this.jdbcTemplate = new JdbcTemplate(this.ds);
         this.provinceJdbcInsert = new SimpleJdbcInsert(this.ds)
                 .withTableName(PROVINCES_TABLE)
@@ -49,25 +48,25 @@ public class ProvinceDaoImplTest
                 .withTableName(COUNTRIES_TABLE);
     }
 
-    private void cleanAllTables(){
+    private void cleanAllTables() {
         this.jdbcTemplate.execute("TRUNCATE SCHEMA PUBLIC RESTART IDENTITY AND COMMIT NO CHECK");
     }
 
-    private Province provinceModel(){
+    private Province provinceModel() {
         Province p = new Province();
         p.setName(PROVINCE);
         p.setId(0);
         return p;
     }
 
-    private void insertCountry(){
+    private void insertCountry() {
         Map<String, Object> map = new HashMap<>();
         map.put("country_id", COUNTRY_ID);
         map.put("name", COUNTRY);
         countryJdbcInsert.execute(map);
     }
 
-    private void insertProvince(){
+    private void insertProvince() {
         insertCountry();
         Map<String, Object> map = new HashMap<>();
         map.put("country_id", COUNTRY_ID);
@@ -81,10 +80,9 @@ public class ProvinceDaoImplTest
         map.put("name", "Corrientes");
         provinceJdbcInsert.execute(map);
     }
-    
+
     @Test
-    public void testCreateProvince()
-    {
+    public void testCreateProvince() {
         // 1. Precondiciones
         cleanAllTables();
         insertCountry();
@@ -100,8 +98,7 @@ public class ProvinceDaoImplTest
     }
 
     @Test
-    public void testFindProvinceById()
-    {
+    public void testFindProvinceById() {
         // 1. Precondiciones
         cleanAllTables();
         insertProvince();
@@ -115,8 +112,7 @@ public class ProvinceDaoImplTest
     }
 
     @Test
-    public void testFindProvinceByIdDoesntExist()
-    {
+    public void testFindProvinceByIdDoesntExist() {
         // 1. Precondiciones
         cleanAllTables();
 
@@ -128,8 +124,7 @@ public class ProvinceDaoImplTest
     }
 
     @Test
-    public void testFindProvincesByIds()
-    {
+    public void testFindProvincesByIds() {
         // 1. Precondiciones
         cleanAllTables();
         insertProvince();
@@ -141,14 +136,13 @@ public class ProvinceDaoImplTest
         // 3. Postcondiciones
         assertNotNull(provinces);
         assertEquals(2, provinces.size());
-        for (Province p : provinces){
+        for (Province p : provinces) {
             assertTrue(p.getName().equals(PROVINCE) || p.getName().equals("Corrientes"));
         }
     }
 
     @Test
-    public void testFindProvincesByIdsDoesntExist()
-    {
+    public void testFindProvincesByIdsDoesntExist() {
         // 1. Precondiciones
         cleanAllTables();
 
@@ -162,8 +156,7 @@ public class ProvinceDaoImplTest
     }
 
     @Test
-    public void testFindProvincesByName()
-    {
+    public void testFindProvincesByName() {
         // 1. Precondiciones
         cleanAllTables();
         insertProvince();
@@ -174,14 +167,13 @@ public class ProvinceDaoImplTest
         // 3. Postcondiciones
         assertNotNull(provinces);
         assertEquals(1, provinces.size());
-        for (Province p : provinces){
+        for (Province p : provinces) {
             assertEquals(PROVINCE, p.getName());
         }
     }
 
     @Test
-    public void testFindProvincesByNameDoesntExist()
-    {
+    public void testFindProvincesByNameDoesntExist() {
         // 1. Precondiciones
         cleanAllTables();
 
@@ -194,8 +186,7 @@ public class ProvinceDaoImplTest
     }
 
     @Test
-    public void testProvinceList()
-    {
+    public void testProvinceList() {
         // 1. Precondiciones
         cleanAllTables();
         insertProvince();
@@ -210,8 +201,7 @@ public class ProvinceDaoImplTest
     }
 
     @Test
-    public void testProvincesEmptyList()
-    {
+    public void testProvincesEmptyList() {
         // 1. Precondiciones
         cleanAllTables();
 
@@ -224,8 +214,7 @@ public class ProvinceDaoImplTest
     }
 
     @Test
-    public void testProvinceUpdate()
-    {
+    public void testProvinceUpdate() {
         // 1. Precondiciones
         cleanAllTables();
         insertProvince();
@@ -236,29 +225,27 @@ public class ProvinceDaoImplTest
         this.provinceDao.update(p);
 
         // 3. Postcondiciones
-        assertEquals(1,JdbcTestUtils.countRowsInTable(jdbcTemplate, PROVINCES_TABLE));
-        assertEquals(1,JdbcTestUtils.countRowsInTableWhere(jdbcTemplate, PROVINCES_TABLE, "name = 'Corrientes'"));
-        assertEquals(0,JdbcTestUtils.countRowsInTableWhere(jdbcTemplate, PROVINCES_TABLE, "name = '" + PROVINCE + "'"));
+        assertEquals(1, JdbcTestUtils.countRowsInTable(jdbcTemplate, PROVINCES_TABLE));
+        assertEquals(1, JdbcTestUtils.countRowsInTableWhere(jdbcTemplate, PROVINCES_TABLE, "name = 'Corrientes'"));
+        assertEquals(0, JdbcTestUtils.countRowsInTableWhere(jdbcTemplate, PROVINCES_TABLE, "name = '" + PROVINCE + "'"));
 
     }
 
     @Test
-    public void testProvinceRemoveById()
-    {
+    public void testProvinceRemoveById() {
         // 1. Precondiciones
         cleanAllTables();
-       insertProvince();
+        insertProvince();
 
         // 2. Ejercitar
         this.provinceDao.remove(0);
 
         // 3. Postcondiciones
-        assertEquals(0,JdbcTestUtils.countRowsInTable(jdbcTemplate, PROVINCES_TABLE));
+        assertEquals(0, JdbcTestUtils.countRowsInTable(jdbcTemplate, PROVINCES_TABLE));
     }
 
     @Test
-    public void testCountryRemoveByModel()
-    {
+    public void testCountryRemoveByModel() {
         // 1. Precondiciones
         cleanAllTables();
         insertProvince();
@@ -268,6 +255,6 @@ public class ProvinceDaoImplTest
         this.provinceDao.remove(p);
 
         // 3. Postcondiciones
-        assertEquals(0,JdbcTestUtils.countRowsInTable(jdbcTemplate, PROVINCES_TABLE));
+        assertEquals(0, JdbcTestUtils.countRowsInTable(jdbcTemplate, PROVINCES_TABLE));
     }
 }

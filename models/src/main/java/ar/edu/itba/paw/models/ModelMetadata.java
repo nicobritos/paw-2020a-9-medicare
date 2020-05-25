@@ -3,29 +3,30 @@ package ar.edu.itba.paw.models;
 import java.util.Objects;
 
 public class ModelMetadata {
-    private final Integer count;
-    private final Integer min;
-    private final Integer max;
+    private final Long count;
+    private final Object min;
+    private final Object max;
 
     public ModelMetadata() {
-        this.count = this.min = this.max = null;
+        this.count = null;
+        this.min = this.max = null;
     }
 
-    public ModelMetadata(Integer count, Integer min, Integer max) {
+    public ModelMetadata(Long count, Object min, Object max) {
         this.count = count;
         this.min = min;
         this.max = max;
     }
 
-    public Integer getMin() {
+    public Object getMin() {
         return this.min;
     }
 
-    public Integer getMax() {
+    public Object getMax() {
         return this.max;
     }
 
-    public Integer getCount() {
+    public Long getCount() {
         return this.count;
     }
 

@@ -1,15 +1,32 @@
 package ar.edu.itba.paw.models;
 
-import ar.edu.itba.paw.persistenceAnnotations.Column;
-import ar.edu.itba.paw.persistenceAnnotations.OrderBy;
-import ar.edu.itba.paw.persistenceAnnotations.OrderCriteria;
-import ar.edu.itba.paw.persistenceAnnotations.Table;
+import javax.persistence.*;
 
-@Table(name = "system_staff_specialty", primaryKey = "specialty_id")
+@Entity
+@Table(
+        name = "system_staff_specialty",
+        indexes = {
+                @Index(columnList = "specialty_id", name = "specialty_specialty_id_uindex", unique = true)
+        }
+)
 public class StaffSpecialty extends GenericModel<Integer> {
-    @OrderBy(OrderCriteria.ASC)
-    @Column(name = "name", required = true)
+    @Id
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "specialty_pk")
+    @SequenceGenerator(sequenceName = "specialty_pk", name = "specialty_pk", allocationSize = 1)
+    @Column(name = "specialty_id")
+    private Integer id;
+    @Column(name = "name", nullable = false)
     private String name;
+
+    @Override
+    public Integer getId() {
+        return this.id;
+    }
+
+    @Override
+    public void setId(Integer id) {
+        this.id = id;
+    }
 
     public String getName() {
         return this.name;

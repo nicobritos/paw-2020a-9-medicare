@@ -2,8 +2,6 @@ package ar.edu.itba.paw;
 
 import ar.edu.itba.paw.models.*;
 import ar.edu.itba.paw.persistence.WorkdayDaoImpl;
-import org.joda.time.DateTime;
-import org.joda.time.LocalTime;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -16,7 +14,6 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.jdbc.JdbcTestUtils;
 
 import javax.sql.DataSource;
-import java.time.DayOfWeek;
 import java.util.*;
 
 import static org.junit.Assert.*;
@@ -24,8 +21,7 @@ import static org.junit.Assert.*;
 @RunWith(SpringJUnit4ClassRunner.class)
 @Sql(scripts = "classpath:sql/schema.sql")
 @ContextConfiguration(classes = TestConfig.class)
-public class WorkdayDaoImplTest
-{
+public class WorkdayDaoImplTest {
     private static final String OFFICE_NAME = "Hospital Nacional";
     public static final String NAME_2 = OFFICE_NAME + "_1";
     private static final String OFFICE_STREET = "Av 9 de Julio";
@@ -48,8 +44,8 @@ public class WorkdayDaoImplTest
     private static final Integer START_MINUTE = 30;
     private static final Integer END_MINUTE = 15;
     private static final Integer END_MINUTE_2 = 30;
-    private static final String DAY_OF_WEEK = DayOfWeek.MONDAY.name();
-    private static final String DAY_OF_WEEK_2 = DayOfWeek.TUESDAY.name();
+    private static final WorkdayDay DAY_OF_WEEK = WorkdayDay.MONDAY;
+    private static final WorkdayDay DAY_OF_WEEK_2 = WorkdayDay.TUESDAY;
 
 
     private static final String OFFICE_TABLE = "office";
@@ -72,8 +68,8 @@ public class WorkdayDaoImplTest
     private DataSource ds;
 
     @Before
-    public void setUp(){
-        this.workdayDao = new WorkdayDaoImpl(this.ds);
+    public void setUp() {
+        this.workdayDao = new WorkdayDaoImpl();
         this.jdbcTemplate = new JdbcTemplate(this.ds);
         this.officeJdbcInsert = new SimpleJdbcInsert(this.ds)
                 .withTableName(OFFICE_TABLE)
@@ -93,12 +89,12 @@ public class WorkdayDaoImplTest
                 .withTableName(WORKDAY_TABLE)
                 .usingGeneratedKeyColumns("workday_id");
     }
-    
-    private void cleanAllTables(){
+
+    private void cleanAllTables() {
         this.jdbcTemplate.execute("TRUNCATE SCHEMA PUBLIC RESTART IDENTITY AND COMMIT NO CHECK");
     }
 
-    private void insertLocality(){
+    private void insertLocality() {
         // Insertar pais
         Map<String, Object> countryMap = new HashMap<>();
         countryMap.put("name", COUNTRY);
@@ -117,7 +113,7 @@ public class WorkdayDaoImplTest
         localityJdbcInsert.execute(localityMap);
     }
 
-    private void insertOffice(){
+    private void insertOffice() {
         insertLocality();
 
         Map<String, Object> officeMap = new HashMap<>();
@@ -154,7 +150,7 @@ public class WorkdayDaoImplTest
         this.staffJdbcInsert.execute(staffMap);
     }
 
-    private void insertWorkday(){
+    private void insertWorkday() {
         insertStaff();
         Map<String, Object> workdayMap = new HashMap<>();
         workdayMap.put("staff_id", 0);
@@ -166,7 +162,7 @@ public class WorkdayDaoImplTest
         this.workdayJdbcInsert.execute(workdayMap);
     }
 
-    private void insertAnotherWorkday(){
+    private void insertAnotherWorkday() {
         Map<String, Object> workdayMap = new HashMap<>();
         workdayMap.put("staff_id", 0);
         workdayMap.put("start_hour", START_HOUR);
@@ -177,21 +173,21 @@ public class WorkdayDaoImplTest
         this.workdayJdbcInsert.execute(workdayMap);
     }
 
-    private Country countryModel(){
+    private Country countryModel() {
         Country c = new Country();
         c.setName(COUNTRY);
         c.setId(COUNTRY_ID);
         return c;
     }
 
-    private Locality localityModel(){
+    private Locality localityModel() {
         Locality l = new Locality();
         l.setName(LOCALITY);
         l.setId(0); // Identity de HSQLDB empieza en 0
         return l;
     }
 
-    private Office officeModel(){
+    private Office officeModel() {
         Office o = new Office();
         o.setId(0);
         o.setName(OFFICE_NAME);
@@ -202,7 +198,7 @@ public class WorkdayDaoImplTest
         return o;
     }
 
-    private Workday workdayModel(){
+    private Workday workdayModel() {
         Workday workday = new Workday();
         workday.setId(0);
         workday.setDay(DAY_OF_WEEK);
@@ -215,8 +211,7 @@ public class WorkdayDaoImplTest
     }
 
     @Test
-    public void testCreateWorkday()
-    {
+    public void testCreateWorkday() {
         // 1. Precondiciones
         cleanAllTables();
         insertStaff();
@@ -231,7 +226,7 @@ public class WorkdayDaoImplTest
     }
 
     @Test
-    public void testFindById(){
+    public void testFindById() {
         // 1. Precondiciones
         cleanAllTables();
         insertWorkday();
@@ -241,12 +236,12 @@ public class WorkdayDaoImplTest
 
         // 3. Postcondiciones
         assertTrue(maybeWorkday.isPresent());
-        assertEquals(0, (int)maybeWorkday.get().getId());
+        assertEquals(0, (int) maybeWorkday.get().getId());
         assertEquals(DAY_OF_WEEK, maybeWorkday.get().getDay());
     }
 
     @Test
-    public void testFindByIdDoesntExist(){
+    public void testFindByIdDoesntExist() {
         // 1. Precondiciones
         cleanAllTables();
 
@@ -258,14 +253,14 @@ public class WorkdayDaoImplTest
     }
 
     @Test
-    public void testFindByIds(){
+    public void testFindByIds() {
         // 1. Precondiciones
         cleanAllTables();
         insertWorkday();
         insertAnotherWorkday();
 
         // 2. Ejercitar
-        Collection<Workday> workdays = workdayDao.findByIds(Arrays.asList(0,1,2)); // Identity de HSQLDB empieza en 0
+        Collection<Workday> workdays = workdayDao.findByIds(Arrays.asList(0, 1, 2)); // Identity de HSQLDB empieza en 0
 
         // 3. Postcondiciones
         assertNotNull(workdays);
@@ -273,12 +268,12 @@ public class WorkdayDaoImplTest
     }
 
     @Test
-    public void testFindByIdsDoesntExist(){
+    public void testFindByIdsDoesntExist() {
         // 1. Precondiciones
         cleanAllTables();
 
         // 2. Ejercitar
-        Collection<Workday> workdays = workdayDao.findByIds(Arrays.asList(0,1,2)); // Identity de HSQLDB empieza en 0
+        Collection<Workday> workdays = workdayDao.findByIds(Arrays.asList(0, 1, 2)); // Identity de HSQLDB empieza en 0
 
         // 3. Postcondiciones
         assertNotNull(workdays);
@@ -286,7 +281,7 @@ public class WorkdayDaoImplTest
     }
 
     @Test
-    public void testList(){
+    public void testList() {
         // 1. Precondiciones
         // Vaciar tablas
         cleanAllTables();
@@ -302,7 +297,7 @@ public class WorkdayDaoImplTest
     }
 
     @Test
-    public void testEmptyList(){
+    public void testEmptyList() {
         // 1. Precondiciones
         cleanAllTables();
 
@@ -315,7 +310,7 @@ public class WorkdayDaoImplTest
     }
 
     @Test
-    public void testRemoveById(){
+    public void testRemoveById() {
         // 1. Precondiciones
         cleanAllTables();
         insertWorkday();
@@ -329,7 +324,7 @@ public class WorkdayDaoImplTest
     }
 
     @Test
-    public void testRemoveByModel(){
+    public void testRemoveByModel() {
         // 1. Precondiciones
         cleanAllTables();
         insertWorkday();
@@ -343,7 +338,7 @@ public class WorkdayDaoImplTest
     }
 
     @Test
-    public void testUpdate(){
+    public void testUpdate() {
         // 1. Precondiciones
         cleanAllTables();
         insertWorkday();

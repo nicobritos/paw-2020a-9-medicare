@@ -1,15 +1,31 @@
 package ar.edu.itba.paw.models;
 
-import ar.edu.itba.paw.persistenceAnnotations.Column;
-import ar.edu.itba.paw.persistenceAnnotations.OrderBy;
-import ar.edu.itba.paw.persistenceAnnotations.OrderCriteria;
-import ar.edu.itba.paw.persistenceAnnotations.Table;
+import javax.persistence.*;
 
-@Table(name = "system_country", primaryKey = "country_id", manualPrimaryKey = true)
+@Entity
+@Table(
+        name = "system_country",
+        indexes = {
+                @Index(columnList = "country_id", name = "system_country_country_id_uindex", unique = true),
+        }
+)
 public class Country extends GenericModel<String> {
-    @OrderBy(OrderCriteria.ASC)
-    @Column(name = "name", required = true)
+    @Id
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "system_country_pk")
+    @SequenceGenerator(sequenceName = "system_country_pk", name = "system_country_pk", allocationSize = 1)
+    @Column(name = "country_id")
+    private String id;
+    @Column(name = "name", nullable = false)
     private String name;
+
+    @Override
+    public String getId() {
+        return this.id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
 
     public String getName() {
         return this.name;

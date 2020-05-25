@@ -5,10 +5,11 @@ import java.util.LinkedList;
 import java.util.List;
 
 public class Paginator<M extends GenericModel<?>> {
-    private final int totalCount, pageSize, page, remainingPages;
+    private final Long totalCount;
+    private final int pageSize, page, remainingPages;
     private final List<M> models;
 
-    public Paginator(Collection<M> models, int page, int pageSize, int totalCount) {
+    public Paginator(Collection<M> models, int page, int pageSize, Long totalCount) {
         this.models = new LinkedList<>(models);
         this.pageSize = pageSize;
         this.totalCount = totalCount;
@@ -17,7 +18,7 @@ public class Paginator<M extends GenericModel<?>> {
         this.remainingPages = (int) Math.ceil((double) totalCount / (double) pageSize) - page;
     }
 
-    public int getTotalCount() {
+    public Long getTotalCount() {
         return this.totalCount;
     }
 

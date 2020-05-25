@@ -34,7 +34,7 @@ public class StaffSpecialityDaoImplTest {
 
     @Before
     public void setUp() {
-        this.staffSpecialtyDao = new StaffSpecialtyDaoImpl(this.ds);
+        this.staffSpecialtyDao = new StaffSpecialtyDaoImpl();
         this.jdbcTemplate = new JdbcTemplate(this.ds);
         this.staffSpecialtyInsert = new SimpleJdbcInsert(this.ds)
                 .withTableName(SPECIALTIES_TABLE)
