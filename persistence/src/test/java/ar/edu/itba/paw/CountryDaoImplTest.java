@@ -22,8 +22,7 @@ import static org.junit.Assert.*;
 @RunWith(SpringJUnit4ClassRunner.class)
 @Sql("classpath:sql/schema.sql")
 @ContextConfiguration(classes = TestConfig.class)
-public class CountryDaoImplTest
-{
+public class CountryDaoImplTest {
     private static final String COUNTRY = "Argentina";
     private static final String COUNTRY_ID = "AR";
     private static final String PROVINCE = "Buenos Aires";
@@ -40,8 +39,8 @@ public class CountryDaoImplTest
     private DataSource ds;
 
     @Before
-    public void setUp(){
-        this.countryDao = new CountryDaoImpl(this.ds);
+    public void setUp() {
+        this.countryDao = new CountryDaoImpl();
         this.jdbcTemplate = new JdbcTemplate(this.ds);
         this.jdbcInsert = new SimpleJdbcInsert(this.ds)
                 .withTableName(COUNTRIES_TABLE);
@@ -50,18 +49,18 @@ public class CountryDaoImplTest
                 .usingGeneratedKeyColumns("province_id");
     }
 
-    private void cleanAllTables(){
+    private void cleanAllTables() {
         this.jdbcTemplate.execute("TRUNCATE SCHEMA PUBLIC RESTART IDENTITY AND COMMIT NO CHECK");
     }
 
-    private Province provinceModel(){
+    private Province provinceModel() {
         Province p = new Province();
         p.setName(PROVINCE);
         p.setId(0);
         return p;
     }
 
-    private Country countryModel(){
+    private Country countryModel() {
         Country c = new Country();
         c.setName(COUNTRY);
         c.setId(COUNTRY_ID);
@@ -83,8 +82,7 @@ public class CountryDaoImplTest
     }
 
     @Test
-    public void testCreateCountry()
-    {
+    public void testCreateCountry() {
         // 1. Precondiciones
         cleanAllTables();
         Country c = countryModel();
@@ -99,8 +97,7 @@ public class CountryDaoImplTest
     }
 
     @Test
-    public void testFindCountryById()
-    {
+    public void testFindCountryById() {
         // 1. Precondiciones
         cleanAllTables();
         insertCountry();
@@ -114,11 +111,10 @@ public class CountryDaoImplTest
     }
 
     @Test
-    public void testFindCountryByIdDoesntExist()
-    {
+    public void testFindCountryByIdDoesntExist() {
         // 1. Precondiciones
         cleanAllTables();
-        
+
         // 2. Ejercitar
         Optional<Country> country = this.countryDao.findById(COUNTRY_ID);
 
@@ -127,8 +123,7 @@ public class CountryDaoImplTest
     }
 
     @Test
-    public void testFindCountryByIds()
-    {
+    public void testFindCountryByIds() {
         // 1. Precondiciones
         cleanAllTables();
         insertCountry();
@@ -140,14 +135,13 @@ public class CountryDaoImplTest
         // 3. Postcondiciones
         assertNotNull(countries);
         assertEquals(2, countries.size());
-        for (Country c : countries){
+        for (Country c : countries) {
             assertTrue(c.getId().equals(COUNTRY_ID) || c.getId().equals("BR"));
         }
     }
 
     @Test
-    public void testFindCountryByIdsDoesntExist()
-    {
+    public void testFindCountryByIdsDoesntExist() {
         // 1. Precondiciones
         cleanAllTables();// 2. Ejercitar
         Collection<Country> countries = this.countryDao.findByIds(Arrays.asList(COUNTRY, "BR"));
@@ -159,8 +153,7 @@ public class CountryDaoImplTest
     }
 
     @Test
-    public void testFindCountryByName()
-    {
+    public void testFindCountryByName() {
         // 1. Precondiciones
         cleanAllTables();
         insertCountry();
@@ -171,14 +164,13 @@ public class CountryDaoImplTest
         // 3. Postcondiciones
         assertNotNull(countries);
         assertEquals(1, countries.size());
-        for (Country c : countries){
+        for (Country c : countries) {
             assertEquals(COUNTRY, c.getName());
         }
     }
 
     @Test
-    public void testFindCountryByNameDoesntExist()
-    {
+    public void testFindCountryByNameDoesntExist() {
         // 1. Precondiciones
         cleanAllTables();// 2. Ejercitar
         Collection<Country> countries = this.countryDao.findByName(COUNTRY);
@@ -189,8 +181,7 @@ public class CountryDaoImplTest
     }
 
     @Test
-    public void testCountryList()
-    {
+    public void testCountryList() {
         // 1. Precondiciones
         cleanAllTables();
         insertCountry();
@@ -205,8 +196,7 @@ public class CountryDaoImplTest
     }
 
     @Test
-    public void testCountryEmptyList()
-    {
+    public void testCountryEmptyList() {
         // 1. Precondiciones
         cleanAllTables();// 2. Ejercitar
         Collection<Country> countries = this.countryDao.list();
@@ -217,8 +207,7 @@ public class CountryDaoImplTest
     }
 
     @Test
-    public void testCountryUpdate()
-    {
+    public void testCountryUpdate() {
         // 1. Precondiciones
         cleanAllTables();
         insertCountry();
@@ -229,15 +218,14 @@ public class CountryDaoImplTest
         this.countryDao.update(c);
 
         // 3. Postcondiciones
-        assertEquals(1,JdbcTestUtils.countRowsInTable(jdbcTemplate, COUNTRIES_TABLE));
-        assertEquals(1,JdbcTestUtils.countRowsInTableWhere(jdbcTemplate, COUNTRIES_TABLE, "name = 'Armenia'"));
-        assertEquals(0,JdbcTestUtils.countRowsInTableWhere(jdbcTemplate, COUNTRIES_TABLE, "name = '"+ COUNTRY +"'"));
+        assertEquals(1, JdbcTestUtils.countRowsInTable(jdbcTemplate, COUNTRIES_TABLE));
+        assertEquals(1, JdbcTestUtils.countRowsInTableWhere(jdbcTemplate, COUNTRIES_TABLE, "name = 'Armenia'"));
+        assertEquals(0, JdbcTestUtils.countRowsInTableWhere(jdbcTemplate, COUNTRIES_TABLE, "name = '" + COUNTRY + "'"));
 
     }
 
     @Test
-    public void testCountryRemoveById()
-    {
+    public void testCountryRemoveById() {
         // 1. Precondiciones
         cleanAllTables();
         insertCountry();
@@ -246,12 +234,11 @@ public class CountryDaoImplTest
         this.countryDao.remove(COUNTRY_ID);
 
         // 3. Postcondiciones
-        assertEquals(0,JdbcTestUtils.countRowsInTable(jdbcTemplate, COUNTRIES_TABLE));
+        assertEquals(0, JdbcTestUtils.countRowsInTable(jdbcTemplate, COUNTRIES_TABLE));
     }
 
     @Test
-    public void testCountryRemoveByModel()
-    {
+    public void testCountryRemoveByModel() {
         // 1. Precondiciones
         cleanAllTables();
         insertCountry();
@@ -261,6 +248,6 @@ public class CountryDaoImplTest
         this.countryDao.remove(c);
 
         // 3. Postcondiciones
-        assertEquals(0,JdbcTestUtils.countRowsInTable(jdbcTemplate, COUNTRIES_TABLE));
+        assertEquals(0, JdbcTestUtils.countRowsInTable(jdbcTemplate, COUNTRIES_TABLE));
     }
 }

@@ -3,12 +3,15 @@ package ar.edu.itba.paw.interfaces.daos.generic;
 import ar.edu.itba.paw.models.GenericModel;
 import ar.edu.itba.paw.models.ModelMetadata;
 
+import javax.persistence.metamodel.SingularAttribute;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 /**
  * This provides a generic DAO interface
+ *
  * @param <M> the DAO model type
  * @param <I> the Model's id type
  */
@@ -29,9 +32,5 @@ public interface GenericDao<M extends GenericModel<I>, I> {
 
     ModelMetadata count();
 
-    Class<M> getModelClass();
-
-    List<M> findByField(String field, Object value);
-
-    Optional<?> findFieldById(I id, String field);
+    ModelMetadata count(Map<SingularAttribute<? super M, ?>, Object> parametersValues);
 }

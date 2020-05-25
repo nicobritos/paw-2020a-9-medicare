@@ -11,7 +11,7 @@ import org.springframework.stereotype.Service;
 import java.util.Set;
 
 @Service
-public class CountryServiceImpl extends GenericSearchableServiceImpl<CountryDao, Country,String> implements CountryService {
+public class CountryServiceImpl extends GenericSearchableServiceImpl<CountryDao, Country, String> implements CountryService {
     @Autowired
     private CountryDao repository;
 

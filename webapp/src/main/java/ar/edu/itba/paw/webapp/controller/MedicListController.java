@@ -73,7 +73,7 @@ public class MedicListController extends GenericController {
                 try {
                     StaffSpecialty specialty = new StaffSpecialty();
                     specialty.setId(Integer.parseInt(s));
-                    if(specialty.getId() >= 0) {
+                    if (specialty.getId() >= 0) {
                         searchedSpecialties.add(specialty);
                     }
                 } catch (NumberFormatException e) {
@@ -90,7 +90,7 @@ public class MedicListController extends GenericController {
                 try {
                     Locality locality = new Locality();
                     locality.setId(Integer.parseInt(s));
-                    if(locality.getId() >= 0){
+                    if (locality.getId() >= 0) {
                         searchedLocalities.add(locality);
                     }
                 } catch (NumberFormatException e) {
@@ -113,7 +113,7 @@ public class MedicListController extends GenericController {
         Optional<User> user = getUser();
         mav.addObject("user", user);
         if (user.isPresent() && isStaff()) {
-            mav.addObject("staffs", staffService.findByUser(user.get().getId()));
+            mav.addObject("staffs", staffService.findByUser(user.get()));
         }
         mav.addObject("searchedLocalities", searchedLocalities);
         mav.addObject("searchedSpecialties", searchedSpecialties);
@@ -145,7 +145,7 @@ public class MedicListController extends GenericController {
         Optional<User> user = getUser();
         mav.addObject("user", user);
         if (user.isPresent() && isStaff()) {
-            mav.addObject("staffs", staffService.findByUser(user.get().getId()));
+            mav.addObject("staffs", staffService.findByUser(user.get()));
         }
         mav.addObject("staff", staff.get());
 

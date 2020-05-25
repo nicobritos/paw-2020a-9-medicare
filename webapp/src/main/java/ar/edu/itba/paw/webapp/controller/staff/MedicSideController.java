@@ -52,7 +52,7 @@ public class MedicSideController extends GenericController {
         }
         ModelAndView mav = new ModelAndView();
 
-        List<Staff> userStaffs = staffService.findByUser(user.get().getId());
+        List<Staff> userStaffs = staffService.findByUser(user.get());
         DateTime today = DateTime.now();
         DateTime monday;
         DateTime selected = today;
@@ -78,7 +78,7 @@ public class MedicSideController extends GenericController {
 
         mav.addObject("user", user);
         if (isStaff()) {
-            mav.addObject("staffs", staffService.findByUser(user.get().getId()));
+            mav.addObject("staffs", staffService.findByUser(user.get()));
         }
         mav.addObject("today", today);
         mav.addObject("isToday", isToday);
@@ -124,7 +124,7 @@ public class MedicSideController extends GenericController {
         ModelAndView mav = new ModelAndView();
         mav.addObject("user", user);
         if (isStaff()) {
-            mav.addObject("staffs", staffService.findByUser(user.get().getId()));
+            mav.addObject("staffs", staffService.findByUser(user.get()));
             mav.addObject("workdays", workdayService.findByUser(user.get()));
         }
         mav.addObject("verified", user.get().getVerified());
@@ -165,7 +165,7 @@ public class MedicSideController extends GenericController {
         ModelAndView mav = new ModelAndView();
         mav.addObject("user", user);
         if (isStaff()) {
-            mav.addObject("staffs", staffService.findByUser(user.get().getId()));
+            mav.addObject("staffs", staffService.findByUser(user.get()));
         }
         mav.setViewName("redirect:/staff/profile");
         return mav;
@@ -181,7 +181,7 @@ public class MedicSideController extends GenericController {
         ModelAndView mav = new ModelAndView();
         mav.addObject("user", user);
         if (isStaff()) {
-            mav.addObject("staffs", staffService.findByUser(user.get().getId()));
+            mav.addObject("staffs", staffService.findByUser(user.get()));
         }
         mav.setViewName("medicSide/addTurno");
         return mav;
@@ -205,7 +205,7 @@ public class MedicSideController extends GenericController {
             return this.addWorkday(form);
         }
 
-        Optional<Staff> realStaff = staffService.findByUser(user.get().getId()).stream().filter(staff -> staff.getOffice().equals(office.get())).findAny();
+        Optional<Staff> realStaff = staffService.findByUser(user.get()).stream().filter(staff -> staff.getOffice().equals(office.get())).findAny();
         if (!realStaff.isPresent()) {
             errors.reject("NotFound.workdayForm.staff", null, "Error");
             return this.addWorkday(form);
@@ -228,25 +228,25 @@ public class MedicSideController extends GenericController {
         Workday workday = new Workday();
         switch (form.getDow()) {
             case 7:
-                workday.setDay(WorkdayDay.SUNDAY.name());
+                workday.setDay(WorkdayDay.SUNDAY);
                 break;
             case 1:
-                workday.setDay(WorkdayDay.MONDAY.name());
+                workday.setDay(WorkdayDay.MONDAY);
                 break;
             case 2:
-                workday.setDay(WorkdayDay.TUESDAY.name());
+                workday.setDay(WorkdayDay.TUESDAY);
                 break;
             case 3:
-                workday.setDay(WorkdayDay.WEDNESDAY.name());
+                workday.setDay(WorkdayDay.WEDNESDAY);
                 break;
             case 4:
-                workday.setDay(WorkdayDay.THURSDAY.name());
+                workday.setDay(WorkdayDay.THURSDAY);
                 break;
             case 5:
-                workday.setDay(WorkdayDay.FRIDAY.name());
+                workday.setDay(WorkdayDay.FRIDAY);
                 break;
             case 6:
-                workday.setDay(WorkdayDay.SATURDAY.name());
+                workday.setDay(WorkdayDay.SATURDAY);
                 break;
             default:
                 return this.addWorkday(form);
@@ -261,7 +261,7 @@ public class MedicSideController extends GenericController {
         ModelAndView mav = new ModelAndView();
         mav.addObject("user", user);
         if (isStaff()) {
-            mav.addObject("staffs", staffService.findByUser(user.get().getId()));
+            mav.addObject("staffs", staffService.findByUser(user.get()));
         }
         mav.setViewName("redirect:/staff/profile");
         return mav;
@@ -297,7 +297,7 @@ public class MedicSideController extends GenericController {
             return new ModelAndView("redirect:/login");
         }
         //get staff for current user
-        List<Staff> staff = this.staffService.findByUser(user.get().getId());
+        List<Staff> staff = this.staffService.findByUser(user.get());
         //get appointment to delete, check for "null"
         Optional<Appointment> appointment = this.appointmentService.findById(id);
         if (!appointment.isPresent()) {

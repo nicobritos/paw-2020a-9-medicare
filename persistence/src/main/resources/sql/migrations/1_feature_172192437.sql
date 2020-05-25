@@ -1,11 +1,11 @@
 create table users
 (
-    email text not null,
-    password text not null,
-    users_id serial not null,
-    first_name text not null,
-    surname text not null,
-    phone text
+    email      text   not null,
+    password   text   not null,
+    users_id   serial not null,
+    first_name text   not null,
+    surname    text   not null,
+    phone      text
 );
 
 create unique index user_email_uindex
@@ -20,11 +20,11 @@ alter table users
 
 create table patient
 (
-    user_id int
+    user_id    int
         constraint patient_users_users_id_fk
             references users
             on update restrict on delete set null,
-    office_id int not null
+    office_id  int    not null
         constraint patient_office_office_id_fk
             references office
             on update restrict on delete cascade,

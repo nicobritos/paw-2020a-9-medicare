@@ -23,8 +23,7 @@ import static org.junit.Assert.*;
 @RunWith(SpringJUnit4ClassRunner.class)
 @Sql(scripts = "classpath:sql/schema.sql")
 @ContextConfiguration(classes = TestConfig.class)
-public class OfficeDaoImplTest
-{
+public class OfficeDaoImplTest {
     private static final String NAME = "Hospital Nacional";
     public static final String NAME_2 = NAME + "_1";
     private static final String STREET = "Av 9 de Julio";
@@ -52,8 +51,8 @@ public class OfficeDaoImplTest
     private DataSource ds;
 
     @Before
-    public void setUp(){
-        this.officeDao = new OfficeDaoImpl(this.ds);
+    public void setUp() {
+        this.officeDao = new OfficeDaoImpl();
         this.jdbcTemplate = new JdbcTemplate(this.ds);
         this.officeJdbcInsert = new SimpleJdbcInsert(this.ds)
                 .withTableName(OFFICE_TABLE)
@@ -67,12 +66,12 @@ public class OfficeDaoImplTest
         this.countryJdbcInsert = new SimpleJdbcInsert(this.ds)
                 .withTableName(COUNTRY_TABLE);
     }
-    
-    private void cleanAllTables(){
+
+    private void cleanAllTables() {
         this.jdbcTemplate.execute("TRUNCATE SCHEMA PUBLIC RESTART IDENTITY AND COMMIT NO CHECK");
     }
 
-    private void insertLocality(){
+    private void insertLocality() {
         // Insertar pais
         Map<String, Object> countryMap = new HashMap<>();
         countryMap.put("name", COUNTRY);
@@ -91,7 +90,7 @@ public class OfficeDaoImplTest
         localityJdbcInsert.execute(localityMap);
     }
 
-    private void insertOffice(){
+    private void insertOffice() {
         insertLocality();
 
         Map<String, Object> officeMap = new HashMap<>();
@@ -104,7 +103,7 @@ public class OfficeDaoImplTest
         officeJdbcInsert.execute(officeMap);
     }
 
-    private void insertAnotherOffice(){
+    private void insertAnotherOffice() {
         Map<String, Object> officeMap = new HashMap<>();
         officeMap.put("name", NAME_2);
         officeMap.put("email", EMAIL);
@@ -115,21 +114,21 @@ public class OfficeDaoImplTest
         officeJdbcInsert.execute(officeMap);
     }
 
-    private Country countryModel(){
+    private Country countryModel() {
         Country c = new Country();
         c.setName(COUNTRY);
         c.setId(COUNTRY_ID);
         return c;
     }
 
-    private Locality localityModel(){
+    private Locality localityModel() {
         Locality l = new Locality();
         l.setName(LOCALITY);
         l.setId(0); // Identity de HSQLDB empieza en 0
         return l;
     }
 
-    private Office officeModel(){
+    private Office officeModel() {
         Office o = new Office();
         o.setId(0);
         o.setName(NAME);
@@ -141,8 +140,7 @@ public class OfficeDaoImplTest
     }
 
     @Test
-    public void testCreateOffice()
-    {
+    public void testCreateOffice() {
         // 1. Precondiciones
         cleanAllTables();
         insertLocality();
@@ -154,12 +152,12 @@ public class OfficeDaoImplTest
         // 3. Postcondiciones
         assertEquals(1, JdbcTestUtils.countRowsInTable(this.jdbcTemplate, OFFICE_TABLE));
         assertEquals(NAME, office.getName());
-        assertEquals(0, (int)office.getId()); // Identity de HSQLDB empieza en 0
+        assertEquals(0, (int) office.getId()); // Identity de HSQLDB empieza en 0
         assertEquals(localityModel(), office.getLocality());
     }
 
     @Test
-    public void testFindById(){
+    public void testFindById() {
         // 1. Precondiciones
         cleanAllTables();
         insertOffice();
@@ -169,12 +167,12 @@ public class OfficeDaoImplTest
 
         // 3. Postcondiciones
         assertTrue(maybeOffice.isPresent());
-        assertEquals(0, (int)maybeOffice.get().getId());
+        assertEquals(0, (int) maybeOffice.get().getId());
         assertEquals(NAME, maybeOffice.get().getName());
     }
 
     @Test
-    public void testFindByIdDoesntExist(){
+    public void testFindByIdDoesntExist() {
         // 1. Precondiciones
         cleanAllTables();
 
@@ -186,14 +184,14 @@ public class OfficeDaoImplTest
     }
 
     @Test
-    public void testFindByIds(){
+    public void testFindByIds() {
         // 1. Precondiciones
         cleanAllTables();
         insertOffice();
         insertAnotherOffice();
 
         // 2. Ejercitar
-        Collection<Office> offices = officeDao.findByIds(Arrays.asList(0,1,2)); // Identity de HSQLDB empieza en 0
+        Collection<Office> offices = officeDao.findByIds(Arrays.asList(0, 1, 2)); // Identity de HSQLDB empieza en 0
 
         // 3. Postcondiciones
         assertNotNull(offices);
@@ -201,12 +199,12 @@ public class OfficeDaoImplTest
     }
 
     @Test
-    public void testFindByIdsDoesntExist(){
+    public void testFindByIdsDoesntExist() {
         // 1. Precondiciones
         cleanAllTables();
 
         // 2. Ejercitar
-        Collection<Office> offices = officeDao.findByIds(Arrays.asList(0,1,2)); // Identity de HSQLDB empieza en 0
+        Collection<Office> offices = officeDao.findByIds(Arrays.asList(0, 1, 2)); // Identity de HSQLDB empieza en 0
 
         // 3. Postcondiciones
         assertNotNull(offices);
@@ -214,7 +212,7 @@ public class OfficeDaoImplTest
     }
 
     @Test
-    public void testFindByName(){
+    public void testFindByName() {
         // 1. Precondiciones
         cleanAllTables();
         insertOffice();
@@ -231,7 +229,7 @@ public class OfficeDaoImplTest
     }
 
     @Test
-    public void testFindByNameDoesntExist(){
+    public void testFindByNameDoesntExist() {
         // 1. Precondiciones
         cleanAllTables();
 
@@ -244,7 +242,7 @@ public class OfficeDaoImplTest
     }
 
     @Test
-    public void testList(){
+    public void testList() {
         // 1. Precondiciones
         // Vaciar tablas
         cleanAllTables();
@@ -260,7 +258,7 @@ public class OfficeDaoImplTest
     }
 
     @Test
-    public void testEmptyList(){
+    public void testEmptyList() {
         // 1. Precondiciones
         cleanAllTables();
 
@@ -273,7 +271,7 @@ public class OfficeDaoImplTest
     }
 
     @Test
-    public void testFindByCountry(){
+    public void testFindByCountry() {
         // 1. Precondiciones
         cleanAllTables();
 
@@ -312,7 +310,7 @@ public class OfficeDaoImplTest
     }
 
     @Test
-    public void testFindByCountryDoesntExists(){
+    public void testFindByCountryDoesntExists() {
         // 1. Precondiciones
         cleanAllTables();
 
@@ -328,7 +326,7 @@ public class OfficeDaoImplTest
     }
 
     @Test
-    public void testRemoveById(){
+    public void testRemoveById() {
         // 1. Precondiciones
         cleanAllTables();
         insertOffice();
@@ -342,7 +340,7 @@ public class OfficeDaoImplTest
     }
 
     @Test
-    public void testRemoveByModel(){
+    public void testRemoveByModel() {
         // 1. Precondiciones
         cleanAllTables();
         insertOffice();
@@ -356,7 +354,7 @@ public class OfficeDaoImplTest
     }
 
     @Test
-    public void testUpdate(){
+    public void testUpdate() {
         // 1. Precondiciones
         cleanAllTables();
         insertOffice();

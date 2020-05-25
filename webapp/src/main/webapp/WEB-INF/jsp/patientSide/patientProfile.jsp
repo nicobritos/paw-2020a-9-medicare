@@ -19,7 +19,7 @@
                         <img
                                 id="profilePic"
                                 class="profile-picture rounded-circle"
-                                src="<c:url value="/profilePics/${user.get().profileId}"/>"
+                                src="<c:url value="/profilePics/${user.get().profilePicture.id}"/>"
                                 alt=""
                         />
                     </div>

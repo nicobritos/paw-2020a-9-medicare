@@ -14,6 +14,7 @@ public interface ProvinceService extends GenericService<Province, Integer> {
     /**
      * Returns Provinces with a name similar to the one provided filtered out by Country.
      * The search is not case-sensitive nor exact
+     *
      * @param name the province's name
      * @return a collection of matched provinces
      */

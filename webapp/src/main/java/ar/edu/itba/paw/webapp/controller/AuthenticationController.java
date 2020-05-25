@@ -156,7 +156,7 @@ public class AuthenticationController extends GenericController {
             mav.setViewName("redirect:/login?token=" + token);
             return mav;
         }
-        if(userOptional.get().getVerified()){
+        if (userOptional.get().getVerified()) {
             mav.setViewName("redirect:/home");
             return mav;
         }

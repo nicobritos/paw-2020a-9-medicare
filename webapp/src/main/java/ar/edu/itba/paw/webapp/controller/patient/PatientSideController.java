@@ -57,7 +57,7 @@ public class PatientSideController extends GenericController {
 
         mav.addObject("user", user);
         if (isStaff()) {
-            mav.addObject("staffs", staffService.findByUser(user.get().getId()));
+            mav.addObject("staffs", staffService.findByUser(user.get()));
         }
         mav.addObject("appointments", appointmentService.findByPatientsFromDate(patients, DateTime.now()));
         mav.addObject("specialties", staffSpecialtyService.list());
@@ -76,7 +76,7 @@ public class PatientSideController extends GenericController {
         ModelAndView mav = new ModelAndView();
         mav.addObject("user", user);
         if (isStaff()) {
-            mav.addObject("staffs", staffService.findByUser(user.get().getId()));
+            mav.addObject("staffs", staffService.findByUser(user.get()));
         } else {
             mav.addObject("patients", patientService.findByUser(user.get()));
         }
@@ -118,7 +118,7 @@ public class PatientSideController extends GenericController {
         ModelAndView mav = new ModelAndView();
         mav.addObject("user", user);
         if (isStaff()) {
-            mav.addObject("staffs", staffService.findByUser(user.get().getId()));
+            mav.addObject("staffs", staffService.findByUser(user.get()));
         }
         mav.setViewName("patientSide/patientProfile");
         return mav;
@@ -209,7 +209,7 @@ public class PatientSideController extends GenericController {
         ModelAndView mav = new ModelAndView();
         mav.addObject("user", userOptional);
         if (user.isPresent() && isStaff()) {
-            mav.addObject("staffs", staffService.findByUser(user.get().getId()));
+            mav.addObject("staffs", staffService.findByUser(user.get()));
         }
         staffOptional.ifPresent(staff -> mav.addObject("staff", staff));
         mav.addObject("date", new DateTime(year, month, day, hour, minute));

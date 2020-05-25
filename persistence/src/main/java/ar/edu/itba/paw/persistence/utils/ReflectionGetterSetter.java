@@ -19,11 +19,11 @@ import java.util.function.Predicate;
 /**
  * This class provides methods to access and manipulate instance's fields via reflection invoking its public
  * getters and setters. It can also get fields that are marked as private without any getter associated with it.
- *
+ * <p>
  * Its usage is discouraged in most cases as it is difficult to understand and it gives the sensation of working by
  * magic, but it allows for really great abstraction and generalization, specially when instantiating models from data
  * saved in the DB without having to implement each method in each specific DAO, let alone using hydration.
- *
+ * <p>
  * Every method access an object fields and its parents
  */
 public abstract class ReflectionGetterSetter {
@@ -130,7 +130,7 @@ public abstract class ReflectionGetterSetter {
 
     /**
      * @param object the object owning the field
-     * @param field the field
+     * @param field  the field
      * @param direct whether the access method should be directly by its field or using getters
      * @return the value associated with the field
      */
