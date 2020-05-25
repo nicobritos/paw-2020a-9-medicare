@@ -35,10 +35,10 @@ public class PictureDaoImplTest {
     private static final int STARTING_ID = 0;
     private static final String MIME_TYPE = "image/svg+xml";
     private static final String PICTURE = "defaultProfilePic.svg";
-    private static final String PICTURE_2 = "logo.svg";
     private static final Resource IMG = new ClassPathResource("img/" + PICTURE);
     private static final byte[] IMG_DATA = getImgData(IMG);
     private static final long IMG_SIZE = getImgSize(IMG);
+    private static final String PICTURE_2 = "logo.svg";
     private static final Resource IMG_2 = new ClassPathResource("img/" + PICTURE);
     private static final byte[] IMG_2_DATA = getImgData(IMG_2);
     private static final long IMG_2_SIZE = getImgSize(IMG_2);
