@@ -502,8 +502,8 @@ public class ProvinceDaoImplTest
         // 1. Precondiciones
         cleanAllTables();
         insertProvince();
-        Province p = new Province();
-        p.setName(PROVINCE);
+        Province p = provinceModel();
+        p.setId(null);
         expectedException.expect(Exception.class); // <-- TODO: Insert exception class here
 
         // 2. Ejercitar

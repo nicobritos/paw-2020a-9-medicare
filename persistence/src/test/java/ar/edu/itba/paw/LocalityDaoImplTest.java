@@ -525,8 +525,8 @@ public class LocalityDaoImplTest
         // 1. Precondiciones
         cleanAllTables();
         insertLocality();
-        Locality l = new Locality();
-        l.setName(LOCALITY);
+        Locality l = localityModel();
+        l.setId(null);
         expectedException.expect(Exception.class); // <-- TODO: Insert exception class here
 
         // 2. Ejercitar
