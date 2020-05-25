@@ -130,61 +130,63 @@
                 </tr>
                 <tr>
                     <td colspan="9">
-                        <ul class="list-group turno-list mr-2 w-50 overflow-auto">
-                            <c:forEach var="appointment" items="${weekAppointments.get(today.dayOfWeek)}">
-                                <li class="list-group-item turno-item mb-3">
-                                    <div class="container">
-                                        <div class="row">
-                                            <div class="col-4 d-flex flex-column justify-content-center">
-                                                <div class="profile-picture-container">
-                                                    <div style="margin-top: 100%;"></div>
-                                                    <img
-                                                            class="profile-picture rounded-circle"
-                                                            src="<c:url value="/profilePics/${appointment.patient.user.profileId}"/>"
-                                                            alt=""
-                                                    />
+                        <div class="container-fluid d-flex justify-content-center">
+                            <ul class="list-group turno-list mr-2 w-50 overflow-auto">
+                                <c:forEach var="appointment" items="${weekAppointments.get(today.dayOfWeek)}">
+                                    <li class="list-group-item turno-item mb-3">
+                                        <div class="container">
+                                            <div class="row">
+                                                <div class="col-4 d-flex flex-column justify-content-center">
+                                                    <div class="profile-picture-container">
+                                                        <div style="margin-top: 100%;"></div>
+                                                        <img
+                                                                class="profile-picture rounded-circle"
+                                                                src="<c:url value="/profilePics/${appointment.patient.user.profileId}"/>"
+                                                                alt=""
+                                                        />
+                                                    </div>
                                                 </div>
-                                            </div>
-                                            <div class="col-6">
-                                                <div class="row justify-content-start">
-                                                    <h5><c:out
-                                                            value="${appointment.patient.user.firstName} ${appointment.patient.user.surname}"/></h5>
+                                                <div class="col-6">
+                                                    <div class="row justify-content-start">
+                                                        <h5><c:out
+                                                                value="${appointment.patient.user.firstName} ${appointment.patient.user.surname}"/></h5>
+                                                    </div>
+                                                    <div class="row">
+                                                        <p class="m-0"><c:if
+                                                                test="${appointment.fromDate.hourOfDay < 10}">0</c:if><c:out
+                                                                value="${appointment.fromDate.hourOfDay}"/>:<c:if
+                                                                test="${appointment.fromDate.minuteOfHour < 10}">0</c:if><c:out
+                                                                value="${appointment.fromDate.minuteOfHour}"/> - <c:if
+                                                                test="${appointment.toDate.hourOfDay < 10}">0</c:if><c:out
+                                                                value="${appointment.toDate.hourOfDay}"/>:<c:if
+                                                                test="${appointment.toDate.minuteOfHour < 10}">0</c:if><c:out
+                                                                value="${appointment.toDate.minuteOfHour}"/></p>
+                                                    </div>
                                                 </div>
-                                                <div class="row">
-                                                    <p class="m-0"><c:if
-                                                            test="${appointment.fromDate.hourOfDay < 10}">0</c:if><c:out
-                                                            value="${appointment.fromDate.hourOfDay}"/>:<c:if
-                                                            test="${appointment.fromDate.minuteOfHour < 10}">0</c:if><c:out
-                                                            value="${appointment.fromDate.minuteOfHour}"/> - <c:if
-                                                            test="${appointment.toDate.hourOfDay < 10}">0</c:if><c:out
-                                                            value="${appointment.toDate.hourOfDay}"/>:<c:if
-                                                            test="${appointment.toDate.minuteOfHour < 10}">0</c:if><c:out
-                                                            value="${appointment.toDate.minuteOfHour}"/></p>
-                                                </div>
-                                            </div>
-                                            <div class="col-2 justify-content-start">
-                                                <div class="dropdown">
-                                                    <img
-                                                            src='<c:url value="/img/moreOptions.svg"/> '
-                                                            class="moreOptionsButton"
-                                                            alt="more options"
-                                                            data-toggle="dropdown"
-                                                    />
-                                                    <div class="dropdown-menu">
-                                                        <!-- TODO add reprogramar -->
-                                                        <form action="<c:url value="/staff/appointment/${appointment.id}${query}"/>"
-                                                              method="post">
-                                                            <button type="submit" class="dropdown-item"><spring:message
-                                                                    code="Cancel"/></button>
-                                                        </form>
+                                                <div class="col-2 justify-content-start">
+                                                    <div class="dropdown">
+                                                        <img
+                                                                src='<c:url value="/img/moreOptions.svg"/> '
+                                                                class="moreOptionsButton"
+                                                                alt="more options"
+                                                                data-toggle="dropdown"
+                                                        />
+                                                        <div class="dropdown-menu">
+                                                            <!-- TODO add reprogramar -->
+                                                            <form action="<c:url value="/staff/appointment/${appointment.id}${query}"/>"
+                                                                  method="post">
+                                                                <button type="submit" class="dropdown-item"><spring:message
+                                                                        code="Cancel"/></button>
+                                                            </form>
+                                                        </div>
                                                     </div>
                                                 </div>
                                             </div>
                                         </div>
-                                    </div>
-                                </li>
-                            </c:forEach>
-                        </ul>
+                                    </li>
+                                </c:forEach>
+                            </ul>
+                        </div>
                     </td>
                 </tr>
             </table>
