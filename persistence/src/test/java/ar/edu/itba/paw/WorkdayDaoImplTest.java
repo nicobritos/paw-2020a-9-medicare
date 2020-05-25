@@ -27,7 +27,7 @@ import static org.junit.Assert.*;
 public class WorkdayDaoImplTest
 {
     private static final String OFFICE_NAME = "Hospital Nacional";
-    public static final String NAME_2 = OFFICE_NAME + "_1";
+    private static final String NAME_2 = OFFICE_NAME + "_1";
     private static final String OFFICE_STREET = "Av 9 de Julio";
     private static final String PROVINCE = "Buenos Aires";
     private static final String LOCALITY = "Capital Federal";

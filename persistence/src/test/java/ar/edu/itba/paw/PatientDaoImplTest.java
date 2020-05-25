@@ -52,7 +52,7 @@ public class PatientDaoImplTest {
     private static final byte[] IMG_DATA = getImgData(IMG);
     private static final long IMG_SIZE = getImgSize(IMG);
     private static final String OFFICE = "Hospital Nacional";
-    public static final String OFFICE_2 = "Sanatorio Provincial";
+    private static final String OFFICE_2 = "Sanatorio Provincial";
     private static final String STREET = "Av 9 de Julio 123";
     private static final String LOCALITY = "Capital Federal";
     private static final String PROVINCE = "Buenos Aires";
