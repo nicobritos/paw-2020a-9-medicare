@@ -27,6 +27,7 @@ import static org.junit.Assert.*;
 @ContextConfiguration(classes = TestConfig.class)
 public class OfficeDaoImplTest
 {
+    private static final int STARTING_ID = 0;
     private static final String OFFICE = "Hospital Nacional";
     public static final String OFFICE_2 = "Sanatorio Provincial";
     private static final String STREET = "Av 9 de Julio 123";
@@ -37,7 +38,6 @@ public class OfficeDaoImplTest
     private static final String PHONE = "1234567890";
     private static final String EMAIL = "test@test.com";
     private static final String URL = "www.hnacional.com";
-    private static final int STARTING_ID = 0;
 
     private static final String OFFICES_TABLE = "office";
     private static final String LOCALITIES_TABLE = "system_locality";

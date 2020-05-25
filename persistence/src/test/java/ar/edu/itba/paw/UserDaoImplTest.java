@@ -158,7 +158,7 @@ public class UserDaoImplTest {
      * email = EMAIL
      * phone = PHONE
      * profileID = PROFILE_ID
-     * token = null
+     * token = TOKEN
      * tokenCreatedDate = null
      **/
     private void insertUser() {
@@ -177,7 +177,7 @@ public class UserDaoImplTest {
 
     /**
      * Inserta en la db el user con
-     * firstName = IMG_DATA
+     * firstName = FIRST_NAME
      * surname = SURNAME
      * password = PASSWORD
      * email = EMAIL
