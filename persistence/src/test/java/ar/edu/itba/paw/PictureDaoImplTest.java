@@ -36,20 +36,18 @@ public class PictureDaoImplTest {
     private static final String MIME_TYPE = "image/svg+xml";
     private static final String PICTURE = "defaultProfilePic.svg";
     private static final String PICTURE_2 = "logo.svg";
+    private static final Resource IMG = new ClassPathResource("img/" + PICTURE);
+    private static final byte[] IMG_DATA = getImgData(IMG);
+    private static final long IMG_SIZE = getImgSize(IMG);
+    private static final Resource IMG_2 = new ClassPathResource("img/" + PICTURE);
+    private static final byte[] IMG_2_DATA = getImgData(IMG_2);
+    private static final long IMG_2_SIZE = getImgSize(IMG_2);
 
     private static final String PICTURES_TABLE = "picture";
 
     private PictureDaoImpl pictureDao;
     private JdbcTemplate jdbcTemplate;
     private SimpleJdbcInsert pictureJdbcInsert;
-
-    private static final Resource IMG = new ClassPathResource("img/" + PICTURE);
-    private static final Resource IMG_2 = new ClassPathResource("img/" + PICTURE);
-
-    private static final byte[] IMG_DATA = getImgData(IMG);
-    private static final long IMG_SIZE = getImgSize(IMG);
-    private static final byte[] IMG_2_DATA = getImgData(IMG_2);
-    private static final long IMG_2_SIZE = getImgSize(IMG_2);
 
     @Rule
     public ExpectedException expectedException = ExpectedException.none();
@@ -449,8 +447,8 @@ public class PictureDaoImplTest {
         // 1. Precondiciones
         cleanAllTables();
         insertPicture();
-        Picture p = new Picture();
-        p.setId(STARTING_ID);
+        Picture p = pictureModel();
+        p.setName(null);
         expectedException.expect(IllegalStateException.class);
 
         // 2. Ejercitar
@@ -467,8 +465,8 @@ public class PictureDaoImplTest {
         // 1. Precondiciones
         cleanAllTables();
         insertPicture();
-        Picture p = new Picture();
-        p.setName(PICTURE);
+        Picture p = pictureModel();
+        p.setId(null);
         expectedException.expect(Exception.class); // <-- TODO: Insert exception class here
 
         // 2. Ejercitar
@@ -691,5 +689,4 @@ public class PictureDaoImplTest {
         assertNotNull(pictures);
         assertTrue(pictures.isEmpty());
     }
-
 }
