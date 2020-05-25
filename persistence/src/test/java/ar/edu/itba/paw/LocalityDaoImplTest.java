@@ -490,10 +490,12 @@ public class LocalityDaoImplTest
         cleanAllTables();
         insertProvince();
         insertAnotherLocality();
+        Locality l = localityModel();
+        l.setId(STARTING_ID + 1);
         expectedException.expect(Exception.class);  // <-- TODO: Insert exception class here
 
         // 2. Ejercitar
-        this.localityDao.update(localityModel()); // TODO: NO HACE NADA, DEBERIA TIRAR EXCEPCION QUE NO EXISTE EL COUNTRY CON ESE ID
+        this.localityDao.update(l); // TODO: NO HACE NADA, DEBERIA TIRAR EXCEPCION QUE NO EXISTE EL COUNTRY CON ESE ID
 
         // 3. Postcondiciones
         assertEquals(1,JdbcTestUtils.countRowsInTable(jdbcTemplate, PROVINCES_TABLE));

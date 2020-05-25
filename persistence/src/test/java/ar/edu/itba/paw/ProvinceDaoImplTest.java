@@ -466,10 +466,12 @@ public class ProvinceDaoImplTest
         cleanAllTables();
         insertCountry();
         insertAnotherProvince();
+        Province p = provinceModel();
+        p.setId(STARTING_ID + 1);
         expectedException.expect(Exception.class);  // <-- TODO: Insert exception class here
 
         // 2. Ejercitar
-        this.provinceDao.update(provinceModel()); // TODO: NO HACE NADA, DEBERIA TIRAR EXCEPCION QUE NO EXISTE EL COUNTRY CON ESE ID
+        this.provinceDao.update(p); // TODO: NO HACE NADA, DEBERIA TIRAR EXCEPCION QUE NO EXISTE EL COUNTRY CON ESE ID
 
         // 3. Postcondiciones
         assertEquals(1,JdbcTestUtils.countRowsInTable(jdbcTemplate, PROVINCES_TABLE));
@@ -510,7 +512,6 @@ public class ProvinceDaoImplTest
         // 3. Postcondiciones
         assertEquals(1,JdbcTestUtils.countRowsInTable(jdbcTemplate, COUNTRIES_TABLE));
     }
-
     /* --------------------- MÉTODO: provinceDao.remove(int id) -------------------------------------------- */
 
     @Test

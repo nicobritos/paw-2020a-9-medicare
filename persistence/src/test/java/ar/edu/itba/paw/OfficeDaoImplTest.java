@@ -154,8 +154,7 @@ public class OfficeDaoImplTest
         localityJdbcInsert.execute(map);
     }
 
-    /** Inserta en la db la localidad con
-     * id=STARTING_ID
+    /** Inserta en la db la oficina con
      * name=OFFICE
      * email=EMAIL
      * phone=PHONE
@@ -176,6 +175,14 @@ public class OfficeDaoImplTest
         officeJdbcInsert.execute(officeMap);
     }
 
+    /** Inserta en la db la oficina con
+     * localityId=STARTING_ID
+     * name=OFFICE
+     * email=EMAIL
+     * phone=PHONE
+     * street=STREET
+     * url=URL
+     **/
     private void insertAnotherOffice(){
         Map<String, Object> officeMap = new HashMap<>();
         officeMap.put("name", OFFICE_2);
@@ -549,10 +556,12 @@ public class OfficeDaoImplTest
         cleanAllTables();
         insertLocality();
         insertAnotherOffice();
+        Office o = officeModel();
+        o.setId(STARTING_ID + 1);
         expectedException.expect(Exception.class);  // <-- TODO: Insert exception class here
 
         // 2. Ejercitar
-        this.officeDao.update(officeModel()); // TODO: NO HACE NADA, DEBERIA TIRAR EXCEPCION QUE NO EXISTE EL COUNTRY CON ESE ID
+        this.officeDao.update(o); // TODO: NO HACE NADA, DEBERIA TIRAR EXCEPCION QUE NO EXISTE EL COUNTRY CON ESE ID
 
         // 3. Postcondiciones
         assertEquals(1,JdbcTestUtils.countRowsInTable(jdbcTemplate, PROVINCES_TABLE));

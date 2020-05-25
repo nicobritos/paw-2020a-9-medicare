@@ -333,9 +333,7 @@ public class CountryDaoImplTest
         assertFalse(country.isPresent());
     }
 
-
     /* --------------------- MÉTODO: countryDao.findByIds(Collection<String>) -------------------------------------------- */
-
 
     @Test
     public void testFindCountryByIds()
