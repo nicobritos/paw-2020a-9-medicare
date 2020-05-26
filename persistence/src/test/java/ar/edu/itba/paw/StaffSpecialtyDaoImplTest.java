@@ -2,7 +2,6 @@ package ar.edu.itba.paw;
 
 import ar.edu.itba.paw.models.ModelMetadata;
 import ar.edu.itba.paw.models.StaffSpecialty;
-import ar.edu.itba.paw.models.StaffSpecialty;
 import ar.edu.itba.paw.persistence.StaffSpecialtyDaoImpl;
 import org.hamcrest.CoreMatchers;
 import org.junit.Before;

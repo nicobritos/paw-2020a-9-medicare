@@ -127,7 +127,7 @@ public class AppointmentDaoImpl extends GenericDaoImpl<Appointment, Integer> imp
     public List<Appointment> findPending(Patient patient) {
         MapSqlParameterSource parameterSource = new MapSqlParameterSource();
         parameterSource.addValue("patient", patient.getId());
-        parameterSource.addValue("status", AppointmentStatus.CANCELLED);
+        parameterSource.addValue("status", AppointmentStatus.PENDING.name());
 
         JDBCWhereClauseBuilder whereClauseBuilder = new JDBCWhereClauseBuilder()
                 .where(this.formatColumnFromName("patient_id"), Operation.EQ, ":patient")
@@ -146,7 +146,7 @@ public class AppointmentDaoImpl extends GenericDaoImpl<Appointment, Integer> imp
     public List<Appointment> findPending(Staff staff) {
         MapSqlParameterSource parameterSource = new MapSqlParameterSource();
         parameterSource.addValue("staff", staff.getId());
-        parameterSource.addValue("status", AppointmentStatus.CANCELLED);
+        parameterSource.addValue("status", AppointmentStatus.PENDING.name());
 
         JDBCWhereClauseBuilder whereClauseBuilder = new JDBCWhereClauseBuilder()
                 .where(this.formatColumnFromName("staff_id"), Operation.EQ, ":staff")
