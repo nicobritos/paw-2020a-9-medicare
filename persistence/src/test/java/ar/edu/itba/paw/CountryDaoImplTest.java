@@ -1,25 +1,24 @@
 package ar.edu.itba.paw;
 
+import ar.edu.itba.paw.interfaces.daos.CountryDao;
 import ar.edu.itba.paw.models.Country;
 import ar.edu.itba.paw.models.ModelMetadata;
-import ar.edu.itba.paw.persistence.CountryDaoImpl;
-import org.hamcrest.CoreMatchers;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.hibernate.TransientObjectException;
+import org.junit.*;
 import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
-import org.springframework.dao.DuplicateKeyException;
-import org.springframework.jdbc.BadSqlGrammarException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
+import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.jdbc.JdbcTestUtils;
 
+import javax.persistence.Persistence;
+import javax.persistence.PersistenceException;
 import javax.sql.DataSource;
 import java.util.*;
 
@@ -37,7 +36,8 @@ public class CountryDaoImplTest {
 
     private static final String COUNTRIES_TABLE = "system_country";
 
-    private CountryDaoImpl countryDao;
+    @Autowired
+    private CountryDao countryDao;
     private JdbcTemplate jdbcTemplate;
     private SimpleJdbcInsert jdbcInsert;
 
@@ -49,7 +49,6 @@ public class CountryDaoImplTest {
 
     @Before
     public void setUp() {
-        this.countryDao = new CountryDaoImpl();
         this.jdbcTemplate = new JdbcTemplate(this.ds);
         this.jdbcInsert = new SimpleJdbcInsert(this.ds)
                 .withTableName(COUNTRIES_TABLE);
@@ -130,7 +129,7 @@ public class CountryDaoImplTest {
         cleanAllTables();
         insertCountry();
         Country c = countryModel();
-        expectedException.expect(DuplicateKeyException.class);
+        expectedException.expect(DataIntegrityViolationException.class);
 
 
         // 2. Ejercitar
@@ -145,7 +144,7 @@ public class CountryDaoImplTest {
     {
         // 1. Precondiciones
         cleanAllTables();
-        expectedException.expect(NullPointerException.class);
+        expectedException.expect(IllegalArgumentException.class);
 
         // 2. Ejercitar
         Country country = this.countryDao.create(null);
@@ -160,10 +159,7 @@ public class CountryDaoImplTest {
         // 1. Precondiciones
         cleanAllTables();
         Country c = new Country();
-        expectedException.expect(CoreMatchers.anyOf( // Falla si no se tira ninguna de las excepciones de la lista
-                CoreMatchers.instanceOf(IllegalStateException.class), // Esta excepcion se tira si no tiene nombre // TODO: chequear esta excepcion (poco descriptiva)
-                CoreMatchers.instanceOf(DataIntegrityViolationException.class) // Esta excepcion se tira si no tiene id // TODO: chequear esta excepcion (poco descriptiva)
-        ));
+        expectedException.expect(IllegalArgumentException.class);
 
         // 2. Ejercitar
         Country country = this.countryDao.create(c);
@@ -179,8 +175,7 @@ public class CountryDaoImplTest {
         cleanAllTables();
         Country c = new Country();
         c.setName(COUNTRY);
-        expectedException.expect(DataIntegrityViolationException.class); // TODO: chequear esta excepcion (poco descriptiva)
-
+        expectedException.expect(IllegalArgumentException.class);
 
         // 2. Ejercitar
         Country country = this.countryDao.create(c);
@@ -196,7 +191,7 @@ public class CountryDaoImplTest {
         cleanAllTables();
         Country c = new Country();
         c.setId(COUNTRY_ID);
-        expectedException.expect(IllegalStateException.class); // TODO: chequear esta excepcion (poco descriptiva)
+        expectedException.expect(PersistenceException.class);
 
         // 2. Ejercitar
         Country country = this.countryDao.create(c);
@@ -213,7 +208,7 @@ public class CountryDaoImplTest {
         Country c = new Country();
         c.setName(COUNTRY);
         c.setId("CCC"); // Los countries IDs deben tener 2 caracteres
-        expectedException.expect(DataIntegrityViolationException.class); // TODO: chequear esta excepcion (poco descriptiva)
+        expectedException.expect(IllegalArgumentException.class);
 
         // 2. Ejercitar
         Country country = this.countryDao.create(c);
@@ -230,7 +225,7 @@ public class CountryDaoImplTest {
         Country c = new Country();
         c.setName(COUNTRY);
         c.setId("C"); // Los countries IDs deben tener 2 caracteres
-        expectedException.expect(DataIntegrityViolationException.class); // TODO: chequear esta excepcion (poco descriptiva)
+        expectedException.expect(IllegalArgumentException.class);
 
         // 2. Ejercitar
         Country country = this.countryDao.create(c);
@@ -247,7 +242,7 @@ public class CountryDaoImplTest {
         Country c = new Country();
         c.setName(COUNTRY);
         c.setId("C2"); // Los countries IDs deben tener 2 caracteres
-        expectedException.expect(DataIntegrityViolationException.class); // TODO: chequear esta excepcion (poco descriptiva)
+        expectedException.expect(IllegalArgumentException.class);
 
         // 2. Ejercitar
         Country country = this.countryDao.create(c);
@@ -309,6 +304,7 @@ public class CountryDaoImplTest {
         // 1. Precondiciones
         cleanAllTables();
         insertCountry();
+        expectedException.expect(IllegalArgumentException.class);
 
         // 2. Ejercitar
         Optional<Country> country = this.countryDao.findById(null);
@@ -516,7 +512,7 @@ public class CountryDaoImplTest {
         cleanAllTables();
         insertCountry();
         insertAnotherCountry();
-        expectedException.expect(NullPointerException.class);
+        expectedException.expect(IllegalArgumentException.class);
 
         // 2. Ejercitar
         this.countryDao.update(null);
@@ -532,10 +528,10 @@ public class CountryDaoImplTest {
         // 1. Precondiciones
         cleanAllTables();
         insertAnotherCountry();
-        expectedException.expect(Exception.class);  // <-- TODO: Insert exception class here
+        expectedException.expect(ObjectOptimisticLockingFailureException.class); // Todo: cambiar la excepcion?
 
         // 2. Ejercitar
-        this.countryDao.update(countryModel()); // TODO: NO HACE NADA, DEBERIA TIRAR EXCEPCION QUE NO EXISTE EL COUNTRY CON ESE ID
+        this.countryDao.update(countryModel());
 
         // 3. Postcondiciones
         assertEquals(1,JdbcTestUtils.countRowsInTable(jdbcTemplate, COUNTRIES_TABLE));
@@ -549,7 +545,7 @@ public class CountryDaoImplTest {
         insertCountry();
         Country c = new Country();
         c.setId(COUNTRY_ID);
-        expectedException.expect(IllegalStateException.class);
+        expectedException.expect(DataIntegrityViolationException.class);
 
         // 2. Ejercitar
         this.countryDao.update(c);
@@ -567,10 +563,10 @@ public class CountryDaoImplTest {
         insertCountry();
         Country c = new Country();
         c.setName(COUNTRY);
-        expectedException.expect(Exception.class); // <-- TODO: Insert exception class here
+        expectedException.expect(TransientObjectException.class);
 
         // 2. Ejercitar
-        this.countryDao.update(c); // TODO: NO HACE NADA, DEBERIA TIRAR EXCEPCION QUE DEBE TENER ID NOT NULL
+        this.countryDao.update(c);
 
         // 3. Postcondiciones
         assertEquals(1,JdbcTestUtils.countRowsInTable(jdbcTemplate, COUNTRIES_TABLE));
@@ -612,6 +608,7 @@ public class CountryDaoImplTest {
         // 1. Precondiciones
         cleanAllTables();
         insertCountry();
+        expectedException.expect(IllegalArgumentException.class);
 
         // 2. Ejercitar
         this.countryDao.remove((String) null);

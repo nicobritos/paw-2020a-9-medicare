@@ -11,8 +11,6 @@ import javax.persistence.*;
 )
 public class Country extends GenericModel<String> {
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "system_country_pk")
-    @SequenceGenerator(sequenceName = "system_country_pk", name = "system_country_pk", allocationSize = 1)
     @Column(name = "country_id")
     private String id;
     @Column(name = "name", nullable = false)

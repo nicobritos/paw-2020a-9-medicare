@@ -5,6 +5,8 @@ import ar.edu.itba.paw.models.GenericModel;
 import ar.edu.itba.paw.models.ModelMetadata;
 import ar.edu.itba.paw.models.Paginator;
 import ar.edu.itba.paw.persistence.utils.StringSearchType;
+import org.hibernate.Session;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
@@ -59,7 +61,8 @@ public abstract class GenericDaoImpl<M extends GenericModel<I>, I> implements Ge
 
     @Override
     public Optional<M> findById(I id) {
-        return Optional.of(this.entityManager.find(this.mClass, id));
+        M model = this.entityManager.find(this.mClass, id);
+        return (model == null)?Optional.empty():Optional.of(model);
     }
 
     @Override
@@ -77,27 +80,31 @@ public abstract class GenericDaoImpl<M extends GenericModel<I>, I> implements Ge
     }
 
     @Override
+    @Transactional
     public M create(M model) {
         this.entityManager.persist(model);
         return model;
     }
 
     @Override
+    @Transactional
     public void update(M model) {
-        this.entityManager.persist(model);
+        this.entityManager.unwrap(Session.class).update(model);
     }
 
     @Override
+    @Transactional
     public void remove(M model) {
         this.remove(model.getId());
     }
 
     @Override
+    @Transactional
     public void remove(I id) {
         M model = this.entityManager.find(this.mClass, id);
-        this.entityManager.getTransaction().begin();
-        this.entityManager.remove(model);
-        this.entityManager.getTransaction().commit();
+        if(model != null) {
+            this.entityManager.remove(model);
+        }
     }
 
     @Override
