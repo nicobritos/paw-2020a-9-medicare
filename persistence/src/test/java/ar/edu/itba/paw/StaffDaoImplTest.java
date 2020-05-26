@@ -1,5 +1,6 @@
 package ar.edu.itba.paw;
 
+import ar.edu.itba.paw.interfaces.daos.StaffDao;
 import ar.edu.itba.paw.models.*;
 import ar.edu.itba.paw.persistence.StaffDaoImpl;
 import org.hamcrest.CoreMatchers;
@@ -73,7 +74,7 @@ public class StaffDaoImplTest
     private static final String STAFF_SPECIALTIES_TABLE = "system_staff_specialty";
 
     @Autowired
-    private StaffDaoImpl staffDao;
+    private StaffDao staffDao;
     private JdbcTemplate jdbcTemplate;
     private SimpleJdbcInsert officeJdbcInsert;
     private SimpleJdbcInsert localityJdbcInsert;

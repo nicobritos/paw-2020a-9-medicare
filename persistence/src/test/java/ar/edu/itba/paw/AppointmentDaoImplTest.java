@@ -1,7 +1,7 @@
 package ar.edu.itba.paw;
 
+import ar.edu.itba.paw.interfaces.daos.AppointmentDao;
 import ar.edu.itba.paw.models.*;
-import ar.edu.itba.paw.persistence.AppointmentDaoImpl;
 import org.hamcrest.CoreMatchers;
 import org.joda.time.DateTime;
 import org.junit.Before;
@@ -85,7 +85,7 @@ public class AppointmentDaoImplTest {
     private static final String APPOINTMENTS_TABLE = "appointment";
 
     @Autowired
-    private AppointmentDaoImpl appointmentDao;
+    private AppointmentDao appointmentDao;
     private JdbcTemplate jdbcTemplate;
     private SimpleJdbcInsert userJdbcInsert;
     private SimpleJdbcInsert pictureJdbcInsert;

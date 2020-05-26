@@ -1,5 +1,6 @@
 package ar.edu.itba.paw;
 
+import ar.edu.itba.paw.interfaces.daos.ProvinceDao;
 import ar.edu.itba.paw.models.Country;
 import ar.edu.itba.paw.models.ModelMetadata;
 import ar.edu.itba.paw.models.Province;
@@ -37,7 +38,7 @@ public class ProvinceDaoImplTest {
     private static final String COUNTRIES_TABLE = "system_country";
 
     @Autowired
-    private ProvinceDaoImpl provinceDao;
+    private ProvinceDao provinceDao;
     private JdbcTemplate jdbcTemplate;
     private SimpleJdbcInsert provinceJdbcInsert;
     private SimpleJdbcInsert countryJdbcInsert;

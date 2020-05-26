@@ -1,5 +1,6 @@
 package ar.edu.itba.paw;
 
+import ar.edu.itba.paw.interfaces.daos.PatientDao;
 import ar.edu.itba.paw.models.*;
 import ar.edu.itba.paw.persistence.PatientDaoImpl;
 import org.hamcrest.CoreMatchers;
@@ -69,7 +70,7 @@ public class PatientDaoImplTest {
     private static final String PATIENTS_TABLE = "patient";
 
     @Autowired
-    private PatientDaoImpl patientDao;
+    private PatientDao patientDao;
     private JdbcTemplate jdbcTemplate;
     private SimpleJdbcInsert userJdbcInsert;
     private SimpleJdbcInsert pictureJdbcInsert;

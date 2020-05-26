@@ -1,8 +1,9 @@
 package ar.edu.itba.paw;
 
+import ar.edu.itba.paw.TestConfig;
+import ar.edu.itba.paw.interfaces.daos.PictureDao;
 import ar.edu.itba.paw.models.ModelMetadata;
 import ar.edu.itba.paw.models.Picture;
-import ar.edu.itba.paw.persistence.PictureDaoImpl;
 import org.hamcrest.CoreMatchers;
 import org.junit.Before;
 import org.junit.Rule;
@@ -45,7 +46,7 @@ public class PictureDaoImplTest {
     private static final String PICTURES_TABLE = "picture";
 
     @Autowired
-    private PictureDaoImpl pictureDao;
+    private PictureDao pictureDao;
     private JdbcTemplate jdbcTemplate;
     private SimpleJdbcInsert pictureJdbcInsert;
 

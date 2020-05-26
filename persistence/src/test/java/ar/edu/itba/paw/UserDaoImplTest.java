@@ -1,5 +1,6 @@
 package ar.edu.itba.paw;
 
+import ar.edu.itba.paw.interfaces.daos.UserDao;
 import ar.edu.itba.paw.models.ModelMetadata;
 import ar.edu.itba.paw.models.Picture;
 import ar.edu.itba.paw.models.User;
@@ -57,7 +58,7 @@ public class UserDaoImplTest {
     private static final String PICTURES_TABLE = "picture";
 
     @Autowired
-    private UserDaoImpl userDao;
+    private UserDao userDao;
     private JdbcTemplate jdbcTemplate;
     private SimpleJdbcInsert userJdbcInsert;
     private SimpleJdbcInsert pictureJdbcInsert;

@@ -1,5 +1,6 @@
 package ar.edu.itba.paw;
 
+import ar.edu.itba.paw.interfaces.daos.StaffSpecialtyDao;
 import ar.edu.itba.paw.models.ModelMetadata;
 import ar.edu.itba.paw.models.StaffSpecialty;
 import ar.edu.itba.paw.persistence.StaffSpecialtyDaoImpl;
@@ -34,7 +35,7 @@ public class StaffSpecialtyDaoImplTest {
     private static final String STAFF_SPECIALTIES_TABLE = "system_staff_specialty";
 
     @Autowired
-    private StaffSpecialtyDaoImpl staffSpecialtyDao;
+    private StaffSpecialtyDao staffSpecialtyDao;
     private JdbcTemplate jdbcTemplate;
     private SimpleJdbcInsert staffSpecialtyInsert;
 

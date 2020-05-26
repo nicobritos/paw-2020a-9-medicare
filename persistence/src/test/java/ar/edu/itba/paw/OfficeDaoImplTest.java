@@ -1,5 +1,6 @@
 package ar.edu.itba.paw;
 
+import ar.edu.itba.paw.interfaces.daos.OfficeDao;
 import ar.edu.itba.paw.models.*;
 import ar.edu.itba.paw.persistence.OfficeDaoImpl;
 import org.junit.Before;
@@ -44,7 +45,7 @@ public class OfficeDaoImplTest
     private static final String COUNTRIES_TABLE = "system_country";
 
     @Autowired
-    private OfficeDaoImpl officeDao;
+    private OfficeDao officeDao;
     private JdbcTemplate jdbcTemplate;
     private SimpleJdbcInsert officeJdbcInsert;
     private SimpleJdbcInsert localityJdbcInsert;

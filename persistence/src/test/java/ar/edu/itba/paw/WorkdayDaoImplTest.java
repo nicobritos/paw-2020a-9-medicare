@@ -1,5 +1,6 @@
 package ar.edu.itba.paw;
 
+import ar.edu.itba.paw.interfaces.daos.WorkdayDao;
 import ar.edu.itba.paw.models.*;
 import ar.edu.itba.paw.persistence.WorkdayDaoImpl;
 import org.hamcrest.CoreMatchers;
@@ -76,7 +77,7 @@ public class WorkdayDaoImplTest
     private static final String WORKDAYS_TABLE = "workday";
 
     @Autowired
-    private WorkdayDaoImpl workdayDao;
+    private WorkdayDao workdayDao;
     private JdbcTemplate jdbcTemplate;
     private SimpleJdbcInsert officeJdbcInsert;
     private SimpleJdbcInsert localityJdbcInsert;

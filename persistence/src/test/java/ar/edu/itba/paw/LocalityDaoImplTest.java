@@ -1,5 +1,6 @@
 package ar.edu.itba.paw;
 
+import ar.edu.itba.paw.interfaces.daos.LocalityDao;
 import ar.edu.itba.paw.models.Country;
 import ar.edu.itba.paw.models.Locality;
 import ar.edu.itba.paw.models.ModelMetadata;
@@ -41,7 +42,7 @@ public class LocalityDaoImplTest {
     private static final String COUNTRIES_TABLE = "system_country";
 
     @Autowired
-    private LocalityDaoImpl localityDao;
+    private LocalityDao localityDao;
     private JdbcTemplate jdbcTemplate;
     private SimpleJdbcInsert localityJdbcInsert;
     private SimpleJdbcInsert provinceJdbcInsert;
