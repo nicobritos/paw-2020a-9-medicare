@@ -62,6 +62,7 @@ public class StaffDaoImplTest
     private static final byte[] IMG_DATA = getImgData(IMG);
     private static final long IMG_SIZE = getImgSize(IMG);
     private static final int REGISTRATION_NUMBER = 123;
+    private static final String STAFF_SPECIALTY = "Odontologo";
 
     private static final String OFFICES_TABLE = "office";
     private static final String LOCALITIES_TABLE = "system_locality";
@@ -70,6 +71,7 @@ public class StaffDaoImplTest
     private static final String USERS_TABLE = "users";
     private static final String PICTURES_TABLE = "picture";
     private static final String STAFFS_TABLE = "staff";
+    private static final String STAFF_SPECIALTIES_TABLE = "system_staff_specialty";
     
     private StaffDaoImpl staffDao;
     private JdbcTemplate jdbcTemplate;
@@ -80,6 +82,7 @@ public class StaffDaoImplTest
     private SimpleJdbcInsert userJdbcInsert;
     private SimpleJdbcInsert pictureJdbcInsert;
     private SimpleJdbcInsert staffJdbcInsert;
+    private SimpleJdbcInsert staffSpecialtiesJdbcInsert;
 
 
     @Rule
@@ -112,6 +115,9 @@ public class StaffDaoImplTest
         this.staffJdbcInsert = new SimpleJdbcInsert(this.ds)
                 .withTableName(STAFFS_TABLE)
                 .usingGeneratedKeyColumns("staff_id");
+        this.staffSpecialtiesJdbcInsert = new SimpleJdbcInsert(this.ds)
+                .withTableName(STAFF_SPECIALTIES_TABLE)
+                .usingGeneratedKeyColumns("specialty_id");
     }
 
     /* ---------------------- FUNCIONES AUXILIARES ---------------------------------------------------------------- */
@@ -396,6 +402,21 @@ public class StaffDaoImplTest
         staffMap.put("user_id", STARTING_ID + 1);
         staffMap.put("office_id", STARTING_ID + 1);
         staffJdbcInsert.execute(staffMap);
+    }
+
+    /** Inserta en la db la especialidad con name=STAFF_SPECIALTY **/
+    private void insertStaffSpecialty(){
+        Map<String, Object> map = new HashMap<>();
+        map.put("name", STAFF_SPECIALTY);
+        staffSpecialtiesJdbcInsert.execute(map);
+    }
+
+    /** Devuelve un StaffSpecialty con name=STAFF_SPECIALTY **/
+    private StaffSpecialty staffSpecialtyModel(){
+        StaffSpecialty ss = new StaffSpecialty();
+        ss.setName(STAFF_SPECIALTY);
+        ss.setId(STARTING_ID);
+        return ss;
     }
 
     /* --------------------- MÉTODO: staffDao.create(Staff) -------------------------------------------- */
@@ -1531,5 +1552,178 @@ public class StaffDaoImplTest
         assertEquals(2, paginator.getTotalCount());
         assertEquals(2, paginator.getTotalPages());
         assertEquals(1, paginator.getModels().size());
+    }
+
+    /* --------------------- MÉTODO: staffDao.addSpecialty(Staff, StaffSpecialty) -------------------------------------------- */
+
+    @Test
+    public void testStaffAddSpecialty()
+    {
+        // 1. Precondiciones
+        cleanAllTables();
+        insertStaff();
+        insertStaffSpecialty();
+        Staff s = staffModel();
+        s.getStaffSpecialties().add(staffSpecialtyModel());
+
+        // 2. Ejercitar
+        staffDao.addStaffSpecialty(s, staffSpecialtyModel());
+
+        // 3. Postcondiciones
+        assertEquals(1, s.getStaffSpecialties().size());
+        assertTrue(s.getStaffSpecialties().contains(staffSpecialtyModel()));
+        assertEquals(1, JdbcTestUtils.countRowsInTable(jdbcTemplate, STAFF_SPECIALTIES_TABLE));
+    }
+
+    @Test
+    public void testStaffAddSpecialtyNullStaffFail()
+    {
+        // 1. Precondiciones
+        cleanAllTables();
+        insertStaff();
+        insertStaffSpecialty();
+        expectedException.expect(NullPointerException.class);
+
+        // 2. Ejercitar
+        staffDao.addStaffSpecialty(null, staffSpecialtyModel());
+
+        // 3. Postcondiciones
+        // que el metodo tire NullPointerException
+    }
+
+    @Test
+    public void testStaffAddSpecialtyNullStaffSpecialtyFail()
+    {
+        // 1. Precondiciones
+        cleanAllTables();
+        insertStaff();
+        insertStaffSpecialty();
+        Staff s = staffModel();
+        expectedException.expect(NullPointerException.class);
+
+        // 2. Ejercitar
+        staffDao.addStaffSpecialty(s, null);
+
+        // 3. Postcondiciones
+        // que el metodo tire NullPointerException
+    }
+
+    /* --------------------- MÉTODO: staffDao.addSpecialties(Staff, Collection<StaffSpecialty>) -------------------------------------------- */
+
+    @Test
+    public void testStaffAddSpecialties()
+    {
+        // 1. Precondiciones
+        cleanAllTables();
+        insertStaff();
+        insertStaffSpecialty();
+        Staff s = staffModel();
+        s.getStaffSpecialties().add(staffSpecialtyModel());
+
+        // 2. Ejercitar
+        staffDao.addStaffSpecialties(s, Collections.singleton(staffSpecialtyModel()));
+
+        // 3. Postcondiciones
+        assertEquals(1, s.getStaffSpecialties().size());
+        assertTrue(s.getStaffSpecialties().contains(staffSpecialtyModel()));
+        assertEquals(1, JdbcTestUtils.countRowsInTable(jdbcTemplate, STAFF_SPECIALTIES_TABLE));
+    }
+
+    @Test
+    public void testStaffAddSpecialtiesNullStaffFail()
+    {
+        // 1. Precondiciones
+        cleanAllTables();
+        insertStaff();
+        insertStaffSpecialty();
+        expectedException.expect(NullPointerException.class);
+
+        // 2. Ejercitar
+        staffDao.addStaffSpecialties(null, Collections.singleton(staffSpecialtyModel()));
+
+        // 3. Postcondiciones
+        // que el metodo tire NullPointerException
+    }
+
+    @Test
+    public void testStaffAddSpecialtiesNullStaffSpecialtiesFail()
+    {
+        // 1. Precondiciones
+        cleanAllTables();
+        insertStaff();
+        insertStaffSpecialty();
+        Staff s = staffModel();
+        expectedException.expect(NullPointerException.class);
+
+        // 2. Ejercitar
+        staffDao.addStaffSpecialties(s, null);
+
+        // 3. Postcondiciones
+        // que el metodo tire NullPointerException
+    }
+
+    /* --------------------- MÉTODO: staffDao.setOffice(Staff, Office) -------------------------------------------- */
+
+    @Test
+    public void testStaffSetOffice()
+    {
+        // 1. Precondiciones
+        cleanAllTables();
+        insertStaff();
+        insertAnotherOffice();
+        Staff s = staffModel();
+        Office o = officeModel();
+        o.setName(OFFICE_2);
+        o.setId(STARTING_ID + 1);
+        s.setOffice(o);
+
+        // 2. Ejercitar
+        staffDao.setOffice(s, o);
+
+        // 3. Postcondiciones
+        assertEquals(o, s.getOffice());
+        assertEquals(2, JdbcTestUtils.countRowsInTable(jdbcTemplate, OFFICES_TABLE));
+    }
+
+    @Test
+    public void testStaffSetOfficeNullStaffFail()
+    {
+        // 1. Precondiciones
+        cleanAllTables();
+        insertStaff();
+        insertAnotherOffice();
+        Staff s = staffModel();
+        Office o = officeModel();
+        o.setName(OFFICE_2);
+        o.setId(STARTING_ID + 1);
+        s.setOffice(o);
+        expectedException.expect(NullPointerException.class);
+
+        // 2. Ejercitar
+        staffDao.setOffice(null, o);
+
+        // 3. Postcondiciones
+        // que el metodo tire NullPointerException
+    }
+
+    @Test
+    public void testStaffSetOfficeNullOfficeFail()
+    {
+        // 1. Precondiciones
+        cleanAllTables();
+        insertStaff();
+        insertAnotherOffice();
+        Staff s = staffModel();
+        Office o = officeModel();
+        o.setName(OFFICE_2);
+        o.setId(STARTING_ID + 1);
+        s.setOffice(o);
+        expectedException.expect(NullPointerException.class);
+
+        // 2. Ejercitar
+        staffDao.setOffice(s, null);
+
+        // 3. Postcondiciones
+        // que el metodo tire NullPointerException
     }
 }
