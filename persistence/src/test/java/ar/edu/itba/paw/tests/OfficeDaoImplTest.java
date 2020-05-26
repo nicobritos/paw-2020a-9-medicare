@@ -1,8 +1,8 @@
-package ar.edu.itba.paw;
+package ar.edu.itba.paw.tests;
 
 import ar.edu.itba.paw.interfaces.daos.OfficeDao;
 import ar.edu.itba.paw.models.*;
-import ar.edu.itba.paw.persistence.OfficeDaoImpl;
+import ar.edu.itba.paw.config.TestConfig;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;

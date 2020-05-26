@@ -1,4 +1,4 @@
-package ar.edu.itba.paw;
+package ar.edu.itba.paw.config;
 
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.MapperFeature;
@@ -80,7 +80,7 @@ public class TestConfig {
 
         final Properties properties = new Properties();
         properties.setProperty("hibernate.hbm2ddl.auto", "update");
-        properties.setProperty("hibernate.dialect", "org.hibernate.dialect.HSQLDialect");
+        properties.setProperty("hibernate.dialect", "ar.edu.itba.paw.dialect.MyHSQLDialect");
         properties.setProperty("jadira.usertype.autoRegisterUserTypes", "true");
 
         factoryBean.setJpaProperties(properties);

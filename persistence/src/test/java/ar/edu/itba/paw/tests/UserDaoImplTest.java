@@ -1,10 +1,10 @@
-package ar.edu.itba.paw;
+package ar.edu.itba.paw.tests;
 
 import ar.edu.itba.paw.interfaces.daos.UserDao;
 import ar.edu.itba.paw.models.ModelMetadata;
 import ar.edu.itba.paw.models.Picture;
 import ar.edu.itba.paw.models.User;
-import ar.edu.itba.paw.persistence.UserDaoImpl;
+import ar.edu.itba.paw.config.TestConfig;
 import org.hamcrest.CoreMatchers;
 import org.junit.Before;
 import org.junit.Rule;

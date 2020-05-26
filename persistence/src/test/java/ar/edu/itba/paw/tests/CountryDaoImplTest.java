@@ -1,8 +1,9 @@
-package ar.edu.itba.paw;
+package ar.edu.itba.paw.tests;
 
 import ar.edu.itba.paw.interfaces.daos.CountryDao;
 import ar.edu.itba.paw.models.Country;
 import ar.edu.itba.paw.models.ModelMetadata;
+import ar.edu.itba.paw.config.TestConfig;
 import org.hibernate.TransientObjectException;
 import org.junit.*;
 import org.junit.rules.ExpectedException;
@@ -17,7 +18,6 @@ import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.jdbc.JdbcTestUtils;
 
-import javax.persistence.Persistence;
 import javax.persistence.PersistenceException;
 import javax.sql.DataSource;
 import java.util.*;

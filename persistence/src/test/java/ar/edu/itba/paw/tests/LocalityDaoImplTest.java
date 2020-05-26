@@ -1,11 +1,11 @@
-package ar.edu.itba.paw;
+package ar.edu.itba.paw.tests;
 
 import ar.edu.itba.paw.interfaces.daos.LocalityDao;
 import ar.edu.itba.paw.models.Country;
 import ar.edu.itba.paw.models.Locality;
 import ar.edu.itba.paw.models.ModelMetadata;
 import ar.edu.itba.paw.models.Province;
-import ar.edu.itba.paw.persistence.LocalityDaoImpl;
+import ar.edu.itba.paw.config.TestConfig;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;

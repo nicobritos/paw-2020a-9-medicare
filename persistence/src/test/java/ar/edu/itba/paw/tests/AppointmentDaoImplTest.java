@@ -1,7 +1,8 @@
-package ar.edu.itba.paw;
+package ar.edu.itba.paw.tests;
 
 import ar.edu.itba.paw.interfaces.daos.AppointmentDao;
 import ar.edu.itba.paw.models.*;
+import ar.edu.itba.paw.config.TestConfig;
 import org.hamcrest.CoreMatchers;
 import org.joda.time.DateTime;
 import org.junit.Before;

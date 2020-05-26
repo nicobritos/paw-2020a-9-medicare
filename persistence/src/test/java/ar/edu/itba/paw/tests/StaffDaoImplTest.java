@@ -1,8 +1,8 @@
-package ar.edu.itba.paw;
+package ar.edu.itba.paw.tests;
 
 import ar.edu.itba.paw.interfaces.daos.StaffDao;
 import ar.edu.itba.paw.models.*;
-import ar.edu.itba.paw.persistence.StaffDaoImpl;
+import ar.edu.itba.paw.config.TestConfig;
 import org.hamcrest.CoreMatchers;
 import org.junit.Before;
 import org.junit.Rule;
