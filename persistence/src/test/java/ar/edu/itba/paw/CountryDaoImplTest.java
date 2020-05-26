@@ -12,7 +12,6 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.DuplicateKeyException;
-import org.springframework.jdbc.BadSqlGrammarException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.test.context.ContextConfiguration;
@@ -37,6 +36,7 @@ public class CountryDaoImplTest {
 
     private static final String COUNTRIES_TABLE = "system_country";
 
+    @Autowired
     private CountryDaoImpl countryDao;
     private JdbcTemplate jdbcTemplate;
     private SimpleJdbcInsert jdbcInsert;
@@ -49,7 +49,6 @@ public class CountryDaoImplTest {
 
     @Before
     public void setUp() {
-        this.countryDao = new CountryDaoImpl();
         this.jdbcTemplate = new JdbcTemplate(this.ds);
         this.jdbcInsert = new SimpleJdbcInsert(this.ds)
                 .withTableName(COUNTRIES_TABLE);

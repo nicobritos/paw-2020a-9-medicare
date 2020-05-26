@@ -9,7 +9,6 @@ import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
-import org.springframework.jdbc.BadSqlGrammarException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.test.context.ContextConfiguration;
@@ -44,6 +43,7 @@ public class OfficeDaoImplTest
     private static final String PROVINCES_TABLE = "system_province";
     private static final String COUNTRIES_TABLE = "system_country";
 
+    @Autowired
     private OfficeDaoImpl officeDao;
     private JdbcTemplate jdbcTemplate;
     private SimpleJdbcInsert officeJdbcInsert;
@@ -59,7 +59,6 @@ public class OfficeDaoImplTest
 
     @Before
     public void setUp() {
-        this.officeDao = new OfficeDaoImpl();
         this.jdbcTemplate = new JdbcTemplate(this.ds);
         this.officeJdbcInsert = new SimpleJdbcInsert(this.ds)
                 .withTableName(OFFICES_TABLE)

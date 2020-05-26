@@ -12,7 +12,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 import org.springframework.dao.DataIntegrityViolationException;
-import org.springframework.jdbc.BadSqlGrammarException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.test.context.ContextConfiguration;
@@ -26,7 +25,6 @@ import java.nio.file.Files;
 import java.util.*;
 
 import static org.junit.Assert.*;
-import static org.junit.Assert.assertTrue;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @Sql(scripts = "classpath:sql/schema.sql")
@@ -70,6 +68,7 @@ public class PatientDaoImplTest {
     private static final String PICTURES_TABLE = "picture";
     private static final String PATIENTS_TABLE = "patient";
 
+    @Autowired
     private PatientDaoImpl patientDao;
     private JdbcTemplate jdbcTemplate;
     private SimpleJdbcInsert userJdbcInsert;
@@ -89,7 +88,6 @@ public class PatientDaoImplTest {
 
     @Before
     public void setUp() {
-        this.patientDao = new PatientDaoImpl();
         this.jdbcTemplate = new JdbcTemplate(this.ds);
         this.userJdbcInsert = new SimpleJdbcInsert(this.ds)
                 .withTableName(USERS_TABLE)

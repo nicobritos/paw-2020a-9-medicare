@@ -13,7 +13,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 import org.springframework.dao.DataIntegrityViolationException;
-import org.springframework.jdbc.BadSqlGrammarException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.test.context.ContextConfiguration;
@@ -76,6 +75,7 @@ public class WorkdayDaoImplTest
     private static final String STAFFS_TABLE = "staff";
     private static final String WORKDAYS_TABLE = "workday";
 
+    @Autowired
     private WorkdayDaoImpl workdayDao;
     private JdbcTemplate jdbcTemplate;
     private SimpleJdbcInsert officeJdbcInsert;
@@ -95,7 +95,6 @@ public class WorkdayDaoImplTest
 
     @Before
     public void setUp() {
-        this.workdayDao = new WorkdayDaoImpl();
         this.jdbcTemplate = new JdbcTemplate(this.ds);
         this.officeJdbcInsert = new SimpleJdbcInsert(this.ds)
                 .withTableName(OFFICES_TABLE)
