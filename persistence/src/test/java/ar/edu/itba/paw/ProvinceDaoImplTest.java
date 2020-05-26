@@ -4,7 +4,6 @@ import ar.edu.itba.paw.models.Country;
 import ar.edu.itba.paw.models.ModelMetadata;
 import ar.edu.itba.paw.models.Province;
 import ar.edu.itba.paw.persistence.ProvinceDaoImpl;
-import org.hamcrest.CoreMatchers;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -12,8 +11,6 @@ import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
-import org.springframework.dao.DuplicateKeyException;
-import org.springframework.jdbc.BadSqlGrammarException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.test.context.ContextConfiguration;
@@ -39,6 +36,7 @@ public class ProvinceDaoImplTest {
     private static final String PROVINCES_TABLE = "system_province";
     private static final String COUNTRIES_TABLE = "system_country";
 
+    @Autowired
     private ProvinceDaoImpl provinceDao;
     private JdbcTemplate jdbcTemplate;
     private SimpleJdbcInsert provinceJdbcInsert;
@@ -52,7 +50,6 @@ public class ProvinceDaoImplTest {
 
     @Before
     public void setUp() {
-        this.provinceDao = new ProvinceDaoImpl();
         this.jdbcTemplate = new JdbcTemplate(this.ds);
         this.provinceJdbcInsert = new SimpleJdbcInsert(this.ds)
                 .withTableName(PROVINCES_TABLE)

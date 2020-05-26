@@ -11,7 +11,6 @@ import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
-import org.springframework.jdbc.BadSqlGrammarException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.test.context.ContextConfiguration;
@@ -34,6 +33,7 @@ public class StaffSpecialtyDaoImplTest {
     
     private static final String STAFF_SPECIALTIES_TABLE = "system_staff_specialty";
 
+    @Autowired
     private StaffSpecialtyDaoImpl staffSpecialtyDao;
     private JdbcTemplate jdbcTemplate;
     private SimpleJdbcInsert staffSpecialtyInsert;
@@ -46,7 +46,6 @@ public class StaffSpecialtyDaoImplTest {
 
     @Before
     public void setUp() {
-        this.staffSpecialtyDao = new StaffSpecialtyDaoImpl();
         this.jdbcTemplate = new JdbcTemplate(this.ds);
         this.staffSpecialtyInsert = new SimpleJdbcInsert(this.ds)
                 .withTableName(STAFF_SPECIALTIES_TABLE)

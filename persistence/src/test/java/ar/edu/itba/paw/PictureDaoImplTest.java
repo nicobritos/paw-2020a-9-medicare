@@ -44,6 +44,7 @@ public class PictureDaoImplTest {
 
     private static final String PICTURES_TABLE = "picture";
 
+    @Autowired
     private PictureDaoImpl pictureDao;
     private JdbcTemplate jdbcTemplate;
     private SimpleJdbcInsert pictureJdbcInsert;
@@ -56,7 +57,6 @@ public class PictureDaoImplTest {
 
     @Before
     public void setUp(){
-        this.pictureDao = new PictureDaoImpl();
         this.jdbcTemplate = new JdbcTemplate(this.ds);
         this.pictureJdbcInsert = new SimpleJdbcInsert(this.ds)
                 .withTableName(PICTURES_TABLE)

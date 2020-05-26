@@ -84,6 +84,7 @@ public class AppointmentDaoImplTest {
     private static final String STAFFS_TABLE = "staff";
     private static final String APPOINTMENTS_TABLE = "appointment";
 
+    @Autowired
     private AppointmentDaoImpl appointmentDao;
     private JdbcTemplate jdbcTemplate;
     private SimpleJdbcInsert userJdbcInsert;
@@ -96,7 +97,6 @@ public class AppointmentDaoImplTest {
     private SimpleJdbcInsert staffJdbcInsert;
     private SimpleJdbcInsert appointmentJdbcInsert;
 
-
     @Rule
     public ExpectedException expectedException = ExpectedException.none();
 
@@ -105,7 +105,6 @@ public class AppointmentDaoImplTest {
 
     @Before
     public void setUp() {
-        this.appointmentDao = new AppointmentDaoImpl();
         this.jdbcTemplate = new JdbcTemplate(this.ds);
         this.userJdbcInsert = new SimpleJdbcInsert(this.ds)
                 .withTableName(USERS_TABLE)

@@ -12,7 +12,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 import org.springframework.dao.DataIntegrityViolationException;
-import org.springframework.jdbc.BadSqlGrammarException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.test.context.ContextConfiguration;
@@ -72,7 +71,8 @@ public class StaffDaoImplTest
     private static final String PICTURES_TABLE = "picture";
     private static final String STAFFS_TABLE = "staff";
     private static final String STAFF_SPECIALTIES_TABLE = "system_staff_specialty";
-    
+
+    @Autowired
     private StaffDaoImpl staffDao;
     private JdbcTemplate jdbcTemplate;
     private SimpleJdbcInsert officeJdbcInsert;
@@ -93,7 +93,6 @@ public class StaffDaoImplTest
     
     @Before
     public void setUp(){
-        this.staffDao = new StaffDaoImpl();
         this.jdbcTemplate = new JdbcTemplate(this.ds);
         this.officeJdbcInsert = new SimpleJdbcInsert(this.ds)
                 .withTableName(OFFICES_TABLE)

@@ -12,7 +12,6 @@ import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
-import org.springframework.jdbc.BadSqlGrammarException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.test.context.ContextConfiguration;
@@ -41,7 +40,7 @@ public class LocalityDaoImplTest {
     private static final String PROVINCES_TABLE = "system_province";
     private static final String COUNTRIES_TABLE = "system_country";
 
-
+    @Autowired
     private LocalityDaoImpl localityDao;
     private JdbcTemplate jdbcTemplate;
     private SimpleJdbcInsert localityJdbcInsert;
@@ -57,7 +56,6 @@ public class LocalityDaoImplTest {
 
     @Before
     public void setUp() {
-        this.localityDao = new LocalityDaoImpl();
         this.jdbcTemplate = new JdbcTemplate(this.ds);
         this.localityJdbcInsert = new SimpleJdbcInsert(this.ds)
                 .withTableName(LOCALITIES_TABLE)
