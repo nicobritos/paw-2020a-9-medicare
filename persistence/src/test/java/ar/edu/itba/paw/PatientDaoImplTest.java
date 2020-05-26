@@ -89,7 +89,7 @@ public class PatientDaoImplTest {
 
     @Before
     public void setUp() {
-        this.patientDao = new PatientDaoImpl(this.ds);
+        this.patientDao = new PatientDaoImpl();
         this.jdbcTemplate = new JdbcTemplate(this.ds);
         this.userJdbcInsert = new SimpleJdbcInsert(this.ds)
                 .withTableName(USERS_TABLE)
@@ -157,7 +157,7 @@ public class PatientDaoImplTest {
             u.setFirstName(FIRST_NAME);
             u.setSurname(SURNAME);
             u.setPhone(PHONE);
-            u.setProfileId(PROFILE_ID);
+            u.setProfilePicture(pictureModel());
             u.setToken(TOKEN);
             u.setTokenCreatedDate(null);
             u.setVerified(true);
@@ -166,6 +166,16 @@ public class PatientDaoImplTest {
             fail(e.getMessage());
         }
         return u;
+    }
+
+    private Picture pictureModel(){
+        Picture p = new Picture();
+        p.setId(STARTING_ID);
+        p.setMimeType(MIME_TYPE);
+        p.setSize(IMG_SIZE);
+        p.setData(IMG_DATA);
+        p.setName(PICTURE);
+        return p;
     }
 
     /**
@@ -188,7 +198,7 @@ public class PatientDaoImplTest {
             u.setFirstName(FIRST_NAME_2);
             u.setSurname(SURNAME_2);
             u.setPhone(PHONE_2);
-            u.setProfileId(PROFILE_ID_2);
+            u.setProfilePicture(pictureModel2());
             u.setToken(null);
             u.setTokenCreatedDate(null);
             u.setVerified(true);
@@ -197,6 +207,16 @@ public class PatientDaoImplTest {
             fail(e.getMessage());
         }
         return u;
+    }
+
+    private Picture pictureModel2(){
+        Picture p = new Picture();
+        p.setId(STARTING_ID + 1);
+        p.setMimeType(MIME_TYPE);
+        p.setSize(IMG_SIZE);
+        p.setData(IMG_DATA);
+        p.setName(PICTURE);
+        return p;
     }
 
     /** Devuelve una locality con id=STARTING_ID, name=PROVINCE y como country el devuelto en countryModel() **/
@@ -876,7 +896,7 @@ public class PatientDaoImplTest {
         ModelMetadata modelMetadata = this.patientDao.count();
 
         // 3. Postcondiciones
-        assertEquals(2, (int) modelMetadata.getCount()); // TODO: fix
+        assertEquals(2, (long) modelMetadata.getCount()); // TODO: fix
         System.out.println(modelMetadata.getMax()); // No se que devuelve esto
         System.out.println(modelMetadata.getMin()); // No se que devuelve esto
     }
@@ -891,97 +911,8 @@ public class PatientDaoImplTest {
         ModelMetadata modelMetadata = this.patientDao.count();
 
         // 3. Postcondiciones
-        assertEquals(0, (int) modelMetadata.getCount()); // TODO: fix
+        assertEquals(0, (long) modelMetadata.getCount()); // TODO: fix
         System.out.println(modelMetadata.getMax()); // No se que devuelve esto
         System.out.println(modelMetadata.getMin()); // No se que devuelve esto
-    }
-
-    /* --------------------- MÉTODO: patientDao.findByField() -------------------------------------------- */
-
-    @Test
-    public void testPatientFindByFieldName()
-    {
-        // 1. Precondiciones
-        cleanAllTables();
-        insertPatient();
-        insertAnotherPatient();
-
-        // 2. Ejercitar
-        List<Patient> patients = this.patientDao.findByField("user_id", STARTING_ID);
-
-        // 3. Postcondiciones
-        assertNotNull(patients);
-        assertEquals(1, patients.size());
-        for (Patient p : patients){
-            assertEquals(STARTING_ID, (int) p.getUser().getId());
-        }
-    }
-
-    @Test
-    public void testPatientFindByFieldId()
-    {
-        // 1. Precondiciones
-        cleanAllTables();
-        insertPatient();
-        insertAnotherPatient();
-
-        // 2. Ejercitar
-        List<Patient> patients = this.patientDao.findByField("patient_id", STARTING_ID);
-
-        // 3. Postcondiciones
-        assertNotNull(patients);
-        assertEquals(1, patients.size());
-        for (Patient p : patients){
-            assertEquals(STARTING_ID, (int) p.getId());
-        }
-    }
-
-    @Test
-    public void testPatientFindByFieldNull()
-    {
-        // 1. Precondiciones
-        cleanAllTables();
-        insertPatient();
-        insertAnotherPatient();
-
-        // 2. Ejercitar
-        List<Patient> patients = this.patientDao.findByField("patient_id", null); //TODO: Deberia tirar NullPointer (?)
-
-        // 3. Postcondiciones
-        assertNotNull(patients);
-        assertTrue(patients.isEmpty());
-    }
-
-    @Test
-    public void testPatientFindByFieldNotExistent()
-    {
-        // 1. Precondiciones
-        cleanAllTables();
-        insertPatient();
-        insertAnotherPatient();
-        expectedException.expect(BadSqlGrammarException.class);
-
-        // 2. Ejercitar
-        List<Patient> patients = this.patientDao.findByField("patient_id_no_existo", STARTING_ID); //TODO: Deberia tirar otro tipo de error (?)
-
-        // 3. Postcondiciones
-        assertNotNull(patients);
-        assertTrue(patients.isEmpty());
-    }
-
-    @Test
-    public void testPatientFindByFieldContentNotExistent()
-    {
-        // 1. Precondiciones
-        cleanAllTables();
-        insertPatient();
-        insertAnotherPatient();
-
-        // 2. Ejercitar
-        List<Patient> patients = this.patientDao.findByField("patient_id", -1); //TODO: Deberia tirar NullPointer (?)
-
-        // 3. Postcondiciones
-        assertNotNull(patients);
-        assertTrue(patients.isEmpty());
     }
 }

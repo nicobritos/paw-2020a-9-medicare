@@ -613,7 +613,7 @@ public class ProvinceDaoImplTest {
         ModelMetadata modelMetadata = this.provinceDao.count();
 
         // 3. Postcondiciones
-        assertEquals(2, (int) modelMetadata.getCount()); // TODO: fix
+        assertEquals(2, (long) modelMetadata.getCount()); // TODO: fix
         System.out.println(modelMetadata.getMax()); // No se que devuelve esto
         System.out.println(modelMetadata.getMin()); // No se que devuelve esto
     }
@@ -628,115 +628,9 @@ public class ProvinceDaoImplTest {
         ModelMetadata modelMetadata = this.provinceDao.count();
 
         // 3. Postcondiciones
-        assertEquals(0, (int) modelMetadata.getCount()); // TODO: fix
+        assertEquals(0, (long) modelMetadata.getCount()); // TODO: fix
         System.out.println(modelMetadata.getMax()); // No se que devuelve esto
         System.out.println(modelMetadata.getMin()); // No se que devuelve esto
-    }
-
-    /* --------------------- MÉTODO: localityDao.findByField(field, value) -------------------------------------------- */
-
-    @Test
-    public void testProvinceFindByFieldName()
-    {
-        // 1. Precondiciones
-        cleanAllTables();
-        insertProvince();
-        insertAnotherProvince();
-
-        // 2. Ejercitar
-        List<Province> provinces = this.provinceDao.findByField("name", PROVINCE);
-
-        // 3. Postcondiciones
-        assertNotNull(provinces);
-        assertEquals(1, provinces.size());
-        for (Province p : provinces){
-            assertEquals(PROVINCE, p.getName());
-        }
-    }
-
-    @Test
-    public void testProvinceFindByFieldId()
-    {
-        // 1. Precondiciones
-        cleanAllTables();
-        insertProvince();
-        insertAnotherProvince();
-
-        // 2. Ejercitar
-        List<Province> provinces = this.provinceDao.findByField("province_id", STARTING_ID);
-
-        // 3. Postcondiciones
-        assertNotNull(provinces);
-        assertEquals(1, provinces.size());
-        for (Province p : provinces){
-            assertEquals(STARTING_ID, (int) p.getId());
-        }
-    }
-
-    @Test
-    public void testProvinceFindByFieldCountry()
-    {
-        // 1. Precondiciones
-        cleanAllTables();
-        insertProvince();
-        insertAnotherProvince();
-
-        // 2. Ejercitar
-        List<Province> provinces = this.provinceDao.findByField("country_id", COUNTRY_ID);
-
-        // 3. Postcondiciones
-        assertNotNull(provinces);
-        assertEquals(2, provinces.size());
-        for (Province p : provinces){
-            assertEquals(countryModel(), p.getCountry());
-        }
-    }
-
-    @Test
-    public void testProvinceFindByFieldNull() {
-        // 1. Precondiciones
-        cleanAllTables();
-        insertProvince();
-        insertAnotherProvince();
-
-        // 2. Ejercitar
-        List<Province> provinces = this.provinceDao.findByField("country_id", null); //TODO: Deberia tirar NullPointer (?)
-
-        // 3. Postcondiciones
-        assertNotNull(provinces);
-        assertTrue(provinces.isEmpty());
-    }
-
-    @Test
-    public void testProvinceFindByFieldNotExistent() {
-        // 1. Precondiciones
-        cleanAllTables();
-        insertProvince();
-        insertAnotherProvince();
-        expectedException.expect(BadSqlGrammarException.class);
-
-        // 2. Ejercitar
-        List<Province> provinces = this.provinceDao.findByField("country_id_no_existo", COUNTRY_ID); //TODO: Deberia tirar otro tipo de error (?)
-
-        // 3. Postcondiciones
-        assertNotNull(provinces);
-        assertTrue(provinces.isEmpty());
-    }
-
-    @Test
-    public void testProvinceFindByFieldContentNotExistent()
-    {
-        // 1. Precondiciones
-        cleanAllTables();
-        insertProvince();
-        insertAnotherProvince();
-
-        // 2. Ejercitar
-        List<Province> provinces = this.provinceDao.findByField("country_id", "No existo"); //TODO: Deberia tirar NullPointer (?)
-
-        // 3. Postcondiciones
-        assertNotNull(provinces);
-        assertTrue(provinces.isEmpty());
     }
 
     /* --------------------- MÉTODO: countryDao.findByCountry(Country) -------------------------------------------- */

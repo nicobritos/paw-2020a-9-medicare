@@ -13,7 +13,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 import org.springframework.dao.DataIntegrityViolationException;
-import org.springframework.jdbc.BadSqlGrammarException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.test.context.ContextConfiguration;
@@ -57,7 +56,7 @@ public class PictureDaoImplTest {
 
     @Before
     public void setUp(){
-        this.pictureDao = new PictureDaoImpl(this.ds);
+        this.pictureDao = new PictureDaoImpl();
         this.jdbcTemplate = new JdbcTemplate(this.ds);
         this.pictureJdbcInsert = new SimpleJdbcInsert(this.ds)
                 .withTableName(PICTURES_TABLE)
@@ -581,7 +580,7 @@ public class PictureDaoImplTest {
         ModelMetadata modelMetadata = this.pictureDao.count();
 
         // 3. Postcondiciones
-        assertEquals(2, (int) modelMetadata.getCount()); // TODO: fix
+        assertEquals(2, (long) modelMetadata.getCount()); // TODO: fix
         System.out.println(modelMetadata.getMax()); // No se que devuelve esto
         System.out.println(modelMetadata.getMin()); // No se que devuelve esto
     }
@@ -596,97 +595,8 @@ public class PictureDaoImplTest {
         ModelMetadata modelMetadata = this.pictureDao.count();
 
         // 3. Postcondiciones
-        assertEquals(0, (int) modelMetadata.getCount()); // TODO: fix
+        assertEquals(0, (long) modelMetadata.getCount()); // TODO: fix
         System.out.println(modelMetadata.getMax()); // No se que devuelve esto
         System.out.println(modelMetadata.getMin()); // No se que devuelve esto
-    }
-
-    /* --------------------- MÉTODO: pictureDao.findByField() -------------------------------------------- */
-
-    @Test
-    public void testPictureFindByFieldName()
-    {
-        // 1. Precondiciones
-        cleanAllTables();
-        insertPicture();
-        insertAnotherPicture();
-
-        // 2. Ejercitar
-        List<Picture> pictures = this.pictureDao.findByField("name", PICTURE);
-
-        // 3. Postcondiciones
-        assertNotNull(pictures);
-        assertEquals(1, pictures.size());
-        for (Picture p : pictures){
-            assertEquals(PICTURE, p.getName());
-        }
-    }
-
-    @Test
-    public void testPictureFindByFieldId()
-    {
-        // 1. Precondiciones
-        cleanAllTables();
-        insertPicture();
-        insertAnotherPicture();
-
-        // 2. Ejercitar
-        List<Picture> pictures = this.pictureDao.findByField("picture_id", STARTING_ID);
-
-        // 3. Postcondiciones
-        assertNotNull(pictures);
-        assertEquals(1, pictures.size());
-        for (Picture p : pictures){
-            assertEquals(STARTING_ID, (int) p.getId());
-        }
-    }
-
-    @Test
-    public void testPictureFindByFieldNull()
-    {
-        // 1. Precondiciones
-        cleanAllTables();
-        insertPicture();
-        insertAnotherPicture();
-
-        // 2. Ejercitar
-        List<Picture> pictures = this.pictureDao.findByField("picture_id", null); //TODO: Deberia tirar NullPointer (?)
-
-        // 3. Postcondiciones
-        assertNotNull(pictures);
-        assertTrue(pictures.isEmpty());
-    }
-
-    @Test
-    public void testPictureFindByFieldNotExistent()
-    {
-        // 1. Precondiciones
-        cleanAllTables();
-        insertPicture();
-        insertAnotherPicture();
-        expectedException.expect(BadSqlGrammarException.class);
-
-        // 2. Ejercitar
-        List<Picture> pictures = this.pictureDao.findByField("picture_id_no_existo", STARTING_ID); //TODO: Deberia tirar otro tipo de error (?)
-
-        // 3. Postcondiciones
-        assertNotNull(pictures);
-        assertTrue(pictures.isEmpty());
-    }
-
-    @Test
-    public void testPictureFindByFieldContentNotExistent()
-    {
-        // 1. Precondiciones
-        cleanAllTables();
-        insertPicture();
-        insertAnotherPicture();
-
-        // 2. Ejercitar
-        List<Picture> pictures = this.pictureDao.findByField("picture_id", -1); //TODO: Deberia tirar NullPointer (?)
-
-        // 3. Postcondiciones
-        assertNotNull(pictures);
-        assertTrue(pictures.isEmpty());
     }
 }

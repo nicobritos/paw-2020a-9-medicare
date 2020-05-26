@@ -680,7 +680,7 @@ public class CountryDaoImplTest {
         ModelMetadata modelMetadata = this.countryDao.count();
 
         // 3. Postcondiciones
-        assertEquals(2, (int) modelMetadata.getCount()); // TODO: fix
+        assertEquals(2, (long) modelMetadata.getCount()); // TODO: fix
         System.out.println(modelMetadata.getMax()); // No se que devuelve esto
         System.out.println(modelMetadata.getMin()); // No se que devuelve esto
     }
@@ -695,97 +695,8 @@ public class CountryDaoImplTest {
         ModelMetadata modelMetadata = this.countryDao.count();
 
         // 3. Postcondiciones
-        assertEquals(0, (int) modelMetadata.getCount()); // TODO: fix
+        assertEquals(0, (long) modelMetadata.getCount()); // TODO: fix
         System.out.println(modelMetadata.getMax()); // No se que devuelve esto
         System.out.println(modelMetadata.getMin()); // No se que devuelve esto
-    }
-
-    /* --------------------- MÉTODO: countryDao.findByField() -------------------------------------------- */
-
-    @Test
-    public void testCountryFindByFieldName()
-    {
-        // 1. Precondiciones
-        cleanAllTables();
-        insertCountry();
-        insertAnotherCountry();
-
-        // 2. Ejercitar
-        List<Country> countries = this.countryDao.findByField("name", COUNTRY);
-
-        // 3. Postcondiciones
-        assertNotNull(countries);
-        assertEquals(1, countries.size());
-        for (Country c : countries){
-            assertEquals(COUNTRY, c.getName());
-        }
-    }
-
-    @Test
-    public void testCountryFindByFieldId()
-    {
-        // 1. Precondiciones
-        cleanAllTables();
-        insertCountry();
-        insertAnotherCountry();
-
-        // 2. Ejercitar
-        List<Country> countries = this.countryDao.findByField("country_id", COUNTRY_ID);
-
-        // 3. Postcondiciones
-        assertNotNull(countries);
-        assertEquals(1, countries.size());
-        for (Country c : countries){
-            assertEquals(COUNTRY_ID, c.getId());
-        }
-    }
-
-    @Test
-    public void testCountryFindByFieldNull()
-    {
-        // 1. Precondiciones
-        cleanAllTables();
-        insertCountry();
-        insertAnotherCountry();
-
-        // 2. Ejercitar
-        List<Country> countries = this.countryDao.findByField("country_id", null); //TODO: Deberia tirar NullPointer (?)
-
-        // 3. Postcondiciones
-        assertNotNull(countries);
-        assertTrue(countries.isEmpty());
-    }
-
-    @Test
-    public void testCountryFindByFieldNotExistent()
-    {
-        // 1. Precondiciones
-        cleanAllTables();
-        insertCountry();
-        insertAnotherCountry();
-        expectedException.expect(BadSqlGrammarException.class);
-
-        // 2. Ejercitar
-        List<Country> countries = this.countryDao.findByField("country_id_no_existo", COUNTRY_ID); //TODO: Deberia tirar otro tipo de error (?)
-
-        // 3. Postcondiciones
-        assertNotNull(countries);
-        assertTrue(countries.isEmpty());
-    }
-
-    @Test
-    public void testCountryFindByFieldContentNotExistent()
-    {
-        // 1. Precondiciones
-        cleanAllTables();
-        insertCountry();
-        insertAnotherCountry();
-
-        // 2. Ejercitar
-        List<Country> countries = this.countryDao.findByField("country_id", "No existo"); //TODO: Deberia tirar NullPointer (?)
-
-        // 3. Postcondiciones
-        assertNotNull(countries);
-        assertTrue(countries.isEmpty());
     }
 }

@@ -742,7 +742,7 @@ public class OfficeDaoImplTest
         ModelMetadata modelMetadata = this.officeDao.count();
 
         // 3. Postcondiciones
-        assertEquals(2, (int) modelMetadata.getCount()); // TODO: fix
+        assertEquals(2, (long) modelMetadata.getCount()); // TODO: fix
         System.out.println(modelMetadata.getMax()); // No se que devuelve esto
         System.out.println(modelMetadata.getMin()); // No se que devuelve esto
     }
@@ -757,115 +757,9 @@ public class OfficeDaoImplTest
         ModelMetadata modelMetadata = this.officeDao.count();
 
         // 3. Postcondiciones
-        assertEquals(2, (int) modelMetadata.getCount()); // TODO: fix
+        assertEquals(2, (long) modelMetadata.getCount()); // TODO: fix
         System.out.println(modelMetadata.getMax()); // No se que devuelve esto
         System.out.println(modelMetadata.getMin()); // No se que devuelve esto
-    }
-
-    /* --------------------- MÉTODO: officeDao.findByField(field, value) -------------------------------------------- */
-
-    @Test
-    public void testOfficeFindByFieldName()
-    {
-        // 1. Precondiciones
-        cleanAllTables();
-        insertOffice();
-        insertAnotherOffice();
-
-        // 2. Ejercitar
-        List<Office> offices = this.officeDao.findByField("name", OFFICE);
-
-        // 3. Postcondiciones
-        assertNotNull(offices);
-        assertEquals(1, offices.size());
-        for (Office o : offices){
-            assertEquals(OFFICE, o.getName());
-        }
-    }
-
-    @Test
-    public void testOfficeFindByFieldId()
-    {
-        // 1. Precondiciones
-        cleanAllTables();
-        insertOffice();
-        insertAnotherOffice();
-
-        // 2. Ejercitar
-        List<Office> offices = this.officeDao.findByField("office_id", STARTING_ID);
-
-        // 3. Postcondiciones
-        assertNotNull(offices);
-        assertEquals(1, offices.size());
-        for (Office o : offices){
-            assertEquals(STARTING_ID, (int) o.getId());
-        }
-    }
-
-    @Test
-    public void testOfficeFindByFieldLocality()
-    {
-        // 1. Precondiciones
-        cleanAllTables();
-        insertOffice();
-        insertAnotherOffice();
-
-        // 2. Ejercitar
-        List<Office> offices = this.officeDao.findByField("locality_id", STARTING_ID);
-
-        // 3. Postcondiciones
-        assertNotNull(offices);
-        assertEquals(2, offices.size());
-        for (Office o : offices){
-            assertEquals(localityModel(), o.getLocality());
-        }
-    }
-
-    @Test
-    public void testOfficeFindByFieldNull() {
-        // 1. Precondiciones
-        cleanAllTables();
-        insertOffice();
-        insertAnotherOffice();
-
-        // 2. Ejercitar
-        List<Office> offices = this.officeDao.findByField("office_id", null); //TODO: Deberia tirar NullPointer (?)
-
-        // 3. Postcondiciones
-        assertNotNull(offices);
-        assertTrue(offices.isEmpty());
-    }
-
-    @Test
-    public void testOfficeFindByFieldNotExistent() {
-        // 1. Precondiciones
-        cleanAllTables();
-        insertOffice();
-        insertAnotherOffice();
-        expectedException.expect(BadSqlGrammarException.class);
-
-        // 2. Ejercitar
-        List<Office> offices = this.officeDao.findByField("office_id_no_existo", STARTING_ID); //TODO: Deberia tirar otro tipo de error (?)
-
-        // 3. Postcondiciones
-        assertNotNull(offices);
-        assertTrue(offices.isEmpty());
-    }
-
-    @Test
-    public void testLocalityFindByFieldContentNotExistent()
-    {
-        // 1. Precondiciones
-        cleanAllTables();
-        insertOffice();
-        insertAnotherOffice();
-
-        // 2. Ejercitar
-        List<Office> offices = this.officeDao.findByField("office_id", -1); //TODO: Deberia tirar NullPointer (?)
-
-        // 3. Postcondiciones
-        assertNotNull(offices);
-        assertTrue(offices.isEmpty());
     }
 
     /* --------------------- MÉTODO: officeDao.findByCountry(Country) -------------------------------------------- */

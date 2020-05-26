@@ -93,7 +93,7 @@ public class StaffDaoImplTest
     
     @Before
     public void setUp(){
-        this.staffDao = new StaffDaoImpl(this.ds);
+        this.staffDao = new StaffDaoImpl();
         this.jdbcTemplate = new JdbcTemplate(this.ds);
         this.officeJdbcInsert = new SimpleJdbcInsert(this.ds)
                 .withTableName(OFFICES_TABLE)
@@ -164,7 +164,7 @@ public class StaffDaoImplTest
             u.setFirstName(FIRST_NAME);
             u.setSurname(SURNAME);
             u.setPhone(PHONE);
-            u.setProfileId(PROFILE_ID);
+            u.setProfilePicture(pictureModel());
             u.setToken(TOKEN);
             u.setTokenCreatedDate(null);
             u.setVerified(true);
@@ -173,6 +173,16 @@ public class StaffDaoImplTest
             fail(e.getMessage());
         }
         return u;
+    }
+
+    private Picture pictureModel(){
+        Picture p = new Picture();
+        p.setId(STARTING_ID);
+        p.setMimeType(MIME_TYPE);
+        p.setSize(IMG_SIZE);
+        p.setData(IMG_DATA);
+        p.setName(PICTURE);
+        return p;
     }
 
     /** Inserta en la db la imagen con
@@ -924,7 +934,7 @@ public class StaffDaoImplTest
         ModelMetadata modelMetadata = this.staffDao.count();
 
         // 3. Postcondiciones
-        assertEquals(2, (int) modelMetadata.getCount()); // TODO: fix
+        assertEquals(2, (long) modelMetadata.getCount()); // TODO: fix
         System.out.println(modelMetadata.getMax()); // No se que devuelve esto
         System.out.println(modelMetadata.getMin()); // No se que devuelve esto
     }
@@ -939,98 +949,9 @@ public class StaffDaoImplTest
         ModelMetadata modelMetadata = this.staffDao.count();
 
         // 3. Postcondiciones
-        assertEquals(0, (int) modelMetadata.getCount()); // TODO: fix
+        assertEquals(0, (long) modelMetadata.getCount()); // TODO: fix
         System.out.println(modelMetadata.getMax()); // No se que devuelve esto
         System.out.println(modelMetadata.getMin()); // No se que devuelve esto
-    }
-
-    /* --------------------- MÉTODO: staffDao.findByField() -------------------------------------------- */
-
-    @Test
-    public void testStaffFindByFieldName()
-    {
-        // 1. Precondiciones
-        cleanAllTables();
-        insertStaff();
-        insertAnotherStaff();
-
-        // 2. Ejercitar
-        List<Staff> staffs = this.staffDao.findByField("first_name", FIRST_NAME);
-
-        // 3. Postcondiciones
-        assertNotNull(staffs);
-        assertEquals(1, staffs.size());
-        for (Staff s : staffs){
-            assertEquals(FIRST_NAME, s.getFirstName());
-        }
-    }
-
-    @Test
-    public void testStaffFindByFieldId()
-    {
-        // 1. Precondiciones
-        cleanAllTables();
-        insertStaff();
-        insertAnotherStaff();
-
-        // 2. Ejercitar
-        List<Staff> staffs = this.staffDao.findByField("staff_id", STARTING_ID);
-
-        // 3. Postcondiciones
-        assertNotNull(staffs);
-        assertEquals(1, staffs.size());
-        for (Staff s : staffs){
-            assertEquals(STARTING_ID, (int) s.getId());
-        }
-    }
-
-    @Test
-    public void testStaffFindByFieldNull()
-    {
-        // 1. Precondiciones
-        cleanAllTables();
-        insertStaff();
-        insertAnotherStaff();
-
-        // 2. Ejercitar
-        List<Staff> staffs = this.staffDao.findByField("staff_id", null); //TODO: Deberia tirar NullPointer (?)
-
-        // 3. Postcondiciones
-        assertNotNull(staffs);
-        assertTrue(staffs.isEmpty());
-    }
-
-    @Test
-    public void testStaffFindByFieldNotExistent()
-    {
-        // 1. Precondiciones
-        cleanAllTables();
-        insertStaff();
-        insertAnotherStaff();
-        expectedException.expect(BadSqlGrammarException.class);
-
-        // 2. Ejercitar
-        List<Staff> staffs = this.staffDao.findByField("staff_id_no_existo", STARTING_ID); //TODO: Deberia tirar otro tipo de error (?)
-
-        // 3. Postcondiciones
-        assertNotNull(staffs);
-        assertTrue(staffs.isEmpty());
-    }
-
-    @Test
-    public void testStaffFindByFieldContentNotExistent()
-    {
-        // 1. Precondiciones
-        cleanAllTables();
-        insertStaff();
-        insertAnotherStaff();
-
-        // 2. Ejercitar
-        List<Staff> staffs = this.staffDao.findByField("staff_id", -1); //TODO: Deberia tirar NullPointer (?)
-
-        // 3. Postcondiciones
-        assertNotNull(staffs);
-        assertTrue(staffs.isEmpty());
     }
 
     /* --------------------- MÉTODO: staffDao.findBy(Collection<String> names, Collection<String> surnames, Collection<Office>, Collection<StaffSpecialty>, Collection<Locality>) -------------------------------------------- */
@@ -1279,7 +1200,7 @@ public class StaffDaoImplTest
         assertEquals(1, paginator.getPage());
         assertEquals(1, paginator.getPageSize());
         assertEquals(0, paginator.getRemainingPages());
-        assertEquals(1, paginator.getTotalCount());
+        assertEquals(1, (long) paginator.getTotalCount());
         assertEquals(1, paginator.getTotalPages());
         assertEquals(1, paginator.getModels().size());
     }
@@ -1300,7 +1221,7 @@ public class StaffDaoImplTest
         assertEquals(1, paginator.getPage());
         assertEquals(1, paginator.getPageSize());
         assertEquals(1, paginator.getRemainingPages());
-        assertEquals(2, paginator.getTotalCount());
+        assertEquals(2, (long) paginator.getTotalCount());
         assertEquals(2, paginator.getTotalPages());
         assertEquals(1, paginator.getModels().size());
     }
@@ -1337,7 +1258,7 @@ public class StaffDaoImplTest
         assertEquals(1, paginator.getPage());
         assertEquals(1, paginator.getPageSize());
         assertEquals(0, paginator.getRemainingPages());
-        assertEquals(1, paginator.getTotalCount());
+        assertEquals(1, (long) paginator.getTotalCount());
         assertEquals(1, paginator.getTotalPages());
         assertEquals(1, paginator.getModels().size());
     }
@@ -1358,7 +1279,7 @@ public class StaffDaoImplTest
         assertEquals(1, paginator.getPage());
         assertEquals(1, paginator.getPageSize());
         assertEquals(0, paginator.getRemainingPages());
-        assertEquals(1, paginator.getTotalCount());
+        assertEquals(1, (long) paginator.getTotalCount());
         assertEquals(1, paginator.getTotalPages());
         assertEquals(1, paginator.getModels().size());
     }
@@ -1379,7 +1300,7 @@ public class StaffDaoImplTest
         assertEquals(1, paginator.getPage());
         assertEquals(1, paginator.getPageSize());
         assertEquals(1, paginator.getRemainingPages());
-        assertEquals(2, paginator.getTotalCount());
+        assertEquals(2, (long) paginator.getTotalCount());
         assertEquals(2, paginator.getTotalPages());
         assertEquals(1, paginator.getModels().size());
     }
@@ -1400,7 +1321,7 @@ public class StaffDaoImplTest
         assertEquals(1, paginator.getPage());
         assertEquals(1, paginator.getPageSize());
         assertEquals(1, paginator.getRemainingPages());
-        assertEquals(2, paginator.getTotalCount());
+        assertEquals(2, (long) paginator.getTotalCount());
         assertEquals(2, paginator.getTotalPages());
         assertEquals(1, paginator.getModels().size());
     }
@@ -1423,7 +1344,7 @@ public class StaffDaoImplTest
         assertEquals(1, paginator.getPage());
         assertEquals(1, paginator.getPageSize());
         assertEquals(0, paginator.getRemainingPages());
-        assertEquals(1, paginator.getTotalCount());
+        assertEquals(1, (long) paginator.getTotalCount());
         assertEquals(1, paginator.getTotalPages());
         assertEquals(1, paginator.getModels().size());
     }
@@ -1444,7 +1365,7 @@ public class StaffDaoImplTest
         assertEquals(1, paginator.getPage());
         assertEquals(1, paginator.getPageSize());
         assertEquals(1, paginator.getRemainingPages());
-        assertEquals(2, paginator.getTotalCount());
+        assertEquals(2, (long) paginator.getTotalCount());
         assertEquals(2, paginator.getTotalPages());
         assertEquals(1, paginator.getModels().size());
     }
@@ -1465,7 +1386,7 @@ public class StaffDaoImplTest
         assertEquals(1, paginator.getPage());
         assertEquals(1, paginator.getPageSize());
         assertEquals(0, paginator.getRemainingPages());
-        assertEquals(1, paginator.getTotalCount());
+        assertEquals(1, (long) paginator.getTotalCount());
         assertEquals(1, paginator.getTotalPages());
         assertEquals(1, paginator.getModels().size());
     }
@@ -1486,7 +1407,7 @@ public class StaffDaoImplTest
         assertEquals(1, paginator.getPage());
         assertEquals(1, paginator.getPageSize());
         assertEquals(0, paginator.getRemainingPages());
-        assertEquals(1, paginator.getTotalCount());
+        assertEquals(1, (long) paginator.getTotalCount());
         assertEquals(1, paginator.getTotalPages());
         assertEquals(1, paginator.getModels().size());
     }
@@ -1507,7 +1428,7 @@ public class StaffDaoImplTest
         assertEquals(1, paginator.getPage());
         assertEquals(1, paginator.getPageSize());
         assertEquals(0, paginator.getRemainingPages());
-        assertEquals(1, paginator.getTotalCount());
+        assertEquals(1, (long)paginator.getTotalCount());
         assertEquals(1, paginator.getTotalPages());
         assertEquals(1, paginator.getModels().size());
     }
@@ -1528,7 +1449,7 @@ public class StaffDaoImplTest
         assertEquals(1, paginator.getPage());
         assertEquals(1, paginator.getPageSize());
         assertEquals(1, paginator.getRemainingPages());
-        assertEquals(2, paginator.getTotalCount());
+        assertEquals(2, (long) paginator.getTotalCount());
         assertEquals(2, paginator.getTotalPages());
         assertEquals(1, paginator.getModels().size());
     }
@@ -1549,181 +1470,8 @@ public class StaffDaoImplTest
         assertEquals(1, paginator.getPage());
         assertEquals(1, paginator.getPageSize());
         assertEquals(1, paginator.getRemainingPages());
-        assertEquals(2, paginator.getTotalCount());
+        assertEquals(2, (long) paginator.getTotalCount());
         assertEquals(2, paginator.getTotalPages());
         assertEquals(1, paginator.getModels().size());
-    }
-
-    /* --------------------- MÉTODO: staffDao.addSpecialty(Staff, StaffSpecialty) -------------------------------------------- */
-
-    @Test
-    public void testStaffAddSpecialty()
-    {
-        // 1. Precondiciones
-        cleanAllTables();
-        insertStaff();
-        insertStaffSpecialty();
-        Staff s = staffModel();
-        s.getStaffSpecialties().add(staffSpecialtyModel());
-
-        // 2. Ejercitar
-        staffDao.addStaffSpecialty(s, staffSpecialtyModel());
-
-        // 3. Postcondiciones
-        assertEquals(1, s.getStaffSpecialties().size());
-        assertTrue(s.getStaffSpecialties().contains(staffSpecialtyModel()));
-        assertEquals(1, JdbcTestUtils.countRowsInTable(jdbcTemplate, STAFF_SPECIALTIES_TABLE));
-    }
-
-    @Test
-    public void testStaffAddSpecialtyNullStaffFail()
-    {
-        // 1. Precondiciones
-        cleanAllTables();
-        insertStaff();
-        insertStaffSpecialty();
-        expectedException.expect(NullPointerException.class);
-
-        // 2. Ejercitar
-        staffDao.addStaffSpecialty(null, staffSpecialtyModel());
-
-        // 3. Postcondiciones
-        // que el metodo tire NullPointerException
-    }
-
-    @Test
-    public void testStaffAddSpecialtyNullStaffSpecialtyFail()
-    {
-        // 1. Precondiciones
-        cleanAllTables();
-        insertStaff();
-        insertStaffSpecialty();
-        Staff s = staffModel();
-        expectedException.expect(NullPointerException.class);
-
-        // 2. Ejercitar
-        staffDao.addStaffSpecialty(s, null);
-
-        // 3. Postcondiciones
-        // que el metodo tire NullPointerException
-    }
-
-    /* --------------------- MÉTODO: staffDao.addSpecialties(Staff, Collection<StaffSpecialty>) -------------------------------------------- */
-
-    @Test
-    public void testStaffAddSpecialties()
-    {
-        // 1. Precondiciones
-        cleanAllTables();
-        insertStaff();
-        insertStaffSpecialty();
-        Staff s = staffModel();
-        s.getStaffSpecialties().add(staffSpecialtyModel());
-
-        // 2. Ejercitar
-        staffDao.addStaffSpecialties(s, Collections.singleton(staffSpecialtyModel()));
-
-        // 3. Postcondiciones
-        assertEquals(1, s.getStaffSpecialties().size());
-        assertTrue(s.getStaffSpecialties().contains(staffSpecialtyModel()));
-        assertEquals(1, JdbcTestUtils.countRowsInTable(jdbcTemplate, STAFF_SPECIALTIES_TABLE));
-    }
-
-    @Test
-    public void testStaffAddSpecialtiesNullStaffFail()
-    {
-        // 1. Precondiciones
-        cleanAllTables();
-        insertStaff();
-        insertStaffSpecialty();
-        expectedException.expect(NullPointerException.class);
-
-        // 2. Ejercitar
-        staffDao.addStaffSpecialties(null, Collections.singleton(staffSpecialtyModel()));
-
-        // 3. Postcondiciones
-        // que el metodo tire NullPointerException
-    }
-
-    @Test
-    public void testStaffAddSpecialtiesNullStaffSpecialtiesFail()
-    {
-        // 1. Precondiciones
-        cleanAllTables();
-        insertStaff();
-        insertStaffSpecialty();
-        Staff s = staffModel();
-        expectedException.expect(NullPointerException.class);
-
-        // 2. Ejercitar
-        staffDao.addStaffSpecialties(s, null);
-
-        // 3. Postcondiciones
-        // que el metodo tire NullPointerException
-    }
-
-    /* --------------------- MÉTODO: staffDao.setOffice(Staff, Office) -------------------------------------------- */
-
-    @Test
-    public void testStaffSetOffice()
-    {
-        // 1. Precondiciones
-        cleanAllTables();
-        insertStaff();
-        insertAnotherOffice();
-        Staff s = staffModel();
-        Office o = officeModel();
-        o.setName(OFFICE_2);
-        o.setId(STARTING_ID + 1);
-        s.setOffice(o);
-
-        // 2. Ejercitar
-        staffDao.setOffice(s, o);
-
-        // 3. Postcondiciones
-        assertEquals(o, s.getOffice());
-        assertEquals(2, JdbcTestUtils.countRowsInTable(jdbcTemplate, OFFICES_TABLE));
-    }
-
-    @Test
-    public void testStaffSetOfficeNullStaffFail()
-    {
-        // 1. Precondiciones
-        cleanAllTables();
-        insertStaff();
-        insertAnotherOffice();
-        Staff s = staffModel();
-        Office o = officeModel();
-        o.setName(OFFICE_2);
-        o.setId(STARTING_ID + 1);
-        s.setOffice(o);
-        expectedException.expect(NullPointerException.class);
-
-        // 2. Ejercitar
-        staffDao.setOffice(null, o);
-
-        // 3. Postcondiciones
-        // que el metodo tire NullPointerException
-    }
-
-    @Test
-    public void testStaffSetOfficeNullOfficeFail()
-    {
-        // 1. Precondiciones
-        cleanAllTables();
-        insertStaff();
-        insertAnotherOffice();
-        Staff s = staffModel();
-        Office o = officeModel();
-        o.setName(OFFICE_2);
-        o.setId(STARTING_ID + 1);
-        s.setOffice(o);
-        expectedException.expect(NullPointerException.class);
-
-        // 2. Ejercitar
-        staffDao.setOffice(s, null);
-
-        // 3. Postcondiciones
-        // que el metodo tire NullPointerException
     }
 }

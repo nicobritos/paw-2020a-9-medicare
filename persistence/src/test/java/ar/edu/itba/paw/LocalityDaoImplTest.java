@@ -639,7 +639,7 @@ public class LocalityDaoImplTest {
         ModelMetadata modelMetadata = this.localityDao.count();
 
         // 3. Postcondiciones
-        assertEquals(2, (int) modelMetadata.getCount()); // TODO: fix
+        assertEquals(2, (long) modelMetadata.getCount()); // TODO: fix
         System.out.println(modelMetadata.getMax()); // No se que devuelve esto
         System.out.println(modelMetadata.getMin()); // No se que devuelve esto
     }
@@ -654,115 +654,9 @@ public class LocalityDaoImplTest {
         ModelMetadata modelMetadata = this.localityDao.count();
 
         // 3. Postcondiciones
-        assertEquals(2, (int) modelMetadata.getCount()); // TODO: fix
+        assertEquals(2, (long) modelMetadata.getCount()); // TODO: fix
         System.out.println(modelMetadata.getMax()); // No se que devuelve esto
         System.out.println(modelMetadata.getMin()); // No se que devuelve esto
-    }
-
-    /* --------------------- MÉTODO: localityDao.findByField(field, value) -------------------------------------------- */
-
-    @Test
-    public void testLocalityFindByFieldName()
-    {
-        // 1. Precondiciones
-        cleanAllTables();
-        insertLocality();
-        insertAnotherLocality();
-
-        // 2. Ejercitar
-        List<Locality> localities = this.localityDao.findByField("name", LOCALITY);
-
-        // 3. Postcondiciones
-        assertNotNull(localities);
-        assertEquals(1, localities.size());
-        for (Locality l : localities){
-            assertEquals(LOCALITY, l.getName());
-        }
-    }
-
-    @Test
-    public void testLocalityFindByFieldId()
-    {
-        // 1. Precondiciones
-        cleanAllTables();
-        insertLocality();
-        insertAnotherLocality();
-
-        // 2. Ejercitar
-        List<Locality> localities = this.localityDao.findByField("locality_id", STARTING_ID);
-
-        // 3. Postcondiciones
-        assertNotNull(localities);
-        assertEquals(1, localities.size());
-        for (Locality l : localities){
-            assertEquals(STARTING_ID, (int) l.getId());
-        }
-    }
-
-    @Test
-    public void testLocalityFindByFieldProvince()
-    {
-        // 1. Precondiciones
-        cleanAllTables();
-        insertLocality();
-        insertAnotherLocality();
-
-        // 2. Ejercitar
-        List<Locality> localities = this.localityDao.findByField("province_id", STARTING_ID);
-
-        // 3. Postcondiciones
-        assertNotNull(localities);
-        assertEquals(2, localities.size());
-        for (Locality l : localities){
-            assertEquals(provinceModel(), l.getProvince());
-        }
-    }
-
-    @Test
-    public void testLocalityFindByFieldNull() {
-        // 1. Precondiciones
-        cleanAllTables();
-        insertLocality();
-        insertAnotherLocality();
-
-        // 2. Ejercitar
-        List<Locality> localities = this.localityDao.findByField("locality_id", null); //TODO: Deberia tirar NullPointer (?)
-
-        // 3. Postcondiciones
-        assertNotNull(localities);
-        assertTrue(localities.isEmpty());
-    }
-
-    @Test
-    public void testLocalityFindByFieldNotExistent() {
-        // 1. Precondiciones
-        cleanAllTables();
-        insertLocality();
-        insertAnotherLocality();
-        expectedException.expect(BadSqlGrammarException.class);
-
-        // 2. Ejercitar
-        List<Locality> localities = this.localityDao.findByField("locality_id_no_existo", STARTING_ID); //TODO: Deberia tirar otro tipo de error (?)
-
-        // 3. Postcondiciones
-        assertNotNull(localities);
-        assertTrue(localities.isEmpty());
-    }
-
-    @Test
-    public void testProvinceFindByFieldContentNotExistent()
-    {
-        // 1. Precondiciones
-        cleanAllTables();
-        insertLocality();
-        insertAnotherLocality();
-
-        // 2. Ejercitar
-        List<Locality> localities = this.localityDao.findByField("locality_id", -1); //TODO: Deberia tirar NullPointer (?)
-
-        // 3. Postcondiciones
-        assertNotNull(localities);
-        assertTrue(localities.isEmpty());
     }
 
     /* --------------------- MÉTODO: countryDao.findByCountry(Country) -------------------------------------------- */

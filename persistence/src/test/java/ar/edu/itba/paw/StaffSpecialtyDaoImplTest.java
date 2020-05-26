@@ -46,7 +46,7 @@ public class StaffSpecialtyDaoImplTest {
 
     @Before
     public void setUp() {
-        this.staffSpecialtyDao = new StaffSpecialtyDaoImpl(this.ds);
+        this.staffSpecialtyDao = new StaffSpecialtyDaoImpl();
         this.jdbcTemplate = new JdbcTemplate(this.ds);
         this.staffSpecialtyInsert = new SimpleJdbcInsert(this.ds)
                 .withTableName(STAFF_SPECIALTIES_TABLE)
@@ -485,7 +485,7 @@ public class StaffSpecialtyDaoImplTest {
         ModelMetadata modelMetadata = this.staffSpecialtyDao.count();
 
         // 3. Postcondiciones
-        assertEquals(2, (int) modelMetadata.getCount()); // TODO: fix
+        assertEquals(2, (long) modelMetadata.getCount()); // TODO: fix
         System.out.println(modelMetadata.getMax()); // No se que devuelve esto
         System.out.println(modelMetadata.getMin()); // No se que devuelve esto
     }
@@ -500,97 +500,8 @@ public class StaffSpecialtyDaoImplTest {
         ModelMetadata modelMetadata = this.staffSpecialtyDao.count();
 
         // 3. Postcondiciones
-        assertEquals(0, (int) modelMetadata.getCount()); // TODO: fix
+        assertEquals(0, (long) modelMetadata.getCount()); // TODO: fix
         System.out.println(modelMetadata.getMax()); // No se que devuelve esto
         System.out.println(modelMetadata.getMin()); // No se que devuelve esto
-    }
-
-    /* --------------------- MÉTODO: staffSpecialtyDao.findByField() -------------------------------------------- */
-
-    @Test
-    public void testStaffSpecialtyFindByFieldName()
-    {
-        // 1. Precondiciones
-        cleanAllTables();
-        insertStaffSpecialty();
-        insertAnotherStaffSpecialty();
-
-        // 2. Ejercitar
-        List<StaffSpecialty> staffSpecialties = this.staffSpecialtyDao.findByField("name", STAFF_SPECIALTY);
-
-        // 3. Postcondiciones
-        assertNotNull(staffSpecialties);
-        assertEquals(1, staffSpecialties.size());
-        for (StaffSpecialty ss : staffSpecialties){
-            assertEquals(STAFF_SPECIALTY, ss.getName());
-        }
-    }
-
-    @Test
-    public void testStaffSpecialtyFindByFieldId()
-    {
-        // 1. Precondiciones
-        cleanAllTables();
-        insertStaffSpecialty();
-        insertAnotherStaffSpecialty();
-
-        // 2. Ejercitar
-        List<StaffSpecialty> staffSpecialties = this.staffSpecialtyDao.findByField("specialty_id", STARTING_ID);
-
-        // 3. Postcondiciones
-        assertNotNull(staffSpecialties);
-        assertEquals(1, staffSpecialties.size());
-        for (StaffSpecialty ss : staffSpecialties){
-            assertEquals(STARTING_ID, (int) ss.getId());
-        }
-    }
-
-    @Test
-    public void testStaffSpecialtyFindByFieldNull()
-    {
-        // 1. Precondiciones
-        cleanAllTables();
-        insertStaffSpecialty();
-        insertAnotherStaffSpecialty();
-
-        // 2. Ejercitar
-        List<StaffSpecialty> staffSpecialties = this.staffSpecialtyDao.findByField("specialty_id", null); //TODO: Deberia tirar NullPointer (?)
-
-        // 3. Postcondiciones
-        assertNotNull(staffSpecialties);
-        assertTrue(staffSpecialties.isEmpty());
-    }
-
-    @Test
-    public void testStaffSpecialtyFindByFieldNotExistent()
-    {
-        // 1. Precondiciones
-        cleanAllTables();
-        insertStaffSpecialty();
-        insertAnotherStaffSpecialty();
-        expectedException.expect(BadSqlGrammarException.class);
-
-        // 2. Ejercitar
-        List<StaffSpecialty> staffSpecialties = this.staffSpecialtyDao.findByField("specialty_id_no_existo", STARTING_ID); //TODO: Deberia tirar otro tipo de error (?)
-
-        // 3. Postcondiciones
-        assertNotNull(staffSpecialties);
-        assertTrue(staffSpecialties.isEmpty());
-    }
-
-    @Test
-    public void testStaffSpecialtyFindByFieldContentNotExistent()
-    {
-        // 1. Precondiciones
-        cleanAllTables();
-        insertStaffSpecialty();
-        insertAnotherStaffSpecialty();
-
-        // 2. Ejercitar
-        List<StaffSpecialty> staffSpecialties = this.staffSpecialtyDao.findByField("specialty_id", -1); //TODO: Deberia tirar NullPointer (?)
-
-        // 3. Postcondiciones
-        assertNotNull(staffSpecialties);
-        assertTrue(staffSpecialties.isEmpty());
     }
 }

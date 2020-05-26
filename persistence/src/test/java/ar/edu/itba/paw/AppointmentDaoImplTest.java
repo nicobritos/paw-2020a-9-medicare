@@ -13,7 +13,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 import org.springframework.dao.DataIntegrityViolationException;
-import org.springframework.jdbc.BadSqlGrammarException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.test.context.ContextConfiguration;
@@ -62,7 +61,7 @@ public class AppointmentDaoImplTest {
     private static final String OFFICE_EMAIL = "test@test.com";
     private static final String URL = "www.hnacional.com";
     private static final int REGISTRATION_NUMBER = 123;
-    private static final String STATUS = "PENDING";
+    private static final AppointmentStatus STATUS = AppointmentStatus.PENDING;
     private static final String FROM_DATE = "2020-05-25 11:00:00.000000";
     private static final String FROM_DATE_2 = "2020-05-25 15:00:00.000000";
     private static final String MOTIVE = "motive";
@@ -106,7 +105,7 @@ public class AppointmentDaoImplTest {
 
     @Before
     public void setUp() {
-        this.appointmentDao = new AppointmentDaoImpl(this.ds);
+        this.appointmentDao = new AppointmentDaoImpl();
         this.jdbcTemplate = new JdbcTemplate(this.ds);
         this.userJdbcInsert = new SimpleJdbcInsert(this.ds)
                 .withTableName(USERS_TABLE)
@@ -180,7 +179,7 @@ public class AppointmentDaoImplTest {
             u.setFirstName(FIRST_NAME);
             u.setSurname(SURNAME);
             u.setPhone(PHONE);
-            u.setProfileId(PROFILE_ID);
+            u.setProfilePicture(pictureModel());
             u.setToken(TOKEN);
             u.setTokenCreatedDate(null);
             u.setVerified(true);
@@ -211,7 +210,7 @@ public class AppointmentDaoImplTest {
             u.setFirstName(FIRST_NAME_2);
             u.setSurname(SURNAME_2);
             u.setPhone(PHONE_2);
-            u.setProfileId(PROFILE_ID_2);
+            u.setProfilePicture(pictureModel());
             u.setToken(null);
             u.setTokenCreatedDate(null);
             u.setVerified(true);
@@ -303,6 +302,16 @@ public class AppointmentDaoImplTest {
         p.setId(STARTING_ID);
         p.setOffice(officeModel2());
         p.setUser(userModel2());
+        return p;
+    }
+
+    private Picture pictureModel(){
+        Picture p = new Picture();
+        p.setId(STARTING_ID);
+        p.setMimeType(MIME_TYPE);
+        p.setSize(IMG_SIZE);
+        p.setData(IMG_DATA);
+        p.setName(PICTURE);
         return p;
     }
 
@@ -504,7 +513,7 @@ public class AppointmentDaoImplTest {
         insertPatient();
         insertStaff();
         Map<String, Object> appointmentMap = new HashMap<>();
-        appointmentMap.put("status", STATUS);
+        appointmentMap.put("status", STATUS.name());
         appointmentMap.put("patient_id", STARTING_ID);
         appointmentMap.put("staff_id", STARTING_ID);
         appointmentMap.put("from_date", FROM_DATE);
@@ -517,7 +526,7 @@ public class AppointmentDaoImplTest {
         insertAnotherPatient();
         insertAnotherStaff();
         Map<String, Object> appointmentMap = new HashMap<>();
-        appointmentMap.put("status", STATUS);
+        appointmentMap.put("status", STATUS.name());
         appointmentMap.put("patient_id", STARTING_ID + 1);
         appointmentMap.put("staff_id", STARTING_ID + 1);
         appointmentMap.put("from_date", FROM_DATE_2);
@@ -1097,7 +1106,7 @@ public class AppointmentDaoImplTest {
         ModelMetadata modelMetadata = this.appointmentDao.count();
 
         // 3. Postcondiciones
-        assertEquals(2, (int) modelMetadata.getCount()); // TODO: fix
+        assertEquals(2, (long) modelMetadata.getCount()); // TODO: fix
         System.out.println(modelMetadata.getMax()); // No se que devuelve esto
         System.out.println(modelMetadata.getMin()); // No se que devuelve esto
     }
@@ -1112,98 +1121,9 @@ public class AppointmentDaoImplTest {
         ModelMetadata modelMetadata = this.appointmentDao.count();
 
         // 3. Postcondiciones
-        assertEquals(0, (int) modelMetadata.getCount()); // TODO: fix
+        assertEquals(0, (long) modelMetadata.getCount()); // TODO: fix
         System.out.println(modelMetadata.getMax()); // No se que devuelve esto
         System.out.println(modelMetadata.getMin()); // No se que devuelve esto
-    }
-
-    /* --------------------- MÉTODO: appointmentDao.findByField() -------------------------------------------- */
-
-    @Test
-    public void testAppointmentFindByFieldName()
-    {
-        // 1. Precondiciones
-        cleanAllTables();
-        insertAppointment();
-        insertAnotherAppointment();
-
-        // 2. Ejercitar
-        List<Appointment> appointments = this.appointmentDao.findByField("from_date", FROM_DATE);
-
-        // 3. Postcondiciones
-        assertNotNull(appointments);
-        assertEquals(1, appointments.size());
-        for (Appointment a : appointments){
-            assertEquals(STATUS,  a.getAppointmentStatus());
-        }
-    }
-
-    @Test
-    public void testAppointmentFindByFieldId()
-    {
-        // 1. Precondiciones
-        cleanAllTables();
-        insertAppointment();
-        insertAnotherAppointment();
-
-        // 2. Ejercitar
-        List<Appointment> appointments = this.appointmentDao.findByField("appointment_id", STARTING_ID);
-
-        // 3. Postcondiciones
-        assertNotNull(appointments);
-        assertEquals(1, appointments.size());
-        for (Appointment a : appointments){
-            assertEquals(STARTING_ID, (int)  a.getId());
-        }
-    }
-
-    @Test
-    public void testAppointmentFindByFieldNull()
-    {
-        // 1. Precondiciones
-        cleanAllTables();
-        insertAppointment();
-        insertAnotherAppointment();
-
-        // 2. Ejercitar
-        List<Appointment> appointments = this.appointmentDao.findByField("appointment_id", null); //TODO: Deberia tirar NullPointer (?)
-
-        // 3. Postcondiciones
-        assertNotNull(appointments);
-        assertTrue(appointments.isEmpty());
-    }
-
-    @Test
-    public void testAppointmentFindByFieldNotExistent()
-    {
-        // 1. Precondiciones
-        cleanAllTables();
-        insertAppointment();
-        insertAnotherAppointment();
-        expectedException.expect(BadSqlGrammarException.class);
-
-        // 2. Ejercitar
-        List<Appointment> appointments = this.appointmentDao.findByField("appointment_id_no_existo", STARTING_ID); //TODO: Deberia tirar otro tipo de error (?)
-
-        // 3. Postcondiciones
-        assertNotNull(appointments);
-        assertTrue(appointments.isEmpty());
-    }
-
-    @Test
-    public void testAppointmentFindByFieldContentNotExistent()
-    {
-        // 1. Precondiciones
-        cleanAllTables();
-        insertAppointment();
-        insertAnotherAppointment();
-
-        // 2. Ejercitar
-        List<Appointment> appointments = this.appointmentDao.findByField("appointment_id", -1); //TODO: Deberia tirar NullPointer (?)
-
-        // 3. Postcondiciones
-        assertNotNull(appointments);
-        assertTrue(appointments.isEmpty());
     }
 
     /* --------------------- MÉTODO: appointmentDao.find(Staff) -------------------------------------------- */

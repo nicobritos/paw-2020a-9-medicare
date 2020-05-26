@@ -60,7 +60,7 @@ public class WorkdayDaoImplTest
     private static final int START_MINUTE = 30;
     private static final int END_HOUR = 13;
     private static final int END_MINUTE = 45;
-    private static final String DAY = WorkdayDay.MONDAY.name();
+    private static final WorkdayDay DAY = WorkdayDay.MONDAY;
     private static final int START_HOUR_2 = 15;
     private static final int START_MINUTE_2 = 30;
     private static final int END_HOUR_2 = 18;
@@ -166,7 +166,7 @@ public class WorkdayDaoImplTest
             u.setFirstName(FIRST_NAME);
             u.setSurname(SURNAME);
             u.setPhone(PHONE);
-            u.setProfileId(PROFILE_ID);
+            u.setProfilePicture(pictureModel());
             u.setToken(TOKEN);
             u.setTokenCreatedDate(null);
             u.setVerified(true);
@@ -175,6 +175,16 @@ public class WorkdayDaoImplTest
             fail(e.getMessage());
         }
         return u;
+    }
+
+    private Picture pictureModel(){
+        Picture p = new Picture();
+        p.setId(STARTING_ID);
+        p.setMimeType(MIME_TYPE);
+        p.setSize(IMG_SIZE);
+        p.setData(IMG_DATA);
+        p.setName(PICTURE);
+        return p;
     }
 
     /** Inserta en la db la imagen con
@@ -742,7 +752,7 @@ public class WorkdayDaoImplTest
         insertWorkday();
         insertAnotherWorkday();
         Workday w = workdayModel();
-        w.setDay(WorkdayDay.WEDNESDAY.name());
+        w.setDay(WorkdayDay.WEDNESDAY);
 
         // 2. Ejercitar
         this.workdayDao.update(w);
@@ -1019,7 +1029,7 @@ public class WorkdayDaoImplTest
         ModelMetadata modelMetadata = this.workdayDao.count();
 
         // 3. Postcondiciones
-        assertEquals(2, (int) modelMetadata.getCount()); // TODO: fix
+        assertEquals(2, (long) modelMetadata.getCount()); // TODO: fix
         System.out.println(modelMetadata.getMax()); // No se que devuelve esto
         System.out.println(modelMetadata.getMin()); // No se que devuelve esto
     }
@@ -1034,98 +1044,9 @@ public class WorkdayDaoImplTest
         ModelMetadata modelMetadata = this.workdayDao.count();
 
         // 3. Postcondiciones
-        assertEquals(0, (int) modelMetadata.getCount()); // TODO: fix
+        assertEquals(0, (long) modelMetadata.getCount()); // TODO: fix
         System.out.println(modelMetadata.getMax()); // No se que devuelve esto
         System.out.println(modelMetadata.getMin()); // No se que devuelve esto
-    }
-
-    /* --------------------- MÉTODO: workdayDao.findByField() -------------------------------------------- */
-
-    @Test
-    public void testWorkdayFindByFieldName()
-    {
-        // 1. Precondiciones
-        cleanAllTables();
-        insertWorkday();
-        insertAnotherWorkday();
-
-        // 2. Ejercitar
-        List<Workday> workdays = this.workdayDao.findByField("day", DAY);
-
-        // 3. Postcondiciones
-        assertNotNull(workdays);
-        assertEquals(1, workdays.size());
-        for (Workday w : workdays){
-            assertEquals(DAY, w.getDay());
-        }
-    }
-
-    @Test
-    public void testWorkdayFindByFieldId()
-    {
-        // 1. Precondiciones
-        cleanAllTables();
-        insertWorkday();
-        insertAnotherWorkday();
-
-        // 2. Ejercitar
-        List<Workday> workdays = this.workdayDao.findByField("workday_id", STARTING_ID);
-
-        // 3. Postcondiciones
-        assertNotNull(workdays);
-        assertEquals(1, workdays.size());
-        for (Workday w : workdays){
-            assertEquals(STARTING_ID, (int) w.getId());
-        }
-    }
-
-    @Test
-    public void testWorkdayFindByFieldNull()
-    {
-        // 1. Precondiciones
-        cleanAllTables();
-        insertWorkday();
-        insertAnotherWorkday();
-
-        // 2. Ejercitar
-        List<Workday> workdays = this.workdayDao.findByField("workday_id", null); //TODO: Deberia tirar NullPointer (?)
-
-        // 3. Postcondiciones
-        assertNotNull(workdays);
-        assertTrue(workdays.isEmpty());
-    }
-
-    @Test
-    public void testWorkdayFindByFieldNotExistent()
-    {
-        // 1. Precondiciones
-        cleanAllTables();
-        insertWorkday();
-        insertAnotherWorkday();
-        expectedException.expect(BadSqlGrammarException.class);
-
-        // 2. Ejercitar
-        List<Workday> workdays = this.workdayDao.findByField("workday_id_no_existo", STARTING_ID); //TODO: Deberia tirar otro tipo de error (?)
-
-        // 3. Postcondiciones
-        assertNotNull(workdays);
-        assertTrue(workdays.isEmpty());
-    }
-
-    @Test
-    public void testWorkdayFindByFieldContentNotExistent()
-    {
-        // 1. Precondiciones
-        cleanAllTables();
-        insertWorkday();
-        insertAnotherWorkday();
-
-        // 2. Ejercitar
-        List<Workday> workdays = this.workdayDao.findByField("workday_id", -1); //TODO: Deberia tirar NullPointer (?)
-
-        // 3. Postcondiciones
-        assertNotNull(workdays);
-        assertTrue(workdays.isEmpty());
     }
 
     /* --------------------- MÉTODO: workdayDao.findByStaff(Staff) -------------------------------------------- */
@@ -1581,233 +1502,6 @@ public class WorkdayDaoImplTest
         assertNotNull(workdays);
         assertEquals(1, JdbcTestUtils.countRowsInTable(jdbcTemplate, WORKDAYS_TABLE));
         assertEquals(0, workdays.size());
-    }
-
-    /* --------------------- MÉTODO: workdayDao.setStaff(Workday, Staff) -------------------------------------------- */
-
-    @Test
-    public void testWorkdaySetStaff()
-    {
-        // 1. Precondiciones
-        cleanAllTables();
-        insertWorkday();
-
-        Map<String, Object> userMap = new HashMap<>();
-        userMap.put("first_name", FIRST_NAME);
-        userMap.put("surname", SURNAME);
-        userMap.put("password", PASSWORD);
-        userMap.put("email", EMAIL);
-        userMap.put("phone", PHONE);
-        userMap.put("profile_id", PROFILE_ID);
-        userMap.put("token", null);
-        userMap.put("token_created_date", null);
-        userJdbcInsert.execute(userMap);
-
-        Map<String, Object> staffMap = new HashMap<>();
-        staffMap.put("first_name", FIRST_NAME);
-        staffMap.put("registration_number", REGISTRATION_NUMBER);
-        staffMap.put("surname", SURNAME);
-        staffMap.put("email", EMAIL);
-        staffMap.put("phone", PHONE);
-        staffMap.put("user_id", STARTING_ID + 1);
-        staffMap.put("office_id", STARTING_ID);
-        staffJdbcInsert.execute(staffMap);
-
-        Staff s = staffModel();
-        s.setId(STARTING_ID + 1);
-        User u = userModel();
-        u.setId(STARTING_ID + 1);
-        s.setUser(u);
-
-        // 2. Ejercitar
-        this.workdayDao.setStaff(workdayModel(), s);
-
-        // 3. Postcondiciones
-        assertEquals(1, JdbcTestUtils.countRowsInTable(jdbcTemplate, WORKDAYS_TABLE));
-        assertEquals(1, JdbcTestUtils.countRowsInTableWhere(jdbcTemplate, WORKDAYS_TABLE, "staff_id = " + (STARTING_ID + 1)));
-        assertEquals(0, JdbcTestUtils.countRowsInTableWhere(jdbcTemplate, WORKDAYS_TABLE, "staff_id = " + STARTING_ID));
-    }
-
-    @Test
-    public void testWorkdaySetStaffNull()
-    {
-        // 1. Precondiciones
-        cleanAllTables();
-        insertWorkday();
-
-        Map<String, Object> userMap = new HashMap<>();
-        userMap.put("first_name", FIRST_NAME);
-        userMap.put("surname", SURNAME);
-        userMap.put("password", PASSWORD);
-        userMap.put("email", EMAIL);
-        userMap.put("phone", PHONE);
-        userMap.put("profile_id", PROFILE_ID);
-        userMap.put("token", null);
-        userMap.put("token_created_date", null);
-        userJdbcInsert.execute(userMap);
-
-        Map<String, Object> staffMap = new HashMap<>();
-        staffMap.put("first_name", FIRST_NAME);
-        staffMap.put("registration_number", REGISTRATION_NUMBER);
-        staffMap.put("surname", SURNAME);
-        staffMap.put("email", EMAIL);
-        staffMap.put("phone", PHONE);
-        staffMap.put("user_id", STARTING_ID + 1);
-        staffMap.put("office_id", STARTING_ID);
-        staffJdbcInsert.execute(staffMap);
-
-        Map<String, Object> map = new HashMap<>();
-        map.put("staff_id", STARTING_ID+1);
-        map.put("start_hour", START_HOUR_2);
-        map.put("start_minute", START_MINUTE_2);
-        map.put("end_hour", END_HOUR_2);
-        map.put("end_minute", END_MINUTE_2);
-        map.put("day", DAY_2);
-        workdayJdbcInsert.execute(map);
-
-        expectedException.expect(NullPointerException.class);
-
-        // 2. Ejercitar
-        this.workdayDao.setStaff(workdayModel(), null);
-
-        // 3. Postcondiciones
-        // que el metodo tire NullPointerException
-    }
-
-    @Test
-    public void testWorkdaySetStaffDoesntExists()
-    {
-        // 1. Precondiciones
-        cleanAllTables();
-        insertWorkday();
-        Staff s = staffModel();
-        s.setId(STARTING_ID + 1);
-        expectedException.expect(IllegalStateException.class);
-
-        // 2. Ejercitar
-        this.workdayDao.setStaff(workdayModel(), s);
-
-        // 3. Postcondiciones
-        // Que tire IllegalStateException
-    }
-
-    @Test
-    public void testWorkdaySetStaffWorkdayNull()
-    {
-        // 1. Precondiciones
-        cleanAllTables();
-        insertWorkday();
-
-        Map<String, Object> userMap = new HashMap<>();
-        userMap.put("first_name", FIRST_NAME);
-        userMap.put("surname", SURNAME);
-        userMap.put("password", PASSWORD);
-        userMap.put("email", EMAIL);
-        userMap.put("phone", PHONE);
-        userMap.put("profile_id", PROFILE_ID);
-        userMap.put("token", null);
-        userMap.put("token_created_date", null);
-        userJdbcInsert.execute(userMap);
-
-        Map<String, Object> staffMap = new HashMap<>();
-        staffMap.put("first_name", FIRST_NAME);
-        staffMap.put("registration_number", REGISTRATION_NUMBER);
-        staffMap.put("surname", SURNAME);
-        staffMap.put("email", EMAIL);
-        staffMap.put("phone", PHONE);
-        staffMap.put("user_id", STARTING_ID + 1);
-        staffMap.put("office_id", STARTING_ID);
-        staffJdbcInsert.execute(staffMap);
-
-        Map<String, Object> map = new HashMap<>();
-        map.put("staff_id", STARTING_ID+1);
-        map.put("start_hour", START_HOUR_2);
-        map.put("start_minute", START_MINUTE_2);
-        map.put("end_hour", END_HOUR_2);
-        map.put("end_minute", END_MINUTE_2);
-        map.put("day", DAY_2);
-        workdayJdbcInsert.execute(map);
-
-        expectedException.expect(NullPointerException.class);
-
-        Staff s = staffModel();
-        s.setId(STARTING_ID + 1);
-        User u = userModel();
-        u.setId(STARTING_ID + 1);
-        s.setUser(u);
-
-        // 2. Ejercitar
-        this.workdayDao.setStaff(null, s);
-
-        // 3. Postcondiciones
-        // que el metodo tire NullPointerException
-    }
-
-    @Test
-    public void testWorkdaySetStaffWorkdayDoesntExists()
-    {
-        // 1. Precondiciones
-        cleanAllTables();
-        insertWorkday();
-        Map<String, Object> userMap = new HashMap<>();
-        userMap.put("first_name", FIRST_NAME);
-        userMap.put("surname", SURNAME);
-        userMap.put("password", PASSWORD);
-        userMap.put("email", EMAIL);
-        userMap.put("phone", PHONE);
-        userMap.put("profile_id", PROFILE_ID);
-        userMap.put("token", null);
-        userMap.put("token_created_date", null);
-        userJdbcInsert.execute(userMap);
-
-        Map<String, Object> staffMap = new HashMap<>();
-        staffMap.put("first_name", FIRST_NAME);
-        staffMap.put("registration_number", REGISTRATION_NUMBER);
-        staffMap.put("surname", SURNAME);
-        staffMap.put("email", EMAIL);
-        staffMap.put("phone", PHONE);
-        staffMap.put("user_id", STARTING_ID + 1);
-        staffMap.put("office_id", STARTING_ID);
-        staffJdbcInsert.execute(staffMap);
-
-        Map<String, Object> map = new HashMap<>();
-        map.put("staff_id", STARTING_ID+1);
-        map.put("start_hour", START_HOUR_2);
-        map.put("start_minute", START_MINUTE_2);
-        map.put("end_hour", END_HOUR_2);
-        map.put("end_minute", END_MINUTE_2);
-        map.put("day", DAY_2);
-        workdayJdbcInsert.execute(map);
-
-        expectedException.expect(IllegalStateException.class);
-        Staff s = staffModel();
-        s.setId(STARTING_ID + 1);
-        User u = userModel();
-        u.setId(STARTING_ID + 1);
-        s.setUser(u);
-
-        Workday w = workdayModel();
-        w.setId(STARTING_ID + 1);
-
-        // 2. Ejercitar
-        this.workdayDao.setStaff(w, s);
-
-        // 3. Postcondiciones
-        // Que tire IllegalStateException
-    }
-
-    @Test
-    public void testWorkdaySetStaffBothNull()
-    {
-        // 1. Precondiciones
-        cleanAllTables();
-        expectedException.expect(NullPointerException.class);
-
-        // 2. Ejercitar
-        this.workdayDao.setStaff(null, null);
-
-        // 3. Postcondiciones
-        // que el metodo tire NullPointerException
     }
 
     /* --------------------- MÉTODO: workdayDao.isStaffWorking(Staff, AppointmentTimeSlot) -------------------------------------------- */

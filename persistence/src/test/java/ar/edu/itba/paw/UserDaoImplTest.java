@@ -1,6 +1,7 @@
 package ar.edu.itba.paw;
 
 import ar.edu.itba.paw.models.ModelMetadata;
+import ar.edu.itba.paw.models.Picture;
 import ar.edu.itba.paw.models.User;
 import ar.edu.itba.paw.persistence.UserDaoImpl;
 import org.hamcrest.CoreMatchers;
@@ -70,7 +71,7 @@ public class UserDaoImplTest {
 
     @Before
     public void setUp() {
-        this.userDao = new UserDaoImpl(this.ds);
+        this.userDao = new UserDaoImpl();
         this.jdbcTemplate = new JdbcTemplate(this.ds);
         this.userJdbcInsert = new SimpleJdbcInsert(this.ds)
                 .withTableName(USERS_TABLE)
@@ -124,7 +125,7 @@ public class UserDaoImplTest {
             u.setFirstName(FIRST_NAME);
             u.setSurname(SURNAME);
             u.setPhone(PHONE);
-            u.setProfileId(PROFILE_ID);
+            u.setProfilePicture(pictureModel());
             u.setToken(TOKEN);
             u.setTokenCreatedDate(null);
             u.setVerified(true);
@@ -133,6 +134,16 @@ public class UserDaoImplTest {
             fail(e.getMessage());
         }
         return u;
+    }
+
+    private Picture pictureModel(){
+        Picture p = new Picture();
+        p.setId(STARTING_ID);
+        p.setMimeType(MIME_TYPE);
+        p.setSize(IMG_SIZE);
+        p.setData(IMG_DATA);
+        p.setName(PICTURE);
+        return p;
     }
 
     /** Inserta en la db la imagen con
@@ -220,7 +231,7 @@ public class UserDaoImplTest {
         assertEquals(EMAIL, user.getEmail());
         assertEquals(PASSWORD, user.getPassword());
         assertEquals(PHONE, user.getPhone());
-        assertEquals(PROFILE_ID, (int) user.getProfileId());
+        assertEquals(pictureModel(), user.getProfilePicture());
     }
 
     @Test
@@ -240,7 +251,7 @@ public class UserDaoImplTest {
         assertEquals(EMAIL, user.getEmail());
         assertEquals(PASSWORD, user.getPassword());
         assertEquals(PHONE, user.getPhone());
-        assertEquals(PROFILE_ID, (int) user.getProfileId());
+        assertEquals(pictureModel(), user.getProfilePicture());
     }
 
     @Test
@@ -639,7 +650,7 @@ public class UserDaoImplTest {
         ModelMetadata modelMetadata = this.userDao.count();
 
         // 3. Postcondiciones
-        assertEquals(2, (int) modelMetadata.getCount()); // TODO: fix
+        assertEquals(2, (long) modelMetadata.getCount()); // TODO: fix
         System.out.println(modelMetadata.getMax()); // No se que devuelve esto
         System.out.println(modelMetadata.getMin()); // No se que devuelve esto
     }
@@ -653,93 +664,9 @@ public class UserDaoImplTest {
         ModelMetadata modelMetadata = this.userDao.count();
 
         // 3. Postcondiciones
-        assertEquals(0, (int) modelMetadata.getCount()); // TODO: fix
+        assertEquals(0, (long) modelMetadata.getCount()); // TODO: fix
         System.out.println(modelMetadata.getMax()); // No se que devuelve esto
         System.out.println(modelMetadata.getMin()); // No se que devuelve esto
-    }
-
-    /* --------------------- MÉTODO: userDao.findByField() -------------------------------------------- */
-
-    @Test
-    public void testUserFindByFieldName() {
-        // 1. Precondiciones
-        cleanAllTables();
-        insertUser();
-        insertAnotherUser();
-
-        // 2. Ejercitar
-        List<User> users = this.userDao.findByField("first_name", FIRST_NAME);
-
-        // 3. Postcondiciones
-        assertNotNull(users);
-        assertEquals(1, users.size());
-        for (User u : users) {
-            assertEquals(FIRST_NAME, u.getFirstName());
-        }
-    }
-
-    @Test
-    public void testUserFindByFieldId() {
-        // 1. Precondiciones
-        cleanAllTables();
-        insertUser();
-        insertAnotherUser();
-
-        // 2. Ejercitar
-        List<User> users = this.userDao.findByField("users_id", STARTING_ID);
-
-        // 3. Postcondiciones
-        assertNotNull(users);
-        assertEquals(1, users.size());
-        for (User u : users) {
-            assertEquals(STARTING_ID, (int) u.getId());
-        }
-    }
-
-    @Test
-    public void testUserFindByFieldNull() {
-        // 1. Precondiciones
-        cleanAllTables();
-        insertUser();
-        insertAnotherUser();
-
-        // 2. Ejercitar
-        List<User> users = this.userDao.findByField("users_id", null); //TODO: Deberia tirar NullPointer (?)
-
-        // 3. Postcondiciones
-        assertNotNull(users);
-        assertTrue(users.isEmpty());
-    }
-
-    @Test
-    public void testUserFindByFieldNotExistent() {
-        // 1. Precondiciones
-        cleanAllTables();
-        insertUser();
-        insertAnotherUser();
-        expectedException.expect(BadSqlGrammarException.class);
-
-        // 2. Ejercitar
-        List<User> users = this.userDao.findByField("users_id_no_existo", STARTING_ID); //TODO: Deberia tirar otro tipo de error (?)
-
-        // 3. Postcondiciones
-        assertNotNull(users);
-        assertTrue(users.isEmpty());
-    }
-
-    @Test
-    public void testUserFindByFieldContentNotExistent() {
-        // 1. Precondiciones
-        cleanAllTables();
-        insertUser();
-        insertAnotherUser();
-
-        // 2. Ejercitar
-        List<User> users = this.userDao.findByField("users_id", -1); //TODO: Deberia tirar NullPointer (?)
-
-        // 3. Postcondiciones
-        assertNotNull(users);
-        assertTrue(users.isEmpty());
     }
 
     /* --------------------- MÉTODO: userDao.existsEmail(String) -------------------------------------------- */
