@@ -203,6 +203,6 @@ public class UserServiceImpl extends GenericSearchableServiceImpl<UserDao, User,
 
     private boolean isValidEmailDomain(String email) {
         String domain = email.substring(email.lastIndexOf("@") + 1);
-        return this.invalidEmailDomains.contains(domain);
+        return !this.invalidEmailDomains.contains(domain);
     }
 }
