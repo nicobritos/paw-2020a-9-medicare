@@ -1,8 +1,8 @@
 package ar.edu.itba.paw.tests;
 
+import ar.edu.itba.paw.config.TestConfig;
 import ar.edu.itba.paw.interfaces.daos.AppointmentDao;
 import ar.edu.itba.paw.models.*;
-import ar.edu.itba.paw.config.TestConfig;
 import org.hamcrest.CoreMatchers;
 import org.joda.time.DateTime;
 import org.junit.Before;
@@ -38,14 +38,12 @@ public class AppointmentDaoImplTest {
     private static final String EMAIL = "napellido@test.com";
     private static final String PHONE = "1123456789";
     private static final String PASSWORD = "pass1234";
-    private static final int PROFILE_ID = STARTING_ID;
     private static final String TOKEN = "123";
     private static final String FIRST_NAME_2 = "Roberto";
     private static final String SURNAME_2 = "Rodriguez";
     private static final String EMAIL_2 = "napellido2@test2.com";
     private static final String PHONE_2 = "(011) 1123456789";
     private static final String PASSWORD_2 = "password1234";
-    private static final int PROFILE_ID_2 = STARTING_ID + 1;
     private static final String MIME_TYPE = "image/svg+xml";
     private static final String PICTURE = "defaultProfilePic.svg";
     private static final Resource IMG = new ClassPathResource("img/" + PICTURE);
@@ -74,6 +72,24 @@ public class AppointmentDaoImplTest {
     private static final int MINUTE = 0;
     private static final int HOUR_2 = 15;
     private static final int MINUTE_2 = 0;
+
+    private static final int USER_ID_1 = STARTING_ID;
+    private static final int USER_ID_2 = STARTING_ID + 1;
+    private static final int PICTURE_ID_1 = STARTING_ID;
+    private static final int PICTURE_ID_2 = STARTING_ID + 1;
+    private static final int LOCALITY_ID = STARTING_ID;
+    private static final int PROVINCE_ID = STARTING_ID;
+    private static final int OFFICE_ID_1 = STARTING_ID;
+    private static final int OFFICE_ID_2 = STARTING_ID + 1;
+    private static final int PATIENT_ID_1 = STARTING_ID;
+    private static final int PATIENT_ID_2 = STARTING_ID + 1;
+    private static final int STAFF_ID_1 = STARTING_ID;
+    private static final int STAFF_ID_2 = STARTING_ID + 1;
+    private static final int APPOINTMENT_ID_1 = STARTING_ID;
+    private static final int APPOINTMENT_ID_2 = STARTING_ID + 1;
+
+    private static final int PROFILE_ID_1 = PICTURE_ID_1;
+    private static final int PROFILE_ID_2 = PICTURE_ID_2;
 
     private static final String OFFICES_TABLE = "office";
     private static final String LOCALITIES_TABLE = "system_locality";
@@ -108,31 +124,23 @@ public class AppointmentDaoImplTest {
     public void setUp() {
         this.jdbcTemplate = new JdbcTemplate(this.ds);
         this.userJdbcInsert = new SimpleJdbcInsert(this.ds)
-                .withTableName(USERS_TABLE)
-                .usingGeneratedKeyColumns("users_id");
+                .withTableName(USERS_TABLE);
         this.pictureJdbcInsert = new SimpleJdbcInsert(this.ds)
-                .withTableName(PICTURES_TABLE)
-                .usingGeneratedKeyColumns("picture_id");
+                .withTableName(PICTURES_TABLE);
         this.officeJdbcInsert = new SimpleJdbcInsert(this.ds)
-                .withTableName(OFFICES_TABLE)
-                .usingGeneratedKeyColumns("office_id");
+                .withTableName(OFFICES_TABLE);
         this.localityJdbcInsert = new SimpleJdbcInsert(this.ds)
-                .withTableName(LOCALITIES_TABLE)
-                .usingGeneratedKeyColumns("locality_id");
+                .withTableName(LOCALITIES_TABLE);
         this.provinceJdbcInsert = new SimpleJdbcInsert(this.ds)
-                .withTableName(PROVINCES_TABLE)
-                .usingGeneratedKeyColumns("province_id");
+                .withTableName(PROVINCES_TABLE);
         this.countryJdbcInsert = new SimpleJdbcInsert(this.ds)
                 .withTableName(COUNTRIES_TABLE);
         this.patientJdbcInsert = new SimpleJdbcInsert(this.ds)
-                .withTableName(PATIENTS_TABLE)
-                .usingGeneratedKeyColumns("patient_id");
+                .withTableName(PATIENTS_TABLE);
         this.staffJdbcInsert = new SimpleJdbcInsert(this.ds)
-                .withTableName(STAFFS_TABLE)
-                .usingGeneratedKeyColumns("staff_id");
+                .withTableName(STAFFS_TABLE);
         this.appointmentJdbcInsert = new SimpleJdbcInsert(this.ds)
-                .withTableName(APPOINTMENTS_TABLE)
-                .usingGeneratedKeyColumns("appointment_id");
+                .withTableName(APPOINTMENTS_TABLE);
     }
 
     /* ---------------------- FUNCIONES AUXILIARES ---------------------------------------------------------------- */
@@ -183,7 +191,7 @@ public class AppointmentDaoImplTest {
             u.setToken(TOKEN);
             u.setTokenCreatedDate(null);
             u.setVerified(true);
-            u.setId(STARTING_ID);
+            u.setId(USER_ID_1);
         } catch (Exception e) {
             fail(e.getMessage());
         }
@@ -214,7 +222,7 @@ public class AppointmentDaoImplTest {
             u.setToken(null);
             u.setTokenCreatedDate(null);
             u.setVerified(true);
-            u.setId(STARTING_ID + 1);
+            u.setId(USER_ID_2);
         } catch (Exception e) {
             fail(e.getMessage());
         }
@@ -226,14 +234,14 @@ public class AppointmentDaoImplTest {
         Locality l = new Locality();
         l.setName(LOCALITY);
         l.setProvince(provinceModel());
-        l.setId(STARTING_ID);
+        l.setId(LOCALITY_ID);
         return l;
     }
 
     /** Devuelve una province con id=STARTING_ID, name=PROVINCE y como country el devuelto en countryModel() **/
     private Province provinceModel(){
         Province p = new Province();
-        p.setId(STARTING_ID);
+        p.setId(PROVINCE_ID);
         p.setCountry(countryModel());
         p.setName(PROVINCE);
         return p;
@@ -258,7 +266,7 @@ public class AppointmentDaoImplTest {
      **/
     private Office officeModel(){
         Office o = new Office();
-        o.setId(STARTING_ID);
+        o.setId(OFFICE_ID_1);
         o.setName(OFFICE);
         o.setEmail(OFFICE_EMAIL);
         o.setPhone(OFFICE_PHONE);
@@ -279,7 +287,7 @@ public class AppointmentDaoImplTest {
      **/
     private Office officeModel2(){
         Office o = new Office();
-        o.setId(STARTING_ID + 1);
+        o.setId(OFFICE_ID_2);
         o.setName(OFFICE_2);
         o.setEmail(OFFICE_EMAIL);
         o.setPhone(OFFICE_PHONE);
@@ -291,7 +299,7 @@ public class AppointmentDaoImplTest {
 
     private Patient patientModel(){
         Patient p = new Patient();
-        p.setId(STARTING_ID);
+        p.setId(PATIENT_ID_1);
         p.setOffice(officeModel());
         p.setUser(userModel());
         return p;
@@ -299,7 +307,7 @@ public class AppointmentDaoImplTest {
 
     private Patient patientModel2(){
         Patient p = new Patient();
-        p.setId(STARTING_ID);
+        p.setId(PATIENT_ID_2);
         p.setOffice(officeModel2());
         p.setUser(userModel2());
         return p;
@@ -307,7 +315,7 @@ public class AppointmentDaoImplTest {
 
     private Picture pictureModel(){
         Picture p = new Picture();
-        p.setId(STARTING_ID);
+        p.setId(PICTURE_ID_1);
         p.setMimeType(MIME_TYPE);
         p.setSize(IMG_SIZE);
         p.setData(IMG_DATA);
@@ -327,6 +335,23 @@ public class AppointmentDaoImplTest {
         map.put("mime_type", MIME_TYPE);
         map.put("size", IMG_SIZE);
         map.put("name", PICTURE);
+        map.put("picture_id", PICTURE_ID_1);
+        pictureJdbcInsert.execute(map);
+    }
+
+    /** Inserta en la db la imagen con
+     * data = IMG_DATA
+     * mimeType = MIME_TYPE
+     * name = NAME
+     * size = IMG_SIZE
+     **/
+    private void insertAnotherPicture() {
+        Map<String, Object> map = new HashMap<>();
+        map.put("data", IMG_DATA);
+        map.put("mime_type", MIME_TYPE);
+        map.put("size", IMG_SIZE);
+        map.put("name", PICTURE);
+        map.put("picture_id", PICTURE_ID_2);
         pictureJdbcInsert.execute(map);
     }
 
@@ -349,9 +374,10 @@ public class AppointmentDaoImplTest {
         map.put("password", PASSWORD);
         map.put("email", EMAIL);
         map.put("phone", PHONE);
-        map.put("profile_id", PROFILE_ID);
+        map.put("profile_id", PROFILE_ID_1);
         map.put("token", TOKEN);
         map.put("token_created_date", null);
+        map.put("users_id", USER_ID_1);
         userJdbcInsert.execute(map);
     }
 
@@ -367,7 +393,7 @@ public class AppointmentDaoImplTest {
      * tokenCreatedDate = null
      **/
     private void insertAnotherUser() {
-        insertPicture();
+        insertAnotherPicture();
         Map<String, Object> map = new HashMap<>();
         map.put("first_name", FIRST_NAME_2);
         map.put("surname", SURNAME_2);
@@ -377,6 +403,7 @@ public class AppointmentDaoImplTest {
         map.put("profile_id", PROFILE_ID_2);
         map.put("token", TOKEN);
         map.put("token_created_date", null);
+        map.put("users_id", USER_ID_2);
         userJdbcInsert.execute(map);
     }
 
@@ -394,6 +421,7 @@ public class AppointmentDaoImplTest {
         Map<String, Object> map = new HashMap<>();
         map.put("country_id", COUNTRY_ID);
         map.put("name", PROVINCE);
+        map.put("province_id", PROVINCE_ID);
         provinceJdbcInsert.execute(map);
     }
 
@@ -401,8 +429,9 @@ public class AppointmentDaoImplTest {
     private void insertLocality(){
         insertProvince();
         Map<String, Object> map = new HashMap<>();
-        map.put("province_id", STARTING_ID);
+        map.put("province_id", PROVINCE_ID);
         map.put("name", LOCALITY);
+        map.put("locality_id", LOCALITY_ID);
         localityJdbcInsert.execute(map);
     }
 
@@ -420,9 +449,10 @@ public class AppointmentDaoImplTest {
         officeMap.put("name", OFFICE);
         officeMap.put("email", OFFICE_EMAIL);
         officeMap.put("phone", OFFICE_PHONE);
-        officeMap.put("locality_id", STARTING_ID);
+        officeMap.put("locality_id", LOCALITY_ID);
         officeMap.put("street", STREET);
         officeMap.put("url", URL);
+        officeMap.put("office_id", OFFICE_ID_1);
         officeJdbcInsert.execute(officeMap);
     }
 
@@ -439,9 +469,10 @@ public class AppointmentDaoImplTest {
         officeMap.put("name", OFFICE_2);
         officeMap.put("email", OFFICE_EMAIL);
         officeMap.put("phone", OFFICE_PHONE);
-        officeMap.put("locality_id", STARTING_ID);
+        officeMap.put("locality_id", LOCALITY_ID);
         officeMap.put("street", STREET);
         officeMap.put("url", URL);
+        officeMap.put("office_id", OFFICE_ID_2);
         officeJdbcInsert.execute(officeMap);
     }
 
@@ -449,8 +480,9 @@ public class AppointmentDaoImplTest {
         insertUser();
         insertOffice();
         Map<String, Object> patientMap = new HashMap<>();
-        patientMap.put("user_id", STARTING_ID);
-        patientMap.put("office_id", STARTING_ID);
+        patientMap.put("users_id", USER_ID_1);
+        patientMap.put("office_id", OFFICE_ID_1);
+        patientMap.put("patient_id", PATIENT_ID_1);
         patientJdbcInsert.execute(patientMap);
     }
 
@@ -458,8 +490,9 @@ public class AppointmentDaoImplTest {
         insertAnotherOffice();
         insertAnotherUser();
         Map<String, Object> patientMap = new HashMap<>();
-        patientMap.put("user_id", STARTING_ID + 1);
-        patientMap.put("office_id", STARTING_ID + 1);
+        patientMap.put("users_id", USER_ID_2);
+        patientMap.put("office_id", OFFICE_ID_2);
+        patientMap.put("patient_id", PATIENT_ID_2);
         patientJdbcInsert.execute(patientMap);
     }
 
@@ -479,8 +512,9 @@ public class AppointmentDaoImplTest {
         staffMap.put("surname", SURNAME);
         staffMap.put("email", EMAIL); // Identity de HSQLDB empieza en 0
         staffMap.put("phone", PHONE);
-        staffMap.put("user_id", STARTING_ID);
-        staffMap.put("office_id", STARTING_ID);
+        staffMap.put("users_id", USER_ID_1);
+        staffMap.put("office_id", OFFICE_ID_1);
+        staffMap.put("staff_id", STAFF_ID_1);
         staffJdbcInsert.execute(staffMap);
     }
 
@@ -491,8 +525,9 @@ public class AppointmentDaoImplTest {
         staffMap.put("surname", SURNAME_2);
         staffMap.put("email", EMAIL); // Identity de HSQLDB empieza en 0
         staffMap.put("phone", PHONE);
-        staffMap.put("user_id", STARTING_ID + 1);
-        staffMap.put("office_id", STARTING_ID + 1);
+        staffMap.put("users_id", USER_ID_2);
+        staffMap.put("office_id", OFFICE_ID_2);
+        staffMap.put("staff_id", STAFF_ID_2);
         staffJdbcInsert.execute(staffMap);
     }
 
@@ -503,7 +538,7 @@ public class AppointmentDaoImplTest {
         s.setSurname(SURNAME);
         s.setEmail(EMAIL);
         s.setPhone(PHONE);
-        s.setId(STARTING_ID);
+        s.setId(STAFF_ID_1);
         s.setUser(userModel());
         s.setOffice(officeModel());
         return s;
@@ -514,11 +549,12 @@ public class AppointmentDaoImplTest {
         insertStaff();
         Map<String, Object> appointmentMap = new HashMap<>();
         appointmentMap.put("status", STATUS.name());
-        appointmentMap.put("patient_id", STARTING_ID);
-        appointmentMap.put("staff_id", STARTING_ID);
+        appointmentMap.put("patient_id", PATIENT_ID_1);
+        appointmentMap.put("staff_id", STAFF_ID_1);
         appointmentMap.put("from_date", FROM_DATE);
         appointmentMap.put("motive", MOTIVE);
         appointmentMap.put("message", MESSAGE);
+        appointmentMap.put("appointment_id", APPOINTMENT_ID_1);
         appointmentJdbcInsert.execute(appointmentMap);
     }
 
@@ -527,11 +563,12 @@ public class AppointmentDaoImplTest {
         insertAnotherStaff();
         Map<String, Object> appointmentMap = new HashMap<>();
         appointmentMap.put("status", STATUS.name());
-        appointmentMap.put("patient_id", STARTING_ID + 1);
-        appointmentMap.put("staff_id", STARTING_ID + 1);
+        appointmentMap.put("patient_id", PATIENT_ID_2);
+        appointmentMap.put("staff_id", STAFF_ID_2);
         appointmentMap.put("from_date", FROM_DATE_2);
         appointmentMap.put("motive", MOTIVE);
         appointmentMap.put("message", MESSAGE);
+        appointmentMap.put("appointment_id", APPOINTMENT_ID_2);
         appointmentJdbcInsert.execute(appointmentMap);
     }
 
@@ -543,7 +580,7 @@ public class AppointmentDaoImplTest {
         appointment.setFromDate(new DateTime(YEAR,MONTH,DAY,HOUR,MINUTE));
         appointment.setMessage(MESSAGE);
         appointment.setMotive(MOTIVE);
-        appointment.setId(STARTING_ID);
+        appointment.setId(APPOINTMENT_ID_1);
         return appointment;
     }
 
@@ -715,7 +752,7 @@ public class AppointmentDaoImplTest {
         insertAnotherAppointment();
 
         // 2. Ejercitar
-        Optional<Appointment> appointment = this.appointmentDao.findById(STARTING_ID);
+        Optional<Appointment> appointment = this.appointmentDao.findById(APPOINTMENT_ID_1);
 
         // 3. Postcondiciones
         assertTrue(appointment.isPresent());
@@ -730,7 +767,7 @@ public class AppointmentDaoImplTest {
         insertAppointment();
 
         // 2. Ejercitar
-        Optional<Appointment> appointment = this.appointmentDao.findById(STARTING_ID + 1);
+        Optional<Appointment> appointment = this.appointmentDao.findById(APPOINTMENT_ID_1 + 1);
 
         // 3. Postcondiciones
         assertFalse(appointment.isPresent());
@@ -761,13 +798,13 @@ public class AppointmentDaoImplTest {
         insertAnotherAppointment();
 
         // 2. Ejercitar
-        Collection<Appointment> appointments = this.appointmentDao.findByIds(Arrays.asList(STARTING_ID, STARTING_ID + 1));
+        Collection<Appointment> appointments = this.appointmentDao.findByIds(Arrays.asList(APPOINTMENT_ID_1, APPOINTMENT_ID_1 + 1));
 
         // 3. Postcondiciones
         assertNotNull(appointments);
         assertEquals(2, appointments.size());
         for (Appointment a : appointments){
-            assertTrue( a.getId().equals(STARTING_ID) ||  a.getId().equals(STARTING_ID + 1));
+            assertTrue( a.getId().equals(APPOINTMENT_ID_1) ||  a.getId().equals(APPOINTMENT_ID_2));
         }
     }
 
@@ -779,7 +816,7 @@ public class AppointmentDaoImplTest {
         insertAppointment();
 
         // 2. Ejercitar
-        Collection<Appointment> appointments = this.appointmentDao.findByIds(Arrays.asList(STARTING_ID, STARTING_ID + 1));
+        Collection<Appointment> appointments = this.appointmentDao.findByIds(Arrays.asList(APPOINTMENT_ID_1, APPOINTMENT_ID_2));
 
         // 3. Postcondiciones
         assertNotNull(appointments);
@@ -796,7 +833,7 @@ public class AppointmentDaoImplTest {
         cleanAllTables();
 
         // 2. Ejercitar
-        Collection<Appointment> appointments = this.appointmentDao.findByIds(Arrays.asList(STARTING_ID, STARTING_ID + 1));
+        Collection<Appointment> appointments = this.appointmentDao.findByIds(Arrays.asList(APPOINTMENT_ID_1, APPOINTMENT_ID_2));
 
         // 3. Postcondiciones
         assertNotNull(appointments);
@@ -882,7 +919,7 @@ public class AppointmentDaoImplTest {
         insertStaff();
         insertAnotherAppointment();
         Appointment a = appointmentModel();
-        a.setId(STARTING_ID + 1);
+        a.setId(APPOINTMENT_ID_2);
         expectedException.expect(Exception.class);  // <-- TODO: Insert exception class here
 
         // 2. Ejercitar
@@ -1009,7 +1046,7 @@ public class AppointmentDaoImplTest {
         insertAppointment();
 
         // 2. Ejercitar
-        this.appointmentDao.remove(STARTING_ID);
+        this.appointmentDao.remove(APPOINTMENT_ID_1);
 
         // 3. Postcondiciones
         assertEquals(0,JdbcTestUtils.countRowsInTable(jdbcTemplate, APPOINTMENTS_TABLE));
@@ -1023,7 +1060,7 @@ public class AppointmentDaoImplTest {
         insertAppointment();
 
         // 2. Ejercitar
-        this.appointmentDao.remove(STARTING_ID + 1);
+        this.appointmentDao.remove(APPOINTMENT_ID_2);
 
         // 3. Postcondiciones
         assertEquals(1,JdbcTestUtils.countRowsInTable(jdbcTemplate, APPOINTMENTS_TABLE));
@@ -1068,7 +1105,7 @@ public class AppointmentDaoImplTest {
         insertStaff();
         insertAnotherAppointment();
         Appointment a = appointmentModel();
-         a.setId(STARTING_ID + 1);
+        a.setId(APPOINTMENT_ID_2);
 
         // 2. Ejercitar
         this.appointmentDao.remove(a);
@@ -2064,7 +2101,7 @@ public class AppointmentDaoImplTest {
         insertStaff();
         insertAnotherAppointment();
         Patient p = patientModel();
-        p.setId(STARTING_ID + 2);
+        p.setId(PATIENT_ID_2);
         Staff s = staffModel();
         s.setFirstName(FIRST_NAME_2);
         s.setSurname(SURNAME_2);
@@ -2089,7 +2126,7 @@ public class AppointmentDaoImplTest {
         insertAnotherAppointment();
         Patient p = patientModel2();
         Staff s = staffModel();
-        s.setId(STARTING_ID + 2);
+        s.setId(STAFF_ID_2);
 
         // 2. Ejercitar
         List<Appointment> appointments = this.appointmentDao.findPending(p, s);

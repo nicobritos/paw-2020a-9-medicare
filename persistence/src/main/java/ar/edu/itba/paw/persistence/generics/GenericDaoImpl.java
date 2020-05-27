@@ -83,7 +83,7 @@ public abstract class GenericDaoImpl<M extends GenericModel<I>, I> implements Ge
     @Transactional
     public M create(M model) {
         this.entityManager.persist(model);
-        return model;
+        return this.findById(model.getId()).get();
     }
 
     @Override
@@ -102,9 +102,8 @@ public abstract class GenericDaoImpl<M extends GenericModel<I>, I> implements Ge
     @Transactional
     public void remove(I id) {
         M model = this.entityManager.find(this.mClass, id);
-        if(model != null) {
+        if (model != null)
             this.entityManager.remove(model);
-        }
     }
 
     @Override
