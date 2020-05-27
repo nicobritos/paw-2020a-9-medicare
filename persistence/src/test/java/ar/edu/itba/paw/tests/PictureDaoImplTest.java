@@ -61,7 +61,8 @@ public class PictureDaoImplTest {
         this.jdbcTemplate = new JdbcTemplate(this.ds);
         this.pictureJdbcInsert = new SimpleJdbcInsert(this.ds)
                 .withTableName(PICTURES_TABLE)
-                .usingGeneratedKeyColumns("picture_id");
+//                .usingGeneratedKeyColumns("picture_id");
+        ;
     }
 
     /* ---------------------- FUNCIONES AUXILIARES ---------------------------------------------------------------- */
@@ -120,6 +121,7 @@ public class PictureDaoImplTest {
         map.put("mime_type", MIME_TYPE);
         map.put("size", IMG_SIZE);
         map.put("name", PICTURE);
+        map.put("picture_id", STARTING_ID);
         pictureJdbcInsert.execute(map);
     }
 
@@ -135,6 +137,7 @@ public class PictureDaoImplTest {
         map.put("mime_type", MIME_TYPE);
         map.put("size", IMG_2_SIZE);
         map.put("name", PICTURE_2);
+        map.put("picture_id", STARTING_ID);
         pictureJdbcInsert.execute(map);
     }
 
