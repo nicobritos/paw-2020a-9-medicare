@@ -17,7 +17,7 @@ import javax.persistence.*;
 public class User extends GenericModel<Integer> {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "user_pk")
-    @SequenceGenerator(sequenceName = "user_pk", name = "user_pk", allocationSize = 1)
+    @SequenceGenerator(sequenceName = "users_users_id_seq", name = "user_pk", allocationSize = 1)
     @Column(name = "users_id")
     private Integer id;
     @Column(name = "email", nullable = false)

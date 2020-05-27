@@ -12,7 +12,7 @@ import javax.persistence.*;
 public class Province extends GenericModel<Integer> {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "system_province_pk")
-    @SequenceGenerator(sequenceName = "system_province_pk", name = "system_province_pk", allocationSize = 1)
+    @SequenceGenerator(sequenceName = "system_province_province_id_seq", name = "system_province_pk", allocationSize = 1)
     @Column(name = "province_id")
     private Integer id;
     @Column(name = "name", nullable = false)

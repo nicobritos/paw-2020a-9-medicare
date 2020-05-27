@@ -15,7 +15,7 @@ import java.util.LinkedList;
 public class Staff extends GenericModel<Integer> {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "staff_pk")
-    @SequenceGenerator(sequenceName = "staff_pk", name = "staff_pk", allocationSize = 1)
+    @SequenceGenerator(sequenceName = "staff_staff_id_seq", name = "staff_pk", allocationSize = 1)
     @Column(name = "staff_id")
     private Integer id;
     @Column(name = "first_name", nullable = false)

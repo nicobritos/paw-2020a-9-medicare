@@ -12,7 +12,7 @@ import javax.persistence.*;
 public class Patient extends GenericModel<Integer> {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "patient_pk")
-    @SequenceGenerator(sequenceName = "patient_pk", name = "patient_pk", allocationSize = 1)
+    @SequenceGenerator(sequenceName = "patient_patient_id_seq", name = "patient_pk", allocationSize = 1)
     @Column(name = "patient_id")
     private Integer id;
     @JoinColumn(name = "user_id")

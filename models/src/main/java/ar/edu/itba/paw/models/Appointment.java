@@ -18,7 +18,7 @@ public class Appointment extends GenericModel<Integer> {
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "appointment_pk")
-    @SequenceGenerator(sequenceName = "appointment_pk", name = "appointment_pk", allocationSize = 1)
+    @SequenceGenerator(sequenceName = "appointment_appointment_id_seq", name = "appointment_pk", allocationSize = 1)
     @Column(name = "appointment_id")
     private Integer id;
     @Column(name = "status", nullable = false)

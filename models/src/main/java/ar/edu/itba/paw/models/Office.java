@@ -12,7 +12,7 @@ import javax.persistence.*;
 public class Office extends GenericModel<Integer> {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "office_pk")
-    @SequenceGenerator(sequenceName = "office_pk", name = "office_pk", allocationSize = 1)
+    @SequenceGenerator(sequenceName = "office_office_id_seq", name = "office_pk", allocationSize = 1)
     @Column(name = "office_id")
     private Integer id;
     @Column(name = "phone")

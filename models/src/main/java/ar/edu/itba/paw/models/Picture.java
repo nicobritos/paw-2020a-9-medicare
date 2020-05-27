@@ -12,7 +12,7 @@ import javax.persistence.*;
 public class Picture extends GenericModel<Integer> {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "picture_pk")
-    @SequenceGenerator(sequenceName = "picture_pk", name = "picture_pk", allocationSize = 1)
+    @SequenceGenerator(sequenceName = "picture_picture_id_seq", name = "picture_pk", allocationSize = 1)
     @Column(name = "picture_id")
     private Integer id;
     @Column(name = "name")

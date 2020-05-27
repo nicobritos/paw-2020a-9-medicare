@@ -13,7 +13,7 @@ import javax.persistence.*;
 public class Workday extends GenericModel<Integer> {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "workday_pk")
-    @SequenceGenerator(sequenceName = "workday_pk", name = "workday_pk", allocationSize = 1)
+    @SequenceGenerator(sequenceName = "workday_workday_id_seq", name = "workday_pk", allocationSize = 1)
     @Column(name = "workday_id")
     private Integer id;
     @Column(name = "start_hour", nullable = false)
