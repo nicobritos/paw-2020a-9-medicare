@@ -11,13 +11,16 @@ import javax.persistence.*;
 )
 public class Province extends GenericModel<Integer> {
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "system_province_pk")
-    @SequenceGenerator(sequenceName = "system_province_province_id_seq", name = "system_province_pk", allocationSize = 1)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "system_province_province_id_seq")
+    @SequenceGenerator(sequenceName = "system_province_province_id_seq", name = "system_province_province_id_seq", allocationSize = 1)
     @Column(name = "province_id")
     private Integer id;
     @Column(name = "name", nullable = false)
     private String name;
-    @ManyToOne(fetch = FetchType.EAGER, optional = false)
+    @ManyToOne(fetch = FetchType.EAGER, optional = false
+//            ,
+//            cascade = {CascadeType.PERSIST, CascadeType.REFRESH, CascadeType.MERGE}
+            )
     @JoinColumn(name = "country_id", nullable = false)
     private Country country;
 

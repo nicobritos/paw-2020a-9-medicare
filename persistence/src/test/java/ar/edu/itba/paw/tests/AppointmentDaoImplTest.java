@@ -34,7 +34,7 @@ import static org.junit.Assert.*;
 @Sql(scripts = "classpath:sql/schema.sql")
 @ContextConfiguration(classes = TestConfig.class)
 public class AppointmentDaoImplTest {
-    private static final int STARTING_ID = 0;
+    private static final int STARTING_ID = 1;
     private static final String FIRST_NAME = "Nombre";
     private static final String SURNAME = "Apellido";
     private static final String EMAIL = "napellido@test.com";
@@ -597,6 +597,7 @@ public class AppointmentDaoImplTest {
         insertStaff();
 
         // 2. Ejercitar
+        a.setId(null);
         Appointment appointment = this.appointmentDao.create(a);
 
         // 3. Postcondiciones
@@ -619,6 +620,7 @@ public class AppointmentDaoImplTest {
         Appointment a = appointmentModel();
 
         // 2. Ejercitar
+        a.setId(null);
         Appointment appointment = this.appointmentDao.create(a);
 
         // 3. Postcondiciones
@@ -636,7 +638,7 @@ public class AppointmentDaoImplTest {
     {
         // 1. Precondiciones
         cleanAllTables();
-        expectedException.expect(NullPointerException.class);
+        expectedException.expect(IllegalArgumentException.class);
 
         // 2. Ejercitar
         Appointment appointment = this.appointmentDao.create(null);
@@ -902,7 +904,7 @@ public class AppointmentDaoImplTest {
         cleanAllTables();
         insertAppointment();
         insertAnotherAppointment();
-        expectedException.expect(NullPointerException.class);
+        expectedException.expect(IllegalArgumentException.class);
 
         // 2. Ejercitar
         this.appointmentDao.update(null);
@@ -1122,7 +1124,7 @@ public class AppointmentDaoImplTest {
         // 1. Precondiciones
         cleanAllTables();
         insertAppointment();
-        expectedException.expect(NullPointerException.class);
+        expectedException.expect(IllegalArgumentException.class);
 
         // 2. Ejercitar
         this.appointmentDao.remove((Appointment) null);
@@ -1193,7 +1195,7 @@ public class AppointmentDaoImplTest {
         cleanAllTables();
         insertAppointment();
         insertAnotherAppointment();
-        expectedException.expect(NullPointerException.class);
+        expectedException.expect(IllegalArgumentException.class);
 
         // 2. Ejercitar
         List<Appointment> appointments = this.appointmentDao.find((Staff) null);
@@ -1247,7 +1249,7 @@ public class AppointmentDaoImplTest {
         cleanAllTables();
         insertAppointment();
         insertAnotherAppointment();
-        expectedException.expect(NullPointerException.class);
+        expectedException.expect(IllegalArgumentException.class);
 
         // 2. Ejercitar
         List<Appointment> appointments = this.appointmentDao.find((Patient) null);
@@ -1301,7 +1303,7 @@ public class AppointmentDaoImplTest {
         cleanAllTables();
         insertAppointment();
         insertAnotherAppointment();
-        expectedException.expect(NullPointerException.class);
+        expectedException.expect(IllegalArgumentException.class);
 
         // 2. Ejercitar
         List<Appointment> appointments = this.appointmentDao.findByDate(patientModel(), null);
@@ -1317,7 +1319,7 @@ public class AppointmentDaoImplTest {
         cleanAllTables();
         insertAppointment();
         insertAnotherAppointment();
-        expectedException.expect(NullPointerException.class);
+        expectedException.expect(IllegalArgumentException.class);
 
         // 2. Ejercitar
         List<Appointment> appointments = this.appointmentDao.findByDate(null, new DateTime(YEAR, MONTH, DAY, HOUR, MINUTE));
@@ -1333,7 +1335,7 @@ public class AppointmentDaoImplTest {
         cleanAllTables();
         insertAppointment();
         insertAnotherAppointment();
-        expectedException.expect(NullPointerException.class);
+        expectedException.expect(IllegalArgumentException.class);
 
         // 2. Ejercitar
         List<Appointment> appointments = this.appointmentDao.findByDate(null, null);
@@ -1404,7 +1406,7 @@ public class AppointmentDaoImplTest {
         cleanAllTables();
         insertAppointment();
         insertAnotherAppointment();
-        expectedException.expect(NullPointerException.class);
+        expectedException.expect(IllegalArgumentException.class);
 
         // 2. Ejercitar
         List<Appointment> appointments = this.appointmentDao.findByPatients(null);
@@ -1458,7 +1460,7 @@ public class AppointmentDaoImplTest {
         cleanAllTables();
         insertAppointment();
         insertAnotherAppointment();
-        expectedException.expect(NullPointerException.class);
+        expectedException.expect(IllegalArgumentException.class);
 
         // 2. Ejercitar
         List<Appointment> appointments = this.appointmentDao.findByPatientsAndDate(Collections.singletonList(patientModel()), null);
@@ -1474,7 +1476,7 @@ public class AppointmentDaoImplTest {
         cleanAllTables();
         insertAppointment();
         insertAnotherAppointment();
-        expectedException.expect(NullPointerException.class);
+        expectedException.expect(IllegalArgumentException.class);
 
         // 2. Ejercitar
         List<Appointment> appointments = this.appointmentDao.findByPatientsAndDate(null, new DateTime(YEAR, MONTH, DAY, HOUR, MINUTE));
@@ -1490,7 +1492,7 @@ public class AppointmentDaoImplTest {
         cleanAllTables();
         insertAppointment();
         insertAnotherAppointment();
-        expectedException.expect(NullPointerException.class);
+        expectedException.expect(IllegalArgumentException.class);
 
         // 2. Ejercitar
         List<Appointment> appointments = this.appointmentDao.findByPatientsAndDate(null, null);
@@ -1561,7 +1563,7 @@ public class AppointmentDaoImplTest {
         cleanAllTables();
         insertAppointment();
         insertAnotherAppointment();
-        expectedException.expect(NullPointerException.class);
+        expectedException.expect(IllegalArgumentException.class);
 
         // 2. Ejercitar
         List<Appointment> appointments = this.appointmentDao.findByPatientsFromDate(Collections.singletonList(patientModel()), null);
@@ -1577,7 +1579,7 @@ public class AppointmentDaoImplTest {
         cleanAllTables();
         insertAppointment();
         insertAnotherAppointment();
-        expectedException.expect(NullPointerException.class);
+        expectedException.expect(IllegalArgumentException.class);
 
         // 2. Ejercitar
         List<Appointment> appointments = this.appointmentDao.findByPatientsFromDate(null, new DateTime(YEAR, MONTH, DAY, 0, 0));
@@ -1593,7 +1595,7 @@ public class AppointmentDaoImplTest {
         cleanAllTables();
         insertAppointment();
         insertAnotherAppointment();
-        expectedException.expect(NullPointerException.class);
+        expectedException.expect(IllegalArgumentException.class);
 
         // 2. Ejercitar
         List<Appointment> appointments = this.appointmentDao.findByPatientsFromDate(null, null);
@@ -1664,7 +1666,7 @@ public class AppointmentDaoImplTest {
         cleanAllTables();
         insertAppointment();
         insertAnotherAppointment();
-        expectedException.expect(NullPointerException.class);
+        expectedException.expect(IllegalArgumentException.class);
 
         // 2. Ejercitar
         List<Appointment> appointments = this.appointmentDao.findByStaffs(null);
@@ -1718,7 +1720,7 @@ public class AppointmentDaoImplTest {
         cleanAllTables();
         insertAppointment();
         insertAnotherAppointment();
-        expectedException.expect(NullPointerException.class);
+        expectedException.expect(IllegalArgumentException.class);
 
         // 2. Ejercitar
         List<Appointment> appointments = this.appointmentDao.findByStaffsAndDate(Collections.singletonList(staffModel()), null);
@@ -1734,7 +1736,7 @@ public class AppointmentDaoImplTest {
         cleanAllTables();
         insertAppointment();
         insertAnotherAppointment();
-        expectedException.expect(NullPointerException.class);
+        expectedException.expect(IllegalArgumentException.class);
 
         // 2. Ejercitar
         List<Appointment> appointments = this.appointmentDao.findByStaffsAndDate(null, new DateTime(YEAR, MONTH, DAY, HOUR, MINUTE));
@@ -1750,7 +1752,7 @@ public class AppointmentDaoImplTest {
         cleanAllTables();
         insertAppointment();
         insertAnotherAppointment();
-        expectedException.expect(NullPointerException.class);
+        expectedException.expect(IllegalArgumentException.class);
 
         // 2. Ejercitar
         List<Appointment> appointments = this.appointmentDao.findByStaffsAndDate(null, null);
@@ -1821,7 +1823,7 @@ public class AppointmentDaoImplTest {
         cleanAllTables();
         insertAppointment();
         insertAnotherAppointment();
-        expectedException.expect(NullPointerException.class);
+        expectedException.expect(IllegalArgumentException.class);
 
         // 2. Ejercitar
         List<Appointment> appointments = this.appointmentDao.findByStaffsAndDate(Collections.singletonList(staffModel()), null, new DateTime(YEAR, MONTH, DAY, 23, 59));
@@ -1837,7 +1839,7 @@ public class AppointmentDaoImplTest {
         cleanAllTables();
         insertAppointment();
         insertAnotherAppointment();
-        expectedException.expect(NullPointerException.class);
+        expectedException.expect(IllegalArgumentException.class);
 
         // 2. Ejercitar
         List<Appointment> appointments = this.appointmentDao.findByStaffsAndDate(Collections.singletonList(staffModel()), new DateTime(YEAR, MONTH, DAY, 0, 0),null);
@@ -1853,7 +1855,7 @@ public class AppointmentDaoImplTest {
         cleanAllTables();
         insertAppointment();
         insertAnotherAppointment();
-        expectedException.expect(NullPointerException.class);
+        expectedException.expect(IllegalArgumentException.class);
 
         // 2. Ejercitar
         List<Appointment> appointments = this.appointmentDao.findByStaffsAndDate(null, new DateTime(YEAR, MONTH, DAY, 0, 0), new DateTime(YEAR, MONTH, DAY, 23, 59));
@@ -1869,7 +1871,7 @@ public class AppointmentDaoImplTest {
         cleanAllTables();
         insertAppointment();
         insertAnotherAppointment();
-        expectedException.expect(NullPointerException.class);
+        expectedException.expect(IllegalArgumentException.class);
 
         // 2. Ejercitar
         List<Appointment> appointments = this.appointmentDao.findByStaffsAndDate(null, null, null);
@@ -1941,7 +1943,7 @@ public class AppointmentDaoImplTest {
         cleanAllTables();
         insertAppointment();
         insertAnotherAppointment();
-        expectedException.expect(NullPointerException.class);
+        expectedException.expect(IllegalArgumentException.class);
 
         // 2. Ejercitar
         List<Appointment> appointments = this.appointmentDao.findPending((Staff) null);
@@ -1997,7 +1999,7 @@ public class AppointmentDaoImplTest {
         cleanAllTables();
         insertAppointment();
         insertAnotherAppointment();
-        expectedException.expect(NullPointerException.class);
+        expectedException.expect(IllegalArgumentException.class);
 
         // 2. Ejercitar
         List<Appointment> appointments = this.appointmentDao.findPending((Patient) null);
@@ -2053,7 +2055,7 @@ public class AppointmentDaoImplTest {
         cleanAllTables();
         insertAppointment();
         insertAnotherAppointment();
-        expectedException.expect(NullPointerException.class);
+        expectedException.expect(IllegalArgumentException.class);
 
         // 2. Ejercitar
         List<Appointment> appointments = this.appointmentDao.findPending(null, staffModel());
@@ -2069,7 +2071,7 @@ public class AppointmentDaoImplTest {
         cleanAllTables();
         insertAppointment();
         insertAnotherAppointment();
-        expectedException.expect(NullPointerException.class);
+        expectedException.expect(IllegalArgumentException.class);
 
         // 2. Ejercitar
         List<Appointment> appointments = this.appointmentDao.findPending(patientModel(), null);
@@ -2085,7 +2087,7 @@ public class AppointmentDaoImplTest {
         cleanAllTables();
         insertAppointment();
         insertAnotherAppointment();
-        expectedException.expect(NullPointerException.class);
+        expectedException.expect(IllegalArgumentException.class);
 
         // 2. Ejercitar
         List<Appointment> appointments = this.appointmentDao.findPending(null, null);

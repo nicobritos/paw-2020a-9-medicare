@@ -1,12 +1,11 @@
 package ar.edu.itba.paw.tests;
 
+import ar.edu.itba.paw.config.TestConfig;
 import ar.edu.itba.paw.interfaces.daos.LocalityDao;
 import ar.edu.itba.paw.models.Country;
 import ar.edu.itba.paw.models.Locality;
 import ar.edu.itba.paw.models.ModelMetadata;
 import ar.edu.itba.paw.models.Province;
-import ar.edu.itba.paw.config.TestConfig;
-import org.hibernate.TransientObjectException;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -36,7 +35,7 @@ public class LocalityDaoImplTest {
     private static final String PROVINCE = "Buenos Aires";
     private static final String LOCALITY_2 = "Palermo";
 
-    private static final int STARTING_ID = 0;
+    private static final int STARTING_ID = 1;
     private static final String COUNTRY = "Argentina";
     private static final String COUNTRY_ID = "AR";
 
@@ -147,6 +146,7 @@ public class LocalityDaoImplTest {
         Locality l = localityModel();
 
         // 2. Ejercitar
+        l.setId(null);
         Locality locality = this.localityDao.create(l);
 
         // 3. Postcondiciones
@@ -384,7 +384,7 @@ public class LocalityDaoImplTest {
         cleanAllTables();
         insertLocality();
         insertAnotherLocality();
-        expectedException.expect(NullPointerException.class);
+        expectedException.expect(IllegalArgumentException.class);
 
         // 2. Ejercitar
         this.localityDao.findByName(null);
@@ -526,7 +526,7 @@ public class LocalityDaoImplTest {
         insertLocality();
         Locality l = localityModel();
         l.setId(null);
-        expectedException.expect(TransientObjectException.class);
+        expectedException.expect(IllegalArgumentException.class);
 
         // 2. Ejercitar
         this.localityDao.update(l);
@@ -559,6 +559,7 @@ public class LocalityDaoImplTest {
         insertLocality();
 
         // 2. Ejercitar
+        expectedException.expect(IllegalArgumentException.class);
         this.localityDao.remove(STARTING_ID + 1);
 
         // 3. Postcondiciones
@@ -608,6 +609,7 @@ public class LocalityDaoImplTest {
         l.setId(STARTING_ID + 1);
 
         // 2. Ejercitar
+        expectedException.expect(IllegalArgumentException.class);
         this.localityDao.remove(l);
 
         // 3. Postcondiciones
@@ -620,7 +622,7 @@ public class LocalityDaoImplTest {
         // 1. Precondiciones
         cleanAllTables();
         insertLocality();
-        expectedException.expect(NullPointerException.class);
+        expectedException.expect(IllegalArgumentException.class);
 
         // 2. Ejercitar
         this.localityDao.remove((Locality) null);

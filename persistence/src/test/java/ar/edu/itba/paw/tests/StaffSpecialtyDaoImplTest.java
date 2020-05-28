@@ -1,10 +1,9 @@
 package ar.edu.itba.paw.tests;
 
+import ar.edu.itba.paw.config.TestConfig;
 import ar.edu.itba.paw.interfaces.daos.StaffSpecialtyDao;
 import ar.edu.itba.paw.models.ModelMetadata;
 import ar.edu.itba.paw.models.StaffSpecialty;
-import ar.edu.itba.paw.config.TestConfig;
-import org.hamcrest.CoreMatchers;
 import org.hibernate.TransientObjectException;
 import org.junit.Before;
 import org.junit.Rule;
@@ -31,7 +30,7 @@ import static org.junit.Assert.*;
 @Sql(scripts = "classpath:sql/schema.sql")
 @ContextConfiguration(classes = TestConfig.class)
 public class StaffSpecialtyDaoImplTest {
-    private static final int STARTING_ID = 0;
+    private static final int STARTING_ID = 1;
     private static final String STAFF_SPECIALTY = "Oftalmologo";
     private static final Object STAFF_SPECIALTY_2 = "Dentista";
     
@@ -92,6 +91,7 @@ public class StaffSpecialtyDaoImplTest {
         StaffSpecialty ss = staffSpecialtyModel();
 
         // 2. Ejercitar
+        ss.setId(null);
         StaffSpecialty staffSpecialty = this.staffSpecialtyDao.create(ss);
 
         // 3. Postcondiciones
@@ -107,6 +107,7 @@ public class StaffSpecialtyDaoImplTest {
         StaffSpecialty ss = staffSpecialtyModel();
 
         // 2. Ejercitar
+        ss.setId(null);
         StaffSpecialty staffSpecialty = this.staffSpecialtyDao.create(ss);
 
         // 3. Postcondiciones
@@ -464,7 +465,7 @@ public class StaffSpecialtyDaoImplTest {
         // 1. Precondiciones
         cleanAllTables();
         insertStaffSpecialty();
-        expectedException.expect(NullPointerException.class);
+        expectedException.expect(IllegalArgumentException.class);
 
         // 2. Ejercitar
         this.staffSpecialtyDao.remove((StaffSpecialty) null);

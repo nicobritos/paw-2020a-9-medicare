@@ -4,7 +4,6 @@ import ar.edu.itba.paw.config.TestConfig;
 import ar.edu.itba.paw.interfaces.daos.PictureDao;
 import ar.edu.itba.paw.models.ModelMetadata;
 import ar.edu.itba.paw.models.Picture;
-import org.hamcrest.CoreMatchers;
 import org.hibernate.TransientObjectException;
 import org.junit.Before;
 import org.junit.Rule;
@@ -14,7 +13,6 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
@@ -35,7 +33,7 @@ import static org.junit.Assert.*;
 @Sql(scripts = "classpath:sql/schema.sql")
 @ContextConfiguration(classes = TestConfig.class)
 public class PictureDaoImplTest {
-    private static final int STARTING_ID = 0;
+    private static final int STARTING_ID = 1;
     private static final String MIME_TYPE = "image/svg+xml";
     private static final String PICTURE = "defaultProfilePic.svg";
     private static final Resource IMG = new ClassPathResource("img/" + PICTURE);
@@ -151,6 +149,7 @@ public class PictureDaoImplTest {
         Picture p = pictureModel();
 
         // 2. Ejercitar
+        p.setId(null);
         Picture picture = this.pictureDao.create(p);
 
         // 3. Postcondiciones
@@ -169,6 +168,7 @@ public class PictureDaoImplTest {
         Picture p = pictureModel();
 
         // 2. Ejercitar
+        p.setId(null);
         Picture picture = this.pictureDao.create(p);
 
         // 3. Postcondiciones
@@ -543,7 +543,7 @@ public class PictureDaoImplTest {
         // 1. Precondiciones
         cleanAllTables();
         insertPicture();
-        expectedException.expect(NullPointerException.class);
+        expectedException.expect(IllegalArgumentException.class);
 
         // 2. Ejercitar
         this.pictureDao.remove((Picture) null);

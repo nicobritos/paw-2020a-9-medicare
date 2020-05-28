@@ -20,6 +20,9 @@ public class OfficeDaoImpl extends GenericSearchableDaoImpl<Office, Integer> imp
 
     @Override
     public List<Office> findByCountry(Country country) {
+        if(country == null){
+            throw new IllegalArgumentException();
+        }
         CriteriaBuilder builder = this.getEntityManager().getCriteriaBuilder();
         CriteriaQuery<Office> query = builder.createQuery(Office.class);
         Root<Office> root = query.from(Office.class);

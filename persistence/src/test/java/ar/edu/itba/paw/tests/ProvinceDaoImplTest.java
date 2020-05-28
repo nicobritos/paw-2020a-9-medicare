@@ -1,11 +1,10 @@
 package ar.edu.itba.paw.tests;
 
+import ar.edu.itba.paw.config.TestConfig;
 import ar.edu.itba.paw.interfaces.daos.ProvinceDao;
 import ar.edu.itba.paw.models.Country;
 import ar.edu.itba.paw.models.ModelMetadata;
 import ar.edu.itba.paw.models.Province;
-import ar.edu.itba.paw.config.TestConfig;
-import org.hibernate.PropertyValueException;
 import org.hibernate.TransientObjectException;
 import org.junit.Before;
 import org.junit.Rule;
@@ -34,7 +33,7 @@ import static org.junit.Assert.*;
 public class ProvinceDaoImplTest {
     private static final String PROVINCE = "Buenos Aires";
     private static final String PROVINCE_2 = "Corrientes";
-    private static final int STARTING_ID = 0;
+    private static final int STARTING_ID = 1;
     private static final String COUNTRY = "Argentina";
     private static final String COUNTRY_ID = "AR";
 
@@ -122,6 +121,7 @@ public class ProvinceDaoImplTest {
         Province p = provinceModel();
 
         // 2. Ejercitar
+        p.setId(null);
         Province province = this.provinceDao.create(p);
 
         // 3. Postcondiciones
@@ -357,7 +357,7 @@ public class ProvinceDaoImplTest {
         cleanAllTables();
         insertProvince();
         insertAnotherProvince();
-        expectedException.expect(NullPointerException.class);
+        expectedException.expect(IllegalArgumentException.class);
 
         // 2. Ejercitar
         this.provinceDao.findByName(null);
@@ -593,7 +593,7 @@ public class ProvinceDaoImplTest {
         // 1. Precondiciones
         cleanAllTables();
         insertProvince();
-        expectedException.expect(NullPointerException.class);
+        expectedException.expect(IllegalArgumentException.class);
 
         // 2. Ejercitar
         this.provinceDao.remove((Province) null);

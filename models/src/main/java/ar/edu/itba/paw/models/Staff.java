@@ -14,8 +14,8 @@ import java.util.LinkedList;
 )
 public class Staff extends GenericModel<Integer> {
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "staff_pk")
-    @SequenceGenerator(sequenceName = "staff_staff_id_seq", name = "staff_pk", allocationSize = 1)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "staff_staff_id_seq")
+    @SequenceGenerator(sequenceName = "staff_staff_id_seq", name = "staff_staff_id_seq", allocationSize = 1)
     @Column(name = "staff_id")
     private Integer id;
     @Column(name = "first_name", nullable = false)
@@ -28,13 +28,12 @@ public class Staff extends GenericModel<Integer> {
     private String email;
     @Column(name = "registration_number")
     private Integer registrationNumber;
-    @JoinColumn(name = "user_id")
+    @JoinColumn(name = "user_id", nullable = false)
     @ManyToOne(fetch = FetchType.EAGER)
     private User user;
-    @JoinColumn(name = "office_id")
+    @JoinColumn(name = "office_id", nullable = false)
     @ManyToOne(fetch = FetchType.EAGER)
     private Office office;
-    @JoinColumn(name = "user_id")
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
             name = "system_staff_specialty_staff",

@@ -1,9 +1,8 @@
 package ar.edu.itba.paw.tests;
 
+import ar.edu.itba.paw.config.TestConfig;
 import ar.edu.itba.paw.interfaces.daos.StaffDao;
 import ar.edu.itba.paw.models.*;
-import ar.edu.itba.paw.config.TestConfig;
-import org.hamcrest.CoreMatchers;
 import org.hibernate.TransientObjectException;
 import org.junit.Before;
 import org.junit.Rule;
@@ -35,7 +34,7 @@ import static org.junit.Assert.*;
 @ContextConfiguration(classes = TestConfig.class)
 public class StaffDaoImplTest
 {
-    private static final int STARTING_ID = 0;
+    private static final int STARTING_ID = 1;
     private static final String OFFICE = "Hospital Nacional";
     private static final String OFFICE_2 = "Consultorio Provincial";
     private static final String STREET = "Av 9 de Julio 123";
@@ -443,18 +442,19 @@ public class StaffDaoImplTest
         Staff s = staffModel();
 
         // 2. Ejercitar
+        s.setId(null);
         Staff staff = this.staffDao.create(s);
 
         // 3. Postcondiciones
         assertEquals(1, JdbcTestUtils.countRowsInTable(this.jdbcTemplate, STAFFS_TABLE));
-        assertEquals(FIRST_NAME, s.getFirstName());
-        assertEquals(EMAIL, s.getEmail());
-        assertEquals(officeModel(), s.getOffice());
-        assertEquals(PHONE, s.getPhone());
-        assertEquals(REGISTRATION_NUMBER, s.getRegistrationNumber());
-        assertEquals(new LinkedList<>(), s.getStaffSpecialties());
-        assertEquals(SURNAME, s.getSurname());
-        assertEquals(userModel(), s.getUser());
+        assertEquals(FIRST_NAME, staff.getFirstName());
+        assertEquals(EMAIL, staff.getEmail());
+        assertEquals(officeModel(), staff.getOffice());
+        assertEquals(PHONE, staff.getPhone());
+        assertEquals(REGISTRATION_NUMBER, staff.getRegistrationNumber());
+        assertEquals(new LinkedList<>(), staff.getStaffSpecialties());
+        assertEquals(SURNAME, staff.getSurname());
+        assertEquals(userModel(), staff.getUser());
     }
 
     @Test
@@ -467,18 +467,19 @@ public class StaffDaoImplTest
         Staff s = staffModel();
 
         // 2. Ejercitar
+        s.setId(null);
         Staff staff = this.staffDao.create(s);
 
         // 3. Postcondiciones
         assertEquals(2, JdbcTestUtils.countRowsInTable(this.jdbcTemplate, STAFFS_TABLE));
-        assertEquals(FIRST_NAME, s.getFirstName());
-        assertEquals(EMAIL, s.getEmail());
-        assertEquals(officeModel(), s.getOffice());
-        assertEquals(PHONE, s.getPhone());
-        assertEquals(REGISTRATION_NUMBER, s.getRegistrationNumber());
-        assertEquals(new LinkedList<>(), s.getStaffSpecialties());
-        assertEquals(SURNAME, s.getSurname());
-        assertEquals(userModel(), s.getUser());
+        assertEquals(FIRST_NAME, staff.getFirstName());
+        assertEquals(EMAIL, staff.getEmail());
+        assertEquals(officeModel(), staff.getOffice());
+        assertEquals(PHONE, staff.getPhone());
+        assertEquals(REGISTRATION_NUMBER, staff.getRegistrationNumber());
+        assertEquals(new LinkedList<>(), staff.getStaffSpecialties());
+        assertEquals(SURNAME, staff.getSurname());
+        assertEquals(userModel(), staff.getUser());
     }
 
     @Test
@@ -913,7 +914,7 @@ public class StaffDaoImplTest
         // 1. Precondiciones
         cleanAllTables();
         insertStaff();
-        expectedException.expect(NullPointerException.class);
+        expectedException.expect(IllegalArgumentException.class);
 
         // 2. Ejercitar
         this.staffDao.remove((Staff) null);

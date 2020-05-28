@@ -1,11 +1,10 @@
 package ar.edu.itba.paw.tests;
 
+import ar.edu.itba.paw.config.TestConfig;
 import ar.edu.itba.paw.interfaces.daos.UserDao;
 import ar.edu.itba.paw.models.ModelMetadata;
 import ar.edu.itba.paw.models.Picture;
 import ar.edu.itba.paw.models.User;
-import ar.edu.itba.paw.config.TestConfig;
-import org.hamcrest.CoreMatchers;
 import org.hibernate.TransientObjectException;
 import org.junit.Before;
 import org.junit.Rule;
@@ -36,7 +35,7 @@ import static org.junit.Assert.*;
 @Sql(scripts = "classpath:sql/schema.sql")
 @ContextConfiguration(classes = TestConfig.class)
 public class UserDaoImplTest {
-    private static final int STARTING_ID = 0;
+    private static final int STARTING_ID = 1;
     private static final String FIRST_NAME = "Nombre";
     private static final String SURNAME = "Apellido";
     private static final String EMAIL = "napellido@test.com";
@@ -224,6 +223,7 @@ public class UserDaoImplTest {
         User u = userModel();
 
         // 2. Ejercitar
+        u.setId(null);
         User user = this.userDao.create(u);
 
         // 3. Postcondiciones
@@ -244,6 +244,7 @@ public class UserDaoImplTest {
         User u = userModel();
 
         // 2. Ejercitar
+        u.setId(null);
         User user = this.userDao.create(u);
 
         // 3. Postcondiciones
@@ -629,7 +630,7 @@ public class UserDaoImplTest {
         // 1. Precondiciones
         cleanAllTables();
         insertUser();
-        expectedException.expect(NullPointerException.class);
+        expectedException.expect(IllegalArgumentException.class);
 
         // 2. Ejercitar
         this.userDao.remove((User) null);

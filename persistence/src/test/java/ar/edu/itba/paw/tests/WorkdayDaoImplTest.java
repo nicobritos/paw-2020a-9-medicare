@@ -1,9 +1,8 @@
 package ar.edu.itba.paw.tests;
 
+import ar.edu.itba.paw.config.TestConfig;
 import ar.edu.itba.paw.interfaces.daos.WorkdayDao;
 import ar.edu.itba.paw.models.*;
-import ar.edu.itba.paw.config.TestConfig;
-import org.hamcrest.CoreMatchers;
 import org.hibernate.TransientObjectException;
 import org.joda.time.DateTime;
 import org.junit.Before;
@@ -36,7 +35,7 @@ import static org.junit.Assert.*;
 @ContextConfiguration(classes = TestConfig.class)
 public class WorkdayDaoImplTest
 {
-    private static final int STARTING_ID = 0;
+    private static final int STARTING_ID = 1;
     private static final String OFFICE = "Hospital Nacional";
     private static final String STREET = "Av 9 de Julio 123";
     private static final String LOCALITY = "Capital Federal";
@@ -429,6 +428,7 @@ public class WorkdayDaoImplTest
         Workday w = workdayModel();
 
         // 2. Ejercitar
+        w.setId(null);
         Workday workday = this.workdayDao.create(w);
 
         // 3. Postcondiciones
@@ -450,6 +450,7 @@ public class WorkdayDaoImplTest
         Workday w = workdayModel();
 
         // 2. Ejercitar
+        w.setId(null);
         Workday workday = this.workdayDao.create(w);
 
         // 3. Postcondiciones
@@ -1008,7 +1009,7 @@ public class WorkdayDaoImplTest
         // 1. Precondiciones
         cleanAllTables();
         insertWorkday();
-        expectedException.expect(NullPointerException.class);
+        expectedException.expect(IllegalArgumentException.class);
 
         // 2. Ejercitar
         this.workdayDao.remove((Workday) null);
@@ -1549,7 +1550,7 @@ public class WorkdayDaoImplTest
         // 1. Precondiciones
         cleanAllTables();
         insertWorkday();
-        expectedException.expect(NullPointerException.class);
+        expectedException.expect(IllegalArgumentException.class);
 
         // 2. Ejercitar
         boolean isStaffWorking = workdayDao.isStaffWorking(staffModel(), null);
@@ -1564,7 +1565,7 @@ public class WorkdayDaoImplTest
         // 1. Precondiciones
         cleanAllTables();
         insertWorkday();
-        expectedException.expect(NullPointerException.class);
+        expectedException.expect(IllegalArgumentException.class);
 
         // 2. Ejercitar
         boolean isStaffWorking = workdayDao.isStaffWorking(null, null);

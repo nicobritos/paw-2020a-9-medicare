@@ -11,8 +11,8 @@ import javax.persistence.*;
 )
 public class StaffSpecialty extends GenericModel<Integer> {
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "specialty_pk")
-    @SequenceGenerator(sequenceName = "system_staff_specialty_specialty_id_seq", name = "specialty_pk", allocationSize = 1)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "system_staff_specialty_specialty_id_seq")
+    @SequenceGenerator(sequenceName = "system_staff_specialty_specialty_id_seq", name = "system_staff_specialty_specialty_id_seq", allocationSize = 1)
     @Column(name = "specialty_id")
     private Integer id;
     @Column(name = "name", nullable = false)

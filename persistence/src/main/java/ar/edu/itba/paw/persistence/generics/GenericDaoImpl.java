@@ -92,21 +92,33 @@ public abstract class GenericDaoImpl<M extends GenericModel<I>, I> implements Ge
     @Override
     @Transactional
     public void update(M model) {
+        if(model == null || model.getId() == null){
+            throw new IllegalArgumentException();
+        }
         this.entityManager.unwrap(Session.class).update(model);
     }
 
     @Override
     @Transactional
     public void remove(M model) {
+        if(model == null){
+            throw new IllegalArgumentException();
+        }
         this.remove(model.getId());
     }
 
     @Override
     @Transactional
     public void remove(I id) {
+        if(id == null){
+            throw new IllegalArgumentException();
+        }
         M model = this.entityManager.find(this.mClass, id);
-        if (model != null)
+        if (model != null) {
             this.entityManager.remove(model);
+        } else {
+            throw new IllegalArgumentException("Model is null");
+        }
     }
 
     @Override
@@ -207,6 +219,9 @@ public abstract class GenericDaoImpl<M extends GenericModel<I>, I> implements Ge
     }
 
     protected List<M> findByIgnoreCase(SingularAttribute<? super M, ?> attribute, String value, StringSearchType stringSearchType) {
+        if (value == null)
+            throw new IllegalArgumentException();
+
         CriteriaBuilder builder = this.entityManager.getCriteriaBuilder();
         CriteriaQuery<M> query = builder.createQuery(this.mClass);
         Root<M> root = query.from(this.mClass);

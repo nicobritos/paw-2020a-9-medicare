@@ -1,9 +1,8 @@
 package ar.edu.itba.paw.tests;
 
+import ar.edu.itba.paw.config.TestConfig;
 import ar.edu.itba.paw.interfaces.daos.OfficeDao;
 import ar.edu.itba.paw.models.*;
-import ar.edu.itba.paw.config.TestConfig;
-import org.hibernate.TransientObjectException;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -30,7 +29,7 @@ import static org.junit.Assert.*;
 @ContextConfiguration(classes = TestConfig.class)
 public class OfficeDaoImplTest
 {
-    private static final int STARTING_ID = 0;
+    private static final int STARTING_ID = 1 ;
     private static final String OFFICE = "Hospital Nacional";
     private static final String OFFICE_2 = "Sanatorio Provincial";
     private static final String STREET = "Av 9 de Julio 123";
@@ -208,6 +207,7 @@ public class OfficeDaoImplTest
         Office o = officeModel();
 
         // 2. Ejercitar
+        o.setId(null);
         Office office = this.officeDao.create(o);
 
         // 3. Postcondiciones
@@ -230,6 +230,7 @@ public class OfficeDaoImplTest
         o.setName(OFFICE_2);
 
         // 2. Ejercitar
+        o.setId(null);
         Office office = this.officeDao.create(o);
 
         // 3. Postcondiciones
@@ -453,7 +454,7 @@ public class OfficeDaoImplTest
         cleanAllTables();
         insertOffice();
         insertAnotherOffice();
-        expectedException.expect(NullPointerException.class);
+        expectedException.expect(IllegalArgumentException.class);
 
         // 2. Ejercitar
         this.officeDao.findByName(null);
@@ -596,7 +597,7 @@ public class OfficeDaoImplTest
         insertOffice();
         Office o = officeModel();
         o.setId(null);
-        expectedException.expect(TransientObjectException.class);
+        expectedException.expect(IllegalArgumentException.class);
 
         // 2. Ejercitar
         this.officeDao.update(o);
@@ -664,6 +665,7 @@ public class OfficeDaoImplTest
         insertOffice();
 
         // 2. Ejercitar
+        expectedException.expect(IllegalArgumentException.class);
         this.officeDao.remove(STARTING_ID + 1);
 
         // 3. Postcondiciones
@@ -713,6 +715,7 @@ public class OfficeDaoImplTest
         o.setId(STARTING_ID + 1);
 
         // 2. Ejercitar
+        expectedException.expect(IllegalArgumentException.class);
         this.officeDao.remove(o);
 
         // 3. Postcondiciones
@@ -725,7 +728,7 @@ public class OfficeDaoImplTest
         // 1. Precondiciones
         cleanAllTables();
         insertOffice();
-        expectedException.expect(NullPointerException.class);
+        expectedException.expect(IllegalArgumentException.class);
 
         // 2. Ejercitar
         this.officeDao.remove((Office) null);
@@ -838,7 +841,7 @@ public class OfficeDaoImplTest
         // 1. Precondiciones
         cleanAllTables();
         insertOffice();
-        expectedException.expect(NullPointerException.class);
+        expectedException.expect(IllegalArgumentException.class);
 
         // 2. Ejercitar
         Collection<Office> offices = officeDao.findByCountry(null);

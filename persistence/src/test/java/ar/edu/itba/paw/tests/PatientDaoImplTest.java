@@ -1,10 +1,10 @@
 package ar.edu.itba.paw.tests;
 
+import ar.edu.itba.paw.config.TestConfig;
 import ar.edu.itba.paw.interfaces.daos.PatientDao;
 import ar.edu.itba.paw.models.*;
-import ar.edu.itba.paw.config.TestConfig;
 import org.hamcrest.CoreMatchers;
-import org.hibernate.TransientObjectException;
+import org.hibernate.PropertyValueException;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -34,7 +34,7 @@ import static org.junit.Assert.*;
 @Sql(scripts = "classpath:sql/schema.sql")
 @ContextConfiguration(classes = TestConfig.class)
 public class PatientDaoImplTest {
-    private static final int STARTING_ID = 0;
+    private static final int STARTING_ID = 1;
     private static final String FIRST_NAME = "Nombre";
     private static final String SURNAME = "Apellido";
     private static final String EMAIL = "napellido@test.com";
@@ -464,12 +464,13 @@ public class PatientDaoImplTest {
         Patient p = patientModel();
 
         // 2. Ejercitar
+        p.setId(null);
         Patient patient = this.patientDao.create(p);
 
         // 3. Postcondiciones
         assertEquals(1, JdbcTestUtils.countRowsInTable(this.jdbcTemplate, PATIENTS_TABLE));
-        assertEquals(userModel(), p.getUser());
-        assertEquals(officeModel(), p.getOffice());
+        assertEquals(userModel(), patient.getUser());
+        assertEquals(officeModel(), patient.getOffice());
     }
 
     @Test
@@ -482,12 +483,13 @@ public class PatientDaoImplTest {
         Patient p = patientModel();
 
         // 2. Ejercitar
+        p.setId(null);
         Patient patient = this.patientDao.create(p);
 
         // 3. Postcondiciones
         assertEquals(2, JdbcTestUtils.countRowsInTable(this.jdbcTemplate, PATIENTS_TABLE));
-        assertEquals(userModel(), p.getUser());
-        assertEquals(officeModel(), p.getOffice());
+        assertEquals(userModel(), patient.getUser());
+        assertEquals(officeModel(), patient.getOffice());
     }
 
     @Test
@@ -511,6 +513,7 @@ public class PatientDaoImplTest {
         cleanAllTables();
         Patient p = new Patient();
         expectedException.expect(CoreMatchers.anyOf( // Falla si no se tira ninguna de las excepciones de la lista
+                CoreMatchers.instanceOf(PropertyValueException.class), // Esta excepcion se tira si es null
                 CoreMatchers.instanceOf(IllegalStateException.class), // Esta excepcion se tira si no tiene data // TODO: chequear esta excepcion (poco descriptiva)
                 CoreMatchers.instanceOf(DataIntegrityViolationException.class) // Esta excepcion se tira si no tiene id // TODO: chequear esta excepcion (poco descriptiva)
         ));
@@ -783,7 +786,7 @@ public class PatientDaoImplTest {
         insertPatient();
         Patient p = patientModel();
         p.setId(null);
-        expectedException.expect(TransientObjectException.class);
+        expectedException.expect(IllegalArgumentException.class);
 
         // 2. Ejercitar
         this.patientDao.update(p);
@@ -814,6 +817,7 @@ public class PatientDaoImplTest {
         // 1. Precondiciones
         cleanAllTables();
         insertPatient();
+        expectedException.expect(IllegalArgumentException.class);
 
         // 2. Ejercitar
         this.patientDao.remove(STARTING_ID + 1);
@@ -863,6 +867,7 @@ public class PatientDaoImplTest {
         insertAnotherPatient();
         Patient p = patientModel();
         p.setId(STARTING_ID + 1);
+        expectedException.expect(IllegalArgumentException.class);
 
         // 2. Ejercitar
         this.patientDao.remove(p);
@@ -877,7 +882,7 @@ public class PatientDaoImplTest {
         // 1. Precondiciones
         cleanAllTables();
         insertPatient();
-        expectedException.expect(NullPointerException.class);
+        expectedException.expect(IllegalArgumentException.class);
 
         // 2. Ejercitar
         this.patientDao.remove((Patient) null);

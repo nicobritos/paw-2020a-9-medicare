@@ -11,8 +11,8 @@ import javax.persistence.*;
 )
 public class Locality extends GenericModel<Integer> {
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "system_locality_pk")
-    @SequenceGenerator(sequenceName = "system_locality_locality_id_seq", name = "system_locality_pk", allocationSize = 1)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "system_locality_locality_id_seq")
+    @SequenceGenerator(sequenceName = "system_locality_locality_id_seq", name = "system_locality_locality_id_seq", allocationSize = 1)
     @Column(name = "locality_id")
     private Integer id;
     @OrderBy("ASC")

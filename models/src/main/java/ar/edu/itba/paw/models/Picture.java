@@ -11,8 +11,8 @@ import javax.persistence.*;
 )
 public class Picture extends GenericModel<Integer> {
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "picture_pk")
-    @SequenceGenerator(sequenceName = "picture_picture_id_seq", name = "picture_pk", allocationSize = 1)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "picture_picture_id_seq")
+    @SequenceGenerator(sequenceName = "picture_picture_id_seq", name = "picture_picture_id_seq", allocationSize = 1)
     @Column(name = "picture_id")
     private Integer id;
     @Column(name = "name")
@@ -21,6 +21,7 @@ public class Picture extends GenericModel<Integer> {
     private String mimeType;
     @Column(name = "size", nullable = false)
     private Long size;
+    @Lob
     @Column(name = "data", nullable = false)
     private byte[] data;
 

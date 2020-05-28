@@ -1,11 +1,12 @@
 package ar.edu.itba.paw.tests;
 
+import ar.edu.itba.paw.config.TestConfig;
 import ar.edu.itba.paw.interfaces.daos.CountryDao;
 import ar.edu.itba.paw.models.Country;
 import ar.edu.itba.paw.models.ModelMetadata;
-import ar.edu.itba.paw.config.TestConfig;
-import org.hibernate.TransientObjectException;
-import org.junit.*;
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -425,7 +426,7 @@ public class CountryDaoImplTest {
         cleanAllTables();
         insertCountry();
         insertAnotherCountry();
-        expectedException.expect(NullPointerException.class);
+        expectedException.expect(IllegalArgumentException.class);
 
         // 2. Ejercitar
         this.countryDao.findByName(null);
@@ -563,7 +564,7 @@ public class CountryDaoImplTest {
         insertCountry();
         Country c = new Country();
         c.setName(COUNTRY);
-        expectedException.expect(TransientObjectException.class);
+        expectedException.expect(IllegalArgumentException.class);
 
         // 2. Ejercitar
         this.countryDao.update(c);
@@ -596,6 +597,7 @@ public class CountryDaoImplTest {
         insertCountry();
 
         // 2. Ejercitar
+        expectedException.expect(IllegalArgumentException.class);
         this.countryDao.remove(COUNTRY_ID_2);
 
         // 3. Postcondiciones
@@ -642,6 +644,7 @@ public class CountryDaoImplTest {
         insertAnotherCountry();
 
         // 2. Ejercitar
+        expectedException.expect(IllegalArgumentException.class);
         this.countryDao.remove(countryModel());
 
         // 3. Postcondiciones
@@ -654,7 +657,7 @@ public class CountryDaoImplTest {
         // 1. Precondiciones
         cleanAllTables();
         insertCountry();
-        expectedException.expect(NullPointerException.class);
+        expectedException.expect(IllegalArgumentException.class);
 
         // 2. Ejercitar
         this.countryDao.remove((Country) null);

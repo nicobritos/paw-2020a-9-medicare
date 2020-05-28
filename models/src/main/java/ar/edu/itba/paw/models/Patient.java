@@ -11,15 +11,15 @@ import javax.persistence.*;
 )
 public class Patient extends GenericModel<Integer> {
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "patient_pk")
-    @SequenceGenerator(sequenceName = "patient_patient_id_seq", name = "patient_pk", allocationSize = 1)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "patient_patient_id_seq")
+    @SequenceGenerator(sequenceName = "patient_patient_id_seq", name = "patient_patient_id_seq", allocationSize = 1)
     @Column(name = "patient_id")
     private Integer id;
-    @JoinColumn(name = "user_id")
-    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "user_id", nullable = false)
+    @ManyToOne(fetch = FetchType.EAGER, optional = false)
     private User user;
-    @JoinColumn(name = "office_id")
-    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "office_id", nullable = false)
+    @ManyToOne(fetch = FetchType.EAGER, optional = false)
     private Office office;
 
     @Override
