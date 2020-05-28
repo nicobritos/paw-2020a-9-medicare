@@ -4,7 +4,6 @@ import ar.edu.itba.paw.config.TestConfig;
 import ar.edu.itba.paw.interfaces.daos.PatientDao;
 import ar.edu.itba.paw.models.*;
 import org.hamcrest.CoreMatchers;
-import org.hibernate.PropertyValueException;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -513,7 +512,7 @@ public class PatientDaoImplTest {
         cleanAllTables();
         Patient p = new Patient();
         expectedException.expect(CoreMatchers.anyOf( // Falla si no se tira ninguna de las excepciones de la lista
-                CoreMatchers.instanceOf(PropertyValueException.class), // Esta excepcion se tira si es null
+                CoreMatchers.instanceOf(PersistenceException.class), // Esta excepcion se tira si es null
                 CoreMatchers.instanceOf(IllegalStateException.class), // Esta excepcion se tira si no tiene data // TODO: chequear esta excepcion (poco descriptiva)
                 CoreMatchers.instanceOf(DataIntegrityViolationException.class) // Esta excepcion se tira si no tiene id // TODO: chequear esta excepcion (poco descriptiva)
         ));
@@ -768,7 +767,7 @@ public class PatientDaoImplTest {
         insertPatient();
         Patient p = patientModel();
         p.setUser(null);
-        expectedException.expect(IllegalArgumentException.class);
+        expectedException.expect(DataIntegrityViolationException.class);
 
         // 2. Ejercitar
         this.patientDao.update(p);

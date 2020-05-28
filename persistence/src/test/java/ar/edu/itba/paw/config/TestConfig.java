@@ -9,7 +9,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.Resource;
-import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.jdbc.datasource.SimpleDriverDataSource;
 import org.springframework.orm.jpa.JpaTransactionManager;
 import org.springframework.orm.jpa.JpaVendorAdapter;
@@ -69,7 +68,9 @@ public class TestConfig {
 
         final Properties properties = new Properties();
         properties.setProperty("hibernate.dialect", "ar.edu.itba.paw.dialect.MyHSQLDialect");
-        properties.setProperty("jadira.usertype.autoRegisterUserTypes", "true");
+        properties.setProperty("hibernate.dialect", "ar.edu.itba.paw.dialect.MyHSQLDialect");
+        properties.setProperty("hibernate.show_sql", "true");
+        properties.setProperty("format_sql", "true");
 
         factoryBean.setJpaProperties(properties);
         return factoryBean;

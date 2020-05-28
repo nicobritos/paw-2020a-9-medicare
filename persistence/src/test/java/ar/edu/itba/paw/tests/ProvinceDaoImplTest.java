@@ -5,7 +5,6 @@ import ar.edu.itba.paw.interfaces.daos.ProvinceDao;
 import ar.edu.itba.paw.models.Country;
 import ar.edu.itba.paw.models.ModelMetadata;
 import ar.edu.itba.paw.models.Province;
-import org.hibernate.TransientObjectException;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -500,7 +499,7 @@ public class ProvinceDaoImplTest {
         insertProvince();
         Province p = provinceModel();
         p.setId(null);
-        expectedException.expect(TransientObjectException.class);
+        expectedException.expect(IllegalArgumentException.class);
 
         // 2. Ejercitar
         this.provinceDao.update(p);
@@ -530,6 +529,7 @@ public class ProvinceDaoImplTest {
         // 1. Precondiciones
         cleanAllTables();
         insertProvince();
+        expectedException.expect(IllegalArgumentException.class);
 
         // 2. Ejercitar
         this.provinceDao.remove(STARTING_ID + 1);
@@ -579,6 +579,7 @@ public class ProvinceDaoImplTest {
         insertAnotherProvince();
         Province p = provinceModel();
         p.setId(STARTING_ID + 1);
+        expectedException.expect(IllegalArgumentException.class);
 
         // 2. Ejercitar
         this.provinceDao.remove(p);

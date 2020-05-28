@@ -4,7 +4,6 @@ import ar.edu.itba.paw.config.TestConfig;
 import ar.edu.itba.paw.interfaces.daos.PictureDao;
 import ar.edu.itba.paw.models.ModelMetadata;
 import ar.edu.itba.paw.models.Picture;
-import org.hibernate.TransientObjectException;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -451,7 +450,7 @@ public class PictureDaoImplTest {
         insertPicture();
         Picture p = pictureModel();
         p.setId(null);
-        expectedException.expect(TransientObjectException.class);
+        expectedException.expect(IllegalArgumentException.class);
 
         // 2. Ejercitar
         this.pictureDao.update(p);
@@ -482,6 +481,7 @@ public class PictureDaoImplTest {
         // 1. Precondiciones
         cleanAllTables();
         insertPicture();
+        expectedException.expect(IllegalArgumentException.class);
 
         // 2. Ejercitar
         this.pictureDao.remove(STARTING_ID + 1);
@@ -529,6 +529,7 @@ public class PictureDaoImplTest {
         insertAnotherPicture();
         Picture p = pictureModel();
         p.setId(STARTING_ID + 1);
+        expectedException.expect(IllegalArgumentException.class);
 
         // 2. Ejercitar
         this.pictureDao.remove(p);

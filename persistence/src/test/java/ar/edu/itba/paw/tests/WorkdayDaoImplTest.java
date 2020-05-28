@@ -3,7 +3,6 @@ package ar.edu.itba.paw.tests;
 import ar.edu.itba.paw.config.TestConfig;
 import ar.edu.itba.paw.interfaces.daos.WorkdayDao;
 import ar.edu.itba.paw.models.*;
-import org.hibernate.TransientObjectException;
 import org.joda.time.DateTime;
 import org.junit.Before;
 import org.junit.Rule;
@@ -826,7 +825,7 @@ public class WorkdayDaoImplTest
         insertWorkday();
         Workday w = workdayModel();
         w.setId(null);
-        expectedException.expect(TransientObjectException.class);
+        expectedException.expect(IllegalArgumentException.class);
 
         // 2. Ejercitar
         this.workdayDao.update(w);
@@ -947,6 +946,7 @@ public class WorkdayDaoImplTest
         // 1. Precondiciones
         cleanAllTables();
         insertWorkday();
+        expectedException.expect(IllegalArgumentException.class);
 
         // 2. Ejercitar
         this.workdayDao.remove(STARTING_ID + 1);
@@ -1497,7 +1497,6 @@ public class WorkdayDaoImplTest
         insertWorkday();
         User u = userModel();
         u.setId(STARTING_ID + 1);
-        expectedException.expect(IllegalArgumentException.class);
 
         // 2. Ejercitar
         List<Workday> workdays = this.workdayDao.findByUser(u);

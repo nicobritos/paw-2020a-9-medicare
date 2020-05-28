@@ -56,18 +56,21 @@ public class WorkdayDaoImpl extends GenericDaoImpl<Workday, Integer> implements 
 
     @Override
     public boolean isStaffWorking(Staff staff, AppointmentTimeSlot timeSlot) {
+        if (staff == null || timeSlot == null)
+            throw new IllegalArgumentException();
+
         CriteriaBuilder builder = this.getEntityManager().getCriteriaBuilder();
         CriteriaQuery<Tuple> query = builder.createQuery(Tuple.class);
         Root<Workday> root = query.from(Workday.class);
 
         Predicate[] predicates = new Predicate[4];
-        predicates[0] = builder.equal(root.get("staff"), staff);
-        predicates[1] = builder.equal(root.get("day"), WorkdayDay.from(timeSlot.getDate()));
-        predicates[2] = builder.le(root.get("start_hour"), timeSlot.getDate().getHourOfDay());
+        predicates[0] = builder.equal(root.get(Workday_.staff), staff);
+        predicates[1] = builder.equal(root.get(Workday_.day), WorkdayDay.from(timeSlot.getDate()));
+        predicates[2] = builder.le(root.get(Workday_.startHour), timeSlot.getDate().getHourOfDay());
         if (timeSlot.getToDate().getMinuteOfHour() == 0) {
-            predicates[3] = builder.ge(root.get("end_hour"), timeSlot.getToDate().getHourOfDay());
+            predicates[3] = builder.ge(root.get(Workday_.endHour), timeSlot.getToDate().getHourOfDay());
         } else {
-            predicates[3] = builder.gt(root.get("end_hour"), timeSlot.getToDate().getHourOfDay());
+            predicates[3] = builder.gt(root.get(Workday_.endHour), timeSlot.getToDate().getHourOfDay());
         }
 
         query.where(builder.and(predicates));

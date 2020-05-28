@@ -26,22 +26,19 @@ public class StaffDaoImpl extends GenericSearchableDaoImpl<Staff, Integer> imple
 
     @Override
     public List<Staff> findBy(String name, String surname, Collection<Office> offices, Collection<StaffSpecialty> staffSpecialties, Collection<Locality> localities) {
-        List<String> names = new LinkedList<>();
-        List<String> surnames = new LinkedList<>();
+        Collection<String> names;
+        Collection<String> surnames;
         if (name != null && !name.isEmpty()) {
+            names = new LinkedList<>();
             names.add(name);
+        } else {
+            names = Collections.emptyList();
         }
         if (surname != null && !surname.isEmpty()) {
+            surnames = new LinkedList<>();
             surnames.add(name);
-        }
-        if(offices == null){
-            offices = new LinkedList<>();
-        }
-        if(staffSpecialties == null){
-            staffSpecialties = new LinkedList<>();
-        }
-        if(localities == null){
-            localities = new LinkedList<>();
+        } else {
+            surnames = Collections.emptyList();
         }
 
         return this.findBy(names, surnames, offices, staffSpecialties, localities);
@@ -74,36 +71,36 @@ public class StaffDaoImpl extends GenericSearchableDaoImpl<Staff, Integer> imple
         Root<Staff> root = query.from(Staff.class);
         Join<Staff, Office> officeJoin = root.join(Staff_.office);
 
-        List<Predicate> predicates = new LinkedList<>();
-        Predicate predicate;
-
-        predicate = this.getNamePredicate(names, surnames, builder, root);
-        if (predicate != null) predicates.add(predicate);
-        predicate = this.getOfficePredicate(offices, root);
-        if (predicate != null) predicates.add(predicate);
-        predicate = this.getStaffSpecialtyPredicate(staffSpecialties, root);
-        if (predicate != null) predicates.add(predicate);
-        predicate = this.getLocalityPredicate(localities, officeJoin);
-        if (predicate != null) predicates.add(predicate);
-
-        Predicate[] predicatesArray = new Predicate[predicates.size()];
-        predicatesArray = predicates.toArray(predicatesArray);
-
         query.select(root);
-        query.where(builder.and(predicatesArray));
+        query.where(builder.and(this.getPredicates(
+                names,
+                surnames,
+                offices,
+                staffSpecialties,
+                localities,
+                builder,
+                root,
+                officeJoin
+        )));
 
         return this.selectQuery(builder, query, root);
     }
 
     @Override
     public Paginator<Staff> findBy(String name, String surname, Collection<Office> offices, Collection<StaffSpecialty> staffSpecialties, Collection<Locality> localities, int page, int pageSize) {
-        List<String> names = new LinkedList<>();
-        List<String> surnames = new LinkedList<>();
+        Collection<String> names;
+        Collection<String> surnames;
         if (name != null && !name.isEmpty()) {
+            names = new LinkedList<>();
             names.add(name);
+        } else {
+            names = Collections.emptyList();
         }
         if (surname != null && !surname.isEmpty()) {
+            surnames = new LinkedList<>();
             surnames.add(name);
+        } else {
+            surnames = Collections.emptyList();
         }
 
         return this.findBy(names, surnames, offices, staffSpecialties, localities, page, pageSize);
@@ -136,29 +133,37 @@ public class StaffDaoImpl extends GenericSearchableDaoImpl<Staff, Integer> imple
 
         CriteriaBuilder builder = this.getEntityManager().getCriteriaBuilder();
         CriteriaQuery<Staff> query = builder.createQuery(Staff.class);
-        CriteriaQuery<Tuple> tupleQuery = builder.createQuery(Tuple.class);
         Root<Staff> root = query.from(Staff.class);
         Join<Staff, Office> officeJoin = root.join(Staff_.office);
 
-        List<Predicate> predicates = new LinkedList<>();
-        Predicate predicate;
-
-        predicate = this.getNamePredicate(names, surnames, builder, root);
-        if (predicate != null) predicates.add(predicate);
-        predicate = this.getOfficePredicate(offices, root);
-        if (predicate != null) predicates.add(predicate);
-        predicate = this.getStaffSpecialtyPredicate(staffSpecialties, root);
-        if (predicate != null) predicates.add(predicate);
-        predicate = this.getLocalityPredicate(localities, officeJoin);
-        if (predicate != null) predicates.add(predicate);
-
-        Predicate[] predicatesArray = new Predicate[predicates.size()];
-        predicatesArray = predicates.toArray(predicatesArray);
+        CriteriaQuery<Tuple> tupleQuery = builder.createQuery(Tuple.class);
+        Root<Staff> rootCount = tupleQuery.from(Staff.class);
+        Join<Staff, Office> officeJoinCount = rootCount.join(Staff_.office);
 
         query.select(root);
-        query.where(builder.and(predicatesArray));
+        query.where(builder.and(this.getPredicates(
+                names,
+                surnames,
+                offices,
+                staffSpecialties,
+                localities,
+                builder,
+                root,
+                officeJoin
+        )));
+
         tupleQuery.from(Staff.class);
-        tupleQuery.where(builder.and(predicatesArray));
+        tupleQuery.where(builder.and(this.getPredicates(
+                names,
+                surnames,
+                offices,
+                staffSpecialties,
+                localities,
+                builder,
+                rootCount,
+                officeJoinCount
+        )));
+        tupleQuery.distinct(true);
 
         return this.selectQuery(builder, query, tupleQuery, root, page, pageSize);
     }
@@ -179,6 +184,31 @@ public class StaffDaoImpl extends GenericSearchableDaoImpl<Staff, Integer> imple
                 builder.asc(root.get(Staff_.firstName)),
                 builder.asc(root.get(Staff_.surname))
         );
+    }
+
+    private Predicate[] getPredicates(Collection<String> names,
+                                      Collection<String> surnames,
+                                      Collection<Office> offices,
+                                      Collection<StaffSpecialty> staffSpecialties,
+                                      Collection<Locality> localities,
+                                      CriteriaBuilder builder,
+                                      Root<Staff> root,
+                                      Join<Staff, Office> officeJoin
+                                      )
+    {
+        List<Predicate> predicates = new LinkedList<>();
+        Predicate predicate;
+        predicate = this.getNamePredicate(names, surnames, builder, root);
+        if (predicate != null) predicates.add(predicate);
+        predicate = this.getOfficePredicate(offices, root);
+        if (predicate != null) predicates.add(predicate);
+        predicate = this.getStaffSpecialtyPredicate(staffSpecialties, root);
+        if (predicate != null) predicates.add(predicate);
+        predicate = this.getLocalityPredicate(localities, officeJoin);
+        if (predicate != null) predicates.add(predicate);
+
+        Predicate[] predicatesArrayCount = new Predicate[predicates.size()];
+        return predicates.toArray(predicatesArrayCount);
     }
 
     private Predicate getLocalityPredicate(Collection<Locality> localities, Join<Staff, Office> officeJoin) {

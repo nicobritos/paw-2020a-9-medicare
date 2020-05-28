@@ -4,7 +4,6 @@ import ar.edu.itba.paw.config.TestConfig;
 import ar.edu.itba.paw.interfaces.daos.StaffSpecialtyDao;
 import ar.edu.itba.paw.models.ModelMetadata;
 import ar.edu.itba.paw.models.StaffSpecialty;
-import org.hibernate.TransientObjectException;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -373,7 +372,7 @@ public class StaffSpecialtyDaoImplTest {
         insertStaffSpecialty();
         StaffSpecialty ss = staffSpecialtyModel();
         ss.setId(null);
-        expectedException.expect(TransientObjectException.class);
+        expectedException.expect(IllegalArgumentException.class);
 
         // 2. Ejercitar
         this.staffSpecialtyDao.update(ss);
@@ -404,6 +403,7 @@ public class StaffSpecialtyDaoImplTest {
         // 1. Precondiciones
         cleanAllTables();
         insertStaffSpecialty();
+        expectedException.expect(IllegalArgumentException.class);
 
         // 2. Ejercitar
         this.staffSpecialtyDao.remove(STARTING_ID + 1);
@@ -451,6 +451,7 @@ public class StaffSpecialtyDaoImplTest {
         insertAnotherStaffSpecialty();
         StaffSpecialty ss = staffSpecialtyModel();
         ss.setId(STARTING_ID + 1);
+        expectedException.expect(IllegalArgumentException.class);
 
         // 2. Ejercitar
         this.staffSpecialtyDao.remove(ss);

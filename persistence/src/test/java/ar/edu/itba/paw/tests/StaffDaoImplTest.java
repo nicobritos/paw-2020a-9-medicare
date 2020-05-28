@@ -524,6 +524,7 @@ public class StaffDaoImplTest
         insertOffice();
         Staff s = staffModel();
         s.setFirstName(null);
+        s.setId(null);
         expectedException.expect(IllegalArgumentException.class);
 
         // 2. Ejercitar

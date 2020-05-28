@@ -5,7 +5,6 @@ import ar.edu.itba.paw.interfaces.daos.UserDao;
 import ar.edu.itba.paw.models.ModelMetadata;
 import ar.edu.itba.paw.models.Picture;
 import ar.edu.itba.paw.models.User;
-import org.hibernate.TransientObjectException;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -544,7 +543,7 @@ public class UserDaoImplTest {
         insertUser();
         User u = userModel();
         u.setId(null);
-        expectedException.expect(TransientObjectException.class);
+        expectedException.expect(IllegalArgumentException.class);
 
         // 2. Ejercitar
         this.userDao.update(u);
@@ -573,6 +572,7 @@ public class UserDaoImplTest {
         // 1. Precondiciones
         cleanAllTables();
         insertUser();
+        expectedException.expect(IllegalArgumentException.class);
 
         // 2. Ejercitar
         this.userDao.remove(STARTING_ID + 1);
@@ -617,6 +617,7 @@ public class UserDaoImplTest {
         insertAnotherUser();
         User u = userModel();
         u.setId(STARTING_ID + 1);
+        expectedException.expect(IllegalArgumentException.class);
 
         // 2. Ejercitar
         this.userDao.remove(u);
