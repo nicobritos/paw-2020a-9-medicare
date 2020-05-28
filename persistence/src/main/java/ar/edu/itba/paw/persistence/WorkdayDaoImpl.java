@@ -20,6 +20,9 @@ public class WorkdayDaoImpl extends GenericDaoImpl<Workday, Integer> implements 
 
     @Override
     public List<Workday> findByUser(User user) {
+        if (user == null){
+            throw new IllegalArgumentException();
+        }
         CriteriaBuilder builder = this.getEntityManager().getCriteriaBuilder();
         CriteriaQuery<Workday> query = builder.createQuery(Workday.class);
         Root<Workday> root = query.from(Workday.class);
@@ -27,18 +30,24 @@ public class WorkdayDaoImpl extends GenericDaoImpl<Workday, Integer> implements 
         Join<Staff, User> userJoin = staffJoin.join(Staff_.user);
 
         query.select(root);
-        query.where(builder.equal(userJoin.get(User_.id), user));
+        query.where(builder.equal(userJoin.get(User_.id), user.getId()));
 
         return this.getEntityManager().createQuery(query).getResultList();
     }
 
     @Override
     public List<Workday> findByStaff(Staff staff) {
+        if (staff == null){
+            throw new IllegalArgumentException();
+        }
         return this.findBy(Workday_.staff, staff);
     }
 
     @Override
     public List<Workday> findByStaff(Staff staff, WorkdayDay day) {
+        if(staff == null || day == null){
+            throw new IllegalArgumentException();
+        }
         Map<SingularAttribute<? super Workday, ?>, Object> parametersValues = new HashMap<>();
         parametersValues.put(Workday_.staff, staff);
         parametersValues.put(Workday_.day, day);

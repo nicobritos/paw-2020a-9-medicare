@@ -5,6 +5,8 @@ import ar.edu.itba.paw.models.Country;
 import ar.edu.itba.paw.models.ModelMetadata;
 import ar.edu.itba.paw.models.Province;
 import ar.edu.itba.paw.config.TestConfig;
+import org.hibernate.PropertyValueException;
+import org.hibernate.TransientObjectException;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -14,11 +16,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
+import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.jdbc.JdbcTestUtils;
 
+import javax.persistence.PersistenceException;
 import javax.sql.DataSource;
 import java.util.*;
 
@@ -152,7 +156,7 @@ public class ProvinceDaoImplTest {
     {
         // 1. Precondiciones
         cleanAllTables();
-        expectedException.expect(NullPointerException.class);
+        expectedException.expect(IllegalArgumentException.class);
 
         // 2. Ejercitar
         Province province = this.provinceDao.create(null);
@@ -167,7 +171,7 @@ public class ProvinceDaoImplTest {
         // 1. Precondiciones
         cleanAllTables();
         Province p = new Province();
-        expectedException.expect(IllegalStateException.class);
+        expectedException.expect(PersistenceException.class);
 
         // 2. Ejercitar
         Province province = this.provinceDao.create(p);
@@ -183,14 +187,13 @@ public class ProvinceDaoImplTest {
         cleanAllTables();
         Province p = new Province();
         p.setName(PROVINCE);
-        expectedException.expect(DataIntegrityViolationException.class); // TODO: chequear esta excepcion (poco descriptiva)
-
+        expectedException.expect(PersistenceException.class);
 
         // 2. Ejercitar
         Province province = this.provinceDao.create(p);
 
         // 3. Postcondiciones
-        // Que el metodo tire DataIntegrityViolationException
+        // Que el metodo tire PropertyValueException
     }
 
     @Test
@@ -201,7 +204,7 @@ public class ProvinceDaoImplTest {
         insertCountry();
         Province p = new Province();
         p.setCountry(countryModel());
-        expectedException.expect(IllegalStateException.class); // TODO: chequear esta excepcion (poco descriptiva)
+        expectedException.expect(PersistenceException.class);
 
         // 2. Ejercitar
         Province province = this.provinceDao.create(p);
@@ -247,6 +250,7 @@ public class ProvinceDaoImplTest {
         // 1. Precondiciones
         cleanAllTables();
         insertProvince();
+        expectedException.expect(IllegalArgumentException.class);
 
         // 2. Ejercitar
         Optional<Province> province = this.provinceDao.findById(null);
@@ -441,7 +445,7 @@ public class ProvinceDaoImplTest {
         cleanAllTables();
         insertProvince();
         insertAnotherProvince();
-        expectedException.expect(NullPointerException.class);
+        expectedException.expect(IllegalArgumentException.class);
 
         // 2. Ejercitar
         this.provinceDao.update(null);
@@ -460,10 +464,10 @@ public class ProvinceDaoImplTest {
         insertAnotherProvince();
         Province p = provinceModel();
         p.setId(STARTING_ID + 1);
-        expectedException.expect(Exception.class);  // <-- TODO: Insert exception class here
+        expectedException.expect(ObjectOptimisticLockingFailureException.class);
 
         // 2. Ejercitar
-        this.provinceDao.update(p); // TODO: NO HACE NADA, DEBERIA TIRAR EXCEPCION QUE NO EXISTE EL COUNTRY CON ESE ID
+        this.provinceDao.update(p);
 
         // 3. Postcondiciones
         assertEquals(1,JdbcTestUtils.countRowsInTable(jdbcTemplate, PROVINCES_TABLE));
@@ -478,7 +482,7 @@ public class ProvinceDaoImplTest {
         Province p = new Province();
         p.setCountry(countryModel());
         p.setId(STARTING_ID);
-        expectedException.expect(IllegalStateException.class);
+        expectedException.expect(DataIntegrityViolationException.class);
 
         // 2. Ejercitar
         this.provinceDao.update(p);
@@ -496,10 +500,10 @@ public class ProvinceDaoImplTest {
         insertProvince();
         Province p = provinceModel();
         p.setId(null);
-        expectedException.expect(Exception.class); // <-- TODO: Insert exception class here
+        expectedException.expect(TransientObjectException.class);
 
         // 2. Ejercitar
-        this.provinceDao.update(p); // TODO: NO HACE NADA, DEBERIA TIRAR EXCEPCION QUE DEBE TENER ID NOT NULL
+        this.provinceDao.update(p);
 
         // 3. Postcondiciones
         assertEquals(1,JdbcTestUtils.countRowsInTable(jdbcTemplate, COUNTRIES_TABLE));
@@ -540,6 +544,7 @@ public class ProvinceDaoImplTest {
         // 1. Precondiciones
         cleanAllTables();
         insertProvince();
+        expectedException.expect(IllegalArgumentException.class);
 
         // 2. Ejercitar
         this.provinceDao.remove((Integer) null);
@@ -756,7 +761,7 @@ public class ProvinceDaoImplTest {
         cleanAllTables();
         insertProvince();
         insertAnotherProvince();
-        expectedException.expect(NullPointerException.class);
+        expectedException.expect(IllegalArgumentException.class);
 
         // 2. Ejercitar
         List<Province> provinces = this.provinceDao.findByCountryAndName(null, PROVINCE);
@@ -795,7 +800,7 @@ public class ProvinceDaoImplTest {
         cleanAllTables();
         insertProvince();
         insertAnotherProvince();
-        expectedException.expect(NullPointerException.class);
+        expectedException.expect(IllegalArgumentException.class);
 
         // 2. Ejercitar
         List<Province> provinces = this.provinceDao.findByCountryAndName(countryModel(), null);

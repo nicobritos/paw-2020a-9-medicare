@@ -27,6 +27,9 @@ public class LocalityDaoImpl extends GenericSearchableDaoImpl<Locality, Integer>
 
     @Override
     public List<Locality> findByProvinceAndName(Province province, String name) {
+        if(province == null || name == null){
+            throw new IllegalArgumentException();
+        }
         CriteriaBuilder builder = this.getEntityManager().getCriteriaBuilder();
         CriteriaQuery<Locality> query = builder.createQuery(Locality.class);
         Root<Locality> root = query.from(Locality.class);

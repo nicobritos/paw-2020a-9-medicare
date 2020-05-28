@@ -4,6 +4,7 @@ import ar.edu.itba.paw.interfaces.daos.WorkdayDao;
 import ar.edu.itba.paw.models.*;
 import ar.edu.itba.paw.config.TestConfig;
 import org.hamcrest.CoreMatchers;
+import org.hibernate.TransientObjectException;
 import org.joda.time.DateTime;
 import org.junit.Before;
 import org.junit.Rule;
@@ -14,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.test.context.ContextConfiguration;
@@ -21,6 +23,7 @@ import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.jdbc.JdbcTestUtils;
 
+import javax.persistence.PersistenceException;
 import javax.sql.DataSource;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -464,7 +467,7 @@ public class WorkdayDaoImplTest
     {
         // 1. Precondiciones
         cleanAllTables();
-        expectedException.expect(NullPointerException.class);
+        expectedException.expect(IllegalArgumentException.class);
 
         // 2. Ejercitar
         Workday workday = this.workdayDao.create(null);
@@ -479,16 +482,13 @@ public class WorkdayDaoImplTest
         // 1. Precondiciones
         cleanAllTables();
         Workday w = new Workday();
-        expectedException.expect(CoreMatchers.anyOf( // Falla si no se tira ninguna de las excepciones de la lista
-                CoreMatchers.instanceOf(IllegalStateException.class), // Esta excepcion se tira si no tiene data // TODO: chequear esta excepcion (poco descriptiva)
-                CoreMatchers.instanceOf(DataIntegrityViolationException.class) // Esta excepcion se tira si no tiene id // TODO: chequear esta excepcion (poco descriptiva)
-        ));
+        expectedException.expect(PersistenceException.class);
 
         // 2. Ejercitar
         Workday workday = this.workdayDao.create(w);
 
         // 3. Postcondiciones
-        // Que el metodo tire IllegalStateException (no data) o DataIntegrityViolationException (no id), se hace esto porque depende de cual chequea primero.
+        // Que el metodo tire PersistenceException
     }
 
     @Test
@@ -499,13 +499,13 @@ public class WorkdayDaoImplTest
         insertStaff();
         Workday w = workdayModel();
         w.setStaff(null);
-        expectedException.expect(IllegalStateException.class); // TODO: chequear esta excepcion (poco descriptiva)
+        expectedException.expect(PersistenceException.class);
 
         // 2. Ejercitar
         Workday workday = this.workdayDao.create(w);
 
         // 3. Postcondiciones
-        // Que el metodo tire IllegalStateException
+        // Que el metodo tire PersistenceException
     }
 
     @Test
@@ -516,13 +516,13 @@ public class WorkdayDaoImplTest
         insertStaff();
         Workday w = workdayModel();
         w.setStartMinute(null);
-        expectedException.expect(IllegalStateException.class); // TODO: chequear esta excepcion (poco descriptiva)
+        expectedException.expect(PersistenceException.class);
 
         // 2. Ejercitar
         Workday workday = this.workdayDao.create(w);
 
         // 3. Postcondiciones
-        // Que el metodo tire IllegalStateException
+        // Que el metodo tire PersistenceException
     }
 
     @Test
@@ -533,13 +533,13 @@ public class WorkdayDaoImplTest
         insertStaff();
         Workday w = workdayModel();
         w.setStartHour(null);
-        expectedException.expect(IllegalStateException.class); // TODO: chequear esta excepcion (poco descriptiva)
+        expectedException.expect(PersistenceException.class);
 
         // 2. Ejercitar
         Workday workday = this.workdayDao.create(w);
 
         // 3. Postcondiciones
-        // Que el metodo tire IllegalStateException
+        // Que el metodo tire PersistenceException
     }
 
     @Test
@@ -550,13 +550,13 @@ public class WorkdayDaoImplTest
         insertStaff();
         Workday w = workdayModel();
         w.setEndHour(null);
-        expectedException.expect(IllegalStateException.class); // TODO: chequear esta excepcion (poco descriptiva)
+        expectedException.expect(PersistenceException.class);
 
         // 2. Ejercitar
         Workday workday = this.workdayDao.create(w);
 
         // 3. Postcondiciones
-        // Que el metodo tire IllegalStateException
+        // Que el metodo tire PersistenceException
     }
     
     @Test
@@ -567,13 +567,13 @@ public class WorkdayDaoImplTest
         insertStaff();
         Workday w = workdayModel();
         w.setEndMinute(null);
-        expectedException.expect(IllegalStateException.class); // TODO: chequear esta excepcion (poco descriptiva)
+        expectedException.expect(PersistenceException.class);
 
         // 2. Ejercitar
         Workday workday = this.workdayDao.create(w);
 
         // 3. Postcondiciones
-        // Que el metodo tire IllegalStateException
+        // Que el metodo tire PersistenceException
     }
 
     @Test
@@ -584,13 +584,13 @@ public class WorkdayDaoImplTest
         insertStaff();
         Workday w = workdayModel();
         w.setDay(null);
-        expectedException.expect(IllegalStateException.class); // TODO: chequear esta excepcion (poco descriptiva)
+        expectedException.expect(PersistenceException.class);
 
         // 2. Ejercitar
         Workday workday = this.workdayDao.create(w);
 
         // 3. Postcondiciones
-        // Que el metodo tire IllegalStateException
+        // Que el metodo tire PersistenceException
     }
 
     @Test
@@ -602,13 +602,13 @@ public class WorkdayDaoImplTest
         Workday w = workdayModel();
         w.setStartMinute(w.getEndMinute() + 1);
         w.setStartHour(w.getEndHour());
-        expectedException.expect(IllegalStateException.class); // TODO: chequear esta excepcion (poco descriptiva)
+        expectedException.expect(PersistenceException.class);
 
         // 2. Ejercitar
         Workday workday = this.workdayDao.create(w);
 
         // 3. Postcondiciones
-        // Que el metodo tire IllegalStateException
+        // Que el metodo tire PersistenceException
     }
 
     /* --------------------- MÉTODO: workdayDao.findById(String) -------------------------------------------- */
@@ -649,6 +649,7 @@ public class WorkdayDaoImplTest
         // 1. Precondiciones
         cleanAllTables();
         insertWorkday();
+        expectedException.expect(IllegalArgumentException.class);
 
         // 2. Ejercitar
         Optional<Workday> workday = this.workdayDao.findById(null);
@@ -770,7 +771,7 @@ public class WorkdayDaoImplTest
         cleanAllTables();
         insertWorkday();
         insertAnotherWorkday();
-        expectedException.expect(NullPointerException.class);
+        expectedException.expect(IllegalArgumentException.class);
 
         // 2. Ejercitar
         this.workdayDao.update(null);
@@ -789,10 +790,10 @@ public class WorkdayDaoImplTest
         insertAnotherWorkday();
         Workday w = workdayModel();
         w.setId(STARTING_ID + 1);
-        expectedException.expect(Exception.class);  // <-- TODO: Insert exception class here
+        expectedException.expect(OptimisticLockingFailureException.class);
 
         // 2. Ejercitar
-        this.workdayDao.update(w); // TODO: NO HACE NADA, DEBERIA TIRAR EXCEPCION QUE NO EXISTE EL WORKDAY CON ESE ID
+        this.workdayDao.update(w);
 
         // 3. Postcondiciones
         assertEquals(1,JdbcTestUtils.countRowsInTable(jdbcTemplate, WORKDAYS_TABLE));
@@ -806,7 +807,7 @@ public class WorkdayDaoImplTest
         insertWorkday();
         Workday w = workdayModel();
         w.setStaff(null);
-        expectedException.expect(IllegalStateException.class);
+        expectedException.expect(DataIntegrityViolationException.class);
 
         // 2. Ejercitar
         this.workdayDao.update(w);
@@ -824,10 +825,10 @@ public class WorkdayDaoImplTest
         insertWorkday();
         Workday w = workdayModel();
         w.setId(null);
-        expectedException.expect(Exception.class); // <-- TODO: Insert exception class here
+        expectedException.expect(TransientObjectException.class);
 
         // 2. Ejercitar
-        this.workdayDao.update(w); // TODO: NO HACE NADA, DEBERIA TIRAR EXCEPCION QUE DEBE TENER ID NOT NULL
+        this.workdayDao.update(w);
 
         // 3. Postcondiciones
         assertEquals(1,JdbcTestUtils.countRowsInTable(jdbcTemplate, WORKDAYS_TABLE));
@@ -841,7 +842,7 @@ public class WorkdayDaoImplTest
         insertWorkday();
         Workday w = workdayModel();
         w.setStartHour(null);
-        expectedException.expect(IllegalStateException.class);
+        expectedException.expect(DataIntegrityViolationException.class);
 
         // 2. Ejercitar
         this.workdayDao.update(w);
@@ -859,7 +860,7 @@ public class WorkdayDaoImplTest
         insertWorkday();
         Workday w = workdayModel();
         w.setStartMinute(null);
-        expectedException.expect(IllegalStateException.class);
+        expectedException.expect(DataIntegrityViolationException.class);
 
         // 2. Ejercitar
         this.workdayDao.update(w);
@@ -877,7 +878,7 @@ public class WorkdayDaoImplTest
         insertWorkday();
         Workday w = workdayModel();
         w.setEndHour(null);
-        expectedException.expect(IllegalStateException.class);
+        expectedException.expect(DataIntegrityViolationException.class);
 
         // 2. Ejercitar
         this.workdayDao.update(w);
@@ -895,7 +896,7 @@ public class WorkdayDaoImplTest
         insertWorkday();
         Workday w = workdayModel();
         w.setEndMinute(null);
-        expectedException.expect(IllegalStateException.class);
+        expectedException.expect(DataIntegrityViolationException.class);
 
         // 2. Ejercitar
         this.workdayDao.update(w);
@@ -913,7 +914,7 @@ public class WorkdayDaoImplTest
         insertWorkday();
         Workday w = workdayModel();
         w.setDay(null);
-        expectedException.expect(IllegalStateException.class);
+        expectedException.expect(DataIntegrityViolationException.class);
 
         // 2. Ejercitar
         this.workdayDao.update(w);
@@ -959,6 +960,7 @@ public class WorkdayDaoImplTest
         // 1. Precondiciones
         cleanAllTables();
         insertWorkday();
+        expectedException.expect(IllegalArgumentException.class);
 
         // 2. Ejercitar
         this.workdayDao.remove((Integer) null);
@@ -1029,7 +1031,7 @@ public class WorkdayDaoImplTest
         ModelMetadata modelMetadata = this.workdayDao.count();
 
         // 3. Postcondiciones
-        assertEquals(2, (long) modelMetadata.getCount()); // TODO: fix
+        assertEquals(2, (long) modelMetadata.getCount());
         System.out.println(modelMetadata.getMax()); // No se que devuelve esto
         System.out.println(modelMetadata.getMin()); // No se que devuelve esto
     }
@@ -1044,7 +1046,7 @@ public class WorkdayDaoImplTest
         ModelMetadata modelMetadata = this.workdayDao.count();
 
         // 3. Postcondiciones
-        assertEquals(0, (long) modelMetadata.getCount()); // TODO: fix
+        assertEquals(0, (long) modelMetadata.getCount());
         System.out.println(modelMetadata.getMax()); // No se que devuelve esto
         System.out.println(modelMetadata.getMin()); // No se que devuelve esto
     }
@@ -1137,7 +1139,7 @@ public class WorkdayDaoImplTest
         map.put("day", DAY_2);
         workdayJdbcInsert.execute(map);
 
-        expectedException.expect(NullPointerException.class);
+        expectedException.expect(IllegalArgumentException.class);
 
         // 2. Ejercitar
         List<Workday> workdays = this.workdayDao.findByStaff(null);
@@ -1252,7 +1254,7 @@ public class WorkdayDaoImplTest
         map.put("day", DAY_2);
         workdayJdbcInsert.execute(map);
 
-        expectedException.expect(NullPointerException.class);
+        expectedException.expect(IllegalArgumentException.class);
 
         // 2. Ejercitar
         List<Workday> workdays = this.workdayDao.findByStaff(null, WorkdayDay.MONDAY);
@@ -1316,7 +1318,7 @@ public class WorkdayDaoImplTest
         map.put("day", DAY_2);
         workdayJdbcInsert.execute(map);
 
-        expectedException.expect(NullPointerException.class);
+        expectedException.expect(IllegalArgumentException.class);
 
         // 2. Ejercitar
         List<Workday> workdays = this.workdayDao.findByStaff(staffModel(), null);
@@ -1380,7 +1382,7 @@ public class WorkdayDaoImplTest
         map.put("day", DAY_2);
         workdayJdbcInsert.execute(map);
 
-        expectedException.expect(NullPointerException.class);
+        expectedException.expect(IllegalArgumentException.class);
 
         // 2. Ejercitar
         List<Workday> workdays = this.workdayDao.findByStaff(null, null);
@@ -1477,7 +1479,7 @@ public class WorkdayDaoImplTest
         map.put("day", DAY_2);
         workdayJdbcInsert.execute(map);
 
-        expectedException.expect(NullPointerException.class);
+        expectedException.expect(IllegalArgumentException.class);
 
         // 2. Ejercitar
         List<Workday> workdays = this.workdayDao.findByUser(null);
@@ -1494,6 +1496,7 @@ public class WorkdayDaoImplTest
         insertWorkday();
         User u = userModel();
         u.setId(STARTING_ID + 1);
+        expectedException.expect(IllegalArgumentException.class);
 
         // 2. Ejercitar
         List<Workday> workdays = this.workdayDao.findByUser(u);
@@ -1579,7 +1582,7 @@ public class WorkdayDaoImplTest
         DateTime startDate = new DateTime(2020, 5, 25,START_HOUR, START_MINUTE); // 25/5/2020 es lunes
         AppointmentTimeSlot appointmentTimeSlot = new AppointmentTimeSlot();
         appointmentTimeSlot.setDate(startDate);
-        expectedException.expect(NullPointerException.class);
+        expectedException.expect(IllegalArgumentException.class);
 
         // 2. Ejercitar
         boolean isStaffWorking = workdayDao.isStaffWorking(null, appointmentTimeSlot);

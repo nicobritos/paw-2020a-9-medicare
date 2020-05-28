@@ -5,6 +5,7 @@ import ar.edu.itba.paw.interfaces.daos.PictureDao;
 import ar.edu.itba.paw.models.ModelMetadata;
 import ar.edu.itba.paw.models.Picture;
 import org.hamcrest.CoreMatchers;
+import org.hibernate.TransientObjectException;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -14,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.test.context.ContextConfiguration;
@@ -21,6 +23,7 @@ import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.jdbc.JdbcTestUtils;
 
+import javax.persistence.PersistenceException;
 import javax.sql.DataSource;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -121,7 +124,6 @@ public class PictureDaoImplTest {
         map.put("mime_type", MIME_TYPE);
         map.put("size", IMG_SIZE);
         map.put("name", PICTURE);
-        map.put("picture_id", STARTING_ID);
         pictureJdbcInsert.execute(map);
     }
 
@@ -137,7 +139,6 @@ public class PictureDaoImplTest {
         map.put("mime_type", MIME_TYPE);
         map.put("size", IMG_2_SIZE);
         map.put("name", PICTURE_2);
-        map.put("picture_id", STARTING_ID);
         pictureJdbcInsert.execute(map);
     }
 
@@ -183,7 +184,7 @@ public class PictureDaoImplTest {
     {
         // 1. Precondiciones
         cleanAllTables();
-        expectedException.expect(NullPointerException.class);
+        expectedException.expect(IllegalArgumentException.class);
 
         // 2. Ejercitar
         Picture picture = this.pictureDao.create(null);
@@ -198,10 +199,7 @@ public class PictureDaoImplTest {
         // 1. Precondiciones
         cleanAllTables();
         Picture p = new Picture();
-        expectedException.expect(CoreMatchers.anyOf( // Falla si no se tira ninguna de las excepciones de la lista
-                CoreMatchers.instanceOf(IllegalStateException.class), // Esta excepcion se tira si no tiene data // TODO: chequear esta excepcion (poco descriptiva)
-                CoreMatchers.instanceOf(DataIntegrityViolationException.class) // Esta excepcion se tira si no tiene id // TODO: chequear esta excepcion (poco descriptiva)
-        ));
+        expectedException.expect(PersistenceException.class);
 
         // 2. Ejercitar
         Picture picture = this.pictureDao.create(p);
@@ -217,7 +215,7 @@ public class PictureDaoImplTest {
         cleanAllTables();
         Picture p = pictureModel();
         p.setData(null);
-        expectedException.expect(IllegalStateException.class); // TODO: chequear esta excepcion (poco descriptiva)
+        expectedException.expect(PersistenceException.class);
 
         // 2. Ejercitar
         Picture picture = this.pictureDao.create(p);
@@ -233,7 +231,7 @@ public class PictureDaoImplTest {
         cleanAllTables();
         Picture p = pictureModel();
         p.setSize(null);
-        expectedException.expect(IllegalStateException.class); // TODO: chequear esta excepcion (poco descriptiva)
+        expectedException.expect(PersistenceException.class);
 
         // 2. Ejercitar
         Picture picture = this.pictureDao.create(p);
@@ -249,7 +247,7 @@ public class PictureDaoImplTest {
         cleanAllTables();
         Picture p = pictureModel();
         p.setMimeType(null);
-        expectedException.expect(IllegalStateException.class); // TODO: chequear esta excepcion (poco descriptiva)
+        expectedException.expect(PersistenceException.class);
 
         // 2. Ejercitar
         Picture picture = this.pictureDao.create(p);
@@ -296,6 +294,7 @@ public class PictureDaoImplTest {
         // 1. Precondiciones
         cleanAllTables();
         insertPicture();
+        expectedException.expect(IllegalArgumentException.class);
 
         // 2. Ejercitar
         Optional<Picture> picture = this.pictureDao.findById(null);
@@ -417,7 +416,7 @@ public class PictureDaoImplTest {
         cleanAllTables();
         insertPicture();
         insertAnotherPicture();
-        expectedException.expect(NullPointerException.class);
+        expectedException.expect(IllegalArgumentException.class);
 
         // 2. Ejercitar
         this.pictureDao.update(null);
@@ -435,31 +434,13 @@ public class PictureDaoImplTest {
         insertAnotherPicture();
         Picture p = pictureModel();
         p.setId(STARTING_ID + 1);
-        expectedException.expect(Exception.class);  // <-- TODO: Insert exception class here
-
-        // 2. Ejercitar
-        this.pictureDao.update(p); // TODO: NO HACE NADA, DEBERIA TIRAR EXCEPCION QUE NO EXISTE EL PICTURE CON ESE ID
-
-        // 3. Postcondiciones
-        assertEquals(1,JdbcTestUtils.countRowsInTable(jdbcTemplate, PICTURES_TABLE));
-    }
-
-    @Test
-    public void testPictureUpdatePictureWithNullName()
-    {
-        // 1. Precondiciones
-        cleanAllTables();
-        insertPicture();
-        Picture p = pictureModel();
-        p.setName(null);
-        expectedException.expect(IllegalStateException.class);
+        expectedException.expect(OptimisticLockingFailureException.class);
 
         // 2. Ejercitar
         this.pictureDao.update(p);
 
         // 3. Postcondiciones
         assertEquals(1,JdbcTestUtils.countRowsInTable(jdbcTemplate, PICTURES_TABLE));
-        assertEquals(pictureModel(), p);
     }
 
     @Test
@@ -470,10 +451,10 @@ public class PictureDaoImplTest {
         insertPicture();
         Picture p = pictureModel();
         p.setId(null);
-        expectedException.expect(Exception.class); // <-- TODO: Insert exception class here
+        expectedException.expect(TransientObjectException.class);
 
         // 2. Ejercitar
-        this.pictureDao.update(p); // TODO: NO HACE NADA, DEBERIA TIRAR EXCEPCION QUE DEBE TENER ID NOT NULL
+        this.pictureDao.update(p);
 
         // 3. Postcondiciones
         assertEquals(1,JdbcTestUtils.countRowsInTable(jdbcTemplate, PICTURES_TABLE));
@@ -515,6 +496,7 @@ public class PictureDaoImplTest {
         // 1. Precondiciones
         cleanAllTables();
         insertPicture();
+        expectedException.expect(IllegalArgumentException.class);
 
         // 2. Ejercitar
         this.pictureDao.remove((Integer) null);
@@ -584,7 +566,7 @@ public class PictureDaoImplTest {
         ModelMetadata modelMetadata = this.pictureDao.count();
 
         // 3. Postcondiciones
-        assertEquals(2, (long) modelMetadata.getCount()); // TODO: fix
+        assertEquals(2, (long) modelMetadata.getCount());
         System.out.println(modelMetadata.getMax()); // No se que devuelve esto
         System.out.println(modelMetadata.getMin()); // No se que devuelve esto
     }
@@ -599,7 +581,7 @@ public class PictureDaoImplTest {
         ModelMetadata modelMetadata = this.pictureDao.count();
 
         // 3. Postcondiciones
-        assertEquals(0, (long) modelMetadata.getCount()); // TODO: fix
+        assertEquals(0, (long) modelMetadata.getCount());
         System.out.println(modelMetadata.getMax()); // No se que devuelve esto
         System.out.println(modelMetadata.getMin()); // No se que devuelve esto
     }

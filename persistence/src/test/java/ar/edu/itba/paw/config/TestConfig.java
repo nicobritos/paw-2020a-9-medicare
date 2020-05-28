@@ -17,8 +17,6 @@ import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
 import org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
-import org.springframework.web.multipart.MultipartResolver;
-import org.springframework.web.multipart.commons.CommonsMultipartResolver;
 
 import javax.persistence.EntityManagerFactory;
 import javax.sql.DataSource;
@@ -28,7 +26,7 @@ import java.util.Properties;
 @EnableTransactionManagement
 @ComponentScan({"ar.edu.itba.paw.persistence"})
 public class TestConfig {
-    private static final String HSQLDB_URL = "jdbc:hsqldb:mem:testdb;sql.syntax_pgs=true";
+    private static final String HSQLDB_URL = "jdbc:hsqldb:mem:test;sql.syntax_pgs=true;check_props=true";
     private static final String HSQLDB_USER = "ha";
     private static final String HSQLDB_PASS = "";
 
@@ -36,7 +34,7 @@ public class TestConfig {
     private Resource schemaSql;
 
     @Bean
-    public DataSource dataSource() {
+    public DataSource dataSource(){
         final SimpleDriverDataSource ds = new SimpleDriverDataSource();
         ds.setDriverClass(JDBCDriver.class);
         ds.setUrl(HSQLDB_URL);
@@ -60,17 +58,8 @@ public class TestConfig {
         return new JpaTransactionManager(entityManagerFactory);
     }
 
-    //TODO:set max size upload maybe?
-    @Bean(name = "multipartResolver")
-    public MultipartResolver multipartResolver() {
-        //final long maxSize = 100000;
-        CommonsMultipartResolver cmr = new CommonsMultipartResolver();
-        //cmr.setMaxUploadSize(maxSize);
-        return cmr;
-    }
-
     @Bean
-    public LocalContainerEntityManagerFactoryBean entityManagerFactoryBean() {
+    public LocalContainerEntityManagerFactoryBean entityManagerFactory() {
         final LocalContainerEntityManagerFactoryBean factoryBean = new LocalContainerEntityManagerFactoryBean();
         factoryBean.setPackagesToScan("ar.edu.itba.paw.models");
         factoryBean.setDataSource(this.dataSource());
@@ -79,7 +68,6 @@ public class TestConfig {
         factoryBean.setJpaVendorAdapter(vendorAdapter);
 
         final Properties properties = new Properties();
-        properties.setProperty("hibernate.hbm2ddl.auto", "update");
         properties.setProperty("hibernate.dialect", "ar.edu.itba.paw.dialect.MyHSQLDialect");
         properties.setProperty("jadira.usertype.autoRegisterUserTypes", "true");
 

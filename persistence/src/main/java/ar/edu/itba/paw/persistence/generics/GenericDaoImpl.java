@@ -82,8 +82,11 @@ public abstract class GenericDaoImpl<M extends GenericModel<I>, I> implements Ge
     @Override
     @Transactional
     public M create(M model) {
+        if(model == null){
+            throw new IllegalArgumentException();
+        }
         this.entityManager.persist(model);
-        return this.findById(model.getId()).get();
+        return model;
     }
 
     @Override

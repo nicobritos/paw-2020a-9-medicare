@@ -4,6 +4,7 @@ import ar.edu.itba.paw.config.TestConfig;
 import ar.edu.itba.paw.interfaces.daos.AppointmentDao;
 import ar.edu.itba.paw.models.*;
 import org.hamcrest.CoreMatchers;
+import org.hibernate.TransientObjectException;
 import org.joda.time.DateTime;
 import org.junit.Before;
 import org.junit.Rule;
@@ -14,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.test.context.ContextConfiguration;
@@ -920,10 +922,10 @@ public class AppointmentDaoImplTest {
         insertAnotherAppointment();
         Appointment a = appointmentModel();
         a.setId(APPOINTMENT_ID_2);
-        expectedException.expect(Exception.class);  // <-- TODO: Insert exception class here
+        expectedException.expect(OptimisticLockingFailureException.class);
 
         // 2. Ejercitar
-        this.appointmentDao.update(a); // TODO: NO HACE NADA, DEBERIA TIRAR EXCEPCION QUE NO EXISTE EL APPOINTMENT CON ESE ID
+        this.appointmentDao.update(a);
 
         // 3. Postcondiciones
         assertEquals(1,JdbcTestUtils.countRowsInTable(jdbcTemplate, APPOINTMENTS_TABLE));
@@ -955,10 +957,10 @@ public class AppointmentDaoImplTest {
         insertAppointment();
         Appointment a = appointmentModel();
          a.setId(null);
-        expectedException.expect(Exception.class); // <-- TODO: Insert exception class here
+        expectedException.expect(TransientObjectException.class);
 
         // 2. Ejercitar
-        this.appointmentDao.update(a); // TODO: NO HACE NADA, DEBERIA TIRAR EXCEPCION QUE DEBE TENER ID NOT NULL
+        this.appointmentDao.update(a);
 
         // 3. Postcondiciones
         assertEquals(1,JdbcTestUtils.countRowsInTable(jdbcTemplate, APPOINTMENTS_TABLE));

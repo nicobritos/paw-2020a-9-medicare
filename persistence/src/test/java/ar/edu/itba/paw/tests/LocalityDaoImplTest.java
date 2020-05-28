@@ -6,6 +6,7 @@ import ar.edu.itba.paw.models.Locality;
 import ar.edu.itba.paw.models.ModelMetadata;
 import ar.edu.itba.paw.models.Province;
 import ar.edu.itba.paw.config.TestConfig;
+import org.hibernate.TransientObjectException;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -15,11 +16,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
+import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.jdbc.JdbcTestUtils;
 
+import javax.persistence.PersistenceException;
 import javax.sql.DataSource;
 import java.util.*;
 
@@ -177,7 +180,7 @@ public class LocalityDaoImplTest {
     {
         // 1. Precondiciones
         cleanAllTables();
-        expectedException.expect(NullPointerException.class);
+        expectedException.expect(IllegalArgumentException.class);
 
         // 2. Ejercitar
         Locality locality = this.localityDao.create(null);
@@ -192,7 +195,7 @@ public class LocalityDaoImplTest {
         // 1. Precondiciones
         cleanAllTables();
         Locality l = new Locality();
-        expectedException.expect(IllegalStateException.class);
+        expectedException.expect(PersistenceException.class);
 
         // 2. Ejercitar
         Locality locality = this.localityDao.create(l);
@@ -208,7 +211,7 @@ public class LocalityDaoImplTest {
         cleanAllTables();
         Locality l = new Locality();
         l.setName(LOCALITY);
-        expectedException.expect(DataIntegrityViolationException.class); // TODO: chequear esta excepcion (poco descriptiva)
+        expectedException.expect(PersistenceException.class);
 
 
         // 2. Ejercitar
@@ -226,7 +229,7 @@ public class LocalityDaoImplTest {
         insertProvince();
         Locality l = new Locality();
         l.setProvince(provinceModel());
-        expectedException.expect(IllegalStateException.class); // TODO: chequear esta excepcion (poco descriptiva)
+        expectedException.expect(PersistenceException.class);
 
         // 2. Ejercitar
         Locality locality = this.localityDao.create(l);
@@ -272,6 +275,7 @@ public class LocalityDaoImplTest {
         // 1. Precondiciones
         cleanAllTables();
         insertProvince();
+        expectedException.expect(IllegalArgumentException.class);
 
         // 2. Ejercitar
         Optional<Locality> locality = this.localityDao.findById(null);
@@ -468,7 +472,7 @@ public class LocalityDaoImplTest {
         cleanAllTables();
         insertLocality();
         insertAnotherLocality();
-        expectedException.expect(NullPointerException.class);
+        expectedException.expect(IllegalArgumentException.class);
 
         // 2. Ejercitar
         this.localityDao.update(null);
@@ -487,10 +491,10 @@ public class LocalityDaoImplTest {
         insertAnotherLocality();
         Locality l = localityModel();
         l.setId(STARTING_ID + 1);
-        expectedException.expect(Exception.class);  // <-- TODO: Insert exception class here
+        expectedException.expect(ObjectOptimisticLockingFailureException.class);
 
         // 2. Ejercitar
-        this.localityDao.update(l); // TODO: NO HACE NADA, DEBERIA TIRAR EXCEPCION QUE NO EXISTE EL COUNTRY CON ESE ID
+        this.localityDao.update(l);
 
         // 3. Postcondiciones
         assertEquals(1,JdbcTestUtils.countRowsInTable(jdbcTemplate, PROVINCES_TABLE));
@@ -505,7 +509,7 @@ public class LocalityDaoImplTest {
         Locality l = new Locality();
         l.setProvince(provinceModel());
         l.setId(STARTING_ID);
-        expectedException.expect(IllegalStateException.class);
+        expectedException.expect(DataIntegrityViolationException.class);
 
         // 2. Ejercitar
         this.localityDao.update(l);
@@ -522,10 +526,10 @@ public class LocalityDaoImplTest {
         insertLocality();
         Locality l = localityModel();
         l.setId(null);
-        expectedException.expect(Exception.class); // <-- TODO: Insert exception class here
+        expectedException.expect(TransientObjectException.class);
 
         // 2. Ejercitar
-        this.localityDao.update(l); // TODO: NO HACE NADA, DEBERIA TIRAR EXCEPCION QUE DEBE TENER ID NOT NULL
+        this.localityDao.update(l);
 
         // 3. Postcondiciones
         assertEquals(1,JdbcTestUtils.countRowsInTable(jdbcTemplate, COUNTRIES_TABLE));
@@ -567,6 +571,7 @@ public class LocalityDaoImplTest {
         // 1. Precondiciones
         cleanAllTables();
         insertLocality();
+        expectedException.expect(IllegalArgumentException.class);
 
         // 2. Ejercitar
         this.localityDao.remove((Integer) null);
@@ -653,7 +658,7 @@ public class LocalityDaoImplTest {
         ModelMetadata modelMetadata = this.localityDao.count();
 
         // 3. Postcondiciones
-        assertEquals(2, (long) modelMetadata.getCount()); // TODO: fix
+        assertEquals(0, (long) modelMetadata.getCount());
         System.out.println(modelMetadata.getMax()); // No se que devuelve esto
         System.out.println(modelMetadata.getMin()); // No se que devuelve esto
     }
@@ -787,7 +792,7 @@ public class LocalityDaoImplTest {
         cleanAllTables();
         insertLocality();
         insertAnotherLocality();
-        expectedException.expect(NullPointerException.class);
+        expectedException.expect(IllegalArgumentException.class);
 
         // 2. Ejercitar
         List<Locality> localities = this.localityDao.findByProvinceAndName(null, LOCALITY);
@@ -827,7 +832,7 @@ public class LocalityDaoImplTest {
         cleanAllTables();
         insertLocality();
         insertAnotherLocality();
-        expectedException.expect(NullPointerException.class);
+        expectedException.expect(IllegalArgumentException.class);
 
         // 2. Ejercitar
         List<Locality> localities = this.localityDao.findByProvinceAndName(provinceModel(), null);

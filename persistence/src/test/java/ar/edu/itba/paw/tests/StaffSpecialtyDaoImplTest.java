@@ -5,6 +5,7 @@ import ar.edu.itba.paw.models.ModelMetadata;
 import ar.edu.itba.paw.models.StaffSpecialty;
 import ar.edu.itba.paw.config.TestConfig;
 import org.hamcrest.CoreMatchers;
+import org.hibernate.TransientObjectException;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -12,6 +13,7 @@ import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.test.context.ContextConfiguration;
@@ -19,6 +21,7 @@ import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.jdbc.JdbcTestUtils;
 
+import javax.persistence.PersistenceException;
 import javax.sql.DataSource;
 import java.util.*;
 
@@ -116,7 +119,7 @@ public class StaffSpecialtyDaoImplTest {
     {
         // 1. Precondiciones
         cleanAllTables();
-        expectedException.expect(NullPointerException.class);
+        expectedException.expect(IllegalArgumentException.class);
 
         // 2. Ejercitar
         StaffSpecialty staffSpecialty = this.staffSpecialtyDao.create(null);
@@ -131,10 +134,7 @@ public class StaffSpecialtyDaoImplTest {
         // 1. Precondiciones
         cleanAllTables();
         StaffSpecialty ss = new StaffSpecialty();
-        expectedException.expect(CoreMatchers.anyOf( // Falla si no se tira ninguna de las excepciones de la lista
-                CoreMatchers.instanceOf(IllegalStateException.class), // Esta excepcion se tira si no tiene data // TODO: chequear esta excepcion (poco descriptiva)
-                CoreMatchers.instanceOf(DataIntegrityViolationException.class) // Esta excepcion se tira si no tiene id // TODO: chequear esta excepcion (poco descriptiva)
-        ));
+        expectedException.expect(PersistenceException.class);
 
         // 2. Ejercitar
         StaffSpecialty staffSpecialty = this.staffSpecialtyDao.create(ss);
@@ -150,7 +150,7 @@ public class StaffSpecialtyDaoImplTest {
         cleanAllTables();
         StaffSpecialty ss = staffSpecialtyModel();
         ss.setName(null);
-        expectedException.expect(IllegalStateException.class); // TODO: chequear esta excepcion (poco descriptiva)
+        expectedException.expect(PersistenceException.class);
 
         // 2. Ejercitar
         StaffSpecialty staffSpecialty = this.staffSpecialtyDao.create(ss);
@@ -197,6 +197,7 @@ public class StaffSpecialtyDaoImplTest {
         // 1. Precondiciones
         cleanAllTables();
         insertStaffSpecialty();
+        expectedException.expect(IllegalArgumentException.class);
 
         // 2. Ejercitar
         Optional<StaffSpecialty> staffSpecialty = this.staffSpecialtyDao.findById(null);
@@ -318,7 +319,7 @@ public class StaffSpecialtyDaoImplTest {
         cleanAllTables();
         insertStaffSpecialty();
         insertAnotherStaffSpecialty();
-        expectedException.expect(NullPointerException.class);
+        expectedException.expect(IllegalArgumentException.class);
 
         // 2. Ejercitar
         this.staffSpecialtyDao.update(null);
@@ -336,10 +337,10 @@ public class StaffSpecialtyDaoImplTest {
         insertAnotherStaffSpecialty();
         StaffSpecialty ss = staffSpecialtyModel();
         ss.setId(STARTING_ID + 1);
-        expectedException.expect(Exception.class);  // <-- TODO: Insert exception class here
+        expectedException.expect(OptimisticLockingFailureException.class);
 
         // 2. Ejercitar
-        this.staffSpecialtyDao.update(ss); // TODO: NO HACE NADA, DEBERIA TIRAR EXCEPCION QUE NO EXISTE EL STAFF_SPECIALTY CON ESE ID
+        this.staffSpecialtyDao.update(ss);
 
         // 3. Postcondiciones
         assertEquals(1,JdbcTestUtils.countRowsInTable(jdbcTemplate, STAFF_SPECIALTIES_TABLE));
@@ -353,7 +354,7 @@ public class StaffSpecialtyDaoImplTest {
         insertStaffSpecialty();
         StaffSpecialty ss = staffSpecialtyModel();
         ss.setName(null);
-        expectedException.expect(IllegalStateException.class);
+        expectedException.expect(DataIntegrityViolationException.class);
 
         // 2. Ejercitar
         this.staffSpecialtyDao.update(ss);
@@ -371,10 +372,10 @@ public class StaffSpecialtyDaoImplTest {
         insertStaffSpecialty();
         StaffSpecialty ss = staffSpecialtyModel();
         ss.setId(null);
-        expectedException.expect(Exception.class); // <-- TODO: Insert exception class here
+        expectedException.expect(TransientObjectException.class);
 
         // 2. Ejercitar
-        this.staffSpecialtyDao.update(ss); // TODO: NO HACE NADA, DEBERIA TIRAR EXCEPCION QUE DEBE TENER ID NOT NULL
+        this.staffSpecialtyDao.update(ss);
 
         // 3. Postcondiciones
         assertEquals(1,JdbcTestUtils.countRowsInTable(jdbcTemplate, STAFF_SPECIALTIES_TABLE));
@@ -416,6 +417,7 @@ public class StaffSpecialtyDaoImplTest {
         // 1. Precondiciones
         cleanAllTables();
         insertStaffSpecialty();
+        expectedException.expect(IllegalArgumentException.class);
 
         // 2. Ejercitar
         this.staffSpecialtyDao.remove((Integer) null);
@@ -485,7 +487,7 @@ public class StaffSpecialtyDaoImplTest {
         ModelMetadata modelMetadata = this.staffSpecialtyDao.count();
 
         // 3. Postcondiciones
-        assertEquals(2, (long) modelMetadata.getCount()); // TODO: fix
+        assertEquals(2, (long) modelMetadata.getCount());
         System.out.println(modelMetadata.getMax()); // No se que devuelve esto
         System.out.println(modelMetadata.getMin()); // No se que devuelve esto
     }
@@ -500,7 +502,7 @@ public class StaffSpecialtyDaoImplTest {
         ModelMetadata modelMetadata = this.staffSpecialtyDao.count();
 
         // 3. Postcondiciones
-        assertEquals(0, (long) modelMetadata.getCount()); // TODO: fix
+        assertEquals(0, (long) modelMetadata.getCount());
         System.out.println(modelMetadata.getMax()); // No se que devuelve esto
         System.out.println(modelMetadata.getMin()); // No se que devuelve esto
     }

@@ -4,6 +4,7 @@ import ar.edu.itba.paw.interfaces.daos.StaffDao;
 import ar.edu.itba.paw.models.*;
 import ar.edu.itba.paw.config.TestConfig;
 import org.hamcrest.CoreMatchers;
+import org.hibernate.TransientObjectException;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -13,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.test.context.ContextConfiguration;
@@ -20,6 +22,7 @@ import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.jdbc.JdbcTestUtils;
 
+import javax.persistence.PersistenceException;
 import javax.sql.DataSource;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -485,7 +488,7 @@ public class StaffDaoImplTest
         cleanAllTables();
         insertUser();
         insertOffice();
-        expectedException.expect(NullPointerException.class);
+        expectedException.expect(IllegalArgumentException.class);
 
         // 2. Ejercitar
         Staff staff = this.staffDao.create(null);
@@ -502,10 +505,7 @@ public class StaffDaoImplTest
         insertUser();
         insertOffice();
         Staff s = new Staff();
-        expectedException.expect(CoreMatchers.anyOf( // Falla si no se tira ninguna de las excepciones de la lista
-                CoreMatchers.instanceOf(IllegalStateException.class), // Esta excepcion se tira si no tiene data // TODO: chequear esta excepcion (poco descriptiva)
-                CoreMatchers.instanceOf(DataIntegrityViolationException.class) // Esta excepcion se tira si no tiene id // TODO: chequear esta excepcion (poco descriptiva)
-        ));
+        expectedException.expect(PersistenceException.class);
 
         // 2. Ejercitar
         Staff staff = this.staffDao.create(s);
@@ -523,7 +523,7 @@ public class StaffDaoImplTest
         insertOffice();
         Staff s = staffModel();
         s.setFirstName(null);
-        expectedException.expect(IllegalStateException.class); // TODO: chequear esta excepcion (poco descriptiva)
+        expectedException.expect(IllegalArgumentException.class);
 
         // 2. Ejercitar
         Staff staff = this.staffDao.create(s);
@@ -541,7 +541,7 @@ public class StaffDaoImplTest
         insertOffice();
         Staff s = staffModel();
         s.setSurname(null);
-        expectedException.expect(IllegalStateException.class); // TODO: chequear esta excepcion (poco descriptiva)
+        expectedException.expect(PersistenceException.class);
 
         // 2. Ejercitar
         Staff staff = this.staffDao.create(s);
@@ -559,7 +559,7 @@ public class StaffDaoImplTest
         insertOffice();
         Staff s = staffModel();
         s.setUser(null);
-        expectedException.expect(IllegalStateException.class); // TODO: chequear esta excepcion (poco descriptiva)
+        expectedException.expect(PersistenceException.class);
 
         // 2. Ejercitar
         Staff staff = this.staffDao.create(s);
@@ -577,7 +577,7 @@ public class StaffDaoImplTest
         insertOffice();
         Staff s = staffModel();
         s.setOffice(null);
-        expectedException.expect(IllegalStateException.class); // TODO: chequear esta excepcion (poco descriptiva)
+        expectedException.expect(PersistenceException.class);
 
         // 2. Ejercitar
         Staff staff = this.staffDao.create(s);
@@ -595,7 +595,7 @@ public class StaffDaoImplTest
         insertOffice();
         Staff s = staffModel();
         s.setEmail(null);
-        expectedException.expect(IllegalStateException.class); // TODO: chequear esta excepcion (poco descriptiva)
+        expectedException.expect(PersistenceException.class);
 
         // 2. Ejercitar
         Staff staff = this.staffDao.create(s);
@@ -642,6 +642,7 @@ public class StaffDaoImplTest
         // 1. Precondiciones
         cleanAllTables();
         insertStaff();
+        expectedException.expect(IllegalArgumentException.class);
 
         // 2. Ejercitar
         Optional<Staff> staff = this.staffDao.findById(null);
@@ -763,7 +764,7 @@ public class StaffDaoImplTest
         cleanAllTables();
         insertStaff();
         insertAnotherStaff();
-        expectedException.expect(NullPointerException.class);
+        expectedException.expect(IllegalArgumentException.class);
 
         // 2. Ejercitar
         this.staffDao.update(null);
@@ -783,7 +784,7 @@ public class StaffDaoImplTest
         insertAnotherStaff();
         Staff s = staffModel();
         s.setId(STARTING_ID + 1);
-        expectedException.expect(Exception.class);  // <-- TODO: Insert exception class here
+        expectedException.expect(OptimisticLockingFailureException.class);  // <-- TODO: Insert exception class here
 
         // 2. Ejercitar
         this.staffDao.update(s); // TODO: NO HACE NADA, DEBERIA TIRAR EXCEPCION QUE NO EXISTE EL STAFF CON ESE ID
@@ -800,7 +801,7 @@ public class StaffDaoImplTest
         insertStaff();
         Staff s = staffModel();
         s.setFirstName(null);
-        expectedException.expect(IllegalStateException.class);
+        expectedException.expect(DataIntegrityViolationException.class);
 
         // 2. Ejercitar
         this.staffDao.update(s);
@@ -818,10 +819,10 @@ public class StaffDaoImplTest
         insertStaff();
         Staff s = staffModel();
         s.setId(null);
-        expectedException.expect(Exception.class); // <-- TODO: Insert exception class here
+        expectedException.expect(TransientObjectException.class);
 
         // 2. Ejercitar
-        this.staffDao.update(s); // TODO: NO HACE NADA, DEBERIA TIRAR EXCEPCION QUE DEBE TENER ID NOT NULL
+        this.staffDao.update(s);
 
         // 3. Postcondiciones
         assertEquals(1,JdbcTestUtils.countRowsInTable(jdbcTemplate, STAFFS_TABLE));
@@ -863,6 +864,7 @@ public class StaffDaoImplTest
         // 1. Precondiciones
         cleanAllTables();
         insertStaff();
+        expectedException.expect(IllegalArgumentException.class);
 
         // 2. Ejercitar
         this.staffDao.remove((Integer) null);

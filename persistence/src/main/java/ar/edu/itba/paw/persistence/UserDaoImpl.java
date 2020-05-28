@@ -29,6 +29,9 @@ public class UserDaoImpl extends GenericSearchableDaoImpl<User, Integer> impleme
 
     @Override
     public Optional<User> findByEmail(String email) {
+        if(email == null){
+            throw new IllegalArgumentException();
+        }
         return this.findBy(User_.email, email).stream().findFirst();
     }
 
@@ -41,6 +44,9 @@ public class UserDaoImpl extends GenericSearchableDaoImpl<User, Integer> impleme
 
     @Override
     public Optional<User> findByToken(String token) {
+        if (token == null){
+            throw new IllegalArgumentException();
+        }
         return this.findBy(User_.token, token).stream().findFirst();
     }
 

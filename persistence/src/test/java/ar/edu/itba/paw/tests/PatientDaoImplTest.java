@@ -4,6 +4,7 @@ import ar.edu.itba.paw.interfaces.daos.PatientDao;
 import ar.edu.itba.paw.models.*;
 import ar.edu.itba.paw.config.TestConfig;
 import org.hamcrest.CoreMatchers;
+import org.hibernate.TransientObjectException;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -13,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.test.context.ContextConfiguration;
@@ -20,6 +22,7 @@ import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.jdbc.JdbcTestUtils;
 
+import javax.persistence.PersistenceException;
 import javax.sql.DataSource;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -492,7 +495,7 @@ public class PatientDaoImplTest {
     {
         // 1. Precondiciones
         cleanAllTables();
-        expectedException.expect(NullPointerException.class);
+        expectedException.expect(IllegalArgumentException.class);
 
         // 2. Ejercitar
         Patient patient = this.patientDao.create(null);
@@ -526,7 +529,7 @@ public class PatientDaoImplTest {
         cleanAllTables();
         Patient p = patientModel();
         p.setUser(null);
-        expectedException.expect(IllegalStateException.class); // TODO: chequear esta excepcion (poco descriptiva)
+        expectedException.expect(PersistenceException.class);
 
         // 2. Ejercitar
         Patient patient = this.patientDao.create(p);
@@ -542,7 +545,7 @@ public class PatientDaoImplTest {
         cleanAllTables();
         Patient p = patientModel();
         p.setOffice(null);
-        expectedException.expect(IllegalStateException.class); // TODO: chequear esta excepcion (poco descriptiva)
+        expectedException.expect(PersistenceException.class);
 
         // 2. Ejercitar
         Patient patient = this.patientDao.create(p);
@@ -590,6 +593,7 @@ public class PatientDaoImplTest {
         // 1. Precondiciones
         cleanAllTables();
         insertPatient();
+        expectedException.expect(IllegalArgumentException.class);
 
         // 2. Ejercitar
         Optional<Patient> patient = this.patientDao.findById(null);
@@ -724,7 +728,7 @@ public class PatientDaoImplTest {
         cleanAllTables();
         insertPatient();
         insertAnotherPatient();
-        expectedException.expect(NullPointerException.class);
+        expectedException.expect(IllegalArgumentException.class);
 
         // 2. Ejercitar
         this.patientDao.update(null);
@@ -744,10 +748,10 @@ public class PatientDaoImplTest {
         insertAnotherPatient();
         Patient p = patientModel();
         p.setId(STARTING_ID + 1);
-        expectedException.expect(Exception.class);  // <-- TODO: Insert exception class here
+        expectedException.expect(OptimisticLockingFailureException.class);
 
         // 2. Ejercitar
-        this.patientDao.update(p); // TODO: NO HACE NADA, DEBERIA TIRAR EXCEPCION QUE NO EXISTE EL PATIENT CON ESE ID
+        this.patientDao.update(p);
 
         // 3. Postcondiciones
         assertEquals(1,JdbcTestUtils.countRowsInTable(jdbcTemplate, PATIENTS_TABLE));
@@ -761,7 +765,7 @@ public class PatientDaoImplTest {
         insertPatient();
         Patient p = patientModel();
         p.setUser(null);
-        expectedException.expect(IllegalStateException.class);
+        expectedException.expect(IllegalArgumentException.class);
 
         // 2. Ejercitar
         this.patientDao.update(p);
@@ -779,10 +783,10 @@ public class PatientDaoImplTest {
         insertPatient();
         Patient p = patientModel();
         p.setId(null);
-        expectedException.expect(Exception.class); // <-- TODO: Insert exception class here
+        expectedException.expect(TransientObjectException.class);
 
         // 2. Ejercitar
-        this.patientDao.update(p); // TODO: NO HACE NADA, DEBERIA TIRAR EXCEPCION QUE DEBE TENER ID NOT NULL
+        this.patientDao.update(p);
 
         // 3. Postcondiciones
         assertEquals(1,JdbcTestUtils.countRowsInTable(jdbcTemplate, PATIENTS_TABLE));
@@ -824,6 +828,7 @@ public class PatientDaoImplTest {
         // 1. Precondiciones
         cleanAllTables();
         insertPatient();
+        expectedException.expect(IllegalArgumentException.class);
 
         // 2. Ejercitar
         this.patientDao.remove((Integer) null);

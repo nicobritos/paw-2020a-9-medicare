@@ -34,6 +34,15 @@ public class StaffDaoImpl extends GenericSearchableDaoImpl<Staff, Integer> imple
         if (surname != null && !surname.isEmpty()) {
             surnames.add(name);
         }
+        if(offices == null){
+            offices = new LinkedList<>();
+        }
+        if(staffSpecialties == null){
+            staffSpecialties = new LinkedList<>();
+        }
+        if(localities == null){
+            localities = new LinkedList<>();
+        }
 
         return this.findBy(names, surnames, offices, staffSpecialties, localities);
     }

@@ -6,6 +6,7 @@ import ar.edu.itba.paw.models.Picture;
 import ar.edu.itba.paw.models.User;
 import ar.edu.itba.paw.config.TestConfig;
 import org.hamcrest.CoreMatchers;
+import org.hibernate.TransientObjectException;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -15,6 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.test.context.ContextConfiguration;
@@ -22,6 +24,7 @@ import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.jdbc.JdbcTestUtils;
 
+import javax.persistence.PersistenceException;
 import javax.sql.DataSource;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -257,7 +260,7 @@ public class UserDaoImplTest {
     public void testCreateUserNullFail() {
         // 1. Precondiciones
         cleanAllTables();
-        expectedException.expect(NullPointerException.class);
+        expectedException.expect(IllegalArgumentException.class);
 
         // 2. Ejercitar
         User user = this.userDao.create(null);
@@ -271,10 +274,7 @@ public class UserDaoImplTest {
         // 1. Precondiciones
         cleanAllTables();
         User u = new User();
-        expectedException.expect(CoreMatchers.anyOf( // Falla si no se tira ninguna de las excepciones de la lista
-                CoreMatchers.instanceOf(IllegalStateException.class), // Esta excepcion se tira si no tiene data // TODO: chequear esta excepcion (poco descriptiva)
-                CoreMatchers.instanceOf(DataIntegrityViolationException.class) // Esta excepcion se tira si no tiene id // TODO: chequear esta excepcion (poco descriptiva)
-        ));
+        expectedException.expect(PersistenceException.class);
 
         // 2. Ejercitar
         User user = this.userDao.create(u);
@@ -289,7 +289,7 @@ public class UserDaoImplTest {
         cleanAllTables();
         User u = userModel();
         u.setFirstName(null);
-        expectedException.expect(IllegalStateException.class); // TODO: chequear esta excepcion (poco descriptiva)
+        expectedException.expect(PersistenceException.class);
 
         // 2. Ejercitar
         User user = this.userDao.create(u);
@@ -304,7 +304,7 @@ public class UserDaoImplTest {
         cleanAllTables();
         User u = userModel();
         u.setSurname(null);
-        expectedException.expect(IllegalStateException.class); // TODO: chequear esta excepcion (poco descriptiva)
+        expectedException.expect(PersistenceException.class);
 
         // 2. Ejercitar
         User user = this.userDao.create(u);
@@ -319,7 +319,7 @@ public class UserDaoImplTest {
         cleanAllTables();
         User u = userModel();
         u.setEmail(null);
-        expectedException.expect(IllegalStateException.class); // TODO: chequear esta excepcion (poco descriptiva)
+        expectedException.expect(PersistenceException.class);
 
         // 2. Ejercitar
         User user = this.userDao.create(u);
@@ -334,7 +334,7 @@ public class UserDaoImplTest {
         cleanAllTables();
         User u = userModel();
         u.setPassword(null);
-        expectedException.expect(IllegalStateException.class); // TODO: chequear esta excepcion (poco descriptiva)
+        expectedException.expect(PersistenceException.class);
 
         // 2. Ejercitar
         User user = this.userDao.create(u);
@@ -378,6 +378,7 @@ public class UserDaoImplTest {
         // 1. Precondiciones
         cleanAllTables();
         insertUser();
+        expectedException.expect(IllegalArgumentException.class);
 
         // 2. Ejercitar
         Optional<User> user = this.userDao.findById(null);
@@ -492,7 +493,7 @@ public class UserDaoImplTest {
         cleanAllTables();
         insertUser();
         insertAnotherUser();
-        expectedException.expect(NullPointerException.class);
+        expectedException.expect(IllegalArgumentException.class);
 
         // 2. Ejercitar
         this.userDao.update(null);
@@ -509,10 +510,10 @@ public class UserDaoImplTest {
         insertAnotherUser();
         User u = userModel();
         u.setId(STARTING_ID + 1);
-        expectedException.expect(Exception.class);  // <-- TODO: Insert exception class here
+        expectedException.expect(OptimisticLockingFailureException.class);
 
         // 2. Ejercitar
-        this.userDao.update(u); // TODO: NO HACE NADA, DEBERIA TIRAR EXCEPCION QUE NO EXISTE EL USER CON ESE ID
+        this.userDao.update(u);
 
         // 3. Postcondiciones
         assertEquals(1, JdbcTestUtils.countRowsInTable(jdbcTemplate, USERS_TABLE));
@@ -525,7 +526,7 @@ public class UserDaoImplTest {
         insertUser();
         User u = userModel();
         u.setFirstName(null);
-        expectedException.expect(IllegalStateException.class);
+        expectedException.expect(DataIntegrityViolationException.class);
 
         // 2. Ejercitar
         this.userDao.update(u);
@@ -542,10 +543,10 @@ public class UserDaoImplTest {
         insertUser();
         User u = userModel();
         u.setId(null);
-        expectedException.expect(Exception.class); // <-- TODO: Insert exception class here
+        expectedException.expect(TransientObjectException.class);
 
         // 2. Ejercitar
-        this.userDao.update(u); // TODO: NO HACE NADA, DEBERIA TIRAR EXCEPCION QUE DEBE TENER ID NOT NULL
+        this.userDao.update(u);
 
         // 3. Postcondiciones
         assertEquals(1, JdbcTestUtils.countRowsInTable(jdbcTemplate, USERS_TABLE));
@@ -584,6 +585,7 @@ public class UserDaoImplTest {
         // 1. Precondiciones
         cleanAllTables();
         insertUser();
+        expectedException.expect(IllegalArgumentException.class);
 
         // 2. Ejercitar
         this.userDao.remove((Integer) null);
@@ -649,7 +651,7 @@ public class UserDaoImplTest {
         ModelMetadata modelMetadata = this.userDao.count();
 
         // 3. Postcondiciones
-        assertEquals(2, (long) modelMetadata.getCount()); // TODO: fix
+        assertEquals(2, (long) modelMetadata.getCount());
         System.out.println(modelMetadata.getMax()); // No se que devuelve esto
         System.out.println(modelMetadata.getMin()); // No se que devuelve esto
     }
@@ -663,7 +665,7 @@ public class UserDaoImplTest {
         ModelMetadata modelMetadata = this.userDao.count();
 
         // 3. Postcondiciones
-        assertEquals(0, (long) modelMetadata.getCount()); // TODO: fix
+        assertEquals(0, (long) modelMetadata.getCount());
         System.out.println(modelMetadata.getMax()); // No se que devuelve esto
         System.out.println(modelMetadata.getMin()); // No se que devuelve esto
     }
@@ -761,7 +763,7 @@ public class UserDaoImplTest {
         // 1. Precondiciones
         cleanAllTables();
         insertAnotherUser();
-        expectedException.expect(NullPointerException.class);
+        expectedException.expect(IllegalArgumentException.class);
 
         // 2. Ejercitar
         Optional<User> userOptional = this.userDao.findByEmail(null);
@@ -806,7 +808,7 @@ public class UserDaoImplTest {
         // 1. Precondiciones
         cleanAllTables();
         insertAnotherUser();
-        expectedException.expect(NullPointerException.class);
+        expectedException.expect(IllegalArgumentException.class);
 
         // 2. Ejercitar
         Optional<User> userOptional = this.userDao.findByToken(null);

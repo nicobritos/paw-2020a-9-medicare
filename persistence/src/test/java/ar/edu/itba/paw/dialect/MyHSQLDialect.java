@@ -1,8 +1,6 @@
 package ar.edu.itba.paw.dialect;
 
-
 import org.hibernate.dialect.HSQLDialect;
-
 import java.sql.Types;
 
 /** Soluciona el problema que el picture byte[] data, era mas grande que 255 bytes que es el default de HSQL si no se
@@ -16,3 +14,4 @@ public class MyHSQLDialect extends HSQLDialect {
         registerColumnType(Types.BLOB, "blob");
     }
 }
+

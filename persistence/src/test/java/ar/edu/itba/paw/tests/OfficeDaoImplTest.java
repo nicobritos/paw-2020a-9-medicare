@@ -3,6 +3,7 @@ package ar.edu.itba.paw.tests;
 import ar.edu.itba.paw.interfaces.daos.OfficeDao;
 import ar.edu.itba.paw.models.*;
 import ar.edu.itba.paw.config.TestConfig;
+import org.hibernate.TransientObjectException;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -12,11 +13,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
+import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.jdbc.JdbcTestUtils;
 
+import javax.persistence.PersistenceException;
 import javax.sql.DataSource;
 import java.util.*;
 
@@ -245,7 +248,7 @@ public class OfficeDaoImplTest
     {
         // 1. Precondiciones
         cleanAllTables();
-        expectedException.expect(NullPointerException.class);
+        expectedException.expect(IllegalArgumentException.class);
 
         // 2. Ejercitar
         Office office = this.officeDao.create(null);
@@ -260,7 +263,7 @@ public class OfficeDaoImplTest
         // 1. Precondiciones
         cleanAllTables();
         Office o = new Office();
-        expectedException.expect(IllegalStateException.class);
+        expectedException.expect(PersistenceException.class);
 
         // 2. Ejercitar
         Office office = this.officeDao.create(o);
@@ -276,7 +279,7 @@ public class OfficeDaoImplTest
         cleanAllTables();
         Office o = new Office();
         o.setName(OFFICE);
-        expectedException.expect(DataIntegrityViolationException.class); // TODO: chequear esta excepcion (poco descriptiva)
+        expectedException.expect(PersistenceException.class); // TODO: chequear esta excepcion (poco descriptiva)
 
 
         // 2. Ejercitar
@@ -294,7 +297,7 @@ public class OfficeDaoImplTest
         insertLocality();
         Office o = new Office();
         o.setLocality(localityModel());
-        expectedException.expect(IllegalStateException.class); // TODO: chequear esta excepcion (poco descriptiva)
+        expectedException.expect(PersistenceException.class);
 
         // 2. Ejercitar
         Office office = this.officeDao.create(o);
@@ -341,6 +344,7 @@ public class OfficeDaoImplTest
         // 1. Precondiciones
         cleanAllTables();
         insertLocality();
+        expectedException.expect(IllegalArgumentException.class);
 
         // 2. Ejercitar
         Optional<Office> office = this.officeDao.findById(null);
@@ -539,7 +543,7 @@ public class OfficeDaoImplTest
         cleanAllTables();
         insertOffice();
         insertAnotherOffice();
-        expectedException.expect(NullPointerException.class);
+        expectedException.expect(IllegalArgumentException.class);
 
         // 2. Ejercitar
         this.officeDao.update(null);
@@ -558,10 +562,10 @@ public class OfficeDaoImplTest
         insertAnotherOffice();
         Office o = officeModel();
         o.setId(STARTING_ID + 1);
-        expectedException.expect(Exception.class);  // <-- TODO: Insert exception class here
+        expectedException.expect(ObjectOptimisticLockingFailureException.class);
 
         // 2. Ejercitar
-        this.officeDao.update(o); // TODO: NO HACE NADA, DEBERIA TIRAR EXCEPCION QUE NO EXISTE EL COUNTRY CON ESE ID
+        this.officeDao.update(o);
 
         // 3. Postcondiciones
         assertEquals(1,JdbcTestUtils.countRowsInTable(jdbcTemplate, PROVINCES_TABLE));
@@ -575,7 +579,7 @@ public class OfficeDaoImplTest
         insertOffice();
         Office o = officeModel();
         o.setName(null);
-        expectedException.expect(IllegalStateException.class);
+        expectedException.expect(DataIntegrityViolationException.class);
 
         // 2. Ejercitar
         this.officeDao.update(o);
@@ -592,7 +596,7 @@ public class OfficeDaoImplTest
         insertOffice();
         Office o = officeModel();
         o.setId(null);
-        expectedException.expect(Exception.class);
+        expectedException.expect(TransientObjectException.class);
 
         // 2. Ejercitar
         this.officeDao.update(o);
@@ -609,7 +613,7 @@ public class OfficeDaoImplTest
         insertOffice();
         Office o = officeModel();
         o.setStreet(null);
-        expectedException.expect(IllegalStateException.class);
+        expectedException.expect(DataIntegrityViolationException.class);
 
         // 2. Ejercitar
         this.officeDao.update(o);
@@ -627,6 +631,7 @@ public class OfficeDaoImplTest
         Office o = new Office();
         o.setName(OFFICE);
         o.setStreet(STREET);
+        o.setId(STARTING_ID);
 
         // 2. Ejercitar
         this.officeDao.update(o);
@@ -671,6 +676,7 @@ public class OfficeDaoImplTest
         // 1. Precondiciones
         cleanAllTables();
         insertOffice();
+        expectedException.expect(IllegalArgumentException.class);
 
         // 2. Ejercitar
         this.officeDao.remove((Integer) null);
@@ -757,7 +763,7 @@ public class OfficeDaoImplTest
         ModelMetadata modelMetadata = this.officeDao.count();
 
         // 3. Postcondiciones
-        assertEquals(2, (long) modelMetadata.getCount()); // TODO: fix
+        assertEquals(0, (long) modelMetadata.getCount()); // TODO: fix
         System.out.println(modelMetadata.getMax()); // No se que devuelve esto
         System.out.println(modelMetadata.getMin()); // No se que devuelve esto
     }
@@ -906,7 +912,7 @@ public class OfficeDaoImplTest
         // 1. Precondiciones
         cleanAllTables();
         insertOffice();
-        expectedException.expect(NullPointerException.class);
+        expectedException.expect(IllegalArgumentException.class);
 
         // 2. Ejercitar
         Collection<Office> offices = officeDao.findByProvince(null);
@@ -974,7 +980,7 @@ public class OfficeDaoImplTest
         // 1. Precondiciones
         cleanAllTables();
         insertOffice();
-        expectedException.expect(NullPointerException.class);
+        expectedException.expect(IllegalArgumentException.class);
 
         // 2. Ejercitar
         Collection<Office> offices = officeDao.findByLocality(null);
