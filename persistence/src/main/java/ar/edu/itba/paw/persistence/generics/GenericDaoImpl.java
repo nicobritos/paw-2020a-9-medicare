@@ -92,7 +92,7 @@ public abstract class GenericDaoImpl<M extends GenericModel<I>, I> implements Ge
     @Override
     @Transactional
     public void update(M model) {
-        this.entityManager.unwrap(Session.class).update(model);
+        this.entityManager.unwrap(Session.class).merge(model);
     }
 
     @Override
