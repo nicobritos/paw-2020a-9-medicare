@@ -995,6 +995,7 @@ public class WorkdayDaoImplTest
         insertAnotherWorkday();
         Workday w = workdayModel();
         w.setId(STARTING_ID + 1);
+        expectedException.expect(IllegalArgumentException.class);
 
         // 2. Ejercitar
         this.workdayDao.remove(w);
