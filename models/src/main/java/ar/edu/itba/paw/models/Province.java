@@ -20,7 +20,7 @@ public class Province extends GenericModel<Integer> {
     @ManyToOne(fetch = FetchType.EAGER, optional = false
 //            ,
 //            cascade = {CascadeType.PERSIST, CascadeType.REFRESH, CascadeType.MERGE}
-            )
+    )
     @JoinColumn(name = "country_id", nullable = false)
     private Country country;
 

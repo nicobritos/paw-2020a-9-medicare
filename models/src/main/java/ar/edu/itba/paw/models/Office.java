@@ -80,7 +80,7 @@ public class Office extends GenericModel<Integer> {
     }
 
     public String getUrl() {
-        return url;
+        return this.url;
     }
 
     public void setUrl(String url) {

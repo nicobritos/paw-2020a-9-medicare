@@ -119,7 +119,7 @@ public class User extends GenericModel<Integer> {
     }
 
     public String getPhone() {
-        return phone;
+        return this.phone;
     }
 
     public void setPhone(String phone) {
