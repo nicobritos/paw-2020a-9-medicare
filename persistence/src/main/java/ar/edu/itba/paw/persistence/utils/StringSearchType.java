@@ -12,8 +12,8 @@ public enum StringSearchType {
     CONTAINS(s -> '%' + s + '%', String::contains),
     CONTAINS_NO_ACC(s -> '%' + s + "%", (s, s2) -> StringUtils.stripAccents(s).contains(s2));
 
-    private Function<String, String> transformer;
-    private BiFunction<String, String, Boolean> operator;
+    private final Function<String, String> transformer;
+    private final BiFunction<String, String, Boolean> operator;
 
     StringSearchType(Function<String, String> transformer, BiFunction<String, String, Boolean> operator) {
         this.transformer = transformer;

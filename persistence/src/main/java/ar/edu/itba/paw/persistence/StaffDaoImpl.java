@@ -194,8 +194,7 @@ public class StaffDaoImpl extends GenericSearchableDaoImpl<Staff, Integer> imple
                                       CriteriaBuilder builder,
                                       Root<Staff> root,
                                       Join<Staff, Office> officeJoin
-                                      )
-    {
+    ) {
         List<Predicate> predicates = new LinkedList<>();
         Predicate predicate;
         predicate = this.getNamePredicate(names, surnames, builder, root);

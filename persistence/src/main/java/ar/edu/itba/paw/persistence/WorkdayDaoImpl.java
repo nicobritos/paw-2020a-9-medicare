@@ -20,7 +20,7 @@ public class WorkdayDaoImpl extends GenericDaoImpl<Workday, Integer> implements 
 
     @Override
     public List<Workday> findByUser(User user) {
-        if (user == null){
+        if (user == null) {
             throw new IllegalArgumentException();
         }
         CriteriaBuilder builder = this.getEntityManager().getCriteriaBuilder();
@@ -37,7 +37,7 @@ public class WorkdayDaoImpl extends GenericDaoImpl<Workday, Integer> implements 
 
     @Override
     public List<Workday> findByStaff(Staff staff) {
-        if (staff == null){
+        if (staff == null) {
             throw new IllegalArgumentException();
         }
         return this.findBy(Workday_.staff, staff);
@@ -45,7 +45,7 @@ public class WorkdayDaoImpl extends GenericDaoImpl<Workday, Integer> implements 
 
     @Override
     public List<Workday> findByStaff(Staff staff, WorkdayDay day) {
-        if(staff == null || day == null){
+        if (staff == null || day == null) {
             throw new IllegalArgumentException();
         }
         Map<SingularAttribute<? super Workday, ?>, Object> parametersValues = new HashMap<>();

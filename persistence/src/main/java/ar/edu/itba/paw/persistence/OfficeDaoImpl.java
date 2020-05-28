@@ -20,7 +20,7 @@ public class OfficeDaoImpl extends GenericSearchableDaoImpl<Office, Integer> imp
 
     @Override
     public List<Office> findByCountry(Country country) {
-        if(country == null){
+        if (country == null) {
             throw new IllegalArgumentException();
         }
         CriteriaBuilder builder = this.getEntityManager().getCriteriaBuilder();
@@ -38,7 +38,7 @@ public class OfficeDaoImpl extends GenericSearchableDaoImpl<Office, Integer> imp
 
     @Override
     public List<Office> findByProvince(Province province) {
-        if(province == null){
+        if (province == null) {
             throw new IllegalArgumentException();
         }
         CriteriaBuilder builder = this.getEntityManager().getCriteriaBuilder();
@@ -55,7 +55,7 @@ public class OfficeDaoImpl extends GenericSearchableDaoImpl<Office, Integer> imp
 
     @Override
     public List<Office> findByLocality(Locality locality) {
-        if(locality == null){
+        if (locality == null) {
             throw new IllegalArgumentException();
         }
         return this.findBy(Office_.locality, locality);

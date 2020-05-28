@@ -30,12 +30,12 @@ public class CountryDaoImpl extends GenericSearchableDaoImpl<Country, String> im
 
     @Override
     @Transactional
-    public Country create(Country c){
-        if(c == null || c.getId() == null || c.getId().length() != 2){
+    public Country create(Country c) {
+        if (c == null || c.getId() == null || c.getId().length() != 2) {
             throw new IllegalArgumentException();
         }
         c.setId(c.getId().toUpperCase());
-        if(!c.getId().matches("[A-Z][A-Z]")){
+        if (!c.getId().matches("[A-Z][A-Z]")) {
             throw new IllegalArgumentException();
         }
         return super.create(c);

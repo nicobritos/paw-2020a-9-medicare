@@ -27,7 +27,7 @@ public class ProvinceDaoImpl extends GenericSearchableDaoImpl<Province, Integer>
 
     @Override
     public List<Province> findByCountryAndName(Country country, String name) {
-        if(country == null || name == null){
+        if (country == null || name == null) {
             throw new IllegalArgumentException();
         }
         CriteriaBuilder builder = this.getEntityManager().getCriteriaBuilder();
