@@ -7,7 +7,7 @@ import ar.edu.itba.paw.webapp.events.events.AppointmentCancelEvent;
 import ar.edu.itba.paw.webapp.events.events.UserConfirmationTokenGenerationEvent;
 import ar.edu.itba.paw.webapp.form.UserProfileForm;
 import ar.edu.itba.paw.webapp.form.WorkdayForm;
-import org.joda.time.DateTime;
+import org.joda.time.LocalDateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Controller;
@@ -53,13 +53,13 @@ public class MedicSideController extends GenericController {
         ModelAndView mav = new ModelAndView();
 
         List<Staff> userStaffs = staffService.findByUser(user.get());
-        DateTime today = DateTime.now();
-        DateTime monday;
-        DateTime selected = today;
+        LocalDateTime today = LocalDateTime.now();
+        LocalDateTime monday;
+        LocalDateTime selected = today;
         boolean isToday = true;
         if (newToday != null) {
             try {
-                selected = DateTime.parse(newToday);
+                selected = LocalDateTime.parse(newToday);
                 isToday = false;
             } catch (DateTimeParseException e) {
 
@@ -86,8 +86,8 @@ public class MedicSideController extends GenericController {
         mav.addObject("todayAppointments", appointmentService.findToday(userStaffs));
 
         List<Appointment> appointments;
-        if (monday.isAfter(DateTime.now())) {
-            appointments = appointmentService.findByStaffsAndDay(userStaffs, DateTime.now(), monday.plusDays(7));
+        if (monday.isAfter(LocalDateTime.now())) {
+            appointments = appointmentService.findByStaffsAndDay(userStaffs, LocalDateTime.now(), monday.plusDays(7));
         } else {
             appointments = appointmentService.findByStaffsAndDay(userStaffs, monday, monday.plusDays(7));
         }

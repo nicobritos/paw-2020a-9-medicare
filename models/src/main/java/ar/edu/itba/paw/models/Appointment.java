@@ -1,7 +1,7 @@
 package ar.edu.itba.paw.models;
 
 import org.hibernate.annotations.Type;
-import org.joda.time.DateTime;
+import org.joda.time.LocalDateTime;
 
 import javax.persistence.*;
 
@@ -26,8 +26,8 @@ public class Appointment extends GenericModel<Integer> {
     @Enumerated(value = EnumType.STRING)
     private AppointmentStatus appointmentStatus;
     @Column(name = "from_date", nullable = false)
-    @Type(type="org.jadira.usertype.dateandtime.joda.PersistentDateTime")
-    private DateTime fromDate;
+    @Type(type="org.jadira.usertype.dateandtime.joda.PersistentLocalDateTime")
+    private LocalDateTime fromDate;
     @Column(name = "message")
     private String message;
     @Column(name = "motive")
@@ -73,15 +73,15 @@ public class Appointment extends GenericModel<Integer> {
         this.staff = staff;
     }
 
-    public DateTime getFromDate() {
+    public LocalDateTime getFromDate() {
         return this.fromDate;
     }
 
-    public void setFromDate(DateTime fromDate) {
+    public void setFromDate(LocalDateTime fromDate) {
         this.fromDate = fromDate;
     }
 
-    public DateTime getToDate() {
+    public LocalDateTime getToDate() {
         return this.fromDate.plusMinutes(Appointment.DURATION);
     }
 

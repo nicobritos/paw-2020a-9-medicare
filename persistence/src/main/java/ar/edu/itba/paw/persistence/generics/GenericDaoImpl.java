@@ -13,10 +13,7 @@ import javax.persistence.PersistenceContext;
 import javax.persistence.Tuple;
 import javax.persistence.criteria.*;
 import javax.persistence.metamodel.SingularAttribute;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.function.Function;
 
 /**
@@ -61,12 +58,20 @@ public abstract class GenericDaoImpl<M extends GenericModel<I>, I> implements Ge
 
     @Override
     public Optional<M> findById(I id) {
+        if (id == null)
+            throw new IllegalArgumentException();
+
         M model = this.entityManager.find(this.mClass, id);
         return (model == null) ? Optional.empty() : Optional.of(model);
     }
 
     @Override
     public List<M> findByIds(Collection<I> ids) {
+        if (ids == null)
+            throw new IllegalArgumentException();
+        if (ids.isEmpty())
+            return Collections.emptyList();
+
         CriteriaBuilder builder = this.entityManager.getCriteriaBuilder();
         CriteriaQuery<M> query = builder.createQuery(this.mClass);
         Root<M> root = query.from(this.mClass);
@@ -146,6 +151,9 @@ public abstract class GenericDaoImpl<M extends GenericModel<I>, I> implements Ge
 
     @Override
     public ModelMetadata count(Map<SingularAttribute<? super M, ?>, Object> parametersValues) {
+        if (parametersValues == null)
+            throw new IllegalArgumentException();
+
         CriteriaBuilder builder = this.entityManager.getCriteriaBuilder();
         CriteriaQuery<Tuple> query = builder.createQuery(Tuple.class);
         Root<M> root = query.from(this.mClass);
@@ -175,6 +183,9 @@ public abstract class GenericDaoImpl<M extends GenericModel<I>, I> implements Ge
     }
 
     protected List<M> findBy(SingularAttribute<? super M, ?> attribute, Object value) {
+        if (value == null)
+            throw new IllegalArgumentException();
+
         CriteriaBuilder builder = this.entityManager.getCriteriaBuilder();
         CriteriaQuery<M> query = builder.createQuery(this.mClass);
         Root<M> root = query.from(this.mClass);
@@ -186,6 +197,11 @@ public abstract class GenericDaoImpl<M extends GenericModel<I>, I> implements Ge
     }
 
     protected List<M> findBy(Map<SingularAttribute<? super M, ?>, Object> parametersValues) {
+        if (parametersValues == null)
+            throw new IllegalArgumentException();
+        if (parametersValues.isEmpty())
+            return Collections.emptyList();
+
         CriteriaBuilder builder = this.entityManager.getCriteriaBuilder();
         CriteriaQuery<M> query = builder.createQuery(this.mClass);
         Root<M> root = query.from(this.mClass);
@@ -202,6 +218,11 @@ public abstract class GenericDaoImpl<M extends GenericModel<I>, I> implements Ge
     }
 
     protected List<M> findByIn(SingularAttribute<? super M, ?> attribute, Collection<?> values) {
+        if (values == null)
+            throw new IllegalArgumentException();
+        if (values.isEmpty())
+            return Collections.emptyList();
+
         CriteriaBuilder builder = this.entityManager.getCriteriaBuilder();
         CriteriaQuery<M> query = builder.createQuery(this.mClass);
         Root<M> root = query.from(this.mClass);

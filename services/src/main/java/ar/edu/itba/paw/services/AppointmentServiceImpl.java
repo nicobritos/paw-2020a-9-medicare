@@ -6,7 +6,7 @@ import ar.edu.itba.paw.interfaces.services.*;
 import ar.edu.itba.paw.interfaces.services.exceptions.*;
 import ar.edu.itba.paw.models.*;
 import ar.edu.itba.paw.services.generics.GenericServiceImpl;
-import org.joda.time.DateTime;
+import org.joda.time.LocalDateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -50,37 +50,37 @@ public class AppointmentServiceImpl extends GenericServiceImpl<AppointmentDao, A
     }
 
     @Override
-    public List<Appointment> findByPatientsFromDate(List<Patient> patients, DateTime from) {
+    public List<Appointment> findByPatientsFromDate(List<Patient> patients, LocalDateTime from) {
         return this.repository.findByPatientsFromDate(patients, from);
     }
 
     @Override
     public List<Appointment> findToday(List<Staff> staffs) {
-        return this.findByStaffsAndDay(staffs, DateTime.now());
+        return this.findByStaffsAndDay(staffs, LocalDateTime.now());
     }
 
     @Override
     public List<Appointment> findToday(Patient patient) {
-        return this.repository.findByDate(patient, DateTime.now());
+        return this.repository.findByDate(patient, LocalDateTime.now());
     }
 
     @Override
-    public List<Appointment> findByDay(Staff staff, DateTime date) {
+    public List<Appointment> findByDay(Staff staff, LocalDateTime date) {
         return this.repository.findByStaffsAndDate(Collections.singletonList(staff), date);
     }
 
     @Override
-    public List<Appointment> findByStaffsAndDay(List<Staff> staffs, DateTime date) {
+    public List<Appointment> findByStaffsAndDay(List<Staff> staffs, LocalDateTime date) {
         return this.repository.findByStaffsAndDate(staffs, date);
     }
 
     @Override
-    public List<Appointment> findByStaffsAndDay(List<Staff> staffs, DateTime from, DateTime to) {
+    public List<Appointment> findByStaffsAndDay(List<Staff> staffs, LocalDateTime from, LocalDateTime to) {
         return this.repository.findByStaffsAndDate(staffs, from, to);
     }
 
     @Override
-    public List<Appointment> findByPatientsAndDay(List<Patient> patients, DateTime date) {
+    public List<Appointment> findByPatientsAndDay(List<Patient> patients, LocalDateTime date) {
         return this.repository.findByPatientsAndDate(patients, date);
     }
 
@@ -123,8 +123,8 @@ public class AppointmentServiceImpl extends GenericServiceImpl<AppointmentDao, A
     }
 
     @Override
-    public List<AppointmentTimeSlot> findAvailableTimeslots(Staff staff, DateTime fromDate, DateTime toDate) {
-        DateTime now = DateTime.now();
+    public List<AppointmentTimeSlot> findAvailableTimeslots(Staff staff, LocalDateTime fromDate, LocalDateTime toDate) {
+        LocalDateTime now = LocalDateTime.now();
         List<AppointmentTimeSlot> appointmentTimeSlots = new LinkedList<>();
         if (now.isAfter(fromDate)) {
             fromDate = now;
@@ -163,13 +163,12 @@ public class AppointmentServiceImpl extends GenericServiceImpl<AppointmentDao, A
                     }
                     for (int imin = startMinute; imin < endMinute; imin += Appointment.DURATION) {
                         AppointmentTimeSlot appointmentTimeSlot = new AppointmentTimeSlot();
-                        appointmentTimeSlot.setDate(new DateTime(
+                        appointmentTimeSlot.setDate(new LocalDateTime(
                                 fromDate.getYear(),
                                 fromDate.getMonthOfYear(),
                                 fromDate.getDayOfMonth(),
                                 ihour,
-                                imin,
-                                fromDate.getZone()
+                                imin
                         ));
                         appointmentTimeSlots.add(appointmentTimeSlot);
                     }
@@ -188,7 +187,7 @@ public class AppointmentServiceImpl extends GenericServiceImpl<AppointmentDao, A
     }
 
     @Override
-    public List<AppointmentTimeSlot> findAvailableTimeslots(Staff staff, DateTime date) {
+    public List<AppointmentTimeSlot> findAvailableTimeslots(Staff staff, LocalDateTime date) {
         return this.findAvailableTimeslots(staff, date, date.withTime(23, 59, 59, 999));
     }
 
@@ -208,7 +207,7 @@ public class AppointmentServiceImpl extends GenericServiceImpl<AppointmentDao, A
         return false;
     }
 
-    private boolean isValidDate(Staff staff, DateTime fromDate) {
+    private boolean isValidDate(Staff staff, LocalDateTime fromDate) {
         AppointmentTimeSlot appointmentTimeSlot = new AppointmentTimeSlot();
         appointmentTimeSlot.setDate(fromDate);
 

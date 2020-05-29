@@ -4,7 +4,7 @@ import ar.edu.itba.paw.interfaces.daos.AppointmentDao;
 import ar.edu.itba.paw.interfaces.services.exceptions.InvalidAppointmentStatusChangeException;
 import ar.edu.itba.paw.models.*;
 import ar.edu.itba.paw.services.AppointmentServiceImpl;
-import org.joda.time.DateTime;
+import org.joda.time.LocalDateTime;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
@@ -102,8 +102,8 @@ public class AppointmentServiceImplTest {
         return staff;
     }
 
-    private DateTime dateModel() {
-        return new DateTime(YEAR, MONTH, DAY_OF_MONTH, HOUR, MINUTE);
+    private LocalDateTime dateModel() {
+        return new LocalDateTime(YEAR, MONTH, DAY_OF_MONTH, HOUR, MINUTE);
     }
 
     private Appointment appointmentModel() {

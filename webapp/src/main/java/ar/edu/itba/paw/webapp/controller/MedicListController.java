@@ -10,8 +10,8 @@ import ar.edu.itba.paw.webapp.controller.utils.GenericController;
 import ar.edu.itba.paw.webapp.controller.utils.JsonResponse;
 import ar.edu.itba.paw.webapp.form.RequestTimeslotForm;
 import ar.edu.itba.paw.webapp.transformer.AppointmentTimeSlotTransformer;
-import org.joda.time.DateTime;
 import org.joda.time.Days;
+import org.joda.time.LocalDateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
@@ -136,9 +136,9 @@ public class MedicListController extends GenericController {
         }
         ModelAndView mav = new ModelAndView();
 
-        DateTime today = DateTime.now();
+        LocalDateTime today = LocalDateTime.now();
         today = today.plusWeeks(week);
-        DateTime monday = today.minusDays(today.getDayOfWeek() - 1);
+        LocalDateTime monday = today.minusDays(today.getDayOfWeek() - 1);
 
         mav.addObject("today", today);
         mav.addObject("monday", monday);
@@ -178,8 +178,8 @@ public class MedicListController extends GenericController {
             if (!staff.isPresent()) {
                 throw new MediCareException("No existe el staff solicitado");
             }
-            DateTime dateFrom = new DateTime(form.getFromYear(), form.getFromMonth(), form.getFromDay(), 0, 0);
-            DateTime dateTo = new DateTime(form.getToYear(), form.getToMonth(), form.getToDay(), 23, 59, 59, 999);
+            LocalDateTime dateFrom = new LocalDateTime(form.getFromYear(), form.getFromMonth(), form.getFromDay(), 0, 0);
+            LocalDateTime dateTo = new LocalDateTime(form.getToYear(), form.getToMonth(), form.getToDay(), 23, 59, 59, 999);
             long daysBetween = Days.daysBetween(dateFrom.toLocalDate(), dateTo.toLocalDate()).getDays();
             if (daysBetween > MAX_DAYS_APPOINTMENTS || dateTo.isBefore(dateFrom)) {
                 throw new MediCareException("Fechas invalidas");

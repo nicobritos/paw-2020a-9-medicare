@@ -3,7 +3,7 @@ package ar.edu.itba.paw.tests;
 import ar.edu.itba.paw.config.TestConfig;
 import ar.edu.itba.paw.interfaces.daos.WorkdayDao;
 import ar.edu.itba.paw.models.*;
-import org.joda.time.DateTime;
+import org.joda.time.LocalDateTime;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -1516,7 +1516,7 @@ public class WorkdayDaoImplTest
         // 1. Precondiciones
         cleanAllTables();
         insertWorkday();
-        DateTime startDate = new DateTime(2020, 5, 25,START_HOUR, START_MINUTE); // 25/5/2020 es lunes
+        LocalDateTime startDate = new LocalDateTime(2020, 5, 25,START_HOUR, START_MINUTE); // 25/5/2020 es lunes
         AppointmentTimeSlot appointmentTimeSlot = new AppointmentTimeSlot();
         appointmentTimeSlot.setDate(startDate);
 
@@ -1533,7 +1533,7 @@ public class WorkdayDaoImplTest
         // 1. Precondiciones
         cleanAllTables();
         insertWorkday();
-        DateTime startDate = new DateTime(2020, 5, 27, START_HOUR, START_MINUTE); // 27/5/2020 es miercoles
+        LocalDateTime startDate = new LocalDateTime(2020, 5, 27, START_HOUR, START_MINUTE); // 27/5/2020 es miercoles
         AppointmentTimeSlot appointmentTimeSlot = new AppointmentTimeSlot();
         appointmentTimeSlot.setDate(startDate);
 
@@ -1580,7 +1580,7 @@ public class WorkdayDaoImplTest
         // 1. Precondiciones
         cleanAllTables();
         insertWorkday();
-        DateTime startDate = new DateTime(2020, 5, 25,START_HOUR, START_MINUTE); // 25/5/2020 es lunes
+        LocalDateTime startDate = new LocalDateTime(2020, 5, 25,START_HOUR, START_MINUTE); // 25/5/2020 es lunes
         AppointmentTimeSlot appointmentTimeSlot = new AppointmentTimeSlot();
         appointmentTimeSlot.setDate(startDate);
         expectedException.expect(IllegalArgumentException.class);

@@ -11,6 +11,7 @@ import ar.edu.itba.paw.webapp.events.events.UserConfirmationTokenGenerationEvent
 import ar.edu.itba.paw.webapp.form.RequestAppointmentForm;
 import ar.edu.itba.paw.webapp.form.UserProfileForm;
 import org.joda.time.DateTime;
+import org.joda.time.LocalDateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Controller;
@@ -59,7 +60,7 @@ public class PatientSideController extends GenericController {
         if (isStaff()) {
             mav.addObject("staffs", staffService.findByUser(user.get()));
         }
-        mav.addObject("appointments", appointmentService.findByPatientsFromDate(patients, DateTime.now()));
+        mav.addObject("appointments", appointmentService.findByPatientsFromDate(patients, LocalDateTime.now()));
         mav.addObject("specialties", staffSpecialtyService.list());
         mav.addObject("localities", localityService.list());
 
@@ -137,8 +138,8 @@ public class PatientSideController extends GenericController {
             errors.reject("NotFound.requestAppointment.staff", null, "Error");
             return this.requestAppointment(form, staffId, year, month, day, hour, minute);
         }
-        DateTime dateFrom = new DateTime(form.getYear(), form.getMonth(), form.getDay(), form.getHour(), form.getMinute());
-        if (dateFrom.isBefore(DateTime.now())) {
+        LocalDateTime dateFrom = new LocalDateTime(form.getYear(), form.getMonth(), form.getDay(), form.getHour(), form.getMinute());
+        if (dateFrom.isBefore(LocalDateTime.now())) {
             errors.reject("PastRequest.requestAppointment.date", null, "Error");
             return this.requestAppointment(form, staffId, year, month, day, hour, minute);
         }

@@ -4,8 +4,7 @@ import ar.edu.itba.paw.config.TestConfig;
 import ar.edu.itba.paw.interfaces.daos.AppointmentDao;
 import ar.edu.itba.paw.models.*;
 import org.hamcrest.CoreMatchers;
-import org.hibernate.TransientObjectException;
-import org.joda.time.DateTime;
+import org.joda.time.LocalDateTime;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -23,6 +22,7 @@ import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.jdbc.JdbcTestUtils;
 
+import javax.persistence.PersistenceException;
 import javax.sql.DataSource;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -474,7 +474,7 @@ public class AppointmentDaoImplTest {
         insertUser();
         insertOffice();
         Map<String, Object> patientMap = new HashMap<>();
-        patientMap.put("users_id", USER_ID_1);
+        patientMap.put("user_id", USER_ID_1);
         patientMap.put("office_id", OFFICE_ID_1);
         patientJdbcInsert.execute(patientMap);
     }
@@ -483,7 +483,7 @@ public class AppointmentDaoImplTest {
         insertAnotherOffice();
         insertAnotherUser();
         Map<String, Object> patientMap = new HashMap<>();
-        patientMap.put("users_id", USER_ID_2);
+        patientMap.put("user_id", USER_ID_2);
         patientMap.put("office_id", OFFICE_ID_2);
         patientJdbcInsert.execute(patientMap);
     }
@@ -504,7 +504,7 @@ public class AppointmentDaoImplTest {
         staffMap.put("surname", SURNAME);
         staffMap.put("email", EMAIL); // Identity de HSQLDB empieza en 0
         staffMap.put("phone", PHONE);
-        staffMap.put("users_id", USER_ID_1);
+        staffMap.put("user_id", USER_ID_1);
         staffMap.put("office_id", OFFICE_ID_1);
         staffJdbcInsert.execute(staffMap);
     }
@@ -516,7 +516,7 @@ public class AppointmentDaoImplTest {
         staffMap.put("surname", SURNAME_2);
         staffMap.put("email", EMAIL); // Identity de HSQLDB empieza en 0
         staffMap.put("phone", PHONE);
-        staffMap.put("users_id", USER_ID_2);
+        staffMap.put("user_id", USER_ID_2);
         staffMap.put("office_id", OFFICE_ID_2);
         staffJdbcInsert.execute(staffMap);
     }
@@ -565,7 +565,7 @@ public class AppointmentDaoImplTest {
         appointment.setAppointmentStatus(STATUS);
         appointment.setStaff(staffModel());
         appointment.setPatient(patientModel());
-        appointment.setFromDate(new DateTime(YEAR,MONTH,DAY,HOUR,MINUTE));
+        appointment.setFromDate(new LocalDateTime(YEAR,MONTH,DAY,HOUR,MINUTE));
         appointment.setMessage(MESSAGE);
         appointment.setMotive(MOTIVE);
         appointment.setId(APPOINTMENT_ID_1);
@@ -593,7 +593,7 @@ public class AppointmentDaoImplTest {
         assertEquals(MOTIVE, appointment.getMotive());
         assertEquals(staffModel(), appointment.getStaff());
         assertEquals(patientModel(), appointment.getPatient());
-        assertEquals(new DateTime(YEAR, MONTH, DAY, HOUR, MINUTE), appointment.getFromDate());
+        assertEquals(new LocalDateTime(YEAR, MONTH, DAY, HOUR, MINUTE), appointment.getFromDate());
     }
 
     @Test
@@ -616,7 +616,7 @@ public class AppointmentDaoImplTest {
         assertEquals(MOTIVE, appointment.getMotive());
         assertEquals(staffModel(), appointment.getStaff());
         assertEquals(patientModel(), appointment.getPatient());
-        assertEquals(new DateTime(YEAR, MONTH, DAY, HOUR, MINUTE), appointment.getFromDate());
+        assertEquals(new LocalDateTime(YEAR, MONTH, DAY, HOUR, MINUTE), appointment.getFromDate());
     }
 
     @Test
@@ -640,7 +640,8 @@ public class AppointmentDaoImplTest {
         cleanAllTables();
         Appointment a = new Appointment();
         expectedException.expect(CoreMatchers.anyOf( // Falla si no se tira ninguna de las excepciones de la lista
-                CoreMatchers.instanceOf(IllegalStateException.class), // Esta excepcion se tira si no tiene data // TODO: chequear esta excepcion (poco descriptiva)
+                CoreMatchers.instanceOf(PersistenceException.class), // Esta excepcion se tira si es null // TODO: chequear esta excepcion (poco descriptiva)
+                CoreMatchers.instanceOf(IllegalArgumentException.class), // Esta excepcion se tira si no tiene data // TODO: chequear esta excepcion (poco descriptiva)
                 CoreMatchers.instanceOf(DataIntegrityViolationException.class) // Esta excepcion se tira si no tiene id // TODO: chequear esta excepcion (poco descriptiva)
         ));
 
@@ -658,7 +659,7 @@ public class AppointmentDaoImplTest {
         cleanAllTables();
         Appointment a = appointmentModel();
          a.setAppointmentStatus(null);
-        expectedException.expect(IllegalStateException.class); // TODO: chequear esta excepcion (poco descriptiva)
+        expectedException.expect(DataIntegrityViolationException.class); // TODO: chequear esta excepcion (poco descriptiva)
 
         // 2. Ejercitar
         Appointment appointment = this.appointmentDao.create(a);
@@ -674,7 +675,7 @@ public class AppointmentDaoImplTest {
         cleanAllTables();
         Appointment a = appointmentModel();
         a.setStaff(null);
-        expectedException.expect(IllegalStateException.class); // TODO: chequear esta excepcion (poco descriptiva)
+        expectedException.expect(PersistenceException.class); // TODO: chequear esta excepcion (poco descriptiva)
 
         // 2. Ejercitar
         Appointment appointment = this.appointmentDao.create(a);
@@ -690,7 +691,7 @@ public class AppointmentDaoImplTest {
         cleanAllTables();
         Appointment a = appointmentModel();
         a.setPatient(null);
-        expectedException.expect(IllegalStateException.class); // TODO: chequear esta excepcion (poco descriptiva)
+        expectedException.expect(DataIntegrityViolationException.class); // TODO: chequear esta excepcion (poco descriptiva)
 
         // 2. Ejercitar
         Appointment appointment = this.appointmentDao.create(a);
@@ -706,7 +707,7 @@ public class AppointmentDaoImplTest {
         cleanAllTables();
         Appointment a = appointmentModel();
         a.setMotive(null);
-        expectedException.expect(IllegalStateException.class); // TODO: chequear esta excepcion (poco descriptiva)
+        expectedException.expect(PersistenceException.class); // TODO: chequear esta excepcion (poco descriptiva)
 
         // 2. Ejercitar
         Appointment appointment = this.appointmentDao.create(a);
@@ -722,7 +723,7 @@ public class AppointmentDaoImplTest {
         cleanAllTables();
         Appointment a = appointmentModel();
         a.setFromDate(null);
-        expectedException.expect(IllegalStateException.class); // TODO: chequear esta excepcion (poco descriptiva)
+        expectedException.expect(PersistenceException.class); // TODO: chequear esta excepcion (poco descriptiva)
 
         // 2. Ejercitar
         Appointment appointment = this.appointmentDao.create(a);
@@ -769,6 +770,7 @@ public class AppointmentDaoImplTest {
         // 1. Precondiciones
         cleanAllTables();
         insertAppointment();
+        expectedException.expect(IllegalArgumentException.class);
 
         // 2. Ejercitar
         Optional<Appointment> appointment = this.appointmentDao.findById(null);
@@ -788,7 +790,7 @@ public class AppointmentDaoImplTest {
         insertAnotherAppointment();
 
         // 2. Ejercitar
-        Collection<Appointment> appointments = this.appointmentDao.findByIds(Arrays.asList(APPOINTMENT_ID_1, APPOINTMENT_ID_1 + 1));
+        Collection<Appointment> appointments = this.appointmentDao.findByIds(Arrays.asList(APPOINTMENT_ID_1, APPOINTMENT_ID_2));
 
         // 3. Postcondiciones
         assertNotNull(appointments);
@@ -872,7 +874,7 @@ public class AppointmentDaoImplTest {
         insertAppointment();
         insertAnotherAppointment();
         Appointment a = appointmentModel();
-        a.setFromDate(new DateTime(YEAR, MONTH, DAY, HOUR_2, MINUTE_2));
+        a.setFromDate(new LocalDateTime(YEAR, MONTH, DAY, HOUR_2, MINUTE_2, 0));
 
         // 2. Ejercitar
         this.appointmentDao.update(a);
@@ -927,7 +929,7 @@ public class AppointmentDaoImplTest {
         insertAppointment();
         Appointment a = appointmentModel();
          a.setAppointmentStatus(null);
-        expectedException.expect(IllegalStateException.class);
+        expectedException.expect(PersistenceException.class);
 
         // 2. Ejercitar
         this.appointmentDao.update(a);
@@ -945,7 +947,7 @@ public class AppointmentDaoImplTest {
         insertAppointment();
         Appointment a = appointmentModel();
          a.setId(null);
-        expectedException.expect(TransientObjectException.class);
+        expectedException.expect(DataIntegrityViolationException.class);
 
         // 2. Ejercitar
         this.appointmentDao.update(a);
@@ -962,7 +964,7 @@ public class AppointmentDaoImplTest {
         insertAppointment();
         Appointment a = appointmentModel();
         a.setStaff(null);
-        expectedException.expect(IllegalStateException.class);
+        expectedException.expect(DataIntegrityViolationException.class);
 
         // 2. Ejercitar
         this.appointmentDao.update(a);
@@ -980,7 +982,7 @@ public class AppointmentDaoImplTest {
         insertAppointment();
         Appointment a = appointmentModel();
         a.setPatient(null);
-        expectedException.expect(IllegalStateException.class);
+        expectedException.expect(DataIntegrityViolationException.class);
 
         // 2. Ejercitar
         this.appointmentDao.update(a);
@@ -998,7 +1000,7 @@ public class AppointmentDaoImplTest {
         insertAppointment();
         Appointment a = appointmentModel();
         a.setMotive(null);
-        expectedException.expect(IllegalStateException.class);
+        expectedException.expect(PersistenceException.class);
 
         // 2. Ejercitar
         this.appointmentDao.update(a);
@@ -1016,7 +1018,7 @@ public class AppointmentDaoImplTest {
         insertAppointment();
         Appointment a = appointmentModel();
         a.setFromDate(null);
-        expectedException.expect(IllegalStateException.class);
+        expectedException.expect(PersistenceException.class);
 
         // 2. Ejercitar
         this.appointmentDao.update(a);
@@ -1048,6 +1050,7 @@ public class AppointmentDaoImplTest {
         // 1. Precondiciones
         cleanAllTables();
         insertAppointment();
+        expectedException.expect(IllegalArgumentException.class);
 
         // 2. Ejercitar
         this.appointmentDao.remove(APPOINTMENT_ID_2);
@@ -1062,6 +1065,7 @@ public class AppointmentDaoImplTest {
         // 1. Precondiciones
         cleanAllTables();
         insertAppointment();
+        expectedException.expect(IllegalArgumentException.class);
 
         // 2. Ejercitar
         this.appointmentDao.remove((Integer) null);
@@ -1099,6 +1103,7 @@ public class AppointmentDaoImplTest {
         insertAnotherAppointment();
         Appointment a = appointmentModel();
         a.setId(APPOINTMENT_ID_2);
+        expectedException.expect(IllegalArgumentException.class);
 
         // 2. Ejercitar
         this.appointmentDao.remove(a);
@@ -1275,7 +1280,7 @@ public class AppointmentDaoImplTest {
         insertAnotherAppointment();
 
         // 2. Ejercitar
-        List<Appointment> appointments = this.appointmentDao.findByDate(patientModel(), new DateTime(YEAR, MONTH, DAY, HOUR, MINUTE));
+        List<Appointment> appointments = this.appointmentDao.findByDate(patientModel(), new LocalDateTime(YEAR, MONTH, DAY, HOUR, MINUTE));
 
         // 3. Postcondiciones
         assertNotNull(appointments);
@@ -1311,7 +1316,7 @@ public class AppointmentDaoImplTest {
         expectedException.expect(IllegalArgumentException.class);
 
         // 2. Ejercitar
-        List<Appointment> appointments = this.appointmentDao.findByDate(null, new DateTime(YEAR, MONTH, DAY, HOUR, MINUTE));
+        List<Appointment> appointments = this.appointmentDao.findByDate(null, new LocalDateTime(YEAR, MONTH, DAY, HOUR, MINUTE));
 
         // 3. Postcondiciones
         // Que tire NullPointerException
@@ -1343,7 +1348,7 @@ public class AppointmentDaoImplTest {
         insertAnotherAppointment();
 
         // 2. Ejercitar
-        List<Appointment> appointments = this.appointmentDao.findByDate(patientModel(), new DateTime(YEAR, MONTH, DAY, HOUR, MINUTE));
+        List<Appointment> appointments = this.appointmentDao.findByDate(patientModel(), new LocalDateTime(YEAR, MONTH, DAY, HOUR, MINUTE));
 
         // 3. Postcondiciones
         assertNotNull(appointments);
@@ -1360,7 +1365,7 @@ public class AppointmentDaoImplTest {
         insertAnotherAppointment();
 
         // 2. Ejercitar
-        List<Appointment> appointments = this.appointmentDao.findByDate(patientModel(), new DateTime(2021, MONTH, DAY, HOUR, MINUTE));
+        List<Appointment> appointments = this.appointmentDao.findByDate(patientModel(), new LocalDateTime(2021, MONTH, DAY, HOUR, MINUTE));
 
         // 3. Postcondiciones
         assertNotNull(appointments);
@@ -1395,7 +1400,7 @@ public class AppointmentDaoImplTest {
         cleanAllTables();
         insertAppointment();
         insertAnotherAppointment();
-        expectedException.expect(IllegalArgumentException.class);
+        expectedException.expect(PersistenceException.class);
 
         // 2. Ejercitar
         List<Appointment> appointments = this.appointmentDao.findByPatients(null);
@@ -1432,7 +1437,7 @@ public class AppointmentDaoImplTest {
         insertAnotherAppointment();
 
         // 2. Ejercitar
-        List<Appointment> appointments = this.appointmentDao.findByPatientsAndDate(Collections.singletonList(patientModel()), new DateTime(YEAR, MONTH, DAY, HOUR, MINUTE));
+        List<Appointment> appointments = this.appointmentDao.findByPatientsAndDate(Collections.singletonList(patientModel()), new LocalDateTime(YEAR, MONTH, DAY, HOUR, MINUTE));
 
         // 3. Postcondiciones
         assertNotNull(appointments);
@@ -1468,7 +1473,7 @@ public class AppointmentDaoImplTest {
         expectedException.expect(IllegalArgumentException.class);
 
         // 2. Ejercitar
-        List<Appointment> appointments = this.appointmentDao.findByPatientsAndDate(null, new DateTime(YEAR, MONTH, DAY, HOUR, MINUTE));
+        List<Appointment> appointments = this.appointmentDao.findByPatientsAndDate(null, new LocalDateTime(YEAR, MONTH, DAY, HOUR, MINUTE));
 
         // 3. Postcondiciones
         // Que tire NullPointerException
@@ -1500,7 +1505,7 @@ public class AppointmentDaoImplTest {
         insertAnotherAppointment();
 
         // 2. Ejercitar
-        List<Appointment> appointments = this.appointmentDao.findByPatientsAndDate(Collections.singletonList(patientModel()), new DateTime(YEAR, MONTH, DAY, HOUR, MINUTE));
+        List<Appointment> appointments = this.appointmentDao.findByPatientsAndDate(Collections.singletonList(patientModel()), new LocalDateTime(YEAR, MONTH, DAY, HOUR, MINUTE));
 
         // 3. Postcondiciones
         assertNotNull(appointments);
@@ -1517,7 +1522,7 @@ public class AppointmentDaoImplTest {
         insertAnotherAppointment();
 
         // 2. Ejercitar
-        List<Appointment> appointments = this.appointmentDao.findByPatientsAndDate(Collections.singletonList(patientModel()), new DateTime(2021, MONTH, DAY, HOUR, MINUTE));
+        List<Appointment> appointments = this.appointmentDao.findByPatientsAndDate(Collections.singletonList(patientModel()), new LocalDateTime(2021, MONTH, DAY, HOUR, MINUTE));
 
         // 3. Postcondiciones
         assertNotNull(appointments);
@@ -1535,7 +1540,7 @@ public class AppointmentDaoImplTest {
         insertAnotherAppointment();
 
         // 2. Ejercitar
-        List<Appointment> appointments = this.appointmentDao.findByPatientsFromDate(Collections.singletonList(patientModel()), new DateTime(YEAR, MONTH, DAY, 0, 0));
+        List<Appointment> appointments = this.appointmentDao.findByPatientsFromDate(Collections.singletonList(patientModel()), new LocalDateTime(YEAR, MONTH, DAY, 0, 0));
 
         // 3. Postcondiciones
         assertNotNull(appointments);
@@ -1571,7 +1576,7 @@ public class AppointmentDaoImplTest {
         expectedException.expect(IllegalArgumentException.class);
 
         // 2. Ejercitar
-        List<Appointment> appointments = this.appointmentDao.findByPatientsFromDate(null, new DateTime(YEAR, MONTH, DAY, 0, 0));
+        List<Appointment> appointments = this.appointmentDao.findByPatientsFromDate(null, new LocalDateTime(YEAR, MONTH, DAY, 0, 0));
 
         // 3. Postcondiciones
         // Que tire NullPointerException
@@ -1603,7 +1608,7 @@ public class AppointmentDaoImplTest {
         insertAnotherAppointment();
 
         // 2. Ejercitar
-        List<Appointment> appointments = this.appointmentDao.findByPatientsFromDate(Collections.singletonList(patientModel()), new DateTime(YEAR, MONTH, DAY, 0, 0));
+        List<Appointment> appointments = this.appointmentDao.findByPatientsFromDate(Collections.singletonList(patientModel()), new LocalDateTime(YEAR, MONTH, DAY, 0, 0));
 
         // 3. Postcondiciones
         assertNotNull(appointments);
@@ -1620,7 +1625,7 @@ public class AppointmentDaoImplTest {
         insertAnotherAppointment();
 
         // 2. Ejercitar
-        List<Appointment> appointments = this.appointmentDao.findByPatientsFromDate(Collections.singletonList(patientModel()), new DateTime(2021, MONTH, DAY, HOUR, MINUTE));
+        List<Appointment> appointments = this.appointmentDao.findByPatientsFromDate(Collections.singletonList(patientModel()), new LocalDateTime(2021, MONTH, DAY, HOUR, MINUTE));
 
         // 3. Postcondiciones
         assertNotNull(appointments);
@@ -1655,7 +1660,7 @@ public class AppointmentDaoImplTest {
         cleanAllTables();
         insertAppointment();
         insertAnotherAppointment();
-        expectedException.expect(IllegalArgumentException.class);
+        expectedException.expect(PersistenceException.class);
 
         // 2. Ejercitar
         List<Appointment> appointments = this.appointmentDao.findByStaffs(null);
@@ -1692,7 +1697,7 @@ public class AppointmentDaoImplTest {
         insertAnotherAppointment();
 
         // 2. Ejercitar
-        List<Appointment> appointments = this.appointmentDao.findByStaffsAndDate(Collections.singletonList(staffModel()), new DateTime(YEAR, MONTH, DAY, HOUR, MINUTE));
+        List<Appointment> appointments = this.appointmentDao.findByStaffsAndDate(Collections.singletonList(staffModel()), new LocalDateTime(YEAR, MONTH, DAY, HOUR, MINUTE));
 
         // 3. Postcondiciones
         assertNotNull(appointments);
@@ -1728,7 +1733,7 @@ public class AppointmentDaoImplTest {
         expectedException.expect(IllegalArgumentException.class);
 
         // 2. Ejercitar
-        List<Appointment> appointments = this.appointmentDao.findByStaffsAndDate(null, new DateTime(YEAR, MONTH, DAY, HOUR, MINUTE));
+        List<Appointment> appointments = this.appointmentDao.findByStaffsAndDate(null, new LocalDateTime(YEAR, MONTH, DAY, HOUR, MINUTE));
 
         // 3. Postcondiciones
         // Que tire NullPointerException
@@ -1760,7 +1765,7 @@ public class AppointmentDaoImplTest {
         insertAnotherAppointment();
 
         // 2. Ejercitar
-        List<Appointment> appointments = this.appointmentDao.findByStaffsAndDate(Collections.singletonList(staffModel()), new DateTime(YEAR, MONTH, DAY, HOUR, MINUTE));
+        List<Appointment> appointments = this.appointmentDao.findByStaffsAndDate(Collections.singletonList(staffModel()), new LocalDateTime(YEAR, MONTH, DAY, HOUR, MINUTE));
 
         // 3. Postcondiciones
         assertNotNull(appointments);
@@ -1777,7 +1782,7 @@ public class AppointmentDaoImplTest {
         insertAnotherAppointment();
 
         // 2. Ejercitar
-        List<Appointment> appointments = this.appointmentDao.findByStaffsAndDate(Collections.singletonList(staffModel()), new DateTime(2021, MONTH, DAY, HOUR, MINUTE));
+        List<Appointment> appointments = this.appointmentDao.findByStaffsAndDate(Collections.singletonList(staffModel()), new LocalDateTime(2021, MONTH, DAY, HOUR, MINUTE));
 
         // 3. Postcondiciones
         assertNotNull(appointments);
@@ -1795,7 +1800,7 @@ public class AppointmentDaoImplTest {
         insertAnotherAppointment();
 
         // 2. Ejercitar
-        List<Appointment> appointments = this.appointmentDao.findByStaffsAndDate(Collections.singletonList(staffModel()), new DateTime(YEAR, MONTH, DAY, 0, 0), new DateTime(YEAR, MONTH, DAY, 23, 59));
+        List<Appointment> appointments = this.appointmentDao.findByStaffsAndDate(Collections.singletonList(staffModel()), new LocalDateTime(YEAR, MONTH, DAY, 0, 0), new LocalDateTime(YEAR, MONTH, DAY, 23, 59));
 
         // 3. Postcondiciones
         assertNotNull(appointments);
@@ -1815,7 +1820,7 @@ public class AppointmentDaoImplTest {
         expectedException.expect(IllegalArgumentException.class);
 
         // 2. Ejercitar
-        List<Appointment> appointments = this.appointmentDao.findByStaffsAndDate(Collections.singletonList(staffModel()), null, new DateTime(YEAR, MONTH, DAY, 23, 59));
+        List<Appointment> appointments = this.appointmentDao.findByStaffsAndDate(Collections.singletonList(staffModel()), null, new LocalDateTime(YEAR, MONTH, DAY, 23, 59));
 
         // 3. Postcondiciones
         // Que tire NullPointerException
@@ -1831,7 +1836,7 @@ public class AppointmentDaoImplTest {
         expectedException.expect(IllegalArgumentException.class);
 
         // 2. Ejercitar
-        List<Appointment> appointments = this.appointmentDao.findByStaffsAndDate(Collections.singletonList(staffModel()), new DateTime(YEAR, MONTH, DAY, 0, 0),null);
+        List<Appointment> appointments = this.appointmentDao.findByStaffsAndDate(Collections.singletonList(staffModel()), new LocalDateTime(YEAR, MONTH, DAY, 0, 0),null);
 
         // 3. Postcondiciones
         // Que tire NullPointerException
@@ -1847,7 +1852,7 @@ public class AppointmentDaoImplTest {
         expectedException.expect(IllegalArgumentException.class);
 
         // 2. Ejercitar
-        List<Appointment> appointments = this.appointmentDao.findByStaffsAndDate(null, new DateTime(YEAR, MONTH, DAY, 0, 0), new DateTime(YEAR, MONTH, DAY, 23, 59));
+        List<Appointment> appointments = this.appointmentDao.findByStaffsAndDate(null, new LocalDateTime(YEAR, MONTH, DAY, 0, 0), new LocalDateTime(YEAR, MONTH, DAY, 23, 59));
 
         // 3. Postcondiciones
         // Que tire NullPointerException
@@ -1879,7 +1884,7 @@ public class AppointmentDaoImplTest {
         insertAnotherAppointment();
 
         // 2. Ejercitar
-        List<Appointment> appointments = this.appointmentDao.findByStaffsAndDate(Collections.singletonList(staffModel()), new DateTime(YEAR, MONTH, DAY, 0, 0), new DateTime(YEAR, MONTH, DAY, 23, 59));
+        List<Appointment> appointments = this.appointmentDao.findByStaffsAndDate(Collections.singletonList(staffModel()), new LocalDateTime(YEAR, MONTH, DAY, 0, 0), new LocalDateTime(YEAR, MONTH, DAY, 23, 59));
 
         // 3. Postcondiciones
         assertNotNull(appointments);
@@ -1896,7 +1901,7 @@ public class AppointmentDaoImplTest {
         insertAnotherAppointment();
 
         // 2. Ejercitar
-        List<Appointment> appointments = this.appointmentDao.findByStaffsAndDate(Collections.singletonList(staffModel()), new DateTime(YEAR, MONTH, DAY, 0, 0), new DateTime(YEAR, MONTH, DAY, 23, 59));
+        List<Appointment> appointments = this.appointmentDao.findByStaffsAndDate(Collections.singletonList(staffModel()), new LocalDateTime(YEAR, MONTH, DAY, 0, 0), new LocalDateTime(YEAR, MONTH, DAY, 23, 59));
 
         // 3. Postcondiciones
         assertNotNull(appointments);

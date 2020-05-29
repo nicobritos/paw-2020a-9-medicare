@@ -3,7 +3,7 @@ package ar.edu.itba.paw.persistence;
 import ar.edu.itba.paw.interfaces.daos.AppointmentDao;
 import ar.edu.itba.paw.models.*;
 import ar.edu.itba.paw.persistence.generics.GenericDaoImpl;
-import org.joda.time.DateTime;
+import org.joda.time.LocalDateTime;
 import org.springframework.stereotype.Repository;
 
 import javax.persistence.criteria.*;
@@ -38,6 +38,9 @@ public class AppointmentDaoImpl extends GenericDaoImpl<Appointment, Integer> imp
 
     @Override
     public List<Appointment> findPending(Patient patient) {
+        if (patient == null)
+            throw new IllegalArgumentException();
+
         Map<SingularAttribute<? super Appointment, ?>, Object> parameters = new HashMap<>();
         parameters.put(Appointment_.patient, patient);
         parameters.put(Appointment_.appointmentStatus, AppointmentStatus.PENDING);
@@ -46,6 +49,9 @@ public class AppointmentDaoImpl extends GenericDaoImpl<Appointment, Integer> imp
 
     @Override
     public List<Appointment> findPending(Staff staff) {
+        if (staff == null)
+            throw new IllegalArgumentException();
+
         Map<SingularAttribute<? super Appointment, ?>, Object> parameters = new HashMap<>();
         parameters.put(Appointment_.staff, staff);
         parameters.put(Appointment_.appointmentStatus, AppointmentStatus.PENDING);
@@ -54,6 +60,9 @@ public class AppointmentDaoImpl extends GenericDaoImpl<Appointment, Integer> imp
 
     @Override
     public List<Appointment> findPending(Patient patient, Staff staff) {
+        if (patient == null || staff == null)
+            throw new IllegalArgumentException();
+
         Map<SingularAttribute<? super Appointment, ?>, Object> parameters = new HashMap<>();
         parameters.put(Appointment_.patient, patient);
         parameters.put(Appointment_.staff, staff);
@@ -62,14 +71,21 @@ public class AppointmentDaoImpl extends GenericDaoImpl<Appointment, Integer> imp
     }
 
     @Override
-    public List<Appointment> findByStaffsAndDate(Collection<Staff> staffs, DateTime date) {
-        DateTime fromDate = new DateTime(date.getYear(), date.getMonthOfYear(), date.getDayOfMonth(), 0, 0);
-        DateTime toDate = new DateTime(date.getYear(), date.getMonthOfYear(), date.getDayOfMonth(), 23, 59);
+    public List<Appointment> findByStaffsAndDate(Collection<Staff> staffs, LocalDateTime date) {
+        if (date == null || staffs == null)
+            throw new IllegalArgumentException();
+        if (staffs.isEmpty())
+            return Collections.emptyList();
+
+        LocalDateTime fromDate = new LocalDateTime(date.getYear(), date.getMonthOfYear(), date.getDayOfMonth(), 0, 0);
+        LocalDateTime toDate = new LocalDateTime(date.getYear(), date.getMonthOfYear(), date.getDayOfMonth(), 23, 59);
         return this.findByStaffsAndDate(staffs, fromDate, toDate);
     }
 
     @Override
-    public List<Appointment> findByStaffsAndDate(Collection<Staff> staffs, DateTime fromDate, DateTime toDate) {
+    public List<Appointment> findByStaffsAndDate(Collection<Staff> staffs, LocalDateTime fromDate, LocalDateTime toDate) {
+        if (fromDate == null || toDate == null || staffs == null)
+            throw new IllegalArgumentException();
         if (staffs.isEmpty())
             return Collections.emptyList();
 
@@ -93,7 +109,9 @@ public class AppointmentDaoImpl extends GenericDaoImpl<Appointment, Integer> imp
     }
 
     @Override
-    public List<Appointment> findByPatientsAndDate(Collection<Patient> patients, DateTime date) {
+    public List<Appointment> findByPatientsAndDate(Collection<Patient> patients, LocalDateTime date) {
+        if (date == null || patients == null)
+            throw new IllegalArgumentException();
         if (patients.isEmpty())
             return Collections.emptyList();
 
@@ -101,8 +119,8 @@ public class AppointmentDaoImpl extends GenericDaoImpl<Appointment, Integer> imp
         CriteriaQuery<Appointment> query = builder.createQuery(Appointment.class);
         Root<Appointment> root = query.from(Appointment.class);
 
-        DateTime fromDate = new DateTime(date.getYear(), date.getMonthOfYear(), date.getDayOfMonth(), 0, 0);
-        DateTime toDate = new DateTime(date.getYear(), date.getMonthOfYear(), date.getDayOfMonth(), 23, 59);
+        LocalDateTime fromDate = new LocalDateTime(date.getYear(), date.getMonthOfYear(), date.getDayOfMonth(), 0, 0);
+        LocalDateTime toDate = new LocalDateTime(date.getYear(), date.getMonthOfYear(), date.getDayOfMonth(), 23, 59);
 
         query.select(root);
         Path<?> expression = root.get(Appointment_.patient);
@@ -120,14 +138,19 @@ public class AppointmentDaoImpl extends GenericDaoImpl<Appointment, Integer> imp
     }
 
     @Override
-    public List<Appointment> findByDate(Patient patient, DateTime date) {
+    public List<Appointment> findByDate(Patient patient, LocalDateTime date) {
+        if (date == null || patient == null)
+            throw new IllegalArgumentException();
+
         List<Patient> patients = new LinkedList<>();
         patients.add(patient);
         return this.findByPatientsAndDate(patients, date);
     }
 
     @Override
-    public List<Appointment> findByPatientsFromDate(Collection<Patient> patients, DateTime from) {
+    public List<Appointment> findByPatientsFromDate(Collection<Patient> patients, LocalDateTime from) {
+        if (from == null || patients == null)
+            throw new IllegalArgumentException();
         if (patients.isEmpty())
             return Collections.emptyList();
 
