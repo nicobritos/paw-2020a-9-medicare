@@ -3,7 +3,6 @@ package ar.edu.itba.paw.tests;
 import ar.edu.itba.paw.config.TestConfig;
 import ar.edu.itba.paw.interfaces.daos.StaffDao;
 import ar.edu.itba.paw.models.*;
-import org.hibernate.TransientObjectException;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -525,7 +524,7 @@ public class StaffDaoImplTest
         Staff s = staffModel();
         s.setFirstName(null);
         s.setId(null);
-        expectedException.expect(IllegalArgumentException.class);
+        expectedException.expect(PersistenceException.class);
 
         // 2. Ejercitar
         Staff staff = this.staffDao.create(s);
@@ -821,7 +820,7 @@ public class StaffDaoImplTest
         insertStaff();
         Staff s = staffModel();
         s.setId(null);
-        expectedException.expect(TransientObjectException.class);
+        expectedException.expect(IllegalArgumentException.class);
 
         // 2. Ejercitar
         this.staffDao.update(s);
@@ -852,6 +851,7 @@ public class StaffDaoImplTest
         // 1. Precondiciones
         cleanAllTables();
         insertStaff();
+        expectedException.expect(IllegalArgumentException.class);
 
         // 2. Ejercitar
         this.staffDao.remove(STARTING_ID + 1);
@@ -901,6 +901,7 @@ public class StaffDaoImplTest
         insertAnotherStaff();
         Staff s = staffModel();
         s.setId(STARTING_ID + 1);
+        expectedException.expect(IllegalArgumentException.class);
 
         // 2. Ejercitar
         this.staffDao.remove(s);

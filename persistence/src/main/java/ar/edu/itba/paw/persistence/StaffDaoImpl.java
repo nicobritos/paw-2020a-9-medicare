@@ -36,7 +36,7 @@ public class StaffDaoImpl extends GenericSearchableDaoImpl<Staff, Integer> imple
         }
         if (surname != null && !surname.isEmpty()) {
             surnames = new LinkedList<>();
-            surnames.add(name);
+            surnames.add(surname);
         } else {
             surnames = Collections.emptyList();
         }
@@ -98,7 +98,7 @@ public class StaffDaoImpl extends GenericSearchableDaoImpl<Staff, Integer> imple
         }
         if (surname != null && !surname.isEmpty()) {
             surnames = new LinkedList<>();
-            surnames.add(name);
+            surnames.add(surname);
         } else {
             surnames = Collections.emptyList();
         }
@@ -152,7 +152,6 @@ public class StaffDaoImpl extends GenericSearchableDaoImpl<Staff, Integer> imple
                 officeJoin
         )));
 
-        tupleQuery.from(Staff.class);
         tupleQuery.where(builder.and(this.getPredicates(
                 names,
                 surnames,
