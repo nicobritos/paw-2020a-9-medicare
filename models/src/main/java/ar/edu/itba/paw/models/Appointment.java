@@ -30,13 +30,13 @@ public class Appointment extends GenericModel<Integer> {
     private LocalDateTime fromDate;
     @Column(name = "message")
     private String message;
-    @Column(name = "motive")
+    @Column(name = "motive", nullable = false)
     private String motive;
     @ManyToOne(fetch = FetchType.EAGER, optional = false)
-    @JoinColumn(name = "patient_id")
+    @JoinColumn(name = "patient_id", nullable = false)
     private Patient patient;
     @ManyToOne(fetch = FetchType.EAGER, optional = false)
-    @JoinColumn(name = "staff_id")
+    @JoinColumn(name = "staff_id", nullable = false)
     private Staff staff;
 
     @Override

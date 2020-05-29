@@ -274,13 +274,13 @@ public class OfficeDaoImplTest
     }
 
     @Test
-    public void testCreateOfficeEmptyLocalityFail() // TODO: Tirar un error si no se especifica country
+    public void testCreateOfficeEmptyLocalityFail()
     {
         // 1. Precondiciones
 
         Office o = new Office();
         o.setName(OFFICE);
-        expectedException.expect(PersistenceException.class); // TODO: chequear esta excepcion (poco descriptiva)
+        expectedException.expect(PersistenceException.class);
 
 
         // 2. Ejercitar
@@ -748,7 +748,7 @@ public class OfficeDaoImplTest
         ModelMetadata modelMetadata = this.officeDao.count();
 
         // 3. Postcondiciones
-        assertEquals(2, (long) modelMetadata.getCount()); // TODO: fix
+        assertEquals(2, (long) modelMetadata.getCount());
         System.out.println(modelMetadata.getMax()); // No se que devuelve esto
         System.out.println(modelMetadata.getMin()); // No se que devuelve esto
     }
@@ -763,7 +763,7 @@ public class OfficeDaoImplTest
         ModelMetadata modelMetadata = this.officeDao.count();
 
         // 3. Postcondiciones
-        assertEquals(0, (long) modelMetadata.getCount()); // TODO: fix
+        assertEquals(0, (long) modelMetadata.getCount());
         System.out.println(modelMetadata.getMax()); // No se que devuelve esto
         System.out.println(modelMetadata.getMin()); // No se que devuelve esto
     }

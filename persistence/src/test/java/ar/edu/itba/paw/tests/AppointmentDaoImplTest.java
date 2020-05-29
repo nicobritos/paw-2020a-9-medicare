@@ -3,7 +3,6 @@ package ar.edu.itba.paw.tests;
 import ar.edu.itba.paw.config.TestConfig;
 import ar.edu.itba.paw.interfaces.daos.AppointmentDao;
 import ar.edu.itba.paw.models.*;
-import org.hamcrest.CoreMatchers;
 import org.joda.time.LocalDateTime;
 import org.junit.Before;
 import org.junit.Rule;
@@ -640,11 +639,7 @@ public class AppointmentDaoImplTest {
         // 1. Precondiciones
 
         Appointment a = new Appointment();
-        expectedException.expect(CoreMatchers.anyOf( // Falla si no se tira ninguna de las excepciones de la lista
-                CoreMatchers.instanceOf(PersistenceException.class), // Esta excepcion se tira si es null // TODO: chequear esta excepcion (poco descriptiva)
-                CoreMatchers.instanceOf(IllegalArgumentException.class), // Esta excepcion se tira si no tiene data // TODO: chequear esta excepcion (poco descriptiva)
-                CoreMatchers.instanceOf(DataIntegrityViolationException.class) // Esta excepcion se tira si no tiene id // TODO: chequear esta excepcion (poco descriptiva)
-        ));
+        expectedException.expect(PersistenceException.class);
 
         // 2. Ejercitar
         Appointment appointment = this.appointmentDao.create(a);
@@ -1141,7 +1136,7 @@ public class AppointmentDaoImplTest {
         ModelMetadata modelMetadata = this.appointmentDao.count();
 
         // 3. Postcondiciones
-        assertEquals(2, (long) modelMetadata.getCount()); // TODO: fix
+        assertEquals(2, (long) modelMetadata.getCount());
         System.out.println(modelMetadata.getMax()); // No se que devuelve esto
         System.out.println(modelMetadata.getMin()); // No se que devuelve esto
     }
@@ -1156,7 +1151,7 @@ public class AppointmentDaoImplTest {
         ModelMetadata modelMetadata = this.appointmentDao.count();
 
         // 3. Postcondiciones
-        assertEquals(0, (long) modelMetadata.getCount()); // TODO: fix
+        assertEquals(0, (long) modelMetadata.getCount());
         System.out.println(modelMetadata.getMax()); // No se que devuelve esto
         System.out.println(modelMetadata.getMin()); // No se que devuelve esto
     }

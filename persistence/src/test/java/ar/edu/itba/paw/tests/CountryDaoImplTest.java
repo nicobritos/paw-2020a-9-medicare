@@ -530,7 +530,7 @@ public class CountryDaoImplTest {
         // 1. Precondiciones
 
         insertAnotherCountry();
-        expectedException.expect(ObjectOptimisticLockingFailureException.class); // Todo: cambiar la excepcion?
+        expectedException.expect(ObjectOptimisticLockingFailureException.class);
 
         // 2. Ejercitar
         this.countryDao.update(countryModel());
@@ -681,7 +681,7 @@ public class CountryDaoImplTest {
         ModelMetadata modelMetadata = this.countryDao.count();
 
         // 3. Postcondiciones
-        assertEquals(2, (long) modelMetadata.getCount()); // TODO: fix
+        assertEquals(2, (long) modelMetadata.getCount());
         System.out.println(modelMetadata.getMax()); // No se que devuelve esto
         System.out.println(modelMetadata.getMin()); // No se que devuelve esto
     }
@@ -696,7 +696,7 @@ public class CountryDaoImplTest {
         ModelMetadata modelMetadata = this.countryDao.count();
 
         // 3. Postcondiciones
-        assertEquals(0, (long) modelMetadata.getCount()); // TODO: fix
+        assertEquals(0, (long) modelMetadata.getCount());
         System.out.println(modelMetadata.getMax()); // No se que devuelve esto
         System.out.println(modelMetadata.getMin()); // No se que devuelve esto
     }

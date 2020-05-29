@@ -180,7 +180,7 @@ public class ProvinceDaoImplTest {
     }
 
     @Test
-    public void testCreateProvinceEmptyCountryFail() // TODO: Tirar un error si no se especifica country
+    public void testCreateProvinceEmptyCountryFail()
     {
         // 1. Precondiciones
 
@@ -617,7 +617,7 @@ public class ProvinceDaoImplTest {
         ModelMetadata modelMetadata = this.provinceDao.count();
 
         // 3. Postcondiciones
-        assertEquals(2, (long) modelMetadata.getCount()); // TODO: fix
+        assertEquals(2, (long) modelMetadata.getCount());
         System.out.println(modelMetadata.getMax()); // No se que devuelve esto
         System.out.println(modelMetadata.getMin()); // No se que devuelve esto
     }
@@ -632,7 +632,7 @@ public class ProvinceDaoImplTest {
         ModelMetadata modelMetadata = this.provinceDao.count();
 
         // 3. Postcondiciones
-        assertEquals(0, (long) modelMetadata.getCount()); // TODO: fix
+        assertEquals(0, (long) modelMetadata.getCount());
         System.out.println(modelMetadata.getMax()); // No se que devuelve esto
         System.out.println(modelMetadata.getMin()); // No se que devuelve esto
     }

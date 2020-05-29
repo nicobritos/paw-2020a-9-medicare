@@ -785,10 +785,10 @@ public class StaffDaoImplTest
         insertAnotherStaff();
         Staff s = staffModel();
         s.setId(STARTING_ID + 1);
-        expectedException.expect(OptimisticLockingFailureException.class);  // <-- TODO: Insert exception class here
+        expectedException.expect(OptimisticLockingFailureException.class);
 
         // 2. Ejercitar
-        this.staffDao.update(s); // TODO: NO HACE NADA, DEBERIA TIRAR EXCEPCION QUE NO EXISTE EL STAFF CON ESE ID
+        this.staffDao.update(s);
 
         // 3. Postcondiciones
         assertEquals(1,JdbcTestUtils.countRowsInTable(jdbcTemplate, STAFFS_TABLE));
@@ -939,7 +939,7 @@ public class StaffDaoImplTest
         ModelMetadata modelMetadata = this.staffDao.count();
 
         // 3. Postcondiciones
-        assertEquals(2, (long) modelMetadata.getCount()); // TODO: fix
+        assertEquals(2, (long) modelMetadata.getCount());
         System.out.println(modelMetadata.getMax()); // No se que devuelve esto
         System.out.println(modelMetadata.getMin()); // No se que devuelve esto
     }
@@ -954,7 +954,7 @@ public class StaffDaoImplTest
         ModelMetadata modelMetadata = this.staffDao.count();
 
         // 3. Postcondiciones
-        assertEquals(0, (long) modelMetadata.getCount()); // TODO: fix
+        assertEquals(0, (long) modelMetadata.getCount());
         System.out.println(modelMetadata.getMax()); // No se que devuelve esto
         System.out.println(modelMetadata.getMin()); // No se que devuelve esto
     }

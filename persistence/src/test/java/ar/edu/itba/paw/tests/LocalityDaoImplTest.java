@@ -204,14 +204,12 @@ public class LocalityDaoImplTest {
     }
 
     @Test
-    public void testCreateLocalityEmptyProvinceFail() // TODO: Tirar un error si no se especifica country
+    public void testCreateLocalityEmptyProvinceFail()
     {
         // 1. Precondiciones
-
         Locality l = new Locality();
         l.setName(LOCALITY);
         expectedException.expect(PersistenceException.class);
-
 
         // 2. Ejercitar
         Locality locality = this.localityDao.create(l);
@@ -640,7 +638,7 @@ public class LocalityDaoImplTest {
         ModelMetadata modelMetadata = this.localityDao.count();
 
         // 3. Postcondiciones
-        assertEquals(2, (long) modelMetadata.getCount()); // TODO: fix
+        assertEquals(2, (long) modelMetadata.getCount());
         System.out.println(modelMetadata.getMax()); // No se que devuelve esto
         System.out.println(modelMetadata.getMin()); // No se que devuelve esto
     }
