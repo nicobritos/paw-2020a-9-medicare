@@ -68,6 +68,7 @@ public class LocalityDaoImplTest {
                 .usingGeneratedKeyColumns("province_id");
         this.countryJdbcInsert = new SimpleJdbcInsert(this.ds)
                 .withTableName(COUNTRIES_TABLE);
+        cleanAllTables();
     }
 
     /* ---------------------- FUNCIONES AUXILIARES ---------------------------------------------------------------- */
@@ -141,12 +142,11 @@ public class LocalityDaoImplTest {
     public void testCreateLocalitySuccessfully()
     {
         // 1. Precondiciones
-        cleanAllTables();
         insertProvince();
         Locality l = localityModel();
+        l.setId(null);
 
         // 2. Ejercitar
-        l.setId(null);
         Locality locality = this.localityDao.create(l);
 
         // 3. Postcondiciones
@@ -159,7 +159,6 @@ public class LocalityDaoImplTest {
     public void testCreateAnotherLocalitySuccessfully()
     {
         // 1. Precondiciones
-        cleanAllTables();
         insertLocality();
         Locality l = new Locality();
         l.setName(LOCALITY_2);
@@ -179,7 +178,7 @@ public class LocalityDaoImplTest {
     public void testCreateLocalityNullFail()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
         expectedException.expect(IllegalArgumentException.class);
 
         // 2. Ejercitar
@@ -193,7 +192,7 @@ public class LocalityDaoImplTest {
     public void testCreateLocalityEmptyLocalityFail()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
         Locality l = new Locality();
         expectedException.expect(PersistenceException.class);
 
@@ -208,7 +207,7 @@ public class LocalityDaoImplTest {
     public void testCreateLocalityEmptyProvinceFail() // TODO: Tirar un error si no se especifica country
     {
         // 1. Precondiciones
-        cleanAllTables();
+
         Locality l = new Locality();
         l.setName(LOCALITY);
         expectedException.expect(PersistenceException.class);
@@ -225,7 +224,7 @@ public class LocalityDaoImplTest {
     public void testCreateProvinceEmptyNameFail()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
         insertProvince();
         Locality l = new Locality();
         l.setProvince(provinceModel());
@@ -244,7 +243,7 @@ public class LocalityDaoImplTest {
     public void testFindLocalityById()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
         insertLocality();
         insertAnotherLocality();
 
@@ -259,7 +258,7 @@ public class LocalityDaoImplTest {
     @Test
     public void testFindLocalityByIdDoesntExist() {
         // 1. Precondiciones
-        cleanAllTables();
+
         insertLocality();
 
         // 2. Ejercitar
@@ -273,7 +272,7 @@ public class LocalityDaoImplTest {
     public void testFindLocalityByIdNull()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
         insertProvince();
         expectedException.expect(IllegalArgumentException.class);
 
@@ -290,7 +289,7 @@ public class LocalityDaoImplTest {
     public void testFindLocalitiesByIds()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
         insertLocality();
         insertAnotherLocality();
 
@@ -309,7 +308,7 @@ public class LocalityDaoImplTest {
     public void testFindLocalitiesByIdsNotAllPresent()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
         insertLocality();
 
         // 2. Ejercitar
@@ -327,7 +326,7 @@ public class LocalityDaoImplTest {
     public void testFindLocalitiesByIdsDoesntExist()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
 
         // 2. Ejercitar
         Collection<Locality> localities = this.localityDao.findByIds(Arrays.asList(STARTING_ID, STARTING_ID+1));
@@ -343,13 +342,9 @@ public class LocalityDaoImplTest {
     public void testFindLocalitiesByName()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
         insertLocality();
         insertAnotherLocality();
-        Map<String, Object> map = new HashMap<>();
-        map.put("name", LOCALITY);
-        map.put("province_id", STARTING_ID);
-        provinceJdbcInsert.execute(map);
 
         // 2. Ejercitar
         Collection<Locality> localities = this.localityDao.findByName(LOCALITY);
@@ -366,7 +361,7 @@ public class LocalityDaoImplTest {
     public void testFindLocalitiesByNameDoesntExist()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
         insertLocality();
 
         // 2. Ejercitar
@@ -381,7 +376,7 @@ public class LocalityDaoImplTest {
     public void testFindLocalityByNameNull()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
         insertLocality();
         insertAnotherLocality();
         expectedException.expect(IllegalArgumentException.class);
@@ -397,7 +392,7 @@ public class LocalityDaoImplTest {
     public void testFindLocalityByContainingName()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
         insertLocality();
         insertAnotherLocality();
         Map<String, Object> map = new HashMap<>();
@@ -418,7 +413,7 @@ public class LocalityDaoImplTest {
     public void testLocalityList()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
         insertLocality();
         insertAnotherLocality();
 
@@ -433,7 +428,7 @@ public class LocalityDaoImplTest {
     @Test
     public void testLocalitysEmptyList() {
         // 1. Precondiciones
-        cleanAllTables();
+
 
         // 2. Ejercitar
         Collection<Locality> localities = this.localityDao.list();
@@ -449,7 +444,7 @@ public class LocalityDaoImplTest {
     @Test
     public void testLocalityUpdate() {
         // 1. Precondiciones
-        cleanAllTables();
+
         insertLocality();
         insertAnotherLocality();
         Locality l = localityModel();
@@ -469,7 +464,7 @@ public class LocalityDaoImplTest {
     public void testLocalityUpdateNull()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
         insertLocality();
         insertAnotherLocality();
         expectedException.expect(IllegalArgumentException.class);
@@ -486,7 +481,7 @@ public class LocalityDaoImplTest {
     public void testLocalityUpdateNotExistentLocality()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
         insertProvince();
         insertAnotherLocality();
         Locality l = localityModel();
@@ -504,7 +499,7 @@ public class LocalityDaoImplTest {
     public void testLocalityUpdateLocalityWithNullName()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
         insertLocality();
         Locality l = new Locality();
         l.setProvince(provinceModel());
@@ -522,7 +517,7 @@ public class LocalityDaoImplTest {
     public void testLocalityUpdateLocalityWithNullId()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
         insertLocality();
         Locality l = localityModel();
         l.setId(null);
@@ -541,7 +536,7 @@ public class LocalityDaoImplTest {
     public void testLocalityRemoveById()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
         insertLocality();
 
         // 2. Ejercitar
@@ -555,7 +550,7 @@ public class LocalityDaoImplTest {
     public void testProvinceRemoveByIdNotExistent()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
         insertLocality();
 
         // 2. Ejercitar
@@ -570,7 +565,7 @@ public class LocalityDaoImplTest {
     public void testProvinceRemoveByNullId()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
         insertLocality();
         expectedException.expect(IllegalArgumentException.class);
 
@@ -587,7 +582,7 @@ public class LocalityDaoImplTest {
     public void testProvinceRemoveByModel()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
         insertLocality();
         Locality l = localityModel();
 
@@ -602,7 +597,7 @@ public class LocalityDaoImplTest {
     public void testLocalityRemoveByModelNotExistent()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
         insertProvince();
         insertAnotherLocality();
         Locality l = localityModel();
@@ -620,7 +615,7 @@ public class LocalityDaoImplTest {
     public void testLocalityRemoveByNullModel()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
         insertLocality();
         expectedException.expect(IllegalArgumentException.class);
 
@@ -637,7 +632,7 @@ public class LocalityDaoImplTest {
     public void testLocalityCount()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
         insertLocality();
         insertAnotherLocality();
 
@@ -654,7 +649,7 @@ public class LocalityDaoImplTest {
     public void testLocalityCountEmptyTable()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
 
         // 2. Ejercitar
         ModelMetadata modelMetadata = this.localityDao.count();
@@ -670,7 +665,7 @@ public class LocalityDaoImplTest {
     @Test
     public void testLocalityFindByProvince(){
         // 1. Precondiciones
-        cleanAllTables();
+
         insertLocality();
         insertAnotherLocality();
 
@@ -695,7 +690,7 @@ public class LocalityDaoImplTest {
     @Test
     public void testLocalityFindByProvinceDoesntExists(){
         // 1. Precondiciones
-        cleanAllTables();
+
         insertCountry();
 
         Map<String, Object> provinceMap = new HashMap<>();
@@ -721,9 +716,10 @@ public class LocalityDaoImplTest {
     @Test
     public void testProvinceFindByCountryNull(){
         // 1. Precondiciones
-        cleanAllTables();
+
         insertLocality();
         insertAnotherLocality();
+        expectedException.expect(IllegalArgumentException.class);
 
         // 2. Ejercitar
         List<Locality> localities = this.localityDao.findByProvince(null);
@@ -738,7 +734,7 @@ public class LocalityDaoImplTest {
     @Test
     public void testLocalityFindByProvinceAndName(){
         // 1. Precondiciones
-        cleanAllTables();
+
         insertLocality();
         insertAnotherLocality();
 
@@ -767,7 +763,7 @@ public class LocalityDaoImplTest {
     @Test
     public void testLocalityFindByProvinceAndNameProvinceDoesntExists(){
         // 1. Precondiciones
-        cleanAllTables();
+
         insertCountry();
 
         Map<String, Object> provinceMap = new HashMap<>();
@@ -791,7 +787,7 @@ public class LocalityDaoImplTest {
     @Test
     public void testProvinceFindByProvinceAndNameProvinceNull(){
         // 1. Precondiciones
-        cleanAllTables();
+
         insertLocality();
         insertAnotherLocality();
         expectedException.expect(IllegalArgumentException.class);
@@ -807,7 +803,7 @@ public class LocalityDaoImplTest {
     @Test
     public void testLocalitiesFindByProvinceAndNameNameDoesntExists(){
         // 1. Precondiciones
-        cleanAllTables();
+
         insertCountry();
 
         Map<String, Object> provinceMap = new HashMap<>();
@@ -831,7 +827,7 @@ public class LocalityDaoImplTest {
     @Test
     public void testLocalityFindByProvinceAndNameNameNull(){
         // 1. Precondiciones
-        cleanAllTables();
+
         insertLocality();
         insertAnotherLocality();
         expectedException.expect(IllegalArgumentException.class);
@@ -847,7 +843,7 @@ public class LocalityDaoImplTest {
     @Test
     public void testLocalityFindByProvinceAndNameNameContains(){
         // 1. Precondiciones
-        cleanAllTables();
+
         insertLocality();
         insertAnotherLocality();
 

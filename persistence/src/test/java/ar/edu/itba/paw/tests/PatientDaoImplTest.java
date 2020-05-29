@@ -112,6 +112,7 @@ public class PatientDaoImplTest {
         this.patientJdbcInsert = new SimpleJdbcInsert(this.ds)
                 .withTableName(PATIENTS_TABLE)
                 .usingGeneratedKeyColumns("patient_id");
+        cleanAllTables();
     }
 
     /* ---------------------- FUNCIONES AUXILIARES ---------------------------------------------------------------- */
@@ -457,13 +458,12 @@ public class PatientDaoImplTest {
     @Test
     public void testCreatePatientSuccessfully() {
         // 1. Precondiciones
-        cleanAllTables();
         insertOffice();
         insertUser();
         Patient p = patientModel();
+        p.setId(null);
 
         // 2. Ejercitar
-        p.setId(null);
         Patient patient = this.patientDao.create(p);
 
         // 3. Postcondiciones
@@ -475,14 +475,13 @@ public class PatientDaoImplTest {
     @Test
     public void testCreateAnotherPatientSuccessfully() {
         // 1. Precondiciones
-        cleanAllTables();
         insertUser();
         insertOffice();
         insertAnotherPatient();
         Patient p = patientModel();
+        p.setId(null);
 
         // 2. Ejercitar
-        p.setId(null);
         Patient patient = this.patientDao.create(p);
 
         // 3. Postcondiciones
@@ -495,7 +494,7 @@ public class PatientDaoImplTest {
     public void testCreatePatientNullFail()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
         expectedException.expect(IllegalArgumentException.class);
 
         // 2. Ejercitar
@@ -509,7 +508,7 @@ public class PatientDaoImplTest {
     public void testCreatePatientEmptyPatientFail()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
         Patient p = new Patient();
         expectedException.expect(CoreMatchers.anyOf( // Falla si no se tira ninguna de las excepciones de la lista
                 CoreMatchers.instanceOf(PersistenceException.class), // Esta excepcion se tira si es null
@@ -528,7 +527,7 @@ public class PatientDaoImplTest {
     public void testCreatePatientEmptyUserFail()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
         Patient p = patientModel();
         p.setUser(null);
         expectedException.expect(PersistenceException.class);
@@ -544,7 +543,7 @@ public class PatientDaoImplTest {
     public void testCreatePatientEmptyOfficeFail()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
         Patient p = patientModel();
         p.setOffice(null);
         expectedException.expect(PersistenceException.class);
@@ -562,7 +561,7 @@ public class PatientDaoImplTest {
     public void testFindPatientById()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
         insertPatient();
         insertAnotherPatient();
 
@@ -579,7 +578,7 @@ public class PatientDaoImplTest {
     public void testFindPatientByIdDoesntExist()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
         insertPatient();
 
         // 2. Ejercitar
@@ -593,7 +592,7 @@ public class PatientDaoImplTest {
     public void testFindPatientByIdNull()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
         insertPatient();
         expectedException.expect(IllegalArgumentException.class);
 
@@ -610,7 +609,7 @@ public class PatientDaoImplTest {
     public void testFindPatientByIds()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
         insertPatient();
         insertAnotherPatient();
 
@@ -629,7 +628,7 @@ public class PatientDaoImplTest {
     public void testFindPatientByIdsNotAllPresent()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
         insertPatient();
 
         // 2. Ejercitar
@@ -647,7 +646,7 @@ public class PatientDaoImplTest {
     public void testFindPatientByIdsDontExist()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
 
         // 2. Ejercitar
         Collection<Patient> patients = this.patientDao.findByIds(Arrays.asList(STARTING_ID, STARTING_ID + 1));
@@ -663,7 +662,7 @@ public class PatientDaoImplTest {
     public void testPatientList()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
         insertPatient();
         insertAnotherPatient();
 
@@ -679,7 +678,7 @@ public class PatientDaoImplTest {
     public void testPatientEmptyList()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
 
         // 2. Ejercitar
         Collection<Patient> patients = this.patientDao.list();
@@ -695,7 +694,7 @@ public class PatientDaoImplTest {
     public void testPatientUpdate()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
         insertPatient();
         insertAnotherPatient();
         Map<String, Object> officeMap = new HashMap<>();
@@ -727,7 +726,7 @@ public class PatientDaoImplTest {
     public void testPatientUpdateNull()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
         insertPatient();
         insertAnotherPatient();
         expectedException.expect(IllegalArgumentException.class);
@@ -744,7 +743,7 @@ public class PatientDaoImplTest {
     public void testPatientUpdateNotExistentPatient()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
         insertUser();
         insertOffice();
         insertAnotherPatient();
@@ -763,7 +762,7 @@ public class PatientDaoImplTest {
     public void testPatientUpdatePatientWithNullUser()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
         insertPatient();
         Patient p = patientModel();
         p.setUser(null);
@@ -781,7 +780,7 @@ public class PatientDaoImplTest {
     public void testPatientUpdatePatientWithNullId()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
         insertPatient();
         Patient p = patientModel();
         p.setId(null);
@@ -800,7 +799,7 @@ public class PatientDaoImplTest {
     public void testPatientRemoveById()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
         insertPatient();
 
         // 2. Ejercitar
@@ -814,7 +813,7 @@ public class PatientDaoImplTest {
     public void testPatientRemoveByIdNotExistent()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
         insertPatient();
         expectedException.expect(IllegalArgumentException.class);
 
@@ -829,7 +828,7 @@ public class PatientDaoImplTest {
     public void testPatientRemoveByNullId()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
         insertPatient();
         expectedException.expect(IllegalArgumentException.class);
 
@@ -845,7 +844,7 @@ public class PatientDaoImplTest {
     public void testPatientRemoveByModel()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
         insertPatient();
         Patient p = patientModel();
 
@@ -860,7 +859,7 @@ public class PatientDaoImplTest {
     public void testPatientRemoveByModelNotExistent()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
         insertUser();
         insertOffice();
         insertAnotherPatient();
@@ -879,7 +878,7 @@ public class PatientDaoImplTest {
     public void testPatientRemoveByNullModel()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
         insertPatient();
         expectedException.expect(IllegalArgumentException.class);
 
@@ -896,7 +895,7 @@ public class PatientDaoImplTest {
     public void testPatientCount()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
         insertPatient();
         insertAnotherPatient();
 
@@ -913,7 +912,7 @@ public class PatientDaoImplTest {
     public void testPatientCountEmptyTable()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
 
         // 2. Ejercitar
         ModelMetadata modelMetadata = this.patientDao.count();

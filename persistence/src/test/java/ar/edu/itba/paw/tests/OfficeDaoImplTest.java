@@ -74,6 +74,7 @@ public class OfficeDaoImplTest
                 .usingGeneratedKeyColumns("province_id");
         this.countryJdbcInsert = new SimpleJdbcInsert(this.ds)
                 .withTableName(COUNTRIES_TABLE);
+        cleanAllTables();
     }
 
     /* ---------------------- FUNCIONES AUXILIARES ---------------------------------------------------------------- */
@@ -202,7 +203,6 @@ public class OfficeDaoImplTest
     public void testCreateOfficeSuccessfully()
     {
         // 1. Precondiciones
-        cleanAllTables();
         insertLocality();
         Office o = officeModel();
 
@@ -224,13 +224,13 @@ public class OfficeDaoImplTest
     public void testCreateAnotherOfficeSuccessfully()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
         insertOffice();
         Office o = officeModel();
         o.setName(OFFICE_2);
+        o.setId(null);
 
         // 2. Ejercitar
-        o.setId(null);
         Office office = this.officeDao.create(o);
 
         // 3. Postcondiciones
@@ -248,7 +248,7 @@ public class OfficeDaoImplTest
     public void testCreateOfficeNullFail()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
         expectedException.expect(IllegalArgumentException.class);
 
         // 2. Ejercitar
@@ -262,7 +262,7 @@ public class OfficeDaoImplTest
     public void testCreateOfficeEmptyOfficeFail()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
         Office o = new Office();
         expectedException.expect(PersistenceException.class);
 
@@ -277,7 +277,7 @@ public class OfficeDaoImplTest
     public void testCreateOfficeEmptyLocalityFail() // TODO: Tirar un error si no se especifica country
     {
         // 1. Precondiciones
-        cleanAllTables();
+
         Office o = new Office();
         o.setName(OFFICE);
         expectedException.expect(PersistenceException.class); // TODO: chequear esta excepcion (poco descriptiva)
@@ -294,7 +294,7 @@ public class OfficeDaoImplTest
     public void testCreateLocalityEmptyNameFail()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
         insertLocality();
         Office o = new Office();
         o.setLocality(localityModel());
@@ -313,7 +313,7 @@ public class OfficeDaoImplTest
     public void testFindOfficeById()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
         insertOffice();
         insertAnotherOffice();
 
@@ -329,7 +329,7 @@ public class OfficeDaoImplTest
     public void testFindOfficeByIdDoesntExist()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
         insertOffice();
 
         // 2. Ejercitar
@@ -343,7 +343,7 @@ public class OfficeDaoImplTest
     public void testFindOfficeByIdNull()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
         insertLocality();
         expectedException.expect(IllegalArgumentException.class);
 
@@ -360,7 +360,7 @@ public class OfficeDaoImplTest
     public void testFindOfficesByIds()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
         insertOffice();
         insertAnotherOffice();
 
@@ -379,7 +379,7 @@ public class OfficeDaoImplTest
     public void testFindOfficesByIdsNotAllPresent()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
         insertOffice();
 
         // 2. Ejercitar
@@ -397,7 +397,7 @@ public class OfficeDaoImplTest
     public void testFindOfficesByIdsDoesntExist()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
 
         // 2. Ejercitar
         Collection<Office> offices = this.officeDao.findByIds(Arrays.asList(STARTING_ID, STARTING_ID+1));
@@ -413,13 +413,9 @@ public class OfficeDaoImplTest
     public void testFindOfficesByName()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
         insertOffice();
         insertAnotherOffice();
-        Map<String, Object> map = new HashMap<>();
-        map.put("name", OFFICE);
-        map.put("locality_id", STARTING_ID);
-        localityJdbcInsert.execute(map);
 
         // 2. Ejercitar
         Collection<Office> offices = this.officeDao.findByName(OFFICE);
@@ -436,7 +432,7 @@ public class OfficeDaoImplTest
     public void testFindOfficesByNameDoesntExist()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
         insertOffice();
 
         // 2. Ejercitar
@@ -451,7 +447,7 @@ public class OfficeDaoImplTest
     public void testFindOfficeByNameNull()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
         insertOffice();
         insertAnotherOffice();
         expectedException.expect(IllegalArgumentException.class);
@@ -467,12 +463,13 @@ public class OfficeDaoImplTest
     public void testFindOfficeByContainingName()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
         insertOffice();
         insertAnotherOffice();
         Map<String, Object> map = new HashMap<>();
         map.put("locality_id", STARTING_ID);
         map.put("name", OFFICE);
+        map.put("street", STREET);
         officeJdbcInsert.execute(map);
 
         // 2. Ejercitar
@@ -488,7 +485,7 @@ public class OfficeDaoImplTest
     public void testOfficeList()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
         insertOffice();
         insertAnotherOffice();
 
@@ -504,7 +501,7 @@ public class OfficeDaoImplTest
     public void testOfficesEmptyList()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
 
         // 2. Ejercitar
         Collection<Office> offices = this.officeDao.list();
@@ -521,7 +518,7 @@ public class OfficeDaoImplTest
     public void testOfficeUpdate()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
         insertOffice();
         insertAnotherOffice();
         Office o = officeModel();
@@ -541,7 +538,7 @@ public class OfficeDaoImplTest
     public void testOfficeUpdateNull()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
         insertOffice();
         insertAnotherOffice();
         expectedException.expect(IllegalArgumentException.class);
@@ -558,7 +555,7 @@ public class OfficeDaoImplTest
     public void testOfficeUpdateNotExistentOffice()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
         insertLocality();
         insertAnotherOffice();
         Office o = officeModel();
@@ -576,7 +573,7 @@ public class OfficeDaoImplTest
     public void testOfficeUpdateOfficeWithNullName()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
         insertOffice();
         Office o = officeModel();
         o.setName(null);
@@ -593,7 +590,7 @@ public class OfficeDaoImplTest
     public void testOfficeUpdateOfficeWithNullId()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
         insertOffice();
         Office o = officeModel();
         o.setId(null);
@@ -610,7 +607,7 @@ public class OfficeDaoImplTest
     public void testOfficeUpdateOfficeWithNullStreet()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
         insertOffice();
         Office o = officeModel();
         o.setStreet(null);
@@ -627,12 +624,12 @@ public class OfficeDaoImplTest
     public void testOfficeUpdateOfficeWithNullNotRequired()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
         insertOffice();
-        Office o = new Office();
-        o.setName(OFFICE);
-        o.setStreet(STREET);
-        o.setId(STARTING_ID);
+        Office o = officeModel();
+        o.setEmail(null);
+        o.setPhone(null);
+        o.setUrl(null);
 
         // 2. Ejercitar
         this.officeDao.update(o);
@@ -647,7 +644,7 @@ public class OfficeDaoImplTest
     public void testOfficeRemoveById()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
         insertOffice();
 
         // 2. Ejercitar
@@ -661,7 +658,7 @@ public class OfficeDaoImplTest
     public void testLocalityRemoveByIdNotExistent()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
         insertOffice();
 
         // 2. Ejercitar
@@ -676,7 +673,7 @@ public class OfficeDaoImplTest
     public void testLocalityRemoveByNullId()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
         insertOffice();
         expectedException.expect(IllegalArgumentException.class);
 
@@ -693,7 +690,7 @@ public class OfficeDaoImplTest
     public void testLocalityRemoveByModel()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
         insertOffice();
         Office o = officeModel();
 
@@ -708,7 +705,7 @@ public class OfficeDaoImplTest
     public void testOfficeRemoveByModelNotExistent()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
         insertLocality();
         insertAnotherOffice();
         Office o = officeModel();
@@ -726,7 +723,7 @@ public class OfficeDaoImplTest
     public void testOfficeRemoveByNullModel()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
         insertOffice();
         expectedException.expect(IllegalArgumentException.class);
 
@@ -743,7 +740,7 @@ public class OfficeDaoImplTest
     public void testOfficeCount()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
         insertOffice();
         insertAnotherOffice();
 
@@ -760,7 +757,7 @@ public class OfficeDaoImplTest
     public void testOfficeCountEmptyTable()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
 
         // 2. Ejercitar
         ModelMetadata modelMetadata = this.officeDao.count();
@@ -775,7 +772,7 @@ public class OfficeDaoImplTest
     @Test
     public void testFindByCountry(){
         // 1. Precondiciones
-        cleanAllTables();
+
 
         insertOffice();
 
@@ -820,7 +817,7 @@ public class OfficeDaoImplTest
     @Test
     public void testFindByCountryDoesntExists() {
         // 1. Precondiciones
-        cleanAllTables();
+
         insertOffice();
 
         //Crear Country modelo
@@ -839,7 +836,7 @@ public class OfficeDaoImplTest
     @Test
     public void testFindByCountryCountryNull(){
         // 1. Precondiciones
-        cleanAllTables();
+
         insertOffice();
         expectedException.expect(IllegalArgumentException.class);
 
@@ -855,7 +852,7 @@ public class OfficeDaoImplTest
     @Test
     public void testFindByProvince(){
         // 1. Precondiciones
-        cleanAllTables();
+
 
         insertOffice();
 
@@ -894,7 +891,7 @@ public class OfficeDaoImplTest
     @Test
     public void testFindByProvinceDoesntExists(){
         // 1. Precondiciones
-        cleanAllTables();
+
         insertOffice();
 
         //Crear Country modelo
@@ -913,7 +910,7 @@ public class OfficeDaoImplTest
     @Test
     public void testFindByProvinceProvinceNull(){
         // 1. Precondiciones
-        cleanAllTables();
+
         insertOffice();
         expectedException.expect(IllegalArgumentException.class);
 
@@ -929,7 +926,7 @@ public class OfficeDaoImplTest
     @Test
     public void testFindByLocality(){
         // 1. Precondiciones
-        cleanAllTables();
+
 
         insertOffice();
 
@@ -962,7 +959,7 @@ public class OfficeDaoImplTest
     @Test
     public void testFindByLocalityDoesntExists(){
         // 1. Precondiciones
-        cleanAllTables();
+
         insertOffice();
 
         //Crear Country modelo
@@ -981,7 +978,7 @@ public class OfficeDaoImplTest
     @Test
     public void testFindByLocalityLocalityNull(){
         // 1. Precondiciones
-        cleanAllTables();
+
         insertOffice();
         expectedException.expect(IllegalArgumentException.class);
 

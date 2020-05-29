@@ -52,6 +52,7 @@ public class StaffSpecialtyDaoImplTest {
         this.staffSpecialtyInsert = new SimpleJdbcInsert(this.ds)
                 .withTableName(STAFF_SPECIALTIES_TABLE)
                 .usingGeneratedKeyColumns("speciality_id");
+        cleanAllTables();
     }
 
     /* ---------------------- FUNCIONES AUXILIARES ---------------------------------------------------------------- */
@@ -86,7 +87,7 @@ public class StaffSpecialtyDaoImplTest {
     @Test
     public void testCreateStaffSpecialtySuccessfully() {
         // 1. Precondiciones
-        cleanAllTables();
+
         StaffSpecialty ss = staffSpecialtyModel();
 
         // 2. Ejercitar
@@ -101,12 +102,12 @@ public class StaffSpecialtyDaoImplTest {
     @Test
     public void testCreateAnotherStaffSpecialtySuccessfully() {
         // 1. Precondiciones
-        cleanAllTables();
+
         insertAnotherStaffSpecialty();
         StaffSpecialty ss = staffSpecialtyModel();
+        ss.setId(null);
 
         // 2. Ejercitar
-        ss.setId(null);
         StaffSpecialty staffSpecialty = this.staffSpecialtyDao.create(ss);
 
         // 3. Postcondiciones
@@ -118,7 +119,7 @@ public class StaffSpecialtyDaoImplTest {
     public void testCreateStaffSpecialtyNullFail()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
         expectedException.expect(IllegalArgumentException.class);
 
         // 2. Ejercitar
@@ -132,7 +133,7 @@ public class StaffSpecialtyDaoImplTest {
     public void testCreateStaffSpecialtyEmptyStaffSpecialtyFail()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
         StaffSpecialty ss = new StaffSpecialty();
         expectedException.expect(PersistenceException.class);
 
@@ -147,7 +148,7 @@ public class StaffSpecialtyDaoImplTest {
     public void testCreateStaffSpecialtyEmptyNameFail()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
         StaffSpecialty ss = staffSpecialtyModel();
         ss.setName(null);
         expectedException.expect(PersistenceException.class);
@@ -165,7 +166,7 @@ public class StaffSpecialtyDaoImplTest {
     public void testFindStaffSpecialtyById()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
         insertStaffSpecialty();
         insertAnotherStaffSpecialty();
 
@@ -181,7 +182,7 @@ public class StaffSpecialtyDaoImplTest {
     public void testFindStaffSpecialtyByIdDoesntExist()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
         insertStaffSpecialty();
 
         // 2. Ejercitar
@@ -195,7 +196,7 @@ public class StaffSpecialtyDaoImplTest {
     public void testFindStaffSpecialtyByIdNull()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
         insertStaffSpecialty();
         expectedException.expect(IllegalArgumentException.class);
 
@@ -212,7 +213,7 @@ public class StaffSpecialtyDaoImplTest {
     public void testFindStaffSpecialtyByIds()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
         insertStaffSpecialty();
         insertAnotherStaffSpecialty();
 
@@ -231,7 +232,7 @@ public class StaffSpecialtyDaoImplTest {
     public void testFindStaffSpecialtyByIdsNotAllPresent()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
         insertStaffSpecialty();
 
         // 2. Ejercitar
@@ -249,7 +250,7 @@ public class StaffSpecialtyDaoImplTest {
     public void testFindStaffSpecialtyByIdsDontExist()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
 
         // 2. Ejercitar
         Collection<StaffSpecialty> staffSpecialties = this.staffSpecialtyDao.findByIds(Arrays.asList(STARTING_ID, STARTING_ID + 1));
@@ -265,7 +266,7 @@ public class StaffSpecialtyDaoImplTest {
     public void testStaffSpecialtyList()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
         insertStaffSpecialty();
         insertAnotherStaffSpecialty();
 
@@ -281,7 +282,7 @@ public class StaffSpecialtyDaoImplTest {
     public void testStaffSpecialtyEmptyList()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
 
         // 2. Ejercitar
         Collection<StaffSpecialty> staffSpecialties = this.staffSpecialtyDao.list();
@@ -297,7 +298,7 @@ public class StaffSpecialtyDaoImplTest {
     public void testStaffSpecialtyUpdate()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
         insertStaffSpecialty();
         insertAnotherStaffSpecialty();
         StaffSpecialty ss = staffSpecialtyModel();
@@ -316,7 +317,7 @@ public class StaffSpecialtyDaoImplTest {
     public void testStaffSpecialtyUpdateNull()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
         insertStaffSpecialty();
         insertAnotherStaffSpecialty();
         expectedException.expect(IllegalArgumentException.class);
@@ -333,7 +334,7 @@ public class StaffSpecialtyDaoImplTest {
     public void testStaffSpecialtyUpdateNotExistentStaffSpecialty()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
         insertAnotherStaffSpecialty();
         StaffSpecialty ss = staffSpecialtyModel();
         ss.setId(STARTING_ID + 1);
@@ -350,7 +351,7 @@ public class StaffSpecialtyDaoImplTest {
     public void testStaffSpecialtyUpdateStaffSpecialtyWithNullName()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
         insertStaffSpecialty();
         StaffSpecialty ss = staffSpecialtyModel();
         ss.setName(null);
@@ -368,7 +369,7 @@ public class StaffSpecialtyDaoImplTest {
     public void testStaffSpecialtyUpdateStaffSpecialtyWithNullId()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
         insertStaffSpecialty();
         StaffSpecialty ss = staffSpecialtyModel();
         ss.setId(null);
@@ -387,7 +388,7 @@ public class StaffSpecialtyDaoImplTest {
     public void testStaffSpecialtyRemoveById()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
         insertStaffSpecialty();
 
         // 2. Ejercitar
@@ -401,7 +402,7 @@ public class StaffSpecialtyDaoImplTest {
     public void testStaffSpecialtyRemoveByIdNotExistent()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
         insertStaffSpecialty();
         expectedException.expect(IllegalArgumentException.class);
 
@@ -416,7 +417,7 @@ public class StaffSpecialtyDaoImplTest {
     public void testStaffSpecialtyRemoveByNullId()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
         insertStaffSpecialty();
         expectedException.expect(IllegalArgumentException.class);
 
@@ -432,7 +433,7 @@ public class StaffSpecialtyDaoImplTest {
     public void testStaffSpecialtyRemoveByModel()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
         insertStaffSpecialty();
         StaffSpecialty ss = staffSpecialtyModel();
 
@@ -447,7 +448,7 @@ public class StaffSpecialtyDaoImplTest {
     public void testStaffSpecialtyRemoveByModelNotExistent()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
         insertAnotherStaffSpecialty();
         StaffSpecialty ss = staffSpecialtyModel();
         ss.setId(STARTING_ID + 1);
@@ -464,7 +465,7 @@ public class StaffSpecialtyDaoImplTest {
     public void testStaffSpecialtyRemoveByNullModel()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
         insertStaffSpecialty();
         expectedException.expect(IllegalArgumentException.class);
 
@@ -481,7 +482,7 @@ public class StaffSpecialtyDaoImplTest {
     public void testStaffSpecialtyCount()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
         insertStaffSpecialty();
         insertAnotherStaffSpecialty();
 
@@ -498,7 +499,7 @@ public class StaffSpecialtyDaoImplTest {
     public void testStaffSpecialtyCountEmptyTable()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
 
         // 2. Ejercitar
         ModelMetadata modelMetadata = this.staffSpecialtyDao.count();

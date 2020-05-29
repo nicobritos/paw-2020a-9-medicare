@@ -121,6 +121,7 @@ public class WorkdayDaoImplTest
         this.workdayJdbcInsert = new SimpleJdbcInsert(this.ds)
                 .withTableName(WORKDAYS_TABLE)
                 .usingGeneratedKeyColumns("workday_id");
+        cleanAllTables();
     }
 
     /* ---------------------- FUNCIONES AUXILIARES ---------------------------------------------------------------- */
@@ -422,12 +423,12 @@ public class WorkdayDaoImplTest
     @Test
     public void testCreateWorkdaySuccessfully() {
         // 1. Precondiciones
-        cleanAllTables();
         insertStaff();
         Workday w = workdayModel();
+        w.setId(null);
+
 
         // 2. Ejercitar
-        w.setId(null);
         Workday workday = this.workdayDao.create(w);
 
         // 3. Postcondiciones
@@ -443,13 +444,12 @@ public class WorkdayDaoImplTest
     @Test
     public void testCreateAnotherWorkdaySuccessfully() {
         // 1. Precondiciones
-        cleanAllTables();
         insertStaff();
         insertAnotherWorkday();
         Workday w = workdayModel();
+        w.setId(null);
 
         // 2. Ejercitar
-        w.setId(null);
         Workday workday = this.workdayDao.create(w);
 
         // 3. Postcondiciones
@@ -466,7 +466,7 @@ public class WorkdayDaoImplTest
     public void testCreateWorkdayNullFail()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
         expectedException.expect(IllegalArgumentException.class);
 
         // 2. Ejercitar
@@ -480,7 +480,7 @@ public class WorkdayDaoImplTest
     public void testCreateWorkdayEmptyWorkdayFail()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
         Workday w = new Workday();
         expectedException.expect(PersistenceException.class);
 
@@ -495,7 +495,7 @@ public class WorkdayDaoImplTest
     public void testCreateWorkdayEmptyStaffFail()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
         insertStaff();
         Workday w = workdayModel();
         w.setStaff(null);
@@ -512,7 +512,7 @@ public class WorkdayDaoImplTest
     public void testCreateWorkdayEmptyStartMinuteFail()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
         insertStaff();
         Workday w = workdayModel();
         w.setStartMinute(null);
@@ -529,7 +529,7 @@ public class WorkdayDaoImplTest
     public void testCreateWorkdayEmptyStartHourFail()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
         insertStaff();
         Workday w = workdayModel();
         w.setStartHour(null);
@@ -546,7 +546,7 @@ public class WorkdayDaoImplTest
     public void testCreateWorkdayEmptyEndHourFail()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
         insertStaff();
         Workday w = workdayModel();
         w.setEndHour(null);
@@ -563,7 +563,7 @@ public class WorkdayDaoImplTest
     public void testCreateWorkdayEmptyEndMinuteFail()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
         insertStaff();
         Workday w = workdayModel();
         w.setEndMinute(null);
@@ -580,7 +580,7 @@ public class WorkdayDaoImplTest
     public void testCreateWorkdayEmptyDayFail()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
         insertStaff();
         Workday w = workdayModel();
         w.setDay(null);
@@ -597,7 +597,7 @@ public class WorkdayDaoImplTest
     public void testCreateWorkdayInvalidHoursFail()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
         insertStaff();
         Workday w = workdayModel();
         w.setStartMinute(w.getEndMinute() + 1);
@@ -617,7 +617,7 @@ public class WorkdayDaoImplTest
     public void testFindWorkdayById()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
         insertWorkday();
         insertAnotherWorkday();
 
@@ -633,7 +633,7 @@ public class WorkdayDaoImplTest
     public void testFindWorkdayByIdDoesntExist()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
         insertWorkday();
 
         // 2. Ejercitar
@@ -647,7 +647,7 @@ public class WorkdayDaoImplTest
     public void testFindWorkdayByIdNull()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
         insertWorkday();
         expectedException.expect(IllegalArgumentException.class);
 
@@ -664,7 +664,7 @@ public class WorkdayDaoImplTest
     public void testFindWorkdayByIds()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
         insertWorkday();
         insertAnotherWorkday();
 
@@ -683,7 +683,7 @@ public class WorkdayDaoImplTest
     public void testFindWorkdayByIdsNotAllPresent()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
         insertWorkday();
 
         // 2. Ejercitar
@@ -701,7 +701,7 @@ public class WorkdayDaoImplTest
     public void testFindWorkdayByIdsDontExist()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
 
         // 2. Ejercitar
         Collection<Workday> workdays = this.workdayDao.findByIds(Arrays.asList(STARTING_ID, STARTING_ID + 1));
@@ -717,7 +717,7 @@ public class WorkdayDaoImplTest
     public void testWorkdayList()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
         insertWorkday();
         insertAnotherWorkday();
 
@@ -733,7 +733,7 @@ public class WorkdayDaoImplTest
     public void testWorkdayEmptyList()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
 
         // 2. Ejercitar
         Collection<Workday> workdays = this.workdayDao.list();
@@ -749,7 +749,7 @@ public class WorkdayDaoImplTest
     public void testWorkdayUpdate()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
         insertWorkday();
         insertAnotherWorkday();
         Workday w = workdayModel();
@@ -768,7 +768,7 @@ public class WorkdayDaoImplTest
     public void testWorkdayUpdateNull()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
         insertWorkday();
         insertAnotherWorkday();
         expectedException.expect(IllegalArgumentException.class);
@@ -785,7 +785,7 @@ public class WorkdayDaoImplTest
     public void testWorkdayUpdateNotExistentWorkday()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
         insertStaff();
         insertAnotherWorkday();
         Workday w = workdayModel();
@@ -803,7 +803,7 @@ public class WorkdayDaoImplTest
     public void testWorkdayUpdateWorkdayWithNullStaff()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
         insertWorkday();
         Workday w = workdayModel();
         w.setStaff(null);
@@ -821,7 +821,7 @@ public class WorkdayDaoImplTest
     public void testWorkdayUpdateWorkdayWithNullId()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
         insertWorkday();
         Workday w = workdayModel();
         w.setId(null);
@@ -838,7 +838,7 @@ public class WorkdayDaoImplTest
     public void testWorkdayUpdateWorkdayWithNullStartHour()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
         insertWorkday();
         Workday w = workdayModel();
         w.setStartHour(null);
@@ -856,7 +856,7 @@ public class WorkdayDaoImplTest
     public void testWorkdayUpdateWorkdayWithNullStartMinute()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
         insertWorkday();
         Workday w = workdayModel();
         w.setStartMinute(null);
@@ -874,7 +874,7 @@ public class WorkdayDaoImplTest
     public void testWorkdayUpdateWorkdayWithNullEndHour()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
         insertWorkday();
         Workday w = workdayModel();
         w.setEndHour(null);
@@ -892,7 +892,7 @@ public class WorkdayDaoImplTest
     public void testWorkdayUpdateWorkdayWithNullEndMinute()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
         insertWorkday();
         Workday w = workdayModel();
         w.setEndMinute(null);
@@ -910,7 +910,7 @@ public class WorkdayDaoImplTest
     public void testWorkdayUpdateWorkdayWithNullDay()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
         insertWorkday();
         Workday w = workdayModel();
         w.setDay(null);
@@ -930,7 +930,7 @@ public class WorkdayDaoImplTest
     public void testWorkdayRemoveById()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
         insertWorkday();
 
         // 2. Ejercitar
@@ -944,7 +944,7 @@ public class WorkdayDaoImplTest
     public void testWorkdayRemoveByIdNotExistent()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
         insertWorkday();
         expectedException.expect(IllegalArgumentException.class);
 
@@ -959,7 +959,7 @@ public class WorkdayDaoImplTest
     public void testWorkdayRemoveByNullId()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
         insertWorkday();
         expectedException.expect(IllegalArgumentException.class);
 
@@ -975,7 +975,7 @@ public class WorkdayDaoImplTest
     public void testWorkdayRemoveByModel()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
         insertWorkday();
         Workday w = workdayModel();
 
@@ -990,7 +990,7 @@ public class WorkdayDaoImplTest
     public void testWorkdayRemoveByModelNotExistent()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
         insertStaff();
         insertAnotherWorkday();
         Workday w = workdayModel();
@@ -1008,7 +1008,7 @@ public class WorkdayDaoImplTest
     public void testWorkdayRemoveByNullModel()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
         insertWorkday();
         expectedException.expect(IllegalArgumentException.class);
 
@@ -1025,7 +1025,7 @@ public class WorkdayDaoImplTest
     public void testWorkdayCount()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
         insertWorkday();
         insertAnotherWorkday();
 
@@ -1042,7 +1042,7 @@ public class WorkdayDaoImplTest
     public void testWorkdayCountEmptyTable()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
 
         // 2. Ejercitar
         ModelMetadata modelMetadata = this.workdayDao.count();
@@ -1059,7 +1059,7 @@ public class WorkdayDaoImplTest
     public void testWorkdayFindByStaff()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
         insertWorkday();
 
         Map<String, Object> userMap = new HashMap<>();
@@ -1108,7 +1108,7 @@ public class WorkdayDaoImplTest
     public void testWorkdayFindByStaffNull()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
         insertWorkday();
 
         Map<String, Object> userMap = new HashMap<>();
@@ -1154,7 +1154,7 @@ public class WorkdayDaoImplTest
     public void testWorkdayFindByStaffDoesntExists()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
         insertWorkday();
         Staff s = staffModel();
         s.setId(STARTING_ID + 1);
@@ -1174,7 +1174,7 @@ public class WorkdayDaoImplTest
     public void testWorkdayFindByStaffWorkdayDay()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
         insertWorkday();
 
         Map<String, Object> userMap = new HashMap<>();
@@ -1223,7 +1223,7 @@ public class WorkdayDaoImplTest
     public void testWorkdayFindByStaffWorkdayDayStaffNull()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
         insertWorkday();
 
         Map<String, Object> userMap = new HashMap<>();
@@ -1269,7 +1269,7 @@ public class WorkdayDaoImplTest
     public void testWorkdayFindByStaffWorkdayDayStaffDoesntExists()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
         insertWorkday();
         Staff s = staffModel();
         s.setId(STARTING_ID + 1);
@@ -1287,7 +1287,7 @@ public class WorkdayDaoImplTest
     public void testWorkdayFindByStaffWorkdayDayWorkdayDayNull()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
         insertWorkday();
 
         Map<String, Object> userMap = new HashMap<>();
@@ -1333,7 +1333,7 @@ public class WorkdayDaoImplTest
     public void testWorkdayFindByStaffWorkdayDayWorkdayDayDoesntExists()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
         insertWorkday();
         Staff s = staffModel();
         s.setId(STARTING_ID + 1);
@@ -1351,7 +1351,7 @@ public class WorkdayDaoImplTest
     public void testWorkdayFindByStaffWorkdayDayBothNull()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
         insertWorkday();
 
         Map<String, Object> userMap = new HashMap<>();
@@ -1399,7 +1399,7 @@ public class WorkdayDaoImplTest
     public void testWorkdayFindByUser()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
         insertWorkday();
 
         Map<String, Object> userMap = new HashMap<>();
@@ -1448,7 +1448,7 @@ public class WorkdayDaoImplTest
     public void testWorkdayFindByUserNull()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
         insertWorkday();
 
         Map<String, Object> userMap = new HashMap<>();
@@ -1494,7 +1494,7 @@ public class WorkdayDaoImplTest
     public void testWorkdayFindByUserDoesntExists()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
         insertWorkday();
         User u = userModel();
         u.setId(STARTING_ID + 1);
@@ -1514,7 +1514,7 @@ public class WorkdayDaoImplTest
     public void testWorkdayIsStaffWorking()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
         insertWorkday();
         LocalDateTime startDate = new LocalDateTime(2020, 5, 25,START_HOUR, START_MINUTE); // 25/5/2020 es lunes
         AppointmentTimeSlot appointmentTimeSlot = new AppointmentTimeSlot();
@@ -1531,7 +1531,7 @@ public class WorkdayDaoImplTest
     public void testWorkdayIsntStaffWorking()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
         insertWorkday();
         LocalDateTime startDate = new LocalDateTime(2020, 5, 27, START_HOUR, START_MINUTE); // 27/5/2020 es miercoles
         AppointmentTimeSlot appointmentTimeSlot = new AppointmentTimeSlot();
@@ -1548,7 +1548,7 @@ public class WorkdayDaoImplTest
     public void testWorkdayIsStaffWorkingNullTimeSlot()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
         insertWorkday();
         expectedException.expect(IllegalArgumentException.class);
 
@@ -1563,7 +1563,7 @@ public class WorkdayDaoImplTest
     public void testWorkdayIsStaffWorkingNullBoth()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
         insertWorkday();
         expectedException.expect(IllegalArgumentException.class);
 
@@ -1578,7 +1578,7 @@ public class WorkdayDaoImplTest
     public void testWorkdayIsStaffWorkingNullStaff()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
         insertWorkday();
         LocalDateTime startDate = new LocalDateTime(2020, 5, 25,START_HOUR, START_MINUTE); // 25/5/2020 es lunes
         AppointmentTimeSlot appointmentTimeSlot = new AppointmentTimeSlot();

@@ -151,6 +151,7 @@ public class AppointmentDaoImplTest {
         this.appointmentJdbcInsert = new SimpleJdbcInsert(this.ds)
                 .withTableName(APPOINTMENTS_TABLE)
                 .usingGeneratedKeyColumns("appointment_id");
+        cleanAllTables();
     }
 
     /* ---------------------- FUNCIONES AUXILIARES ---------------------------------------------------------------- */
@@ -577,13 +578,13 @@ public class AppointmentDaoImplTest {
     @Test
     public void testCreateAppointmentSuccessfully() {
         // 1. Precondiciones
-        cleanAllTables();
+
         Appointment a = appointmentModel();
         insertPatient();
         insertStaff();
+        a.setId(null);
 
         // 2. Ejercitar
-        a.setId(null);
         Appointment appointment = this.appointmentDao.create(a);
 
         // 3. Postcondiciones
@@ -599,14 +600,14 @@ public class AppointmentDaoImplTest {
     @Test
     public void testCreateAnotherAppointmentSuccessfully() {
         // 1. Precondiciones
-        cleanAllTables();
+
         insertPatient();
         insertStaff();
         insertAnotherAppointment();
         Appointment a = appointmentModel();
+        a.setId(null);
 
         // 2. Ejercitar
-        a.setId(null);
         Appointment appointment = this.appointmentDao.create(a);
 
         // 3. Postcondiciones
@@ -623,7 +624,7 @@ public class AppointmentDaoImplTest {
     public void testCreateAppointmentNullFail()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
         expectedException.expect(IllegalArgumentException.class);
 
         // 2. Ejercitar
@@ -637,7 +638,7 @@ public class AppointmentDaoImplTest {
     public void testCreateAppointmentEmptyAppointmentFail()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
         Appointment a = new Appointment();
         expectedException.expect(CoreMatchers.anyOf( // Falla si no se tira ninguna de las excepciones de la lista
                 CoreMatchers.instanceOf(PersistenceException.class), // Esta excepcion se tira si es null // TODO: chequear esta excepcion (poco descriptiva)
@@ -656,10 +657,10 @@ public class AppointmentDaoImplTest {
     public void testCreateAppointmentEmptyStatusFail()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
         Appointment a = appointmentModel();
          a.setAppointmentStatus(null);
-        expectedException.expect(DataIntegrityViolationException.class); // TODO: chequear esta excepcion (poco descriptiva)
+        expectedException.expect(PersistenceException.class);
 
         // 2. Ejercitar
         Appointment appointment = this.appointmentDao.create(a);
@@ -672,11 +673,10 @@ public class AppointmentDaoImplTest {
     public void testCreateAppointmentEmptyStaffFail()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
         Appointment a = appointmentModel();
         a.setStaff(null);
-        expectedException.expect(PersistenceException.class); // TODO: chequear esta excepcion (poco descriptiva)
-
+        expectedException.expect(PersistenceException.class);
         // 2. Ejercitar
         Appointment appointment = this.appointmentDao.create(a);
 
@@ -688,10 +688,10 @@ public class AppointmentDaoImplTest {
     public void testCreateAppointmentEmptyPatientFail()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
         Appointment a = appointmentModel();
         a.setPatient(null);
-        expectedException.expect(DataIntegrityViolationException.class); // TODO: chequear esta excepcion (poco descriptiva)
+        expectedException.expect(PersistenceException.class);
 
         // 2. Ejercitar
         Appointment appointment = this.appointmentDao.create(a);
@@ -704,10 +704,10 @@ public class AppointmentDaoImplTest {
     public void testCreateAppointmentEmptyMotiveFail()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
         Appointment a = appointmentModel();
         a.setMotive(null);
-        expectedException.expect(PersistenceException.class); // TODO: chequear esta excepcion (poco descriptiva)
+        expectedException.expect(PersistenceException.class);
 
         // 2. Ejercitar
         Appointment appointment = this.appointmentDao.create(a);
@@ -720,10 +720,10 @@ public class AppointmentDaoImplTest {
     public void testCreateAppointmentEmptyDateFail()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
         Appointment a = appointmentModel();
         a.setFromDate(null);
-        expectedException.expect(PersistenceException.class); // TODO: chequear esta excepcion (poco descriptiva)
+        expectedException.expect(PersistenceException.class);
 
         // 2. Ejercitar
         Appointment appointment = this.appointmentDao.create(a);
@@ -738,7 +738,7 @@ public class AppointmentDaoImplTest {
     public void testFindAppointmentById()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
         insertAppointment();
         insertAnotherAppointment();
 
@@ -754,7 +754,7 @@ public class AppointmentDaoImplTest {
     public void testFindAppointmentByIdDoesntExist()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
         insertAppointment();
 
         // 2. Ejercitar
@@ -768,7 +768,7 @@ public class AppointmentDaoImplTest {
     public void testFindAppointmentByIdNull()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
         insertAppointment();
         expectedException.expect(IllegalArgumentException.class);
 
@@ -785,7 +785,7 @@ public class AppointmentDaoImplTest {
     public void testFindAppointmentByIds()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
         insertAppointment();
         insertAnotherAppointment();
 
@@ -804,7 +804,7 @@ public class AppointmentDaoImplTest {
     public void testFindAppointmentByIdsNotAllPresent()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
         insertAppointment();
 
         // 2. Ejercitar
@@ -822,7 +822,7 @@ public class AppointmentDaoImplTest {
     public void testFindAppointmentByIdsDontExist()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
 
         // 2. Ejercitar
         Collection<Appointment> appointments = this.appointmentDao.findByIds(Arrays.asList(APPOINTMENT_ID_1, APPOINTMENT_ID_2));
@@ -838,7 +838,7 @@ public class AppointmentDaoImplTest {
     public void testAppointmentList()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
         insertAppointment();
         insertAnotherAppointment();
 
@@ -854,7 +854,7 @@ public class AppointmentDaoImplTest {
     public void testAppointmentEmptyList()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
 
         // 2. Ejercitar
         Collection<Appointment> appointments = this.appointmentDao.list();
@@ -870,7 +870,7 @@ public class AppointmentDaoImplTest {
     public void testAppointmentUpdate()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
         insertAppointment();
         insertAnotherAppointment();
         Appointment a = appointmentModel();
@@ -889,7 +889,7 @@ public class AppointmentDaoImplTest {
     public void testAppointmentUpdateNull()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
         insertAppointment();
         insertAnotherAppointment();
         expectedException.expect(IllegalArgumentException.class);
@@ -906,7 +906,7 @@ public class AppointmentDaoImplTest {
     public void testAppointmentUpdateNotExistentAppointment()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
         insertPatient();
         insertStaff();
         insertAnotherAppointment();
@@ -925,11 +925,11 @@ public class AppointmentDaoImplTest {
     public void testAppointmentUpdateAppointmentWithNullAppointmentStatus()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
         insertAppointment();
         Appointment a = appointmentModel();
-         a.setAppointmentStatus(null);
-        expectedException.expect(PersistenceException.class);
+        a.setAppointmentStatus(null);
+        expectedException.expect(DataIntegrityViolationException.class);
 
         // 2. Ejercitar
         this.appointmentDao.update(a);
@@ -943,11 +943,11 @@ public class AppointmentDaoImplTest {
     public void testAppointmentUpdateAppointmentWithNullId()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
         insertAppointment();
         Appointment a = appointmentModel();
-         a.setId(null);
-        expectedException.expect(DataIntegrityViolationException.class);
+        a.setId(null);
+        expectedException.expect(IllegalArgumentException.class);
 
         // 2. Ejercitar
         this.appointmentDao.update(a);
@@ -960,7 +960,7 @@ public class AppointmentDaoImplTest {
     public void testAppointmentUpdateAppointmentWithNullStaff()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
         insertAppointment();
         Appointment a = appointmentModel();
         a.setStaff(null);
@@ -978,7 +978,7 @@ public class AppointmentDaoImplTest {
     public void testAppointmentUpdateAppointmentWithNullPatient()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
         insertAppointment();
         Appointment a = appointmentModel();
         a.setPatient(null);
@@ -996,11 +996,11 @@ public class AppointmentDaoImplTest {
     public void testAppointmentUpdateAppointmentWithNullMotive()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
         insertAppointment();
         Appointment a = appointmentModel();
         a.setMotive(null);
-        expectedException.expect(PersistenceException.class);
+        expectedException.expect(DataIntegrityViolationException.class);
 
         // 2. Ejercitar
         this.appointmentDao.update(a);
@@ -1014,11 +1014,11 @@ public class AppointmentDaoImplTest {
     public void testAppointmentUpdateAppointmentWithNullDate()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
         insertAppointment();
         Appointment a = appointmentModel();
         a.setFromDate(null);
-        expectedException.expect(PersistenceException.class);
+        expectedException.expect(DataIntegrityViolationException.class);
 
         // 2. Ejercitar
         this.appointmentDao.update(a);
@@ -1034,7 +1034,7 @@ public class AppointmentDaoImplTest {
     public void testAppointmentRemoveById()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
         insertAppointment();
 
         // 2. Ejercitar
@@ -1048,7 +1048,7 @@ public class AppointmentDaoImplTest {
     public void testAppointmentRemoveByIdNotExistent()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
         insertAppointment();
         expectedException.expect(IllegalArgumentException.class);
 
@@ -1063,7 +1063,7 @@ public class AppointmentDaoImplTest {
     public void testAppointmentRemoveByNullId()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
         insertAppointment();
         expectedException.expect(IllegalArgumentException.class);
 
@@ -1079,7 +1079,7 @@ public class AppointmentDaoImplTest {
     public void testAppointmentRemoveByModel()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
         insertAppointment();
         Appointment a = appointmentModel();
         assertEquals(1,JdbcTestUtils.countRowsInTable(jdbcTemplate, APPOINTMENTS_TABLE));
@@ -1097,7 +1097,7 @@ public class AppointmentDaoImplTest {
     public void testAppointmentRemoveByModelNotExistent()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
         insertPatient();
         insertStaff();
         insertAnotherAppointment();
@@ -1116,7 +1116,7 @@ public class AppointmentDaoImplTest {
     public void testAppointmentRemoveByNullModel()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
         insertAppointment();
         expectedException.expect(IllegalArgumentException.class);
 
@@ -1133,7 +1133,7 @@ public class AppointmentDaoImplTest {
     public void testAppointmentCount()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
         insertAppointment();
         insertAnotherAppointment();
 
@@ -1150,7 +1150,7 @@ public class AppointmentDaoImplTest {
     public void testAppointmentCountEmptyTable()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
 
         // 2. Ejercitar
         ModelMetadata modelMetadata = this.appointmentDao.count();
@@ -1167,7 +1167,7 @@ public class AppointmentDaoImplTest {
     public void testAppointmentFindStaff()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
         insertAppointment();
         insertAnotherAppointment();
 
@@ -1186,7 +1186,7 @@ public class AppointmentDaoImplTest {
     public void testAppointmentFindStaffNull()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
         insertAppointment();
         insertAnotherAppointment();
         expectedException.expect(IllegalArgumentException.class);
@@ -1202,7 +1202,7 @@ public class AppointmentDaoImplTest {
     public void testAppointmentFindStaffDoesntExist()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
         insertPatient();
         insertStaff();
         insertAnotherAppointment();
@@ -1221,7 +1221,7 @@ public class AppointmentDaoImplTest {
     public void testAppointmentFindPatient()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
         insertAppointment();
         insertAnotherAppointment();
 
@@ -1240,7 +1240,7 @@ public class AppointmentDaoImplTest {
     public void testAppointmentFindPatientNull()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
         insertAppointment();
         insertAnotherAppointment();
         expectedException.expect(IllegalArgumentException.class);
@@ -1256,7 +1256,7 @@ public class AppointmentDaoImplTest {
     public void testAppointmentFindPatientDoesntExist()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
         insertPatient();
         insertStaff();
         insertAnotherAppointment();
@@ -1275,7 +1275,7 @@ public class AppointmentDaoImplTest {
     public void testAppointmentFindPatientDate()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
         insertAppointment();
         insertAnotherAppointment();
 
@@ -1294,7 +1294,7 @@ public class AppointmentDaoImplTest {
     public void testAppointmentFindPatientDateDateNull()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
         insertAppointment();
         insertAnotherAppointment();
         expectedException.expect(IllegalArgumentException.class);
@@ -1310,7 +1310,7 @@ public class AppointmentDaoImplTest {
     public void testAppointmentFindPatientDatePatientNull()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
         insertAppointment();
         insertAnotherAppointment();
         expectedException.expect(IllegalArgumentException.class);
@@ -1326,7 +1326,7 @@ public class AppointmentDaoImplTest {
     public void testAppointmentFindPatientDateBothNull()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
         insertAppointment();
         insertAnotherAppointment();
         expectedException.expect(IllegalArgumentException.class);
@@ -1342,7 +1342,7 @@ public class AppointmentDaoImplTest {
     public void testAppointmentFindPatientDatePatientDoesntExist()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
         insertPatient();
         insertStaff();
         insertAnotherAppointment();
@@ -1359,7 +1359,7 @@ public class AppointmentDaoImplTest {
     public void testAppointmentFindPatientDateDateDoesntExist()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
         insertPatient();
         insertStaff();
         insertAnotherAppointment();
@@ -1378,7 +1378,7 @@ public class AppointmentDaoImplTest {
     public void testAppointmentFindByPatients()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
         insertAppointment();
         insertAnotherAppointment();
 
@@ -1397,10 +1397,10 @@ public class AppointmentDaoImplTest {
     public void testAppointmentFindByPatientsNull()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
         insertAppointment();
         insertAnotherAppointment();
-        expectedException.expect(PersistenceException.class);
+        expectedException.expect(IllegalArgumentException.class);
 
         // 2. Ejercitar
         List<Appointment> appointments = this.appointmentDao.findByPatients(null);
@@ -1413,7 +1413,7 @@ public class AppointmentDaoImplTest {
     public void testAppointmentFindByPatientsDoesntExist()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
         insertPatient();
         insertStaff();
         insertAnotherAppointment();
@@ -1432,7 +1432,7 @@ public class AppointmentDaoImplTest {
     public void testAppointmentFindByPatientAndDate()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
         insertAppointment();
         insertAnotherAppointment();
 
@@ -1451,7 +1451,7 @@ public class AppointmentDaoImplTest {
     public void testAppointmentFindByPatientAndDateDateNull()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
         insertAppointment();
         insertAnotherAppointment();
         expectedException.expect(IllegalArgumentException.class);
@@ -1467,7 +1467,7 @@ public class AppointmentDaoImplTest {
     public void testAppointmentFindByPatientAndDatePatientNull()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
         insertAppointment();
         insertAnotherAppointment();
         expectedException.expect(IllegalArgumentException.class);
@@ -1483,7 +1483,7 @@ public class AppointmentDaoImplTest {
     public void testAppointmentFindByPatientAndDateBothNull()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
         insertAppointment();
         insertAnotherAppointment();
         expectedException.expect(IllegalArgumentException.class);
@@ -1499,7 +1499,7 @@ public class AppointmentDaoImplTest {
     public void testAppointmentFindByPatientAndDatePatientDoesntExist()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
         insertPatient();
         insertStaff();
         insertAnotherAppointment();
@@ -1516,7 +1516,7 @@ public class AppointmentDaoImplTest {
     public void testAppointmentFindByPatientAndDateDateDoesntExist()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
         insertPatient();
         insertStaff();
         insertAnotherAppointment();
@@ -1535,7 +1535,7 @@ public class AppointmentDaoImplTest {
     public void testAppointmentFindByPatientFromDate()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
         insertAppointment();
         insertAnotherAppointment();
 
@@ -1554,7 +1554,7 @@ public class AppointmentDaoImplTest {
     public void testAppointmentFindByPatientFromDateDateNull()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
         insertAppointment();
         insertAnotherAppointment();
         expectedException.expect(IllegalArgumentException.class);
@@ -1570,7 +1570,7 @@ public class AppointmentDaoImplTest {
     public void testAppointmentFindByPatientFromDatePatientNull()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
         insertAppointment();
         insertAnotherAppointment();
         expectedException.expect(IllegalArgumentException.class);
@@ -1586,7 +1586,7 @@ public class AppointmentDaoImplTest {
     public void testAppointmentFindByPatientFromDateBothNull()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
         insertAppointment();
         insertAnotherAppointment();
         expectedException.expect(IllegalArgumentException.class);
@@ -1602,7 +1602,7 @@ public class AppointmentDaoImplTest {
     public void testAppointmentFindByPatientFromDatePatientDoesntExist()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
         insertPatient();
         insertStaff();
         insertAnotherAppointment();
@@ -1619,7 +1619,7 @@ public class AppointmentDaoImplTest {
     public void testAppointmentFindByPatientFromDateDateDoesntExist()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
         insertPatient();
         insertStaff();
         insertAnotherAppointment();
@@ -1638,7 +1638,7 @@ public class AppointmentDaoImplTest {
     public void testAppointmentFindByStaffs()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
         insertAppointment();
         insertAnotherAppointment();
 
@@ -1657,10 +1657,10 @@ public class AppointmentDaoImplTest {
     public void testAppointmentFindByStaffsNull()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
         insertAppointment();
         insertAnotherAppointment();
-        expectedException.expect(PersistenceException.class);
+        expectedException.expect(IllegalArgumentException.class);
 
         // 2. Ejercitar
         List<Appointment> appointments = this.appointmentDao.findByStaffs(null);
@@ -1673,7 +1673,7 @@ public class AppointmentDaoImplTest {
     public void testAppointmentFindByStaffsDoesntExist()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
         insertPatient();
         insertStaff();
         insertAnotherAppointment();
@@ -1692,7 +1692,7 @@ public class AppointmentDaoImplTest {
     public void testAppointmentFindByStaffAndDate()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
         insertAppointment();
         insertAnotherAppointment();
 
@@ -1711,7 +1711,7 @@ public class AppointmentDaoImplTest {
     public void testAppointmentFindByStaffAndDateDateNull()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
         insertAppointment();
         insertAnotherAppointment();
         expectedException.expect(IllegalArgumentException.class);
@@ -1727,7 +1727,7 @@ public class AppointmentDaoImplTest {
     public void testAppointmentFindByStaffAndDateStaffNull()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
         insertAppointment();
         insertAnotherAppointment();
         expectedException.expect(IllegalArgumentException.class);
@@ -1743,7 +1743,7 @@ public class AppointmentDaoImplTest {
     public void testAppointmentFindByStaffAndDateBothNull()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
         insertAppointment();
         insertAnotherAppointment();
         expectedException.expect(IllegalArgumentException.class);
@@ -1759,7 +1759,7 @@ public class AppointmentDaoImplTest {
     public void testAppointmentFindByStaffAndDateStaffDoesntExist()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
         insertPatient();
         insertStaff();
         insertAnotherAppointment();
@@ -1776,7 +1776,7 @@ public class AppointmentDaoImplTest {
     public void testAppointmentFindByStaffAndDateDateDoesntExist()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
         insertPatient();
         insertStaff();
         insertAnotherAppointment();
@@ -1795,7 +1795,7 @@ public class AppointmentDaoImplTest {
     public void testAppointmentFindByStaffsAndDateFromTo()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
         insertAppointment();
         insertAnotherAppointment();
 
@@ -1814,7 +1814,7 @@ public class AppointmentDaoImplTest {
     public void testAppointmentFindByStaffsAndDateFromToFromDateNull()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
         insertAppointment();
         insertAnotherAppointment();
         expectedException.expect(IllegalArgumentException.class);
@@ -1830,7 +1830,7 @@ public class AppointmentDaoImplTest {
     public void testAppointmentFindByStaffsAndDateFromToToDateNull()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
         insertAppointment();
         insertAnotherAppointment();
         expectedException.expect(IllegalArgumentException.class);
@@ -1846,7 +1846,7 @@ public class AppointmentDaoImplTest {
     public void testAppointmentFindByStaffAndDateFromToStaffNull()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
         insertAppointment();
         insertAnotherAppointment();
         expectedException.expect(IllegalArgumentException.class);
@@ -1862,7 +1862,7 @@ public class AppointmentDaoImplTest {
     public void testAppointmentFindByStaffAndDateFromToAllNull()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
         insertAppointment();
         insertAnotherAppointment();
         expectedException.expect(IllegalArgumentException.class);
@@ -1878,7 +1878,7 @@ public class AppointmentDaoImplTest {
     public void testAppointmentFindByStaffAndDateFromToStaffDoesntExist()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
         insertPatient();
         insertStaff();
         insertAnotherAppointment();
@@ -1895,7 +1895,7 @@ public class AppointmentDaoImplTest {
     public void testAppointmentFindByStaffAndDateFromToDateDoesntExist()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
         insertPatient();
         insertStaff();
         insertAnotherAppointment();
@@ -1914,7 +1914,7 @@ public class AppointmentDaoImplTest {
     public void testAppointmentFindPendingStaff()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
         insertAppointment();
         insertAnotherAppointment();
 
@@ -1926,7 +1926,7 @@ public class AppointmentDaoImplTest {
         assertEquals(1, appointments.size());
         for (Appointment appointment: appointments){
             assertEquals(staffModel(), appointment.getStaff());
-            assertEquals("PENDING", appointment.getAppointmentStatus());
+            assertEquals(STATUS, appointment.getAppointmentStatus());
         }
     }
 
@@ -1934,7 +1934,7 @@ public class AppointmentDaoImplTest {
     public void testAppointmentFindPendingStaffNull()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
         insertAppointment();
         insertAnotherAppointment();
         expectedException.expect(IllegalArgumentException.class);
@@ -1950,7 +1950,7 @@ public class AppointmentDaoImplTest {
     public void testAppointmentFindPendingStaffDoesntExist()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
         insertPatient();
         insertStaff();
         insertAnotherAppointment();
@@ -1970,7 +1970,7 @@ public class AppointmentDaoImplTest {
     public void testAppointmentFindPendingPatient()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
         insertAppointment();
         insertAnotherAppointment();
 
@@ -1982,7 +1982,7 @@ public class AppointmentDaoImplTest {
         assertEquals(1, appointments.size());
         for (Appointment appointment: appointments){
             assertEquals(patientModel(), appointment.getPatient());
-            assertEquals("PENDING", appointment.getAppointmentStatus());
+            assertEquals(STATUS, appointment.getAppointmentStatus());
         }
     }
 
@@ -1990,7 +1990,7 @@ public class AppointmentDaoImplTest {
     public void testAppointmentFindPendingPatientNull()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
         insertAppointment();
         insertAnotherAppointment();
         expectedException.expect(IllegalArgumentException.class);
@@ -2006,7 +2006,7 @@ public class AppointmentDaoImplTest {
     public void testAppointmentFindPendingPatientDoesntExist()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
         insertPatient();
         insertStaff();
         insertAnotherAppointment();
@@ -2025,7 +2025,7 @@ public class AppointmentDaoImplTest {
     public void testAppointmentFindPendingPatientStaff()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
         insertAppointment();
         insertAnotherAppointment();
 
@@ -2038,7 +2038,7 @@ public class AppointmentDaoImplTest {
         for (Appointment appointment: appointments){
             assertEquals(patientModel(), appointment.getPatient());
             assertEquals(staffModel(), appointment.getStaff());
-            assertEquals("PENDING", appointment.getAppointmentStatus());
+            assertEquals(STATUS, appointment.getAppointmentStatus());
         }
     }
 
@@ -2046,7 +2046,7 @@ public class AppointmentDaoImplTest {
     public void testAppointmentFindPendingPatientStaffPatientNull()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
         insertAppointment();
         insertAnotherAppointment();
         expectedException.expect(IllegalArgumentException.class);
@@ -2062,7 +2062,7 @@ public class AppointmentDaoImplTest {
     public void testAppointmentFindPendingPatientStaffStaffNull()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
         insertAppointment();
         insertAnotherAppointment();
         expectedException.expect(IllegalArgumentException.class);
@@ -2078,7 +2078,7 @@ public class AppointmentDaoImplTest {
     public void testAppointmentFindPendingPatientStaffBothNull()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
         insertAppointment();
         insertAnotherAppointment();
         expectedException.expect(IllegalArgumentException.class);
@@ -2094,7 +2094,7 @@ public class AppointmentDaoImplTest {
     public void testAppointmentFindPendingPatientStaffPatientDoesntExist()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
         insertPatient();
         insertStaff();
         insertAnotherAppointment();
@@ -2118,13 +2118,12 @@ public class AppointmentDaoImplTest {
     public void testAppointmentFindPendingPatientStaffStaffDoesntExist()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
         insertPatient();
         insertStaff();
         insertAnotherAppointment();
         Patient p = patientModel2();
         Staff s = staffModel();
-        s.setId(STAFF_ID_2);
 
         // 2. Ejercitar
         List<Appointment> appointments = this.appointmentDao.findPending(p, s);

@@ -61,8 +61,8 @@ public class PictureDaoImplTest {
         this.jdbcTemplate = new JdbcTemplate(this.ds);
         this.pictureJdbcInsert = new SimpleJdbcInsert(this.ds)
                 .withTableName(PICTURES_TABLE)
-//                .usingGeneratedKeyColumns("picture_id");
-        ;
+                .usingGeneratedKeyColumns("picture_id");
+        cleanAllTables();
     }
 
     /* ---------------------- FUNCIONES AUXILIARES ---------------------------------------------------------------- */
@@ -144,11 +144,10 @@ public class PictureDaoImplTest {
     @Test
     public void testCreatePictureSuccessfully() {
         // 1. Precondiciones
-        cleanAllTables();
         Picture p = pictureModel();
+        p.setId(null);
 
         // 2. Ejercitar
-        p.setId(null);
         Picture picture = this.pictureDao.create(p);
 
         // 3. Postcondiciones
@@ -162,12 +161,12 @@ public class PictureDaoImplTest {
     @Test
     public void testCreateAnotherPictureSuccessfully() {
         // 1. Precondiciones
-        cleanAllTables();
+
         insertAnotherPicture();
         Picture p = pictureModel();
+        p.setId(null);
 
         // 2. Ejercitar
-        p.setId(null);
         Picture picture = this.pictureDao.create(p);
 
         // 3. Postcondiciones
@@ -182,7 +181,7 @@ public class PictureDaoImplTest {
     public void testCreatePictureNullFail()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
         expectedException.expect(IllegalArgumentException.class);
 
         // 2. Ejercitar
@@ -196,7 +195,7 @@ public class PictureDaoImplTest {
     public void testCreatePictureEmptyPictureFail()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
         Picture p = new Picture();
         expectedException.expect(PersistenceException.class);
 
@@ -211,7 +210,7 @@ public class PictureDaoImplTest {
     public void testCreatePictureEmptyDataFail()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
         Picture p = pictureModel();
         p.setData(null);
         expectedException.expect(PersistenceException.class);
@@ -227,7 +226,7 @@ public class PictureDaoImplTest {
     public void testCreatePictureEmptySizeFail()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
         Picture p = pictureModel();
         p.setSize(null);
         expectedException.expect(PersistenceException.class);
@@ -243,7 +242,7 @@ public class PictureDaoImplTest {
     public void testCreatePictureEmptyMimeFail()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
         Picture p = pictureModel();
         p.setMimeType(null);
         expectedException.expect(PersistenceException.class);
@@ -261,7 +260,7 @@ public class PictureDaoImplTest {
     public void testFindPictureById()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
         insertPicture();
         insertAnotherPicture();
 
@@ -277,7 +276,7 @@ public class PictureDaoImplTest {
     public void testFindPictureByIdDoesntExist()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
         insertPicture();
 
         // 2. Ejercitar
@@ -291,7 +290,7 @@ public class PictureDaoImplTest {
     public void testFindPictureByIdNull()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
         insertPicture();
         expectedException.expect(IllegalArgumentException.class);
 
@@ -308,7 +307,7 @@ public class PictureDaoImplTest {
     public void testFindPictureByIds()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
         insertPicture();
         insertAnotherPicture();
 
@@ -327,7 +326,7 @@ public class PictureDaoImplTest {
     public void testFindPictureByIdsNotAllPresent()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
         insertPicture();
 
         // 2. Ejercitar
@@ -345,7 +344,7 @@ public class PictureDaoImplTest {
     public void testFindPictureByIdsDontExist()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
         
         // 2. Ejercitar
         Collection<Picture> pictures = this.pictureDao.findByIds(Arrays.asList(STARTING_ID, STARTING_ID + 1));
@@ -361,7 +360,7 @@ public class PictureDaoImplTest {
     public void testPictureList()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
         insertPicture();
         insertAnotherPicture();
 
@@ -377,7 +376,7 @@ public class PictureDaoImplTest {
     public void testPictureEmptyList()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
 
         // 2. Ejercitar
         Collection<Picture> pictures = this.pictureDao.list();
@@ -393,7 +392,7 @@ public class PictureDaoImplTest {
     public void testPictureUpdate()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
         insertPicture();
         insertAnotherPicture();
         Picture p = pictureModel();
@@ -412,7 +411,7 @@ public class PictureDaoImplTest {
     public void testPictureUpdateNull()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
         insertPicture();
         insertAnotherPicture();
         expectedException.expect(IllegalArgumentException.class);
@@ -429,7 +428,7 @@ public class PictureDaoImplTest {
     public void testPictureUpdateNotExistentPicture()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
         insertAnotherPicture();
         Picture p = pictureModel();
         p.setId(STARTING_ID + 1);
@@ -446,7 +445,7 @@ public class PictureDaoImplTest {
     public void testPictureUpdatePictureWithNullId()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
         insertPicture();
         Picture p = pictureModel();
         p.setId(null);
@@ -465,7 +464,7 @@ public class PictureDaoImplTest {
     public void testPictureRemoveById()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
         insertPicture();
 
         // 2. Ejercitar
@@ -479,7 +478,7 @@ public class PictureDaoImplTest {
     public void testPictureRemoveByIdNotExistent()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
         insertPicture();
         expectedException.expect(IllegalArgumentException.class);
 
@@ -494,7 +493,7 @@ public class PictureDaoImplTest {
     public void testPictureRemoveByNullId()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
         insertPicture();
         expectedException.expect(IllegalArgumentException.class);
 
@@ -510,7 +509,7 @@ public class PictureDaoImplTest {
     public void testPictureRemoveByModel()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
         insertPicture();
         Picture p = pictureModel();
 
@@ -525,7 +524,7 @@ public class PictureDaoImplTest {
     public void testPictureRemoveByModelNotExistent()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
         insertAnotherPicture();
         Picture p = pictureModel();
         p.setId(STARTING_ID + 1);
@@ -542,7 +541,7 @@ public class PictureDaoImplTest {
     public void testPictureRemoveByNullModel()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
         insertPicture();
         expectedException.expect(IllegalArgumentException.class);
 
@@ -559,7 +558,7 @@ public class PictureDaoImplTest {
     public void testPictureCount()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
         insertPicture();
         insertAnotherPicture();
 
@@ -576,7 +575,7 @@ public class PictureDaoImplTest {
     public void testPictureCountEmptyTable()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
 
         // 2. Ejercitar
         ModelMetadata modelMetadata = this.pictureDao.count();

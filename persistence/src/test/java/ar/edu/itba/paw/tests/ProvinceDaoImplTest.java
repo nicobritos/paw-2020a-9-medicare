@@ -59,6 +59,7 @@ public class ProvinceDaoImplTest {
                 .usingGeneratedKeyColumns("province_id");
         this.countryJdbcInsert = new SimpleJdbcInsert(this.ds)
                 .withTableName(COUNTRIES_TABLE);
+        cleanAllTables();
     }
 
     /* ---------------------- FUNCIONES AUXILIARES ---------------------------------------------------------------- */
@@ -115,12 +116,11 @@ public class ProvinceDaoImplTest {
     public void testCreateProvinceSuccessfully()
     {
         // 1. Precondiciones
-        cleanAllTables();
         insertCountry();
         Province p = provinceModel();
+        p.setId(null);
 
         // 2. Ejercitar
-        p.setId(null);
         Province province = this.provinceDao.create(p);
 
         // 3. Postcondiciones
@@ -134,7 +134,7 @@ public class ProvinceDaoImplTest {
     public void testCreateAnotherProvinceSuccessfully()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
         insertProvince();
         Province p = new Province();
         p.setName(PROVINCE_2);
@@ -154,7 +154,7 @@ public class ProvinceDaoImplTest {
     public void testCreateProvinceNullFail()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
         expectedException.expect(IllegalArgumentException.class);
 
         // 2. Ejercitar
@@ -168,7 +168,7 @@ public class ProvinceDaoImplTest {
     public void testCreateProvinceEmptyProvinceFail()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
         Province p = new Province();
         expectedException.expect(PersistenceException.class);
 
@@ -183,7 +183,7 @@ public class ProvinceDaoImplTest {
     public void testCreateProvinceEmptyCountryFail() // TODO: Tirar un error si no se especifica country
     {
         // 1. Precondiciones
-        cleanAllTables();
+
         Province p = new Province();
         p.setName(PROVINCE);
         expectedException.expect(PersistenceException.class);
@@ -199,7 +199,7 @@ public class ProvinceDaoImplTest {
         public void testCreateProvinceEmptyNameFail()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
         insertCountry();
         Province p = new Province();
         p.setCountry(countryModel());
@@ -218,7 +218,7 @@ public class ProvinceDaoImplTest {
     public void testFindProvinceById()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
         insertProvince();
         insertAnotherProvince();
 
@@ -233,7 +233,7 @@ public class ProvinceDaoImplTest {
     @Test
     public void testFindProvinceByIdDoesntExist() {
         // 1. Precondiciones
-        cleanAllTables();
+
         insertProvince();
 
         // 2. Ejercitar
@@ -247,7 +247,7 @@ public class ProvinceDaoImplTest {
     public void testFindProvinceByIdNull()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
         insertProvince();
         expectedException.expect(IllegalArgumentException.class);
 
@@ -264,7 +264,7 @@ public class ProvinceDaoImplTest {
     public void testFindProvincesByIds()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
         insertProvince();
         insertAnotherProvince();
 
@@ -283,7 +283,7 @@ public class ProvinceDaoImplTest {
     public void testFindProvincesByIdsNotAllPresent()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
         insertProvince();
 
         // 2. Ejercitar
@@ -301,7 +301,7 @@ public class ProvinceDaoImplTest {
     public void testFindProvincesByIdsDoesntExist()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
 
         // 2. Ejercitar
         Collection<Province> provinces = this.provinceDao.findByIds(Arrays.asList(STARTING_ID, STARTING_ID+1));
@@ -316,7 +316,7 @@ public class ProvinceDaoImplTest {
     @Test
     public void testFindProvincesByName() {
         // 1. Precondiciones
-        cleanAllTables();
+
         insertProvince();
         insertAnotherProvince();
         Map<String, Object> map = new HashMap<>();
@@ -338,7 +338,7 @@ public class ProvinceDaoImplTest {
     @Test
     public void testFindProvincesByNameDoesntExist() {
         // 1. Precondiciones
-        cleanAllTables();
+
         insertProvince();
 
         // 2. Ejercitar
@@ -353,7 +353,7 @@ public class ProvinceDaoImplTest {
     public void testFindProvinceByNameNull()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
         insertProvince();
         insertAnotherProvince();
         expectedException.expect(IllegalArgumentException.class);
@@ -369,7 +369,7 @@ public class ProvinceDaoImplTest {
     public void testFindProvinceByContainingName()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
         insertProvince();
         insertAnotherProvince();
         Map<String, Object> map = new HashMap<>();
@@ -391,7 +391,7 @@ public class ProvinceDaoImplTest {
     public void testProvinceList()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
         insertProvince();
         insertAnotherProvince();
 
@@ -406,7 +406,7 @@ public class ProvinceDaoImplTest {
     @Test
     public void testProvincesEmptyList() {
         // 1. Precondiciones
-        cleanAllTables();
+
 
         // 2. Ejercitar
         Collection<Province> provinces = this.provinceDao.list();
@@ -421,7 +421,7 @@ public class ProvinceDaoImplTest {
     @Test
     public void testProvinceUpdate() {
         // 1. Precondiciones
-        cleanAllTables();
+
         insertProvince();
         insertAnotherProvince();
         Province p = provinceModel();
@@ -441,7 +441,7 @@ public class ProvinceDaoImplTest {
     public void testProvinceUpdateNull()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
         insertProvince();
         insertAnotherProvince();
         expectedException.expect(IllegalArgumentException.class);
@@ -458,7 +458,7 @@ public class ProvinceDaoImplTest {
     public void testProvinceUpdateNotExistentProvince()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
         insertCountry();
         insertAnotherProvince();
         Province p = provinceModel();
@@ -476,7 +476,7 @@ public class ProvinceDaoImplTest {
     public void testProvinceUpdateProvinceWithNullName()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
         insertProvince();
         Province p = new Province();
         p.setCountry(countryModel());
@@ -495,7 +495,7 @@ public class ProvinceDaoImplTest {
     public void testProvinceUpdateProvinceWithNullId()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
         insertProvince();
         Province p = provinceModel();
         p.setId(null);
@@ -513,7 +513,7 @@ public class ProvinceDaoImplTest {
     public void testProvinceRemoveById()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
         insertProvince();
 
         // 2. Ejercitar
@@ -527,7 +527,7 @@ public class ProvinceDaoImplTest {
     public void testProvinceRemoveByIdNotExistent()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
         insertProvince();
         expectedException.expect(IllegalArgumentException.class);
 
@@ -542,7 +542,7 @@ public class ProvinceDaoImplTest {
     public void testProvinceRemoveByNullId()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
         insertProvince();
         expectedException.expect(IllegalArgumentException.class);
 
@@ -559,7 +559,7 @@ public class ProvinceDaoImplTest {
     public void testProvinceRemoveByModel()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
         insertProvince();
         Province p = provinceModel();
 
@@ -574,7 +574,7 @@ public class ProvinceDaoImplTest {
     public void testProvinceRemoveByModelNotExistent()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
         insertCountry();
         insertAnotherProvince();
         Province p = provinceModel();
@@ -592,7 +592,7 @@ public class ProvinceDaoImplTest {
     public void testProvinceRemoveByNullModel()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
         insertProvince();
         expectedException.expect(IllegalArgumentException.class);
 
@@ -609,7 +609,7 @@ public class ProvinceDaoImplTest {
     public void testProvinceCount()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
         insertProvince();
         insertAnotherProvince();
 
@@ -626,7 +626,7 @@ public class ProvinceDaoImplTest {
     public void testProvinceCountEmptyTable()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
 
         // 2. Ejercitar
         ModelMetadata modelMetadata = this.provinceDao.count();
@@ -642,7 +642,7 @@ public class ProvinceDaoImplTest {
     @Test
     public void testProvinceFindByCountry(){
         // 1. Precondiciones
-        cleanAllTables();
+
         insertProvince();
         insertAnotherProvince();
 
@@ -667,7 +667,7 @@ public class ProvinceDaoImplTest {
     @Test
     public void testProvinceFindByCountryDoesntExists(){
         // 1. Precondiciones
-        cleanAllTables();
+
 
         Map<String, Object> countryMap = new HashMap<>();
         countryMap.put("country_id", "BR");
@@ -690,9 +690,10 @@ public class ProvinceDaoImplTest {
     @Test
     public void testProvinceFindByCountryNull(){
         // 1. Precondiciones
-        cleanAllTables();
+
         insertProvince();
         insertAnotherProvince();
+        expectedException.expect(IllegalArgumentException.class);
 
         // 2. Ejercitar
         List<Province> provinces = this.provinceDao.findByCountry(null);
@@ -707,7 +708,7 @@ public class ProvinceDaoImplTest {
     @Test
     public void testProvinceFindByCountryAndName(){
         // 1. Precondiciones
-        cleanAllTables();
+
         insertProvince();
         insertAnotherProvince();
 
@@ -736,7 +737,7 @@ public class ProvinceDaoImplTest {
     @Test
     public void testProvinceFindByCountryAndNameCountryDoesntExists(){
         // 1. Precondiciones
-        cleanAllTables();
+
 
         Map<String, Object> countryMap = new HashMap<>();
         countryMap.put("country_id", "BR");
@@ -759,7 +760,7 @@ public class ProvinceDaoImplTest {
     @Test
     public void testProvinceFindByCountryAndNameCountryNull(){
         // 1. Precondiciones
-        cleanAllTables();
+
         insertProvince();
         insertAnotherProvince();
         expectedException.expect(IllegalArgumentException.class);
@@ -775,7 +776,7 @@ public class ProvinceDaoImplTest {
     @Test
     public void testProvinceFindByCountryAndNameNameDoesntExists(){
         // 1. Precondiciones
-        cleanAllTables();
+
 
         Map<String, Object> countryMap = new HashMap<>();
         countryMap.put("country_id", "BR");
@@ -798,7 +799,7 @@ public class ProvinceDaoImplTest {
     @Test
     public void testProvinceFindByCountryAndNameNameNull(){
         // 1. Precondiciones
-        cleanAllTables();
+
         insertProvince();
         insertAnotherProvince();
         expectedException.expect(IllegalArgumentException.class);
@@ -814,7 +815,7 @@ public class ProvinceDaoImplTest {
     @Test
     public void testProvinceFindByCountryAndNameNameContains(){
         // 1. Precondiciones
-        cleanAllTables();
+
         insertProvince();
         insertAnotherProvince();
 

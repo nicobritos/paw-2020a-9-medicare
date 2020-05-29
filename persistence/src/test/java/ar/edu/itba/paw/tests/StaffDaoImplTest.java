@@ -119,6 +119,7 @@ public class StaffDaoImplTest
         this.staffSpecialtiesJdbcInsert = new SimpleJdbcInsert(this.ds)
                 .withTableName(STAFF_SPECIALTIES_TABLE)
                 .usingGeneratedKeyColumns("specialty_id");
+        cleanAllTables();
     }
 
     /* ---------------------- FUNCIONES AUXILIARES ---------------------------------------------------------------- */
@@ -435,13 +436,12 @@ public class StaffDaoImplTest
     @Test
     public void testCreateStaffSuccessfully() {
         // 1. Precondiciones
-        cleanAllTables();
         insertUser();
         insertOffice();
         Staff s = staffModel();
+        s.setId(null);
 
         // 2. Ejercitar
-        s.setId(null);
         Staff staff = this.staffDao.create(s);
 
         // 3. Postcondiciones
@@ -459,7 +459,7 @@ public class StaffDaoImplTest
     @Test
     public void testCreateAnotherStaffSuccessfully() {
         // 1. Precondiciones
-        cleanAllTables();
+
         insertUser();
         insertOffice();
         insertAnotherStaff();
@@ -485,7 +485,7 @@ public class StaffDaoImplTest
     public void testCreateStaffNullFail()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
         insertUser();
         insertOffice();
         expectedException.expect(IllegalArgumentException.class);
@@ -501,7 +501,7 @@ public class StaffDaoImplTest
     public void testCreateStaffEmptyStaffFail()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
         insertUser();
         insertOffice();
         Staff s = new Staff();
@@ -518,7 +518,7 @@ public class StaffDaoImplTest
     public void testCreateStaffEmptyNameFail()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
         insertUser();
         insertOffice();
         Staff s = staffModel();
@@ -537,7 +537,7 @@ public class StaffDaoImplTest
     public void testCreateStaffEmptySurnameFail()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
         insertUser();
         insertOffice();
         Staff s = staffModel();
@@ -555,7 +555,7 @@ public class StaffDaoImplTest
     public void testCreateStaffEmptyUserFail()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
         insertUser();
         insertOffice();
         Staff s = staffModel();
@@ -573,7 +573,7 @@ public class StaffDaoImplTest
     public void testCreateStaffEmptyOfficeFail()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
         insertUser();
         insertOffice();
         Staff s = staffModel();
@@ -591,7 +591,7 @@ public class StaffDaoImplTest
     public void testCreateStaffEmptyEmailFail()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
         insertUser();
         insertOffice();
         Staff s = staffModel();
@@ -611,7 +611,7 @@ public class StaffDaoImplTest
     public void testFindStaffById()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
         insertStaff();
         insertAnotherStaff();
 
@@ -627,7 +627,7 @@ public class StaffDaoImplTest
     public void testFindStaffByIdDoesntExist()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
         insertStaff();
 
         // 2. Ejercitar
@@ -641,7 +641,7 @@ public class StaffDaoImplTest
     public void testFindStaffByIdNull()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
         insertStaff();
         expectedException.expect(IllegalArgumentException.class);
 
@@ -658,7 +658,7 @@ public class StaffDaoImplTest
     public void testFindStaffByIds()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
         insertStaff();
         insertAnotherStaff();
 
@@ -677,7 +677,7 @@ public class StaffDaoImplTest
     public void testFindStaffByIdsNotAllPresent()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
         insertStaff();
 
         // 2. Ejercitar
@@ -695,7 +695,7 @@ public class StaffDaoImplTest
     public void testFindStaffByIdsDontExist()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
 
         // 2. Ejercitar
         Collection<Staff> staffs = this.staffDao.findByIds(Arrays.asList(STARTING_ID, STARTING_ID + 1));
@@ -711,7 +711,7 @@ public class StaffDaoImplTest
     public void testStaffList()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
         insertStaff();
         insertAnotherStaff();
 
@@ -727,7 +727,7 @@ public class StaffDaoImplTest
     public void testStaffEmptyList()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
 
         // 2. Ejercitar
         Collection<Staff> staffs = this.staffDao.list();
@@ -743,7 +743,7 @@ public class StaffDaoImplTest
     public void testStaffUpdate()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
         insertStaff();
         insertAnotherStaff();
         Staff s = staffModel();
@@ -762,7 +762,7 @@ public class StaffDaoImplTest
     public void testStaffUpdateNull()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
         insertStaff();
         insertAnotherStaff();
         expectedException.expect(IllegalArgumentException.class);
@@ -779,7 +779,7 @@ public class StaffDaoImplTest
     public void testStaffUpdateNotExistentStaff()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
         insertUser();
         insertOffice();
         insertAnotherStaff();
@@ -798,7 +798,7 @@ public class StaffDaoImplTest
     public void testStaffUpdateStaffWithNullName()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
         insertStaff();
         Staff s = staffModel();
         s.setFirstName(null);
@@ -816,7 +816,7 @@ public class StaffDaoImplTest
     public void testStaffUpdateStaffWithNullId()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
         insertStaff();
         Staff s = staffModel();
         s.setId(null);
@@ -835,7 +835,7 @@ public class StaffDaoImplTest
     public void testStaffRemoveById()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
         insertStaff();
 
         // 2. Ejercitar
@@ -849,7 +849,7 @@ public class StaffDaoImplTest
     public void testStaffRemoveByIdNotExistent()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
         insertStaff();
         expectedException.expect(IllegalArgumentException.class);
 
@@ -864,7 +864,7 @@ public class StaffDaoImplTest
     public void testStaffRemoveByNullId()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
         insertStaff();
         expectedException.expect(IllegalArgumentException.class);
 
@@ -880,7 +880,7 @@ public class StaffDaoImplTest
     public void testStaffRemoveByModel()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
         insertStaff();
         Staff s = staffModel();
 
@@ -895,7 +895,7 @@ public class StaffDaoImplTest
     public void testStaffRemoveByModelNotExistent()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
         insertUser();
         insertOffice();
         insertAnotherStaff();
@@ -914,7 +914,7 @@ public class StaffDaoImplTest
     public void testStaffRemoveByNullModel()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
         insertStaff();
         expectedException.expect(IllegalArgumentException.class);
 
@@ -931,7 +931,7 @@ public class StaffDaoImplTest
     public void testStaffCount()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
         insertStaff();
         insertAnotherStaff();
 
@@ -948,7 +948,7 @@ public class StaffDaoImplTest
     public void testStaffCountEmptyTable()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
 
         // 2. Ejercitar
         ModelMetadata modelMetadata = this.staffDao.count();
@@ -965,7 +965,7 @@ public class StaffDaoImplTest
     public void testStaffFindByNamesOfficeStaffSpecialtyLocality()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
         insertStaff();
         insertAnotherStaff();
 
@@ -981,7 +981,7 @@ public class StaffDaoImplTest
     public void testStaffFindByNamesOfficeStaffSpecialtyLocalityNullAll()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
         insertStaff();
         insertAnotherStaff();
 
@@ -997,7 +997,7 @@ public class StaffDaoImplTest
     public void testStaffFindByNamesOfficeStaffSpecialtyLocalityOnlyFirstName()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
         insertStaff();
         insertAnotherStaff();
 
@@ -1013,7 +1013,7 @@ public class StaffDaoImplTest
     public void testStaffFindByNamesOfficeStaffSpecialtyLocalityOnlySurname()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
         insertStaff();
         insertAnotherStaff();
 
@@ -1029,7 +1029,7 @@ public class StaffDaoImplTest
     public void testStaffFindByNamesOfficeStaffSpecialtyLocalityOnlyOffice()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
         insertStaff();
         insertAnotherStaff();
 
@@ -1045,7 +1045,7 @@ public class StaffDaoImplTest
     public void testStaffFindByNamesOfficeStaffSpecialtyLocalityOnlySpecialties()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
         insertStaff();
         insertAnotherStaff();
 
@@ -1061,7 +1061,7 @@ public class StaffDaoImplTest
     public void testStaffFindByNamesOfficeStaffSpecialtyLocalityOnlyLocality()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
         insertStaff();
         insertAnotherStaff();
 
@@ -1079,7 +1079,7 @@ public class StaffDaoImplTest
     public void testStaffFindByNameOfficeStaffSpecialtyLocality()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
         insertStaff();
         insertAnotherStaff();
 
@@ -1095,7 +1095,7 @@ public class StaffDaoImplTest
     public void testStaffFindByNameOfficeStaffSpecialtyLocalityNullAll()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
         insertStaff();
         insertAnotherStaff();
 
@@ -1111,7 +1111,7 @@ public class StaffDaoImplTest
     public void testStaffFindByNameOfficeStaffSpecialtyLocalityOnlyFirstName()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
         insertStaff();
         insertAnotherStaff();
 
@@ -1127,7 +1127,7 @@ public class StaffDaoImplTest
     public void testStaffFindByNameOfficeStaffSpecialtyLocalityOnlySurname()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
         insertStaff();
         insertAnotherStaff();
 
@@ -1143,7 +1143,7 @@ public class StaffDaoImplTest
     public void testStaffFindByNameOfficeStaffSpecialtyLocalityOnlyOffice()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
         insertStaff();
         insertAnotherStaff();
 
@@ -1159,7 +1159,7 @@ public class StaffDaoImplTest
     public void testStaffFindByNameOfficeStaffSpecialtyLocalityOnlySpecialties()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
         insertStaff();
         insertAnotherStaff();
 
@@ -1175,7 +1175,7 @@ public class StaffDaoImplTest
     public void testStaffFindByNameOfficeStaffSpecialtyLocalityOnlyLocality()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
         insertStaff();
         insertAnotherStaff();
 
@@ -1193,7 +1193,7 @@ public class StaffDaoImplTest
     public void testStaffFindByNamesOfficeStaffSpecialtyLocalityPage()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
         insertStaff();
         insertAnotherStaff();
 
@@ -1214,7 +1214,7 @@ public class StaffDaoImplTest
     public void testStaffFindByNamesOfficeStaffSpecialtyLocalityPageNullAll()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
         insertStaff();
         insertAnotherStaff();
 
@@ -1235,7 +1235,7 @@ public class StaffDaoImplTest
     public void testStaffFindByNamesOfficeStaffSpecialtyLocalityPageOnlyFirstName()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
         insertStaff();
         insertAnotherStaff();
 
@@ -1251,7 +1251,7 @@ public class StaffDaoImplTest
     public void testStaffFindByNamesOfficeStaffSpecialtyLocalityPageOnlySurname()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
         insertStaff();
         insertAnotherStaff();
 
@@ -1272,7 +1272,7 @@ public class StaffDaoImplTest
     public void testStaffFindByNamesOfficeStaffSpecialtyLocalityPageOnlyOffice()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
         insertStaff();
         insertAnotherStaff();
 
@@ -1293,7 +1293,7 @@ public class StaffDaoImplTest
     public void testStaffFindByNamesOfficeStaffSpecialtyLocalityPageOnlySpecialties()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
         insertStaff();
         insertAnotherStaff();
 
@@ -1314,7 +1314,7 @@ public class StaffDaoImplTest
     public void testStaffFindByNamesOfficeStaffSpecialtyLocalityPageOnlyLocality()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
         insertStaff();
         insertAnotherStaff();
 
@@ -1337,7 +1337,7 @@ public class StaffDaoImplTest
     public void testStaffFindByNameOfficeStaffSpecialtyLocalityPage()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
         insertStaff();
         insertAnotherStaff();
 
@@ -1358,7 +1358,7 @@ public class StaffDaoImplTest
     public void testStaffFindByNameOfficeStaffSpecialtyLocalityPageNullAll()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
         insertStaff();
         insertAnotherStaff();
 
@@ -1379,7 +1379,7 @@ public class StaffDaoImplTest
     public void testStaffFindByNameOfficeStaffSpecialtyLocalityPageOnlyFirstName()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
         insertStaff();
         insertAnotherStaff();
 
@@ -1400,7 +1400,7 @@ public class StaffDaoImplTest
     public void testStaffFindByNameOfficeStaffSpecialtyLocalityPageOnlySurname()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
         insertStaff();
         insertAnotherStaff();
 
@@ -1421,7 +1421,7 @@ public class StaffDaoImplTest
     public void testStaffFindByNameOfficeStaffSpecialtyLocalityPageOnlyOffice()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
         insertStaff();
         insertAnotherStaff();
 
@@ -1442,7 +1442,7 @@ public class StaffDaoImplTest
     public void testStaffFindByNameOfficeStaffSpecialtyLocalityPageOnlySpecialties()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
         insertStaff();
         insertAnotherStaff();
 
@@ -1463,7 +1463,7 @@ public class StaffDaoImplTest
     public void testStaffFindByNameOfficeStaffSpecialtyLocalityPageOnlyLocality()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
         insertStaff();
         insertAnotherStaff();
 

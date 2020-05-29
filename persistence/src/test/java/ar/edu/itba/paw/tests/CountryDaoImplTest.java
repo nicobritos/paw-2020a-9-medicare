@@ -53,6 +53,7 @@ public class CountryDaoImplTest {
         this.jdbcTemplate = new JdbcTemplate(this.ds);
         this.jdbcInsert = new SimpleJdbcInsert(this.ds)
                 .withTableName(COUNTRIES_TABLE);
+        cleanAllTables();
     }
 
     /* --------------------- FUNCIONES AUXILIARES -------------------------------------------- */
@@ -92,7 +93,7 @@ public class CountryDaoImplTest {
     public void testCreateCountrySuccessfully()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
         Country c = countryModel();
 
         // 2. Ejercitar
@@ -108,7 +109,7 @@ public class CountryDaoImplTest {
     public void testCreateAnotherCountrySuccessfully()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
         insertCountry();
         Country c = new Country();
         c.setName(COUNTRY_2);
@@ -127,7 +128,7 @@ public class CountryDaoImplTest {
     public void testCreateCountryRepeatedKeyFail()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
         insertCountry();
         Country c = countryModel();
         expectedException.expect(DataIntegrityViolationException.class);
@@ -144,7 +145,7 @@ public class CountryDaoImplTest {
     public void testCreateCountryNullFail()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
         expectedException.expect(IllegalArgumentException.class);
 
         // 2. Ejercitar
@@ -158,7 +159,7 @@ public class CountryDaoImplTest {
     public void testCreateCountryEmptyCountryFail()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
         Country c = new Country();
         expectedException.expect(IllegalArgumentException.class);
 
@@ -173,7 +174,7 @@ public class CountryDaoImplTest {
     public void testCreateCountryEmptyIdFail()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
         Country c = new Country();
         c.setName(COUNTRY);
         expectedException.expect(IllegalArgumentException.class);
@@ -189,7 +190,7 @@ public class CountryDaoImplTest {
     public void testCreateCountryEmptyNameFail()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
         Country c = new Country();
         c.setId(COUNTRY_ID);
         expectedException.expect(PersistenceException.class);
@@ -205,7 +206,7 @@ public class CountryDaoImplTest {
     public void testCreateCountryTooLongIdFail()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
         Country c = new Country();
         c.setName(COUNTRY);
         c.setId("CCC"); // Los countries IDs deben tener 2 caracteres
@@ -222,7 +223,7 @@ public class CountryDaoImplTest {
     public void testCreateCountryTooShortIdFail()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
         Country c = new Country();
         c.setName(COUNTRY);
         c.setId("C"); // Los countries IDs deben tener 2 caracteres
@@ -239,7 +240,7 @@ public class CountryDaoImplTest {
     public void testCreateCountryInvalidCharInIdFail()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
         Country c = new Country();
         c.setName(COUNTRY);
         c.setId("C2"); // Los countries IDs deben tener 2 caracteres
@@ -256,7 +257,7 @@ public class CountryDaoImplTest {
     public void testCreateCountryCaseInsensitiveId()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
         Country c = new Country();
         c.setName(COUNTRY);
         c.setId(COUNTRY_ID.toLowerCase());
@@ -274,7 +275,7 @@ public class CountryDaoImplTest {
     public void testFindCountryById()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
         insertCountry();
         insertAnotherCountry();
 
@@ -289,7 +290,7 @@ public class CountryDaoImplTest {
     @Test
     public void testFindCountryByIdDoesntExist() {
         // 1. Precondiciones
-        cleanAllTables();
+
         insertCountry();
         
         // 2. Ejercitar
@@ -303,7 +304,7 @@ public class CountryDaoImplTest {
     public void testFindCountryByIdNull()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
         insertCountry();
         expectedException.expect(IllegalArgumentException.class);
 
@@ -318,7 +319,7 @@ public class CountryDaoImplTest {
     public void testFindCountryByIdInvalidId()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
         insertCountry();
 
         // 2. Ejercitar
@@ -334,7 +335,7 @@ public class CountryDaoImplTest {
     public void testFindCountryByIds()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
         insertCountry();
         insertAnotherCountry();
 
@@ -353,7 +354,7 @@ public class CountryDaoImplTest {
     public void testFindCountryByIdsNotAllPresent()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
         insertCountry();
 
         // 2. Ejercitar
@@ -371,7 +372,7 @@ public class CountryDaoImplTest {
     public void testFindCountryByIdsDontExist()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
 
         // 2. Ejercitar
         Collection<Country> countries = this.countryDao.findByIds(Arrays.asList(COUNTRY_ID, COUNTRY_ID_2));
@@ -386,7 +387,7 @@ public class CountryDaoImplTest {
     @Test
     public void testFindCountryByName() {
         // 1. Precondiciones
-        cleanAllTables();
+
         insertCountry();
         insertAnotherCountry();
         Map<String, Object> map = new HashMap<>();
@@ -408,7 +409,7 @@ public class CountryDaoImplTest {
     @Test
     public void testFindCountryByNameDoesntExist() {
         // 1. Precondiciones
-        cleanAllTables();
+
         insertCountry();
 
         // 2. Ejercitar
@@ -423,7 +424,7 @@ public class CountryDaoImplTest {
     public void testFindCountryByNameNull()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
         insertCountry();
         insertAnotherCountry();
         expectedException.expect(IllegalArgumentException.class);
@@ -439,7 +440,7 @@ public class CountryDaoImplTest {
     public void testFindCountryByContainingName()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
         insertCountry();
         insertAnotherCountry();
         Map<String, Object> map = new HashMap<>();
@@ -461,7 +462,7 @@ public class CountryDaoImplTest {
     public void testCountryList()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
         insertCountry();
         insertAnotherCountry();
 
@@ -476,7 +477,7 @@ public class CountryDaoImplTest {
     @Test
     public void testCountryEmptyList() {
         // 1. Precondiciones
-        cleanAllTables();
+
 
         // 2. Ejercitar
         Collection<Country> countries = this.countryDao.list();
@@ -491,7 +492,7 @@ public class CountryDaoImplTest {
     @Test
     public void testCountryUpdate() {
         // 1. Precondiciones
-        cleanAllTables();
+
         insertCountry();
         insertAnotherCountry();
         Country c = countryModel();
@@ -510,7 +511,7 @@ public class CountryDaoImplTest {
     public void testCountryUpdateNull()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
         insertCountry();
         insertAnotherCountry();
         expectedException.expect(IllegalArgumentException.class);
@@ -527,7 +528,7 @@ public class CountryDaoImplTest {
     public void testCountryUpdateNotExistentCountry()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
         insertAnotherCountry();
         expectedException.expect(ObjectOptimisticLockingFailureException.class); // Todo: cambiar la excepcion?
 
@@ -542,7 +543,7 @@ public class CountryDaoImplTest {
     public void testCountryUpdateCountryWithNullName()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
         insertCountry();
         Country c = new Country();
         c.setId(COUNTRY_ID);
@@ -560,7 +561,7 @@ public class CountryDaoImplTest {
     public void testCountryUpdateCountryWithNullId()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
         insertCountry();
         Country c = new Country();
         c.setName(COUNTRY);
@@ -579,7 +580,7 @@ public class CountryDaoImplTest {
     public void testCountryRemoveById()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
         insertCountry();
 
         // 2. Ejercitar
@@ -593,7 +594,7 @@ public class CountryDaoImplTest {
     public void testCountryRemoveByIdNotExistent()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
         insertCountry();
 
         // 2. Ejercitar
@@ -608,7 +609,7 @@ public class CountryDaoImplTest {
     public void testCountryRemoveByNullId()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
         insertCountry();
         expectedException.expect(IllegalArgumentException.class);
 
@@ -625,7 +626,7 @@ public class CountryDaoImplTest {
     public void testCountryRemoveByModel()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
         insertCountry();
         Country c = countryModel();
 
@@ -640,7 +641,7 @@ public class CountryDaoImplTest {
     public void testCountryRemoveByModelNotExistent()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
         insertAnotherCountry();
 
         // 2. Ejercitar
@@ -655,7 +656,7 @@ public class CountryDaoImplTest {
     public void testCountryRemoveByNullModel()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
         insertCountry();
         expectedException.expect(IllegalArgumentException.class);
 
@@ -672,7 +673,7 @@ public class CountryDaoImplTest {
     public void testCountryCount()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
         insertCountry();
         insertAnotherCountry();
 
@@ -689,7 +690,7 @@ public class CountryDaoImplTest {
     public void testCountryCountEmptyTable()
     {
         // 1. Precondiciones
-        cleanAllTables();
+
 
         // 2. Ejercitar
         ModelMetadata modelMetadata = this.countryDao.count();

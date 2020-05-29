@@ -79,6 +79,7 @@ public class UserDaoImplTest {
         this.pictureJdbcInsert = new SimpleJdbcInsert(this.ds)
                 .withTableName(PICTURES_TABLE)
                 .usingGeneratedKeyColumns("picture_id");
+        cleanAllTables();
     }
 
     /* ---------------------- FUNCIONES AUXILIARES ---------------------------------------------------------------- */
@@ -119,20 +120,16 @@ public class UserDaoImplTest {
      **/
     private User userModel() {
         User u = new User();
-        try {
-            u.setEmail(EMAIL);
-            u.setPassword(PASSWORD);
-            u.setFirstName(FIRST_NAME);
-            u.setSurname(SURNAME);
-            u.setPhone(PHONE);
-            u.setProfilePicture(pictureModel());
-            u.setToken(TOKEN);
-            u.setTokenCreatedDate(null);
-            u.setVerified(true);
-            u.setId(STARTING_ID);
-        } catch (Exception e) {
-            fail(e.getMessage());
-        }
+        u.setEmail(EMAIL);
+        u.setPassword(PASSWORD);
+        u.setFirstName(FIRST_NAME);
+        u.setSurname(SURNAME);
+        u.setPhone(PHONE);
+        u.setProfilePicture(pictureModel());
+        u.setToken(TOKEN);
+        u.setTokenCreatedDate(null);
+        u.setVerified(true);
+        u.setId(STARTING_ID);
         return u;
     }
 
@@ -217,12 +214,12 @@ public class UserDaoImplTest {
     @Test
     public void testCreateUserSuccessfully() {
         // 1. Precondiciones
-        cleanAllTables();
+
         insertPicture();
         User u = userModel();
+        u.setId(null);
 
         // 2. Ejercitar
-        u.setId(null);
         User user = this.userDao.create(u);
 
         // 3. Postcondiciones
@@ -238,12 +235,11 @@ public class UserDaoImplTest {
     @Test
     public void testCreateAnotherUserSuccessfully() {
         // 1. Precondiciones
-        cleanAllTables();
         insertAnotherUser();
         User u = userModel();
+        u.setId(null);
 
         // 2. Ejercitar
-        u.setId(null);
         User user = this.userDao.create(u);
 
         // 3. Postcondiciones
@@ -259,7 +255,7 @@ public class UserDaoImplTest {
     @Test
     public void testCreateUserNullFail() {
         // 1. Precondiciones
-        cleanAllTables();
+
         expectedException.expect(IllegalArgumentException.class);
 
         // 2. Ejercitar
@@ -272,7 +268,7 @@ public class UserDaoImplTest {
     @Test
     public void testCreateUserEmptyUserFail() {
         // 1. Precondiciones
-        cleanAllTables();
+
         User u = new User();
         expectedException.expect(PersistenceException.class);
 
@@ -286,7 +282,7 @@ public class UserDaoImplTest {
     @Test
     public void testCreateUserEmptyFirstNameFail() {
         // 1. Precondiciones
-        cleanAllTables();
+
         User u = userModel();
         u.setFirstName(null);
         expectedException.expect(PersistenceException.class);
@@ -301,7 +297,7 @@ public class UserDaoImplTest {
     @Test
     public void testCreateUserEmptySurnameFail() {
         // 1. Precondiciones
-        cleanAllTables();
+
         User u = userModel();
         u.setSurname(null);
         expectedException.expect(PersistenceException.class);
@@ -316,7 +312,7 @@ public class UserDaoImplTest {
     @Test
     public void testCreateUserEmptyEmailFail() {
         // 1. Precondiciones
-        cleanAllTables();
+
         User u = userModel();
         u.setEmail(null);
         expectedException.expect(PersistenceException.class);
@@ -331,7 +327,7 @@ public class UserDaoImplTest {
     @Test
     public void testCreateUserEmptyPasswordFail() {
         // 1. Precondiciones
-        cleanAllTables();
+
         User u = userModel();
         u.setPassword(null);
         expectedException.expect(PersistenceException.class);
@@ -348,7 +344,7 @@ public class UserDaoImplTest {
     @Test
     public void testFindUserById() {
         // 1. Precondiciones
-        cleanAllTables();
+
         insertUser();
         insertAnotherUser();
 
@@ -363,7 +359,7 @@ public class UserDaoImplTest {
     @Test
     public void testFindUserByIdDoesntExist() {
         // 1. Precondiciones
-        cleanAllTables();
+
         insertUser();
 
         // 2. Ejercitar
@@ -376,7 +372,7 @@ public class UserDaoImplTest {
     @Test
     public void testFindUserByIdNull() {
         // 1. Precondiciones
-        cleanAllTables();
+
         insertUser();
         expectedException.expect(IllegalArgumentException.class);
 
@@ -392,7 +388,7 @@ public class UserDaoImplTest {
     @Test
     public void testFindUserByIds() {
         // 1. Precondiciones
-        cleanAllTables();
+
         insertUser();
         insertAnotherUser();
 
@@ -410,7 +406,7 @@ public class UserDaoImplTest {
     @Test
     public void testFindUserByIdsNotAllPresent() {
         // 1. Precondiciones
-        cleanAllTables();
+
         insertUser();
 
         // 2. Ejercitar
@@ -427,7 +423,7 @@ public class UserDaoImplTest {
     @Test
     public void testFindUserByIdsDontExist() {
         // 1. Precondiciones
-        cleanAllTables();
+
 
         // 2. Ejercitar
         Collection<User> users = this.userDao.findByIds(Arrays.asList(STARTING_ID, STARTING_ID + 1));
@@ -442,7 +438,7 @@ public class UserDaoImplTest {
     @Test
     public void testUserList() {
         // 1. Precondiciones
-        cleanAllTables();
+
         insertUser();
         insertAnotherUser();
 
@@ -457,7 +453,7 @@ public class UserDaoImplTest {
     @Test
     public void testUserEmptyList() {
         // 1. Precondiciones
-        cleanAllTables();
+
 
         // 2. Ejercitar
         Collection<User> users = this.userDao.list();
@@ -472,7 +468,7 @@ public class UserDaoImplTest {
     @Test
     public void testUserUpdate() {
         // 1. Precondiciones
-        cleanAllTables();
+
         insertUser();
         insertAnotherUser();
         User u = userModel();
@@ -490,7 +486,7 @@ public class UserDaoImplTest {
     @Test
     public void testUserUpdateNull() {
         // 1. Precondiciones
-        cleanAllTables();
+
         insertUser();
         insertAnotherUser();
         expectedException.expect(IllegalArgumentException.class);
@@ -506,7 +502,7 @@ public class UserDaoImplTest {
     @Test
     public void testUserUpdateNotExistentUser() {
         // 1. Precondiciones
-        cleanAllTables();
+
         insertAnotherUser();
         User u = userModel();
         u.setId(STARTING_ID + 1);
@@ -522,7 +518,7 @@ public class UserDaoImplTest {
     @Test
     public void testUserUpdateUserWithNullName() {
         // 1. Precondiciones
-        cleanAllTables();
+
         insertUser();
         User u = userModel();
         u.setFirstName(null);
@@ -539,7 +535,7 @@ public class UserDaoImplTest {
     @Test
     public void testUserUpdateUserWithNullId() {
         // 1. Precondiciones
-        cleanAllTables();
+
         insertUser();
         User u = userModel();
         u.setId(null);
@@ -557,7 +553,7 @@ public class UserDaoImplTest {
     @Test
     public void testUserRemoveById() {
         // 1. Precondiciones
-        cleanAllTables();
+
         insertUser();
 
         // 2. Ejercitar
@@ -570,7 +566,7 @@ public class UserDaoImplTest {
     @Test
     public void testUserRemoveByIdNotExistent() {
         // 1. Precondiciones
-        cleanAllTables();
+
         insertUser();
         expectedException.expect(IllegalArgumentException.class);
 
@@ -584,7 +580,7 @@ public class UserDaoImplTest {
     @Test
     public void testUserRemoveByNullId() {
         // 1. Precondiciones
-        cleanAllTables();
+
         insertUser();
         expectedException.expect(IllegalArgumentException.class);
 
@@ -599,7 +595,7 @@ public class UserDaoImplTest {
     @Test
     public void testUserRemoveByModel() {
         // 1. Precondiciones
-        cleanAllTables();
+
         insertUser();
         User u = userModel();
 
@@ -613,7 +609,7 @@ public class UserDaoImplTest {
     @Test
     public void testUserRemoveByModelNotExistent() {
         // 1. Precondiciones
-        cleanAllTables();
+
         insertAnotherUser();
         User u = userModel();
         u.setId(STARTING_ID + 1);
@@ -629,7 +625,7 @@ public class UserDaoImplTest {
     @Test
     public void testUserRemoveByNullModel() {
         // 1. Precondiciones
-        cleanAllTables();
+
         insertUser();
         expectedException.expect(IllegalArgumentException.class);
 
@@ -645,7 +641,7 @@ public class UserDaoImplTest {
     @Test
     public void testUserCount() {
         // 1. Precondiciones
-        cleanAllTables();
+
         insertUser();
         insertAnotherUser();
 
@@ -661,7 +657,7 @@ public class UserDaoImplTest {
     @Test
     public void testUserCountEmptyTable() {
         // 1. Precondiciones
-        cleanAllTables();
+
 
         // 2. Ejercitar
         ModelMetadata modelMetadata = this.userDao.count();
@@ -677,7 +673,7 @@ public class UserDaoImplTest {
     @Test
     public void testUserExistsEmail() {
         // 1. Precondiciones
-        cleanAllTables();
+
         insertUser();
         insertAnotherUser();
 
@@ -691,7 +687,7 @@ public class UserDaoImplTest {
     @Test
     public void testUserDoesntExistsEmail() {
         // 1. Precondiciones
-        cleanAllTables();
+
         insertAnotherUser();
 
         // 2. Ejercitar
@@ -706,7 +702,7 @@ public class UserDaoImplTest {
     @Test
     public void testUserExistsToken() {
         // 1. Precondiciones
-        cleanAllTables();
+
         insertUser();
         insertAnotherUser();
 
@@ -720,7 +716,7 @@ public class UserDaoImplTest {
     @Test
     public void testUserDoesntExistsToken() {
         // 1. Precondiciones
-        cleanAllTables();
+
         insertAnotherUser();
 
         // 2. Ejercitar
@@ -735,7 +731,7 @@ public class UserDaoImplTest {
     @Test
     public void testUserFindByEmail() {
         // 1. Precondiciones
-        cleanAllTables();
+
         insertUser();
         insertAnotherUser();
 
@@ -750,7 +746,7 @@ public class UserDaoImplTest {
     @Test
     public void testUserFindByEmailDoesntExists() {
         // 1. Precondiciones
-        cleanAllTables();
+
         insertAnotherUser();
 
         // 2. Ejercitar
@@ -763,7 +759,7 @@ public class UserDaoImplTest {
     @Test
     public void testUserFindByEmailNull() {
         // 1. Precondiciones
-        cleanAllTables();
+
         insertAnotherUser();
         expectedException.expect(IllegalArgumentException.class);
 
@@ -780,7 +776,7 @@ public class UserDaoImplTest {
     @Test
     public void testUserFindByToken() {
         // 1. Precondiciones
-        cleanAllTables();
+
         insertUser();
         insertAnotherUser();
 
@@ -795,7 +791,7 @@ public class UserDaoImplTest {
     @Test
     public void testUserFindByTokenDoesntExists() {
         // 1. Precondiciones
-        cleanAllTables();
+
         insertAnotherUser();
 
         // 2. Ejercitar
@@ -808,7 +804,7 @@ public class UserDaoImplTest {
     @Test
     public void testUserFindByTokenNull() {
         // 1. Precondiciones
-        cleanAllTables();
+
         insertAnotherUser();
         expectedException.expect(IllegalArgumentException.class);
 
