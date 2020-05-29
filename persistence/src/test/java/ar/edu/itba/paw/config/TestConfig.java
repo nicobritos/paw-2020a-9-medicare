@@ -29,9 +29,6 @@ public class TestConfig {
     private static final String HSQLDB_USER = "ha";
     private static final String HSQLDB_PASS = "";
 
-    @Value("classpath:sql/schema.sql")
-    private Resource schemaSql;
-
     @Bean
     public DataSource dataSource(){
         final SimpleDriverDataSource ds = new SimpleDriverDataSource();
@@ -67,7 +64,6 @@ public class TestConfig {
         factoryBean.setJpaVendorAdapter(vendorAdapter);
 
         final Properties properties = new Properties();
-        properties.setProperty("hibernate.dialect", "ar.edu.itba.paw.dialect.MyHSQLDialect");
         properties.setProperty("hibernate.dialect", "ar.edu.itba.paw.dialect.MyHSQLDialect");
         properties.setProperty("hibernate.show_sql", "true");
         properties.setProperty("format_sql", "true");
