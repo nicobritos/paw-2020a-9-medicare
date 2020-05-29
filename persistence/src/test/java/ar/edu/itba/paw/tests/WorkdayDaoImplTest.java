@@ -1034,8 +1034,7 @@ public class WorkdayDaoImplTest
 
         // 3. Postcondiciones
         assertEquals(2, (long) modelMetadata.getCount());
-        System.out.println(modelMetadata.getMax()); // No se que devuelve esto
-        System.out.println(modelMetadata.getMin()); // No se que devuelve esto
+
     }
 
     @Test
@@ -1049,8 +1048,7 @@ public class WorkdayDaoImplTest
 
         // 3. Postcondiciones
         assertEquals(0, (long) modelMetadata.getCount());
-        System.out.println(modelMetadata.getMax()); // No se que devuelve esto
-        System.out.println(modelMetadata.getMin()); // No se que devuelve esto
+
     }
 
     /* --------------------- MÉTODO: workdayDao.findByStaff(Staff) -------------------------------------------- */
