@@ -1,5 +1,6 @@
 package ar.edu.itba.paw.models;
 
+import org.hibernate.annotations.Type;
 import org.joda.time.DateTime;
 
 import javax.persistence.*;
@@ -25,6 +26,7 @@ public class Appointment extends GenericModel<Integer> {
     @Enumerated(value = EnumType.STRING)
     private AppointmentStatus appointmentStatus;
     @Column(name = "from_date", nullable = false)
+    @Type(type="org.jadira.usertype.dateandtime.joda.PersistentDateTime")
     private DateTime fromDate;
     @Column(name = "message")
     private String message;
