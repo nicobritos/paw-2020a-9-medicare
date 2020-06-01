@@ -1,4 +1,7 @@
 const App = function () {
+    let baseUrl = $("base")[0].href;
+    baseUrl = baseUrl.substring(0, baseUrl.length - 1);
+
     let showOk = function (messages, title = 'Exito') {
         if (messages == null) {
             return;
@@ -109,8 +112,7 @@ const App = function () {
         }
     };
 
-    let baseUrl = $("base")[0].href;
-    baseUrl = baseUrl.substring(0, baseUrl.length - 1);
+
     return {
         init: function () {
             // First, checks if it isn't implemented yet.
@@ -125,6 +127,12 @@ const App = function () {
                     });
                 };
             }
+
+            $(document).ready(function(){
+                $('.btn-loading').on('click', function() {
+                    $(this).append(' <div class="spinner-border loading-spinner-button" role="status"></div>');
+                });
+            });
         },
         get: function (url, parameters = {}) {
             if (url[0] === "/") {
@@ -154,27 +162,3 @@ const App = function () {
         }
     };
 }();
-
-$(document).ready(function(){
-    $('.btn').on('click', function() {
-        $(this).append(' <div class="spinner-border" role="status"><span class="sr-only">Loading...</span></div>');
-    });
-    
-    Swal.fire({
-        title: 'Prueba de Modals en App.js',
-        text: "Texto prueba",
-        icon: 'warning',
-        showCancelButton: true,
-        confirmButtonColor: '#3085d6',
-        cancelButtonColor: '#d33',
-        confirmButtonText: 'Confirmar'
-    }).then((result) => {
-        if (result.value) {
-            Swal.fire(
-                'Confirmado!',
-                'Prueba exitosa.',
-                'success'
-            )
-        }
-    })
-});

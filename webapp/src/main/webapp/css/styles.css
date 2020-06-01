@@ -238,3 +238,12 @@ tr:nth-child(even) {
 .select-css:disabled:hover, .select-css[aria-disabled=true] {
     border-color: #aaa;
 }
+
+.loading-spinner-button {
+    margin-left: 10px;
+}
+
+.btn {
+    display: flex;
+    align-items: center;
+}
