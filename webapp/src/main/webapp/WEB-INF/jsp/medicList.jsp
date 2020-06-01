@@ -136,21 +136,10 @@
 
 </body>
 <script src='<c:url value="/js/scripts/AppointmentRequest.js"/> '></script>
-<script src='<c:url value="/js/scripts/AppointmentList.js"/> '></script>
+<script src='<c:url value="/js/scripts/AppointmentList.js"/> '>
+</script>
 <script>
-    let prevButton = document.getElementById("prevButton");
-    let nextButton = document.getElementById("nextButton");
-    if (prevButton != null) {
-        prevButton.onclick = () => {
-            location.href = "<c:url value="/mediclist/${page-1}"/>" + location.search;
-        }
-    }
-    if (nextButton != null) {
-        nextButton.onclick = () => {
-            location.href = "<c:url value="/mediclist/${page+1}"/>" + location.search;
-        }
-    }
+    AppointmentList.init(parseInt(${page}));
 
-    AppointmentList.init();
 </script>
 </html>

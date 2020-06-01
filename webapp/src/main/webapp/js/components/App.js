@@ -82,9 +82,12 @@ const App = function () {
         });
     };
 
-    let goto = function (url) {
-        if (url.startsWith('/')) {
-            location.href = url;
+    let goto = function (url, preserveParameters) {
+        if (url.startsWith('/') || url.startsWith('http://') || url.startsWith('https://')) {
+            if (preserveParameters)
+                location.href = url + location.search;
+            else
+                location.href = url;
         } else if (url.startsWith('..')) {
             let pathname = location.pathname;
             if (pathname.endsWith('/') || pathname.endsWith('#')) pathname = pathname.substring(0, pathname.length - 1);
@@ -103,15 +106,12 @@ const App = function () {
             }
 
             location.pathname = oldPaths.concat(newPaths).join('/');
-        } else if (url.startsWith('http://') || url.startsWith('https://')) {
-            location.href = url;
         } else {
             let pathname = location.pathname;
             if (pathname.endsWith('/') || pathname.endsWith('#')) pathname = pathname.substring(0, pathname.length - 1);
             location.pathname = [pathname, url].join('/');
         }
     };
-
 
     return {
         init: function () {
@@ -153,11 +153,11 @@ const App = function () {
         goBack: function () {
             history.back();
         },
-        goto: function (url) {
+        goto: function (url, preserveParameters = false) {
             if (url[0] === "/") {
-                return goto(baseUrl + url)
+                return goto(baseUrl + url, preserveParameters)
             } else {
-                return goto(url);
+                return goto(url, preserveParameters);
             }
         }
     };

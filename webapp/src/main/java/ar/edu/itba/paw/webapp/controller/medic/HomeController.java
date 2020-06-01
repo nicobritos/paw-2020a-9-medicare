@@ -1,4 +1,4 @@
-package ar.edu.itba.paw.webapp.controller.staff;
+package ar.edu.itba.paw.webapp.controller.medic;
 
 import ar.edu.itba.paw.interfaces.services.*;
 import ar.edu.itba.paw.models.*;
@@ -24,7 +24,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Controller
-public class MedicSideController extends GenericController {
+public class HomeController extends GenericController {
     @Autowired
     UserService userService;
     @Autowired

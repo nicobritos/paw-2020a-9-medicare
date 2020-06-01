@@ -29,7 +29,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Controller
-public class PatientSideController extends GenericController {
+public class HomeController extends GenericController {
     @Autowired
     AppointmentService appointmentService;
     @Autowired

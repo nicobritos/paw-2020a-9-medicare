@@ -24,7 +24,7 @@ import java.util.Optional;
 
 @Controller
 @RequestMapping("/profilePics")
-public class ProfilePicController extends GenericController {
+public class ProfilePictureController extends GenericController {
     @Autowired
     private PictureService pictureService;
     @Autowired
