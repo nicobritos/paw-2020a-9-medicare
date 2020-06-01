@@ -200,7 +200,7 @@ public class StaffDaoImpl extends GenericSearchableDaoImpl<Staff, Integer> imple
         if (predicate != null) predicates.add(predicate);
         predicate = this.getOfficePredicate(offices, root);
         if (predicate != null) predicates.add(predicate);
-        predicate = this.getStaffSpecialtyPredicate(staffSpecialties, root);
+        predicate = this.getStaffSpecialtyPredicate(staffSpecialties, builder, root);
         if (predicate != null) predicates.add(predicate);
         predicate = this.getLocalityPredicate(localities, officeJoin);
         if (predicate != null) predicates.add(predicate);
@@ -217,12 +217,20 @@ public class StaffDaoImpl extends GenericSearchableDaoImpl<Staff, Integer> imple
         return expression.in(localities);
     }
 
-    private Predicate getStaffSpecialtyPredicate(Collection<StaffSpecialty> staffSpecialties, Root<Staff> root) {
+    private Predicate getStaffSpecialtyPredicate(Collection<StaffSpecialty> staffSpecialties, CriteriaBuilder builder, Root<Staff> root) {
         if (staffSpecialties.isEmpty())
             return null;
 
-        Expression<?> expression = root.get(Staff_.staffSpecialties);
-        return expression.in(staffSpecialties);
+        List<Predicate> predicates = new LinkedList<>();
+        Expression<Collection<StaffSpecialty>> expression = root.get(Staff_.staffSpecialties);
+
+        for (StaffSpecialty staffSpecialty : staffSpecialties) {
+            predicates.add(builder.isMember(staffSpecialty, expression));
+        }
+
+        Predicate[] predicatesArray = new Predicate[predicates.size()];
+        predicatesArray = predicates.toArray(predicatesArray);
+        return builder.or(predicatesArray);
     }
 
     private Predicate getOfficePredicate(Collection<Office> offices, Root<Staff> root) {

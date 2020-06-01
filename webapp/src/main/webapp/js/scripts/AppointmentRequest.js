@@ -1,5 +1,29 @@
-var AppointmentRequest = function () {
+const AppointmentRequest = function () {
     let staffId = null;
+
+    let getStaffTimeslots = function () {
+        return App.post('/timeslots/' + staffId, {
+            fromDay: 3,
+            fromMonth: 5,
+            fromYear: 2020,
+            toDay: 8,
+            toMonth: 5,
+            toYear: 2020
+        });
+    };
+
+    let requestAppointment = function (year, month, day, hour, minute) {
+        App.post('/patient/appointment', {
+            staffId: staffId,
+            year: year,
+            month: month,
+            day: day,
+            minute: minute,
+            hour: hour
+        }).then(() => {
+            App.showOk(['Su turno fue agendado exitosamente'], 'Agendado');
+        });
+    };
 
     let bindElements = function () {
         let modal = Modal.create(
@@ -47,30 +71,6 @@ var AppointmentRequest = function () {
                     buttonContainer.append(button);
                 }
             }
-        });
-    };
-
-    let getStaffTimeslots = function () {
-        return App.post('/timeslots/' + staffId, {
-            fromDay: 3,
-            fromMonth: 5,
-            fromYear: 2020,
-            toDay: 8,
-            toMonth: 5,
-            toYear: 2020
-        });
-    };
-
-    let requestAppointment = function (year, month, day, hour, minute) {
-        App.post('/patient/appointment', {
-            staffId: staffId,
-            year: year,
-            month: month,
-            day: day,
-            minute: minute,
-            hour: hour
-        }).then(() => {
-            App.showOk(['Su turno fue agendado exitosamente'], 'Agendado');
         });
     };
 

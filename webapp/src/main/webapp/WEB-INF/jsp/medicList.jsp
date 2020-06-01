@@ -15,7 +15,7 @@
             <h4>
                 <c:choose>
                     <c:when test="${paginator.totalCount == 0}">
-                        <spring:message code="NoResultsFound" />
+                        <spring:message code="NoResultsFound"/>
                     </c:when>
                     <c:when test="${paginator.totalCount == 1}">
                     </c:when>
@@ -139,7 +139,8 @@
 <script src='<c:url value="/js/scripts/AppointmentList.js"/> '>
 </script>
 <script>
-    AppointmentList.init(parseInt(${page}));
-
+    $(document).ready(() => {
+        AppointmentList.init(parseInt(${page}));
+    })
 </script>
 </html>

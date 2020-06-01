@@ -135,17 +135,7 @@
 </div>
 </body>
 </html>
+<script src="<c:url value="/js/scripts/SelectAppointment.js"/>"></script>
 <script>
-    let prevButton = document.getElementById("day-left");
-    let nextButton = document.getElementById("day-right");
-    if (prevButton != null) {
-        prevButton.onclick = () => {
-            location.href = "<c:url value="/appointment/${id}/${week-1}"/>" + location.search;
-        }
-    }
-    if (nextButton != null) {
-        nextButton.onclick = () => {
-            location.href = "<c:url value="/appointment/${id}/${week+1}"/>" + location.search;
-        }
-    }
+    SelectAppointment.init(parseInt(${id}), parseInt(${week}));
 </script>

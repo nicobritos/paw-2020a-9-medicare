@@ -34,13 +34,13 @@ public class ProfilePictureController extends GenericController {
 
     //TODO:correct path
 
-    private String defaultImagePath = "/img/defaultProfilePic.svg";
-    private String defaultImageType = "image/svg+xml";
+    private final String defaultImagePath = "/img/defaultProfilePic.svg";
+    private final String defaultImageType = "image/svg+xml";
 
     @RequestMapping(value = "/set", method = RequestMethod.POST)
     public ResponseEntity<String> setProfilePic(@RequestParam MultipartFile pic, HttpServletRequest req) {
         //get current user
-        Optional<User> user = getUser();
+        Optional<User> user = this.getUser();
         if (!user.isPresent()) {
             //TODO:revise status code
             return new ResponseEntity<>(HttpStatus.FORBIDDEN);
@@ -82,7 +82,7 @@ public class ProfilePictureController extends GenericController {
         //else return a common pic
         else {
             try {
-                InputStream in = context.getResourceAsStream(this.defaultImagePath);
+                InputStream in = this.context.getResourceAsStream(this.defaultImagePath);
                 headers.add("content-type", this.defaultImageType);
                 res = new ResponseEntity<>(IOUtils.toByteArray(in), headers, HttpStatus.OK);
             } catch (Exception e) {
@@ -99,7 +99,7 @@ public class ProfilePictureController extends GenericController {
         HttpHeaders headers = new HttpHeaders();
         //if there is a pic return the
         try {
-            InputStream in = context.getResourceAsStream(this.defaultImagePath);
+            InputStream in = this.context.getResourceAsStream(this.defaultImagePath);
             headers.add("content-type", this.defaultImageType);
             byte[] bytepic = IOUtils.toByteArray(in);
             res = new ResponseEntity<byte[]>(bytepic, headers, HttpStatus.OK);

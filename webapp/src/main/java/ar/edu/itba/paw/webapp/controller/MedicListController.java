@@ -56,7 +56,7 @@ public class MedicListController extends GenericController {
     @RequestMapping(value = "/mediclist/{page}")
     public ModelAndView medicsList(@RequestParam(value = "name", required = false) String name, @RequestParam(value = "specialties", required = false) String specialties, @RequestParam(value = "localities", required = false) String localities, @PathVariable("page") int page) {
         if (page <= 0) {
-            return medicList(name, specialties, localities);
+            return this.medicList(name, specialties, localities);
         }
 
         //get modelandview from medicList.jsp
@@ -64,40 +64,40 @@ public class MedicListController extends GenericController {
         //staff variable that will be passed to the jsp
         Collection<Staff> staffList;
 
-        Set<StaffSpecialty> searchedSpecialties = new HashSet<>();
-
+        Collection<StaffSpecialty> searchedSpecialties;
+        Set<Integer> specialtiesIds = new HashSet<>();
         if (specialties != null) {
             // split strings to get all specialties used in search
             // and create the search parameter
             for (String s : specialties.split(",")) {
                 try {
-                    StaffSpecialty specialty = new StaffSpecialty();
-                    specialty.setId(Integer.parseInt(s));
-                    if (specialty.getId() >= 0) {
-                        searchedSpecialties.add(specialty);
+                    int id = Integer.parseInt(s);
+                    if (id >= 0) {
+                        specialtiesIds.add(id);
                     }
                 } catch (NumberFormatException e) {
                 }
             }
         }
 
-        Set<Locality> searchedLocalities = new HashSet<>();
-
+        Collection<Locality> searchedLocalities;
+        Collection<Integer> localitiesIds = new HashSet<>();
         if (localities != null) {
             // split strings to get all specialties used in search
             // and create the search parameter
             for (String s : localities.split(",")) {
                 try {
-                    Locality locality = new Locality();
-                    locality.setId(Integer.parseInt(s));
-                    if (locality.getId() >= 0) {
-                        searchedLocalities.add(locality);
+                    int id = Integer.parseInt(s);
+                    if (id >= 0) {
+                        localitiesIds.add(id);
                     }
                 } catch (NumberFormatException e) {
                 }
             }
         }
 
+        searchedSpecialties = this.specialityService.findByIds(specialtiesIds);
+        searchedLocalities = this.localityService.findByIds(localitiesIds);
         Paginator<Staff> staffPaginator;
         if (name != null && !(name = name.trim()).equals("")) {
             Set<String> words = new HashSet<>(Arrays.asList(name.split(" ")));
@@ -110,10 +110,10 @@ public class MedicListController extends GenericController {
         Collection<Locality> localitiesList = this.localityService.list();
 
         // pass objects to model and view
-        Optional<User> user = getUser();
+        Optional<User> user = this.getUser();
         mav.addObject("user", user);
-        if (user.isPresent() && isStaff()) {
-            mav.addObject("staffs", staffService.findByUser(user.get()));
+        if (user.isPresent() && this.isStaff()) {
+            mav.addObject("staffs", this.staffService.findByUser(user.get()));
         }
         mav.addObject("searchedLocalities", searchedLocalities);
         mav.addObject("searchedSpecialties", searchedSpecialties);
@@ -130,7 +130,7 @@ public class MedicListController extends GenericController {
 
     @RequestMapping("/appointment/{id}/{week}")
     public ModelAndView appointment(@PathVariable("id") final int id, @PathVariable("week") final int week) {
-        Optional<Staff> staff = staffService.findById(id);
+        Optional<Staff> staff = this.staffService.findById(id);
         if (!staff.isPresent()) {
             return new ModelAndView("error/404"); //todo: throw status code instead of this
         }
@@ -142,10 +142,10 @@ public class MedicListController extends GenericController {
 
         mav.addObject("today", today);
         mav.addObject("monday", monday);
-        Optional<User> user = getUser();
+        Optional<User> user = this.getUser();
         mav.addObject("user", user);
-        if (user.isPresent() && isStaff()) {
-            mav.addObject("staffs", staffService.findByUser(user.get()));
+        if (user.isPresent() && this.isStaff()) {
+            mav.addObject("staffs", this.staffService.findByUser(user.get()));
         }
         mav.addObject("staff", staff.get());
 
@@ -162,7 +162,7 @@ public class MedicListController extends GenericController {
             }
         }
         mav.addObject("weekSlots", weekslots);
-        mav.setViewName("selectTurno");
+        mav.setViewName("selectAppointment");
         return mav;
     }
 

@@ -29,7 +29,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Controller
-public class HomeController extends GenericController {
+public class PatientHomeController extends GenericController {
     @Autowired
     AppointmentService appointmentService;
     @Autowired
@@ -45,9 +45,8 @@ public class HomeController extends GenericController {
     @Autowired
     private ApplicationEventPublisher eventPublisher;
 
-
     @RequestMapping("/patient/home")
-    public ModelAndView patientHome() {
+    public ModelAndView home() {
         Optional<User> user = this.getUser();
         if (!user.isPresent()) {
             return new ModelAndView("redirect:/login");
@@ -64,12 +63,12 @@ public class HomeController extends GenericController {
         mav.addObject("specialties", staffSpecialtyService.list());
         mav.addObject("localities", localityService.list());
 
-        mav.setViewName("patientSide/homePaciente");
+        mav.setViewName("patient/home");
         return mav;
     }
 
     @RequestMapping(value = "/patient/profile", method = RequestMethod.GET)
-    public ModelAndView patientProfile(@ModelAttribute("patientProfileForm") final UserProfileForm form) {
+    public ModelAndView profile(@ModelAttribute("patientProfileForm") final UserProfileForm form) {
         Optional<User> user = getUser();
         if (!user.isPresent()) {
             return new ModelAndView("redirect:/login");
@@ -83,28 +82,28 @@ public class HomeController extends GenericController {
         }
 
         mav.addObject("verified", user.get().getVerified());
-        mav.setViewName("patientSide/patientProfile");
+        mav.setViewName("patient/profile");
         return mav;
     }
 
     @RequestMapping(value = "/patient/profile", method = RequestMethod.POST)
-    public ModelAndView editMedicUser(@Valid @ModelAttribute("patientProfileForm") final UserProfileForm form, final BindingResult errors, HttpServletRequest request, HttpServletResponse response) {
+    public ModelAndView editProfile(@Valid @ModelAttribute("patientProfileForm") final UserProfileForm form, final BindingResult errors, HttpServletRequest request, HttpServletResponse response) {
         Optional<User> user = getUser();
         if (!user.isPresent()) {
             return new ModelAndView("redirect:/login");
         }
 
         if (errors.hasErrors()) {
-            return this.patientProfile(form);
+            return this.profile(form);
         }
         if ((!form.getPassword().isEmpty() && form.getPassword().length() < 8) || !form.getPassword().equals(form.getRepeatPassword())) {
             errors.reject("Min.patientProfileForm.password", null, "Error");
-            return this.patientProfile(form);
+            return this.profile(form);
         }
         Optional<User> userOptional = userService.findByUsername(form.getEmail());
         if (userOptional.isPresent() && !userOptional.get().equals(user.get())) { // si se edito el email pero ya existe cuenta con ese email
             errors.reject("AlreadyExists.patientProfileForm.email", null, "Error");
-            return this.patientProfile(form);
+            return this.profile(form);
         }
 
         User editedUser = user.get();
@@ -121,7 +120,7 @@ public class HomeController extends GenericController {
         if (isStaff()) {
             mav.addObject("staffs", staffService.findByUser(user.get()));
         }
-        mav.setViewName("patientSide/patientProfile");
+        mav.setViewName("patient/profile");
         return mav;
     }
 
@@ -214,7 +213,7 @@ public class HomeController extends GenericController {
         }
         staffOptional.ifPresent(staff -> mav.addObject("staff", staff));
         mav.addObject("date", new DateTime(year, month, day, hour, minute));
-        mav.setViewName("patientSide/reservarTurno");
+        mav.setViewName("patient/requestAppointment");
         return mav;
     }
 

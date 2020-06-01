@@ -1,5 +1,9 @@
-var AppointmentList = function () {
+const AppointmentList = function () {
     let page;
+
+    let refreshPage = function () {
+        App.goto('/mediclist/' + page, true);
+    };
 
     let bindElements = function () {
         let buttons = $('.available-appointments-button');
@@ -11,10 +15,12 @@ var AppointmentList = function () {
         });
 
         $("#prevButton").click(function () {
-            App.goto('/mediclist/' + (page - 1), true);
+            page -= 1;
+            refreshPage();
         });
         $("#nextButton").click(function () {
-            App.goto('/mediclist/' + (page + 1), true);
+            page += 1;
+            refreshPage();
         });
     };
 

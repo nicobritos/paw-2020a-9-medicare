@@ -128,8 +128,8 @@ const App = function () {
                 };
             }
 
-            $(document).ready(function(){
-                $('.btn-loading').on('click', function() {
+            $(document).ready(function () {
+                $('.btn-loading').on('click', function () {
                     $(this).append(' <div class="spinner-border loading-spinner-button" role="status"></div>');
                 });
             });

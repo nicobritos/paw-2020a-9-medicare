@@ -24,7 +24,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Controller
-public class HomeController extends GenericController {
+public class MedicHomeController extends GenericController {
     @Autowired
     UserService userService;
     @Autowired
@@ -45,14 +45,14 @@ public class HomeController extends GenericController {
     private ApplicationEventPublisher eventPublisher;
 
     @RequestMapping("/staff/home")
-    public ModelAndView medicHome(@RequestParam(defaultValue = "0") String week, @RequestParam(required = false, name = "today") String newToday, HttpServletRequest request) {
+    public ModelAndView home(@RequestParam(defaultValue = "0") String week, @RequestParam(required = false, name = "today") String newToday, HttpServletRequest request) {
         Optional<User> user = this.getUser();
         if (!user.isPresent()) {
             return new ModelAndView("redirect:/login");
         }
         ModelAndView mav = new ModelAndView();
 
-        List<Staff> userStaffs = staffService.findByUser(user.get());
+        List<Staff> userStaffs = this.staffService.findByUser(user.get());
         LocalDateTime today = LocalDateTime.now();
         LocalDateTime monday;
         LocalDateTime selected = today;
@@ -77,19 +77,19 @@ public class HomeController extends GenericController {
         monday = today.minusDays(today.getDayOfWeek() - 1);
 
         mav.addObject("user", user);
-        if (isStaff()) {
-            mav.addObject("staffs", staffService.findByUser(user.get()));
+        if (this.isStaff()) {
+            mav.addObject("staffs", this.staffService.findByUser(user.get()));
         }
         mav.addObject("today", today);
         mav.addObject("isToday", isToday);
         mav.addObject("monday", monday);
-        mav.addObject("todayAppointments", appointmentService.findToday(userStaffs));
+        mav.addObject("todayAppointments", this.appointmentService.findToday(userStaffs));
 
         List<Appointment> appointments;
         if (monday.isAfter(LocalDateTime.now())) {
-            appointments = appointmentService.findByStaffsAndDay(userStaffs, LocalDateTime.now(), monday.plusDays(7));
+            appointments = this.appointmentService.findByStaffsAndDay(userStaffs, LocalDateTime.now(), monday.plusDays(7));
         } else {
-            appointments = appointmentService.findByStaffsAndDay(userStaffs, monday, monday.plusDays(7));
+            appointments = this.appointmentService.findByStaffsAndDay(userStaffs, monday, monday.plusDays(7));
         }
         List<List<Appointment>> weekAppointments = new LinkedList<>();
         for (int i = 0; i <= 7; i++) {
@@ -109,47 +109,47 @@ public class HomeController extends GenericController {
         }
         mav.addObject("query", query);
         mav.addObject("weekAppointments", weekAppointments); // lista de turnos que se muestra en la agenda semanal
-        mav.addObject("specialties", staffSpecialtyService.list());
-        mav.addObject("localities", localityService.list());
-        mav.setViewName("medicSide/homeMedico");
+        mav.addObject("specialties", this.staffSpecialtyService.list());
+        mav.addObject("localities", this.localityService.list());
+        mav.setViewName("medic/home");
         return mav;
     }
 
     @RequestMapping(value = "/staff/profile", method = RequestMethod.GET)
-    public ModelAndView medicProfile(@ModelAttribute("medicProfileForm") final UserProfileForm form) {
-        Optional<User> user = getUser();
+    public ModelAndView profile(@ModelAttribute("medicProfileForm") final UserProfileForm form) {
+        Optional<User> user = this.getUser();
         if (!user.isPresent()) {
             return new ModelAndView("redirect:/login");
         }
         ModelAndView mav = new ModelAndView();
         mav.addObject("user", user);
-        if (isStaff()) {
-            mav.addObject("staffs", staffService.findByUser(user.get()));
-            mav.addObject("workdays", workdayService.findByUser(user.get()));
+        if (this.isStaff()) {
+            mav.addObject("staffs", this.staffService.findByUser(user.get()));
+            mav.addObject("workdays", this.workdayService.findByUser(user.get()));
         }
         mav.addObject("verified", user.get().getVerified());
-        mav.setViewName("medicSide/medicProfile");
+        mav.setViewName("medic/profile");
         return mav;
     }
 
     @RequestMapping(value = "/staff/profile", method = RequestMethod.POST)
-    public ModelAndView editMedicUser(@Valid @ModelAttribute("medicProfileForm") final UserProfileForm form, final BindingResult errors, HttpServletRequest request, HttpServletResponse response) {
-        Optional<User> user = getUser();
+    public ModelAndView editProfile(@Valid @ModelAttribute("medicProfileForm") final UserProfileForm form, final BindingResult errors, HttpServletRequest request, HttpServletResponse response) {
+        Optional<User> user = this.getUser();
         if (!user.isPresent()) {
             return new ModelAndView("redirect:/login");
         }
 
         if (errors.hasErrors()) {
-            return this.medicProfile(form);
+            return this.profile(form);
         }
         if ((!form.getPassword().isEmpty() && form.getPassword().length() < 8) || !form.getPassword().equals(form.getRepeatPassword())) {
             errors.reject("Min.medicProfileForm.password", null, "Error");
-            return this.medicProfile(form);
+            return this.profile(form);
         }
-        Optional<User> userOptional = userService.findByUsername(form.getEmail());
+        Optional<User> userOptional = this.userService.findByUsername(form.getEmail());
         if (userOptional.isPresent() && !userOptional.get().equals(user.get())) { // si se edito el email pero ya existe cuenta con ese email
             errors.reject("AlreadyExists.medicProfileForm.email", null, "Error");
-            return this.medicProfile(form);
+            return this.profile(form);
         }
 
         User editedUser = user.get();
@@ -159,13 +159,13 @@ public class HomeController extends GenericController {
         editedUser.setPhone(form.getPhone());
         if (!form.getPassword().isEmpty())
             editedUser.setPassword(form.getPassword());
-        userService.update(editedUser);
+        this.userService.update(editedUser);
         this.createConfirmationEvent(request, editedUser);
 
         ModelAndView mav = new ModelAndView();
         mav.addObject("user", user);
-        if (isStaff()) {
-            mav.addObject("staffs", staffService.findByUser(user.get()));
+        if (this.isStaff()) {
+            mav.addObject("staffs", this.staffService.findByUser(user.get()));
         }
         mav.setViewName("redirect:/staff/profile");
         return mav;
@@ -173,23 +173,23 @@ public class HomeController extends GenericController {
 
     @RequestMapping(value = "/staff/profile/workday", method = RequestMethod.GET)
     public ModelAndView addWorkday(@ModelAttribute("workdayForm") final WorkdayForm form) {
-        Optional<User> user = getUser();
+        Optional<User> user = this.getUser();
         if (!user.isPresent()) {
             return new ModelAndView("redirect:/login");
         }
 
         ModelAndView mav = new ModelAndView();
         mav.addObject("user", user);
-        if (isStaff()) {
-            mav.addObject("staffs", staffService.findByUser(user.get()));
+        if (this.isStaff()) {
+            mav.addObject("staffs", this.staffService.findByUser(user.get()));
         }
-        mav.setViewName("medicSide/addTurno");
+        mav.setViewName("medic/addWorkday");
         return mav;
     }
 
     @RequestMapping(value = "/staff/profile/workday", method = RequestMethod.POST)
     public ModelAndView addWorkdayAction(@Valid @ModelAttribute("workdayForm") final WorkdayForm form, final BindingResult errors, HttpServletRequest request, HttpServletResponse response) {
-        Optional<User> user = getUser();
+        Optional<User> user = this.getUser();
         if (!user.isPresent()) {
             return new ModelAndView("redirect:/login");
         }
@@ -199,13 +199,13 @@ public class HomeController extends GenericController {
         }
 
 
-        Optional<Office> office = officeService.findById(form.getOfficeId());
+        Optional<Office> office = this.officeService.findById(form.getOfficeId());
         if (!office.isPresent()) {
             errors.reject("NotFound.workdayForm.office", null, "Error");
             return this.addWorkday(form);
         }
 
-        Optional<Staff> realStaff = staffService.findByUser(user.get()).stream().filter(staff -> staff.getOffice().equals(office.get())).findAny();
+        Optional<Staff> realStaff = this.staffService.findByUser(user.get()).stream().filter(staff -> staff.getOffice().equals(office.get())).findAny();
         if (!realStaff.isPresent()) {
             errors.reject("NotFound.workdayForm.staff", null, "Error");
             return this.addWorkday(form);
@@ -256,12 +256,12 @@ public class HomeController extends GenericController {
         workday.setEndHour(endHour);
         workday.setEndMinute(endMin);
         workday.setStaff(realStaff.get());
-        workday = workdayService.create(workday);
+        workday = this.workdayService.create(workday);
 
         ModelAndView mav = new ModelAndView();
         mav.addObject("user", user);
-        if (isStaff()) {
-            mav.addObject("staffs", staffService.findByUser(user.get()));
+        if (this.isStaff()) {
+            mav.addObject("staffs", this.staffService.findByUser(user.get()));
         }
         mav.setViewName("redirect:/staff/profile");
         return mav;
@@ -269,16 +269,16 @@ public class HomeController extends GenericController {
 
     @RequestMapping(value = "/staff/profile/workday/delete/{workdayId}", method = RequestMethod.POST)
     public ModelAndView deleteWorkday(@PathVariable("workdayId") final int workdayId) {
-        Optional<User> user = getUser();
+        Optional<User> user = this.getUser();
         if (!user.isPresent()) {
             return new ModelAndView("redirect:/login");
         }
-        Optional<Workday> workday = workdayService.findById(workdayId);
+        Optional<Workday> workday = this.workdayService.findById(workdayId);
         if (!workday.isPresent() || !workday.get().getStaff().getUser().equals(user.get())) {
             return new ModelAndView("redirect:/staff/profile");
         }
 
-        workdayService.remove(workdayId);
+        this.workdayService.remove(workdayId);
 
         return new ModelAndView("redirect:/staff/profile");
     }
@@ -292,7 +292,7 @@ public class HomeController extends GenericController {
         } else {
             query = "?week=" + week;
         }
-        Optional<User> user = getUser();
+        Optional<User> user = this.getUser();
         if (!user.isPresent()) {
             return new ModelAndView("redirect:/login");
         }
