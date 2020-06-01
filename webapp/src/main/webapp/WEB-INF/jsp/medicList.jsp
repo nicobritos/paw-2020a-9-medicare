@@ -113,20 +113,22 @@
                         </li>
                     </c:forEach>
                 </ul>
-                <div id="paging" class="p-3 d-flex container w-100 justify-content-center">
-                    <c:if test="${page > 1}">
-                        <div>
-                            <button type="button" class="btn btn-info btn-sm" id="prevButton"><</button>
-                        </div>
-                    </c:if>
-                    <p class="d-inline mx-2"><spring:message code="Page"/> <c:out value="${page}"/> <spring:message
-                            code="of"/> <c:out value="${paginator.totalPages}"/></p>
-                    <c:if test="${paginator.remainingPages != 0}">
-                        <div>
-                            <button type="button" class="btn btn-info btn-sm" id="nextButton">></button>
-                        </div>
-                    </c:if>
-                </div>
+                <c:if test="${paginator.totalPages != 0}">
+                    <div id="paging" class="p-3 d-flex container w-100 justify-content-center">
+                        <c:if test="${page > 1}">
+                            <div>
+                                <button type="button" class="btn btn-info btn-sm" id="prevButton"><</button>
+                            </div>
+                        </c:if>
+                        <p class="d-inline mx-2"><spring:message code="Page"/> <c:out value="${page}"/> <spring:message
+                                code="of"/> <c:out value="${paginator.totalPages}"/></p>
+                        <c:if test="${paginator.remainingPages != 0}">
+                            <div>
+                                <button type="button" class="btn btn-info btn-sm" id="nextButton">></button>
+                            </div>
+                        </c:if>
+                    </div>
+                </c:if>
             </div>
         </div>
     </div>
