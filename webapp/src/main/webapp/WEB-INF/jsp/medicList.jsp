@@ -24,7 +24,7 @@
                 <%--            </select>--%>
                 <%--          </div>--%>
                 <div class="row mt-4">
-                    <select class="form-control w-100" type="text" name="specialties" id="selEspecialidad">
+                    <select class="select-css form-control w-100" type="text" name="specialties" id="selEspecialidad">
                         <option value="-1" disabled <c:if test="${searchedSpecialties.isEmpty()}">selected</c:if>>
                             <spring:message code="Specialty"/></option>
                         <option value="-1"><spring:message code="Any"/></option>
@@ -36,7 +36,7 @@
                     </select>
                 </div>
                 <div class="row mt-4">
-                    <select class="form-control w-100" type="text" name="localities" id="localidad">
+                    <select class="select-css form-control w-100" type="text" name="localities" id="localidad">
                         <option value="-1" disabled <c:if test="${searchedLocalities.isEmpty()}">selected</c:if>>
                             <spring:message code="Locality"/></option>
                         <option value="-1"><spring:message code="Any"/></option>

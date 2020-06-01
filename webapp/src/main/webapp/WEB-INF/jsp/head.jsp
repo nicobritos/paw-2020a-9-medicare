@@ -5,6 +5,7 @@
 <script src='<c:url value="/js/plugins/jquery-3.5.0.min.js"/>'></script>
 <base href='<c:url value="/"/>' id="baseUrl">
 <script src='<c:url value="/js/plugins/bootstrap-notify.min.js"/>'></script>
+<script src='https://cdn.jsdelivr.net/npm/sweetalert2@9'></script>
 <script src='<c:url value="/js/components/App.js"/>'></script>
 <script src='<c:url value="/js/components/Modal.js"/>'></script>
 <script>

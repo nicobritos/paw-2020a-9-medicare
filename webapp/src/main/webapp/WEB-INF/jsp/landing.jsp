@@ -24,7 +24,7 @@
             <div class="col">
                 <label for="specialties">
                 </label>
-                <select name="specialties" class="form-control" id="specialties">
+                <select name="specialties" class="select-css form-control" id="specialties">
                     <option value="-1" disabled selected><spring:message code="Specialty"/></option>
                     <option value="-1"><spring:message code="Any"/></option>
                     <c:forEach var="specialty" items="${specialties}">
@@ -36,7 +36,7 @@
             <div class="col pr-5">
                 <label for="localities">
                 </label>
-                <select name="localities" class="form-control" id="localities">
+                <select name="localities" class="select-css form-control" id="localities">
                     <option value="-1" disabled selected><spring:message code="Locality"/></option>
                     <option value="-1"><spring:message code="Any"/></option>
                     <c:forEach var="locality" items="${localities}">
