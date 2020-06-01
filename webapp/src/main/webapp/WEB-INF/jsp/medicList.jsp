@@ -11,9 +11,25 @@
 
 <form action="<c:url value="/mediclist/1"/>">
     <div class="container h-75">
+        <div class="row mt-4">
+            <h4>
+                <c:choose>
+                    <c:when test="${paginator.totalCount == 0}">
+                        <spring:message code="NoResultsFound" />
+                    </c:when>
+                    <c:when test="${paginator.totalCount == 1}">
+                    </c:when>
+                    <c:otherwise>
+                        <spring:message code="SearchResults2More" arguments="${paginator.totalCount}"/>
+                    </c:otherwise>
+                </c:choose>
+                <c:if test="${paginator.totalCount == 0}">
+                </c:if>
+            </h4>
+        </div>
         <div class="row mt-4 justify-content-center">
             <input class="form-control w-100" type="text" name="name" value="<c:out value="${name}"/>"
-                   placeholder="<spring:message code="Name"/>"/>
+                   placeholder="<spring:message code="Name" />"/>
         </div>
         <div class="row mt-4">
             <div class="col-4 px-3">
