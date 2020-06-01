@@ -159,4 +159,22 @@ $(document).ready(function(){
     $('.btn').on('click', function() {
         $(this).append(' <div class="spinner-border" role="status"><span class="sr-only">Loading...</span></div>');
     });
+    
+    Swal.fire({
+        title: 'Prueba de Modals en App.js',
+        text: "Texto prueba",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Confirmar'
+    }).then((result) => {
+        if (result.value) {
+            Swal.fire(
+                'Confirmado!',
+                'Prueba exitosa.',
+                'success'
+            )
+        }
+    })
 });
