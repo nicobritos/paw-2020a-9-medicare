@@ -5,6 +5,7 @@ import ar.edu.itba.paw.interfaces.services.LocalityService;
 import ar.edu.itba.paw.interfaces.services.ProvinceService;
 import ar.edu.itba.paw.interfaces.services.UserService;
 import ar.edu.itba.paw.interfaces.services.exceptions.EmailAlreadyExistsException;
+import ar.edu.itba.paw.interfaces.services.exceptions.InvalidEmailDomain;
 import ar.edu.itba.paw.models.*;
 import ar.edu.itba.paw.webapp.auth.UserRole;
 import ar.edu.itba.paw.webapp.controller.utils.GenericController;
@@ -108,6 +109,9 @@ public class AuthenticationController extends GenericController {
         } catch (EmailAlreadyExistsException e) {
             errors.reject("EmailAlreadyTaken.signupForm.email", null, "Error");
             return this.signupStaffIndex(form);
+        } catch (InvalidEmailDomain e) {
+            errors.reject("InvalidEmailDomain.signupForm.email", null, "Error");
+            return this.signupStaffIndex(form);
         }
         StringBuilder baseUrl = new StringBuilder(request.getRequestURL());
         baseUrl.replace(request.getRequestURL().lastIndexOf(request.getServletPath()), request.getRequestURL().length(), "");
@@ -137,6 +141,9 @@ public class AuthenticationController extends GenericController {
             newUser = this.userService.create(form.getAsUser());
         } catch (EmailAlreadyExistsException e) {
             errors.reject("EmailAlreadyTaken.signupForm.email", null, "Error");
+            return this.signupPatientIndex(form);
+        } catch (InvalidEmailDomain e) {
+            errors.reject("InvalidEmailDomain.signupForm.email", null, "Error");
             return this.signupPatientIndex(form);
         }
         StringBuilder baseUrl = new StringBuilder(request.getRequestURL());
