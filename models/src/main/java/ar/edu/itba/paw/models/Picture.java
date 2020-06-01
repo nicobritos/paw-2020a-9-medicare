@@ -21,7 +21,6 @@ public class Picture extends GenericModel<Integer> {
     private String mimeType;
     @Column(name = "size", nullable = false)
     private Long size;
-    @Lob
     @Column(name = "data", nullable = false)
     private byte[] data;
 
