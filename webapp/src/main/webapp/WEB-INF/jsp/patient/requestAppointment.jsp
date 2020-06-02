@@ -26,12 +26,12 @@
                 <div class="col px-0">
                     <spring:message var="firstNamePlaceholder" code="Name"/>
                     <form:input path="firstName" placeholder="${firstNamePlaceholder}" type="text" name="firstName"
-                                id="firstName" class="form-control w-50" readonly="true"/>
+                                id="firstName" class="form-control w-100" readonly="true"/>
                 </div>
                 <div class="col p-0 ml-2">
                     <spring:message var="surnamePlaceholder" code="Surname"/>
                     <form:input path="surname" placeholder="${surnamePlaceholder}" type="text" name="surname"
-                                id="surname" class="form-control w-50" readonly="true"/>
+                                id="surname" class="form-control w-100" readonly="true"/>
                 </div>
             </div>
             <spring:message var="phonePlaceholder" code="Phone"/>
