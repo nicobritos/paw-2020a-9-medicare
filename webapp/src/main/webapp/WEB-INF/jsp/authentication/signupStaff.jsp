@@ -107,7 +107,7 @@
 
     <form:errors path="*" cssClass="mt-4 mb-0 text-danger" element="p"/>
 </form:form>
-<script src='<c:url value="/js/scripts/authentication/register.js"/> '></script>
+<script src='<c:url value="/js/scripts/authentication/Register.js"/> '></script>
 <script>
     $(document).ready(() => {
         Register.initStaff();

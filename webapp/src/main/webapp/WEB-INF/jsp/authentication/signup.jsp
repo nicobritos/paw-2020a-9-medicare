@@ -28,7 +28,7 @@
         </div>
     </div>
 </div>
-<script src='<c:url value="/js/scripts/authentication/register.js"/> '></script>
+<script src='<c:url value="/js/scripts/authentication/Register.js"/> '></script>
 <script>
     $(document).ready(() => {
         Register.init();

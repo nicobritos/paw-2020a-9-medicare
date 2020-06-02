@@ -66,7 +66,7 @@
         </c:if>
     </form:form>
 </div>
-<script src='<c:url value="/js/scripts/authentication/login.js"/> '></script>
+<script src='<c:url value="/js/scripts/authentication/Login.js"/> '></script>
 <script>
     $(document).ready(() => {
         Login.init();
