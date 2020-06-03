@@ -40,4 +40,6 @@ public interface AppointmentService extends GenericService<Appointment, Integer>
     List<AppointmentTimeSlot> findAvailableTimeslots(Staff staff, LocalDateTime fromDate, LocalDateTime toDate);
 
     List<AppointmentTimeSlot> findAvailableTimeslots(Staff staff, LocalDateTime date);
+
+    void cancelAppointments(Workday workday);
 }

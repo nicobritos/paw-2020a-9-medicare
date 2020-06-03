@@ -10,6 +10,7 @@ import org.joda.time.LocalDateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
@@ -104,6 +105,7 @@ public class AppointmentServiceImpl extends GenericServiceImpl<AppointmentDao, A
         this.repository.update(appointment);
     }
 
+    @Override
     public Appointment create(Appointment model) throws InvalidAppointmentDateException {
         if (model.getFromDate().getMinuteOfHour() % 15 != 0)
             throw new InvalidMinutesException();
@@ -189,6 +191,16 @@ public class AppointmentServiceImpl extends GenericServiceImpl<AppointmentDao, A
     @Override
     public List<AppointmentTimeSlot> findAvailableTimeslots(Staff staff, LocalDateTime date) {
         return this.findAvailableTimeslots(staff, date, date.withTime(23, 59, 59, 999));
+    }
+
+    @Override
+    public void cancelAppointments(Workday workday) {
+        Collection<Appointment> appointments = this.repository.findByWorkday(workday);
+        if (appointments.isEmpty())
+            return;
+
+        // TODO: Enviar email
+        this.repository.cancelAppointments(appointments);
     }
 
     @Override

@@ -306,6 +306,10 @@ public abstract class GenericDaoImpl<M extends GenericModel<I>, I> implements Ge
         return this.count(builder, query, root).getCount() > 0;
     }
 
+    protected int executeUpdate(CriteriaUpdate<M> update) {
+        return this.entityManager.createQuery(update).executeUpdate();
+    }
+
     protected EntityManager getEntityManager() {
         return this.entityManager;
     }
