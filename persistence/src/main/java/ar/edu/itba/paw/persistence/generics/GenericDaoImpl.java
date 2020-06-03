@@ -5,7 +5,9 @@ import ar.edu.itba.paw.models.GenericModel;
 import ar.edu.itba.paw.models.ModelMetadata;
 import ar.edu.itba.paw.models.Paginator;
 import ar.edu.itba.paw.persistence.utils.StringSearchType;
+import org.hibernate.NonUniqueObjectException;
 import org.hibernate.Session;
+import org.slf4j.LoggerFactory;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
@@ -100,7 +102,12 @@ public abstract class GenericDaoImpl<M extends GenericModel<I>, I> implements Ge
         if (model == null || model.getId() == null) {
             throw new IllegalArgumentException();
         }
-        this.entityManager.unwrap(Session.class).update(model);
+        try{
+            this.entityManager.unwrap(Session.class).update(model);
+        }catch (NonUniqueObjectException e){
+            this.entityManager.unwrap(Session.class).merge(model);
+            LoggerFactory.getLogger(this.getClass()).warn("merged",e);
+        }
     }
 
     @Override
