@@ -4,7 +4,7 @@
 
 <html>
 <head>
-    <%@ include file="../head.jsp" %>
+    <%@ include file="../../partials/head.jsp" %>
     <link rel="stylesheet" type="text/css" href="<c:url value="/css/addTurno.css"/>">
 </head>
 <body>

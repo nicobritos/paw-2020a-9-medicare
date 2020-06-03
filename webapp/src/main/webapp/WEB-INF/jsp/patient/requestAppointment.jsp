@@ -5,7 +5,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <%@ include file="../head.jsp" %>
+    <%@ include file="../../partials/head.jsp" %>
     <link rel="stylesheet" href='<c:url value="/css/reservarTurno.css"/>'/>
 </head>
 <body class="container-fluid p-0 m-0 d-flex flex-column">
@@ -15,7 +15,7 @@
         <c:url value="/patient/appointment/${staffId}/${year}/${month}/${day}/${hour}/${minute}"
                var="createAppointmentUrl"/>
         <form:form modelAttribute="appointmentForm" action="${createAppointmentUrl}" method="post"
-                   class="col d-flex flex-column">
+                   class="col d-flex flex-column" id="appointment-request-form">
             <h4 class="text-muted"><spring:message code="ScheduleAppointment"/></h4>
             <p class="mt-3 text-muted"><spring:message code="Motive"/></p>
             <spring:message var="motivePlaceholder" code="Motive"/>
@@ -43,7 +43,7 @@
             <spring:message var="commentPlaceholder" code="OptionalComment"/>
             <form:textarea path="comment" placeholder="${commentPlaceholder}" class="form-control mt-3" name="comment"
                            id="comment" cols="30" rows="5"/>
-            <button type="submit" class="btn btn-info mt-3 w-100"><spring:message code="ScheduleAppointment"/></button>
+            <button type="button" id="appointment-request-button" class="btn btn-info mt-3 w-100"><spring:message code="ScheduleAppointment"/></button>
 
             <form:errors path="*" cssClass="mt-4 mb-0 text-danger" element="p"/>
         </form:form>
@@ -121,4 +121,8 @@
     </div>
 </div>
 </body>
+<script src="<c:url value="/js/scripts/AppointmentRequest.js"/>"></script>
+<script>
+    AppointmentRequest.init();
+</script>
 </html>

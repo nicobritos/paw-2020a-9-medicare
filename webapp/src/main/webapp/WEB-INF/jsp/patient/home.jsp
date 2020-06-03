@@ -3,7 +3,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <%@ include file="../head.jsp" %>
+    <%@ include file="../../partials/head.jsp" %>
     <link rel="stylesheet" href='<c:url value="/css/patient/homePaciente.css"/>'/>
 </head>
 <body>

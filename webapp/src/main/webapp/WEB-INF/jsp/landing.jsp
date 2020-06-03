@@ -1,7 +1,7 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jstl/core_rt" %>
 <html>
 <head>
-    <%@ include file="head.jsp" %>
+    <%@ include file="../partials/head.jsp" %>
     <link rel="stylesheet" type="text/css" href='<c:url value="/css/landing.css"/>'>
 </head>
 <body>
