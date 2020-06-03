@@ -158,6 +158,7 @@ public class UserServiceImpl extends GenericSearchableServiceImpl<UserDao, User,
     @Override
     @Transactional
     public String generateVerificationToken(User user) {
+        user = this.findById(user.getId()).get();
         if (user.getVerified())
             return null;
         if (user.getToken() != null) {
