@@ -316,7 +316,7 @@ public class MedicHomeController extends GenericController {
             return new ModelAndView("redirect:/staff/home" + query);
         }
         //cancel appointment
-        this.appointmentService.remove(appointment.get()); // TODO
+        this.appointmentService.remove(appointment.get().getId()); // TODO
         StringBuilder baseUrl = new StringBuilder(request.getRequestURL());
         baseUrl.replace(request.getRequestURL().lastIndexOf(request.getServletPath()), request.getRequestURL().length(), "");
         this.eventPublisher.publishEvent(new AppointmentCancelEvent(user.get(), true, appointment.get().getPatient().getUser(), appointment.get(), request.getLocale(), baseUrl.toString()));
