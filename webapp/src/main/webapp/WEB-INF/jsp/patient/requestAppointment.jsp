@@ -26,12 +26,12 @@
                 <div class="col px-0">
                     <spring:message var="firstNamePlaceholder" code="Name"/>
                     <form:input path="firstName" placeholder="${firstNamePlaceholder}" type="text" name="firstName"
-                                id="firstName" class="form-control w-100" readonly="true"/>
+                                id="firstName" class="form-control-plaintext w-100" readonly="true"/>
                 </div>
                 <div class="col p-0 ml-2">
                     <spring:message var="surnamePlaceholder" code="Surname"/>
                     <form:input path="surname" placeholder="${surnamePlaceholder}" type="text" name="surname"
-                                id="surname" class="form-control w-100" readonly="true"/>
+                                id="surname" class="form-control-plaintext w-100" readonly="true"/>
                 </div>
             </div>
             <spring:message var="phonePlaceholder" code="Phone"/>
@@ -39,7 +39,7 @@
                         class="form-control w-50 mb-1"/>
             <spring:message var="emailPlaceholder" code="Email"/>
             <form:input path="email" placeholder="${emailPlaceholder}" type="text" name="email" id="email"
-                        class="form-control w-50 mb-1" readonly="true"/>
+                        class="form-control-plaintext w-50 mb-1" readonly="true"/>
             <spring:message var="commentPlaceholder" code="OptionalComment"/>
             <form:textarea path="comment" placeholder="${commentPlaceholder}" class="form-control mt-3" name="comment"
                            id="comment" cols="30" rows="5"/>
