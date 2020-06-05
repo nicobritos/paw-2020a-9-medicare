@@ -121,6 +121,11 @@
     </div>
 </div>
 </body>
+<script type="text/javascript">
+    let strings = new Array();
+    strings['title'] = "<spring:message code='YouAreAboutToScheduleAnAppointment' javaScriptEscape='true' />";
+    strings['body'] = "<spring:message code='DoYouWantToContinue' javaScriptEscape='true' />";
+</script>
 <script src="<c:url value="/js/scripts/AppointmentRequest.js"/>"></script>
 <script>
     AppointmentRequest.init();
