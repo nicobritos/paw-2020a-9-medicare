@@ -154,7 +154,7 @@
         </div>
     </div>
 </div>
-<script src='<c:url value="/js/scripts/staff/Profile.js"/> '></script>
+<script src='<c:url value="/js/scripts/Profile.js"/> '></script>
 <script>
     $(document).ready(() => {
         Profile.init()
