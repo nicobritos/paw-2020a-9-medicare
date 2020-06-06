@@ -82,8 +82,6 @@ create table if not exists staff
     office_id           integer not null
         constraint staff_office
             references office,
-    first_name          varchar(255) not null,
-    surname             varchar(255) not null,
     phone               varchar(255),
     email               varchar(255),
     registration_number integer,

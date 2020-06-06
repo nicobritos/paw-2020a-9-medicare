@@ -95,8 +95,6 @@ public class AppointmentServiceImplTest {
         Staff staff = new Staff();
         staff.setPhone(STAFF_PHONE);
         staff.setEmail(STAFF_EMAIL);
-        staff.setSurname(STAFF_SURNAME); // TODO ELIMINAR
-        staff.setFirstName(STAFF_FIRSTNAME); // TODO ELIMINAR
         staff.setRegistrationNumber(REGISTRATION_NUMBER);
         staff.setId(STAFF_ID);
         return staff;

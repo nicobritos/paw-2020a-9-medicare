@@ -522,9 +522,7 @@ public class AppointmentDaoImplTest {
 
     private Staff staffModel(){
         Staff s = new Staff();
-        s.setFirstName(FIRST_NAME); // TODO ELIMINAR
         s.setRegistrationNumber(REGISTRATION_NUMBER);
-        s.setSurname(SURNAME); // TODO ELIMINAR
         s.setEmail(EMAIL);
         s.setPhone(PHONE);
         s.setId(STAFF_ID_1);
@@ -2093,8 +2091,6 @@ public class AppointmentDaoImplTest {
         Patient p = patientModel();
         p.setId(PATIENT_ID_2);
         Staff s = staffModel();
-        s.setFirstName(FIRST_NAME_2); // TODO ELIMINAR
-        s.setSurname(SURNAME_2); // TODO ELIMINAR
         s.setUser(userModel2());
         s.setOffice(officeModel2());
 

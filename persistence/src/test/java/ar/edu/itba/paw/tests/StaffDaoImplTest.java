@@ -11,7 +11,6 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.test.context.ContextConfiguration;
@@ -367,9 +366,7 @@ public class StaffDaoImplTest
     
     private Staff staffModel(){
         Staff s = new Staff();
-        s.setFirstName(FIRST_NAME); // TODO ELIMINAR
         s.setRegistrationNumber(REGISTRATION_NUMBER);
-        s.setSurname(SURNAME); // TODO ELIMINAR
         s.setEmail(EMAIL);
         s.setPhone(PHONE);
         s.setId(STARTING_ID);
@@ -511,43 +508,6 @@ public class StaffDaoImplTest
 
         // 3. Postcondiciones
         // Que el metodo tire IllegalStateException (no data) o DataIntegrityViolationException (no id), se hace esto porque depende de cual chequea primero.
-    }
-
-    @Test
-    public void testCreateStaffEmptyNameFail() // TODO ELIMINAR
-    {
-        // 1. Precondiciones
-
-        insertUser();
-        insertOffice();
-        Staff s = staffModel();
-        s.setFirstName(null); // TODO ELIMINAR
-        s.setId(null);
-        expectedException.expect(PersistenceException.class);
-
-        // 2. Ejercitar
-        Staff staff = this.staffDao.create(s);
-
-        // 3. Postcondiciones
-        // Que el metodo tire IllegalStateException
-    }
-
-    @Test
-    public void testCreateStaffEmptySurnameFail() // TODO ELIMINAR
-    {
-        // 1. Precondiciones
-
-        insertUser();
-        insertOffice();
-        Staff s = staffModel();
-        s.setSurname(null); // TODO ELIMINAR
-        expectedException.expect(PersistenceException.class);
-
-        // 2. Ejercitar
-        Staff staff = this.staffDao.create(s);
-
-        // 3. Postcondiciones
-        // Que el metodo tire IllegalStateException
     }
 
     @Test
@@ -791,24 +751,6 @@ public class StaffDaoImplTest
 
         // 3. Postcondiciones
         assertEquals(1,JdbcTestUtils.countRowsInTable(jdbcTemplate, STAFFS_TABLE));
-    }
-
-    @Test
-    public void testStaffUpdateStaffWithNullName() // TODO ELIMINAR
-    {
-        // 1. Precondiciones
-
-        insertStaff();
-        Staff s = staffModel();
-        s.setFirstName(null); // TODO ELIMINAR
-        expectedException.expect(DataIntegrityViolationException.class);
-
-        // 2. Ejercitar
-        this.staffDao.update(s);
-
-        // 3. Postcondiciones
-        assertEquals(1,JdbcTestUtils.countRowsInTable(jdbcTemplate, STAFFS_TABLE));
-        assertEquals(staffModel(), s);
     }
 
     @Test

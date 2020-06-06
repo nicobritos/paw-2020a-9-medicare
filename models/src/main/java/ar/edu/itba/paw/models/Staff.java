@@ -18,10 +18,6 @@ public class Staff extends GenericModel<Integer> {
     @SequenceGenerator(sequenceName = "staff_staff_id_seq", name = "staff_staff_id_seq", allocationSize = 1)
     @Column(name = "staff_id")
     private Integer id;
-    @Column(name = "first_name", nullable = false)
-    private String firstName;
-    @Column(name = "surname", nullable = false)
-    private String surname;
     @Column(name = "phone")
     private String phone;
     @Column(name = "email")
@@ -51,22 +47,6 @@ public class Staff extends GenericModel<Integer> {
     @Override
     public void setId(Integer id) {
         this.id = id;
-    }
-
-    public String getFirstName() {
-        return this.firstName;
-    } // TODO ELIMINAR
-
-    public void setFirstName(String firstName) {
-        this.firstName = firstName;
-    } // TODO ELIMINAR
-
-    public String getSurname() {
-        return this.surname;
-    } // TODO ELIMINAR
-
-    public void setSurname(String surname) { // TODO ELIMINAR
-        this.surname = surname;
     }
 
     public String getPhone() {

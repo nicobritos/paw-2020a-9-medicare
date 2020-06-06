@@ -1,12 +1,12 @@
 package ar.edu.itba.paw.interfaces.daos;
 
-import ar.edu.itba.paw.interfaces.daos.generic.GenericSearchableDao;
+import ar.edu.itba.paw.interfaces.daos.generic.GenericDao;
 import ar.edu.itba.paw.models.*;
 
 import java.util.Collection;
 import java.util.List;
 
-public interface StaffDao extends GenericSearchableDao<Staff, Integer> {
+public interface StaffDao extends GenericDao<Staff, Integer> {
     /**
      * @param name             if not null nor empty String, the search will filter the list by staff's name that
      *                         contains the string (ignoring case)

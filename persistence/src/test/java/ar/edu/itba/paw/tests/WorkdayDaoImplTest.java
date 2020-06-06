@@ -324,9 +324,7 @@ public class WorkdayDaoImplTest
 
     private Staff staffModel(){
         Staff s = new Staff();
-        s.setFirstName(FIRST_NAME); // TODO ELIMINAR
         s.setRegistrationNumber(REGISTRATION_NUMBER);
-        s.setSurname(SURNAME); // TODO ELIMINAR
         s.setEmail(EMAIL);
         s.setPhone(PHONE);
         s.setId(STARTING_ID);
