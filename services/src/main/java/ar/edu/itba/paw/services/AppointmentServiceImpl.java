@@ -151,6 +151,11 @@ public class AppointmentServiceImpl extends GenericServiceImpl<AppointmentDao, A
                     startHour = fromDate.getHourOfDay();
                     firstStartMinute = fromDate.getMinuteOfHour();
                 }
+                firstStartMinute = (int) Math.ceil((double) firstStartMinute / Appointment.DURATION) * Appointment.DURATION;
+                if(firstStartMinute == 60){
+                    firstStartMinute = 0;
+                    startHour++;
+                }
                 for (int ihour = startHour; ihour <= workday.getEndHour(); ihour++) {
 
                     int startMinute = 0;
@@ -210,7 +215,6 @@ public class AppointmentServiceImpl extends GenericServiceImpl<AppointmentDao, A
     private boolean isValidDate(Staff staff, LocalDateTime fromDate) {
         AppointmentTimeSlot appointmentTimeSlot = new AppointmentTimeSlot();
         appointmentTimeSlot.setDate(fromDate);
-
         if (!this.workdayService.isStaffWorking(staff, appointmentTimeSlot))
             return false;
         return this.findAvailableTimeslots(staff, fromDate).contains(appointmentTimeSlot);

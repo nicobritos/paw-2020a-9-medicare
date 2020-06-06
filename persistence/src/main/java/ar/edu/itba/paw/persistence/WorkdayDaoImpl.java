@@ -59,23 +59,14 @@ public class WorkdayDaoImpl extends GenericDaoImpl<Workday, Integer> implements 
         if (staff == null || timeSlot == null)
             throw new IllegalArgumentException();
 
-        CriteriaBuilder builder = this.getEntityManager().getCriteriaBuilder();
-        CriteriaQuery<Tuple> query = builder.createQuery(Tuple.class);
-        Root<Workday> root = query.from(Workday.class);
-
-        Predicate[] predicates = new Predicate[4];
-        predicates[0] = builder.equal(root.get(Workday_.staff), staff);
-        predicates[1] = builder.equal(root.get(Workday_.day), WorkdayDay.from(timeSlot.getDate()));
-        predicates[2] = builder.le(root.get(Workday_.startHour), timeSlot.getDate().getHourOfDay());
-        if (timeSlot.getToDate().getMinuteOfHour() == 0) {
-            predicates[3] = builder.ge(root.get(Workday_.endHour), timeSlot.getToDate().getHourOfDay());
-        } else {
-            predicates[3] = builder.gt(root.get(Workday_.endHour), timeSlot.getToDate().getHourOfDay());
+        List<Workday> workdays = findByStaff(staff, WorkdayDay.from(timeSlot.getDate()));
+        for (Workday workday : workdays){
+            if((workday.getStartTime().compareTo(timeSlot.getDate().toLocalTime()) <= 0) &&
+                    (workday.getEndTime().compareTo(timeSlot.getToDate().toLocalTime()) >= 0)){
+                return true;
+            }
         }
-
-        query.where(builder.and(predicates));
-
-        return this.exists(builder, query, root);
+        return false;
     }
 
 
