@@ -12,7 +12,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 import org.springframework.dao.DataIntegrityViolationException;
-import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.test.context.ContextConfiguration;
@@ -368,9 +367,9 @@ public class StaffDaoImplTest
     
     private Staff staffModel(){
         Staff s = new Staff();
-        s.setFirstName(FIRST_NAME);
+        s.setFirstName(FIRST_NAME); // TODO ELIMINAR
         s.setRegistrationNumber(REGISTRATION_NUMBER);
-        s.setSurname(SURNAME);
+        s.setSurname(SURNAME); // TODO ELIMINAR
         s.setEmail(EMAIL);
         s.setPhone(PHONE);
         s.setId(STARTING_ID);
@@ -409,8 +408,8 @@ public class StaffDaoImplTest
         staffMap.put("first_name", FIRST_NAME_2);
         staffMap.put("registration_number", REGISTRATION_NUMBER);
         staffMap.put("surname", SURNAME_2);
-        staffMap.put("email", EMAIL); // Identity de HSQLDB empieza en 0
-        staffMap.put("phone", PHONE);
+        staffMap.put("email", EMAIL_2);
+        staffMap.put("phone", PHONE_2);
         staffMap.put("user_id", STARTING_ID + 1);
         staffMap.put("office_id", STARTING_ID + 1);
         staffJdbcInsert.execute(staffMap);
@@ -446,13 +445,13 @@ public class StaffDaoImplTest
 
         // 3. Postcondiciones
         assertEquals(1, JdbcTestUtils.countRowsInTable(this.jdbcTemplate, STAFFS_TABLE));
-        assertEquals(FIRST_NAME, staff.getFirstName());
+        assertEquals(FIRST_NAME, staff.getUser().getFirstName());
         assertEquals(EMAIL, staff.getEmail());
         assertEquals(officeModel(), staff.getOffice());
         assertEquals(PHONE, staff.getPhone());
         assertEquals(REGISTRATION_NUMBER, staff.getRegistrationNumber());
         assertEquals(new LinkedList<>(), staff.getStaffSpecialties());
-        assertEquals(SURNAME, staff.getSurname());
+        assertEquals(SURNAME, staff.getUser().getSurname());
         assertEquals(userModel(), staff.getUser());
     }
 
@@ -471,13 +470,13 @@ public class StaffDaoImplTest
 
         // 3. Postcondiciones
         assertEquals(2, JdbcTestUtils.countRowsInTable(this.jdbcTemplate, STAFFS_TABLE));
-        assertEquals(FIRST_NAME, staff.getFirstName());
+        assertEquals(FIRST_NAME, staff.getUser().getFirstName());
         assertEquals(EMAIL, staff.getEmail());
         assertEquals(officeModel(), staff.getOffice());
         assertEquals(PHONE, staff.getPhone());
         assertEquals(REGISTRATION_NUMBER, staff.getRegistrationNumber());
         assertEquals(new LinkedList<>(), staff.getStaffSpecialties());
-        assertEquals(SURNAME, staff.getSurname());
+        assertEquals(SURNAME, staff.getUser().getSurname());
         assertEquals(userModel(), staff.getUser());
     }
 
@@ -515,14 +514,14 @@ public class StaffDaoImplTest
     }
 
     @Test
-    public void testCreateStaffEmptyNameFail()
+    public void testCreateStaffEmptyNameFail() // TODO ELIMINAR
     {
         // 1. Precondiciones
 
         insertUser();
         insertOffice();
         Staff s = staffModel();
-        s.setFirstName(null);
+        s.setFirstName(null); // TODO ELIMINAR
         s.setId(null);
         expectedException.expect(PersistenceException.class);
 
@@ -534,14 +533,14 @@ public class StaffDaoImplTest
     }
 
     @Test
-    public void testCreateStaffEmptySurnameFail()
+    public void testCreateStaffEmptySurnameFail() // TODO ELIMINAR
     {
         // 1. Precondiciones
 
         insertUser();
         insertOffice();
         Staff s = staffModel();
-        s.setSurname(null);
+        s.setSurname(null); // TODO ELIMINAR
         expectedException.expect(PersistenceException.class);
 
         // 2. Ejercitar
@@ -747,15 +746,15 @@ public class StaffDaoImplTest
         insertStaff();
         insertAnotherStaff();
         Staff s = staffModel();
-        s.setFirstName("Armenia");
+        s.setPhone("Armenia");
 
         // 2. Ejercitar
         this.staffDao.update(s);
 
         // 3. Postcondiciones
         assertEquals(2,JdbcTestUtils.countRowsInTable(jdbcTemplate, STAFFS_TABLE));
-        assertEquals(1,JdbcTestUtils.countRowsInTableWhere(jdbcTemplate, STAFFS_TABLE, "first_name = 'Armenia'"));
-        assertEquals(0,JdbcTestUtils.countRowsInTableWhere(jdbcTemplate, STAFFS_TABLE, "first_name = '"+ FIRST_NAME +"'"));
+        assertEquals(1,JdbcTestUtils.countRowsInTableWhere(jdbcTemplate, STAFFS_TABLE, "phone = 'Armenia'"));
+        assertEquals(0,JdbcTestUtils.countRowsInTableWhere(jdbcTemplate, STAFFS_TABLE, "phone = '"+ PHONE +"'"));
     }
 
     @Test
@@ -785,7 +784,7 @@ public class StaffDaoImplTest
         insertAnotherStaff();
         Staff s = staffModel();
         s.setId(STARTING_ID + 1);
-        expectedException.expect(OptimisticLockingFailureException.class);
+        expectedException.expect(IllegalArgumentException.class);
 
         // 2. Ejercitar
         this.staffDao.update(s);
@@ -795,13 +794,13 @@ public class StaffDaoImplTest
     }
 
     @Test
-    public void testStaffUpdateStaffWithNullName()
+    public void testStaffUpdateStaffWithNullName() // TODO ELIMINAR
     {
         // 1. Precondiciones
 
         insertStaff();
         Staff s = staffModel();
-        s.setFirstName(null);
+        s.setFirstName(null); // TODO ELIMINAR
         expectedException.expect(DataIntegrityViolationException.class);
 
         // 2. Ejercitar

@@ -23,7 +23,7 @@
                 </div>
                 <div class="col mr-3">
                     <div class="row mt-2">
-                        <h5><c:out value="${staff.firstName} ${staff.surname}"/></h5>
+                        <h5><c:out value="${staff.user.firstName} ${staff.user.surname}"/></h5>
                     </div>
                     <div class="row mt-3 d-flex justify-content-start">
                         <p>

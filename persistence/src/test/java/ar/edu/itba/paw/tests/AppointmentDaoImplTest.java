@@ -13,7 +13,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 import org.springframework.dao.DataIntegrityViolationException;
-import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.test.context.ContextConfiguration;
@@ -523,9 +522,9 @@ public class AppointmentDaoImplTest {
 
     private Staff staffModel(){
         Staff s = new Staff();
-        s.setFirstName(FIRST_NAME);
+        s.setFirstName(FIRST_NAME); // TODO ELIMINAR
         s.setRegistrationNumber(REGISTRATION_NUMBER);
-        s.setSurname(SURNAME);
+        s.setSurname(SURNAME); // TODO ELIMINAR
         s.setEmail(EMAIL);
         s.setPhone(PHONE);
         s.setId(STAFF_ID_1);
@@ -907,7 +906,7 @@ public class AppointmentDaoImplTest {
         insertAnotherAppointment();
         Appointment a = appointmentModel();
         a.setId(APPOINTMENT_ID_2);
-        expectedException.expect(OptimisticLockingFailureException.class);
+        expectedException.expect(IllegalArgumentException.class);
 
         // 2. Ejercitar
         this.appointmentDao.update(a);
@@ -2094,8 +2093,8 @@ public class AppointmentDaoImplTest {
         Patient p = patientModel();
         p.setId(PATIENT_ID_2);
         Staff s = staffModel();
-        s.setFirstName(FIRST_NAME_2);
-        s.setSurname(SURNAME_2);
+        s.setFirstName(FIRST_NAME_2); // TODO ELIMINAR
+        s.setSurname(SURNAME_2); // TODO ELIMINAR
         s.setUser(userModel2());
         s.setOffice(officeModel2());
 

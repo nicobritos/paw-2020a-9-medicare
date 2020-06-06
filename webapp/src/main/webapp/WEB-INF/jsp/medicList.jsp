@@ -87,7 +87,7 @@
                                     </div>
                                     <div class="col-6">
                                         <div class="row justify-content-start">
-                                            <h5><c:out value="${member.firstName} ${member.surname}"/></h5>
+                                            <h5><c:out value="${member.user.firstName} ${member.user.surname}"/></h5>
                                         </div>
                                         <div class="row">
                                             <p class="m-0">

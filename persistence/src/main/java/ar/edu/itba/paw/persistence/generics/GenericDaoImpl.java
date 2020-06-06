@@ -100,14 +100,12 @@ public abstract class GenericDaoImpl<M extends GenericModel<I>, I> implements Ge
     @Transactional
     public void update(M model) {
         if (model == null || model.getId() == null) {
-            throw new IllegalArgumentException();
+            throw new IllegalArgumentException("Model or its id is null");
         }
-        try{
-            this.entityManager.unwrap(Session.class).update(model);
-        }catch (NonUniqueObjectException e){
-            this.entityManager.unwrap(Session.class).merge(model);
-            LoggerFactory.getLogger(this.getClass()).warn("merged",e);
+        if(!findById(model.getId()).isPresent()){
+            throw new IllegalArgumentException(model.getClass().getName() + " with id:" + model.getId() + " doesn't exists");
         }
+        this.entityManager.unwrap(Session.class).merge(model);
     }
 
     @Override

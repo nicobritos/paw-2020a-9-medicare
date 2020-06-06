@@ -55,17 +55,17 @@ public class Staff extends GenericModel<Integer> {
 
     public String getFirstName() {
         return this.firstName;
-    }
+    } // TODO ELIMINAR
 
     public void setFirstName(String firstName) {
         this.firstName = firstName;
-    }
+    } // TODO ELIMINAR
 
     public String getSurname() {
         return this.surname;
-    }
+    } // TODO ELIMINAR
 
-    public void setSurname(String surname) {
+    public void setSurname(String surname) { // TODO ELIMINAR
         this.surname = surname;
     }
 

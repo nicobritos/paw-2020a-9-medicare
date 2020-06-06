@@ -64,7 +64,7 @@
                         </div>
                     </div>
                     <div class="col p-0">
-                        <p class="m-0 white-text"><c:out value="${staff.firstName} ${staff.surname}"/></p>
+                        <p class="m-0 white-text"><c:out value="${staff.user.firstName} ${staff.user.surname}"/></p>
                         <small class="white-text">
                             <c:forEach var="specialty" items="${staff.staffSpecialties}">
                                 <c:out value="${specialty.name} "/>

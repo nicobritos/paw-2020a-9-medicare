@@ -33,7 +33,7 @@
                                 <div class="col-7">
                                     <div class="row justify-content-start">
                                         <h5><c:out
-                                                value="${appointment.staff.firstName} ${appointment.staff.surname}"/></h5>
+                                                value="${appointment.staff.user.firstName} ${appointment.staff.user.surname}"/></h5>
                                     </div>
                                     <div class="row">
                                         <p class="m-0">
