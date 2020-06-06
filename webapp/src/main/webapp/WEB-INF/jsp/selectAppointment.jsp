@@ -38,19 +38,26 @@
                 <p><spring:message code="Address"/>: <c:out
                         value="${staff.office.street} - ${staff.office.locality.name}"/></p>
             </div>
-            <div class="row pl-4">
-                <p><spring:message code="Phones"/>:</p>
-            </div>
-            <div class="row pl-4">
-                <ul>
-                    <c:if test="${staff.user.phone != null}">
-                        <li><c:out value="${staff.user.phone}"/> (<spring:message code="Personal"/>)</li>
-                    </c:if>
-                    <c:if test="${staff.office.phone != null}">
-                        <li><c:out value="${staff.office.phone} (${staff.office.name})"/></li>
-                    </c:if>
-                </ul>
-            </div>
+            <c:choose>
+                <c:when test="${(staff.user.phone != null && !staff.user.phone.isEmpty()) || (staff.office.phone != null && !staff.office.phone.isEmpty())}">
+                    <div class="row pl-4">
+                        <p><spring:message code="Phones"/>:</p>
+                    </div>
+                    <ul>
+                        <c:if test="${staff.user.phone != null && !staff.user.phone.isEmpty()}">
+                            <li><c:out value="${staff.user.phone}"/> (<spring:message code="Personal"/>)</li>
+                        </c:if>
+                        <c:if test="${staff.office.phone != null && !staff.office.phone.isEmpty()}">
+                            <li><c:out value="${staff.office.phone} (${staff.office.name})"/></li>
+                        </c:if>
+                    </ul>
+                </c:when>
+                <c:otherwise>
+                    <div class="row pl-4">
+                        <p><spring:message code="Phones"/>: <spring:message code="UserWithNoPhones"/></p>
+                    </div>
+                </c:otherwise>
+            </c:choose>
             <div class="row pl-4">
                 <p><spring:message code="Email"/>: ${staff.email}</p>
             </div>
