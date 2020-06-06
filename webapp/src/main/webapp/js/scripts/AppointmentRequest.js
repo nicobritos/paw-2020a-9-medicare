@@ -8,7 +8,7 @@ const AppointmentRequest = function () {
                 title: strings['title'],
                 body: strings['body'],
                 callbacks: {
-                    success: function () {
+                    confirm: function () {
                         appointmentRequestForm.submit();
                     }
                 }
