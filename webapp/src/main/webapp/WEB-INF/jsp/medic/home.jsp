@@ -162,9 +162,10 @@
                                                 <div class="col-4 d-flex flex-column justify-content-center">
                                                     <div class="profile-picture-container">
                                                         <div style="margin-top: 100%;"></div>
+                                                        <%--TODO: check this--%>
                                                         <img
                                                                 class="profile-picture rounded-circle"
-                                                                src="<c:url value="/profilePics/${appointment.patient.user.profileId}"/>"
+                                                                src="<c:url value="/profilePics/${appointment.patient.user.profilePicture.id}"/>"
                                                                 alt=""
                                                         />
                                                     </div>
