@@ -18,6 +18,7 @@
                         <spring:message code="NoResultsFound"/>
                     </c:when>
                     <c:when test="${paginator.totalCount == 1}">
+                        <spring:message code="SearchResults1"/>
                     </c:when>
                     <c:otherwise>
                         <spring:message code="SearchResults2More" arguments="${paginator.totalCount}"/>
@@ -70,6 +71,32 @@
             </div>
             <div class="col-1"></div>
             <div class="col">
+                <c:if test="${paginator.totalPages != 0}">
+                    <div id="paging" class="p-3 d-flex container w-100 justify-content-center ">
+                        <c:if test="${page > 2}">
+                            <div>
+                                <button type="button" class="btn btn-info btn-sm mr-1 firstButton"><<</button>
+                            </div>
+                        </c:if>
+                        <c:if test="${page > 1}">
+                            <div>
+                                <button type="button" class="btn btn-info btn-sm prevButton"><</button>
+                            </div>
+                        </c:if>
+                        <p class="d-inline mx-2"><spring:message code="Page"/> <c:out value="${page}"/> <spring:message
+                                code="of"/> <c:out value="${paginator.totalPages}"/></p>
+                        <c:if test="${paginator.remainingPages != 0}">
+                            <div>
+                                <button type="button" class="btn btn-info btn-sm nextButton">></button>
+                            </div>
+                        </c:if>
+                        <c:if test="${paginator.remainingPages > 1}">
+                            <div>
+                                <button type="button" class="btn btn-info btn-sm ml-1 lastButton">>></button>
+                            </div>
+                        </c:if>
+                    </div>
+                </c:if>
                 <ul class="list-group turno-list mr-2 w-100">
                     <c:forEach var="member" items="${staff}">
                         <li class="list-group-item turno-item mb-3">
@@ -117,17 +144,27 @@
                     </c:forEach>
                 </ul>
                 <c:if test="${paginator.totalPages != 0}">
-                    <div id="paging" class="p-3 d-flex container w-100 justify-content-center">
+                    <div id="paging" class="p-3 d-flex container w-100 justify-content-center ">
+                        <c:if test="${page > 2}">
+                            <div>
+                                <button type="button" class="btn btn-info btn-sm mr-1 firstButton"><<</button>
+                            </div>
+                        </c:if>
                         <c:if test="${page > 1}">
                             <div>
-                                <button type="button" class="btn btn-info btn-sm" id="prevButton"><</button>
+                                <button type="button" class="btn btn-info btn-sm prevButton"><</button>
                             </div>
                         </c:if>
                         <p class="d-inline mx-2"><spring:message code="Page"/> <c:out value="${page}"/> <spring:message
                                 code="of"/> <c:out value="${paginator.totalPages}"/></p>
                         <c:if test="${paginator.remainingPages != 0}">
                             <div>
-                                <button type="button" class="btn btn-info btn-sm" id="nextButton">></button>
+                                <button type="button" class="btn btn-info btn-sm nextButton">></button>
+                            </div>
+                        </c:if>
+                        <c:if test="${paginator.remainingPages > 1}">
+                            <div>
+                                <button type="button" class="btn btn-info btn-sm ml-1 lastButton">>></button>
                             </div>
                         </c:if>
                     </div>
@@ -143,7 +180,7 @@
 </script>
 <script>
     $(document).ready(() => {
-        AppointmentList.init(parseInt(${page}));
+        AppointmentList.init(parseInt(${page}), parseInt(${paginator.totalPages}));
     })
 </script>
 </html>
