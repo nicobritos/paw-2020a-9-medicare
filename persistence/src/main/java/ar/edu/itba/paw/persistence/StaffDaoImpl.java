@@ -179,6 +179,7 @@ public class StaffDaoImpl extends GenericDaoImpl<Staff, Integer> implements Staf
 
     @Override
     protected void insertOrderBy(CriteriaBuilder builder, CriteriaQuery<Staff> query, Root<Staff> root) {
+        query.orderBy(builder.asc(root.get(Staff_.user).get(User_.firstName)), builder.asc(root.get(Staff_.user).get(User_.surname)));
     }
 
     private Predicate[] getPredicates(Collection<String> names,
