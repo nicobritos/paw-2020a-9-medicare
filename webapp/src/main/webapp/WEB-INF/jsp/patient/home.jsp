@@ -117,14 +117,14 @@
                                             </c:otherwise>
                                             </c:choose>
 
-                                            <c:if test="${appointment.fromDate.hourOfDay < 10}">0</c:if>
-                                                <c:out value="${appointment.fromDate.hourOfDay}"/>:<c:if
-                                                test="${appointment.fromDate.minuteOfHour < 10}">0</c:if>
-                                                <c:out value="${appointment.fromDate.minuteOfHour}hs"/> -
-                                            <c:if test="${appointment.toDate.hourOfDay < 10}">0</c:if>
-                                                <c:out value="${appointment.toDate.hourOfDay}:"/>
-                                            <c:if test="${appointment.toDate.minuteOfHour < 10}">0</c:if>
-                                                <c:out value="${appointment.toDate.minuteOfHour}hs"/>
+                                            <c:if test="${appointment.fromDate.hourOfDay < 10}">0</c:if><c:out
+                                                    value="${appointment.fromDate.hourOfDay}"/>:<c:if
+                                                    test="${appointment.fromDate.minuteOfHour < 10}">0</c:if><c:out
+                                                    value="${appointment.fromDate.minuteOfHour}hs"/> - <c:if
+                                                    test="${appointment.toDate.hourOfDay < 10}">0</c:if><c:out
+                                                    value="${appointment.toDate.hourOfDay}"/>:<c:if
+                                                    test="${appointment.toDate.minuteOfHour < 10}">0</c:if><c:out
+                                                    value="${appointment.toDate.minuteOfHour}hs"/>
                                     </div>
                                 </div>
                                 <div class="col-1 justify-content-start">

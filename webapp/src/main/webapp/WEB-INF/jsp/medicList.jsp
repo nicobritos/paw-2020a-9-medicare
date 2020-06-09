@@ -99,6 +99,9 @@
                                         <div class="row">
                                             <p class="m-0"><c:out value="${member.office.street}"/></p>
                                         </div>
+                                        <div class="row">
+                                            <p class="m-0"><c:out value="${member.office.locality.name}"/></p>
+                                        </div>
                                     </div>
                                     <div class="col d-flex justify-content-center align-items-center">
                                         <a href="<c:url value="/appointment/${member.id}/0"/>">
