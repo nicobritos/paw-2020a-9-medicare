@@ -78,7 +78,7 @@
 
                 <c:forEach var="i" begin="0" end="6">
                     <div class="col-1 mr-4 p-0">
-                            <span class="d-flex flex-column align-items-center">
+                            <span class="d-flex flex-column align-items-center text-center">
                                 <p class="mb-0"><c:choose>
                                     <c:when test="${monday.plusDays(i).dayOfWeek == 1}"><spring:message code="Monday"/></c:when>
                                     <c:when test="${monday.plusDays(i).dayOfWeek == 2}"><spring:message code="Tuesday"/></c:when>

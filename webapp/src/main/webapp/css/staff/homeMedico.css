@@ -98,3 +98,7 @@ html, body {
     left: 0;
     position: absolute;
 }
+
+.medicare-day-span{
+    cursor: pointer;
+}
