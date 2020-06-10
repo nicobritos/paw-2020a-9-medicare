@@ -12,7 +12,6 @@
 <div class="container flex-fill mx-5 pl-5 mt-3 w-100">
     <div class="row">
         <div class="col-4 align-items-start d-flex flex-column">
-            <!-- TODO check imagen -->
             <div class="picture-container no-select">
                 <div class="w-100 d-flex flex-column justify-content-center">
                     <div class="profile-picture-container">
