@@ -134,8 +134,8 @@
                                         <div class="dropdown-menu">
                                                 <%-- TODO add reprogramar --%>
                                             <form action="<c:url value="/patient/appointment/${appointment.id}"/>"
-                                                  method="post">
-                                                <button type="submit" class="dropdown-item"><spring:message
+                                                  method="post" class="cancel-appt-form">
+                                                <button type="button" class="dropdown-item cancel-appt-btn"><spring:message
                                                         code="Cancel"/></button>
                                             </form>
                                         </div>
@@ -182,5 +182,16 @@
         </div>
     </div>
 </div>
+<script type="text/javascript">
+    let strings = new Array();
+    strings['title'] = "<spring:message code='YouAreAboutToCancelAnAppointment' javaScriptEscape='true' />";
+    strings['body'] = "<spring:message code='DoYouWantToContinue' javaScriptEscape='true' />";
+</script>
+<script src='<c:url value="/js/scripts/patient/PatientHome.js"/> '></script>
+<script>
+    $(document).ready(() => {
+        PatientHome.init()
+    });
+</script>
 </body>
 </html>
