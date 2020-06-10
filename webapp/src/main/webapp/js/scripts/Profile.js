@@ -47,6 +47,22 @@ const Profile = function () {
                 App.showError();
             });
         })
+
+        $( ".cancel-workday-form" ).each( function( index, element ){
+            $(element).children('.cancel-workday-btn').click(function () {
+                Modal.confirm({
+                    title: strings['title'],
+                    body: strings['body'],
+                    callbacks: {
+                        confirm: function () {
+                            element.submit();
+                        }
+                    }
+                });
+            });
+        })
+
+
     };
 
     let toggleVisibility = function () {

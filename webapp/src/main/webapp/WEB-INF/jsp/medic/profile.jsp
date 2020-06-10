@@ -135,8 +135,8 @@
                                             test="${workday.endMinute < 10}">0</c:if><c:out
                                             value="${workday.endMinute}hs - ${workday.staff.office.name}"/></p>
                                     <form action="<c:url value="/staff/profile/workday/delete/${workday.id}"/>"
-                                          method="post">
-                                        <button class="btn" type="submit">X</button>
+                                          method="post" class="cancel-workday-form">
+                                        <button class="btn cancel-workday-btn" type="button">X</button>
                                     </form>
                                 </c:forEach>
                             </c:forEach>
@@ -153,6 +153,11 @@
         </div>
     </div>
 </div>
+<script type="text/javascript">
+    let strings = new Array();
+    strings['title'] = "<spring:message code='YouAreAboutToCancelAWorkday' javaScriptEscape='true' />";
+    strings['body'] = "<spring:message code='DoYouWantToContinue' javaScriptEscape='true' />";
+</script>
 <script src='<c:url value="/js/scripts/Profile.js"/> '></script>
 <script>
     $(document).ready(() => {
