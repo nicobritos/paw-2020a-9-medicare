@@ -33,8 +33,8 @@ public class Staff extends GenericModel<Integer> {
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
             name = "system_staff_specialty_staff",
-            joinColumns = @JoinColumn(name = "specialty_id"),
-            inverseJoinColumns = @JoinColumn(name = "staff_id")
+            joinColumns = @JoinColumn(name = "staff_id"),
+            inverseJoinColumns = @JoinColumn(name = "specialty_id")
     )
     @OrderBy("name ASC")
     private Collection<StaffSpecialty> staffSpecialties = new LinkedList<>();
