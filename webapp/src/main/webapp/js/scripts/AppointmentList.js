@@ -1,4 +1,11 @@
-var AppointmentList = function () {
+const AppointmentList = function () {
+    let page;
+    let final_page;
+
+    let refreshPage = function () {
+        App.goto('/mediclist/' + page, true);
+    };
+
     let bindElements = function () {
         let buttons = $('.available-appointments-button');
         buttons.each(function () {
@@ -7,9 +14,30 @@ var AppointmentList = function () {
                 AppointmentRequest.init($this.data('id'));
             });
         });
+
+        $(".firstButton").click(function () {
+            page = 1;
+            refreshPage();
+        })
+        $(".prevButton").click(function () {
+            page -= 1;
+            refreshPage();
+        });
+        $(".nextButton").click(function () {
+            page += 1;
+            refreshPage();
+        });
+        $(".lastButton").click(function () {
+            page = final_page;
+            refreshPage();
+        });
     };
 
     return {
-        init: bindElements
+        init: function (_page, _finalpage) {
+            page = _page;
+            final_page = _finalpage
+            bindElements();
+        }
     }
 }();

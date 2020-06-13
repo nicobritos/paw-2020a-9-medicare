@@ -3,6 +3,7 @@ package ar.edu.itba.paw.services.generics;
 import ar.edu.itba.paw.interfaces.daos.generic.GenericDao;
 import ar.edu.itba.paw.interfaces.services.generic.GenericService;
 import ar.edu.itba.paw.models.GenericModel;
+import ar.edu.itba.paw.models.ModelMetadata;
 
 import java.util.Collection;
 import java.util.List;
@@ -10,6 +11,7 @@ import java.util.Optional;
 
 /**
  * This provides a generic Service abstract class
+ *
  * @param <M> the Service model type
  * @param <I> the Model's id type
  */
@@ -48,6 +50,11 @@ public abstract class GenericServiceImpl<DAO extends GenericDao<M, I>, M extends
     public List<M> list() {
         return this.getRepository().list();
     }
-    
+
+    @Override
+    public ModelMetadata count() {
+        return this.getRepository().count();
+    }
+
     protected abstract DAO getRepository();
 }

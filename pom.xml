@@ -24,12 +24,15 @@
         <com.fasterxml.jackson.databind.version>2.4.1.1</com.fasterxml.jackson.databind.version>
         <org.simpleflatmapper.sfm-jdbc.version>8.2.2</org.simpleflatmapper.sfm-jdbc.version>
         <joda-time.version>2.10.6</joda-time.version>
+        <org.jadira.usertype.core-version>5.0.0.GA</org.jadira.usertype.core-version>
         <org.slf4j.version>1.7.5</org.slf4j.version>
         <logback.version>1.1.2</logback.version>
         <logback-ext-spring.version>0.1.1</logback-ext-spring.version>
         <javax.mail-api.version>1.5.5</javax.mail-api.version>
         <javax.mail.version>1.4.7</javax.mail.version>
         <commons-fileupload.version>1.3.1</commons-fileupload.version>
+        <org.hibernate.version>5.1.0.Final</org.hibernate.version>
+        <org.hibernate.jpa.version>1.0.0.Final</org.hibernate.jpa.version>
     </properties>
 
     <dependencyManagement>
@@ -51,6 +54,12 @@
                 <groupId>joda-time</groupId>
                 <artifactId>joda-time</artifactId>
                 <version>${joda-time.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.jadira.usertype</groupId>
+                <artifactId>usertype.core</artifactId>
+                <version>${org.jadira.usertype.core-version}</version>
             </dependency>
 
             <dependency>
@@ -166,6 +175,12 @@
                 <groupId>org.hibernate</groupId>
                 <artifactId>hibernate-validator</artifactId>
                 <version>${org.hibernate.validator}</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>org.jboss.logging</groupId>
+                        <artifactId>jboss-logging</artifactId>
+                    </exclusion>
+                </exclusions>
             </dependency>
 
             <dependency>
@@ -222,6 +237,32 @@
                 <artifactId>commons-fileupload</artifactId>
                 <version>${commons-fileupload.version}</version>
             </dependency>
+
+            <dependency>
+                <groupId>org.springframework</groupId>
+                <artifactId>spring-orm</artifactId>
+                <version>${org.springframework.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.hibernate</groupId>
+                <artifactId>hibernate-core</artifactId>
+                <version>${org.hibernate.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.hibernate</groupId>
+                <artifactId>hibernate-entitymanager</artifactId>
+                <version>${org.hibernate.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.hibernate.javax.persistence</groupId>
+                <artifactId>hibernate-jpa-2.1-api</artifactId>
+                <version>${org.hibernate.jpa.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.hibernate</groupId>
+                <artifactId>hibernate-jpamodelgen</artifactId>
+                <version>${org.hibernate.version}</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
     <modules>
@@ -229,7 +270,6 @@
         <module>interfaces</module>
         <module>services</module>
         <module>persistence</module>
-        <module>persistenceAnnotations</module>
         <module>models</module>
     </modules>
 
@@ -275,6 +315,31 @@
                 <plugin>
                     <artifactId>maven-project-info-reports-plugin</artifactId>
                     <version>3.0.0</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.bsc.maven</groupId>
+                    <artifactId>maven-processor-plugin</artifactId>
+                    <executions>
+                        <execution>
+                            <goals>
+                                <goal>process</goal>
+                            </goals>
+                            <phase>generate-sources</phase>
+                            <configuration>
+                                <compilerArguments>-AaddGeneratedAnnotation=false
+                                </compilerArguments> <!-- suppress java.annotation -->
+                                <processors>
+                                    <processor>org.hibernate.jpamodelgen.JPAMetaModelEntityProcessor</processor>
+                                </processors>
+                            </configuration>
+                        </execution>
+                    </executions>
+                    <dependencies>
+                        <dependency>
+                            <groupId>org.hibernate</groupId>
+                            <artifactId>hibernate-jpamodelgen</artifactId>
+                        </dependency>
+                    </dependencies>
                 </plugin>
             </plugins>
         </pluginManagement>

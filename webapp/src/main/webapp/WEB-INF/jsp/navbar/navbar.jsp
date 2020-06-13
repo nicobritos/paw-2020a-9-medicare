@@ -7,5 +7,3 @@
         <%@ include file="navbarNotLogged.jsp" %>
     </c:otherwise>
 </c:choose>
-
-

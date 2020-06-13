@@ -13,6 +13,4 @@ public interface WorkdayDao extends GenericDao<Workday, Integer> {
     List<Workday> findByStaff(Staff staff, WorkdayDay day);
 
     boolean isStaffWorking(Staff staff, AppointmentTimeSlot timeSlot);
-
-    void setStaff(Workday workday, Staff staff);
 }

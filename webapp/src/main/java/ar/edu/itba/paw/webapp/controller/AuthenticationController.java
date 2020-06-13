@@ -5,6 +5,7 @@ import ar.edu.itba.paw.interfaces.services.LocalityService;
 import ar.edu.itba.paw.interfaces.services.ProvinceService;
 import ar.edu.itba.paw.interfaces.services.UserService;
 import ar.edu.itba.paw.interfaces.services.exceptions.EmailAlreadyExistsException;
+import ar.edu.itba.paw.interfaces.services.exceptions.InvalidEmailDomain;
 import ar.edu.itba.paw.models.*;
 import ar.edu.itba.paw.webapp.auth.UserRole;
 import ar.edu.itba.paw.webapp.controller.utils.GenericController;
@@ -13,6 +14,7 @@ import ar.edu.itba.paw.webapp.events.events.UserConfirmationTokenGenerationEvent
 import ar.edu.itba.paw.webapp.form.authentication.PatientSignUpForm;
 import ar.edu.itba.paw.webapp.form.authentication.StaffSignUpForm;
 import ar.edu.itba.paw.webapp.form.authentication.UserLoginForm;
+import ar.edu.itba.paw.webapp.handlers.CustomSecurityRepository;
 import ar.edu.itba.paw.webapp.transformer.LocalityTransformer;
 import ar.edu.itba.paw.webapp.transformer.ProvinceTransformer;
 import org.slf4j.Logger;
@@ -107,6 +109,9 @@ public class AuthenticationController extends GenericController {
         } catch (EmailAlreadyExistsException e) {
             errors.reject("EmailAlreadyTaken.signupForm.email", null, "Error");
             return this.signupStaffIndex(form);
+        } catch (InvalidEmailDomain e) {
+            errors.reject("InvalidEmailDomain.signupForm.email", null, "Error");
+            return this.signupStaffIndex(form);
         }
         StringBuilder baseUrl = new StringBuilder(request.getRequestURL());
         baseUrl.replace(request.getRequestURL().lastIndexOf(request.getServletPath()), request.getRequestURL().length(), "");
@@ -137,6 +142,9 @@ public class AuthenticationController extends GenericController {
         } catch (EmailAlreadyExistsException e) {
             errors.reject("EmailAlreadyTaken.signupForm.email", null, "Error");
             return this.signupPatientIndex(form);
+        } catch (InvalidEmailDomain e) {
+            errors.reject("InvalidEmailDomain.signupForm.email", null, "Error");
+            return this.signupPatientIndex(form);
         }
         StringBuilder baseUrl = new StringBuilder(request.getRequestURL());
         baseUrl.replace(request.getRequestURL().lastIndexOf(request.getServletPath()), request.getRequestURL().length(), "");
@@ -155,7 +163,7 @@ public class AuthenticationController extends GenericController {
             mav.setViewName("redirect:/login?token=" + token);
             return mav;
         }
-        if(userOptional.get().getVerified()){
+        if (userOptional.get().getVerified()) {
             mav.setViewName("redirect:/home");
             return mav;
         }
@@ -235,7 +243,9 @@ public class AuthenticationController extends GenericController {
     private void updateRole(User user) {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         List<GrantedAuthority> updatedAuthorities = AuthorityUtils.commaSeparatedStringToAuthorityList(this.getRoles(user));
+
         Authentication newAuth = new UsernamePasswordAuthenticationToken(auth.getPrincipal(), auth.getCredentials(), updatedAuthorities);
         SecurityContextHolder.getContext().setAuthentication(newAuth);
+        CustomSecurityRepository.propagateAuthorities((org.springframework.security.core.userdetails.User) auth.getPrincipal(), updatedAuthorities);
     }
 }

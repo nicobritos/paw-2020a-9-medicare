@@ -2,7 +2,7 @@
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags" %>
 <!DOCTYPE html>
 <html lang="en">
-<%@ include file="head.jsp" %>
+<%@ include file="../partials/head.jsp" %>
 <link rel="stylesheet" href='<c:url value="/css/unverified.css"/>'/>
 </head>
 <body class="d-flex flex-column">

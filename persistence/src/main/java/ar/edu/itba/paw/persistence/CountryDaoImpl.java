@@ -2,76 +2,42 @@ package ar.edu.itba.paw.persistence;
 
 import ar.edu.itba.paw.interfaces.daos.CountryDao;
 import ar.edu.itba.paw.models.Country;
+import ar.edu.itba.paw.models.Country_;
 import ar.edu.itba.paw.persistence.generics.GenericSearchableDaoImpl;
-import ar.edu.itba.paw.persistence.utils.JDBCArgumentValue;
-import ar.edu.itba.paw.persistence.utils.RowMapperAlias;
-import ar.edu.itba.paw.persistence.utils.builder.JDBCSelectQueryBuilder;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jdbc.core.ResultSetExtractor;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
-import javax.sql.DataSource;
-import java.sql.SQLException;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Root;
+import javax.persistence.metamodel.SingularAttribute;
 
 @Repository
 public class CountryDaoImpl extends GenericSearchableDaoImpl<Country, String> implements CountryDao {
-    public static final RowMapperAlias<Country> ROW_MAPPER = (prefix, resultSet) -> {
-        Country country = new Country();
-        try {
-            country.setId(resultSet.getString(formatColumnFromName(CountryDaoImpl.PRIMARY_KEY_NAME, prefix)));
-        } catch (SQLException e) {
-            country.setId(resultSet.getString(CountryDaoImpl.PRIMARY_KEY_NAME));
+    public CountryDaoImpl() {
+        super(Country.class, Country_.id);
+    }
+
+    @Override
+    protected SingularAttribute<? super Country, ?> getNameAttribute() {
+        return Country_.name;
+    }
+
+    @Override
+    protected void insertOrderBy(CriteriaBuilder builder, CriteriaQuery<Country> query, Root<Country> root) {
+        query.orderBy(builder.asc(root.get(Country_.name)));
+    }
+
+    @Override
+    @Transactional
+    public Country create(Country c) {
+        if (c == null || c.getId() == null || c.getId().length() != 2) {
+            throw new IllegalArgumentException();
         }
-        populateEntity(country, resultSet, prefix);
-        return country;
-    };
-    public static final String TABLE_NAME = getTableNameFromModel(Country.class);
-    public static final String PRIMARY_KEY_NAME = getPrimaryKeyNameFromModel(Country.class);
-
-    @Autowired
-    public CountryDaoImpl(DataSource dataSource) {
-        super(dataSource, Country.class);
-    }
-
-    @Override
-    protected ResultSetExtractor<List<Country>> getResultSetExtractor() {
-        return resultSet -> {
-            Map<String, Country> entityMap = new HashMap<>();
-            List<Country> sortedEntities = new LinkedList<>();
-            while (resultSet.next()) {
-                String id;
-                try {
-                    id = resultSet.getString(this.formatColumnFromAlias(this.getIdColumnName()));
-                } catch (SQLException e) {
-                    id = resultSet.getString(this.getIdColumnName());
-                }
-                if (resultSet.wasNull())
-                    continue;
-                entityMap.computeIfAbsent(id, string -> {
-                    try {
-                        Country newEntity = ROW_MAPPER.mapRow(this.getTableAlias(), resultSet);
-                        sortedEntities.add(newEntity);
-                        return newEntity;
-                    } catch (SQLException e) {
-                        return null;
-                    }
-                });
-            }
-            return sortedEntities;
-        };
-    }
-
-    @Override
-    protected void populateJoins(JDBCSelectQueryBuilder selectQueryBuilder) {
-
-    }
-
-    @Override
-    protected Map<String, JDBCArgumentValue> getModelRelationsArgumentValue(Country model, String prefix) {
-        return null;
+        c.setId(c.getId().toUpperCase());
+        if (!c.getId().matches("[A-Z][A-Z]")) {
+            throw new IllegalArgumentException();
+        }
+        return super.create(c);
     }
 }

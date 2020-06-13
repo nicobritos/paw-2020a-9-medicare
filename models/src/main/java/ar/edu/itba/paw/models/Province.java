@@ -1,17 +1,38 @@
 package ar.edu.itba.paw.models;
 
-import ar.edu.itba.paw.persistenceAnnotations.Column;
-import ar.edu.itba.paw.persistenceAnnotations.OrderBy;
-import ar.edu.itba.paw.persistenceAnnotations.OrderCriteria;
-import ar.edu.itba.paw.persistenceAnnotations.Table;
+import javax.persistence.*;
 
-@Table(name = "system_province", primaryKey = "province_id")
+@Entity
+@Table(
+        name = "system_province",
+        indexes = {
+                @Index(columnList = "province_id", name = "system_province_province_id_uindex", unique = true),
+        }
+)
 public class Province extends GenericModel<Integer> {
-    @OrderBy(OrderCriteria.ASC)
-    @Column(name = "name", required = true)
+    @Id
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "system_province_province_id_seq")
+    @SequenceGenerator(sequenceName = "system_province_province_id_seq", name = "system_province_province_id_seq", allocationSize = 1)
+    @Column(name = "province_id")
+    private Integer id;
+    @Column(name = "name", nullable = false)
     private String name;
-
+    @ManyToOne(fetch = FetchType.EAGER, optional = false
+//            ,
+//            cascade = {CascadeType.PERSIST, CascadeType.REFRESH, CascadeType.MERGE}
+    )
+    @JoinColumn(name = "country_id", nullable = false)
     private Country country;
+
+    @Override
+    public Integer getId() {
+        return this.id;
+    }
+
+    @Override
+    public void setId(Integer id) {
+        this.id = id;
+    }
 
     public String getName() {
         return this.name;

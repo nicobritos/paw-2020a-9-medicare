@@ -29,7 +29,7 @@ public class LandingController extends GenericController {
     @RequestMapping("/")
     public ModelAndView landingPage() {
         final ModelAndView mav = new ModelAndView("landing");
-        Optional<User> user = getUser();
+        Optional<User> user = this.getUser();
         if (user.isPresent()) {
             if (!user.get().getVerified()) {
                 return new ModelAndView("redirect:/verifyEmail");
@@ -42,8 +42,8 @@ public class LandingController extends GenericController {
 
         // pass objects to model and view
         mav.addObject("user", user);
-        if (user.isPresent() && isStaff()) {
-            mav.addObject("staffs", staffService.findByUser(user.get().getId()));
+        if (user.isPresent() && this.isStaff()) {
+            mav.addObject("staffs", this.staffService.findByUser(user.get()));
         }
         mav.addObject("specialties", specialtiesList);
         mav.addObject("localities", localitiesList);
@@ -52,14 +52,14 @@ public class LandingController extends GenericController {
 
     @RequestMapping("/home")
     public ModelAndView home() {
-        Optional<User> userOptional = getUser();
+        Optional<User> userOptional = this.getUser();
         if (!userOptional.isPresent()) {
             return new ModelAndView("redirect:/");
         }
         if (!userOptional.get().getVerified()) {
             return new ModelAndView("redirect:/verifyEmail");
         }
-        if (isStaff()) {
+        if (this.isStaff()) {
             return new ModelAndView("redirect:/staff/home");
         } else {
             return new ModelAndView("redirect:/patient/home");

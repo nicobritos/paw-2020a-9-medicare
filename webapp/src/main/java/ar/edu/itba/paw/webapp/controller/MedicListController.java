@@ -10,8 +10,8 @@ import ar.edu.itba.paw.webapp.controller.utils.GenericController;
 import ar.edu.itba.paw.webapp.controller.utils.JsonResponse;
 import ar.edu.itba.paw.webapp.form.RequestTimeslotForm;
 import ar.edu.itba.paw.webapp.transformer.AppointmentTimeSlotTransformer;
-import org.joda.time.DateTime;
 import org.joda.time.Days;
+import org.joda.time.LocalDateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
@@ -56,62 +56,69 @@ public class MedicListController extends GenericController {
     @RequestMapping(value = "/mediclist/{page}")
     public ModelAndView medicsList(@RequestParam(value = "name", required = false) String name, @RequestParam(value = "specialties", required = false) String specialties, @RequestParam(value = "localities", required = false) String localities, @PathVariable("page") int page) {
         if (page <= 0) {
-            return medicList(name, specialties, localities);
+            return this.medicList(name, specialties, localities);
         }
+
         //get modelandview from medicList.jsp
         final ModelAndView mav = new ModelAndView("medicList");
         //staff variable that will be passed to the jsp
         Collection<Staff> staffList;
 
-        Set<StaffSpecialty> searchedSpecialties = new HashSet<>();
-
+        Collection<StaffSpecialty> searchedSpecialties;
+        Set<Integer> specialtiesIds = new HashSet<>();
         if (specialties != null) {
             // split strings to get all specialties used in search
             // and create the search parameter
             for (String s : specialties.split(",")) {
                 try {
-                    StaffSpecialty specialty = new StaffSpecialty();
-                    specialty.setId(Integer.parseInt(s));
-                    searchedSpecialties.add(specialty);
+                    int id = Integer.parseInt(s);
+                    if (id >= 0) {
+                        specialtiesIds.add(id);
+                    }
                 } catch (NumberFormatException e) {
                 }
             }
         }
 
-        Set<Locality> searchedLocalities = new HashSet<>();
-
+        Collection<Locality> searchedLocalities;
+        Collection<Integer> localitiesIds = new HashSet<>();
         if (localities != null) {
             // split strings to get all specialties used in search
             // and create the search parameter
             for (String s : localities.split(",")) {
                 try {
-                    Locality locality = new Locality();
-                    locality.setId(Integer.parseInt(s));
-                    searchedLocalities.add(locality);
+                    int id = Integer.parseInt(s);
+                    if (id >= 0) {
+                        localitiesIds.add(id);
+                    }
                 } catch (NumberFormatException e) {
                 }
             }
         }
 
+        searchedSpecialties = this.specialityService.findByIds(specialtiesIds);
+        searchedLocalities = this.localityService.findByIds(localitiesIds);
+        Paginator<Staff> staffPaginator;
         if (name != null && !(name = name.trim()).equals("")) {
             Set<String> words = new HashSet<>(Arrays.asList(name.split(" ")));
-            staffList = this.staffService.findBy(words, words, null, searchedSpecialties, searchedLocalities, page);
+            staffPaginator = this.staffService.findBy(words, words, null, searchedSpecialties, searchedLocalities, page);
         } else {
-            staffList = this.staffService.findBy((String) null, null, null, searchedSpecialties, searchedLocalities, page);
+            staffPaginator = this.staffService.findBy((String) null, null, null, searchedSpecialties, searchedLocalities, page);
         }
 
         Collection<StaffSpecialty> specialtiesList = this.specialityService.list();
         Collection<Locality> localitiesList = this.localityService.list();
 
         // pass objects to model and view
-        Optional<User> user = getUser();
+        Optional<User> user = this.getUser();
         mav.addObject("user", user);
-        if (user.isPresent() && isStaff()) {
-            mav.addObject("staffs", staffService.findByUser(user.get().getId()));
+        if (user.isPresent() && this.isStaff()) {
+            mav.addObject("staffs", this.staffService.findByUser(user.get()));
         }
         mav.addObject("searchedLocalities", searchedLocalities);
         mav.addObject("searchedSpecialties", searchedSpecialties);
-        mav.addObject("staff", staffList);
+        mav.addObject("staff", staffPaginator.getModels());
+        mav.addObject("paginator", staffPaginator);
         mav.addObject("specialties", specialtiesList);
         mav.addObject("localities", localitiesList);
         mav.addObject("name", name);
@@ -123,22 +130,22 @@ public class MedicListController extends GenericController {
 
     @RequestMapping("/appointment/{id}/{week}")
     public ModelAndView appointment(@PathVariable("id") final int id, @PathVariable("week") final int week) {
-        Optional<Staff> staff = staffService.findById(id);
+        Optional<Staff> staff = this.staffService.findById(id);
         if (!staff.isPresent()) {
             return new ModelAndView("error/404"); //todo: throw status code instead of this
         }
         ModelAndView mav = new ModelAndView();
 
-        DateTime today = DateTime.now();
+        LocalDateTime today = LocalDateTime.now();
         today = today.plusWeeks(week);
-        DateTime monday = today.minusDays(today.getDayOfWeek() - 1);
+        LocalDateTime monday = today.minusDays(today.getDayOfWeek() - 1);
 
         mav.addObject("today", today);
         mav.addObject("monday", monday);
-        Optional<User> user = getUser();
+        Optional<User> user = this.getUser();
         mav.addObject("user", user);
-        if (user.isPresent() && isStaff()) {
-            mav.addObject("staffs", staffService.findByUser(user.get().getId()));
+        if (user.isPresent() && this.isStaff()) {
+            mav.addObject("staffs", this.staffService.findByUser(user.get()));
         }
         mav.addObject("staff", staff.get());
 
@@ -155,7 +162,7 @@ public class MedicListController extends GenericController {
             }
         }
         mav.addObject("weekSlots", weekslots);
-        mav.setViewName("selectTurno");
+        mav.setViewName("selectAppointment");
         return mav;
     }
 
@@ -171,8 +178,8 @@ public class MedicListController extends GenericController {
             if (!staff.isPresent()) {
                 throw new MediCareException("No existe el staff solicitado");
             }
-            DateTime dateFrom = new DateTime(form.getFromYear(), form.getFromMonth(), form.getFromDay(), 0, 0);
-            DateTime dateTo = new DateTime(form.getToYear(), form.getToMonth(), form.getToDay(), 23, 59, 59, 999);
+            LocalDateTime dateFrom = new LocalDateTime(form.getFromYear(), form.getFromMonth(), form.getFromDay(), 0, 0);
+            LocalDateTime dateTo = new LocalDateTime(form.getToYear(), form.getToMonth(), form.getToDay(), 23, 59, 59, 999);
             long daysBetween = Days.daysBetween(dateFrom.toLocalDate(), dateTo.toLocalDate()).getDays();
             if (daysBetween > MAX_DAYS_APPOINTMENTS || dateTo.isBefore(dateFrom)) {
                 throw new MediCareException("Fechas invalidas");

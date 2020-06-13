@@ -3,7 +3,7 @@
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags" %>
 <html>
 <head>
-    <%@ include file="../head.jsp" %>
+    <%@ include file="../../partials/head.jsp" %>
     <link rel="stylesheet" href='<c:url value="/css/authentication/register.css"/> '>
 </head>
 <body class="container-fluid w-100 m-0 p-0 d-flex flex-column justify-content-center align-items-center">
@@ -107,7 +107,7 @@
 
     <form:errors path="*" cssClass="mt-4 mb-0 text-danger" element="p"/>
 </form:form>
-<script src='<c:url value="/js/scripts/authentication/register.js"/> '></script>
+<script src='<c:url value="/js/scripts/authentication/Register.js"/> '></script>
 <script>
     $(document).ready(() => {
         Register.initStaff();

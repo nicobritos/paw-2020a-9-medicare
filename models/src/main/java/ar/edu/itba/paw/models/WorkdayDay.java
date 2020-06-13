@@ -1,7 +1,7 @@
 package ar.edu.itba.paw.models;
 
-import org.joda.time.DateTime;
 import org.joda.time.DateTimeConstants;
+import org.joda.time.LocalDateTime;
 
 import java.util.Calendar;
 
@@ -16,18 +16,26 @@ public enum WorkdayDay {
 
     public static WorkdayDay from(Calendar calendar) {
         switch (calendar.get(Calendar.DAY_OF_WEEK)) {
-            case Calendar.MONDAY: return MONDAY;
-            case Calendar.TUESDAY: return TUESDAY;
-            case Calendar.WEDNESDAY: return WEDNESDAY;
-            case Calendar.THURSDAY: return THURSDAY;
-            case Calendar.FRIDAY: return FRIDAY;
-            case Calendar.SATURDAY: return SATURDAY;
-            case Calendar.SUNDAY: return SUNDAY;
-            default: return null;
+            case Calendar.MONDAY:
+                return MONDAY;
+            case Calendar.TUESDAY:
+                return TUESDAY;
+            case Calendar.WEDNESDAY:
+                return WEDNESDAY;
+            case Calendar.THURSDAY:
+                return THURSDAY;
+            case Calendar.FRIDAY:
+                return FRIDAY;
+            case Calendar.SATURDAY:
+                return SATURDAY;
+            case Calendar.SUNDAY:
+                return SUNDAY;
+            default:
+                return null;
         }
     }
 
-    public static WorkdayDay from(DateTime localDate) {
+    public static WorkdayDay from(LocalDateTime localDate) {
         if (localDate.getDayOfWeek() == DateTimeConstants.MONDAY) {
             return MONDAY;
         } else if (localDate.getDayOfWeek() == DateTimeConstants.TUESDAY) {

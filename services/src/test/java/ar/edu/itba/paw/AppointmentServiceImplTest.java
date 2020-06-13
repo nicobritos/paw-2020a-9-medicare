@@ -4,7 +4,7 @@ import ar.edu.itba.paw.interfaces.daos.AppointmentDao;
 import ar.edu.itba.paw.interfaces.services.exceptions.InvalidAppointmentStatusChangeException;
 import ar.edu.itba.paw.models.*;
 import ar.edu.itba.paw.services.AppointmentServiceImpl;
-import org.joda.time.DateTime;
+import org.joda.time.LocalDateTime;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
@@ -13,7 +13,6 @@ import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -55,7 +54,7 @@ public class AppointmentServiceImplTest {
     @Mock
     private AppointmentDao mockDao;
 
-    private User userModel(){
+    private User userModel() {
         User user = new User();
         user.setFirstName(FIRST_NAME);
         user.setSurname(SURNAME);
@@ -65,14 +64,14 @@ public class AppointmentServiceImplTest {
         return user;
     }
 
-    private Locality localityModel(){
+    private Locality localityModel() {
         Locality locality = new Locality();
         locality.setName(LOCALITY);
         locality.setId(LOCALITY_ID);
         return locality;
     }
 
-    private Office officeModel(){
+    private Office officeModel() {
         Office office = new Office();
         office.setId(OFFICE_ID);
         office.setLocality(localityModel());
@@ -84,7 +83,7 @@ public class AppointmentServiceImplTest {
         return office;
     }
 
-    private Patient patientModel(){
+    private Patient patientModel() {
         Patient patient = new Patient();
         patient.setUser(userModel());
         patient.setOffice(officeModel());
@@ -92,62 +91,60 @@ public class AppointmentServiceImplTest {
         return patient;
     }
 
-    private Staff staffModel(){
+    private Staff staffModel() {
         Staff staff = new Staff();
         staff.setPhone(STAFF_PHONE);
         staff.setEmail(STAFF_EMAIL);
-        staff.setSurname(STAFF_SURNAME);
-        staff.setFirstName(STAFF_FIRSTNAME);
         staff.setRegistrationNumber(REGISTRATION_NUMBER);
         staff.setId(STAFF_ID);
         return staff;
     }
 
-    private DateTime dateModel(){
-        return new DateTime(YEAR, MONTH, DAY_OF_MONTH, HOUR, MINUTE);
+    private LocalDateTime dateModel() {
+        return new LocalDateTime(YEAR, MONTH, DAY_OF_MONTH, HOUR, MINUTE);
     }
 
-    private Appointment appointmentModel(){
+    private Appointment appointmentModel() {
         Appointment appointment = new Appointment();
         appointment.setFromDate(dateModel());
         appointment.setPatient(patientModel());
         appointment.setStaff(staffModel());
         appointment.setId(APPOINTMENT_ID);
-        appointment.setAppointmentStatus(AppointmentStatus.PENDING.name());
+        appointment.setAppointmentStatus(AppointmentStatus.PENDING);
         return appointment;
     }
 
     @Test
-    public void mockExample(){
+    public void mockExample() {
         Staff staff = staffModel();
         Mockito.when(mockDao.find(Mockito.eq(staff))).thenReturn(Collections.singletonList(appointmentModel()));
         List<Appointment> appointments = appointmentService.find(staff);
-        assertEquals(appointments,Collections.singletonList(appointmentModel()));
+        assertEquals(appointments, Collections.singletonList(appointmentModel()));
     }
 
     @Test
-    public void changeToPossibleStatusOfPendingAppointmentTest(){
+    public void changeToPossibleStatusOfPendingAppointmentTest() {
         Appointment appointment = appointmentModel();
         AppointmentStatus status = AppointmentStatus.PENDING;
         AppointmentStatus changeToStatus = AppointmentStatus.CANCELLED;
-        try{
-            appointment.setAppointmentStatus(status.name());
+        try {
+            appointment.setAppointmentStatus(status);
             appointmentService.setStatus(appointment, changeToStatus);
 
             changeToStatus = AppointmentStatus.WAITING;
-            appointment.setAppointmentStatus(AppointmentStatus.PENDING.name());
+            appointment.setAppointmentStatus(AppointmentStatus.PENDING);
             appointmentService.setStatus(appointment, changeToStatus);
-        }catch (Exception e){
+        } catch (Exception e) {
             fail("Failed to set appointment to status:" + changeToStatus.name() + " because exception " + e.getClass().getName() + " was thrown with message:\n" + e.getMessage());
         }
     }
 
     @Test(expected = InvalidAppointmentStatusChangeException.class)
-    public void changeToSeeingStatusOfPendingAppointmentTest(){
+    public void changeToSeeingStatusOfPendingAppointmentTest() {
         Appointment appointment = appointmentModel();
         AppointmentStatus status = AppointmentStatus.PENDING;
         AppointmentStatus changeToStatus = AppointmentStatus.SEEN;
-        appointment.setAppointmentStatus(status.name());
+        appointment.setAppointmentStatus(status);
         appointmentService.setStatus(appointment, changeToStatus);
     }
 }

@@ -2,7 +2,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <%@ include file="head.jsp" %>
+    <%@ include file="../partials/head.jsp" %>
 
     <link rel="stylesheet" href='<c:url value="/css/loggedMedicList.css"/> '/>
 </head>
@@ -11,9 +11,26 @@
 
 <form action="<c:url value="/mediclist/1"/>">
     <div class="container h-75">
+        <div class="row mt-4">
+            <h4>
+                <c:choose>
+                    <c:when test="${paginator.totalCount == 0}">
+                        <spring:message code="NoResultsFound"/>
+                    </c:when>
+                    <c:when test="${paginator.totalCount == 1}">
+                        <spring:message code="SearchResults1"/>
+                    </c:when>
+                    <c:otherwise>
+                        <spring:message code="SearchResults2More" arguments="${paginator.totalCount}"/>
+                    </c:otherwise>
+                </c:choose>
+                <c:if test="${paginator.totalCount == 0}">
+                </c:if>
+            </h4>
+        </div>
         <div class="row mt-4 justify-content-center">
             <input class="form-control w-100" type="text" name="name" value="<c:out value="${name}"/>"
-                   placeholder="<spring:message code="Name"/>"/>
+                   placeholder="<spring:message code="Name" />"/>
         </div>
         <div class="row mt-4">
             <div class="col-4 px-3">
@@ -24,7 +41,7 @@
                 <%--            </select>--%>
                 <%--          </div>--%>
                 <div class="row mt-4">
-                    <select class="form-control w-100" type="text" name="specialties" id="selEspecialidad">
+                    <select class="select-css form-control w-100" type="text" name="specialties" id="selEspecialidad">
                         <option value="-1" disabled <c:if test="${searchedSpecialties.isEmpty()}">selected</c:if>>
                             <spring:message code="Specialty"/></option>
                         <option value="-1"><spring:message code="Any"/></option>
@@ -36,7 +53,7 @@
                     </select>
                 </div>
                 <div class="row mt-4">
-                    <select class="form-control w-100" type="text" name="localities" id="localidad">
+                    <select class="select-css form-control w-100" type="text" name="localities" id="localidad">
                         <option value="-1" disabled <c:if test="${searchedLocalities.isEmpty()}">selected</c:if>>
                             <spring:message code="Locality"/></option>
                         <option value="-1"><spring:message code="Any"/></option>
@@ -54,6 +71,32 @@
             </div>
             <div class="col-1"></div>
             <div class="col">
+                <c:if test="${paginator.totalPages != 0}">
+                    <div id="paging" class="p-3 d-flex container w-100 justify-content-center ">
+                        <c:if test="${page > 2}">
+                            <div>
+                                <button type="button" class="btn btn-info btn-sm mr-1 firstButton"><<</button>
+                            </div>
+                        </c:if>
+                        <c:if test="${page > 1}">
+                            <div>
+                                <button type="button" class="btn btn-info btn-sm prevButton"><</button>
+                            </div>
+                        </c:if>
+                        <p class="d-inline mx-2"><spring:message code="Page"/> <c:out value="${page}"/> <spring:message
+                                code="of"/> <c:out value="${paginator.totalPages}"/></p>
+                        <c:if test="${paginator.remainingPages != 0}">
+                            <div>
+                                <button type="button" class="btn btn-info btn-sm nextButton">></button>
+                            </div>
+                        </c:if>
+                        <c:if test="${paginator.remainingPages > 1}">
+                            <div>
+                                <button type="button" class="btn btn-info btn-sm ml-1 lastButton">>></button>
+                            </div>
+                        </c:if>
+                    </div>
+                </c:if>
                 <ul class="list-group turno-list mr-2 w-100">
                     <c:forEach var="member" items="${staff}">
                         <li class="list-group-item turno-item mb-3">
@@ -64,14 +107,14 @@
                                             <div style="margin-top: 100%;"></div>
                                             <img
                                                     class="profile-picture rounded-circle"
-                                                    src="<c:url value="/profilePics/${member.user.profileId}"/>"
+                                                    src="<c:url value="/profilePics/${member.user.profilePicture.id}"/>"
                                                     alt=""
                                             />
                                         </div>
                                     </div>
                                     <div class="col-6">
                                         <div class="row justify-content-start">
-                                            <h5><c:out value="${member.firstName} ${member.surname}"/></h5>
+                                            <h5><c:out value="${member.user.firstName} ${member.user.surname}"/></h5>
                                         </div>
                                         <div class="row">
                                             <p class="m-0">
@@ -82,6 +125,9 @@
                                         </div>
                                         <div class="row">
                                             <p class="m-0"><c:out value="${member.office.street}"/></p>
+                                        </div>
+                                        <div class="row">
+                                            <p class="m-0"><c:out value="${member.office.locality.name}"/></p>
                                         </div>
                                     </div>
                                     <div class="col d-flex justify-content-center align-items-center">
@@ -97,20 +143,32 @@
                         </li>
                     </c:forEach>
                 </ul>
-                <div id="paging" class="p-3 d-flex container w-100 justify-content-center">
-                    <c:if test="${page > 1}">
-                        <div>
-                            <button type="button" class="btn btn-info btn-sm" id="prevButton"><</button>
-                        </div>
-                    </c:if>
-
-                    <p class="d-inline mx-2"><spring:message code="Page"/> <c:out value="${page}"/></p>
-                    <c:if test="${staff.size() == 10}">
-                        <div>
-                            <button type="button" class="btn btn-info btn-sm" id="nextButton">></button>
-                        </div>
-                    </c:if>
-                </div>
+                <c:if test="${paginator.totalPages != 0}">
+                    <div id="paging" class="p-3 d-flex container w-100 justify-content-center ">
+                        <c:if test="${page > 2}">
+                            <div>
+                                <button type="button" class="btn btn-info btn-sm mr-1 firstButton"><<</button>
+                            </div>
+                        </c:if>
+                        <c:if test="${page > 1}">
+                            <div>
+                                <button type="button" class="btn btn-info btn-sm prevButton"><</button>
+                            </div>
+                        </c:if>
+                        <p class="d-inline mx-2"><spring:message code="Page"/> <c:out value="${page}"/> <spring:message
+                                code="of"/> <c:out value="${paginator.totalPages}"/></p>
+                        <c:if test="${paginator.remainingPages != 0}">
+                            <div>
+                                <button type="button" class="btn btn-info btn-sm nextButton">></button>
+                            </div>
+                        </c:if>
+                        <c:if test="${paginator.remainingPages > 1}">
+                            <div>
+                                <button type="button" class="btn btn-info btn-sm ml-1 lastButton">>></button>
+                            </div>
+                        </c:if>
+                    </div>
+                </c:if>
             </div>
         </div>
     </div>
@@ -118,21 +176,11 @@
 
 </body>
 <script src='<c:url value="/js/scripts/AppointmentRequest.js"/> '></script>
-<script src='<c:url value="/js/scripts/AppointmentList.js"/> '></script>
+<script src='<c:url value="/js/scripts/AppointmentList.js"/> '>
+</script>
 <script>
-    let prevButton = document.getElementById("prevButton");
-    let nextButton = document.getElementById("nextButton");
-    if (prevButton != null) {
-        prevButton.onclick = () => {
-            location.href = "<c:url value="/mediclist/${page-1}"/>" + location.search;
-        }
-    }
-    if (nextButton != null) {
-        nextButton.onclick = () => {
-            location.href = "<c:url value="/mediclist/${page+1}"/>" + location.search;
-        }
-    }
-
-    AppointmentList.init();
+    $(document).ready(() => {
+        AppointmentList.init(parseInt(${page}), parseInt(${paginator.totalPages}));
+    })
 </script>
 </html>

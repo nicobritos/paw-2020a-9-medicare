@@ -3,7 +3,7 @@
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags" %>
 <html>
 <head>
-    <%@ include file="../head.jsp" %>
+    <%@ include file="../../partials/head.jsp" %>
     <link rel="stylesheet" href='<c:url value="/css/authentication/login.css"/> '>
 </head>
 <body>
@@ -66,7 +66,7 @@
         </c:if>
     </form:form>
 </div>
-<script src='<c:url value="/js/scripts/authentication/login.js"/> '></script>
+<script src='<c:url value="/js/scripts/authentication/Login.js"/> '></script>
 <script>
     $(document).ready(() => {
         Login.init();

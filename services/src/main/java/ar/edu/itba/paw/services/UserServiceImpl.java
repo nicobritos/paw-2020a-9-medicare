@@ -4,19 +4,27 @@ import ar.edu.itba.paw.interfaces.MediCareException;
 import ar.edu.itba.paw.interfaces.daos.UserDao;
 import ar.edu.itba.paw.interfaces.services.*;
 import ar.edu.itba.paw.interfaces.services.exceptions.EmailAlreadyExistsException;
+import ar.edu.itba.paw.interfaces.services.exceptions.InvalidEmailDomain;
 import ar.edu.itba.paw.models.*;
 import ar.edu.itba.paw.services.generics.GenericSearchableServiceImpl;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.joda.time.DateTime;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.Resource;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Optional;
-import java.util.UUID;
+import java.io.IOException;
+import java.util.*;
 
 @Service
 public class UserServiceImpl extends GenericSearchableServiceImpl<UserDao, User, Integer> implements UserService {
+    private static final Logger LOGGER = LoggerFactory.getLogger(UserServiceImpl.class);
+
     @Autowired
     private UserDao repository;
     @Autowired
@@ -30,12 +38,24 @@ public class UserServiceImpl extends GenericSearchableServiceImpl<UserDao, User,
     @Autowired
     private PasswordEncoder passwordEncoder;
 
+    private Set<String> invalidEmailDomains = new HashSet<>();
+
+    public UserServiceImpl() {
+        Resource invalidEmailDomainsFile = new ClassPathResource("/invalidEmailDomains.json");
+        try {
+            this.invalidEmailDomains = new HashSet<>(Arrays.asList(new ObjectMapper().readValue(invalidEmailDomainsFile.getInputStream(), String[].class)));
+        } catch (NullPointerException | IOException e) {
+            LOGGER.error("Reading InvalidEmailDomains file. File present: {}", invalidEmailDomainsFile.exists() ? "YES" : "NO");
+        }
+    }
+
     @Override
     @Transactional
     public User create(User user) throws EmailAlreadyExistsException {
-        if (this.repository.existsEmail(user.getEmail())) {
+        if (this.repository.existsEmail(user.getEmail()))
             throw new EmailAlreadyExistsException();
-        }
+        if (!this.isValidEmailDomain(user.getEmail()))
+            throw new InvalidEmailDomain();
 
         user.setPassword(this.passwordEncoder.encode(user.getPassword()));
         return super.create(user);
@@ -43,7 +63,7 @@ public class UserServiceImpl extends GenericSearchableServiceImpl<UserDao, User,
 
     @Override
     public boolean isStaff(User user) {
-        return !this.staffService.findByUser(user.getId()).isEmpty();
+        return !this.staffService.findByUser(user).isEmpty();
     }
 
     @Override
@@ -56,16 +76,20 @@ public class UserServiceImpl extends GenericSearchableServiceImpl<UserDao, User,
     @Transactional
     public User createAsStaff(User user, Office office) throws EmailAlreadyExistsException {
         User newUser = this.create(user);
-        Optional<Office> officeOptional = this.officeService.findById(office.getId());
-        if (!officeOptional.isPresent())
+        if(office.getId()==null){
             office = this.officeService.create(office);
-        else
-            office = officeOptional.get();
+        }else{
+            Optional<Office> officeOptional = this.officeService.findById(office.getId());
+            if (!officeOptional.isPresent()) {
+                office = this.officeService.create(office);
+            }
+            else {
+                office = officeOptional.get();
+            }
+        }
 
         Staff staff = new Staff();
         staff.setEmail(newUser.getEmail());
-        staff.setFirstName(newUser.getFirstName());
-        staff.setSurname(newUser.getSurname());
         staff.setUser(newUser);
         staff.setOffice(office);
         this.staffService.create(staff);
@@ -76,12 +100,12 @@ public class UserServiceImpl extends GenericSearchableServiceImpl<UserDao, User,
     @Override
     @Transactional
     public void setProfile(User user, Picture picture) {
-        if (user.getProfileId() == null) {
+        if (user.getProfilePicture() == null) {
             picture = this.pictureService.create(picture);
-            user.setProfileId(picture.getId());
+            user.setProfilePicture(picture);
             this.update(user);
         } else {
-            picture.setId(user.getProfileId());
+            picture.setId(user.getProfilePicture().getId());
             this.pictureService.update(picture);
         }
     }
@@ -94,23 +118,23 @@ public class UserServiceImpl extends GenericSearchableServiceImpl<UserDao, User,
 
     @Override
     @Transactional
-    public void update(User user){
+    public void update(User user) {
         Optional<User> userOptional = this.repository.findByEmail(user.getEmail());
         if (userOptional.isPresent()) {
             if (!userOptional.get().equals(user)) {
+                // The email belongs to another user
                 throw new EmailAlreadyExistsException();
             }
-            if (!userOptional.get().equals(user) && this.repository.existsToken(user.getToken())) {
-                throw new MediCareException("Confirmation token already exists");
-            }
         } else {
-            // Already exists in DB, the email has changed
             if (user.getId() != null && this.findById(user.getId()).isPresent()) {
+                // Already exists in DB, the email has changed
+                if (!this.isValidEmailDomain(user.getEmail()))
+                    throw new InvalidEmailDomain();
                 user.setVerified(false);
                 user.setToken(null);
             } else {
                 Optional<User> userToken = this.repository.findByToken(user.getToken());
-                if (userToken.isPresent() && !userToken.get().equals(user)){
+                if (userToken.isPresent() && !userToken.get().equals(user)) {
                     throw new MediCareException("Confirmation token already exists");
                 }
             }
@@ -125,13 +149,14 @@ public class UserServiceImpl extends GenericSearchableServiceImpl<UserDao, User,
     }
 
     @Override
-    public Optional<User> findByToken(String token){
+    public Optional<User> findByToken(String token) {
         return this.repository.findByToken(token);
     }
 
     @Override
     @Transactional
     public String generateVerificationToken(User user) {
+        user = this.findById(user.getId()).get();
         if (user.getVerified())
             return null;
         if (user.getToken() != null) {
@@ -162,17 +187,16 @@ public class UserServiceImpl extends GenericSearchableServiceImpl<UserDao, User,
     @Override
     @Transactional
     public boolean confirm(User user, String token) {
-        if(user.getVerified()){
+        if (user.getVerified()) {
             return false;
         }
-        if(user.getToken() != null && user.getToken().equals(token)){
+        if (user.getToken() != null && user.getToken().equals(token)) {
             user.setVerified(true);
             user.setToken(null);
             user.setTokenCreatedDate(null);
             this.update(user);
             return true;
-        }
-        else {
+        } else {
             return false;
         }
     }
@@ -180,5 +204,10 @@ public class UserServiceImpl extends GenericSearchableServiceImpl<UserDao, User,
     @Override
     protected UserDao getRepository() {
         return this.repository;
+    }
+
+    private boolean isValidEmailDomain(String email) {
+        String domain = email.substring(email.lastIndexOf("@") + 1);
+        return !this.invalidEmailDomains.contains(domain);
     }
 }

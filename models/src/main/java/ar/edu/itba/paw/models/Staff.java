@@ -1,46 +1,52 @@
 package ar.edu.itba.paw.models;
 
-import ar.edu.itba.paw.persistenceAnnotations.Column;
-import ar.edu.itba.paw.persistenceAnnotations.OrderBy;
-import ar.edu.itba.paw.persistenceAnnotations.OrderCriteria;
-import ar.edu.itba.paw.persistenceAnnotations.Table;
-
+import javax.persistence.*;
 import java.util.Collection;
 import java.util.LinkedList;
 
-@Table(name = "staff", primaryKey = "staff_id")
+@Entity
+@Table(
+        name = "staff",
+        indexes = {
+                @Index(columnList = "staff_id", name = "staff_staff_id_uindex", unique = true),
+                @Index(columnList = "user_id", name = "staff_user_id_index")
+        }
+)
 public class Staff extends GenericModel<Integer> {
-    @OrderBy(OrderCriteria.ASC)
-    @Column(name = "first_name", required = true)
-    private String firstName;
-    @OrderBy(value = OrderCriteria.ASC, priority = 1)
-    @Column(name = "surname", required = true)
-    private String surname;
+    @Id
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "staff_staff_id_seq")
+    @SequenceGenerator(sequenceName = "staff_staff_id_seq", name = "staff_staff_id_seq", allocationSize = 1)
+    @Column(name = "staff_id")
+    private Integer id;
     @Column(name = "phone")
     private String phone;
     @Column(name = "email")
     private String email;
     @Column(name = "registration_number")
     private Integer registrationNumber;
-
+    @JoinColumn(name = "user_id", nullable = false)
+    @ManyToOne(fetch = FetchType.EAGER)
     private User user;
+    @JoinColumn(name = "office_id", nullable = false)
+    @ManyToOne(fetch = FetchType.EAGER)
     private Office office;
+    @ManyToMany(fetch = FetchType.EAGER)
+    @JoinTable(
+            name = "system_staff_specialty_staff",
+            joinColumns = @JoinColumn(name = "staff_id"),
+            inverseJoinColumns = @JoinColumn(name = "specialty_id")
+    )
+    @OrderBy("name ASC")
     private Collection<StaffSpecialty> staffSpecialties = new LinkedList<>();
 
-    public String getFirstName() {
-        return this.firstName;
+    @Override
+    public Integer getId() {
+        return this.id;
     }
 
-    public void setFirstName(String firstName) {
-        this.firstName = firstName;
-    }
-
-    public String getSurname() {
-        return this.surname;
-    }
-
-    public void setSurname(String surname) {
-        this.surname = surname;
+    @Override
+    public void setId(Integer id) {
+        this.id = id;
     }
 
     public String getPhone() {
@@ -83,12 +89,16 @@ public class Staff extends GenericModel<Integer> {
         this.office = office;
     }
 
+    public Collection<StaffSpecialty> getStaffSpecialties() {
+        return this.staffSpecialties;
+    }
+
+    public void setStaffSpecialties(Collection<StaffSpecialty> staffSpecialties) {
+        this.staffSpecialties = staffSpecialties;
+    }
+
     @Override
     protected boolean isSameInstance(Object o) {
         return o instanceof Staff;
-    }
-
-    public Collection<StaffSpecialty> getStaffSpecialties() {
-        return this.staffSpecialties;
     }
 }

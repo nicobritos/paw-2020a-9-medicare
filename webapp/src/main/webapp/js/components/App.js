@@ -1,4 +1,7 @@
 const App = function () {
+    let baseUrl = $("base")[0].href;
+    baseUrl = baseUrl.substring(0, baseUrl.length - 1);
+
     let showOk = function (messages, title = 'Exito') {
         if (messages == null) {
             return;
@@ -79,9 +82,12 @@ const App = function () {
         });
     };
 
-    let goto = function (url) {
-        if (url.startsWith('/')) {
-            location.href = url;
+    let goto = function (url, preserveParameters) {
+        if (url.startsWith('/') || url.startsWith('http://') || url.startsWith('https://')) {
+            if (preserveParameters)
+                location.href = url + location.search;
+            else
+                location.href = url;
         } else if (url.startsWith('..')) {
             let pathname = location.pathname;
             if (pathname.endsWith('/') || pathname.endsWith('#')) pathname = pathname.substring(0, pathname.length - 1);
@@ -100,8 +106,6 @@ const App = function () {
             }
 
             location.pathname = oldPaths.concat(newPaths).join('/');
-        } else if (url.startsWith('http://') || url.startsWith('https://')) {
-            location.href = url;
         } else {
             let pathname = location.pathname;
             if (pathname.endsWith('/') || pathname.endsWith('#')) pathname = pathname.substring(0, pathname.length - 1);
@@ -109,8 +113,6 @@ const App = function () {
         }
     };
 
-    let baseUrl = $("base")[0].href;
-    baseUrl = baseUrl.substring(0, baseUrl.length - 1);
     return {
         init: function () {
             // First, checks if it isn't implemented yet.
@@ -125,6 +127,12 @@ const App = function () {
                     });
                 };
             }
+
+            $(document).ready(function () {
+                $('.btn-loading').on('click', function () {
+                    $(this).append(' <div class="spinner-border loading-spinner-button" role="status"></div>');
+                });
+            });
         },
         get: function (url, parameters = {}) {
             if (url[0] === "/") {
@@ -145,11 +153,11 @@ const App = function () {
         goBack: function () {
             history.back();
         },
-        goto: function (url) {
+        goto: function (url, preserveParameters = false) {
             if (url[0] === "/") {
-                return goto(baseUrl + url)
+                return goto(baseUrl + url, preserveParameters)
             } else {
-                return goto(url);
+                return goto(url, preserveParameters);
             }
         }
     };

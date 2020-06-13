@@ -6,7 +6,7 @@ import ar.edu.itba.paw.interfaces.services.*;
 import ar.edu.itba.paw.interfaces.services.exceptions.*;
 import ar.edu.itba.paw.models.*;
 import ar.edu.itba.paw.services.generics.GenericServiceImpl;
-import org.joda.time.DateTime;
+import org.joda.time.LocalDateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -35,7 +35,7 @@ public class AppointmentServiceImpl extends GenericServiceImpl<AppointmentDao, A
     }
 
     @Override
-    public List<Appointment> findByStaffs(List<Staff> staffs){
+    public List<Appointment> findByStaffs(List<Staff> staffs) {
         return this.repository.findByStaffs(staffs);
     }
 
@@ -50,37 +50,37 @@ public class AppointmentServiceImpl extends GenericServiceImpl<AppointmentDao, A
     }
 
     @Override
-    public List<Appointment> findByPatientsFromDate(List<Patient> patients, DateTime from) {
+    public List<Appointment> findByPatientsFromDate(List<Patient> patients, LocalDateTime from) {
         return this.repository.findByPatientsFromDate(patients, from);
     }
 
-        @Override
-    public List<Appointment> findToday(List<Staff> staffs){
-        return this.findByStaffsAndDay(staffs, DateTime.now());
+    @Override
+    public List<Appointment> findToday(List<Staff> staffs) {
+        return this.findByStaffsAndDay(staffs, LocalDateTime.now());
     }
 
     @Override
-    public List<Appointment> findToday(Patient patient){
-        return this.repository.findByDate(patient, DateTime.now());
+    public List<Appointment> findToday(Patient patient) {
+        return this.repository.findByDate(patient, LocalDateTime.now());
     }
 
     @Override
-    public List<Appointment> findByDay(Staff staff, DateTime date){
+    public List<Appointment> findByDay(Staff staff, LocalDateTime date) {
         return this.repository.findByStaffsAndDate(Collections.singletonList(staff), date);
     }
 
     @Override
-    public List<Appointment> findByStaffsAndDay(List<Staff> staffs, DateTime date){
+    public List<Appointment> findByStaffsAndDay(List<Staff> staffs, LocalDateTime date) {
         return this.repository.findByStaffsAndDate(staffs, date);
     }
 
     @Override
-    public List<Appointment> findByStaffsAndDay(List<Staff> staffs, DateTime from, DateTime to){
+    public List<Appointment> findByStaffsAndDay(List<Staff> staffs, LocalDateTime from, LocalDateTime to) {
         return this.repository.findByStaffsAndDate(staffs, from, to);
     }
 
     @Override
-    public List<Appointment> findByPatientsAndDay(List<Patient> patients, DateTime date){
+    public List<Appointment> findByPatientsAndDay(List<Patient> patients, LocalDateTime date) {
         return this.repository.findByPatientsAndDate(patients, date);
     }
 
@@ -89,33 +89,33 @@ public class AppointmentServiceImpl extends GenericServiceImpl<AppointmentDao, A
             AppointmentAlreadyCancelledException,
             InvalidAppointmentStatusChangeException,
             AppointmentAlreadyCompletedException {
-        if (appointment.getAppointmentStatus().equals(status.name()))
+        if (appointment.getAppointmentStatus().equals(status))
             return;
 
-        if (appointment.getAppointmentStatus().equals(AppointmentStatus.CANCELLED.name())) {
+        if (appointment.getAppointmentStatus().equals(AppointmentStatus.CANCELLED)) {
             throw new AppointmentAlreadyCancelledException();
-        } else if (appointment.getAppointmentStatus().equals(AppointmentStatus.COMPLETE.name())) {
+        } else if (appointment.getAppointmentStatus().equals(AppointmentStatus.COMPLETE)) {
             throw new AppointmentAlreadyCompletedException();
-        } else if (!this.isValidStatusChange(appointment.getAppointmentStatus(), status.name())) {
-            throw new InvalidAppointmentStatusChangeException(appointment.getAppointmentStatus(), status.name());
+        } else if (!this.isValidStatusChange(appointment.getAppointmentStatus(), status)) {
+            throw new InvalidAppointmentStatusChangeException(appointment.getAppointmentStatus().name(), status.name());
         }
 
-        appointment.setAppointmentStatus(status.name());
+        appointment.setAppointmentStatus(status);
         this.repository.update(appointment);
     }
 
     public Appointment create(Appointment model) throws InvalidAppointmentDateException {
-        if(model.getFromDate().getMinuteOfHour() % 15 != 0)
+        if (model.getFromDate().getMinuteOfHour() % 15 != 0)
             throw new InvalidMinutesException();
         if (!this.isValidDate(model.getStaff(), model.getFromDate()))
             throw new InvalidAppointmentDateException();
 
-        model.setAppointmentStatus(AppointmentStatus.PENDING.name());
+        model.setAppointmentStatus(AppointmentStatus.PENDING);
 
         List<Appointment> appointments = this.findByDay(model.getStaff(), model.getFromDate());
-        for (Appointment appointment : appointments){
+        for (Appointment appointment : appointments) {
             if (model.getFromDate().isAfter(appointment.getFromDate()) && model.getFromDate().isBefore(appointment.getToDate())
-                    || (model.getToDate().isAfter(appointment.getFromDate()) && model.getToDate().isBefore(appointment.getToDate()))){
+                    || (model.getToDate().isAfter(appointment.getFromDate()) && model.getToDate().isBefore(appointment.getToDate()))) {
                 throw new MediCareException("Workday date overlaps with an existing one");
             }
         }
@@ -123,16 +123,16 @@ public class AppointmentServiceImpl extends GenericServiceImpl<AppointmentDao, A
     }
 
     @Override
-    public List<AppointmentTimeSlot> findAvailableTimeslots(Staff staff, DateTime fromDate, DateTime toDate) {
-        DateTime now = DateTime.now();
+    public List<AppointmentTimeSlot> findAvailableTimeslots(Staff staff, LocalDateTime fromDate, LocalDateTime toDate) {
+        LocalDateTime now = LocalDateTime.now();
         List<AppointmentTimeSlot> appointmentTimeSlots = new LinkedList<>();
         if (now.isAfter(fromDate)) {
             fromDate = now;
         }
         int hour = fromDate.getHourOfDay();
         int minute = fromDate.getMinuteOfHour();
-        minute = (int)Math.ceil((double)minute/Appointment.DURATION) * Appointment.DURATION;
-        if(minute == 60) {
+        minute = (int) Math.ceil((double) minute / Appointment.DURATION) * Appointment.DURATION;
+        if (minute == 60) {
             hour += 1;
             minute = 0;
             if (hour == 24) {
@@ -151,10 +151,15 @@ public class AppointmentServiceImpl extends GenericServiceImpl<AppointmentDao, A
                     startHour = fromDate.getHourOfDay();
                     firstStartMinute = fromDate.getMinuteOfHour();
                 }
+                firstStartMinute = (int) Math.ceil((double) firstStartMinute / Appointment.DURATION) * Appointment.DURATION;
+                if(firstStartMinute == 60){
+                    firstStartMinute = 0;
+                    startHour++;
+                }
                 for (int ihour = startHour; ihour <= workday.getEndHour(); ihour++) {
 
                     int startMinute = 0;
-                    if(ihour == startHour){
+                    if (ihour == startHour) {
                         startMinute = firstStartMinute;
                     }
                     int endMinute = 60;
@@ -163,13 +168,12 @@ public class AppointmentServiceImpl extends GenericServiceImpl<AppointmentDao, A
                     }
                     for (int imin = startMinute; imin < endMinute; imin += Appointment.DURATION) {
                         AppointmentTimeSlot appointmentTimeSlot = new AppointmentTimeSlot();
-                        appointmentTimeSlot.setDate(new DateTime(
+                        appointmentTimeSlot.setDate(new LocalDateTime(
                                 fromDate.getYear(),
                                 fromDate.getMonthOfYear(),
                                 fromDate.getDayOfMonth(),
                                 ihour,
-                                imin,
-                                fromDate.getZone()
+                                imin
                         ));
                         appointmentTimeSlots.add(appointmentTimeSlot);
                     }
@@ -182,14 +186,14 @@ public class AppointmentServiceImpl extends GenericServiceImpl<AppointmentDao, A
                 });
             }
             fromDate = fromDate.plusDays(1);
-            fromDate = fromDate.withTime(0,0,0,0);
+            fromDate = fromDate.withTime(0, 0, 0, 0);
         }
         return appointmentTimeSlots;
     }
 
     @Override
-    public List<AppointmentTimeSlot> findAvailableTimeslots(Staff staff, DateTime date) {
-        return this.findAvailableTimeslots(staff, date, date.withTime(23,59,59,999));
+    public List<AppointmentTimeSlot> findAvailableTimeslots(Staff staff, LocalDateTime date) {
+        return this.findAvailableTimeslots(staff, date, date.withTime(23, 59, 59, 999));
     }
 
     @Override
@@ -197,21 +201,20 @@ public class AppointmentServiceImpl extends GenericServiceImpl<AppointmentDao, A
         return this.repository;
     }
 
-    private boolean isValidStatusChange(String appointmentStatus, String newStatus) {
-        if (appointmentStatus.equals(AppointmentStatus.PENDING.name())) {
-            return newStatus.equals(AppointmentStatus.WAITING.name()) || newStatus.equals(AppointmentStatus.CANCELLED.name());
-        } else if (appointmentStatus.equals(AppointmentStatus.WAITING.name())) {
-            return newStatus.equals(AppointmentStatus.SEEN.name()) || newStatus.equals(AppointmentStatus.CANCELLED.name());
-        } else if (appointmentStatus.equals(AppointmentStatus.SEEN.name())) {
-            return newStatus.equals(AppointmentStatus.COMPLETE.name());
+    private boolean isValidStatusChange(AppointmentStatus appointmentStatus, AppointmentStatus newStatus) {
+        if (appointmentStatus.equals(AppointmentStatus.PENDING)) {
+            return newStatus.equals(AppointmentStatus.WAITING) || newStatus.equals(AppointmentStatus.CANCELLED);
+        } else if (appointmentStatus.equals(AppointmentStatus.WAITING)) {
+            return newStatus.equals(AppointmentStatus.SEEN) || newStatus.equals(AppointmentStatus.CANCELLED);
+        } else if (appointmentStatus.equals(AppointmentStatus.SEEN)) {
+            return newStatus.equals(AppointmentStatus.COMPLETE);
         }
         return false;
     }
 
-    private boolean isValidDate(Staff staff, DateTime fromDate) {
+    private boolean isValidDate(Staff staff, LocalDateTime fromDate) {
         AppointmentTimeSlot appointmentTimeSlot = new AppointmentTimeSlot();
         appointmentTimeSlot.setDate(fromDate);
-
         if (!this.workdayService.isStaffWorking(staff, appointmentTimeSlot))
             return false;
         return this.findAvailableTimeslots(staff, fromDate).contains(appointmentTimeSlot);

@@ -1,18 +1,32 @@
 package ar.edu.itba.paw.models;
 
-import ar.edu.itba.paw.persistenceAnnotations.Column;
-import ar.edu.itba.paw.persistenceAnnotations.Table;
 import org.joda.time.DateTime;
 
-@Table(name = "users", primaryKey = "users_id")
+import javax.persistence.*;
+
+@Entity
+@Table(
+        name = "users",
+        indexes = {
+                @Index(columnList = "users_id", name = "user_users_id_uindex", unique = true),
+                @Index(columnList = "email", name = "user_email_uindex", unique = true),
+                @Index(columnList = "token", name = "users_token_uindex", unique = true),
+                @Index(columnList = "email", name = "user_email_uindex", unique = true),
+        }
+)
 public class User extends GenericModel<Integer> {
-    @Column(name = "email", required = true)
+    @Id
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "users_users_id_seq")
+    @SequenceGenerator(sequenceName = "users_users_id_seq", name = "users_users_id_seq", allocationSize = 1)
+    @Column(name = "users_id")
+    private Integer id;
+    @Column(name = "email", nullable = false)
     private String email;
-    @Column(name = "password", required = true)
+    @Column(name = "password", nullable = false)
     private String password;
-    @Column(name = "first_name", required = true)
+    @Column(name = "first_name", nullable = false)
     private String firstName;
-    @Column(name = "surname", required = true)
+    @Column(name = "surname", nullable = false)
     private String surname;
     @Column(name = "verified")
     private Boolean verified = false;
@@ -20,10 +34,29 @@ public class User extends GenericModel<Integer> {
     private String token;
     @Column(name = "token_created_date")
     private DateTime tokenCreatedDate;
-    @Column(name = "profile_id")
-    private Integer profileId;
+    @JoinColumn(name = "profile_id")
+    @ManyToOne(fetch = FetchType.EAGER)
+    private Picture profilePicture;
     @Column(name = "phone")
     private String phone;
+
+    @Override
+    public Integer getId() {
+        return this.id;
+    }
+
+    @Override
+    public void setId(Integer id) {
+        this.id = id;
+    }
+
+    public Picture getProfilePicture() {
+        return this.profilePicture;
+    }
+
+    public void setProfilePicture(Picture profilePicture) {
+        this.profilePicture = profilePicture;
+    }
 
     public String getEmail() {
         return this.email;
@@ -85,16 +118,8 @@ public class User extends GenericModel<Integer> {
         this.tokenCreatedDate = tokenCreatedDate;
     }
 
-    public Integer getProfileId() {
-        return this.profileId;
-    }
-
-    public void setProfileId(Integer profileId) {
-        this.profileId = profileId;
-    }
-
     public String getPhone() {
-        return phone;
+        return this.phone;
     }
 
     public void setPhone(String phone) {
