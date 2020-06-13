@@ -79,7 +79,7 @@
                     <c:forEach var="i" begin="0" end="6">
                         <td class="px-0">
                             <!-- day of the week -->
-                            <span class="medicare-day-span container px-0 mx-2 d-flex flex-column align-items-center"
+                            <span class="medicare-day-span container px-0 mx-2 d-flex flex-column align-items-center text-center"
                                   data-day="<c:out value="${monday.plusDays(i)}"/>"
                                   <c:if test="${monday.plusDays(i).dayOfYear == today.dayOfYear && monday.plusDays(i).year == today.year}">style="font-weight:bold"</c:if>>
                                 <p class="mb-0">
