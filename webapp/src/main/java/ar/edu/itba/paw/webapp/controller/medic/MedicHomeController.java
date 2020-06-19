@@ -19,7 +19,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import java.time.format.DateTimeParseException;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 
@@ -276,6 +275,44 @@ public class MedicHomeController extends GenericController {
         this.appointmentService.remove(appointment.get()); // TODO: all the logic above should be done inside service
         createCancelEvent(request, user.get(), appointment.get());
         return new ModelAndView("redirect:/staff/home" + query);
+    }
+
+    @RequestMapping(value = "/staff/profile/specialty/{specialtyId}", method = RequestMethod.POST)
+    public ModelAndView addSpecialty(@PathVariable("specialtyId") final int specialtyId) {
+        Optional<User> user = this.getUser();
+        if (!user.isPresent()) {
+            return new ModelAndView("redirect:/login");
+        }
+        List<Staff> staffs = this.staffService.findByUser(user.get());
+        Optional<StaffSpecialty> staffSpecialty = this.staffSpecialtyService.findById(specialtyId);
+        if(staffSpecialty.isPresent()) {
+            for (Staff staff : staffs) {
+                if(!staff.getStaffSpecialties().contains(staffSpecialty.get())) {
+                    staff.getStaffSpecialties().add(staffSpecialty.get());
+                    staffService.update(staff);
+                }
+            }
+        }
+
+        return new ModelAndView("redirect:/staff/profile");
+    }
+
+    @RequestMapping(value = "/staff/profile/specialty/delete/{specialtyId}", method = RequestMethod.POST)
+    public ModelAndView deleteSpecialty(@PathVariable("specialtyId") final int specialtyId) {
+        Optional<User> user = this.getUser();
+        if (!user.isPresent()) {
+            return new ModelAndView("redirect:/login");
+        }
+        List<Staff> staffs = this.staffService.findByUser(user.get());
+        Optional<StaffSpecialty> staffSpecialty = this.staffSpecialtyService.findById(specialtyId);
+        if(staffSpecialty.isPresent()) {
+            for (Staff staff : staffs) {
+                staff.getStaffSpecialties().remove(staffSpecialty.get());
+                staffService.update(staff);
+            }
+        }
+
+        return new ModelAndView("redirect:/staff/profile");
     }
 
     private void createConfirmationEvent(HttpServletRequest request, User user) {
