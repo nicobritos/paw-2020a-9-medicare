@@ -147,6 +147,27 @@
                         </div>
                     </div>
                 </div>
+                <div class="row mb-3">
+                    <h3><spring:message code="Specialties"/></h3>
+                    <c:forEach var="staff" items="${staffs}">
+                        <c:forEach var="specialty" items="${staff.staffSpecialties}">
+                            <div class="container p-0 m-0 pl-3">
+                                <div class="row d-flex align-items-center justify-content-between">
+                                    <p class="m-0"><c:out value="${specialty.name}"/></p>
+                                    <form action="<c:url value="/staff/profile/specialty/delete/${specialty.id}"/>"
+                                          method="post" class="cancel-specialty-form">
+                                        <button class="btn cancel-specialty-btn" type="button">X</button>
+                                    </form>
+                                </div>
+                            </div>
+                        </c:forEach>
+                    </c:forEach>
+                </div>
+                <%-- TODO: MAKE A MODAL POP UP WHEN CLICKED--%>
+<%--                <div class="row d-flex align-items-center justify-content-center my-3">--%>
+<%--                    <c:url value="/staff/profile/specialty/${selectedSpecialtyId}" var="addSpecialtyUrl"/>--%>
+<%--                    <a href="" type="button" class="btn btn-info"><spring:message code="AddSpecialty"/></a>--%>
+<%--                </div>--%>
             </div>
         </div>
         <div class="col-2">
@@ -154,9 +175,12 @@
     </div>
 </div>
 <script type="text/javascript">
-    let strings = new Array();
-    strings['title'] = "<spring:message code='YouAreAboutToCancelAWorkday' javaScriptEscape='true' />";
-    strings['body'] = "<spring:message code='DoYouWantToContinue' javaScriptEscape='true' />";
+    let workday_strings = new Array();
+    workday_strings['title'] = "<spring:message code='YouAreAboutToCancelAWorkday' javaScriptEscape='true' />";
+    workday_strings['body'] = "<spring:message code='DoYouWantToContinue' javaScriptEscape='true' />";
+    let specialty_strings = new Array();
+    specialty_strings['title'] = "<spring:message code='YouAreAboutToDeleteASpecialty' javaScriptEscape='true' />";
+    specialty_strings['body'] = "<spring:message code='DoYouWantToContinue' javaScriptEscape='true' />";
 </script>
 <script src='<c:url value="/js/scripts/Profile.js"/> '></script>
 <script>
