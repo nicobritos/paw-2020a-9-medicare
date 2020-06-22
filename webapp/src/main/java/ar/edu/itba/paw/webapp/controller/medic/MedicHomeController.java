@@ -5,6 +5,7 @@ import ar.edu.itba.paw.models.*;
 import ar.edu.itba.paw.webapp.controller.utils.GenericController;
 import ar.edu.itba.paw.webapp.events.events.AppointmentCancelEvent;
 import ar.edu.itba.paw.webapp.events.events.UserConfirmationTokenGenerationEvent;
+import ar.edu.itba.paw.webapp.form.SpecialtyForm;
 import ar.edu.itba.paw.webapp.form.UserProfileForm;
 import ar.edu.itba.paw.webapp.form.WorkdayForm;
 import org.joda.time.LocalDateTime;
@@ -277,14 +278,20 @@ public class MedicHomeController extends GenericController {
         return new ModelAndView("redirect:/staff/home" + query);
     }
 
-    @RequestMapping(value = "/staff/profile/specialty/{specialtyId}", method = RequestMethod.POST)
-    public ModelAndView addSpecialty(@PathVariable("specialtyId") final int specialtyId) {
+    @RequestMapping(value = "/staff/profile/specialty", method = RequestMethod.POST)
+    public ModelAndView addSpecialtyAction(@Valid @ModelAttribute("specialtyForm") final SpecialtyForm form, final BindingResult errors, HttpServletRequest request, HttpServletResponse response) {
         Optional<User> user = this.getUser();
         if (!user.isPresent()) {
             return new ModelAndView("redirect:/login");
         }
+
+        if (errors.hasErrors()) {
+            return this.addSpecialty(form);
+        }
+
+        ModelAndView mav = new ModelAndView();
         List<Staff> staffs = this.staffService.findByUser(user.get());
-        Optional<StaffSpecialty> staffSpecialty = this.staffSpecialtyService.findById(specialtyId);
+        Optional<StaffSpecialty> staffSpecialty = this.staffSpecialtyService.findById(form.getSpecialtyId());
         if(staffSpecialty.isPresent()) {
             for (Staff staff : staffs) {
                 if(!staff.getStaffSpecialties().contains(staffSpecialty.get())) {
@@ -293,8 +300,29 @@ public class MedicHomeController extends GenericController {
                 }
             }
         }
+        mav.addObject("user", user);
+        if (this.isStaff()) {
+            mav.addObject("staffs", this.staffService.findByUser(user.get()));
+        }
+        mav.setViewName("redirect:/staff/profile");
+        return mav;
+    }
 
-        return new ModelAndView("redirect:/staff/profile");
+    @RequestMapping(value = "/staff/profile/specialty", method = RequestMethod.GET)
+    public ModelAndView addSpecialty(@ModelAttribute("specialtyForm") final SpecialtyForm form) {
+        Optional<User> user = this.getUser();
+        if (!user.isPresent()) {
+            return new ModelAndView("redirect:/login");
+        }
+
+        ModelAndView mav = new ModelAndView();
+        mav.addObject("user", user);
+        if (this.isStaff()) {
+            mav.addObject("staffs", this.staffService.findByUser(user.get()));
+        }
+        mav.addObject("specialties", staffSpecialtyService.list());
+        mav.setViewName("medic/addSpecialty");
+        return mav;
     }
 
     @RequestMapping(value = "/staff/profile/specialty/delete/{specialtyId}", method = RequestMethod.POST)

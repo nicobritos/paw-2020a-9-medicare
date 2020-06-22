@@ -163,11 +163,10 @@
                         </c:forEach>
                     </c:forEach>
                 </div>
-                <%-- TODO: MAKE A MODAL POP UP WHEN CLICKED--%>
-<%--                <div class="row d-flex align-items-center justify-content-center my-3">--%>
-<%--                    <c:url value="/staff/profile/specialty/${selectedSpecialtyId}" var="addSpecialtyUrl"/>--%>
-<%--                    <a href="" type="button" class="btn btn-info"><spring:message code="AddSpecialty"/></a>--%>
-<%--                </div>--%>
+                <div class="row d-flex align-items-center justify-content-center my-3">
+                    <c:url value="/staff/profile/specialty" var="addSpecialtyUrl"/>
+                    <a href="${addSpecialtyUrl}" type="button" class="btn btn-info"><spring:message code="AddSpecialty"/></a>
+                </div>
             </div>
         </div>
         <div class="col-2">
