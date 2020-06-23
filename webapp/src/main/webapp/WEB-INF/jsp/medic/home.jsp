@@ -13,6 +13,11 @@
         <div class="col-4 h-100 pl-0 mr-3 w-100">
             <h4><spring:message code="AgendaFor"/> <spring:message code="today"/></h4>
             <ul class="list-group turno-list mr-2 w-100 h-100 overflow-auto">
+                <c:if test="${todayAppointments.isEmpty()}">
+                    <div class="container-fluid justify-content-center">
+                        <p class="text-left mt-4" style="color:grey;"><spring:message code="NoAppointmentsToday"/></p>
+                    </div>
+                </c:if>
                 <c:forEach var="appointment" items="${todayAppointments}">
                     <li class="list-group-item turno-item mb-3" id="lit">
                         <div class="container">
@@ -155,6 +160,11 @@
                     <td colspan="9">
                         <div class="container-fluid d-flex justify-content-center">
                             <ul class="list-group turno-list mr-2 w-50 overflow-auto">
+                                <c:if test="${weekAppointments.get(today.dayOfWeek).isEmpty()}">
+                                    <div class="container-fluid justify-content-center">
+                                        <p class="text-center mt-4" style="color:grey;"><spring:message code="NoAppointmentsThisDay"/></p>
+                                    </div>
+                                </c:if>
                                 <c:forEach var="appointment" items="${weekAppointments.get(today.dayOfWeek)}">
                                     <li class="list-group-item turno-item mb-3">
                                         <div class="container">
