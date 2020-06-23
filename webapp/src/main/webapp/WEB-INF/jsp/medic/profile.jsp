@@ -111,39 +111,37 @@
                                     <p class="text-center mt-2" style="color:grey;"><spring:message code="NoSchedule"/></p>
                                 </div>
                             </c:if>
-                            <c:forEach var="staff" items="${staffs}">
-                                <c:forEach var="workday" items="${workdays}">
-                                    <p class="m-0">- <c:choose>
-                                        <%-- TODO: maybe use spring:message directly instead of with choose --%>
-                                        <c:when test="${workday.day == 'MONDAY'}"><spring:message
-                                                code="Monday"/></c:when>
-                                        <c:when test="${workday.day == 'TUESDAY'}"><spring:message
-                                                code="Tuesday"/></c:when>
-                                        <c:when test="${workday.day == 'WEDNESDAY'}"><spring:message
-                                                code="Wednesday"/></c:when>
-                                        <c:when test="${workday.day == 'THURSDAY'}"><spring:message
-                                                code="Thursday"/></c:when>
-                                        <c:when test="${workday.day == 'FRIDAY'}"><spring:message
-                                                code="Friday"/></c:when>
-                                        <c:when test="${workday.day == 'SATURDAY'}"><spring:message
-                                                code="Saturday"/></c:when>
-                                        <c:when test="${workday.day == 'SUNDAY'}"><spring:message
-                                                code="Sunday"/></c:when>
-                                        <c:otherwise>${workday.day}</c:otherwise>
-                                    </c:choose> <spring:message code="of"/> <c:if
-                                            test="${workday.startHour < 10}">0</c:if><c:out
-                                            value="${workday.startHour}"/>:<c:if
-                                            test="${workday.startMinute < 10}">0</c:if><c:out
-                                            value="${workday.startMinute}hs a "/><c:if
-                                            test="${workday.endHour < 10}">0</c:if><c:out
-                                            value="${workday.endHour}:"/><c:if
-                                            test="${workday.endMinute < 10}">0</c:if><c:out
-                                            value="${workday.endMinute}hs - ${workday.staff.office.name}"/></p>
-                                    <form action="<c:url value="/staff/profile/workday/delete/${workday.id}"/>"
-                                          method="post" class="cancel-workday-form">
-                                        <button class="btn cancel-workday-btn" type="button">X</button>
-                                    </form>
-                                </c:forEach>
+                            <c:forEach var="workday" items="${workdays}">
+                                <p class="m-0">- <c:choose>
+                                    <%-- TODO: maybe use spring:message directly instead of with choose --%>
+                                    <c:when test="${workday.day == 'MONDAY'}"><spring:message
+                                            code="Monday"/></c:when>
+                                    <c:when test="${workday.day == 'TUESDAY'}"><spring:message
+                                            code="Tuesday"/></c:when>
+                                    <c:when test="${workday.day == 'WEDNESDAY'}"><spring:message
+                                            code="Wednesday"/></c:when>
+                                    <c:when test="${workday.day == 'THURSDAY'}"><spring:message
+                                            code="Thursday"/></c:when>
+                                    <c:when test="${workday.day == 'FRIDAY'}"><spring:message
+                                            code="Friday"/></c:when>
+                                    <c:when test="${workday.day == 'SATURDAY'}"><spring:message
+                                            code="Saturday"/></c:when>
+                                    <c:when test="${workday.day == 'SUNDAY'}"><spring:message
+                                            code="Sunday"/></c:when>
+                                    <c:otherwise>${workday.day}</c:otherwise>
+                                </c:choose> <spring:message code="of"/> <c:if
+                                        test="${workday.startHour < 10}">0</c:if><c:out
+                                        value="${workday.startHour}"/>:<c:if
+                                        test="${workday.startMinute < 10}">0</c:if><c:out
+                                        value="${workday.startMinute}hs a "/><c:if
+                                        test="${workday.endHour < 10}">0</c:if><c:out
+                                        value="${workday.endHour}:"/><c:if
+                                        test="${workday.endMinute < 10}">0</c:if><c:out
+                                        value="${workday.endMinute}hs - ${workday.staff.office.name}"/></p>
+                                <form action="<c:url value="/staff/profile/workday/delete/${workday.id}"/>"
+                                      method="post" class="cancel-workday-form">
+                                    <button class="btn cancel-workday-btn" type="button">X</button>
+                                </form>
                             </c:forEach>
                         </div>
                         <div class="row d-flex align-items-center justify-content-center my-3">
@@ -154,24 +152,21 @@
                 </div>
                 <div class="row mb-3">
                     <h3><spring:message code="Specialties"/></h3>
-
-                    <c:forEach var="staff" items="${staffs}">
-                        <c:if test="${staff.staffSpecialties.isEmpty()}">
-                            <div class="container-fluid justify-content-center">
-                                <p class="text-center mt-2" style="color:grey;"><spring:message code="NoSpecialties"/></p>
+                    <c:if test="${specialties.isEmpty()}">
+                        <div class="container-fluid justify-content-center">
+                            <p class="text-center mt-2" style="color:grey;"><spring:message code="NoSpecialties"/></p>
+                        </div>
+                    </c:if>
+                    <c:forEach var="specialty" items="${specialties}">
+                        <div class="container p-0 m-0 pl-3">
+                            <div class="row d-flex align-items-center justify-content-between">
+                                <p class="m-0"><c:out value="${specialty.name}"/></p>
+                                <form action="<c:url value="/staff/profile/specialty/delete/${specialty.id}"/>"
+                                      method="post" class="cancel-specialty-form">
+                                    <button class="btn cancel-specialty-btn" type="button">X</button>
+                                </form>
                             </div>
-                        </c:if>
-                        <c:forEach var="specialty" items="${staff.staffSpecialties}">
-                            <div class="container p-0 m-0 pl-3">
-                                <div class="row d-flex align-items-center justify-content-between">
-                                    <p class="m-0"><c:out value="${specialty.name}"/></p>
-                                    <form action="<c:url value="/staff/profile/specialty/delete/${specialty.id}"/>"
-                                          method="post" class="cancel-specialty-form">
-                                        <button class="btn cancel-specialty-btn" type="button">X</button>
-                                    </form>
-                                </div>
-                            </div>
-                        </c:forEach>
+                        </div>
                     </c:forEach>
                 </div>
                 <div class="row d-flex align-items-center justify-content-center my-3">

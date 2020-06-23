@@ -20,6 +20,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import java.time.format.DateTimeParseException;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -104,7 +106,13 @@ public class MedicHomeController extends GenericController {
         ModelAndView mav = new ModelAndView();
         mav.addObject("user", user);
         if (this.isStaff()) {
-            mav.addObject("staffs", this.staffService.findByUser(user.get()));
+            List<Staff> staffs = this.staffService.findByUser(user.get());
+            mav.addObject("staffs", staffs);
+            if(!staffs.isEmpty()){
+                mav.addObject("specialties", staffs.get(0).getStaffSpecialties());
+            } else {
+                mav.addObject("specialties", Collections.emptyList());
+            }
             mav.addObject("workdays", this.workdayService.findByUser(user.get()));
         }
         mav.setViewName("medic/profile");
