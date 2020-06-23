@@ -35,13 +35,20 @@
                 </div>
             </div>
             <div class="row mt-3 pl-4">
-                <p><spring:message code="Address"/>: <c:out
+                <p class="m-0"><b><spring:message code="Address"/>:</b> <c:out
                         value="${staff.office.street} - ${staff.office.locality.name}"/></p>
+                <a
+                    class="link"
+                    href="https://www.google.com/maps/search/?api=1&query=${staff.office.locality.name},${staff.office.street}"
+                    target="_blank"
+                >
+                    <small class="m-1"><spring:message code="SeeInGoogleMaps"/></small>
+                </a>
             </div>
             <c:choose>
                 <c:when test="${(staff.user.phone != null && !staff.user.phone.isEmpty()) || (staff.office.phone != null && !staff.office.phone.isEmpty())}">
-                    <div class="row pl-4">
-                        <p><spring:message code="Phones"/>:</p>
+                    <div class="row mt-3 pl-4">
+                        <p><b><spring:message code="Phones"/>:</b></p>
                     </div>
                     <ul>
                         <c:if test="${staff.user.phone != null && !staff.user.phone.isEmpty()}">
@@ -53,13 +60,13 @@
                     </ul>
                 </c:when>
                 <c:otherwise>
-                    <div class="row pl-4">
-                        <p><spring:message code="Phones"/>: <spring:message code="UserWithNoPhones"/></p>
+                    <div class="row mt-3 pl-4">
+                        <p><b><spring:message code="Phones"/>:</b> <spring:message code="UserWithNoPhones"/></p>
                     </div>
                 </c:otherwise>
             </c:choose>
-            <div class="row pl-4">
-                <p><spring:message code="Email"/>: ${staff.email}</p>
+            <div class="row mt-3 pl-4">
+                <p><b><spring:message code="Email"/>:</b> ${staff.email}</p>
             </div>
         </div>
         <div class="col ml-5 mt-3 p-0">

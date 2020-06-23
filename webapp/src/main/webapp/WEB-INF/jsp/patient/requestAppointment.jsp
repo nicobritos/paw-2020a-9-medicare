@@ -112,8 +112,14 @@
                         <img src='<c:url value="/img/mapIcon.svg"/> ' class="w-75" alt="map icon">
                     </div>
                     <div class="col p-0">
-                        <p class="m-0 white-text"><c:out value="${staff.office.street}"/></p>
-                        <small class="white-text"><c:out value="${staff.office.locality.name}"/></small>
+                        <p class="m-0 white-text"><c:out value="${staff.office.street} - ${staff.office.locality.name}"/></p>
+                        <a
+                                class="link"
+                                href="https://www.google.com/maps/search/?api=1&query=${staff.office.locality.name},${staff.office.street}"
+                                target="_blank"
+                        >
+                            <small class="white-text m-0"><spring:message code="SeeInGoogleMaps"/></small>
+                        </a>
                     </div>
                 </div>
             </div>

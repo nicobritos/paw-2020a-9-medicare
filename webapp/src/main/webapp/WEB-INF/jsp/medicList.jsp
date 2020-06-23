@@ -123,17 +123,16 @@
                                                 </c:forEach>
                                             </p>
                                         </div>
+                                        <div class="row">
+                                            <p class="m-0"><c:out value="${member.office.street}"/> - <c:out value="${member.office.locality.name}"/></p>
+                                        </div>
                                         <a
-                                                class="link"
-                                                href="https://www.google.com/maps/search/?api=1&query=${member.office.locality.name},${member.office.street}"
+                                            class="link"
+                                            href="https://www.google.com/maps/search/?api=1&query=${member.office.locality.name},${member.office.street}"
+                                            target="_blank"
                                         >
-
                                             <div class="row">
-                                                <i class="fa fa-map-marker" style="color:grey;"></i>
-                                                <p class="m-0"><c:out value="${member.office.street}"/></p>
-                                            </div>
-                                            <div class="row">
-                                                <p class="m-0"><c:out value="${member.office.locality.name}"/></p>
+                                                <small class="m-0"><spring:message code="SeeInGoogleMaps"/></small>
                                             </div>
                                         </a>
                                     </div>
