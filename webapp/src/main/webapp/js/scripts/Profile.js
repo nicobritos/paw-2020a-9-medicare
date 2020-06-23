@@ -51,8 +51,22 @@ const Profile = function () {
         $( ".cancel-workday-form" ).each( function( index, element ){
             $(element).children('.cancel-workday-btn').click(function () {
                 Modal.confirm({
-                    title: strings['title'],
-                    body: strings['body'],
+                    title: workday_strings['title'],
+                    body: workday_strings['body'],
+                    callbacks: {
+                        confirm: function () {
+                            element.submit();
+                        }
+                    }
+                });
+            });
+        })
+
+        $( ".cancel-specialty-form" ).each( function( index, element ){
+            $(element).children('.cancel-specialty-btn').click(function () {
+                Modal.confirm({
+                    title: specialty_strings['title'],
+                    body: specialty_strings['body'],
                     callbacks: {
                         confirm: function () {
                             element.submit();

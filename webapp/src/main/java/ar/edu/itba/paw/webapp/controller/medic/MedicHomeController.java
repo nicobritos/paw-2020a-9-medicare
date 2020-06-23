@@ -5,6 +5,7 @@ import ar.edu.itba.paw.models.*;
 import ar.edu.itba.paw.webapp.controller.utils.GenericController;
 import ar.edu.itba.paw.webapp.events.events.AppointmentCancelEvent;
 import ar.edu.itba.paw.webapp.events.events.UserConfirmationTokenGenerationEvent;
+import ar.edu.itba.paw.webapp.form.SpecialtyForm;
 import ar.edu.itba.paw.webapp.form.UserProfileForm;
 import ar.edu.itba.paw.webapp.form.WorkdayForm;
 import org.joda.time.LocalDateTime;
@@ -19,7 +20,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import java.time.format.DateTimeParseException;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 
@@ -276,6 +276,71 @@ public class MedicHomeController extends GenericController {
         this.appointmentService.remove(appointment.get()); // TODO: all the logic above should be done inside service
         createCancelEvent(request, user.get(), appointment.get());
         return new ModelAndView("redirect:/staff/home" + query);
+    }
+
+    @RequestMapping(value = "/staff/profile/specialty", method = RequestMethod.POST)
+    public ModelAndView addSpecialtyAction(@Valid @ModelAttribute("specialtyForm") final SpecialtyForm form, final BindingResult errors, HttpServletRequest request, HttpServletResponse response) {
+        Optional<User> user = this.getUser();
+        if (!user.isPresent()) {
+            return new ModelAndView("redirect:/login");
+        }
+
+        if (errors.hasErrors()) {
+            return this.addSpecialty(form);
+        }
+
+        ModelAndView mav = new ModelAndView();
+        List<Staff> staffs = this.staffService.findByUser(user.get());
+        Optional<StaffSpecialty> staffSpecialty = this.staffSpecialtyService.findById(form.getSpecialtyId());
+        if(staffSpecialty.isPresent()) {
+            for (Staff staff : staffs) {
+                if(!staff.getStaffSpecialties().contains(staffSpecialty.get())) {
+                    staff.getStaffSpecialties().add(staffSpecialty.get());
+                    staffService.update(staff);
+                }
+            }
+        }
+        mav.addObject("user", user);
+        if (this.isStaff()) {
+            mav.addObject("staffs", this.staffService.findByUser(user.get()));
+        }
+        mav.setViewName("redirect:/staff/profile");
+        return mav;
+    }
+
+    @RequestMapping(value = "/staff/profile/specialty", method = RequestMethod.GET)
+    public ModelAndView addSpecialty(@ModelAttribute("specialtyForm") final SpecialtyForm form) {
+        Optional<User> user = this.getUser();
+        if (!user.isPresent()) {
+            return new ModelAndView("redirect:/login");
+        }
+
+        ModelAndView mav = new ModelAndView();
+        mav.addObject("user", user);
+        if (this.isStaff()) {
+            mav.addObject("staffs", this.staffService.findByUser(user.get()));
+        }
+        mav.addObject("specialties", staffSpecialtyService.list());
+        mav.setViewName("medic/addSpecialty");
+        return mav;
+    }
+
+    @RequestMapping(value = "/staff/profile/specialty/delete/{specialtyId}", method = RequestMethod.POST)
+    public ModelAndView deleteSpecialty(@PathVariable("specialtyId") final int specialtyId) {
+        Optional<User> user = this.getUser();
+        if (!user.isPresent()) {
+            return new ModelAndView("redirect:/login");
+        }
+        List<Staff> staffs = this.staffService.findByUser(user.get());
+        Optional<StaffSpecialty> staffSpecialty = this.staffSpecialtyService.findById(specialtyId);
+        if(staffSpecialty.isPresent()) {
+            for (Staff staff : staffs) {
+                staff.getStaffSpecialties().remove(staffSpecialty.get());
+                staffService.update(staff);
+            }
+        }
+
+        return new ModelAndView("redirect:/staff/profile");
     }
 
     private void createConfirmationEvent(HttpServletRequest request, User user) {
