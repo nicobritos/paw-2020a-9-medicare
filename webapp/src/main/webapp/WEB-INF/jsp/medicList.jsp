@@ -123,12 +123,19 @@
                                                 </c:forEach>
                                             </p>
                                         </div>
-                                        <div class="row">
-                                            <p class="m-0"><c:out value="${member.office.street}"/></p>
-                                        </div>
-                                        <div class="row">
-                                            <p class="m-0"><c:out value="${member.office.locality.name}"/></p>
-                                        </div>
+                                        <a
+                                                class="link"
+                                                href="https://www.google.com/maps/search/?api=1&query=${member.office.locality.name},${member.office.street}"
+                                        >
+
+                                            <div class="row">
+                                                <i class="fa fa-map-marker" style="color:grey;"></i>
+                                                <p class="m-0"><c:out value="${member.office.street}"/></p>
+                                            </div>
+                                            <div class="row">
+                                                <p class="m-0"><c:out value="${member.office.locality.name}"/></p>
+                                            </div>
+                                        </a>
                                     </div>
                                     <div class="col d-flex justify-content-center align-items-center">
                                         <a href="<c:url value="/appointment/${member.id}/0"/>">
