@@ -106,6 +106,11 @@
                     <h3><spring:message code="Schedule"/></h3>
                     <div class="container p-0 m-0 pl-3">
                         <div class="row d-flex align-items-center justify-content-between">
+                            <c:if test="${workdays.isEmpty()}">
+                                <div class="container-fluid justify-content-center">
+                                    <p class="text-center mt-2" style="color:grey;"><spring:message code="NoSchedule"/></p>
+                                </div>
+                            </c:if>
                             <c:forEach var="staff" items="${staffs}">
                                 <c:forEach var="workday" items="${workdays}">
                                     <p class="m-0">- <c:choose>
@@ -149,7 +154,13 @@
                 </div>
                 <div class="row mb-3">
                     <h3><spring:message code="Specialties"/></h3>
+
                     <c:forEach var="staff" items="${staffs}">
+                        <c:if test="${staff.staffSpecialties.isEmpty()}">
+                            <div class="container-fluid justify-content-center">
+                                <p class="text-center mt-2" style="color:grey;"><spring:message code="NoSpecialties"/></p>
+                            </div>
+                        </c:if>
                         <c:forEach var="specialty" items="${staff.staffSpecialties}">
                             <div class="container p-0 m-0 pl-3">
                                 <div class="row d-flex align-items-center justify-content-between">

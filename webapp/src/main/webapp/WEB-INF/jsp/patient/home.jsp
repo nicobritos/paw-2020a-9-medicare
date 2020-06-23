@@ -16,6 +16,11 @@
     <div class="row h-100">
         <div class="col h-100 pl-0 mr-5 w-100">
             <ul class="list-group turno-list mr-2 w-100 h-100 overflow-auto">
+                <c:if test="${appointments.isEmpty()}">
+                    <div class="container-fluid justify-content-center">
+                        <p class="text-left mt-4" style="color:grey;"><spring:message code="NoAppointments"/></p>
+                    </div>
+                </c:if>
                 <c:forEach var="appointment" items="${appointments}">
                     <li class="list-group-item turno-item mb-3">
                         <div class="container">
