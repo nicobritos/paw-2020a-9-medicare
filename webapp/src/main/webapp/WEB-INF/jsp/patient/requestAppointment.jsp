@@ -66,8 +66,9 @@
                     <div class="col p-0">
                         <p class="m-0 white-text"><c:out value="${staff.user.firstName} ${staff.user.surname}"/></p>
                         <small class="white-text">
-                            <c:forEach var="specialty" items="${staff.staffSpecialties}">
+                            <c:forEach var="specialty" items="${staff.staffSpecialties}" varStatus="loop">
                                 <c:out value="${specialty.name} "/>
+                                <c:if test="${!loop.last}">,</c:if>
                             </c:forEach>
                         </small>
                     </div>

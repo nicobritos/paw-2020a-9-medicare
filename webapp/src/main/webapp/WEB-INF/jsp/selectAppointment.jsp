@@ -27,8 +27,9 @@
                     </div>
                     <div class="row mt-3 d-flex justify-content-start">
                         <p>
-                            <c:forEach items="${staff.staffSpecialties}" var="specialty">
+                            <c:forEach items="${staff.staffSpecialties}" var="specialty" varStatus="loop">
                                 <c:out value="${specialty.name} "/>
+                                <c:if test="${!loop.last}">,</c:if>
                             </c:forEach>
                         </p>
                     </div>

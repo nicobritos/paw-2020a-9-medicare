@@ -123,8 +123,9 @@
                                         </div>
                                         <div class="row">
                                             <p class="m-0">
-                                                <c:forEach var="specialty" items="${member.staffSpecialties}">
+                                                <c:forEach var="specialty" items="${member.staffSpecialties}" varStatus="loop">
                                                     <c:out value="${specialty.name}"/>
+                                                    <c:if test="${!loop.last}">,</c:if>
                                                 </c:forEach>
                                             </p>
                                         </div>
