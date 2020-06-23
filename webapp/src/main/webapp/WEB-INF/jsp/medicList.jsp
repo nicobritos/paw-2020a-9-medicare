@@ -124,11 +124,17 @@
                                             </p>
                                         </div>
                                         <div class="row">
-                                            <p class="m-0"><c:out value="${member.office.street}"/></p>
+                                            <p class="m-0"><c:out value="${member.office.street}"/> - <c:out value="${member.office.locality.name}"/></p>
                                         </div>
-                                        <div class="row">
-                                            <p class="m-0"><c:out value="${member.office.locality.name}"/></p>
-                                        </div>
+                                        <a
+                                            class="link"
+                                            href="https://www.google.com/maps/search/?api=1&query=${member.office.locality.name},${member.office.street}"
+                                            target="_blank"
+                                        >
+                                            <div class="row">
+                                                <small class="m-0"><spring:message code="SeeInGoogleMaps"/></small>
+                                            </div>
+                                        </a>
                                     </div>
                                     <div class="col d-flex justify-content-center align-items-center">
                                         <a href="<c:url value="/appointment/${member.id}/0"/>">
