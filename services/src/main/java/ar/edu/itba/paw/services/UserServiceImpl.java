@@ -90,8 +90,6 @@ public class UserServiceImpl extends GenericSearchableServiceImpl<UserDao, User,
 
         Staff staff = new Staff();
         staff.setEmail(newUser.getEmail());
-        staff.setFirstName(newUser.getFirstName());
-        staff.setSurname(newUser.getSurname());
         staff.setUser(newUser);
         staff.setOffice(office);
         this.staffService.create(staff);
@@ -158,6 +156,7 @@ public class UserServiceImpl extends GenericSearchableServiceImpl<UserDao, User,
     @Override
     @Transactional
     public String generateVerificationToken(User user) {
+        user = this.findById(user.getId()).get();
         if (user.getVerified())
             return null;
         if (user.getToken() != null) {

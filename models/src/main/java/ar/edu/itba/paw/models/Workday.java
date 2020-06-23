@@ -1,5 +1,7 @@
 package ar.edu.itba.paw.models;
 
+import org.joda.time.LocalTime;
+
 import javax.persistence.*;
 
 @Entity
@@ -87,6 +89,14 @@ public class Workday extends GenericModel<Integer> {
 
     public void setEndMinute(Integer endMinute) {
         this.endMinute = endMinute;
+    }
+
+    public LocalTime getStartTime(){
+        return new LocalTime(startHour, startMinute);
+    }
+
+    public LocalTime getEndTime(){
+        return new LocalTime(endHour, endMinute);
     }
 
     @Override

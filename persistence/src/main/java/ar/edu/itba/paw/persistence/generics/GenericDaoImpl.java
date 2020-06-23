@@ -5,7 +5,9 @@ import ar.edu.itba.paw.models.GenericModel;
 import ar.edu.itba.paw.models.ModelMetadata;
 import ar.edu.itba.paw.models.Paginator;
 import ar.edu.itba.paw.persistence.utils.StringSearchType;
+import org.hibernate.NonUniqueObjectException;
 import org.hibernate.Session;
+import org.slf4j.LoggerFactory;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
@@ -98,9 +100,12 @@ public abstract class GenericDaoImpl<M extends GenericModel<I>, I> implements Ge
     @Transactional
     public void update(M model) {
         if (model == null || model.getId() == null) {
-            throw new IllegalArgumentException();
+            throw new IllegalArgumentException("Model or its id is null");
         }
-        this.entityManager.unwrap(Session.class).update(model);
+        if(!findById(model.getId()).isPresent()){
+            throw new IllegalArgumentException(model.getClass().getName() + " with id:" + model.getId() + " doesn't exists");
+        }
+        this.entityManager.unwrap(Session.class).merge(model);
     }
 
     @Override

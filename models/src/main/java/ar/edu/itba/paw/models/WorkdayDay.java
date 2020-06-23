@@ -42,20 +42,41 @@ public enum WorkdayDay {
     }
 
     public static WorkdayDay from(LocalDateTime localDate) {
-        if (localDate.getDayOfWeek() == DateTimeConstants.MONDAY) {
-            return MONDAY;
-        } else if (localDate.getDayOfWeek() == DateTimeConstants.TUESDAY) {
-            return TUESDAY;
-        } else if (localDate.getDayOfWeek() == DateTimeConstants.WEDNESDAY) {
-            return WEDNESDAY;
-        } else if (localDate.getDayOfWeek() == DateTimeConstants.THURSDAY) {
-            return THURSDAY;
-        } else if (localDate.getDayOfWeek() == DateTimeConstants.FRIDAY) {
-            return FRIDAY;
-        } else if (localDate.getDayOfWeek() == DateTimeConstants.SATURDAY) {
-            return SATURDAY;
-        } else if (localDate.getDayOfWeek() == DateTimeConstants.SUNDAY) {
-            return SUNDAY;
+        switch (localDate.getDayOfWeek()) {
+            case DateTimeConstants.MONDAY:
+                return MONDAY;
+            case DateTimeConstants.TUESDAY:
+                return TUESDAY;
+            case DateTimeConstants.WEDNESDAY:
+                return WEDNESDAY;
+            case DateTimeConstants.THURSDAY:
+                return THURSDAY;
+            case DateTimeConstants.FRIDAY:
+                return FRIDAY;
+            case DateTimeConstants.SATURDAY:
+                return SATURDAY;
+            case DateTimeConstants.SUNDAY:
+                return SUNDAY;
+        }
+        return null;
+    }
+
+    public static WorkdayDay from(int dow) {
+        switch (dow) {
+            case DateTimeConstants.MONDAY:
+                return MONDAY;
+            case DateTimeConstants.TUESDAY:
+                return TUESDAY;
+            case DateTimeConstants.WEDNESDAY:
+                return WEDNESDAY;
+            case DateTimeConstants.THURSDAY:
+                return THURSDAY;
+            case DateTimeConstants.FRIDAY:
+                return FRIDAY;
+            case DateTimeConstants.SATURDAY:
+                return SATURDAY;
+            case DateTimeConstants.SUNDAY:
+                return SUNDAY;
         }
         return null;
     }

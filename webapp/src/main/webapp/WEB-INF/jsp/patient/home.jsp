@@ -16,6 +16,11 @@
     <div class="row h-100">
         <div class="col h-100 pl-0 mr-5 w-100">
             <ul class="list-group turno-list mr-2 w-100 h-100 overflow-auto">
+                <c:if test="${appointments.isEmpty()}">
+                    <div class="container-fluid justify-content-center">
+                        <p class="text-left mt-4" style="color:grey;"><spring:message code="NoAppointments"/></p>
+                    </div>
+                </c:if>
                 <c:forEach var="appointment" items="${appointments}">
                     <li class="list-group-item turno-item mb-3">
                         <div class="container">
@@ -33,12 +38,13 @@
                                 <div class="col-7">
                                     <div class="row justify-content-start">
                                         <h5><c:out
-                                                value="${appointment.staff.firstName} ${appointment.staff.surname}"/></h5>
+                                                value="${appointment.staff.user.firstName} ${appointment.staff.user.surname}"/></h5>
                                     </div>
                                     <div class="row">
                                         <p class="m-0">
-                                            <c:forEach var="specialty" items="${appointment.staff.staffSpecialties}">
+                                            <c:forEach var="specialty" items="${appointment.staff.staffSpecialties}" varStatus="loop">
                                                 <c:out value="${specialty.name} "/>
+                                                <c:if test="${!loop.last}">,</c:if>
                                             </c:forEach>
                                         </p>
                                     </div>
@@ -117,14 +123,14 @@
                                             </c:otherwise>
                                             </c:choose>
 
-                                            <c:if test="${appointment.fromDate.hourOfDay < 10}">0</c:if>
-                                                <c:out value="${appointment.fromDate.hourOfDay}"/>:<c:if
-                                                test="${appointment.fromDate.minuteOfHour < 10}">0</c:if>
-                                                <c:out value="${appointment.fromDate.minuteOfHour}hs"/> -
-                                            <c:if test="${appointment.toDate.hourOfDay < 10}">0</c:if>
-                                                <c:out value="${appointment.toDate.hourOfDay}:"/>
-                                            <c:if test="${appointment.toDate.minuteOfHour < 10}">0</c:if>
-                                                <c:out value="${appointment.toDate.minuteOfHour}hs"/>
+                                            <c:if test="${appointment.fromDate.hourOfDay < 10}">0</c:if><c:out
+                                                    value="${appointment.fromDate.hourOfDay}"/>:<c:if
+                                                    test="${appointment.fromDate.minuteOfHour < 10}">0</c:if><c:out
+                                                    value="${appointment.fromDate.minuteOfHour}hs"/> - <c:if
+                                                    test="${appointment.toDate.hourOfDay < 10}">0</c:if><c:out
+                                                    value="${appointment.toDate.hourOfDay}"/>:<c:if
+                                                    test="${appointment.toDate.minuteOfHour < 10}">0</c:if><c:out
+                                                    value="${appointment.toDate.minuteOfHour}hs"/>
                                     </div>
                                 </div>
                                 <div class="col-1 justify-content-start">
@@ -134,8 +140,8 @@
                                         <div class="dropdown-menu">
                                                 <%-- TODO add reprogramar --%>
                                             <form action="<c:url value="/patient/appointment/${appointment.id}"/>"
-                                                  method="post">
-                                                <button type="submit" class="dropdown-item"><spring:message
+                                                  method="post" class="cancel-appt-form">
+                                                <button type="button" class="dropdown-item cancel-appt-btn"><spring:message
                                                         code="Cancel"/></button>
                                             </form>
                                         </div>
@@ -182,5 +188,16 @@
         </div>
     </div>
 </div>
+<script type="text/javascript">
+    let strings = new Array();
+    strings['title'] = "<spring:message code='YouAreAboutToCancelAnAppointment' javaScriptEscape='true' />";
+    strings['body'] = "<spring:message code='DoYouWantToContinue' javaScriptEscape='true' />";
+</script>
+<script src='<c:url value="/js/scripts/patient/PatientHome.js"/> '></script>
+<script>
+    $(document).ready(() => {
+        PatientHome.init()
+    });
+</script>
 </body>
 </html>

@@ -13,6 +13,11 @@
         <div class="col-4 h-100 pl-0 mr-3 w-100">
             <h4><spring:message code="AgendaFor"/> <spring:message code="today"/></h4>
             <ul class="list-group turno-list mr-2 w-100 h-100 overflow-auto">
+                <c:if test="${todayAppointments.isEmpty()}">
+                    <div class="container-fluid justify-content-center">
+                        <p class="text-left mt-4" style="color:grey;"><spring:message code="NoAppointmentsToday"/></p>
+                    </div>
+                </c:if>
                 <c:forEach var="appointment" items="${todayAppointments}">
                     <li class="list-group-item turno-item mb-3" id="lit">
                         <div class="container">
@@ -79,7 +84,7 @@
                     <c:forEach var="i" begin="0" end="6">
                         <td class="px-0">
                             <!-- day of the week -->
-                            <span class="medicare-day-span container px-0 mx-2 d-flex flex-column align-items-center"
+                            <span class="medicare-day-span container px-0 mx-2 d-flex flex-column align-items-center text-center"
                                   data-day="<c:out value="${monday.plusDays(i)}"/>"
                                   <c:if test="${monday.plusDays(i).dayOfYear == today.dayOfYear && monday.plusDays(i).year == today.year}">style="font-weight:bold"</c:if>>
                                 <p class="mb-0">
@@ -155,6 +160,11 @@
                     <td colspan="9">
                         <div class="container-fluid d-flex justify-content-center">
                             <ul class="list-group turno-list mr-2 w-50 overflow-auto">
+                                <c:if test="${weekAppointments.get(today.dayOfWeek).isEmpty()}">
+                                    <div class="container-fluid justify-content-center">
+                                        <p class="text-center mt-4" style="color:grey;"><spring:message code="NoAppointmentsThisDay"/></p>
+                                    </div>
+                                </c:if>
                                 <c:forEach var="appointment" items="${weekAppointments.get(today.dayOfWeek)}">
                                     <li class="list-group-item turno-item mb-3">
                                         <div class="container">
@@ -162,9 +172,10 @@
                                                 <div class="col-4 d-flex flex-column justify-content-center">
                                                     <div class="profile-picture-container">
                                                         <div style="margin-top: 100%;"></div>
+                                                        <%--TODO: check this--%>
                                                         <img
                                                                 class="profile-picture rounded-circle"
-                                                                src="<c:url value="/profilePics/${appointment.patient.user.profileId}"/>"
+                                                                src="<c:url value="/profilePics/${appointment.patient.user.profilePicture.id}"/>"
                                                                 alt=""
                                                         />
                                                     </div>
@@ -197,8 +208,8 @@
                                                         <div class="dropdown-menu">
                                                             <!-- TODO add reprogramar -->
                                                             <form action="<c:url value="/staff/appointment/${appointment.id}${query}"/>"
-                                                                  method="post">
-                                                                <button type="submit" class="dropdown-item">
+                                                                  method="post" class="cancel-appt-form">
+                                                                <button type="button" class="dropdown-item cancel-appt-btn">
                                                                     <spring:message
                                                                             code="Cancel"/></button>
                                                             </form>
@@ -217,6 +228,11 @@
         </div>
     </div>
 </div>
+<script type="text/javascript">
+    let strings = new Array();
+    strings['title'] = "<spring:message code='YouAreAboutToCancelAnAppointment' javaScriptEscape='true' />";
+    strings['body'] = "<spring:message code='DoYouWantToContinue' javaScriptEscape='true' />";
+</script>
 <script src='<c:url value="/js/scripts/staff/MedicHome.js"/> '></script>
 <script>
     $(document).ready(() => {

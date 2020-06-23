@@ -15,7 +15,6 @@ public class Locality extends GenericModel<Integer> {
     @SequenceGenerator(sequenceName = "system_locality_locality_id_seq", name = "system_locality_locality_id_seq", allocationSize = 1)
     @Column(name = "locality_id")
     private Integer id;
-    @OrderBy("ASC")
     @Column(name = "name", nullable = false)
     private String name;
     @ManyToOne(fetch = FetchType.EAGER, optional = false)

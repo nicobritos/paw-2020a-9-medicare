@@ -4,11 +4,11 @@ const AppointmentRequest = function () {
 
     let bindElements = function () {
         appointmentRequestButton.click(function () {
-            Modal.confirm({ // TODO: i18n
-                title: 'Estas por pedir un turno',
-                body: 'Estas seguro que quieres hacerlo?',
+            Modal.confirm({
+                title: strings['title'],
+                body: strings['body'],
                 callbacks: {
-                    success: function () {
+                    confirm: function () {
                         appointmentRequestForm.submit();
                     }
                 }

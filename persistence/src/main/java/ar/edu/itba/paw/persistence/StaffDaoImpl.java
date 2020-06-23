@@ -2,14 +2,13 @@ package ar.edu.itba.paw.persistence;
 
 import ar.edu.itba.paw.interfaces.daos.StaffDao;
 import ar.edu.itba.paw.models.*;
-import ar.edu.itba.paw.persistence.generics.GenericSearchableDaoImpl;
+import ar.edu.itba.paw.persistence.generics.GenericDaoImpl;
 import ar.edu.itba.paw.persistence.utils.StringSearchType;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Repository;
 
 import javax.persistence.Tuple;
 import javax.persistence.criteria.*;
-import javax.persistence.metamodel.SingularAttribute;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedList;
@@ -17,7 +16,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Repository
-public class StaffDaoImpl extends GenericSearchableDaoImpl<Staff, Integer> implements StaffDao {
+public class StaffDaoImpl extends GenericDaoImpl<Staff, Integer> implements StaffDao {
     private static final int DEFAULT_PAGE_SIZE = 10;
 
     public StaffDaoImpl() {
@@ -70,6 +69,7 @@ public class StaffDaoImpl extends GenericSearchableDaoImpl<Staff, Integer> imple
         CriteriaQuery<Staff> query = builder.createQuery(Staff.class);
         Root<Staff> root = query.from(Staff.class);
         Join<Staff, Office> officeJoin = root.join(Staff_.office);
+        Join<Staff, User> userJoin = root.join(Staff_.user);
 
         query.select(root);
         query.where(builder.and(this.getPredicates(
@@ -80,7 +80,8 @@ public class StaffDaoImpl extends GenericSearchableDaoImpl<Staff, Integer> imple
                 localities,
                 builder,
                 root,
-                officeJoin
+                officeJoin,
+                userJoin
         )));
 
         return this.selectQuery(builder, query, root);
@@ -135,10 +136,12 @@ public class StaffDaoImpl extends GenericSearchableDaoImpl<Staff, Integer> imple
         CriteriaQuery<Staff> query = builder.createQuery(Staff.class);
         Root<Staff> root = query.from(Staff.class);
         Join<Staff, Office> officeJoin = root.join(Staff_.office);
+        Join<Staff, User> userJoin = root.join(Staff_.user);
 
         CriteriaQuery<Tuple> tupleQuery = builder.createQuery(Tuple.class);
         Root<Staff> rootCount = tupleQuery.from(Staff.class);
         Join<Staff, Office> officeJoinCount = rootCount.join(Staff_.office);
+        Join<Staff, User> userJoinCount = rootCount.join(Staff_.user);
 
         query.select(root);
         query.where(builder.and(this.getPredicates(
@@ -149,7 +152,8 @@ public class StaffDaoImpl extends GenericSearchableDaoImpl<Staff, Integer> imple
                 localities,
                 builder,
                 root,
-                officeJoin
+                officeJoin,
+                userJoin
         )));
 
         tupleQuery.where(builder.and(this.getPredicates(
@@ -160,7 +164,8 @@ public class StaffDaoImpl extends GenericSearchableDaoImpl<Staff, Integer> imple
                 localities,
                 builder,
                 rootCount,
-                officeJoinCount
+                officeJoinCount,
+                userJoinCount
         )));
         tupleQuery.distinct(true);
 
@@ -173,16 +178,8 @@ public class StaffDaoImpl extends GenericSearchableDaoImpl<Staff, Integer> imple
     }
 
     @Override
-    protected SingularAttribute<? super Staff, ?> getNameAttribute() {
-        return Staff_.firstName;
-    }
-
-    @Override
     protected void insertOrderBy(CriteriaBuilder builder, CriteriaQuery<Staff> query, Root<Staff> root) {
-        query.orderBy(
-                builder.asc(root.get(Staff_.firstName)),
-                builder.asc(root.get(Staff_.surname))
-        );
+        query.orderBy(builder.asc(root.get(Staff_.user).get(User_.firstName)), builder.asc(root.get(Staff_.user).get(User_.surname)));
     }
 
     private Predicate[] getPredicates(Collection<String> names,
@@ -192,11 +189,12 @@ public class StaffDaoImpl extends GenericSearchableDaoImpl<Staff, Integer> imple
                                       Collection<Locality> localities,
                                       CriteriaBuilder builder,
                                       Root<Staff> root,
-                                      Join<Staff, Office> officeJoin
+                                      Join<Staff, Office> officeJoin,
+                                      Join<Staff, User> userJoin
     ) {
         List<Predicate> predicates = new LinkedList<>();
         Predicate predicate;
-        predicate = this.getNamePredicate(names, surnames, builder, root);
+        predicate = this.getNamePredicate(names, surnames, builder, userJoin);
         if (predicate != null) predicates.add(predicate);
         predicate = this.getOfficePredicate(offices, root);
         if (predicate != null) predicates.add(predicate);
@@ -241,12 +239,13 @@ public class StaffDaoImpl extends GenericSearchableDaoImpl<Staff, Integer> imple
         return expression.in(offices);
     }
 
-    private Predicate getNamePredicate(Collection<String> firstNames, Collection<String> surnames, CriteriaBuilder builder, Root<Staff> root) {
+    private Predicate getNamePredicate(Collection<String> firstNames, Collection<String> surnames, CriteriaBuilder builder, Join<Staff, User> userJoin) {
         if (firstNames.isEmpty() && surnames.isEmpty())
             return null;
 
         List<Predicate> predicates = new LinkedList<>();
-        Expression<String> expression = root.get(Staff_.firstName).as(String.class);
+
+        Expression<String> expression = userJoin.get(User_.firstName).as(String.class);
         for (String name : firstNames) {
             if (name.isEmpty()) continue;
             predicates.add(
@@ -257,7 +256,7 @@ public class StaffDaoImpl extends GenericSearchableDaoImpl<Staff, Integer> imple
             );
         }
 
-        expression = root.get(Staff_.surname).as(String.class);
+        expression = userJoin.get(User_.surname).as(String.class);
         for (String name : surnames) {
             if (name.isEmpty()) continue;
             predicates.add(

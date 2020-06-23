@@ -162,6 +162,7 @@ public class MedicListController extends GenericController {
             }
         }
         mav.addObject("weekSlots", weekslots);
+        mav.addObject("timeslotsAvailable",timeSlots);
         mav.setViewName("selectAppointment");
         return mav;
     }

@@ -23,36 +23,51 @@
                 </div>
                 <div class="col mr-3">
                     <div class="row mt-2">
-                        <h5><c:out value="${staff.firstName} ${staff.surname}"/></h5>
+                        <h5><c:out value="${staff.user.firstName} ${staff.user.surname}"/></h5>
                     </div>
                     <div class="row mt-3 d-flex justify-content-start">
                         <p>
-                            <c:forEach items="${staff.staffSpecialties}" var="specialty">
+                            <c:forEach items="${staff.staffSpecialties}" var="specialty" varStatus="loop">
                                 <c:out value="${specialty.name} "/>
+                                <c:if test="${!loop.last}">,</c:if>
                             </c:forEach>
                         </p>
                     </div>
                 </div>
             </div>
             <div class="row mt-3 pl-4">
-                <p><spring:message code="Address"/>: <c:out
+                <p class="m-0"><b><spring:message code="Address"/>:</b> <c:out
                         value="${staff.office.street} - ${staff.office.locality.name}"/></p>
+                <a
+                    class="link"
+                    href="https://www.google.com/maps/search/?api=1&query=${staff.office.locality.name},${staff.office.street}"
+                    target="_blank"
+                >
+                    <small class="m-1"><spring:message code="SeeInGoogleMaps"/></small>
+                </a>
             </div>
-            <div class="row pl-4">
-                <p><spring:message code="Phones"/>:</p>
-            </div>
-            <div class="row pl-4">
-                <ul>
-                    <c:if test="${staff.user.phone != null}">
-                        <li><c:out value="${staff.user.phone}"/> (<spring:message code="Personal"/>)</li>
-                    </c:if>
-                    <c:if test="${staff.office.phone != null}">
-                        <li><c:out value="${staff.office.phone} (${staff.office.name})"/></li>
-                    </c:if>
-                </ul>
-            </div>
-            <div class="row pl-4">
-                <p><spring:message code="Email"/>: ${staff.email}</p>
+            <c:choose>
+                <c:when test="${(staff.user.phone != null && !staff.user.phone.isEmpty()) || (staff.office.phone != null && !staff.office.phone.isEmpty())}">
+                    <div class="row mt-3 pl-4">
+                        <p><b><spring:message code="Phones"/>:</b></p>
+                    </div>
+                    <ul>
+                        <c:if test="${staff.user.phone != null && !staff.user.phone.isEmpty()}">
+                            <li><c:out value="${staff.user.phone}"/> (<spring:message code="Personal"/>)</li>
+                        </c:if>
+                        <c:if test="${staff.office.phone != null && !staff.office.phone.isEmpty()}">
+                            <li><c:out value="${staff.office.phone} (${staff.office.name})"/></li>
+                        </c:if>
+                    </ul>
+                </c:when>
+                <c:otherwise>
+                    <div class="row mt-3 pl-4">
+                        <p><b><spring:message code="Phones"/>:</b> <spring:message code="UserWithNoPhones"/></p>
+                    </div>
+                </c:otherwise>
+            </c:choose>
+            <div class="row mt-3 pl-4">
+                <p><b><spring:message code="Email"/>:</b> ${staff.email}</p>
             </div>
         </div>
         <div class="col ml-5 mt-3 p-0">
@@ -71,7 +86,7 @@
 
                 <c:forEach var="i" begin="0" end="6">
                     <div class="col-1 mr-4 p-0">
-                            <span class="d-flex flex-column align-items-center">
+                            <span class="d-flex flex-column align-items-center text-center">
                                 <p class="mb-0"><c:choose>
                                     <c:when test="${monday.plusDays(i).dayOfWeek == 1}"><spring:message code="Monday"/></c:when>
                                     <c:when test="${monday.plusDays(i).dayOfWeek == 2}"><spring:message code="Tuesday"/></c:when>
@@ -130,6 +145,11 @@
                     <button id="day-right" class="btn">></button>
                 </div>
             </div>
+            <c:if test="${timeslotsAvailable.isEmpty()}">
+                <div class="row justify-content-center">
+                    <p class="text-center mt-2" style="color:grey;"><spring:message code="NoAvailableAppointmentsThisWeek"/></p>
+                </div>
+            </c:if>
         </div>
     </div>
 </div>

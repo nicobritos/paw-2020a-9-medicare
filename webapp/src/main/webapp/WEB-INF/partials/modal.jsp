@@ -22,6 +22,6 @@
 </script>
 
 <script type="text/template" id="modal-generic-modal-footer">
-    <button type="button" id="modal-generic-modal-footer-cancel" class="btn btn-secondary">Close</button>
-    <button type="button" id="modal-generic-modal-footer-confirm" class="btn btn-primary">Save changes</button>
+    <button type="button" id="modal-generic-modal-footer-cancel" class="btn btn-secondary"><spring:message code="Close"/></button>
+    <button type="button" id="modal-generic-modal-footer-confirm" class="btn btn-primary"><spring:message code="Accept"/></button>
 </script>

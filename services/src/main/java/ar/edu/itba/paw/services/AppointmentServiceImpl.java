@@ -9,11 +9,13 @@ import ar.edu.itba.paw.services.generics.GenericServiceImpl;
 import org.joda.time.LocalDateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
 import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
+import java.time.DayOfWeek;
+import static org.joda.time.DateTimeConstants.MONDAY;
+import static org.joda.time.DateTimeConstants.SUNDAY;
 
 @Service
 public class AppointmentServiceImpl extends GenericServiceImpl<AppointmentDao, Appointment, Integer> implements AppointmentService {
@@ -76,8 +78,24 @@ public class AppointmentServiceImpl extends GenericServiceImpl<AppointmentDao, A
     }
 
     @Override
-    public List<Appointment> findByStaffsAndDay(List<Staff> staffs, LocalDateTime from, LocalDateTime to) {
-        return this.repository.findByStaffsAndDate(staffs, from, to);
+    public List<List<Appointment>> findByStaffsAndDay(List<Staff> staffs, LocalDateTime from, LocalDateTime to) {
+        if(from.isBefore(LocalDateTime.now())) {
+            from = LocalDateTime.now();
+        }
+        List<Appointment> appointments = this.repository.findByStaffsAndDate(staffs, from, to);
+        List<List<Appointment>> weekAppointments = new LinkedList<>();
+        for (int i = 0; i < DayOfWeek.values().length + 1; i++) { // +1 para guardar basura en caso que la haya (no deberia)
+            weekAppointments.add(new LinkedList<>());
+        }
+
+        for (Appointment appointment : appointments) {
+            if (appointment.getFromDate().getDayOfWeek() < MONDAY|| appointment.getFromDate().getDayOfWeek() > SUNDAY) { // Los dias en JodaTime van de Monday a Sunday
+                weekAppointments.get(0).add(appointment); // Basura (1 = Monday => 0 = libre)
+            } else {
+                weekAppointments.get(appointment.getFromDate().getDayOfWeek()).add(appointment);
+            }
+        }
+        return weekAppointments;
     }
 
     @Override
@@ -153,6 +171,11 @@ public class AppointmentServiceImpl extends GenericServiceImpl<AppointmentDao, A
                     startHour = fromDate.getHourOfDay();
                     firstStartMinute = fromDate.getMinuteOfHour();
                 }
+                firstStartMinute = (int) Math.ceil((double) firstStartMinute / Appointment.DURATION) * Appointment.DURATION;
+                if(firstStartMinute == 60){
+                    firstStartMinute = 0;
+                    startHour++;
+                }
                 for (int ihour = startHour; ihour <= workday.getEndHour(); ihour++) {
 
                     int startMinute = 0;
@@ -222,7 +245,6 @@ public class AppointmentServiceImpl extends GenericServiceImpl<AppointmentDao, A
     private boolean isValidDate(Staff staff, LocalDateTime fromDate) {
         AppointmentTimeSlot appointmentTimeSlot = new AppointmentTimeSlot();
         appointmentTimeSlot.setDate(fromDate);
-
         if (!this.workdayService.isStaffWorking(staff, appointmentTimeSlot))
             return false;
         return this.findAvailableTimeslots(staff, fromDate).contains(appointmentTimeSlot);

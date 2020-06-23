@@ -1,5 +1,6 @@
 const AppointmentList = function () {
     let page;
+    let final_page;
 
     let refreshPage = function () {
         App.goto('/mediclist/' + page, true);
@@ -14,19 +15,28 @@ const AppointmentList = function () {
             });
         });
 
-        $("#prevButton").click(function () {
+        $(".firstButton").click(function () {
+            page = 1;
+            refreshPage();
+        })
+        $(".prevButton").click(function () {
             page -= 1;
             refreshPage();
         });
-        $("#nextButton").click(function () {
+        $(".nextButton").click(function () {
             page += 1;
+            refreshPage();
+        });
+        $(".lastButton").click(function () {
+            page = final_page;
             refreshPage();
         });
     };
 
     return {
-        init: function (_page) {
+        init: function (_page, _finalpage) {
             page = _page;
+            final_page = _finalpage
             bindElements();
         }
     }
