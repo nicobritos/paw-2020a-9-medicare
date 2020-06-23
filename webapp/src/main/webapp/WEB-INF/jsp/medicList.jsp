@@ -98,6 +98,11 @@
                     </div>
                 </c:if>
                 <ul class="list-group turno-list mr-2 w-100">
+                    <c:if test="${staff.isEmpty()}">
+                        <div class="container-fluid justify-content-center">
+                            <p class="text-center" style="color:grey;"><spring:message code="NoMedicsFound"/></p>
+                        </div>
+                    </c:if>
                     <c:forEach var="member" items="${staff}">
                         <li class="list-group-item turno-item mb-3">
                             <div class="container">
