@@ -69,5 +69,14 @@
     <br>
     <br>
 </div>
+<script>
+    logoUrls = [];
+    logoUrls["facebook"] = "<c:url value="/img/logos/facebooklogo.svg"/>";
+    logoUrls["twitter"] = "<c:url value="/img/logos/twitterlogo.svg"/>";
+    logoUrls["whatsapp"] = "<c:url value="/img/logos/whatsapplogo.svg"/>";
+    logoUrls["linkedin"] = "<c:url value="/img/logos/linkedinlogo.svg"/>";
+    logoUrls["pinterest"] = "<c:url value="/img/logos/pinterestlogo.svg"/>";
+</script>
+<script src="<c:url value="/js/scripts/Landing.js"/>"></script>
 </body>
 </html>

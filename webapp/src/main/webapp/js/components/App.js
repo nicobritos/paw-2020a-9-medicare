@@ -162,31 +162,3 @@ const App = function () {
         }
     };
 }();
-
-$(document).ready(function(){
-    var faded = false;
-    
-    $(".shareSocial").jsSocials({
-        showLabel: false,
-        showCount: false,
-        shares: ["whatsapp", "facebook", "linkedin", "twitter", "pinterest"]
-    });
-    
-    $(document).scroll(function(){
-        var actualTop = window.pageYOffset || document.documentElement.scrollTop;
-        if(actualTop > 100 && faded === false)
-        {
-            $('.header').animate({
-                "opacity" : "-=0.05"
-            }, 250);
-            faded = true;
-        }
-        else if(faded === true && actualTop < 100)
-        {
-            $('.header').animate({
-                "opacity" : "+=0.05"
-            }, 250);
-            faded = false;
-        }
-    });
-});
