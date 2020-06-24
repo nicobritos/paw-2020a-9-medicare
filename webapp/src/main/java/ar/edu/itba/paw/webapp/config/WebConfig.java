@@ -39,8 +39,7 @@ import java.util.Properties;
         "ar.edu.itba.paw.services",
         "ar.edu.itba.paw.persistence",
         "ar.edu.itba.paw.webapp.transformer",
-        "ar.edu.itba.paw.webapp.events",
-        "ar.edu.itba.paw.webapp.handlers"
+        "ar.edu.itba.paw.webapp.events"
 })
 @Configuration
 @EnableTransactionManagement
