@@ -25,6 +25,8 @@ import org.springframework.web.util.UriComponentsBuilder;
 import javax.validation.Valid;
 import java.util.*;
 
+import static org.joda.time.DateTimeConstants.MONDAY;
+
 @Controller
 public class MedicListController extends GenericController {
     private static final long MAX_DAYS_APPOINTMENTS = 7;
@@ -138,7 +140,7 @@ public class MedicListController extends GenericController {
 
         LocalDateTime today = LocalDateTime.now();
         today = today.plusWeeks(week);
-        LocalDateTime monday = today.minusDays(today.getDayOfWeek() - 1);
+        LocalDateTime monday = today.minusDays(today.getDayOfWeek() - MONDAY);
 
         mav.addObject("today", today);
         mav.addObject("monday", monday);
@@ -149,20 +151,16 @@ public class MedicListController extends GenericController {
         }
         mav.addObject("staff", staff.get());
 
-        List<AppointmentTimeSlot> timeSlots = this.appointmentService.findAvailableTimeslots(staff.get(), monday, monday.plusDays(6).withTime(23, 59, 59, 999));
-        List<List<AppointmentTimeSlot>> weekslots = new LinkedList<>();
-        for (int i = 0; i <= 7; i++) {
-            weekslots.add(new LinkedList<>());
-        }
-        for (AppointmentTimeSlot timeSlot : timeSlots) {
-            if (timeSlot.getDate().getDayOfWeek() < 1 && timeSlot.getDate().getDayOfWeek() > 7) {
-                weekslots.get(0).add(timeSlot);
-            } else {
-                weekslots.get(timeSlot.getDate().getDayOfWeek()).add(timeSlot);
+        List<List<AppointmentTimeSlot>> weekslots = this.appointmentService.findWeekTimeslots(staff.get(), monday, monday.plusDays(6).withTime(23,59,59,999));
+        boolean hasTimeslots = false;
+        for(List<AppointmentTimeSlot> dayslots: weekslots){
+            if(!dayslots.isEmpty()){
+                hasTimeslots = true;
+                break;
             }
         }
         mav.addObject("weekSlots", weekslots);
-        mav.addObject("timeslotsAvailable",timeSlots);
+        mav.addObject("hasTimeslots",hasTimeslots);
         mav.setViewName("selectAppointment");
         return mav;
     }

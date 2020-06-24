@@ -193,15 +193,12 @@ public class PatientHomeController extends GenericController {
         if (!staffOptional.isPresent()) {
             return new ModelAndView("redirect:/mediclist/0");
         }
-        Optional<StaffSpecialty> staffSpecialty = staffOptional.get().getStaffSpecialties().stream().findFirst();
-        if (staffSpecialty.isPresent()) {
-            form.setMotive("Consulta de " + staffSpecialty.get().getName());
+        if(staffOptional.get().getStaffSpecialties().size() > 0) {
+            form.setMotive("Consulta de " + staffOptional.get().getStaffSpecialties().iterator().next().getName());
         } else {
             form.setMotive("Consulta");
         }
-        userOptional.ifPresent(user -> {
-            form.setPhone(user.getPhone());
-        });
+        userOptional.ifPresent(user -> form.setPhone(user.getPhone()));
         Optional<User> user = getUser();
         ModelAndView mav = new ModelAndView();
         mav.addObject("user", userOptional);
@@ -221,32 +218,14 @@ public class PatientHomeController extends GenericController {
         if (!user.isPresent()) {
             return new ModelAndView("redirect:/login");
         }
-        //get patient for current user
-        List<Patient> patient = this.patientService.findByUser(user.get());
-        //get appointment to delete, check for "null"
         Optional<Appointment> appointment = this.appointmentService.findById(id);
         if (!appointment.isPresent()) {
             return new ModelAndView("redirect:/patient/home");
         }
-        //check if user is allowed to cancel
-        boolean isAllowed = false;
-        for (Patient p : patient) {
-            if (p.equals(appointment.get().getPatient())) {
-                isAllowed = true;
-                break;
-            }
-        }
-        //return response code for not allow
-        if (!isAllowed) {
-            return new ModelAndView("redirect:/patient/home");
-        }
-        //cancel appointment
-        this.appointmentService.remove(appointment.get().getId()); // TODO
+        this.appointmentService.remove(id, user.get());
         StringBuilder baseUrl = new StringBuilder(request.getRequestURL());
         baseUrl.replace(request.getRequestURL().lastIndexOf(request.getServletPath()), request.getRequestURL().length(), "");
         this.eventPublisher.publishEvent(new AppointmentCancelEvent(user.get(), false, appointment.get().getStaff().getUser(), appointment.get(), request.getLocale(), baseUrl.toString()));
-//        this.appointmentService.setStatus(appointment.get(), AppointmentStatus.CANCELLED);
-        //return success
         return new ModelAndView("redirect:/patient/home");
     }
 

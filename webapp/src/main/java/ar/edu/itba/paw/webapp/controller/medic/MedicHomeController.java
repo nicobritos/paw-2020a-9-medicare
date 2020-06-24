@@ -274,6 +274,7 @@ public class MedicHomeController extends GenericController {
         for(Appointment a: cancelledAppointments) {
             createCancelEvent(request, user.get(), a);
         }
+        this.workdayService.remove(workdayId);
         return new ModelAndView("redirect:/staff/profile");
     }
 
