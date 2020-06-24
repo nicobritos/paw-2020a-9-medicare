@@ -37,7 +37,7 @@ public class StaffSpecialty extends GenericModel<Integer> {
     }
 
     @Override
-    protected boolean isSameInstance(Object o) {
+    protected boolean isSameType(Object o) {
         return o instanceof StaffSpecialty;
     }
 }

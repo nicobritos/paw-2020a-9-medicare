@@ -8,6 +8,7 @@ import ar.edu.itba.paw.models.*;
 import org.joda.time.LocalDateTime;
 
 import java.util.List;
+import java.util.Map;
 
 public interface AppointmentService extends GenericService<Appointment, Integer> {
     List<Appointment> find(Staff staff);
@@ -28,9 +29,11 @@ public interface AppointmentService extends GenericService<Appointment, Integer>
 
     List<Appointment> findByStaffsAndDay(List<Staff> staffs, LocalDateTime date);
 
-    List<Appointment> findByStaffsAndDay(List<Staff> staffs, LocalDateTime from, LocalDateTime to);
+    List<List<Appointment>> findByStaffsAndDay(List<Staff> staffs, LocalDateTime from, LocalDateTime to);
 
     List<Appointment> findByPatientsAndDay(List<Patient> patients, LocalDateTime date);
+
+    List<Appointment> findByWorkday(Workday workday);
 
     void setStatus(Appointment appointment, AppointmentStatus status) throws
             AppointmentAlreadyCancelledException,
@@ -40,4 +43,12 @@ public interface AppointmentService extends GenericService<Appointment, Integer>
     List<AppointmentTimeSlot> findAvailableTimeslots(Staff staff, LocalDateTime fromDate, LocalDateTime toDate);
 
     List<AppointmentTimeSlot> findAvailableTimeslots(Staff staff, LocalDateTime date);
+
+    List<Appointment> cancelAppointments(Workday workday);
+
+    Map<Workday, Integer> appointmentQtyByWorkdayOfUser(User user);
+
+    void remove(Integer id, User user);
+
+    List<List<AppointmentTimeSlot>> findWeekTimeslots(Staff staff, LocalDateTime from, LocalDateTime to);
 }

@@ -23,12 +23,24 @@
         </c:if>
 
         <div class="d-inline-flex flex-column align-items-end">
-            <p style="font-weight: 400;" class="m-0 p-0 text-muted white-text"><c:out
-                    value="${user.get().firstName} ${user.get().surname}"/></p>
+            <c:choose>
+                <c:when test="${staffs == null}">
+                    <a href="<c:url value="/patient/profile"/>">
+                        <p style="font-weight: 400;" class="m-0 p-0 text-muted white-text"><c:out
+                                value="${user.get().firstName} ${user.get().surname}"/></p>
+                    </a>
+                </c:when>
+                <c:otherwise>
+                    <a href="<c:url value="/staff/profile"/>">
+                        <p style="font-weight: 400;" class="m-0 p-0 text-muted white-text"><c:out
+                                value="${user.get().firstName} ${user.get().surname}"/></p>
+                    </a>
+                </c:otherwise>
+            </c:choose>
+
             <a href="<c:url value="/logout"/>" class="m-0 p-0 header-a-element"><small class="m-0 p-0"><spring:message
                     code="Logout"/></small></a>
         </div>
-        <%--TODO:connect correct image--%>
         <c:choose>
             <c:when test="${!user.get().verified}">
                 <img id="navbarUnverifiedUserImage" class="ml-2"
@@ -53,7 +65,6 @@
             <c:otherwise>
                 <a href="<c:url value="/staff/profile"/>">
                         <%-- TODO:move style to css --%>
-                        <%-- TODO: check image--%>
                     <div style="width: 2em;" class="d-flex flex-column justify-content-center">
                         <div class="profile-picture-container">
                             <div style="margin-top: 100%;"></div>

@@ -106,39 +106,58 @@
                     <h3><spring:message code="Schedule"/></h3>
                     <div class="container p-0 m-0 pl-3">
                         <div class="row d-flex align-items-center justify-content-between">
-                            <c:forEach var="staff" items="${staffs}">
-                                <c:forEach var="workday" items="${workdays}">
-                                    <p class="m-0">- <c:choose>
+                            <c:if test="${workdays.isEmpty()}">
+                                <div class="container-fluid justify-content-center">
+                                    <p class="text-center mt-2" style="color:grey;"><spring:message code="NoSchedule"/></p>
+                                </div>
+                            </c:if>
+                            <c:forEach var="workday" items="${workdays}">
+                                <p class="m-0">-
+                                    <c:choose>
                                         <%-- TODO: maybe use spring:message directly instead of with choose --%>
-                                        <c:when test="${workday.day == 'MONDAY'}"><spring:message
-                                                code="Monday"/></c:when>
-                                        <c:when test="${workday.day == 'TUESDAY'}"><spring:message
-                                                code="Tuesday"/></c:when>
-                                        <c:when test="${workday.day == 'WEDNESDAY'}"><spring:message
-                                                code="Wednesday"/></c:when>
-                                        <c:when test="${workday.day == 'THURSDAY'}"><spring:message
-                                                code="Thursday"/></c:when>
-                                        <c:when test="${workday.day == 'FRIDAY'}"><spring:message
-                                                code="Friday"/></c:when>
-                                        <c:when test="${workday.day == 'SATURDAY'}"><spring:message
-                                                code="Saturday"/></c:when>
-                                        <c:when test="${workday.day == 'SUNDAY'}"><spring:message
-                                                code="Sunday"/></c:when>
-                                        <c:otherwise>${workday.day}</c:otherwise>
-                                    </c:choose> <spring:message code="of"/> <c:if
-                                            test="${workday.startHour < 10}">0</c:if><c:out
-                                            value="${workday.startHour}"/>:<c:if
-                                            test="${workday.startMinute < 10}">0</c:if><c:out
-                                            value="${workday.startMinute}hs a "/><c:if
-                                            test="${workday.endHour < 10}">0</c:if><c:out
-                                            value="${workday.endHour}:"/><c:if
-                                            test="${workday.endMinute < 10}">0</c:if><c:out
-                                            value="${workday.endMinute}hs - ${workday.staff.office.name}"/></p>
-                                    <form action="<c:url value="/staff/profile/workday/delete/${workday.id}"/>"
-                                          method="post" class="cancel-workday-form">
-                                        <button class="btn cancel-workday-btn" type="button">X</button>
-                                    </form>
-                                </c:forEach>
+                                        <c:when test="${workday.day == 'MONDAY'}"><spring:message code="Monday" var="wkDay"/></c:when>
+                                        <c:when test="${workday.day == 'TUESDAY'}"><spring:message code="Tuesday" var="wkDay"/></c:when>
+                                        <c:when test="${workday.day == 'WEDNESDAY'}"><spring:message code="Wednesday" var="wkDay"/></c:when>
+                                        <c:when test="${workday.day == 'THURSDAY'}"><spring:message code="Thursday" var="wkDay"/></c:when>
+                                        <c:when test="${workday.day == 'FRIDAY'}"><spring:message code="Friday" var="wkDay"/></c:when>
+                                        <c:when test="${workday.day == 'SATURDAY'}"><spring:message code="Saturday" var="wkDay"/></c:when>
+                                        <c:when test="${workday.day == 'SUNDAY'}"><spring:message code="Sunday" var="wkDay"/></c:when>
+                                        <c:otherwise><c:set value="${workday.day}" var="wkDay"/></c:otherwise>
+                                    </c:choose>
+                                    <c:choose>
+                                        <c:when test="${workday.startHour < 10}"><c:set value="0${workday.startHour}" var="wkStartHour"/></c:when>
+                                        <c:otherwise><c:set value="${workday.startHour}" var="wkStartHour"/></c:otherwise>
+                                    </c:choose>
+                                    <c:choose>
+                                        <c:when test="${workday.startMinute < 10}"><c:set value="0${workday.startMinute}" var="wkStartMinute"/></c:when>
+                                        <c:otherwise><c:set value="${workday.startMinute}" var="wkStartMinute"/></c:otherwise>
+                                    </c:choose>
+                                    <c:choose>
+                                        <c:when test="${workday.endHour < 10}"><c:set value="0${workday.endHour}" var="wkEndHour"/></c:when>
+                                        <c:otherwise><c:set value="${workday.endHour}" var="wkEndHour"/></c:otherwise>
+                                    </c:choose>
+                                    <c:choose>
+                                        <c:when test="${workday.endMinute < 10}"><c:set value="0${workday.endMinute}" var="wkEndMinute"/></c:when>
+                                        <c:otherwise><c:set value="${workday.endMinute}" var="wkEndMinute"/></c:otherwise>
+                                    </c:choose>
+                                    <spring:message code="wkd_from_wksh_wksm_to_wkeh_wkem_cons" argumentSeparator=";" arguments="${wkDay};${wkStartHour};${wkStartMinute};${wkEndHour};${wkEndMinute};${workday.staff.office.name}"/>
+                                </p>
+                                <c:choose>
+                                    <c:when test="${appointmentMap.get(workday) == 1}">
+                                        <spring:message code='YouWillDeleteAppt' javaScriptEscape='true' var="appts" arguments="${appointmentMap.get(workday)}"/>
+                                    </c:when>
+                                    <c:otherwise>
+                                        <spring:message code='YouWillDeleteAppts' javaScriptEscape='true' var="appts" arguments="${appointmentMap.get(workday)}"/>
+                                    </c:otherwise>
+                                </c:choose>
+                                <form action="<c:url value="/staff/profile/workday/delete/${workday.id}"/>"
+                                      method="post" class="cancel-workday-form"
+                                      data-appointment_url="<c:url value="/staff/appointment/workday/${workday.id}"/>"
+
+                                      data-appts="${appts}"
+                                >
+                                    <button class="btn cancel-workday-btn" type="button">X</button>
+                                </form>
                             </c:forEach>
                         </div>
                         <div class="row d-flex align-items-center justify-content-center my-3">
@@ -147,6 +166,29 @@
                         </div>
                     </div>
                 </div>
+                <div class="row mb-3">
+                    <h3><spring:message code="Specialties"/></h3>
+                    <c:if test="${specialties.isEmpty()}">
+                        <div class="container-fluid justify-content-center">
+                            <p class="text-center mt-2" style="color:grey;"><spring:message code="NoSpecialties"/></p>
+                        </div>
+                    </c:if>
+                    <c:forEach var="specialty" items="${specialties}">
+                        <div class="container p-0 m-0 pl-3">
+                            <div class="row d-flex align-items-center justify-content-between">
+                                <p class="m-0"><c:out value="${specialty.name}"/></p>
+                                <form action="<c:url value="/staff/profile/specialty/delete/${specialty.id}"/>"
+                                      method="post" class="cancel-specialty-form">
+                                    <button class="btn cancel-specialty-btn" type="button">X</button>
+                                </form>
+                            </div>
+                        </div>
+                    </c:forEach>
+                </div>
+                <div class="row d-flex align-items-center justify-content-center my-3">
+                    <c:url value="/staff/profile/specialty" var="addSpecialtyUrl"/>
+                    <a href="${addSpecialtyUrl}" type="button" class="btn btn-info"><spring:message code="AddSpecialty"/></a>
+                </div>
             </div>
         </div>
         <div class="col-2">
@@ -154,9 +196,26 @@
     </div>
 </div>
 <script type="text/javascript">
-    let strings = new Array();
-    strings['title'] = "<spring:message code='YouAreAboutToCancelAWorkday' javaScriptEscape='true' />";
-    strings['body'] = "<spring:message code='DoYouWantToContinue' javaScriptEscape='true' />";
+    let workday_strings = new Array();
+    workday_strings['title'] = "<spring:message code='YouAreAboutToCancelAWorkday' javaScriptEscape='true' />";
+    workday_strings['body'] = "<spring:message code='DoYouWantToContinue' javaScriptEscape='true' />";
+    workday_strings['accept'] = "<spring:message code='Accept' javaScriptEscape='true' />";
+    workday_strings['cancel'] = "<spring:message code='Cancel' javaScriptEscape='true' />";
+    workday_strings['deleted'] = "<spring:message code='Deleted' javaScriptEscape='true' />";
+    workday_strings['deleted_body'] = "<spring:message code='OperationCompletedSuccessfully' javaScriptEscape='true' />";
+    workday_strings['title2'] = "";
+    workday_strings['body2'] = "<spring:message code='DoYouWantToCancelFutureAppointmentsThatMatchInThisWorkday' javaScriptEscape='true' />";
+    workday_strings['accept2'] = "<spring:message code='Yes' javaScriptEscape='true' />";
+    workday_strings['cancel2'] = "<spring:message code='No' javaScriptEscape='true' />";
+    let specialty_strings = new Array();
+    specialty_strings['title'] = "<spring:message code='YouAreAboutToDeleteASpecialty' javaScriptEscape='true' />";
+    specialty_strings['body'] = "<spring:message code='DoYouWantToContinue' javaScriptEscape='true' />";
+    specialty_strings['accept'] = "<spring:message code='Accept' javaScriptEscape='true' />";
+    specialty_strings['cancel'] = "<spring:message code='Cancel' javaScriptEscape='true' />";
+    specialty_strings['deleted'] = "<spring:message code='Deleted' javaScriptEscape='true' />";
+    specialty_strings['deleted_body'] = "<spring:message code='OperationCompletedSuccessfully' javaScriptEscape='true' />";
+    let error_message = new Array();
+    error_message['error'] = "<spring:message code='ThereWasAnError' javaScriptEscape='true' />";
 </script>
 <script src='<c:url value="/js/scripts/Profile.js"/> '></script>
 <script>

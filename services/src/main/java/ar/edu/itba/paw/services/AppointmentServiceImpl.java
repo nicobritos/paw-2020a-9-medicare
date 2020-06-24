@@ -10,9 +10,10 @@ import org.joda.time.LocalDateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.Collections;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
+import java.time.DayOfWeek;
+import static org.joda.time.DateTimeConstants.MONDAY;
+import static org.joda.time.DateTimeConstants.SUNDAY;
 
 @Service
 public class AppointmentServiceImpl extends GenericServiceImpl<AppointmentDao, Appointment, Integer> implements AppointmentService {
@@ -75,8 +76,24 @@ public class AppointmentServiceImpl extends GenericServiceImpl<AppointmentDao, A
     }
 
     @Override
-    public List<Appointment> findByStaffsAndDay(List<Staff> staffs, LocalDateTime from, LocalDateTime to) {
-        return this.repository.findByStaffsAndDate(staffs, from, to);
+    public List<List<Appointment>> findByStaffsAndDay(List<Staff> staffs, LocalDateTime from, LocalDateTime to) {
+        if(from.isBefore(LocalDateTime.now())) {
+            from = LocalDateTime.now();
+        }
+        List<Appointment> appointments = this.repository.findByStaffsAndDate(staffs, from, to);
+        List<List<Appointment>> weekAppointments = new LinkedList<>();
+        for (int i = 0; i < DayOfWeek.values().length + 1; i++) { // +1 para guardar basura en caso que la haya (no deberia)
+            weekAppointments.add(new LinkedList<>());
+        }
+
+        for (Appointment appointment : appointments) {
+            if (appointment.getFromDate().getDayOfWeek() < MONDAY|| appointment.getFromDate().getDayOfWeek() > SUNDAY) { // Los dias en JodaTime van de Monday a Sunday
+                weekAppointments.get(0).add(appointment); // Basura (1 = Monday => 0 = libre)
+            } else {
+                weekAppointments.get(appointment.getFromDate().getDayOfWeek()).add(appointment);
+            }
+        }
+        return weekAppointments;
     }
 
     @Override
@@ -104,6 +121,7 @@ public class AppointmentServiceImpl extends GenericServiceImpl<AppointmentDao, A
         this.repository.update(appointment);
     }
 
+    @Override
     public Appointment create(Appointment model) throws InvalidAppointmentDateException {
         if (model.getFromDate().getMinuteOfHour() % 15 != 0)
             throw new InvalidMinutesException();
@@ -192,8 +210,90 @@ public class AppointmentServiceImpl extends GenericServiceImpl<AppointmentDao, A
     }
 
     @Override
+    public List<List<AppointmentTimeSlot>> findWeekTimeslots(Staff staff, LocalDateTime from, LocalDateTime to) {
+        List<AppointmentTimeSlot> timeSlots = findAvailableTimeslots(staff, from, to);
+        List<List<AppointmentTimeSlot>> weekslots = new LinkedList<>();
+        for (int i = 0; i <= 7; i++) {
+            weekslots.add(new LinkedList<>());
+        }
+        for (AppointmentTimeSlot timeSlot : timeSlots) {
+            if (timeSlot.getDate().getDayOfWeek() < 1 && timeSlot.getDate().getDayOfWeek() > 7) {
+                weekslots.get(0).add(timeSlot);
+            } else {
+                weekslots.get(timeSlot.getDate().getDayOfWeek()).add(timeSlot);
+            }
+        }
+        return weekslots;
+    }
+
+    @Override
     public List<AppointmentTimeSlot> findAvailableTimeslots(Staff staff, LocalDateTime date) {
         return this.findAvailableTimeslots(staff, date, date.withTime(23, 59, 59, 999));
+    }
+
+    @Override
+    public List<Appointment> cancelAppointments(Workday workday) {
+        List<Appointment> cancelled = new LinkedList<>();
+        List<Appointment> appointments = findByWorkday(workday);
+        //check if user is allowed to cancel
+        for(Appointment a: appointments) {
+            if(workday.getStaff().equals(a.getStaff())) {
+                remove(a.getId());
+                cancelled.add(a);
+            }
+        }
+        return cancelled;
+    }
+
+    @Override
+    public List<Appointment> findByWorkday(Workday workday) {
+        return this.repository.findByWorkday(workday);
+    }
+
+    @Override
+    public Map<Workday, Integer> appointmentQtyByWorkdayOfUser(User user) {
+        Map<Workday, Integer> appointmentMap = new HashMap<>();
+        List<Workday> workdays = this.workdayService.findByUser(user);
+        for(Workday workday: workdays){
+            List<Appointment> appointments = findByWorkday(workday);
+            List<Appointment> myAppts = new LinkedList<>();
+            for(Appointment appointment : appointments){
+                if(appointment.getStaff().getUser().equals(user)){
+                    myAppts.add(appointment);
+                }
+            }
+            appointmentMap.put(workday, myAppts.size());
+        }
+        return appointmentMap;
+    }
+
+    @Override
+    public void remove(Integer id, User user) {
+        Optional<Appointment> appointment = findById(id);
+        if(appointment.isPresent()) {
+            //get staff for current user
+            List<Staff> staffs = this.staffService.findByUser(user); // TODO: add staff list inside User model
+            //get patient for current user
+            List<Patient> patient = this.patientService.findByUser(user);
+            //check if user is allowed to cancel
+            boolean isAllowed = false;
+            for (Patient p : patient) {
+                if (p.equals(appointment.get().getPatient())) {
+                    isAllowed = true;
+                    break;
+                }
+            }
+            //check if user is allowed to cancel
+            for (Staff s : staffs) {
+                if (s.equals(appointment.get().getStaff())) {
+                    isAllowed = true;
+                    break;
+                }
+            }
+            if (isAllowed) {
+                super.remove(id);
+            }
+        }
     }
 
     @Override

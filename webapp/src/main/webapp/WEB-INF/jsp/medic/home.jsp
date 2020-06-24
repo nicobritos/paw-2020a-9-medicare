@@ -13,6 +13,11 @@
         <div class="col-4 h-100 pl-0 mr-3 w-100">
             <h4><spring:message code="AgendaFor"/> <spring:message code="today"/></h4>
             <ul class="list-group turno-list mr-2 w-100 h-100 overflow-auto">
+                <c:if test="${todayAppointments.isEmpty()}">
+                    <div class="container-fluid justify-content-center">
+                        <p class="text-left mt-4" style="color:grey;"><spring:message code="NoAppointmentsToday"/></p>
+                    </div>
+                </c:if>
                 <c:forEach var="appointment" items="${todayAppointments}">
                     <li class="list-group-item turno-item mb-3" id="lit">
                         <div class="container">
@@ -29,19 +34,28 @@
                                 </div>
                                 <div class="col-6">
                                     <div class="row justify-content-start">
-                                        <h5><c:out
-                                                value="${appointment.patient.user.firstName} ${appointment.patient.user.surname}"/></h5>
+                                        <h5><spring:message code="name_surname" arguments="${appointment.patient.user.firstName};${appointment.patient.user.surname}" argumentSeparator=";"/></h5>
                                     </div>
                                     <div class="row">
-                                        <p class="m-0"><c:if
-                                                test="${appointment.fromDate.hourOfDay < 10}">0</c:if><c:out
-                                                value="${appointment.fromDate.hourOfDay}"/>:<c:if
-                                                test="${appointment.fromDate.minuteOfHour < 10}">0</c:if><c:out
-                                                value="${appointment.fromDate.minuteOfHour}"/> - <c:if
-                                                test="${appointment.toDate.hourOfDay < 10}">0</c:if><c:out
-                                                value="${appointment.toDate.hourOfDay}"/>:<c:if
-                                                test="${appointment.toDate.minuteOfHour < 10}">0</c:if><c:out
-                                                value="${appointment.toDate.minuteOfHour}"/></p>
+                                        <p class="m-0">
+                                            <c:choose>
+                                                <c:when test="${appointment.fromDate.hourOfDay < 10}"><c:set value="0${appointment.fromDate.hourOfDay}" var="vafromHourOfDay"/></c:when>
+                                                <c:otherwise><c:set value="${appointment.fromDate.hourOfDay}" var="vafromHourOfDay"/></c:otherwise>
+                                            </c:choose>
+                                            <c:choose>
+                                                <c:when test="${appointment.fromDate.minuteOfHour < 10}"><c:set value="0${appointment.fromDate.minuteOfHour}" var="vafromMinuteOfHour"/></c:when>
+                                                <c:otherwise><c:set value="${appointment.fromDate.minuteOfHour}" var="vafromMinuteOfHour"/></c:otherwise>
+                                            </c:choose>
+                                            <c:choose>
+                                                <c:when test="${appointment.toDate.hourOfDay < 10}"><c:set value="0${appointment.toDate.hourOfDay}" var="vatoHourOfDay"/></c:when>
+                                                <c:otherwise><c:set value="${appointment.toDate.hourOfDay}" var="vatoHourOfDay"/></c:otherwise>
+                                            </c:choose>
+                                            <c:choose>
+                                                <c:when test="${appointment.toDate.minuteOfHour < 10}"><c:set value="0${appointment.toDate.minuteOfHour}" var="vatoMinuteOfHour"/></c:when>
+                                                <c:otherwise><c:set value="${appointment.toDate.minuteOfHour}" var="vatoMinuteOfHour"/></c:otherwise>
+                                            </c:choose>
+                                            <spring:message argumentSeparator=";" arguments="${vafromHourOfDay};${vafromMinuteOfHour};${vatoHourOfDay};${vatoMinuteOfHour}" code="fhom_fmoh_thod_tmoh"/>
+                                        </p>
                                     </div>
                                 </div>
                                 <div class="col-2 justify-content-start">
@@ -55,10 +69,8 @@
                                         <div class="dropdown-menu">
                                             <!-- TODO add reprogramar -->
 
-                                            <form action="<c:url value="/staff/appointment/${appointment.id}${query}"/>"
-                                                  method="post">
-                                                <button type="submit" class="dropdown-item"><spring:message
-                                                        code="Cancel"/></button>
+                                            <form action="<c:url value="/staff/appointment/${appointment.id}${query}"/>" method="post">
+                                                <button type="submit" class="dropdown-item"><spring:message code="Cancel"/></button>
                                             </form>
                                         </div>
                                     </div>
@@ -84,65 +96,41 @@
                                   <c:if test="${monday.plusDays(i).dayOfYear == today.dayOfYear && monday.plusDays(i).year == today.year}">style="font-weight:bold"</c:if>>
                                 <p class="mb-0">
                                   <c:choose>
-                                      <c:when test="${monday.plusDays(i).dayOfWeek == 1}"><spring:message
-                                              code="MondayAbbreviated"/></c:when>
-                                      <c:when test="${monday.plusDays(i).dayOfWeek == 2}"><spring:message
-                                              code="TuesdayAbbreviated"/></c:when>
-                                      <c:when test="${monday.plusDays(i).dayOfWeek == 3}"><spring:message
-                                              code="WednesdayAbbreviated"/></c:when>
-                                      <c:when test="${monday.plusDays(i).dayOfWeek == 4}"><spring:message
-                                              code="ThursdayAbbreviated"/></c:when>
-                                      <c:when test="${monday.plusDays(i).dayOfWeek == 5}"><spring:message
-                                              code="FridayAbbreviated"/></c:when>
-                                      <c:when test="${monday.plusDays(i).dayOfWeek == 6}"><spring:message
-                                              code="SaturdayAbbreviated"/></c:when>
-                                      <c:when test="${monday.plusDays(i).dayOfWeek == 7}"><spring:message
-                                              code="SundayAbbreviated"/></c:when>
-                                      <c:otherwise>
-                                          <c:out value="${monday.plusDays(i).dayOfWeek}"/>
-                                      </c:otherwise>
+                                      <c:when test="${monday.plusDays(i).dayOfWeek == 1}"><spring:message code="MondayAbbreviated"/></c:when>
+                                      <c:when test="${monday.plusDays(i).dayOfWeek == 2}"><spring:message code="TuesdayAbbreviated"/></c:when>
+                                      <c:when test="${monday.plusDays(i).dayOfWeek == 3}"><spring:message code="WednesdayAbbreviated"/></c:when>
+                                      <c:when test="${monday.plusDays(i).dayOfWeek == 4}"><spring:message code="ThursdayAbbreviated"/></c:when>
+                                      <c:when test="${monday.plusDays(i).dayOfWeek == 5}"><spring:message code="FridayAbbreviated"/></c:when>
+                                      <c:when test="${monday.plusDays(i).dayOfWeek == 6}"><spring:message code="SaturdayAbbreviated"/></c:when>
+                                      <c:when test="${monday.plusDays(i).dayOfWeek == 7}"><spring:message code="SundayAbbreviated"/></c:when>
+                                      <c:otherwise><c:out value="${monday.plusDays(i).dayOfWeek}"/></c:otherwise>
                                   </c:choose>
                                 </p>
                                 <!-- day/month -->
-                                <p class="my-0"><c:out value="${monday.plusDays(i).dayOfMonth}"/> <spring:message
-                                        code="of"/>
+                                <p class="my-0">
                                     <c:choose>
-                                        <c:when test="${monday.plusDays(i).monthOfYear == 1}"><spring:message
-                                                code="JanuaryAbbreviated"/></c:when>
-                                        <c:when test="${monday.plusDays(i).monthOfYear == 2}"><spring:message
-                                                code="FebruaryAbbreviated"/></c:when>
-                                        <c:when test="${monday.plusDays(i).monthOfYear == 3}"><spring:message
-                                                code="MarchAbbreviated"/></c:when>
-                                        <c:when test="${monday.plusDays(i).monthOfYear == 4}"><spring:message
-                                                code="AprilAbbreviated"/></c:when>
-                                        <c:when test="${monday.plusDays(i).monthOfYear == 5}"><spring:message
-                                                code="MayAbbreviated"/></c:when>
-                                        <c:when test="${monday.plusDays(i).monthOfYear == 6}"><spring:message
-                                                code="JuneAbbreviated"/></c:when>
-                                        <c:when test="${monday.plusDays(i).monthOfYear == 7}"><spring:message
-                                                code="JulyAbbreviated"/></c:when>
-                                        <c:when test="${monday.plusDays(i).monthOfYear == 8}"><spring:message
-                                                code="AugustAbbreviated"/></c:when>
-                                        <c:when test="${monday.plusDays(i).monthOfYear == 9}"><spring:message
-                                                code="SeptemberAbbreviated"/></c:when>
-                                        <c:when test="${monday.plusDays(i).monthOfYear == 10}"><spring:message
-                                                code="OctoberAbbreviated"/></c:when>
-                                        <c:when test="${monday.plusDays(i).monthOfYear == 11}"><spring:message
-                                                code="NovemberAbbreviated"/></c:when>
-                                        <c:when test="${monday.plusDays(i).monthOfYear == 12}"><spring:message
-                                                code="DecemberAbbreviated"/></c:when>
-                                        <c:otherwise>${monday.plusDays(i).monthOfYear}</c:otherwise>
+                                        <c:when test="${monday.plusDays(i).monthOfYear == 1}"><spring:message code="JanuaryAbbreviated" var="mpdMonthOfYear"/></c:when>
+                                        <c:when test="${monday.plusDays(i).monthOfYear == 2}"><spring:message code="FebruaryAbbreviated" var="mpdMonthOfYear"/></c:when>
+                                        <c:when test="${monday.plusDays(i).monthOfYear == 3}"><spring:message code="MarchAbbreviated" var="mpdMonthOfYear"/></c:when>
+                                        <c:when test="${monday.plusDays(i).monthOfYear == 4}"><spring:message code="AprilAbbreviated" var="mpdMonthOfYear"/></c:when>
+                                        <c:when test="${monday.plusDays(i).monthOfYear == 5}"><spring:message code="MayAbbreviated" var="mpdMonthOfYear"/></c:when>
+                                        <c:when test="${monday.plusDays(i).monthOfYear == 6}"><spring:message code="JuneAbbreviated" var="mpdMonthOfYear"/></c:when>
+                                        <c:when test="${monday.plusDays(i).monthOfYear == 7}"><spring:message code="JulyAbbreviated" var="mpdMonthOfYear"/></c:when>
+                                        <c:when test="${monday.plusDays(i).monthOfYear == 8}"><spring:message code="AugustAbbreviated" var="mpdMonthOfYear"/></c:when>
+                                        <c:when test="${monday.plusDays(i).monthOfYear == 9}"><spring:message code="SeptemberAbbreviated" var="mpdMonthOfYear"/></c:when>
+                                        <c:when test="${monday.plusDays(i).monthOfYear == 10}"><spring:message code="OctoberAbbreviated" var="mpdMonthOfYear"/></c:when>
+                                        <c:when test="${monday.plusDays(i).monthOfYear == 11}"><spring:message code="NovemberAbbreviated" var="mpdMonthOfYear"/></c:when>
+                                        <c:when test="${monday.plusDays(i).monthOfYear == 12}"><spring:message code="DecemberAbbreviated" var="mpdMonthOfYear"/></c:when>
+                                        <c:otherwise><c:set value="${monday.plusDays(i).monthOfYear}" var="mpdMonthOfYear"/> </c:otherwise>
                                     </c:choose>
+                                    <spring:message code="dom_moy" argumentSeparator=";" arguments="${monday.plusDays(i).dayOfMonth};${mpdMonthOfYear}"/>
                                 </p>
-                                <p><c:out value="${weekAppointments.get(monday.plusDays(i).dayOfWeek).size()}"/>
+                                <p>
                                     <c:choose>
-                                        <c:when test="${weekAppointments.get(monday.plusDays(i).dayOfWeek).size() == 1}">
-                                            <spring:message code="appointmentAbbreviated"/>
-                                        </c:when>
-                                        <c:otherwise>
-                                            <spring:message code="appointmentsAbbreviated"/>
-                                        </c:otherwise>
+                                        <c:when test="${weekAppointments.get(monday.plusDays(i).dayOfWeek).size() == 1}"><spring:message code="appointmentAbbreviated" var="vwapp"/></c:when>
+                                        <c:otherwise><spring:message code="appointmentsAbbreviated" var="vwapp"/></c:otherwise>
                                     </c:choose>
+                                    <spring:message arguments="${weekAppointments.get(monday.plusDays(i).dayOfWeek).size()};${vwapp}" argumentSeparator=";" code="NumberedAppointments"/>
                                 </p>
                             </span>
                         </td>
@@ -155,6 +143,11 @@
                     <td colspan="9">
                         <div class="container-fluid d-flex justify-content-center">
                             <ul class="list-group turno-list mr-2 w-50 overflow-auto">
+                                <c:if test="${weekAppointments.get(today.dayOfWeek).isEmpty()}">
+                                    <div class="container-fluid justify-content-center">
+                                        <p class="text-center mt-4" style="color:grey;"><spring:message code="NoAppointmentsThisDay"/></p>
+                                    </div>
+                                </c:if>
                                 <c:forEach var="appointment" items="${weekAppointments.get(today.dayOfWeek)}">
                                     <li class="list-group-item turno-item mb-3">
                                         <div class="container">
@@ -172,19 +165,28 @@
                                                 </div>
                                                 <div class="col-6">
                                                     <div class="row justify-content-start">
-                                                        <h5><c:out
-                                                                value="${appointment.patient.user.firstName} ${appointment.patient.user.surname}"/></h5>
+                                                        <h5><c:out value="${appointment.patient.user.firstName} ${appointment.patient.user.surname}"/></h5>
                                                     </div>
                                                     <div class="row">
-                                                        <p class="m-0"><c:if
-                                                                test="${appointment.fromDate.hourOfDay < 10}">0</c:if><c:out
-                                                                value="${appointment.fromDate.hourOfDay}"/>:<c:if
-                                                                test="${appointment.fromDate.minuteOfHour < 10}">0</c:if><c:out
-                                                                value="${appointment.fromDate.minuteOfHour}"/> - <c:if
-                                                                test="${appointment.toDate.hourOfDay < 10}">0</c:if><c:out
-                                                                value="${appointment.toDate.hourOfDay}"/>:<c:if
-                                                                test="${appointment.toDate.minuteOfHour < 10}">0</c:if><c:out
-                                                                value="${appointment.toDate.minuteOfHour}"/></p>
+                                                        <p class="m-0">
+                                                            <c:choose>
+                                                                <c:when test="${appointment.fromDate.hourOfDay < 10}"><c:set value="0${appointment.fromDate.hourOfDay}" var="vafromHourOfDay"/></c:when>
+                                                                <c:otherwise><c:set value="${appointment.fromDate.hourOfDay}" var="vafromHourOfDay"/></c:otherwise>
+                                                            </c:choose>
+                                                            <c:choose>
+                                                                <c:when test="${appointment.fromDate.minuteOfHour < 10}"><c:set value="0${appointment.fromDate.minuteOfHour}" var="vafromMinuteOfHour"/></c:when>
+                                                                <c:otherwise><c:set value="${appointment.fromDate.minuteOfHour}" var="vafromMinuteOfHour"/></c:otherwise>
+                                                            </c:choose>
+                                                            <c:choose>
+                                                                <c:when test="${appointment.toDate.hourOfDay < 10}"><c:set value="0${appointment.toDate.hourOfDay}" var="vatoHourOfDay"/></c:when>
+                                                                <c:otherwise><c:set value="${appointment.toDate.hourOfDay}" var="vatoHourOfDay"/></c:otherwise>
+                                                            </c:choose>
+                                                            <c:choose>
+                                                                <c:when test="${appointment.toDate.minuteOfHour < 10}"><c:set value="0${appointment.toDate.minuteOfHour}" var="vatoMinuteOfHour"/></c:when>
+                                                                <c:otherwise><c:set value="${appointment.toDate.minuteOfHour}" var="vatoMinuteOfHour"/></c:otherwise>
+                                                            </c:choose>
+                                                            <spring:message argumentSeparator=";" arguments="${vafromHourOfDay};${vafromMinuteOfHour};${vatoHourOfDay};${vatoMinuteOfHour}" code="fhom_fmoh_thod_tmoh"/>
+                                                        </p>
                                                     </div>
                                                 </div>
                                                 <div class="col-2 justify-content-start">
@@ -200,8 +202,7 @@
                                                             <form action="<c:url value="/staff/appointment/${appointment.id}${query}"/>"
                                                                   method="post" class="cancel-appt-form">
                                                                 <button type="button" class="dropdown-item cancel-appt-btn">
-                                                                    <spring:message
-                                                                            code="Cancel"/></button>
+                                                                    <spring:message code="Cancel"/></button>
                                                             </form>
                                                         </div>
                                                     </div>
@@ -222,6 +223,8 @@
     let strings = new Array();
     strings['title'] = "<spring:message code='YouAreAboutToCancelAnAppointment' javaScriptEscape='true' />";
     strings['body'] = "<spring:message code='DoYouWantToContinue' javaScriptEscape='true' />";
+    strings['accept'] = "<spring:message code='Accept' javaScriptEscape='true' />";
+    strings['cancel'] = "<spring:message code='Cancel' javaScriptEscape='true' />";
 </script>
 <script src='<c:url value="/js/scripts/staff/MedicHome.js"/> '></script>
 <script>

@@ -5,9 +5,11 @@ import ar.edu.itba.paw.models.*;
 import ar.edu.itba.paw.webapp.controller.utils.GenericController;
 import ar.edu.itba.paw.webapp.events.events.AppointmentCancelEvent;
 import ar.edu.itba.paw.webapp.events.events.UserConfirmationTokenGenerationEvent;
+import ar.edu.itba.paw.webapp.form.SpecialtyForm;
 import ar.edu.itba.paw.webapp.form.UserProfileForm;
 import ar.edu.itba.paw.webapp.form.WorkdayForm;
-import org.joda.time.LocalDateTime;
+import org.joda.time.LocalDate;
+import org.joda.time.LocalTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Controller;
@@ -19,9 +21,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import java.time.format.DateTimeParseException;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
+
+import static org.joda.time.DateTimeConstants.MONDAY;
 
 @Controller
 public class MedicHomeController extends GenericController {
@@ -45,7 +47,7 @@ public class MedicHomeController extends GenericController {
     private ApplicationEventPublisher eventPublisher;
 
     @RequestMapping("/staff/home")
-    public ModelAndView home(@RequestParam(defaultValue = "0") String week, @RequestParam(required = false, name = "today") String newToday, HttpServletRequest request) {
+    public ModelAndView home(@RequestParam(defaultValue = "0") String week, @RequestParam(required = false, name = "today") String selectedDay, HttpServletRequest request) {
         Optional<User> user = this.getUser();
         if (!user.isPresent()) {
             return new ModelAndView("redirect:/login");
@@ -53,60 +55,37 @@ public class MedicHomeController extends GenericController {
         ModelAndView mav = new ModelAndView();
 
         List<Staff> userStaffs = this.staffService.findByUser(user.get());
-        LocalDateTime today = LocalDateTime.now();
-        LocalDateTime monday;
-        LocalDateTime selected = today;
-        boolean isToday = true;
-        if (newToday != null) {
+        LocalDate today = LocalDate.now();
+        LocalDate monday;
+        LocalDate selected = today;
+        if (selectedDay != null) {
             try {
-                selected = LocalDateTime.parse(newToday);
-                isToday = false;
-            } catch (DateTimeParseException e) {
-
+                selected = LocalDate.parse(selectedDay);
+            } catch (IllegalArgumentException ignored) { // Queda en selected = today
             }
         }
         if (week != null) {
             try {
                 int weekOffset = Integer.parseInt(week);
                 today = today.plusWeeks(weekOffset);
-            } catch (NumberFormatException e) {
-
+            } catch (NumberFormatException ignored) { // Queda en today
             }
         }
         today = today.plusDays(selected.getDayOfWeek() - today.getDayOfWeek());
-        monday = today.minusDays(today.getDayOfWeek() - 1);
+        monday = today.minusDays(today.getDayOfWeek() - MONDAY);
+        List<List<Appointment>> weekAppointments = this.appointmentService.findByStaffsAndDay(userStaffs, monday.toLocalDateTime(new LocalTime(0,0,0)), monday.plusDays(7).toLocalDateTime(new LocalTime(0,0,0)));
+        String query = request.getQueryString();
+        if (query != null && !query.isEmpty()) {
+            query = "?" + query;
+        }
 
         mav.addObject("user", user);
         if (this.isStaff()) {
             mav.addObject("staffs", this.staffService.findByUser(user.get()));
         }
         mav.addObject("today", today);
-        mav.addObject("isToday", isToday);
         mav.addObject("monday", monday);
         mav.addObject("todayAppointments", this.appointmentService.findToday(userStaffs));
-
-        List<Appointment> appointments;
-        if (monday.isAfter(LocalDateTime.now())) {
-            appointments = this.appointmentService.findByStaffsAndDay(userStaffs, LocalDateTime.now(), monday.plusDays(7));
-        } else {
-            appointments = this.appointmentService.findByStaffsAndDay(userStaffs, monday, monday.plusDays(7));
-        }
-        List<List<Appointment>> weekAppointments = new LinkedList<>();
-        for (int i = 0; i <= 7; i++) {
-            weekAppointments.add(new LinkedList<>());
-        }
-
-        for (Appointment appointment : appointments) {
-            if (appointment.getFromDate().getDayOfWeek() < 1 || appointment.getFromDate().getDayOfWeek() > 7) {
-                weekAppointments.get(0).add(appointment);
-            } else {
-                weekAppointments.get(appointment.getFromDate().getDayOfWeek()).add(appointment);
-            }
-        }
-        String query = request.getQueryString();
-        if (query != null && !query.isEmpty()) {
-            query = "?" + query;
-        }
         mav.addObject("query", query);
         mav.addObject("weekAppointments", weekAppointments); // lista de turnos que se muestra en la agenda semanal
         mav.addObject("specialties", this.staffSpecialtyService.list());
@@ -123,11 +102,18 @@ public class MedicHomeController extends GenericController {
         }
         ModelAndView mav = new ModelAndView();
         mav.addObject("user", user);
+        Map<Workday, Integer> appointmentMap = this.appointmentService.appointmentQtyByWorkdayOfUser(user.get());
         if (this.isStaff()) {
-            mav.addObject("staffs", this.staffService.findByUser(user.get()));
-            mav.addObject("workdays", this.workdayService.findByUser(user.get()));
+            List<Staff> staffs = this.staffService.findByUser(user.get());
+            mav.addObject("staffs", staffs);
+            if(!staffs.isEmpty()){
+                mav.addObject("specialties", staffs.get(0).getStaffSpecialties()); // Todos los staffSpecialties tienen el mismo stafs
+            } else {
+                mav.addObject("specialties", Collections.emptyList());
+            }
+            mav.addObject("workdays", appointmentMap.keySet());
+            mav.addObject("appointmentMap", appointmentMap);
         }
-        mav.addObject("verified", user.get().getVerified());
         mav.setViewName("medic/profile");
         return mav;
     }
@@ -143,11 +129,11 @@ public class MedicHomeController extends GenericController {
             return this.profile(form);
         }
         if ((!form.getPassword().isEmpty() && form.getPassword().length() < 8) || !form.getPassword().equals(form.getRepeatPassword())) {
-            errors.reject("Min.medicProfileForm.password", null, "Error");
+            errors.reject("Min.medicProfileForm.password", new Object[]{8}, "Error");
             return this.profile(form);
         }
-        Optional<User> userOptional = this.userService.findByUsername(form.getEmail());
-        if (userOptional.isPresent() && !userOptional.get().equals(user.get())) { // si se edito el email pero ya existe cuenta con ese email
+        Optional<User> newEmailUser = this.userService.findByUsername(form.getEmail());
+        if (newEmailUser.isPresent() && !newEmailUser.get().equals(user.get())) { // si se edito el email pero ya existe cuenta con ese email
             errors.reject("AlreadyExists.medicProfileForm.email", null, "Error");
             return this.profile(form);
         }
@@ -210,8 +196,8 @@ public class MedicHomeController extends GenericController {
             errors.reject("NotFound.workdayForm.staff", null, "Error");
             return this.addWorkday(form);
         }
-        String[] startTime = form.getStartHour().split(":");
-        String[] endTime = form.getEndHour().split(":");
+        String[] startTime = form.getStartHour().split(":"); // Formato: "HH:MM"
+        String[] endTime = form.getEndHour().split(":"); // Formato: "HH:MM"
         int startHour = Integer.parseInt(startTime[0]);
         int endHour = Integer.parseInt(endTime[0]);
         int startMin = Integer.parseInt(startTime[1]);
@@ -225,38 +211,27 @@ public class MedicHomeController extends GenericController {
             return this.addWorkday(form);
         }
 
-        Workday workday = new Workday();
-        switch (form.getDow()) {
-            case 7:
-                workday.setDay(WorkdayDay.SUNDAY);
-                break;
-            case 1:
-                workday.setDay(WorkdayDay.MONDAY);
-                break;
-            case 2:
-                workday.setDay(WorkdayDay.TUESDAY);
-                break;
-            case 3:
-                workday.setDay(WorkdayDay.WEDNESDAY);
-                break;
-            case 4:
-                workday.setDay(WorkdayDay.THURSDAY);
-                break;
-            case 5:
-                workday.setDay(WorkdayDay.FRIDAY);
-                break;
-            case 6:
-                workday.setDay(WorkdayDay.SATURDAY);
-                break;
-            default:
-                return this.addWorkday(form);
+        boolean addedDay = false;
+        for(int i=0;i<7 && i<form.getDow().length;i++){
+            if(form.getDow()[i]){
+                addedDay = true;
+                Workday workday = new Workday();
+                workday.setDay(WorkdayDay.from(i+1));
+                if(workday.getDay() == null){
+                    return this.addWorkday(form);
+                }
+                workday.setStartHour(startHour);
+                workday.setStartMinute(startMin);
+                workday.setEndHour(endHour);
+                workday.setEndMinute(endMin);
+                workday.setStaff(realStaff.get());
+                this.workdayService.create(workday);
+            }
         }
-        workday.setStartHour(startHour);
-        workday.setStartMinute(startMin);
-        workday.setEndHour(endHour);
-        workday.setEndMinute(endMin);
-        workday.setStaff(realStaff.get());
-        workday = this.workdayService.create(workday);
+        if(!addedDay){
+            errors.reject("NotEmpty.workdayForm.days", null, "Error");
+            return this.addWorkday(form);
+        }
 
         ModelAndView mav = new ModelAndView();
         mav.addObject("user", user);
@@ -283,6 +258,27 @@ public class MedicHomeController extends GenericController {
         return new ModelAndView("redirect:/staff/profile");
     }
 
+    @RequestMapping(value = "/staff/appointment/workday/{workdayId}", method = RequestMethod.POST)
+    public ModelAndView cancelAppointments(@PathVariable("workdayId") final int workdayId, HttpServletRequest request) {
+        //get current user, check for null
+        Optional<User> user = this.getUser();
+        if (!user.isPresent()) {
+            return new ModelAndView("redirect:/login");
+        }
+        //get appointment to delete, check for "null"
+        Optional<Workday> workday = this.workdayService.findById(workdayId);
+        if(!workday.isPresent()){
+            return new ModelAndView("redirect:/staff/profile");
+        }
+        List<Appointment> cancelledAppointments = this.appointmentService.cancelAppointments(workday.get());
+        for(Appointment a: cancelledAppointments) {
+            createCancelEvent(request, user.get(), a);
+        }
+        this.workdayService.remove(workdayId);
+        return new ModelAndView("redirect:/staff/profile");
+    }
+
+
     @RequestMapping(value = "/staff/appointment/{id}", method = RequestMethod.POST)
     public ModelAndView cancelAppointment(@PathVariable Integer id, HttpServletRequest request, @RequestParam(defaultValue = "0") String week, @RequestParam(required = false, name = "today") String newToday) {
         //get current user, check for null
@@ -296,33 +292,62 @@ public class MedicHomeController extends GenericController {
         if (!user.isPresent()) {
             return new ModelAndView("redirect:/login");
         }
-        //get staff for current user
-        List<Staff> staff = this.staffService.findByUser(user.get());
         //get appointment to delete, check for "null"
         Optional<Appointment> appointment = this.appointmentService.findById(id);
         if (!appointment.isPresent()) {
             return new ModelAndView("redirect:/staff/home" + query);
         }
-        //check if user is allowed to cancel
-        boolean isAllowed = false;
-        for (Staff s : staff) {
-            if (s.equals(appointment.get().getStaff())) {
-                isAllowed = true;
-                break;
-            }
-        }
-        //return response code for not allow
-        if (!isAllowed) {
-            return new ModelAndView("redirect:/staff/home" + query);
-        }
-        //cancel appointment
-        this.appointmentService.remove(appointment.get()); // TODO
-        StringBuilder baseUrl = new StringBuilder(request.getRequestURL());
-        baseUrl.replace(request.getRequestURL().lastIndexOf(request.getServletPath()), request.getRequestURL().length(), "");
-        this.eventPublisher.publishEvent(new AppointmentCancelEvent(user.get(), true, appointment.get().getPatient().getUser(), appointment.get(), request.getLocale(), baseUrl.toString()));
-//        this.appointmentService.setStatus(appointment.get(), AppointmentStatus.CANCELLED);
-        //return success
+        this.appointmentService.remove(id, user.get());
+        createCancelEvent(request, user.get(), appointment.get());
         return new ModelAndView("redirect:/staff/home" + query);
+    }
+
+    @RequestMapping(value = "/staff/profile/specialty", method = RequestMethod.POST)
+    public ModelAndView addSpecialtyAction(@Valid @ModelAttribute("specialtyForm") final SpecialtyForm form, final BindingResult errors, HttpServletRequest request, HttpServletResponse response) {
+        Optional<User> user = this.getUser();
+        if (!user.isPresent()) {
+            return new ModelAndView("redirect:/login");
+        }
+
+        if (errors.hasErrors()) {
+            return this.addSpecialty(form);
+        }
+
+        ModelAndView mav = new ModelAndView();
+        this.staffSpecialtyService.addToUser(form.getSpecialtyId(), user.get());
+        mav.addObject("user", user);
+        if (this.isStaff()) {
+            mav.addObject("staffs", this.staffService.findByUser(user.get()));
+        }
+        mav.setViewName("redirect:/staff/profile");
+        return mav;
+    }
+
+    @RequestMapping(value = "/staff/profile/specialty", method = RequestMethod.GET)
+    public ModelAndView addSpecialty(@ModelAttribute("specialtyForm") final SpecialtyForm form) {
+        Optional<User> user = this.getUser();
+        if (!user.isPresent()) {
+            return new ModelAndView("redirect:/login");
+        }
+
+        ModelAndView mav = new ModelAndView();
+        mav.addObject("user", user);
+        if (this.isStaff()) {
+            mav.addObject("staffs", this.staffService.findByUser(user.get()));
+        }
+        mav.addObject("specialties", staffSpecialtyService.list());
+        mav.setViewName("medic/addSpecialty");
+        return mav;
+    }
+
+    @RequestMapping(value = "/staff/profile/specialty/delete/{specialtyId}", method = RequestMethod.POST)
+    public ModelAndView deleteSpecialty(@PathVariable("specialtyId") final int specialtyId) {
+        Optional<User> user = this.getUser();
+        if (!user.isPresent()) {
+            return new ModelAndView("redirect:/login");
+        }
+        this.staffSpecialtyService.removeFromUser(specialtyId, user.get());
+        return new ModelAndView("redirect:/staff/profile");
     }
 
     private void createConfirmationEvent(HttpServletRequest request, User user) {
@@ -336,5 +361,11 @@ public class MedicHomeController extends GenericController {
                         request.getLocale()
                 )
         );
+    }
+
+    private void createCancelEvent(HttpServletRequest request, User user, Appointment appointment) {
+        StringBuilder baseUrl = new StringBuilder(request.getRequestURL());
+        baseUrl.replace(request.getRequestURL().lastIndexOf(request.getServletPath()), request.getRequestURL().length(), "");
+        this.eventPublisher.publishEvent(new AppointmentCancelEvent(user, true, appointment.getPatient().getUser(), appointment, request.getLocale(), baseUrl.toString()));
     }
 }

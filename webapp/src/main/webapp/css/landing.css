@@ -74,3 +74,23 @@
     left: 0;
     position: absolute;
 }
+
+.shareDiv {
+	display: flex;
+	padding: 0% 10%;
+	justify-content: center;
+}
+
+.shareTitle {
+	font-size: 1.5em;
+	padding-top: 14px;
+}
+
+.shareSocial {
+	margin-left: 30px;
+}
+
+.jssocials-share-link {
+	box-shadow: none;
+	border: none !important;
+}

@@ -83,8 +83,7 @@
                                 <button type="button" class="btn btn-info btn-sm prevButton"><</button>
                             </div>
                         </c:if>
-                        <p class="d-inline mx-2"><spring:message code="Page"/> <c:out value="${page}"/> <spring:message
-                                code="of"/> <c:out value="${paginator.totalPages}"/></p>
+                        <p class="d-inline mx-2"><spring:message code="Page_of_totalPages" argumentSeparator=";" arguments="${page};${paginator.totalPages}"/></p>
                         <c:if test="${paginator.remainingPages != 0}">
                             <div>
                                 <button type="button" class="btn btn-info btn-sm nextButton">></button>
@@ -98,6 +97,11 @@
                     </div>
                 </c:if>
                 <ul class="list-group turno-list mr-2 w-100">
+                    <c:if test="${staff.isEmpty()}">
+                        <div class="container-fluid justify-content-center">
+                            <p class="text-center" style="color:grey;"><spring:message code="NoMedicsFound"/></p>
+                        </div>
+                    </c:if>
                     <c:forEach var="member" items="${staff}">
                         <li class="list-group-item turno-item mb-3">
                             <div class="container">
@@ -118,17 +122,24 @@
                                         </div>
                                         <div class="row">
                                             <p class="m-0">
-                                                <c:forEach var="specialty" items="${member.staffSpecialties}">
+                                                <c:forEach var="specialty" items="${member.staffSpecialties}" varStatus="loop">
                                                     <c:out value="${specialty.name}"/>
+                                                    <c:if test="${!loop.last}">,</c:if>
                                                 </c:forEach>
                                             </p>
                                         </div>
                                         <div class="row">
-                                            <p class="m-0"><c:out value="${member.office.street}"/></p>
+                                            <p class="m-0"><c:out value="${member.office.street}"/> - <c:out value="${member.office.locality.name}"/></p>
                                         </div>
-                                        <div class="row">
-                                            <p class="m-0"><c:out value="${member.office.locality.name}"/></p>
-                                        </div>
+                                        <a
+                                            class="link"
+                                            href="https://www.google.com/maps/search/?api=1&query=${member.office.locality.name},${member.office.street}"
+                                            target="_blank"
+                                        >
+                                            <div class="row">
+                                                <small class="m-0"><spring:message code="SeeInGoogleMaps"/></small>
+                                            </div>
+                                        </a>
                                     </div>
                                     <div class="col d-flex justify-content-center align-items-center">
                                         <a href="<c:url value="/appointment/${member.id}/0"/>">
@@ -155,8 +166,7 @@
                                 <button type="button" class="btn btn-info btn-sm prevButton"><</button>
                             </div>
                         </c:if>
-                        <p class="d-inline mx-2"><spring:message code="Page"/> <c:out value="${page}"/> <spring:message
-                                code="of"/> <c:out value="${paginator.totalPages}"/></p>
+                        <p class="d-inline mx-2"><spring:message code="Page_of_totalPages" argumentSeparator=";" arguments="${page};${paginator.totalPages}"/></p>
                         <c:if test="${paginator.remainingPages != 0}">
                             <div>
                                 <button type="button" class="btn btn-info btn-sm nextButton">></button>

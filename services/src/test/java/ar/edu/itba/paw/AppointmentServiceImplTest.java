@@ -114,13 +114,13 @@ public class AppointmentServiceImplTest {
         return appointment;
     }
 
-    @Test
-    public void mockExample() {
-        Staff staff = staffModel();
-        Mockito.when(mockDao.find(Mockito.eq(staff))).thenReturn(Collections.singletonList(appointmentModel()));
-        List<Appointment> appointments = appointmentService.find(staff);
-        assertEquals(appointments, Collections.singletonList(appointmentModel()));
-    }
+//    @Test
+//    public void mockExample() {
+//        Staff staff = staffModel();
+//        Mockito.when(mockDao.find(Mockito.eq(staff))).thenReturn(Collections.singletonList(appointmentModel()));
+//        List<Appointment> appointments = appointmentService.find(staff);
+//        assertEquals(appointments, Collections.singletonList(appointmentModel()));
+//    }
 
     @Test
     public void changeToPossibleStatusOfPendingAppointmentTest() {
