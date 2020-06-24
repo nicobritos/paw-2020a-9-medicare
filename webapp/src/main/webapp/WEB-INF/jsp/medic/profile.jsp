@@ -139,7 +139,10 @@
                                         test="${workday.endMinute < 10}">0</c:if><c:out
                                         value="${workday.endMinute}hs - ${workday.staff.office.name}"/></p>
                                 <form action="<c:url value="/staff/profile/workday/delete/${workday.id}"/>"
-                                      method="post" class="cancel-workday-form" data-appointment_url="<c:url value="/staff/appointment/workday/${workday.id}"/>">
+                                      method="post" class="cancel-workday-form"
+                                      data-appointment_url="<c:url value="/staff/appointment/workday/${workday.id}"/>"
+                                      data-appts="<spring:message code='YouWillDeleteAppts' javaScriptEscape='true' arguments="${appointmentMap.get(workday)}"/>"
+                                >
                                     <button class="btn cancel-workday-btn" type="button">X</button>
                                 </form>
                             </c:forEach>

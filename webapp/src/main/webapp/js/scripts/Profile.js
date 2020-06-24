@@ -64,7 +64,7 @@ const Profile = function () {
                         if(check) {
                             Swal.fire({
                                 title: workday_strings['title2'],
-                                text: workday_strings['body2'],
+                                text: workday_strings['body2'] + ' ' + element.dataset.appts,
                                 icon: 'warning',
                                 showCancelButton: true,
                                 confirmButtonColor: '#3085d6',

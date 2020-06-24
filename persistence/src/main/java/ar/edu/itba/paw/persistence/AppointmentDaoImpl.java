@@ -191,10 +191,6 @@ public class AppointmentDaoImpl extends GenericDaoImpl<Appointment, Integer> imp
                         builder.function("DATE_PART", Integer.class, builder.literal("isodow"), root.get(Appointment_.fromDate)),
                         workday.getDay().toInteger()
                 ),
-                builder.greaterThanOrEqualTo(
-                        root.get(Appointment_.fromDate),
-                        fromDate
-                ),
                 builder.and(
                         builder.or(
                                 builder.and(
@@ -225,12 +221,11 @@ public class AppointmentDaoImpl extends GenericDaoImpl<Appointment, Integer> imp
                                 ),
                                 builder.lessThan(
                                         builder.function("HOUR", Integer.class, root.get(Appointment_.fromDate)),
-                                        workday.getEndMinute()
+                                        workday.getEndHour()
                                 )
                         )
                 )
         ));
-
         return this.selectQuery(builder, query, root);
     }
 

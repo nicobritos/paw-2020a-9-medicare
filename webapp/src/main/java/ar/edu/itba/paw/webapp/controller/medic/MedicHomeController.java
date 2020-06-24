@@ -21,9 +21,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import java.time.format.DateTimeParseException;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 import static org.joda.time.DateTimeConstants.MONDAY;
 
@@ -105,6 +103,18 @@ public class MedicHomeController extends GenericController {
         }
         ModelAndView mav = new ModelAndView();
         mav.addObject("user", user);
+        List<Workday> workdays = this.workdayService.findByUser(user.get());
+        Map<Workday, Integer> appointmentMap = new HashMap<>();
+        for(Workday workday: workdays){
+            List<Appointment> appointments = this.appointmentService.findByWorkday(workday);
+            List<Appointment> myAppts = new LinkedList<>();
+            for(Appointment appointment : appointments){
+                if(appointment.getStaff().getUser().equals(user.get())){
+                    myAppts.add(appointment);
+                }
+            }
+            appointmentMap.put(workday, myAppts.size());
+        }
         if (this.isStaff()) {
             List<Staff> staffs = this.staffService.findByUser(user.get());
             mav.addObject("staffs", staffs);
@@ -113,7 +123,8 @@ public class MedicHomeController extends GenericController {
             } else {
                 mav.addObject("specialties", Collections.emptyList());
             }
-            mav.addObject("workdays", this.workdayService.findByUser(user.get()));
+            mav.addObject("workdays", workdays);
+            mav.addObject("appointmentMap", appointmentMap);
         }
         mav.setViewName("medic/profile");
         return mav;
@@ -252,7 +263,6 @@ public class MedicHomeController extends GenericController {
     @RequestMapping(value = "/staff/appointment/workday/{workdayId}", method = RequestMethod.POST)
     public ModelAndView cancelAppointments(@PathVariable("workdayId") final int workdayId) {
         //get current user, check for null
-        System.out.println("Aca estoy");
         Optional<User> user = this.getUser();
         if (!user.isPresent()) {
             return new ModelAndView("redirect:/login");
