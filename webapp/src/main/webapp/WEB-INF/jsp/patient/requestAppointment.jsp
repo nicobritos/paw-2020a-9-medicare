@@ -72,32 +72,42 @@
                         <img src='<c:url value="/img/calendarIcon.svg"/>' class="w-75" alt="calendar icon">
                     </div>
                     <div class="col p-0">
-                        <p class="m-0 white-text"><c:choose>
-                            <c:when test="${date.dayOfWeek == 1}"><spring:message code="Monday"/></c:when>
-                            <c:when test="${date.dayOfWeek == 2}"><spring:message code="Tuesday"/></c:when>
-                            <c:when test="${date.dayOfWeek == 3}"><spring:message code="Wednesday"/></c:when>
-                            <c:when test="${date.dayOfWeek == 4}"><spring:message code="Thursday"/></c:when>
-                            <c:when test="${date.dayOfWeek == 5}"><spring:message code="Friday"/></c:when>
-                            <c:when test="${date.dayOfWeek == 6}"><spring:message code="Saturday"/></c:when>
-                            <c:when test="${date.dayOfWeek == 7}"><spring:message code="Sunday"/></c:when>
-                            <c:otherwise><c:out value="${date.dayOfWeek}"/></c:otherwise>
-                        </c:choose><c:out value="${date.dayOfMonth} "/><spring:message code="of"/> <c:choose>
-                            <c:when test="${date.monthOfYear == 1}"><spring:message code="January"/></c:when>
-                            <c:when test="${date.monthOfYear == 2}"><spring:message code="February"/></c:when>
-                            <c:when test="${date.monthOfYear == 3}"><spring:message code="March"/></c:when>
-                            <c:when test="${date.monthOfYear == 4}"><spring:message code="April"/></c:when>
-                            <c:when test="${date.monthOfYear == 5}"><spring:message code="May"/></c:when>
-                            <c:when test="${date.monthOfYear == 6}"><spring:message code="June"/></c:when>
-                            <c:when test="${date.monthOfYear == 7}"><spring:message code="July"/></c:when>
-                            <c:when test="${date.monthOfYear == 8}"><spring:message code="August"/></c:when>
-                            <c:when test="${date.monthOfYear == 9}"><spring:message code="September"/></c:when>
-                            <c:when test="${date.monthOfYear == 10}"><spring:message code="October"/></c:when>
-                            <c:when test="${date.monthOfYear == 11}"><spring:message code="November"/></c:when>
-                            <c:when test="${date.monthOfYear == 12}"><spring:message code="December"/></c:when>
-                            <c:otherwise><c:out value="${date.monthOfYear}"/></c:otherwise>
-                        </c:choose>, <c:if test="${date.hourOfDay < 10}">0</c:if><c:out
-                                value="${date.hourOfDay}"/>:<c:if test="${date.minuteOfHour < 10}">0</c:if><c:out
-                                value="${date.minuteOfHour}hs"/></p>
+                        <p class="m-0 white-text">
+                            <c:choose>
+                                <c:when test="${date.dayOfWeek == 1}"><spring:message code="Monday" var="vdateDayOfWeek"/></c:when>
+                                <c:when test="${date.dayOfWeek == 2}"><spring:message code="Tuesday" var="vdateDayOfWeek"/></c:when>
+                                <c:when test="${date.dayOfWeek == 3}"><spring:message code="Wednesday" var="vdateDayOfWeek"/></c:when>
+                                <c:when test="${date.dayOfWeek == 4}"><spring:message code="Thursday" var="vdateDayOfWeek"/></c:when>
+                                <c:when test="${date.dayOfWeek == 5}"><spring:message code="Friday" var="vdateDayOfWeek"/></c:when>
+                                <c:when test="${date.dayOfWeek == 6}"><spring:message code="Saturday" var="vdateDayOfWeek"/></c:when>
+                                <c:when test="${date.dayOfWeek == 7}"><spring:message code="Sunday" var="vdateDayOfWeek"/></c:when>
+                                <c:otherwise><c:set var="vdateDayOfWeek" value="${date.dayOfWeek}"/></c:otherwise>
+                            </c:choose>
+                             <c:choose>
+                                <c:when test="${date.monthOfYear == 1}"><spring:message code="January" var="vdateMonthOfYear"/></c:when>
+                                <c:when test="${date.monthOfYear == 2}"><spring:message code="February" var="vdateMonthOfYear"/></c:when>
+                                <c:when test="${date.monthOfYear == 3}"><spring:message code="March" var="vdateMonthOfYear"/></c:when>
+                                <c:when test="${date.monthOfYear == 4}"><spring:message code="April" var="vdateMonthOfYear"/></c:when>
+                                <c:when test="${date.monthOfYear == 5}"><spring:message code="May" var="vdateMonthOfYear"/></c:when>
+                                <c:when test="${date.monthOfYear == 6}"><spring:message code="June" var="vdateMonthOfYear"/></c:when>
+                                <c:when test="${date.monthOfYear == 7}"><spring:message code="July" var="vdateMonthOfYear"/></c:when>
+                                <c:when test="${date.monthOfYear == 8}"><spring:message code="August" var="vdateMonthOfYear"/></c:when>
+                                <c:when test="${date.monthOfYear == 9}"><spring:message code="September" var="vdateMonthOfYear"/></c:when>
+                                <c:when test="${date.monthOfYear == 10}"><spring:message code="October" var="vdateMonthOfYear"/></c:when>
+                                <c:when test="${date.monthOfYear == 11}"><spring:message code="November" var="vdateMonthOfYear"/></c:when>
+                                <c:when test="${date.monthOfYear == 12}"><spring:message code="December" var="vdateMonthOfYear"/></c:when>
+                                <c:otherwise><c:set value="${date.monthOfYear}" var="vdateMonthOfYear"/></c:otherwise>
+                            </c:choose>
+                            <c:choose>
+                                <c:when test="${date.hourOfDay < 10}"><c:set var="vdateHourOfDay" value="0${date.hourOfDay}"/></c:when>
+                                <c:otherwise><c:set var="vdateHourOfDay" value="${date.hourOfDay}"/></c:otherwise>
+                            </c:choose>
+                            <c:choose>
+                                <c:when test="${date.minuteOfHour < 10}"><c:set var="vdateMinuteOfHour" value="0${date.minuteOfHour}"/></c:when>
+                                <c:otherwise><c:set var="vdateMinuteOfHour" value="${date.minuteOfHour}"/></c:otherwise>
+                            </c:choose>
+                            <spring:message arguments="${vdateDayOfWeek};${date.dayOfMonth};${vdateMonthOfYear};${vdateHourOfDay};${vdateMinuteOfHour}" argumentSeparator=";" code="dow_dom_moy_hod_moh"/>
+                        </p>
                         <a href="<c:url value="/appointment/${staffId}/0"/> "><small class="white-text"><spring:message
                                 code="ChangeDate"/></small></a>
                     </div>

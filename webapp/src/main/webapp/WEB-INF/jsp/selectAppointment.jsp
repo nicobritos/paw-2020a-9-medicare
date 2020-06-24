@@ -87,55 +87,53 @@
                 <c:forEach var="i" begin="0" end="6">
                     <div class="col-1 mr-4 p-0">
                             <span class="d-flex flex-column align-items-center text-center">
-                                <p class="mb-0"><c:choose>
-                                    <c:when test="${monday.plusDays(i).dayOfWeek == 1}"><spring:message code="Monday"/></c:when>
-                                    <c:when test="${monday.plusDays(i).dayOfWeek == 2}"><spring:message code="Tuesday"/></c:when>
-                                    <c:when test="${monday.plusDays(i).dayOfWeek == 3}"><spring:message
-                                            code="Wednesday"/></c:when>
-                                    <c:when test="${monday.plusDays(i).dayOfWeek == 4}"><spring:message
-                                            code="Thursday"/></c:when>
-                                    <c:when test="${monday.plusDays(i).dayOfWeek == 5}"><spring:message code="Friday"/></c:when>
-                                    <c:when test="${monday.plusDays(i).dayOfWeek == 6}"><spring:message
-                                            code="Saturday"/></c:when>
-                                    <c:when test="${monday.plusDays(i).dayOfWeek == 7}"><spring:message code="Sunday"/></c:when>
-                                    <c:otherwise><c:out value="${monday.plusDays(i).dayOfWeek}"/></c:otherwise>
-                                </c:choose>
+                                <p class="mb-0">
+                                    <c:choose>
+                                        <c:when test="${monday.plusDays(i).dayOfWeek == 1}"><spring:message code="Monday"/></c:when>
+                                        <c:when test="${monday.plusDays(i).dayOfWeek == 2}"><spring:message code="Tuesday"/></c:when>
+                                        <c:when test="${monday.plusDays(i).dayOfWeek == 3}"><spring:message code="Wednesday"/></c:when>
+                                        <c:when test="${monday.plusDays(i).dayOfWeek == 4}"><spring:message code="Thursday"/></c:when>
+                                        <c:when test="${monday.plusDays(i).dayOfWeek == 5}"><spring:message code="Friday"/></c:when>
+                                        <c:when test="${monday.plusDays(i).dayOfWeek == 6}"><spring:message code="Saturday"/></c:when>
+                                        <c:when test="${monday.plusDays(i).dayOfWeek == 7}"><spring:message code="Sunday"/></c:when>
+                                        <c:otherwise><c:out value="${monday.plusDays(i).dayOfWeek}"/></c:otherwise>
+                                    </c:choose>
                                 </p>
                                 <!-- day/month -->
-                                <p class="my-0"><c:out value="${monday.plusDays(i).dayOfMonth}"/> <spring:message
-                                        code="of"/> <c:choose>
-                                    <c:when test="${monday.plusDays(i).monthOfYear == 1}"><spring:message
-                                            code="January"/></c:when>
-                                    <c:when test="${monday.plusDays(i).monthOfYear == 2}"><spring:message
-                                            code="February"/></c:when>
-                                    <c:when test="${monday.plusDays(i).monthOfYear == 3}"><spring:message code="March"/></c:when>
-                                    <c:when test="${monday.plusDays(i).monthOfYear == 4}"><spring:message code="April"/></c:when>
-                                    <c:when test="${monday.plusDays(i).monthOfYear == 5}"><spring:message
-                                            code="May"/></c:when>
-                                    <c:when test="${monday.plusDays(i).monthOfYear == 6}"><spring:message code="June"/></c:when>
-                                    <c:when test="${monday.plusDays(i).monthOfYear == 7}"><spring:message code="July"/></c:when>
-                                    <c:when test="${monday.plusDays(i).monthOfYear == 8}"><spring:message
-                                            code="August"/></c:when>
-                                    <c:when test="${monday.plusDays(i).monthOfYear == 9}"><spring:message
-                                            code="September"/></c:when>
-                                    <c:when test="${monday.plusDays(i).monthOfYear == 10}"><spring:message
-                                            code="October"/></c:when>
-                                    <c:when test="${monday.plusDays(i).monthOfYear == 11}"><spring:message
-                                            code="November"/></c:when>
-                                    <c:when test="${monday.plusDays(i).monthOfYear == 12}"><spring:message
-                                            code="December"/></c:when>
-                                    <c:otherwise><c:out value="${monday.plusDays(i).monthOfYear}"/></c:otherwise>
-                                </c:choose>
+                                <p class="my-0">
+                                    <c:choose>
+                                        <c:when test="${monday.plusDays(i).monthOfYear == 1}"><spring:message code="January" var="vmondaypdMonthOfYear"/></c:when>
+                                        <c:when test="${monday.plusDays(i).monthOfYear == 2}"><spring:message code="February" var="vmondaypdMonthOfYear"/></c:when>
+                                        <c:when test="${monday.plusDays(i).monthOfYear == 3}"><spring:message code="March" var="vmondaypdMonthOfYear"/></c:when>
+                                        <c:when test="${monday.plusDays(i).monthOfYear == 4}"><spring:message code="April" var="vmondaypdMonthOfYear"/></c:when>
+                                        <c:when test="${monday.plusDays(i).monthOfYear == 5}"><spring:message code="May" var="vmondaypdMonthOfYear"/></c:when>
+                                        <c:when test="${monday.plusDays(i).monthOfYear == 6}"><spring:message code="June" var="vmondaypdMonthOfYear"/></c:when>
+                                        <c:when test="${monday.plusDays(i).monthOfYear == 7}"><spring:message code="July" var="vmondaypdMonthOfYear"/></c:when>
+                                        <c:when test="${monday.plusDays(i).monthOfYear == 8}"><spring:message code="August" var="vmondaypdMonthOfYear"/></c:when>
+                                        <c:when test="${monday.plusDays(i).monthOfYear == 9}"><spring:message code="September" var="vmondaypdMonthOfYear"/></c:when>
+                                        <c:when test="${monday.plusDays(i).monthOfYear == 10}"><spring:message code="October" var="vmondaypdMonthOfYear"/></c:when>
+                                        <c:when test="${monday.plusDays(i).monthOfYear == 11}"><spring:message code="November" var="vmondaypdMonthOfYear"/></c:when>
+                                        <c:when test="${monday.plusDays(i).monthOfYear == 12}"><spring:message code="December" var="vmondaypdMonthOfYear"/></c:when>
+                                        <c:otherwise><c:set value="${monday.plusDays(i).monthOfYear}" var = "vmondaypdMonthOfYear"/></c:otherwise>
+                                    </c:choose>
+                                    <spring:message argumentSeparator=";" arguments="${monday.plusDays(i).dayOfMonth};${vmondaypdMonthOfYear}" code="dom_moy"/>
                                 </p>
                             </span>
                         <div class="d-flex flex-column align-content-center">
                             <c:forEach var="timeslot" items="${weekSlots.get(monday.plusDays(i).dayOfWeek)}">
                                 <a href="<c:url value="/patient/appointment/${staff.id}/${timeslot.date.year}/${timeslot.date.monthOfYear}/${timeslot.date.dayOfMonth}/${timeslot.date.hourOfDay}/${timeslot.date.minuteOfHour}"/>"
                                    class="btn btn-sm btn-secondary mb-2">
-                                    <p class="m-0"><c:if test="${timeslot.date.hourOfDay < 10}">0</c:if><c:out
-                                            value="${timeslot.date.hourOfDay}:"/><c:if
-                                            test="${timeslot.date.minuteOfHour < 10}">0</c:if><c:out
-                                            value="${timeslot.date.minuteOfHour}hs"/></p>
+                                    <p class="m-0">
+                                        <c:choose>
+                                            <c:when test="${timeslot.date.hourOfDay < 10}"><c:set var="vtdHourOfDay" value="0${timeslot.date.hourOfDay}"/></c:when>
+                                            <c:otherwise><c:set var="vtdHourOfDay" value="${timeslot.date.hourOfDay}"/></c:otherwise>
+                                        </c:choose>
+                                        <c:choose>
+                                            <c:when test="${timeslot.date.minuteOfHour < 10}"><c:set var="vtdMinuteOfHour" value="0${timeslot.date.minuteOfHour}"/></c:when>
+                                            <c:otherwise><c:set var="vtdMinuteOfHour" value="${timeslot.date.minuteOfHour}"/></c:otherwise>
+                                        </c:choose>
+                                        <spring:message argumentSeparator=";" arguments="${vtdHourOfDay};${vtdMinuteOfHour}" code="hod_moh"/>
+                                    </p>
                                 </a>
                             </c:forEach>
                         </div>
