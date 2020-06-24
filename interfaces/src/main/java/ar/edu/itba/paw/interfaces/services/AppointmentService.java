@@ -8,6 +8,7 @@ import ar.edu.itba.paw.models.*;
 import org.joda.time.LocalDateTime;
 
 import java.util.List;
+import java.util.Map;
 
 public interface AppointmentService extends GenericService<Appointment, Integer> {
     List<Appointment> find(Staff staff);
@@ -43,5 +44,9 @@ public interface AppointmentService extends GenericService<Appointment, Integer>
 
     List<AppointmentTimeSlot> findAvailableTimeslots(Staff staff, LocalDateTime date);
 
-    void cancelAppointments(Workday workday);
+    List<Appointment> cancelAppointments(Workday workday);
+
+    Map<Workday, Integer> appointmentQtyByWorkdayOfUser(User user);
+
+    void remove(Integer id, User user);
 }

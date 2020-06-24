@@ -9,10 +9,8 @@ import ar.edu.itba.paw.services.generics.GenericServiceImpl;
 import org.joda.time.LocalDateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.LinkedList;
-import java.util.List;
+
+import java.util.*;
 import java.time.DayOfWeek;
 import static org.joda.time.DateTimeConstants.MONDAY;
 import static org.joda.time.DateTimeConstants.SUNDAY;
@@ -217,18 +215,57 @@ public class AppointmentServiceImpl extends GenericServiceImpl<AppointmentDao, A
     }
 
     @Override
-    public void cancelAppointments(Workday workday) {
-        Collection<Appointment> appointments = this.repository.findByWorkday(workday);
-        if (appointments.isEmpty())
-            return;
-
-        // TODO: Enviar email
-        this.repository.cancelAppointments(appointments);
+    public List<Appointment> cancelAppointments(Workday workday) {
+        List<Appointment> cancelled = new LinkedList<>();
+        List<Appointment> appointments = findByWorkday(workday);
+        //check if user is allowed to cancel
+        for(Appointment a: appointments) {
+            if(workday.getStaff().equals(a.getStaff())) {
+                remove(a.getId());
+                cancelled.add(a);
+            }
+        }
+        return cancelled;
     }
 
     @Override
     public List<Appointment> findByWorkday(Workday workday) {
         return this.repository.findByWorkday(workday);
+    }
+
+    @Override
+    public Map<Workday, Integer> appointmentQtyByWorkdayOfUser(User user) {
+        Map<Workday, Integer> appointmentMap = new HashMap<>();
+        List<Workday> workdays = this.workdayService.findByUser(user);
+        for(Workday workday: workdays){
+            List<Appointment> appointments = findByWorkday(workday);
+            List<Appointment> myAppts = new LinkedList<>();
+            for(Appointment appointment : appointments){
+                if(appointment.getStaff().getUser().equals(user)){
+                    myAppts.add(appointment);
+                }
+            }
+            appointmentMap.put(workday, myAppts.size());
+        }
+        return appointmentMap;
+    }
+
+    @Override
+    public void remove(Integer id, User user) {
+        Optional<Appointment> appointment = findById(id);
+        //get staff for current user
+        List<Staff> staffs = this.staffService.findByUser(user); // TODO: add staff list inside User model
+        //check if user is allowed to cancel
+        boolean isAllowed = false;
+        for (Staff s : staffs) {
+            if (s.equals(appointment.get().getStaff())) {
+                isAllowed = true;
+                break;
+            }
+        }
+        if(isAllowed) {
+            super.remove(id);
+        }
     }
 
     @Override

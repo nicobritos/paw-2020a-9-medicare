@@ -61,7 +61,7 @@ public class MedicHomeController extends GenericController {
         if (selectedDay != null) {
             try {
                 selected = LocalDate.parse(selectedDay);
-            } catch (DateTimeParseException ignored) { // Queda en selected = today
+            } catch (IllegalArgumentException ignored) { // Queda en selected = today
             }
         }
         if (week != null) {
@@ -73,6 +73,11 @@ public class MedicHomeController extends GenericController {
         }
         today = today.plusDays(selected.getDayOfWeek() - today.getDayOfWeek());
         monday = today.minusDays(today.getDayOfWeek() - MONDAY);
+        List<List<Appointment>> weekAppointments = this.appointmentService.findByStaffsAndDay(userStaffs, monday.toLocalDateTime(new LocalTime(0,0,0)), monday.plusDays(7).toLocalDateTime(new LocalTime(0,0,0)));
+        String query = request.getQueryString();
+        if (query != null && !query.isEmpty()) {
+            query = "?" + query;
+        }
 
         mav.addObject("user", user);
         if (this.isStaff()) {
@@ -81,12 +86,6 @@ public class MedicHomeController extends GenericController {
         mav.addObject("today", today);
         mav.addObject("monday", monday);
         mav.addObject("todayAppointments", this.appointmentService.findToday(userStaffs));
-        List<List<Appointment>> weekAppointments = this.appointmentService.findByStaffsAndDay(userStaffs, monday.toLocalDateTime(new LocalTime(0,0,0)), monday.plusDays(7).toLocalDateTime(new LocalTime(0,0,0)));
-
-        String query = request.getQueryString();
-        if (query != null && !query.isEmpty()) {
-            query = "?" + query;
-        }
         mav.addObject("query", query);
         mav.addObject("weekAppointments", weekAppointments); // lista de turnos que se muestra en la agenda semanal
         mav.addObject("specialties", this.staffSpecialtyService.list());
@@ -103,18 +102,7 @@ public class MedicHomeController extends GenericController {
         }
         ModelAndView mav = new ModelAndView();
         mav.addObject("user", user);
-        List<Workday> workdays = this.workdayService.findByUser(user.get());
-        Map<Workday, Integer> appointmentMap = new HashMap<>();
-        for(Workday workday: workdays){
-            List<Appointment> appointments = this.appointmentService.findByWorkday(workday);
-            List<Appointment> myAppts = new LinkedList<>();
-            for(Appointment appointment : appointments){
-                if(appointment.getStaff().getUser().equals(user.get())){
-                    myAppts.add(appointment);
-                }
-            }
-            appointmentMap.put(workday, myAppts.size());
-        }
+        Map<Workday, Integer> appointmentMap = this.appointmentService.appointmentQtyByWorkdayOfUser(user.get());
         if (this.isStaff()) {
             List<Staff> staffs = this.staffService.findByUser(user.get());
             mav.addObject("staffs", staffs);
@@ -123,7 +111,7 @@ public class MedicHomeController extends GenericController {
             } else {
                 mav.addObject("specialties", Collections.emptyList());
             }
-            mav.addObject("workdays", workdays);
+            mav.addObject("workdays", appointmentMap.keySet());
             mav.addObject("appointmentMap", appointmentMap);
         }
         mav.setViewName("medic/profile");
@@ -241,6 +229,7 @@ public class MedicHomeController extends GenericController {
             }
         }
         if(!addedDay){
+            errors.reject("NotEmpty.workdayForm.days", null, "Error");
             return this.addWorkday(form);
         }
 
@@ -270,33 +259,20 @@ public class MedicHomeController extends GenericController {
     }
 
     @RequestMapping(value = "/staff/appointment/workday/{workdayId}", method = RequestMethod.POST)
-    public ModelAndView cancelAppointments(@PathVariable("workdayId") final int workdayId) {
+    public ModelAndView cancelAppointments(@PathVariable("workdayId") final int workdayId, HttpServletRequest request) {
         //get current user, check for null
         Optional<User> user = this.getUser();
         if (!user.isPresent()) {
             return new ModelAndView("redirect:/login");
         }
-        //get staff for current user
-        List<Staff> staff = this.staffService.findByUser(user.get()); // TODO: add staff list inside User model
         //get appointment to delete, check for "null"
         Optional<Workday> workday = this.workdayService.findById(workdayId);
         if(!workday.isPresent()){
             return new ModelAndView("redirect:/staff/profile");
         }
-        List<Appointment> appointments = this.appointmentService.findByWorkday(workday.get());
-        //check if user is allowed to cancel
-        for(Appointment a: appointments) {
-            boolean isAllowed = false;
-            for (Staff s : staff) {
-                if (s.equals(a.getStaff())) {
-                    isAllowed = true;
-                    break;
-                }
-            }
-            if(isAllowed) {
-                this.appointmentService.remove(a.getId()); // TODO: all the logic above should be done inside service
-                //createCancelEvent(request, user.get(), a);
-            }
+        List<Appointment> cancelledAppointments = this.appointmentService.cancelAppointments(workday.get());
+        for(Appointment a: cancelledAppointments) {
+            createCancelEvent(request, user.get(), a);
         }
         return new ModelAndView("redirect:/staff/profile");
     }
@@ -315,26 +291,12 @@ public class MedicHomeController extends GenericController {
         if (!user.isPresent()) {
             return new ModelAndView("redirect:/login");
         }
-        //get staff for current user
-        List<Staff> staff = this.staffService.findByUser(user.get()); // TODO: add staff list inside User model
         //get appointment to delete, check for "null"
         Optional<Appointment> appointment = this.appointmentService.findById(id);
         if (!appointment.isPresent()) {
             return new ModelAndView("redirect:/staff/home" + query);
         }
-        //check if user is allowed to cancel
-        boolean isAllowed = false;
-        for (Staff s : staff) {
-            if (s.equals(appointment.get().getStaff())) {
-                isAllowed = true;
-                break;
-            }
-        }
-        //return response code for not allow
-        if (!isAllowed) {
-            return new ModelAndView("redirect:/staff/home" + query);
-        }
-        this.appointmentService.remove(appointment.get().getId()); // TODO: all the logic above should be done inside service
+        this.appointmentService.remove(id, user.get());
         createCancelEvent(request, user.get(), appointment.get());
         return new ModelAndView("redirect:/staff/home" + query);
     }
@@ -351,16 +313,7 @@ public class MedicHomeController extends GenericController {
         }
 
         ModelAndView mav = new ModelAndView();
-        List<Staff> staffs = this.staffService.findByUser(user.get());
-        Optional<StaffSpecialty> staffSpecialty = this.staffSpecialtyService.findById(form.getSpecialtyId());
-        if(staffSpecialty.isPresent()) {
-            for (Staff staff : staffs) {
-                if(!staff.getStaffSpecialties().contains(staffSpecialty.get())) {
-                    staff.getStaffSpecialties().add(staffSpecialty.get());
-                    staffService.update(staff);
-                }
-            }
-        }
+        this.staffSpecialtyService.addToUser(form.getSpecialtyId(), user.get());
         mav.addObject("user", user);
         if (this.isStaff()) {
             mav.addObject("staffs", this.staffService.findByUser(user.get()));
@@ -392,15 +345,7 @@ public class MedicHomeController extends GenericController {
         if (!user.isPresent()) {
             return new ModelAndView("redirect:/login");
         }
-        List<Staff> staffs = this.staffService.findByUser(user.get());
-        Optional<StaffSpecialty> staffSpecialty = this.staffSpecialtyService.findById(specialtyId);
-        if(staffSpecialty.isPresent()) {
-            for (Staff staff : staffs) {
-                staff.getStaffSpecialties().remove(staffSpecialty.get());
-                staffService.update(staff);
-            }
-        }
-
+        this.staffSpecialtyService.removeFromUser(specialtyId, user.get());
         return new ModelAndView("redirect:/staff/profile");
     }
 
