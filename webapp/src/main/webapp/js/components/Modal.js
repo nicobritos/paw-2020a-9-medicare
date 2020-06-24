@@ -4,6 +4,8 @@ const Modal = function () {
      *     title: {String|HTML},
      *     body: {String|HTML},
      *     footer: {String|HTML|null},
+     *     accept: {String},
+     *     cancel: {String},
      *     callbacks: {null|{
      *         confirm: {Function|null},
      *         cancel: {Function|null},
@@ -16,6 +18,8 @@ const Modal = function () {
         let title = options.title || '';
         let body = options.body || '';
         let footer = options.footer || '';
+        let accept = options.accept || '';
+        let cancel = options.cancel || '';
         let confirmCallback, cancelCallback;
         let preventDestroyOnCancel;
         let confirmed = false;
@@ -30,7 +34,7 @@ const Modal = function () {
             preventDestroyOnCancel = false;
         }
 
-        let isDefaultFooter = footer == '';
+        let isDefaultFooter = footer === '';
 
         if (typeof body !== 'string')
             body = $(body).html();
@@ -40,7 +44,7 @@ const Modal = function () {
             footer = $(footer);
         }
 
-        let modal = $($('#modal-generic-modal').html().format(title, body, footer.html()));
+        let modal = $($('#modal-generic-modal').html().format(title, body, footer.html().format(accept, cancel)));
         if (isDefaultFooter) {
             if (confirmCallback) {
                 modal.find('#modal-generic-modal-footer-confirm').click(function () {
@@ -69,6 +73,8 @@ const Modal = function () {
      *     title: {String|HTML},
      *     body: {String|HTML},
      *     footer: {String|HTML|null},
+     *     accept: {String},
+     *     cancel: {String},
      *     callbacks: {null|{
      *         confirm: {Function|null},
      *         cancel: {Function|null}

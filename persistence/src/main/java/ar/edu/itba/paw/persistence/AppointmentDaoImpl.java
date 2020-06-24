@@ -5,6 +5,7 @@ import ar.edu.itba.paw.models.*;
 import ar.edu.itba.paw.persistence.generics.GenericDaoImpl;
 import org.joda.time.LocalDateTime;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.criteria.*;
 import javax.persistence.metamodel.SingularAttribute;
@@ -187,7 +188,7 @@ public class AppointmentDaoImpl extends GenericDaoImpl<Appointment, Integer> imp
                 builder.equal(root.get(Appointment_.staff), workday.getStaff()),
                 builder.equal(root.get(Appointment_.appointmentStatus), AppointmentStatus.PENDING),
                 builder.equal(
-                        builder.function("DOW", Integer.class, root.get(Appointment_.fromDate)),
+                        builder.function("DATE_PART", Integer.class, builder.literal("isodow"), root.get(Appointment_.fromDate)),
                         workday.getDay().toInteger()
                 ),
                 builder.greaterThanOrEqualTo(
@@ -233,6 +234,7 @@ public class AppointmentDaoImpl extends GenericDaoImpl<Appointment, Integer> imp
         return this.selectQuery(builder, query, root);
     }
 
+    @Transactional
     @Override
     public void cancelAppointments(Collection<Appointment> appointments) {
         if (appointments == null)

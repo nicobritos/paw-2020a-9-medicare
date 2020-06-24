@@ -151,6 +151,8 @@ public class NewAppointmentEventListener implements ApplicationListener<NewAppoi
                 },
                 locale));
         values.put("comment", this.messageSource.getMessage(MESSAGE_SOURCE_BODY_PREFIX + ".comment", new Object[]{comment}, locale));
+        values.put("link", baseUrl);
+        values.put("buttonText", this.messageSource.getMessage(MESSAGE_SOURCE_BODY_PREFIX + ".buttonText", new Object[]{comment}, locale));
         values.put("disclaimer", this.messageSource.getMessage(MESSAGE_SOURCE_DISCLAIMER, null, locale));
         values.put("title", this.messageSource.getMessage(MESSAGE_SOURCE_BODY_PREFIX + ".title", null, locale));
 

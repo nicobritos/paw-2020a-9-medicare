@@ -7,6 +7,8 @@ const AppointmentRequest = function () {
             Modal.confirm({
                 title: strings['title'],
                 body: strings['body'],
+                accept: strings['accept'],
+                cancel: strings['cancel'],
                 callbacks: {
                     confirm: function () {
                         appointmentRequestForm.submit();

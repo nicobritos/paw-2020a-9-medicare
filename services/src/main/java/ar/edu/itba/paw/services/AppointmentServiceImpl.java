@@ -227,6 +227,11 @@ public class AppointmentServiceImpl extends GenericServiceImpl<AppointmentDao, A
     }
 
     @Override
+    public List<Appointment> findByWorkday(Workday workday) {
+        return this.repository.findByWorkday(workday);
+    }
+
+    @Override
     protected AppointmentDao getRepository() {
         return this.repository;
     }

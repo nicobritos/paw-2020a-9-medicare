@@ -139,7 +139,7 @@
                                         test="${workday.endMinute < 10}">0</c:if><c:out
                                         value="${workday.endMinute}hs - ${workday.staff.office.name}"/></p>
                                 <form action="<c:url value="/staff/profile/workday/delete/${workday.id}"/>"
-                                      method="post" class="cancel-workday-form">
+                                      method="post" class="cancel-workday-form" data-appointment_url="<c:url value="/staff/appointment/workday/${workday.id}"/>">
                                     <button class="btn cancel-workday-btn" type="button">X</button>
                                 </form>
                             </c:forEach>
@@ -183,9 +183,23 @@
     let workday_strings = new Array();
     workday_strings['title'] = "<spring:message code='YouAreAboutToCancelAWorkday' javaScriptEscape='true' />";
     workday_strings['body'] = "<spring:message code='DoYouWantToContinue' javaScriptEscape='true' />";
+    workday_strings['accept'] = "<spring:message code='Accept' javaScriptEscape='true' />";
+    workday_strings['cancel'] = "<spring:message code='Cancel' javaScriptEscape='true' />";
+    workday_strings['deleted'] = "<spring:message code='Deleted' javaScriptEscape='true' />";
+    workday_strings['deleted_body'] = "<spring:message code='OperationCompletedSuccessfully' javaScriptEscape='true' />";
+    workday_strings['title2'] = "";
+    workday_strings['body2'] = "<spring:message code='DoYouWantToCancelFutureAppointmentsThatMatchInThisWorkday' javaScriptEscape='true' />";
+    workday_strings['accept2'] = "<spring:message code='Yes' javaScriptEscape='true' />";
+    workday_strings['cancel2'] = "<spring:message code='No' javaScriptEscape='true' />";
     let specialty_strings = new Array();
     specialty_strings['title'] = "<spring:message code='YouAreAboutToDeleteASpecialty' javaScriptEscape='true' />";
     specialty_strings['body'] = "<spring:message code='DoYouWantToContinue' javaScriptEscape='true' />";
+    specialty_strings['accept'] = "<spring:message code='Accept' javaScriptEscape='true' />";
+    specialty_strings['cancel'] = "<spring:message code='Cancel' javaScriptEscape='true' />";
+    specialty_strings['deleted'] = "<spring:message code='Deleted' javaScriptEscape='true' />";
+    specialty_strings['deleted_body'] = "<spring:message code='OperationCompletedSuccessfully' javaScriptEscape='true' />";
+    let error_message = new Array();
+    error_message['error'] = "<spring:message code='ThereWasAnError' javaScriptEscape='true' />";
 </script>
 <script src='<c:url value="/js/scripts/Profile.js"/> '></script>
 <script>

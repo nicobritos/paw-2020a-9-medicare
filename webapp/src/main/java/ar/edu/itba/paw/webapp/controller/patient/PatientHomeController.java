@@ -200,9 +200,6 @@ public class PatientHomeController extends GenericController {
             form.setMotive("Consulta");
         }
         userOptional.ifPresent(user -> {
-            form.setEmail(user.getEmail());
-            form.setFirstName(user.getFirstName());
-            form.setSurname(user.getSurname());
             form.setPhone(user.getPhone());
         });
         Optional<User> user = getUser();

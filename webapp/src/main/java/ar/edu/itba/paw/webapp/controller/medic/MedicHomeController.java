@@ -249,6 +249,40 @@ public class MedicHomeController extends GenericController {
         return new ModelAndView("redirect:/staff/profile");
     }
 
+    @RequestMapping(value = "/staff/appointment/workday/{workdayId}", method = RequestMethod.POST)
+    public ModelAndView cancelAppointments(@PathVariable("workdayId") final int workdayId) {
+        //get current user, check for null
+        System.out.println("Aca estoy");
+        Optional<User> user = this.getUser();
+        if (!user.isPresent()) {
+            return new ModelAndView("redirect:/login");
+        }
+        //get staff for current user
+        List<Staff> staff = this.staffService.findByUser(user.get()); // TODO: add staff list inside User model
+        //get appointment to delete, check for "null"
+        Optional<Workday> workday = this.workdayService.findById(workdayId);
+        if(!workday.isPresent()){
+            return new ModelAndView("redirect:/staff/profile");
+        }
+        List<Appointment> appointments = this.appointmentService.findByWorkday(workday.get());
+        //check if user is allowed to cancel
+        for(Appointment a: appointments) {
+            boolean isAllowed = false;
+            for (Staff s : staff) {
+                if (s.equals(a.getStaff())) {
+                    isAllowed = true;
+                    break;
+                }
+            }
+            if(isAllowed) {
+                this.appointmentService.remove(a.getId()); // TODO: all the logic above should be done inside service
+                //createCancelEvent(request, user.get(), a);
+            }
+        }
+        return new ModelAndView("redirect:/staff/profile");
+    }
+
+
     @RequestMapping(value = "/staff/appointment/{id}", method = RequestMethod.POST)
     public ModelAndView cancelAppointment(@PathVariable Integer id, HttpServletRequest request, @RequestParam(defaultValue = "0") String week, @RequestParam(required = false, name = "today") String newToday) {
         //get current user, check for null

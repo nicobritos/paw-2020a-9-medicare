@@ -6,6 +6,11 @@
 <base href='<c:url value="/"/>' id="baseUrl">
 <script src='<c:url value="/js/plugins/bootstrap-notify.min.js"/>'></script>
 <script src='https://cdn.jsdelivr.net/npm/sweetalert2@9'></script>
+<script>
+    let app_strings = new Array();
+    app_strings['error'] = "<spring:message code='ThereWasAnError' javaScriptEscape='true' />";
+    app_strings['ok'] = "<spring:message code='Success' javaScriptEscape='true' />";
+</script>
 <script src='<c:url value="/js/components/App.js"/>'></script>
 <script src='<c:url value="/js/components/Modal.js"/>'></script>
 <script>

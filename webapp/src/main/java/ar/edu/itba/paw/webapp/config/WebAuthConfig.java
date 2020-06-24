@@ -29,7 +29,7 @@ import java.util.concurrent.TimeUnit;
 
 @EnableWebSecurity
 @Configuration
-@ComponentScan(basePackages = {"ar.edu.itba.paw.webapp.auth", "ar.edu.itba.paw.webapp.handlers"})
+@ComponentScan(basePackages = {"ar.edu.itba.paw.webapp.auth"})
 public class WebAuthConfig extends WebSecurityConfigurerAdapter {
     @Autowired
     private UserDetailsService userDetailsService;
@@ -109,6 +109,6 @@ public class WebAuthConfig extends WebSecurityConfigurerAdapter {
     }
 
     public static class SecurityWebInitializer extends AbstractSecurityWebApplicationInitializer {
-
+        // Si esta clase no esta, no corre
     }
 }

@@ -24,22 +24,16 @@
             <p class="mt-3 text-muted mb-1"><spring:message code="PersonalData"/></p>
             <div class="container-fluid p-0 mb-1 d-flex flex-row">
                 <div class="col px-0">
-                    <spring:message var="firstNamePlaceholder" code="Name"/>
-                    <form:input path="firstName" placeholder="${firstNamePlaceholder}" type="text" name="firstName"
-                                id="firstName" class="form-control-plaintext w-100" readonly="true"/>
+                    <p><c:out value="${user.get().firstName}"/></p>
                 </div>
                 <div class="col p-0 ml-2">
-                    <spring:message var="surnamePlaceholder" code="Surname"/>
-                    <form:input path="surname" placeholder="${surnamePlaceholder}" type="text" name="surname"
-                                id="surname" class="form-control-plaintext w-100" readonly="true"/>
+                    <p><c:out value="${user.get().surname}"/></p>
                 </div>
             </div>
             <spring:message var="phonePlaceholder" code="Phone"/>
             <form:input path="phone" placeholder="${phonePlaceholder}" type="text" name="phone" id="phone"
                         class="form-control w-50 mb-1"/>
-            <spring:message var="emailPlaceholder" code="Email"/>
-            <form:input path="email" placeholder="${emailPlaceholder}" type="text" name="email" id="email"
-                        class="form-control-plaintext w-50 mb-1" readonly="true"/>
+            <p><c:out value="${user.get().email}"/></p>
             <spring:message var="commentPlaceholder" code="OptionalComment"/>
             <form:textarea path="comment" placeholder="${commentPlaceholder}" class="form-control mt-3" name="comment"
                            id="comment" cols="30" rows="5"/>
@@ -132,6 +126,8 @@
     let strings = new Array();
     strings['title'] = "<spring:message code='YouAreAboutToScheduleAnAppointment' javaScriptEscape='true' />";
     strings['body'] = "<spring:message code='DoYouWantToContinue' javaScriptEscape='true' />";
+    strings['accept'] = "<spring:message code='Accept' javaScriptEscape='true' />";
+    strings['cancel'] = "<spring:message code='Cancel' javaScriptEscape='true' />";
 </script>
 <script src="<c:url value="/js/scripts/AppointmentRequest.js"/>"></script>
 <script>
