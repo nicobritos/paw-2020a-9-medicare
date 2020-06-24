@@ -112,32 +112,36 @@
                                 </div>
                             </c:if>
                             <c:forEach var="workday" items="${workdays}">
-                                <p class="m-0">- <c:choose>
-                                    <%-- TODO: maybe use spring:message directly instead of with choose --%>
-                                    <c:when test="${workday.day == 'MONDAY'}"><spring:message
-                                            code="Monday"/></c:when>
-                                    <c:when test="${workday.day == 'TUESDAY'}"><spring:message
-                                            code="Tuesday"/></c:when>
-                                    <c:when test="${workday.day == 'WEDNESDAY'}"><spring:message
-                                            code="Wednesday"/></c:when>
-                                    <c:when test="${workday.day == 'THURSDAY'}"><spring:message
-                                            code="Thursday"/></c:when>
-                                    <c:when test="${workday.day == 'FRIDAY'}"><spring:message
-                                            code="Friday"/></c:when>
-                                    <c:when test="${workday.day == 'SATURDAY'}"><spring:message
-                                            code="Saturday"/></c:when>
-                                    <c:when test="${workday.day == 'SUNDAY'}"><spring:message
-                                            code="Sunday"/></c:when>
-                                    <c:otherwise>${workday.day}</c:otherwise>
-                                </c:choose> <spring:message code="of"/> <c:if
-                                        test="${workday.startHour < 10}">0</c:if><c:out
-                                        value="${workday.startHour}"/>:<c:if
-                                        test="${workday.startMinute < 10}">0</c:if><c:out
-                                        value="${workday.startMinute}hs a "/><c:if
-                                        test="${workday.endHour < 10}">0</c:if><c:out
-                                        value="${workday.endHour}:"/><c:if
-                                        test="${workday.endMinute < 10}">0</c:if><c:out
-                                        value="${workday.endMinute}hs - ${workday.staff.office.name}"/></p>
+                                <p class="m-0">-
+                                    <c:choose>
+                                        <%-- TODO: maybe use spring:message directly instead of with choose --%>
+                                        <c:when test="${workday.day == 'MONDAY'}"><spring:message code="Monday" var="wkDay"/></c:when>
+                                        <c:when test="${workday.day == 'TUESDAY'}"><spring:message code="Tuesday" var="wkDay"/></c:when>
+                                        <c:when test="${workday.day == 'WEDNESDAY'}"><spring:message code="Wednesday" var="wkDay"/></c:when>
+                                        <c:when test="${workday.day == 'THURSDAY'}"><spring:message code="Thursday" var="wkDay"/></c:when>
+                                        <c:when test="${workday.day == 'FRIDAY'}"><spring:message code="Friday" var="wkDay"/></c:when>
+                                        <c:when test="${workday.day == 'SATURDAY'}"><spring:message code="Saturday" var="wkDay"/></c:when>
+                                        <c:when test="${workday.day == 'SUNDAY'}"><spring:message code="Sunday" var="wkDay"/></c:when>
+                                        <c:otherwise><c:set value="${workday.day}" var="wkDay"/></c:otherwise>
+                                    </c:choose>
+                                    <c:choose>
+                                        <c:when test="${workday.startHour < 10}"><c:set value="0${workday.startHour}" var="wkStartHour"/></c:when>
+                                        <c:otherwise><c:set value="${workday.startHour}" var="wkStartHour"/></c:otherwise>
+                                    </c:choose>
+                                    <c:choose>
+                                        <c:when test="${workday.startMinute < 10}"><c:set value="0${workday.startMinute}" var="wkStartMinute"/></c:when>
+                                        <c:otherwise><c:set value="${workday.startMinute}" var="wkStartMinute"/></c:otherwise>
+                                    </c:choose>
+                                    <c:choose>
+                                        <c:when test="${workday.endHour < 10}"><c:set value="0${workday.endHour}" var="wkEndHour"/></c:when>
+                                        <c:otherwise><c:set value="${workday.endHour}" var="wkEndHour"/></c:otherwise>
+                                    </c:choose>
+                                    <c:choose>
+                                        <c:when test="${workday.endMinute < 10}"><c:set value="0${workday.endMinute}" var="wkEndMinute"/></c:when>
+                                        <c:otherwise><c:set value="${workday.endMinute}" var="wkEndMinute"/></c:otherwise>
+                                    </c:choose>
+                                    <spring:message code="wkd_from_wksh_wksm_to_wkeh_wkem_cons" argumentSeparator=";" arguments="${wkDay};${wkStartHour};${wkStartMinute};${wkEndHour};${wkEndMinute};${workday.staff.office.name}"/>
+                                </p>
                                 <c:choose>
                                     <c:when test="${appointmentMap.get(workday) == 1}">
                                         <spring:message code='YouWillDeleteAppt' javaScriptEscape='true' var="appts" arguments="${appointmentMap.get(workday)}"/>
