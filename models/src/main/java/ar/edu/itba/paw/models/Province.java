@@ -51,7 +51,7 @@ public class Province extends GenericModel<Integer> {
     }
 
     @Override
-    protected boolean isSameInstance(Object o) {
+    protected boolean isSameType(Object o) {
         return o instanceof Province;
     }
 }

@@ -34,7 +34,7 @@ public class Country extends GenericModel<String> {
     }
 
     @Override
-    protected boolean isSameInstance(Object o) {
+    protected boolean isSameType(Object o) {
         return o instanceof Country;
     }
 }

@@ -15,7 +15,7 @@ public abstract class GenericModel<I> {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!this.isSameInstance(o)) return false;
+        if (!this.isSameType(o)) return false;
         return this.getId().equals(((GenericModel<?>) o).getId());
     }
 
@@ -24,5 +24,5 @@ public abstract class GenericModel<I> {
         return Objects.hash(this.getId());
     }
 
-    protected abstract boolean isSameInstance(Object o);
+    protected abstract boolean isSameType(Object o);
 }
