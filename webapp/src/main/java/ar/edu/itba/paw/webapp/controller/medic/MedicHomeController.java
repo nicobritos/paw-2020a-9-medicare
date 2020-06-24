@@ -8,7 +8,8 @@ import ar.edu.itba.paw.webapp.events.events.UserConfirmationTokenGenerationEvent
 import ar.edu.itba.paw.webapp.form.SpecialtyForm;
 import ar.edu.itba.paw.webapp.form.UserProfileForm;
 import ar.edu.itba.paw.webapp.form.WorkdayForm;
-import org.joda.time.LocalDateTime;
+import org.joda.time.LocalDate;
+import org.joda.time.LocalTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Controller;
@@ -20,7 +21,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import java.time.format.DateTimeParseException;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -57,12 +57,12 @@ public class MedicHomeController extends GenericController {
         ModelAndView mav = new ModelAndView();
 
         List<Staff> userStaffs = this.staffService.findByUser(user.get());
-        LocalDateTime today = LocalDateTime.now();
-        LocalDateTime monday;
-        LocalDateTime selected = today;
+        LocalDate today = LocalDate.now();
+        LocalDate monday;
+        LocalDate selected = today;
         if (selectedDay != null) {
             try {
-                selected = LocalDateTime.parse(selectedDay);
+                selected = LocalDate.parse(selectedDay);
             } catch (DateTimeParseException ignored) { // Queda en selected = today
             }
         }
@@ -83,7 +83,7 @@ public class MedicHomeController extends GenericController {
         mav.addObject("today", today);
         mav.addObject("monday", monday);
         mav.addObject("todayAppointments", this.appointmentService.findToday(userStaffs));
-        List<List<Appointment>> weekAppointments = this.appointmentService.findByStaffsAndDay(userStaffs, monday, monday.plusDays(7));
+        List<List<Appointment>> weekAppointments = this.appointmentService.findByStaffsAndDay(userStaffs, monday.toLocalDateTime(new LocalTime(0,0,0)), monday.plusDays(7).toLocalDateTime(new LocalTime(0,0,0)));
 
         String query = request.getQueryString();
         if (query != null && !query.isEmpty()) {
@@ -109,7 +109,7 @@ public class MedicHomeController extends GenericController {
             List<Staff> staffs = this.staffService.findByUser(user.get());
             mav.addObject("staffs", staffs);
             if(!staffs.isEmpty()){
-                mav.addObject("specialties", staffs.get(0).getStaffSpecialties());
+                mav.addObject("specialties", staffs.get(0).getStaffSpecialties()); // Todos los staffSpecialties tienen el mismo stafs
             } else {
                 mav.addObject("specialties", Collections.emptyList());
             }

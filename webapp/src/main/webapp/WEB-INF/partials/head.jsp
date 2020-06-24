@@ -12,7 +12,6 @@
     app_strings['ok'] = "<spring:message code='Success' javaScriptEscape='true' />";
 </script>
 <script src='<c:url value="/js/components/App.js"/>'></script>
-<script src='<c:url value="/js/components/Modal.js"/>'></script>
 <script>
     App.init();
 </script>

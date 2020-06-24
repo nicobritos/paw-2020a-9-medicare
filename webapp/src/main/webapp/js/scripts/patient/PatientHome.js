@@ -19,8 +19,6 @@ const PatientHome = function () {
                             strings['deleted_body'],
                             'success'
                         )
-                    } else {
-                        element.submit();
                     }
                 })
             });

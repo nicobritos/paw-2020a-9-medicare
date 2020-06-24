@@ -4,17 +4,20 @@ const AppointmentRequest = function () {
 
     let bindElements = function () {
         appointmentRequestButton.click(function () {
-            Modal.confirm({
+            Swal.fire({
                 title: strings['title'],
-                body: strings['body'],
-                accept: strings['accept'],
-                cancel: strings['cancel'],
-                callbacks: {
-                    confirm: function () {
-                        appointmentRequestForm.submit();
-                    }
+                text: strings['body'],
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                cancelButtonText: strings['cancel'],
+                confirmButtonText: strings['accept'],
+            }).then((result) => {
+                if (result.value) {
+                    appointmentRequestForm.submit();
                 }
-            });
+            })
         });
     };
 

@@ -113,8 +113,6 @@ const Profile = function () {
                             specialty_strings['deleted_body'],
                             'success'
                         )
-                    } else {
-                        element.submit();
                     }
                 })
             });
