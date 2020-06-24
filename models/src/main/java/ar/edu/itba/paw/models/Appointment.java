@@ -102,7 +102,7 @@ public class Appointment extends GenericModel<Integer> {
     }
 
     @Override
-    protected boolean isSameInstance(Object o) {
+    protected boolean isSameType(Object o) {
         return o instanceof Appointment;
     }
 }

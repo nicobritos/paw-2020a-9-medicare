@@ -100,7 +100,7 @@ public class Workday extends GenericModel<Integer> {
     }
 
     @Override
-    protected boolean isSameInstance(Object o) {
+    protected boolean isSameType(Object o) {
         return o instanceof Workday;
     }
 }

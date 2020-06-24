@@ -3,6 +3,13 @@
 <head>
     <%@ include file="../partials/head.jsp" %>
     <link rel="stylesheet" type="text/css" href='<c:url value="/css/landing.css"/>'>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/jquery.jssocials/1.4.0/jssocials.min.js"></script>
+    <link type="text/css" rel="stylesheet" href="https://cdn.jsdelivr.net/jquery.jssocials/1.4.0/jssocials.css" />
+    <link type="text/css" rel="stylesheet" href="https://cdn.jsdelivr.net/jquery.jssocials/1.4.0/jssocials-theme-flat.css" />
+    <link type="text/css" rel="stylesheet" href="https://cdn.jsdelivr.net/jquery.jssocials/1.4.0/jssocials-theme-classic.css" />
+    <link type="text/css" rel="stylesheet" href="https://cdn.jsdelivr.net/jquery.jssocials/1.4.0/jssocials-theme-minima.css" />
+    <link type="text/css" rel="stylesheet" href="https://cdn.jsdelivr.net/jquery.jssocials/1.4.0/jssocials-theme-plain.css" />
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.6.0/css/all.css" integrity="sha384-aOkxzJ5uQz7WBObEZcHvV5JvRW3TUc2rNPA7pe3AwnsUohiw1Vj2Rgx2KSOkF5+h" crossorigin="anonymous">
 </head>
 <body>
 <%@ include file="navbar/navbar.jsp" %>
@@ -50,6 +57,26 @@
                     code="SearchMedics"/></button>
         </div>
     </form>
+    <br>
+    <div class="container"><hr></div>
+    <div class="shareDiv">
+        <h1 class="shareTitle">¡Compartí MediCare con tus amigos!</h1>
+        <div class="shareSocial"></div>
+        <br>
+    </div>
+    <br>
+    <div class="container"><hr></div>
+    <br>
+    <br>
 </div>
+<script>
+    logoUrls = [];
+    logoUrls["facebook"] = "<c:url value="/img/logos/facebooklogo.svg"/>";
+    logoUrls["twitter"] = "<c:url value="/img/logos/twitterlogo.svg"/>";
+    logoUrls["whatsapp"] = "<c:url value="/img/logos/whatsapplogo.svg"/>";
+    logoUrls["linkedin"] = "<c:url value="/img/logos/linkedinlogo.svg"/>";
+    logoUrls["pinterest"] = "<c:url value="/img/logos/pinterestlogo.svg"/>";
+</script>
+<script src="<c:url value="/js/scripts/Landing.js"/>"></script>
 </body>
 </html>
