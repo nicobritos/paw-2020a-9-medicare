@@ -138,10 +138,19 @@
                                         value="${workday.endHour}:"/><c:if
                                         test="${workday.endMinute < 10}">0</c:if><c:out
                                         value="${workday.endMinute}hs - ${workday.staff.office.name}"/></p>
+                                <c:choose>
+                                    <c:when test="${appointmentMap.get(workday) == 1}">
+                                        <spring:message code='YouWillDeleteAppt' javaScriptEscape='true' var="appts" arguments="${appointmentMap.get(workday)}"/>
+                                    </c:when>
+                                    <c:otherwise>
+                                        <spring:message code='YouWillDeleteAppts' javaScriptEscape='true' var="appts" arguments="${appointmentMap.get(workday)}"/>
+                                    </c:otherwise>
+                                </c:choose>
                                 <form action="<c:url value="/staff/profile/workday/delete/${workday.id}"/>"
                                       method="post" class="cancel-workday-form"
                                       data-appointment_url="<c:url value="/staff/appointment/workday/${workday.id}"/>"
-                                      data-appts="<spring:message code='YouWillDeleteAppts' javaScriptEscape='true' arguments="${appointmentMap.get(workday)}"/>"
+
+                                      data-appts="${appts}"
                                 >
                                     <button class="btn cancel-workday-btn" type="button">X</button>
                                 </form>
