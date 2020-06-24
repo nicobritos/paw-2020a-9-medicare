@@ -253,27 +253,29 @@ public class AppointmentServiceImpl extends GenericServiceImpl<AppointmentDao, A
     @Override
     public void remove(Integer id, User user) {
         Optional<Appointment> appointment = findById(id);
-        //get staff for current user
-        List<Staff> staffs = this.staffService.findByUser(user); // TODO: add staff list inside User model
-        //get patient for current user
-        List<Patient> patient = this.patientService.findByUser(user);
-        //check if user is allowed to cancel
-        boolean isAllowed = false;
-        for (Patient p : patient) {
-            if (p.equals(appointment.get().getPatient())) {
-                isAllowed = true;
-                break;
+        if(appointment.isPresent()) {
+            //get staff for current user
+            List<Staff> staffs = this.staffService.findByUser(user); // TODO: add staff list inside User model
+            //get patient for current user
+            List<Patient> patient = this.patientService.findByUser(user);
+            //check if user is allowed to cancel
+            boolean isAllowed = false;
+            for (Patient p : patient) {
+                if (p.equals(appointment.get().getPatient())) {
+                    isAllowed = true;
+                    break;
+                }
             }
-        }
-        //check if user is allowed to cancel
-        for (Staff s : staffs) {
-            if (s.equals(appointment.get().getStaff())) {
-                isAllowed = true;
-                break;
+            //check if user is allowed to cancel
+            for (Staff s : staffs) {
+                if (s.equals(appointment.get().getStaff())) {
+                    isAllowed = true;
+                    break;
+                }
             }
-        }
-        if(isAllowed) {
-            super.remove(id);
+            if (isAllowed) {
+                super.remove(id);
+            }
         }
     }
 
