@@ -24,55 +24,53 @@
 
         <div class="form-group row">
             <div class="col">
-                <label for="dow"><spring:message code="DayOfWeek"/></label>
+                <label><spring:message code="DayOfWeek"/></label>
             </div>
             <div class="col-8">
-                <!--<form:select class="form-control" name="dow" id="dow" path="dow">
-                    <form:option selected="true" value="1"><spring:message code="Monday"/></form:option>
-                    <form:option value="2"><spring:message code="Tuesday"/></form:option>
-                    <form:option value="3"><spring:message code="Wednesday"/></form:option>
-                    <form:option value="4"><spring:message code="Thursday"/></form:option>
-                    <form:option value="5"><spring:message code="Friday"/></form:option>
-                    <form:option value="6"><spring:message code="Saturday"/></form:option>
-                    <form:option value="7"><spring:message code="Sunday"/></form:option>
-                </form:select>-->
                 <div class="pretty p-icon p-round p-smooth">
-                    <input type="checkbox" />
+                    <form:checkbox path="dow[0]" />
                     <div class="state p-success">
                         <i class="icon mdi mdi-check"></i>
                         <label><spring:message code="Monday"/></label>
                     </div>
                 </div>
                 <div class="pretty p-icon p-round p-smooth">
-                    <input type="checkbox" />
+                    <form:checkbox path="dow[1]" />
                     <div class="state p-success">
                         <i class="icon mdi mdi-check"></i>
                         <label><spring:message code="Tuesday"/></label>
                     </div>
                 </div>
                 <div class="pretty p-icon p-round p-smooth">
-                    <input type="checkbox" />
+                    <form:checkbox path="dow[2]" />
                     <div class="state p-success">
                         <i class="icon mdi mdi-check"></i>
                         <label><spring:message code="Wednesday"/></label>
                     </div>
                 </div>
                 <div class="pretty p-icon p-round p-smooth">
-                    <input type="checkbox" />
+                    <form:checkbox path="dow[3]" />
+                    <div class="state p-success">
+                        <i class="icon mdi mdi-check"></i>
+                        <label><spring:message code="Thursday"/></label>
+                    </div>
+                </div>
+                <div class="pretty p-icon p-round p-smooth">
+                    <form:checkbox path="dow[4]" />
                     <div class="state p-success">
                         <i class="icon mdi mdi-check"></i>
                         <label><spring:message code="Friday"/></label>
                     </div>
                 </div>
                 <div class="pretty p-icon p-round p-smooth">
-                    <input type="checkbox" />
+                    <form:checkbox path="dow[5]" />
                     <div class="state p-success">
                         <i class="icon mdi mdi-check"></i>
                         <label><spring:message code="Saturday"/></label>
                     </div>
                 </div>
                 <div class="pretty p-icon p-round p-smooth">
-                    <input type="checkbox" />
+                    <form:checkbox path="dow[6]" />
                     <div class="state p-success">
                         <i class="icon mdi mdi-check"></i>
                         <label><spring:message code="Sunday"/></label>

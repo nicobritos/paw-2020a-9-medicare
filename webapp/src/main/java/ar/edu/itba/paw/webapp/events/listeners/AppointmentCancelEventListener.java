@@ -119,6 +119,8 @@ public class AppointmentCancelEventListener implements ApplicationListener<Appoi
                             appointmentCancelEvent.getAppointment(),
                             this.messageSource.getMessage(dowMessage, null, appointmentCancelEvent.getLocale()),
                             this.messageSource.getMessage(month, null, appointmentCancelEvent.getLocale()),
+                            appointmentCancelEvent.getBaseUrl() + (appointmentCancelEvent.isCancellingStaff()?"/mediclist/1":""),
+                            appointmentCancelEvent.isCancellingStaff(),
                             appointmentCancelEvent.getLocale()),
                     true);
             mimeMessageHelper.setSubject(subject);
@@ -130,7 +132,7 @@ public class AppointmentCancelEventListener implements ApplicationListener<Appoi
         }
     }
 
-    private String getHTML(String baseUrl, User userCancelling, String userTitle, Appointment appointment, String dow, String month, Locale locale) throws IOException {
+    private String getHTML(String baseUrl, User userCancelling, String userTitle, Appointment appointment, String dow, String month, String link, boolean isCancellingStaff, Locale locale) throws IOException {
         Map<String, String> values = new HashMap<>();
         values.put("baseUrl", baseUrl);
         values.put("year", String.valueOf(DateTime.now().getYear()));
@@ -150,7 +152,12 @@ public class AppointmentCancelEventListener implements ApplicationListener<Appoi
                 locale));
         values.put("disclaimer", this.messageSource.getMessage(MESSAGE_SOURCE_DISCLAIMER, null, locale));
         values.put("title", this.messageSource.getMessage(MESSAGE_SOURCE_BODY_PREFIX + ".title", null, locale));
-
+        values.put("link", link);
+        if(isCancellingStaff) {
+            values.put("buttonText", this.messageSource.getMessage(MESSAGE_SOURCE_BODY_PREFIX + ".buttonText.toPatient", null, locale));
+        } else {
+            values.put("buttonText", this.messageSource.getMessage(MESSAGE_SOURCE_BODY_PREFIX + ".buttonText.toStaff", null, locale));
+        }
         EmailFormatter emailFormatter = new EmailFormatter();
         String html = emailFormatter.format(emailFormatter.getHTMLFromFilename("cancel"));
         StrSubstitutor substitutor = new StrSubstitutor(values, "${", "}");

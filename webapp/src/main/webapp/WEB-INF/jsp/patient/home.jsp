@@ -16,6 +16,11 @@
     <div class="row h-100">
         <div class="col h-100 pl-0 mr-5 w-100">
             <ul class="list-group turno-list mr-2 w-100 h-100 overflow-auto">
+                <c:if test="${appointments.isEmpty()}">
+                    <div class="container-fluid justify-content-center">
+                        <p class="text-left mt-4" style="color:grey;"><spring:message code="NoAppointments"/></p>
+                    </div>
+                </c:if>
                 <c:forEach var="appointment" items="${appointments}">
                     <li class="list-group-item turno-item mb-3">
                         <div class="container">
@@ -37,8 +42,9 @@
                                     </div>
                                     <div class="row">
                                         <p class="m-0">
-                                            <c:forEach var="specialty" items="${appointment.staff.staffSpecialties}">
+                                            <c:forEach var="specialty" items="${appointment.staff.staffSpecialties}" varStatus="loop">
                                                 <c:out value="${specialty.name} "/>
+                                                <c:if test="${!loop.last}">,</c:if>
                                             </c:forEach>
                                         </p>
                                     </div>
@@ -186,6 +192,10 @@
     let strings = new Array();
     strings['title'] = "<spring:message code='YouAreAboutToCancelAnAppointment' javaScriptEscape='true' />";
     strings['body'] = "<spring:message code='DoYouWantToContinue' javaScriptEscape='true' />";
+    strings['accept'] = "<spring:message code='Accept' javaScriptEscape='true' />";
+    strings['cancel'] = "<spring:message code='Cancel' javaScriptEscape='true' />";
+    strings['deleted'] = "<spring:message code='Deleted' javaScriptEscape='true' />";
+    strings['deleted_body'] = "<spring:message code='OperationCompletedSuccessfully' javaScriptEscape='true' />";
 </script>
 <script src='<c:url value="/js/scripts/patient/PatientHome.js"/> '></script>
 <script>

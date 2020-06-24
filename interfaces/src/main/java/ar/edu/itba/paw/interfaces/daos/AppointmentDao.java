@@ -4,6 +4,7 @@ import ar.edu.itba.paw.interfaces.daos.generic.GenericDao;
 import ar.edu.itba.paw.models.Appointment;
 import ar.edu.itba.paw.models.Patient;
 import ar.edu.itba.paw.models.Staff;
+import ar.edu.itba.paw.models.Workday;
 import org.joda.time.LocalDateTime;
 
 import java.util.Collection;
@@ -33,4 +34,8 @@ public interface AppointmentDao extends GenericDao<Appointment, Integer> {
     List<Appointment> findByDate(Patient patient, LocalDateTime date);
 
     List<Appointment> findByPatientsFromDate(Collection<Patient> patients, LocalDateTime from);
+
+    List<Appointment> findByWorkday(Workday workday);
+
+    void cancelAppointments(Collection<Appointment> appointments);
 }
