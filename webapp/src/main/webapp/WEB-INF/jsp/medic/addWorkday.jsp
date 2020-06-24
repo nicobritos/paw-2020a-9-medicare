@@ -6,6 +6,7 @@
 <head>
     <%@ include file="../../partials/head.jsp" %>
     <link rel="stylesheet" type="text/css" href="<c:url value="/css/addTurno.css"/>">
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/pretty-checkbox@3.0/dist/pretty-checkbox.min.css">
 </head>
 <body>
 <div class="container w-100 h-100 d-flex flex-column justify-content-center align-items-center">
@@ -26,7 +27,7 @@
                 <label for="dow"><spring:message code="DayOfWeek"/></label>
             </div>
             <div class="col-8">
-                <form:select class="form-control" name="dow" id="dow" path="dow">
+                <!--<form:select class="form-control" name="dow" id="dow" path="dow">
                     <form:option selected="true" value="1"><spring:message code="Monday"/></form:option>
                     <form:option value="2"><spring:message code="Tuesday"/></form:option>
                     <form:option value="3"><spring:message code="Wednesday"/></form:option>
@@ -34,7 +35,49 @@
                     <form:option value="5"><spring:message code="Friday"/></form:option>
                     <form:option value="6"><spring:message code="Saturday"/></form:option>
                     <form:option value="7"><spring:message code="Sunday"/></form:option>
-                </form:select>
+                </form:select>-->
+                <div class="pretty p-icon p-round p-smooth">
+                    <input type="checkbox" />
+                    <div class="state p-success">
+                        <i class="icon mdi mdi-check"></i>
+                        <label><spring:message code="Monday"/></label>
+                    </div>
+                </div>
+                <div class="pretty p-icon p-round p-smooth">
+                    <input type="checkbox" />
+                    <div class="state p-success">
+                        <i class="icon mdi mdi-check"></i>
+                        <label><spring:message code="Tuesday"/></label>
+                    </div>
+                </div>
+                <div class="pretty p-icon p-round p-smooth">
+                    <input type="checkbox" />
+                    <div class="state p-success">
+                        <i class="icon mdi mdi-check"></i>
+                        <label><spring:message code="Wednesday"/></label>
+                    </div>
+                </div>
+                <div class="pretty p-icon p-round p-smooth">
+                    <input type="checkbox" />
+                    <div class="state p-success">
+                        <i class="icon mdi mdi-check"></i>
+                        <label><spring:message code="Friday"/></label>
+                    </div>
+                </div>
+                <div class="pretty p-icon p-round p-smooth">
+                    <input type="checkbox" />
+                    <div class="state p-success">
+                        <i class="icon mdi mdi-check"></i>
+                        <label><spring:message code="Saturday"/></label>
+                    </div>
+                </div>
+                <div class="pretty p-icon p-round p-smooth">
+                    <input type="checkbox" />
+                    <div class="state p-success">
+                        <i class="icon mdi mdi-check"></i>
+                        <label><spring:message code="Sunday"/></label>
+                    </div>
+                </div>
             </div>
         </div>
 
