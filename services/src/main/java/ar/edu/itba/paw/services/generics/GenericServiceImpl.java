@@ -37,11 +37,6 @@ public abstract class GenericServiceImpl<DAO extends GenericDao<M, I>, M extends
     }
 
     @Override
-    public void remove(M model) {
-        this.getRepository().remove(model);
-    }
-
-    @Override
     public void remove(I id) {
         this.getRepository().remove(id);
     }

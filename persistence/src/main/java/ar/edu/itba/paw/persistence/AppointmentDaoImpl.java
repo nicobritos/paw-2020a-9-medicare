@@ -5,10 +5,12 @@ import ar.edu.itba.paw.models.*;
 import ar.edu.itba.paw.persistence.generics.GenericDaoImpl;
 import org.joda.time.LocalDateTime;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.criteria.*;
 import javax.persistence.metamodel.SingularAttribute;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Repository
 public class AppointmentDaoImpl extends GenericDaoImpl<Appointment, Integer> implements AppointmentDao {
@@ -167,6 +169,84 @@ public class AppointmentDaoImpl extends GenericDaoImpl<Appointment, Integer> imp
         ));
 
         return this.selectQuery(builder, query, root);
+    }
+
+    @Override
+    public List<Appointment> findByWorkday(Workday workday) {
+        if (workday == null || workday.getStaff() == null || workday.getDay() == null)
+            throw new IllegalArgumentException();
+
+        CriteriaBuilder builder = this.getEntityManager().getCriteriaBuilder();
+        CriteriaQuery<Appointment> query = builder.createQuery(Appointment.class);
+        Root<Appointment> root = query.from(Appointment.class);
+
+        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime fromDate = new LocalDateTime(now.getYear(), now.getMonthOfYear(), now.getDayOfMonth(), 0, 0).plusDays(1);
+
+        query.select(root);
+        query.where(builder.and(
+                builder.equal(root.get(Appointment_.staff), workday.getStaff()),
+                builder.equal(root.get(Appointment_.appointmentStatus), AppointmentStatus.PENDING),
+                builder.equal(
+                        builder.function("DATE_PART", Integer.class, builder.literal("isodow"), root.get(Appointment_.fromDate)),
+                        workday.getDay().toInteger()
+                ),
+                builder.and(
+                        builder.or(
+                                builder.and(
+                                        builder.equal(
+                                                builder.function("HOUR", Integer.class, root.get(Appointment_.fromDate)),
+                                                workday.getStartHour()
+                                        ),
+                                        builder.greaterThanOrEqualTo(
+                                                builder.function("MINUTE", Integer.class, root.get(Appointment_.fromDate)),
+                                                workday.getStartMinute()
+                                        )
+                                ),
+                                builder.greaterThan(
+                                        builder.function("HOUR", Integer.class, root.get(Appointment_.fromDate)),
+                                        workday.getStartHour()
+                                )
+                        ),
+                        builder.or(
+                                builder.and(
+                                        builder.equal(
+                                                builder.function("HOUR", Integer.class, root.get(Appointment_.fromDate)),
+                                                workday.getEndHour()
+                                        ),
+                                        builder.lessThanOrEqualTo(
+                                                builder.function("MINUTE", Integer.class, root.get(Appointment_.fromDate)),
+                                                workday.getEndMinute()
+                                        )
+                                ),
+                                builder.lessThan(
+                                        builder.function("HOUR", Integer.class, root.get(Appointment_.fromDate)),
+                                        workday.getEndHour()
+                                )
+                        )
+                )
+        ));
+        return this.selectQuery(builder, query, root);
+    }
+
+    @Transactional
+    @Override
+    public void cancelAppointments(Collection<Appointment> appointments) {
+        if (appointments == null)
+            throw new IllegalArgumentException();
+        if (appointments.isEmpty())
+            return;
+
+        CriteriaBuilder builder = this.getEntityManager().getCriteriaBuilder();
+        CriteriaUpdate<Appointment> query = builder.createCriteriaUpdate(Appointment.class);
+        Root<Appointment> root = query.from(Appointment.class);
+
+        query.set(root.get(Appointment_.appointmentStatus), AppointmentStatus.CANCELLED);
+        Path<?> expression = root.get(Appointment_.id);
+        Predicate predicate = expression.in(appointments.stream().map(GenericModel::getId).collect(Collectors.toList()));
+        query.where(predicate);
+
+        this.executeUpdate(query);
     }
 
     @Override

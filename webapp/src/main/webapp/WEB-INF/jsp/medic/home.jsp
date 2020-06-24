@@ -232,6 +232,8 @@
     let strings = new Array();
     strings['title'] = "<spring:message code='YouAreAboutToCancelAnAppointment' javaScriptEscape='true' />";
     strings['body'] = "<spring:message code='DoYouWantToContinue' javaScriptEscape='true' />";
+    strings['accept'] = "<spring:message code='Accept' javaScriptEscape='true' />";
+    strings['cancel'] = "<spring:message code='Cancel' javaScriptEscape='true' />";
 </script>
 <script src='<c:url value="/js/scripts/staff/MedicHome.js"/> '></script>
 <script>

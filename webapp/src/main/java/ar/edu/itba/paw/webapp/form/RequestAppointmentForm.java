@@ -24,15 +24,8 @@ public class RequestAppointmentForm {
     @Max(59)
     private int minute;
     @NotEmpty
-    private String firstName;
-    @NotEmpty
-    private String surname;
-    @NotEmpty
     private String motive;
     private String comment;
-    @Email
-    @NotEmpty
-    private String email;
     private String phone;
 
     public int getStaffId() {
@@ -83,22 +76,6 @@ public class RequestAppointmentForm {
         this.minute = minute;
     }
 
-    public String getFirstName() {
-        return firstName;
-    }
-
-    public void setFirstName(String firstName) {
-        this.firstName = firstName;
-    }
-
-    public String getSurname() {
-        return surname;
-    }
-
-    public void setSurname(String surname) {
-        this.surname = surname;
-    }
-
     public String getMotive() {
         return motive;
     }
@@ -113,14 +90,6 @@ public class RequestAppointmentForm {
 
     public void setComment(String comment) {
         this.comment = comment;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
     }
 
     public String getPhone() {

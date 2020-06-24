@@ -2,7 +2,7 @@ const App = function () {
     let baseUrl = $("base")[0].href;
     baseUrl = baseUrl.substring(0, baseUrl.length - 1);
 
-    let showOk = function (messages, title = 'Exito') {
+    let showOk = function (messages, title = app_strings['ok']) {
         if (messages == null) {
             return;
         }
@@ -24,7 +24,7 @@ const App = function () {
 
     let showError = function (messages, title = 'Error') {
         if (messages == null) {
-            messages = ['Un error ha ocurrido'];
+            messages = [app_strings['error']];
         }
 
         if (!$.isArray(messages))

@@ -51,40 +51,16 @@
     <logger name="ar.edu.itba.paw.persistence" level="INFO" additivity="false">
         <appender-ref ref="persistence-appender"/>
     </logger>
-    <logger name="ar.edu.itba.paw.persistence" level="ERROR" additivity="false">
-        <appender-ref ref="persistence-appender"/>
-    </logger>
-    <logger name="ar.edu.itba.paw.persistence" level="WARNING" additivity="false">
-        <appender-ref ref="persistence-appender"/>
-    </logger>
 
     <logger name="ar.edu.itba.paw.webapp" level="INFO" additivity="false">
-        <appender-ref ref="webapp-appender"/>
-    </logger>
-    <logger name="ar.edu.itba.paw.webapp" level="ERROR" additivity="false">
-        <appender-ref ref="webapp-appender"/>
-    </logger>
-    <logger name="ar.edu.itba.paw.webapp" level="WARNING" additivity="false">
         <appender-ref ref="webapp-appender"/>
     </logger>
 
     <logger name="ar.edu.itba.paw.models" level="INFO" additivity="false">
         <appender-ref ref="models-appender"/>
     </logger>
-    <logger name="ar.edu.itba.paw.models" level="ERROR" additivity="false">
-        <appender-ref ref="models-appender"/>
-    </logger>
-    <logger name="ar.edu.itba.paw.models" level="WARNING" additivity="false">
-        <appender-ref ref="models-appender"/>
-    </logger>
 
     <logger name="ar.edu.itba.paw.services" level="INFO" additivity="false">
-        <appender-ref ref="services-appender"/>
-    </logger>
-    <logger name="ar.edu.itba.paw.services" level="ERROR" additivity="false">
-        <appender-ref ref="services-appender"/>
-    </logger>
-    <logger name="ar.edu.itba.paw.services" level="WARNING" additivity="false">
         <appender-ref ref="services-appender"/>
     </logger>
 

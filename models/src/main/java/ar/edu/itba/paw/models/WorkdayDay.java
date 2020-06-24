@@ -6,13 +6,19 @@ import org.joda.time.LocalDateTime;
 import java.util.Calendar;
 
 public enum WorkdayDay {
-    MONDAY,
-    TUESDAY,
-    WEDNESDAY,
-    THURSDAY,
-    FRIDAY,
-    SATURDAY,
-    SUNDAY;
+    MONDAY(1),
+    TUESDAY(2),
+    WEDNESDAY(3),
+    THURSDAY(4),
+    FRIDAY(5),
+    SATURDAY(6),
+    SUNDAY(0);
+
+    private int dow;
+
+    WorkdayDay(int dow) {
+        this.dow = dow;
+    }
 
     public static WorkdayDay from(Calendar calendar) {
         switch (calendar.get(Calendar.DAY_OF_WEEK)) {
@@ -73,5 +79,9 @@ public enum WorkdayDay {
                 return SUNDAY;
         }
         return null;
+    }
+
+    public int toInteger() {
+        return this.dow;
     }
 }

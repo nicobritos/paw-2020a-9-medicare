@@ -192,6 +192,10 @@
     let strings = new Array();
     strings['title'] = "<spring:message code='YouAreAboutToCancelAnAppointment' javaScriptEscape='true' />";
     strings['body'] = "<spring:message code='DoYouWantToContinue' javaScriptEscape='true' />";
+    strings['accept'] = "<spring:message code='Accept' javaScriptEscape='true' />";
+    strings['cancel'] = "<spring:message code='Cancel' javaScriptEscape='true' />";
+    strings['deleted'] = "<spring:message code='Deleted' javaScriptEscape='true' />";
+    strings['deleted_body'] = "<spring:message code='OperationCompletedSuccessfully' javaScriptEscape='true' />";
 </script>
 <script src='<c:url value="/js/scripts/patient/PatientHome.js"/> '></script>
 <script>

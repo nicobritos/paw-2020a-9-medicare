@@ -22,8 +22,6 @@ public interface GenericService<M extends GenericModel<I>, I> {
 
     void update(M model);
 
-    void remove(M model);
-
     void remove(I id);
 
     List<M> list();

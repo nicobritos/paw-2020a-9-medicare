@@ -23,7 +23,7 @@ const Profile = function () {
             //get profile pic file and check type
             let file = e.target.files[0];
             if (!file.type.includes("image")) {
-                App.showError();
+                App.showError(error_message['error']);
                 return;
             }
             //append it to form
@@ -40,39 +40,81 @@ const Profile = function () {
                     location.reload();
                 } else {
                     //TODO:show better message
-                    App.showError();
+                    App.showError(error_message['error']);
                 }
             }).catch((e) => {
                 //TODO:show better message
-                App.showError();
+                App.showError(error_message['error']);
             });
         })
 
         $( ".cancel-workday-form" ).each( function( index, element ){
             $(element).children('.cancel-workday-btn').click(function () {
-                Modal.confirm({
+                var check = false;
+                Swal.fire({
                     title: workday_strings['title'],
-                    body: workday_strings['body'],
-                    callbacks: {
-                        confirm: function () {
-                            element.submit();
+                    text: workday_strings['body'],
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#3085d6',
+                    cancelButtonColor: '#d33',
+                    confirmButtonText: workday_strings['accept'],
+                    cancelButtonText: workday_strings['cancel'],
+                    onAfterClose: () => {
+                        if(check) {
+                            Swal.fire({
+                                title: workday_strings['title2'],
+                                text: workday_strings['body2'] + ' ' + element.dataset.appts,
+                                icon: 'warning',
+                                showCancelButton: true,
+                                confirmButtonColor: '#3085d6',
+                                cancelButtonColor: '#d33',
+                                confirmButtonText: workday_strings['accept2'],
+                                cancelButtonText: workday_strings['cancel2'],
+                            }).then((result) => {
+                                if (result.value) {
+                                    $.post(element.dataset.appointment_url);
+                                    element.submit();
+                                    Swal.fire(
+                                        workday_strings['deleted'],
+                                        workday_strings['deleted_body'],
+                                        'success'
+                                    )
+                                } else {
+                                    element.submit();
+                                }
+                            })
                         }
                     }
-                });
+                }).then((result) => {
+                    if (result.value) {
+                        check = true;
+                    }
+                })
             });
         })
 
         $( ".cancel-specialty-form" ).each( function( index, element ){
             $(element).children('.cancel-specialty-btn').click(function () {
-                Modal.confirm({
+                Swal.fire({
                     title: specialty_strings['title'],
-                    body: specialty_strings['body'],
-                    callbacks: {
-                        confirm: function () {
-                            element.submit();
-                        }
+                    text: specialty_strings['body'],
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#3085d6',
+                    cancelButtonColor: '#d33',
+                    confirmButtonText: specialty_strings['accept'],
+                    cancelButtonText: specialty_strings['cancel'],
+                }).then((result) => {
+                    if (result.value) {
+                        element.submit();
+                        Swal.fire(
+                            specialty_strings['deleted'],
+                            specialty_strings['deleted_body'],
+                            'success'
+                        )
                     }
-                });
+                })
             });
         })
 

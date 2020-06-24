@@ -200,9 +200,6 @@ public class PatientHomeController extends GenericController {
             form.setMotive("Consulta");
         }
         userOptional.ifPresent(user -> {
-            form.setEmail(user.getEmail());
-            form.setFirstName(user.getFirstName());
-            form.setSurname(user.getSurname());
             form.setPhone(user.getPhone());
         });
         Optional<User> user = getUser();
@@ -244,7 +241,7 @@ public class PatientHomeController extends GenericController {
             return new ModelAndView("redirect:/patient/home");
         }
         //cancel appointment
-        this.appointmentService.remove(appointment.get()); // TODO
+        this.appointmentService.remove(appointment.get().getId()); // TODO
         StringBuilder baseUrl = new StringBuilder(request.getRequestURL());
         baseUrl.replace(request.getRequestURL().lastIndexOf(request.getServletPath()), request.getRequestURL().length(), "");
         this.eventPublisher.publishEvent(new AppointmentCancelEvent(user.get(), false, appointment.get().getStaff().getUser(), appointment.get(), request.getLocale(), baseUrl.toString()));

@@ -8,7 +8,8 @@ import ar.edu.itba.paw.webapp.events.events.UserConfirmationTokenGenerationEvent
 import ar.edu.itba.paw.webapp.form.SpecialtyForm;
 import ar.edu.itba.paw.webapp.form.UserProfileForm;
 import ar.edu.itba.paw.webapp.form.WorkdayForm;
-import org.joda.time.LocalDateTime;
+import org.joda.time.LocalDate;
+import org.joda.time.LocalTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Controller;
@@ -20,10 +21,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import java.time.format.DateTimeParseException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 import static org.joda.time.DateTimeConstants.MONDAY;
 
@@ -57,12 +55,12 @@ public class MedicHomeController extends GenericController {
         ModelAndView mav = new ModelAndView();
 
         List<Staff> userStaffs = this.staffService.findByUser(user.get());
-        LocalDateTime today = LocalDateTime.now();
-        LocalDateTime monday;
-        LocalDateTime selected = today;
+        LocalDate today = LocalDate.now();
+        LocalDate monday;
+        LocalDate selected = today;
         if (selectedDay != null) {
             try {
-                selected = LocalDateTime.parse(selectedDay);
+                selected = LocalDate.parse(selectedDay);
             } catch (DateTimeParseException ignored) { // Queda en selected = today
             }
         }
@@ -83,7 +81,7 @@ public class MedicHomeController extends GenericController {
         mav.addObject("today", today);
         mav.addObject("monday", monday);
         mav.addObject("todayAppointments", this.appointmentService.findToday(userStaffs));
-        List<List<Appointment>> weekAppointments = this.appointmentService.findByStaffsAndDay(userStaffs, monday, monday.plusDays(7));
+        List<List<Appointment>> weekAppointments = this.appointmentService.findByStaffsAndDay(userStaffs, monday.toLocalDateTime(new LocalTime(0,0,0)), monday.plusDays(7).toLocalDateTime(new LocalTime(0,0,0)));
 
         String query = request.getQueryString();
         if (query != null && !query.isEmpty()) {
@@ -105,15 +103,28 @@ public class MedicHomeController extends GenericController {
         }
         ModelAndView mav = new ModelAndView();
         mav.addObject("user", user);
+        List<Workday> workdays = this.workdayService.findByUser(user.get());
+        Map<Workday, Integer> appointmentMap = new HashMap<>();
+        for(Workday workday: workdays){
+            List<Appointment> appointments = this.appointmentService.findByWorkday(workday);
+            List<Appointment> myAppts = new LinkedList<>();
+            for(Appointment appointment : appointments){
+                if(appointment.getStaff().getUser().equals(user.get())){
+                    myAppts.add(appointment);
+                }
+            }
+            appointmentMap.put(workday, myAppts.size());
+        }
         if (this.isStaff()) {
             List<Staff> staffs = this.staffService.findByUser(user.get());
             mav.addObject("staffs", staffs);
             if(!staffs.isEmpty()){
-                mav.addObject("specialties", staffs.get(0).getStaffSpecialties());
+                mav.addObject("specialties", staffs.get(0).getStaffSpecialties()); // Todos los staffSpecialties tienen el mismo stafs
             } else {
                 mav.addObject("specialties", Collections.emptyList());
             }
-            mav.addObject("workdays", this.workdayService.findByUser(user.get()));
+            mav.addObject("workdays", workdays);
+            mav.addObject("appointmentMap", appointmentMap);
         }
         mav.setViewName("medic/profile");
         return mav;
@@ -258,6 +269,39 @@ public class MedicHomeController extends GenericController {
         return new ModelAndView("redirect:/staff/profile");
     }
 
+    @RequestMapping(value = "/staff/appointment/workday/{workdayId}", method = RequestMethod.POST)
+    public ModelAndView cancelAppointments(@PathVariable("workdayId") final int workdayId) {
+        //get current user, check for null
+        Optional<User> user = this.getUser();
+        if (!user.isPresent()) {
+            return new ModelAndView("redirect:/login");
+        }
+        //get staff for current user
+        List<Staff> staff = this.staffService.findByUser(user.get()); // TODO: add staff list inside User model
+        //get appointment to delete, check for "null"
+        Optional<Workday> workday = this.workdayService.findById(workdayId);
+        if(!workday.isPresent()){
+            return new ModelAndView("redirect:/staff/profile");
+        }
+        List<Appointment> appointments = this.appointmentService.findByWorkday(workday.get());
+        //check if user is allowed to cancel
+        for(Appointment a: appointments) {
+            boolean isAllowed = false;
+            for (Staff s : staff) {
+                if (s.equals(a.getStaff())) {
+                    isAllowed = true;
+                    break;
+                }
+            }
+            if(isAllowed) {
+                this.appointmentService.remove(a.getId()); // TODO: all the logic above should be done inside service
+                //createCancelEvent(request, user.get(), a);
+            }
+        }
+        return new ModelAndView("redirect:/staff/profile");
+    }
+
+
     @RequestMapping(value = "/staff/appointment/{id}", method = RequestMethod.POST)
     public ModelAndView cancelAppointment(@PathVariable Integer id, HttpServletRequest request, @RequestParam(defaultValue = "0") String week, @RequestParam(required = false, name = "today") String newToday) {
         //get current user, check for null
@@ -290,7 +334,7 @@ public class MedicHomeController extends GenericController {
         if (!isAllowed) {
             return new ModelAndView("redirect:/staff/home" + query);
         }
-        this.appointmentService.remove(appointment.get()); // TODO: all the logic above should be done inside service
+        this.appointmentService.remove(appointment.get().getId()); // TODO: all the logic above should be done inside service
         createCancelEvent(request, user.get(), appointment.get());
         return new ModelAndView("redirect:/staff/home" + query);
     }
