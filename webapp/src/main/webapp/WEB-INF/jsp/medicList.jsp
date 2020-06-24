@@ -83,8 +83,7 @@
                                 <button type="button" class="btn btn-info btn-sm prevButton"><</button>
                             </div>
                         </c:if>
-                        <p class="d-inline mx-2"><spring:message code="Page"/> <c:out value="${page}"/> <spring:message
-                                code="of"/> <c:out value="${paginator.totalPages}"/></p>
+                        <p class="d-inline mx-2"><spring:message code="Page_of_totalPages" argumentSeparator=";" arguments="${page};${paginator.totalPages}"/></p>
                         <c:if test="${paginator.remainingPages != 0}">
                             <div>
                                 <button type="button" class="btn btn-info btn-sm nextButton">></button>
@@ -167,8 +166,7 @@
                                 <button type="button" class="btn btn-info btn-sm prevButton"><</button>
                             </div>
                         </c:if>
-                        <p class="d-inline mx-2"><spring:message code="Page"/> <c:out value="${page}"/> <spring:message
-                                code="of"/> <c:out value="${paginator.totalPages}"/></p>
+                        <p class="d-inline mx-2"><spring:message code="Page_of_totalPages" argumentSeparator=";" arguments="${page};${paginator.totalPages}"/></p>
                         <c:if test="${paginator.remainingPages != 0}">
                             <div>
                                 <button type="button" class="btn btn-info btn-sm nextButton">></button>
