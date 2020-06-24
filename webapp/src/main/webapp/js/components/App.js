@@ -113,17 +113,6 @@ const App = function () {
         }
     };
 
-    function OpenModal(objHTML, fullWidth){
-        if(typeof(fullWidth) === "undefined") fullWidth = false;
-        Swal.close();
-        Swal({
-            html: objHTML,
-            showConfirmButton:false,
-            showCloseButton:true,
-            width: (fullWidth === true) ? ("100%") : (null)
-        });
-    }
-
     return {
         init: function () {
             // First, checks if it isn't implemented yet.
