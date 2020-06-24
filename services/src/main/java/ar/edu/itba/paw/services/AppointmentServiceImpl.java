@@ -210,6 +210,23 @@ public class AppointmentServiceImpl extends GenericServiceImpl<AppointmentDao, A
     }
 
     @Override
+    public List<List<AppointmentTimeSlot>> findWeekTimeslots(Staff staff, LocalDateTime from, LocalDateTime to) {
+        List<AppointmentTimeSlot> timeSlots = findAvailableTimeslots(staff, from, to);
+        List<List<AppointmentTimeSlot>> weekslots = new LinkedList<>();
+        for (int i = 0; i <= 7; i++) {
+            weekslots.add(new LinkedList<>());
+        }
+        for (AppointmentTimeSlot timeSlot : timeSlots) {
+            if (timeSlot.getDate().getDayOfWeek() < 1 && timeSlot.getDate().getDayOfWeek() > 7) {
+                weekslots.get(0).add(timeSlot);
+            } else {
+                weekslots.get(timeSlot.getDate().getDayOfWeek()).add(timeSlot);
+            }
+        }
+        return weekslots;
+    }
+
+    @Override
     public List<AppointmentTimeSlot> findAvailableTimeslots(Staff staff, LocalDateTime date) {
         return this.findAvailableTimeslots(staff, date, date.withTime(23, 59, 59, 999));
     }

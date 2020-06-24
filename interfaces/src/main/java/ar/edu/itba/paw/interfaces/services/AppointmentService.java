@@ -49,4 +49,6 @@ public interface AppointmentService extends GenericService<Appointment, Integer>
     Map<Workday, Integer> appointmentQtyByWorkdayOfUser(User user);
 
     void remove(Integer id, User user);
+
+    List<List<AppointmentTimeSlot>> findWeekTimeslots(Staff staff, LocalDateTime from, LocalDateTime to);
 }

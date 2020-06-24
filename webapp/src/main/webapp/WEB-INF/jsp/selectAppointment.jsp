@@ -145,7 +145,7 @@
                     <button id="day-right" class="btn">></button>
                 </div>
             </div>
-            <c:if test="${timeslotsAvailable.isEmpty()}">
+            <c:if test="${!hasTimeslots}">
                 <div class="row justify-content-center">
                     <p class="text-center mt-2" style="color:grey;"><spring:message code="NoAvailableAppointmentsThisWeek"/></p>
                 </div>

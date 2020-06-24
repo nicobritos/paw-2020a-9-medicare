@@ -32,8 +32,6 @@ public class ProfilePictureController extends GenericController {
     @Autowired
     ServletContext context;
 
-    //TODO:correct path
-
     private final String defaultImagePath = "/img/defaultProfilePic.svg";
     private final String defaultImageType = "image/svg+xml";
 
@@ -42,7 +40,6 @@ public class ProfilePictureController extends GenericController {
         //get current user
         Optional<User> user = this.getUser();
         if (!user.isPresent()) {
-            //TODO:revise status code
             return new ResponseEntity<>(HttpStatus.FORBIDDEN);
         }
         //check its a valid pic
