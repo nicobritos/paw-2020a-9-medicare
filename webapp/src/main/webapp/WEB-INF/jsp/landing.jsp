@@ -3,6 +3,12 @@
 <head>
     <%@ include file="../partials/head.jsp" %>
     <link rel="stylesheet" type="text/css" href='<c:url value="/css/landing.css"/>'>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/jquery.jssocials/1.4.0/jssocials.min.js"></script>
+    <link type="text/css" rel="stylesheet" href="https://cdn.jsdelivr.net/jquery.jssocials/1.4.0/jssocials.css" />
+    <link type="text/css" rel="stylesheet" href="https://cdn.jsdelivr.net/jquery.jssocials/1.4.0/jssocials-theme-flat.css" />
+    <link type="text/css" rel="stylesheet" href="https://cdn.jsdelivr.net/jquery.jssocials/1.4.0/jssocials-theme-classic.css" />
+    <link type="text/css" rel="stylesheet" href="https://cdn.jsdelivr.net/jquery.jssocials/1.4.0/jssocials-theme-minima.css" />
+    <link type="text/css" rel="stylesheet" href="https://cdn.jsdelivr.net/jquery.jssocials/1.4.0/jssocials-theme-plain.css" />
 </head>
 <body>
 <%@ include file="navbar/navbar.jsp" %>
@@ -50,6 +56,17 @@
                     code="SearchMedics"/></button>
         </div>
     </form>
+    <br>
+    <div class="container"><hr></div>
+    <div class="shareDiv">
+        <h1 class="shareTitle">¡Compartí MediCare con tus amigos!</h1>
+        <div class="shareSocial"></div>
+        <br>
+    </div>
+    <br>
+    <div class="container"><hr></div>
+    <br>
+    <br>
 </div>
 </body>
 </html>
