@@ -16,20 +16,6 @@ import java.util.Optional;
 public class WorkdayServiceImpl extends GenericServiceImpl<WorkdayDao, Workday, Integer> implements WorkdayService {
     @Autowired
     private WorkdayDao repository;
-    @Autowired
-    private AppointmentService appointmentService;
-
-    @Override
-    public void remove(Integer id) {
-        if (id == null)
-            throw new IllegalArgumentException();
-        Optional<Workday> workday = this.findById(id);
-        if (!workday.isPresent())
-            throw new IllegalArgumentException();
-
-        this.appointmentService.cancelAppointments(workday.get());
-        super.remove(id);
-    }
 
     @Override
     public List<Workday> findByUser(User user) {

@@ -73,15 +73,21 @@ const Profile = function () {
                                 cancelButtonText: workday_strings['cancel2'],
                             }).then((result) => {
                                 if (result.value) {
-                                    $.post(element.dataset.appointment_url);
+                                    $.post(element.dataset.appointment_url).done(function (){
+                                        Swal.fire(
+                                            workday_strings['deleted'],
+                                            workday_strings['deleted_body'],
+                                            'success'
+                                        )
+                                        location.reload();
+                                    });
+                                } else {
                                     element.submit();
                                     Swal.fire(
                                         workday_strings['deleted'],
                                         workday_strings['deleted_body'],
                                         'success'
                                     )
-                                } else {
-                                    element.submit();
                                 }
                             })
                         }
