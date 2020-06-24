@@ -141,7 +141,7 @@ public class MedicHomeController extends GenericController {
             return this.profile(form);
         }
         if ((!form.getPassword().isEmpty() && form.getPassword().length() < 8) || !form.getPassword().equals(form.getRepeatPassword())) {
-            errors.reject("Min.medicProfileForm.password", null, "Error");
+            errors.reject("Min.medicProfileForm.password", new Object[]{8}, "Error");
             return this.profile(form);
         }
         Optional<User> newEmailUser = this.userService.findByUsername(form.getEmail());

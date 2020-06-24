@@ -88,7 +88,7 @@ public class Office extends GenericModel<Integer> {
     }
 
     @Override
-    protected boolean isSameInstance(Object o) {
+    protected boolean isSameType(Object o) {
         return o instanceof Office;
     }
 }

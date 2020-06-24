@@ -98,7 +98,7 @@ public class Staff extends GenericModel<Integer> {
     }
 
     @Override
-    protected boolean isSameInstance(Object o) {
+    protected boolean isSameType(Object o) {
         return o instanceof Staff;
     }
 }

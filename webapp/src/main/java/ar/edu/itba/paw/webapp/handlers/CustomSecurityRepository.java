@@ -27,7 +27,7 @@ public abstract class CustomSecurityRepository {
             userContext.remove((User) context.getAuthentication().getPrincipal());
     }
 
-    public static synchronized void propagateAuthorities(User user, Collection<GrantedAuthority> authorities) {
+    public static void propagateAuthorities(User user, Collection<GrantedAuthority> authorities) {
         Collection<SecurityContext> originalContexts = userContext.get(user);
         if (originalContexts == null) {
             LOGGER.error("Error propagating authorities: stored SecurityContexts is null. Are they being saved? For user: {}", user.getUsername());
