@@ -212,17 +212,26 @@ public class MedicHomeController extends GenericController {
             return this.addWorkday(form);
         }
 
-        Workday workday = new Workday();
-        workday.setDay(WorkdayDay.from(form.getDow()));
-        if(workday.getDay() == null){
+        boolean addedDay = false;
+        for(int i=0;i<7 && i<form.getDow().length;i++){
+            if(form.getDow()[i]){
+                addedDay = true;
+                Workday workday = new Workday();
+                workday.setDay(WorkdayDay.from(i+1));
+                if(workday.getDay() == null){
+                    return this.addWorkday(form);
+                }
+                workday.setStartHour(startHour);
+                workday.setStartMinute(startMin);
+                workday.setEndHour(endHour);
+                workday.setEndMinute(endMin);
+                workday.setStaff(realStaff.get());
+                this.workdayService.create(workday);
+            }
+        }
+        if(!addedDay){
             return this.addWorkday(form);
         }
-        workday.setStartHour(startHour);
-        workday.setStartMinute(startMin);
-        workday.setEndHour(endHour);
-        workday.setEndMinute(endMin);
-        workday.setStaff(realStaff.get());
-        this.workdayService.create(workday);
 
         ModelAndView mav = new ModelAndView();
         mav.addObject("user", user);

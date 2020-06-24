@@ -70,7 +70,7 @@ const MedicHome = function () {
 
         $( ".cancel-appt-form" ).each( function( index, element ){
             $(element).children('.cancel-appt-btn').click(function () {
-                Modal.confirm({
+                /*Modal.confirm({
                     title: strings['title'],
                     body: strings['body'],
                     callbacks: {
@@ -78,7 +78,20 @@ const MedicHome = function () {
                             element.submit();
                         }
                     }
-                });
+                });*/
+                Swal.fire({
+                    title: strings['title'],
+                    text: strings['body'],
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#3085d6',
+                    cancelButtonColor: '#d33',
+                    confirmButtonText: strings['yes']
+                }).then((result) => {
+                    if (result.value) {
+                        element.submit();
+                    }
+                })
             });
         })
     }
