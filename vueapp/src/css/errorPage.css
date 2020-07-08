@@ -1,0 +1,12 @@
+body, html {
+    height: 100%;
+}
+
+.logo-for-error {
+    height: 1em;
+}
+
+#homeBtn {
+    margin-top: 10px;
+    margin-bottom: 50px;
+}

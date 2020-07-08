@@ -1,0 +1,68 @@
+body, html {
+    height: 100%;
+    background-color: rgba(0, 196, 186, 0.205);
+}
+
+.addturn-form {
+    background-color: #fff;
+    border-radius: 1em !important;
+    box-shadow: 10px 9px 12px 0px rgba(0, 196, 186, 0.205);
+}
+
+
+.form-link:hover {
+    text-decoration: none;
+}
+
+.addturn-form input, .addturn-form select {
+    background-color: #f0f0f0;
+}
+
+.addturn-form input:focus, .addturn-form select:focus {
+    background-color: #e0e0e0;
+}
+
+.addturn-form-title {
+    margin-bottom: 1em;
+}
+
+.addturn-form #logo {
+    width: 1em;
+}
+
+.addturn-form button {
+    background-color: #00C4BA;
+    color: white;
+}
+
+.addturn-form button:hover {
+    background-color: rgb(1, 150, 142);
+    color: #fafafa;
+}
+
+.form-atras-btn {
+    background-color: grey !important;
+    color: white;
+}
+
+.form-atras-btn:hover {
+    background-color: rgb(94, 94, 94) !important;
+    color: white;
+}
+
+.profile-picture-container {
+    display: inline-block;
+    position: relative;
+    width: 100%;
+}
+
+.profile-picture {
+    object-fit: cover;
+    height: 100%;
+    width: 100%;
+    top: 0;
+    bottom: 0;
+    right: 0;
+    left: 0;
+    position: absolute;
+}
