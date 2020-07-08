@@ -1,26 +1,23 @@
-//
-<c:choose>
-//     <c:when test="${user.isPresent()}">
-//         <%@ include file="navbarLogged.jsp" %>
-//     </c:when>
-//     <c:otherwise>
-//         <%@ include file="navbarNotLogged.jsp" %>
-//     </c:otherwise>
-// </c:choose>
 <template>
   <!--TODO:check -->
-  <div>
-    <NavbarLogged v-if="user.isPreset()"></NavbarLogged>
-    <NavbarNotLogged v-else></NavbarNotLogged>
-  </div>
+  <nav class="navbar navbar-expand header">       
+    <NavbarLogo/>
+    <!-- <NavbarLogged v-if="user.isPreset()"></NavbarLogged> -->
+    <NavbarNotLogged/>
+  </nav>
 </template>
 
 <script>
-import { NavbarLogged } from "./navbarLogged";
-import { NavbarNotLogged } from "./navbarNotLogged";
+import NavbarNotLogged from "./navbarNotLogged";
+// import NavbarLogged from "./navbarLogged";
+import NavbarLogo from "./navbarLogo";
 
 export default {
   name: "Navbar",
-  components: [NavbarLogged, NavbarNotLogged],
+  components: {
+    // NavbarLogged, 
+    NavbarLogo:NavbarLogo,
+    NavbarNotLogged:NavbarNotLogged
+  },
 };
 </script>
