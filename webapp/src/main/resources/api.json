@@ -384,6 +384,68 @@
                     }
                 }
             }
+        },
+        "responses": {
+            "get-staff": {
+                "description": "Successful",
+                "content": {
+                    "application/vnd.staff.get.v1+json": {
+                        "schema": {
+                            "$ref": "#/components/schemas/staff"
+                        }
+                    }
+                }
+            },
+            "get-user": {
+                "description": "Successful",
+                "content": {
+                    "application/vnd.user.get.v1+json": {
+                        "schema": {
+                            "$ref": "#/components/schemas/user"
+                        }
+                    }
+                }
+            },
+            "get-appointment": {
+                "description": "Successful",
+                "content": {
+                    "application/vnd.appointment.get.v1+json": {
+                        "schema": {
+                            "$ref": "#/components/schemas/appointment"
+                        }
+                    }
+                }
+            },
+            "get-workday": {
+                "description": "Successful",
+                "content": {
+                    "application/vnd.workday.get.v1+json": {
+                        "schema": {
+                            "$ref": "#/components/schemas/workday"
+                        }
+                    }
+                }
+            },
+            "error-400": {
+                "description": "Not found",
+                "content": {
+                    "application/vnd.error.v1+json": {
+                        "schema": {
+                            "$ref": "#/components/schemas/error"
+                        }
+                    }
+                }
+            },
+            "error-404": {
+                "description": "Not found",
+                "content": {
+                    "application/vnd.error.v1+json": {
+                        "schema": {
+                            "$ref": "#/components/schemas/error"
+                        }
+                    }
+                }
+            }
         }
     },
 
@@ -441,24 +503,10 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "Successful",
-                        "content": {
-                            "application/vnd.staff.get.v1+json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/staff"
-                                }
-                            }
-                        }
+                        "$ref": "#/components/responses/get-staff"
                     },
                     "404": {
-                        "description": "Not found",
-                        "content": {
-                            "application/vnd.error.v1+json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/error"
-                                }
-                            }
-                        }
+                        "$ref": "#/components/responses/error-404"
                     }
                 }
             },
@@ -486,14 +534,7 @@
                         }
                     },
                     "404": {
-                        "description": "Not found",
-                        "content": {
-                            "application/vnd.error.v1+json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/error"
-                                }
-                            }
-                        }
+                        "$ref": "#/components/responses/error-404"
                     }
                 }
             }
@@ -513,24 +554,10 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "Successful",
-                        "content": {
-                            "application/vnd.user.get.v1+json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/user"
-                                }
-                            }
-                        }
+                        "$ref": "#/components/responses/get-user"
                     },
                     "404": {
-                        "description": "Not found",
-                        "content": {
-                            "application/vnd.error.v1+json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/error"
-                                }
-                            }
-                        }
+                        "$ref": "#/components/responses/error-404"
                     }
                 }
             },
@@ -548,24 +575,10 @@
                 },
                 "responses": {
                     "200": {
-                        "description": "Successful",
-                        "content": {
-                            "application/vnd.user.get.v1+json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/user"
-                                }
-                            }
-                        }
+                        "$ref": "#/components/responses/get-user"
                     },
                     "404": {
-                        "description": "Not found",
-                        "content": {
-                            "application/vnd.error.v1+json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/error"
-                                }
-                            }
-                        }
+                        "$ref": "#/components/responses/error-404"
                     }
                 }
             }
@@ -606,24 +619,10 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "Successful",
-                        "content": {
-                            "application/vnd.appointment.get.v1+json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/appointment"
-                                }
-                            }
-                        }
+                        "$ref": "#/components/responses/get-appointment"
                     },
                     "404": {
-                        "description": "Not found",
-                        "content": {
-                            "application/vnd.error.v1+json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/error"
-                                }
-                            }
-                        }
+                        "$ref": "#/components/responses/error-404"
                     }
                 }
             },
@@ -641,24 +640,10 @@
                 },
                 "responses": {
                     "201": {
-                        "description": "Successful",
-                        "content": {
-                            "application/vnd.appointment.get.v1+json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/appointment"
-                                }
-                            }
-                        }
+                        "$ref": "#/components/responses/get-appointment"
                     },
                     "400": {
-                        "description": "Not found",
-                        "content": {
-                            "application/vnd.error.v1+json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/error"
-                                }
-                            }
-                        }
+                        "$ref": "#/components/responses/error-400"
                     }
                 }
             },
@@ -669,14 +654,7 @@
                         "description": "Successful"
                     },
                     "404": {
-                        "description": "Not found",
-                        "content": {
-                            "application/vnd.error.v1+json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/error"
-                                }
-                            }
-                        }
+                        "$ref": "#/components/responses/error-404"
                     }
                 }
             }
@@ -748,14 +726,7 @@
                         }
                     },
                     "404": {
-                        "description": "Not found",
-                        "content": {
-                            "application/vnd.error.v1+json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/error"
-                                }
-                            }
-                        }
+                        "$ref": "#/components/responses/error-404"
                     }
                 }
             }
@@ -806,14 +777,7 @@
                         }
                     },
                     "404": {
-                        "description": "Not found",
-                        "content": {
-                            "application/vnd.error.v1+json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/error"
-                                }
-                            }
-                        }
+                        "$ref": "#/components/responses/error-404"
                     }
                 }
             }
@@ -864,14 +828,7 @@
                         }
                     },
                     "404": {
-                        "description": "Not found",
-                        "content": {
-                            "application/vnd.error.v1+json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/error"
-                                }
-                            }
-                        }
+                        "$ref": "#/components/responses/error-404"
                     }
                 }
             }
@@ -922,25 +879,10 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "Successful",
-
-                        "content": {
-                            "application/vnd.workday.get.v1+json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/workday"
-                                }
-                            }
-                        }
+                        "$ref": "#/components/responses/get-workday"
                     },
                     "404": {
-                        "description": "Not found",
-                        "content": {
-                            "application/vnd.error.v1+json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/error"
-                                }
-                            }
-                        }
+                        "$ref": "#/components/responses/error-404"
                     }
                 }
             },
@@ -958,24 +900,10 @@
                 },
                 "responses": {
                     "201": {
-                        "description": "Successful",
-                        "content": {
-                            "application/vnd.workday.get.v1+json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/workday"
-                                }
-                            }
-                        }
+                        "$ref": "#/components/responses/get-workday"
                     },
                     "400": {
-                        "description": "Not found",
-                        "content": {
-                            "application/vnd.error.v1+json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/error"
-                                }
-                            }
-                        }
+                        "$ref": "#/components/responses/error-400"
                     }
                 }
             },
@@ -986,14 +914,7 @@
                         "description": "Successful"
                     },
                     "404": {
-                        "description": "Not found",
-                        "content": {
-                            "application/vnd.error.v1+json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/error"
-                                }
-                            }
-                        }
+                        "$ref": "#/components/responses/error-404"
                     }
                 }
             }
