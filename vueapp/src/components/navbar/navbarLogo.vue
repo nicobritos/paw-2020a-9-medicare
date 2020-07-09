@@ -1,7 +1,7 @@
 <template>
     <div class="container w-100 justify-content-start">
         <img class="navbar-brand" :src='logo' alt="logo" id="navbar-logo">
-        <a class="navbar-brand header-brand header-a-element" :href='getUrl()'>MediCare</a>
+        <router-link :to='getUrl()' class="navbar-brand header-brand header-a-element" >MediCare</router-link>
     </div>
 </template>
 

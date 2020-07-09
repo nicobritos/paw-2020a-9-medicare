@@ -1,8 +1,8 @@
 <template>    
     <div class="container w-100 justify-content-end">
-        <a :href='getUrl("signup/staff")' class="header-a-element nav-link mx-3">{{$t('AreYouMedic')}}</a>
-        <a :href='getUrl("signup")' class="header-a-element nav-link mx-3">{{$t("SignUp")}}</a>
-        <a :href='getUrl("login")' class="header-btn-element btn btn-light rounded mx-3">{{$t("Login")}}</a>
+        <router-link :to='getUrl("signup/staff")' class="header-a-element nav-link mx-3">{{$t('AreYouMedic')}}</router-link>
+        <router-link :to='getUrl("signup")' class="header-a-element nav-link mx-3">{{$t("SignUp")}}</router-link>
+        <router-link :to='getUrl("login")' class="header-btn-element btn btn-light rounded mx-3">{{$t("Login")}}</router-link>
     </div>
 </template>
 <script>
