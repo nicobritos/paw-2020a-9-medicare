@@ -34,6 +34,7 @@
         <org.hibernate.version>5.1.0.Final</org.hibernate.version>
         <org.hibernate.jpa.version>1.0.0.Final</org.hibernate.jpa.version>
         <jersey.version>3.0-SNAPSHOT</jersey.version>
+        <org.json.version>20200518</org.json.version>
     </properties>
 
     <dependencyManagement>
@@ -316,6 +317,12 @@
                 <groupId>org.glassfish.jersey.media</groupId>
                 <artifactId>jersey-media-jaxb</artifactId>
                 <version>${jersey.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.json</groupId>
+                <artifactId>json</artifactId>
+                <version>${org.json.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
