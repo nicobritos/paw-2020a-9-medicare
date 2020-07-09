@@ -96,13 +96,23 @@
                     "profilePictureId": {
                         "type": "integer"
                     }
-                }
+                },
+                "required": [
+                    "email",
+                    "firstName",
+                    "surname",
+                    "phone",
+                    "profilePictureId"
+                ]
             },
 
             "office": {
                 "properties": {
                     "id": {
                         "type": "integer"
+                    },
+                    "name": {
+                        "type": "string"
                     },
                     "phone": {
                         "type": "string"
@@ -147,7 +157,7 @@
                     "staffSpecialtyIds": {
                         "type": "array",
                         "items": {
-                            "$ref": "#/components/schemas/staffSpecialty"
+                            "type": "integer"
                         }
                     }
                 }
@@ -171,9 +181,6 @@
                         "type": "email",
                         "format": "email"
                     },
-                    "registrationNumber": {
-                        "type": "integer"
-                    },
                     "staffSpecialtyIds": {
                         "type": "array",
                         "items": {
@@ -182,7 +189,12 @@
                         "nullable": false,
                         "minLength": 1
                     }
-                }
+                },
+                "required": [
+                    "phone",
+                    "email",
+                    "staffSpecialtyIds"
+                ]
             },
 
             "patient": {
@@ -321,9 +333,9 @@
                             "SEEN"
                         ]
                     },
-                    "from": {
-                        "type": "string",
-                        "format": "date-time"
+                    "date_from": {
+                        "type": "long",
+                        "format": "epoch millis"
                     },
                     "message": {
                         "type": "string"
@@ -341,24 +353,9 @@
             },
             "createAppointment": {
                 "properties": {
-                    "id": {
-                        "type": "integer",
-                        "required": true
-                    },
-                    "status": {
-                        "type": "string",
-                        "enum": [
-                            "PENDING",
-                            "COMPLETE",
-                            "CANCELLED",
-                            "WAITING",
-                            "SEEN"
-                        ],
-                        "required": true
-                    },
-                    "from": {
-                        "type": "string",
-                        "format": "date-time",
+                    "date_from": {
+                        "type": "long",
+                        "format": "epoch millis",
                         "required": true
                     },
                     "message": {
