@@ -3,7 +3,10 @@ package ar.edu.itba.paw.webapp.controller.patient;
 import ar.edu.itba.paw.interfaces.services.*;
 import ar.edu.itba.paw.interfaces.services.exceptions.InvalidAppointmentDateException;
 import ar.edu.itba.paw.interfaces.services.exceptions.InvalidMinutesException;
-import ar.edu.itba.paw.models.*;
+import ar.edu.itba.paw.models.Appointment;
+import ar.edu.itba.paw.models.Patient;
+import ar.edu.itba.paw.models.Staff;
+import ar.edu.itba.paw.models.User;
 import ar.edu.itba.paw.webapp.controller.utils.GenericController;
 import ar.edu.itba.paw.webapp.events.events.AppointmentCancelEvent;
 import ar.edu.itba.paw.webapp.events.events.NewAppointmentEvent;
@@ -194,6 +197,7 @@ public class PatientHomeController extends GenericController {
             return new ModelAndView("redirect:/mediclist/0");
         }
         if(staffOptional.get().getStaffSpecialties().size() > 0) {
+            // TODO: i18n
             form.setMotive("Consulta de " + staffOptional.get().getStaffSpecialties().iterator().next().getName());
         } else {
             form.setMotive("Consulta");

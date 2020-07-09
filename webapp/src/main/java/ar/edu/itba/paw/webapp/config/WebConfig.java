@@ -39,15 +39,19 @@ import java.util.Properties;
         "ar.edu.itba.paw.services",
         "ar.edu.itba.paw.persistence",
         "ar.edu.itba.paw.webapp.transformer",
-        "ar.edu.itba.paw.webapp.events"
+        "ar.edu.itba.paw.webapp.events",
+        "ar.edu.itba.paw.webapp.exceptions"
 })
 @Configuration
 @EnableTransactionManagement
 @EnableAsync
 public class WebConfig {
-    protected static final String DB_URL = "jdbc:postgresql://10.16.1.110:5432/paw-2020a-9?useUnicode=true&amp;characterEncoding=utf8";
-    protected static final String DB_USER = "paw-2020a-9";
-    protected static final String DB_PASSWORD = "N4wC7cmxe";
+//    protected static final String DB_URL = "jdbc:postgresql://10.16.1.110:5432/paw-2020a-9?useUnicode=true&amp;characterEncoding=utf8";
+//    protected static final String DB_USER = "paw-2020a-9";
+//    protected static final String DB_PASSWORD = "N4wC7cmxe";
+    protected static final String DB_URL = "jdbc:postgresql://localhost:5433/paw?useUnicode=true&amp;characterEncoding=utf8";
+    protected static final String DB_USER = "postgres";
+    protected static final String DB_PASSWORD = "postgres";
 
     @Bean
     public MessageSource messageSource() {
@@ -132,6 +136,8 @@ public class WebConfig {
         properties.setProperty("hibernate.hbm2ddl.auto", "update");
         properties.setProperty("hibernate.dialect", "org.hibernate.dialect.PostgreSQL92Dialect");
         properties.setProperty("jadira.usertype.autoRegisterUserTypes", "true");
+//        properties.setProperty("hibernate.show_sql", "true");
+//        properties.setProperty("format_sql", "true");
 
         factoryBean.setJpaProperties(properties);
         return factoryBean;

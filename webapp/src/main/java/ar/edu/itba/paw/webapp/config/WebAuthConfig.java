@@ -1,8 +1,5 @@
 package ar.edu.itba.paw.webapp.config;
 
-import ar.edu.itba.paw.webapp.auth.UserRole;
-import ar.edu.itba.paw.webapp.handlers.AuthenticationSuccessHandlerImpl;
-import ar.edu.itba.paw.webapp.handlers.LogoutSuccessHandlerImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -19,13 +16,11 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.web.context.AbstractSecurityWebApplicationInitializer;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
-import java.util.concurrent.TimeUnit;
 
 @EnableWebSecurity
 @Configuration
@@ -56,40 +51,42 @@ public class WebAuthConfig extends WebSecurityConfigurerAdapter {
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
-        http.sessionManagement()
-                .invalidSessionUrl("/")
-                .and().authorizeRequests()
-                .antMatchers("/").permitAll()
-                .antMatchers("/verifyEmail").permitAll()
-                .antMatchers("/mediclist/**").hasAnyRole(UserRole.ANONYMOUS.name(), UserRole.PATIENT.name())
-                .antMatchers("/login").anonymous()
-                .antMatchers("/signup/**").anonymous()
-                .antMatchers("/patient/**").hasRole(UserRole.PATIENT.name())
-                .antMatchers("/staff/**").hasRole(UserRole.STAFF.name())
-                .antMatchers("/img/**").permitAll()
-                .antMatchers("/profilePics/**").permitAll()
-                .antMatchers("/**").authenticated()
-                .and().formLogin()
-                .usernameParameter("email")
-                .passwordParameter("password")
-                .loginPage("/login")
-                .permitAll()
-                .successHandler(new AuthenticationSuccessHandlerImpl())
-                .and().rememberMe()
-                .rememberMeParameter("rememberMe")
-                .userDetailsService(this.userDetailsService)
-                .key(this.getSecretKey())
-                .tokenValiditySeconds((int) TimeUnit.DAYS.toSeconds(30))
-                .and().logout()
-                .logoutUrl("/logout")
-                .logoutSuccessUrl("/")
-                .invalidateHttpSession(true)
-                .permitAll()
-                .logoutSuccessHandler(new LogoutSuccessHandlerImpl())
-                .and().exceptionHandling()
-                .accessDeniedPage("/403")
-                .and().csrf()
-                .disable();
+        http.authorizeRequests().anyRequest().permitAll().and().csrf().disable();
+
+//        http.sessionManagement()
+//                .invalidSessionUrl("/")
+//                .and().authorizeRequests()
+//                .antMatchers("/").permitAll()
+//                .antMatchers("/verifyEmail").permitAll()
+//                .antMatchers("/mediclist/**").hasAnyRole(UserRole.ANONYMOUS.name(), UserRole.PATIENT.name())
+//                .antMatchers("/login").anonymous()
+//                .antMatchers("/signup/**").anonymous()
+//                .antMatchers("/patient/**").hasRole(UserRole.PATIENT.name())
+//                .antMatchers("/staff/**").hasRole(UserRole.STAFF.name())
+//                .antMatchers("/img/**").permitAll()
+//                .antMatchers("/profilePics/**").permitAll()
+//                .antMatchers("/**").authenticated()
+//                .and().formLogin()
+//                .usernameParameter("email")
+//                .passwordParameter("password")
+//                .loginPage("/login")
+//                .permitAll()
+//                .successHandler(new AuthenticationSuccessHandlerImpl())
+//                .and().rememberMe()
+//                .rememberMeParameter("rememberMe")
+//                .userDetailsService(this.userDetailsService)
+//                .key(this.getSecretKey())
+//                .tokenValiditySeconds((int) TimeUnit.DAYS.toSeconds(30))
+//                .and().logout()
+//                .logoutUrl("/logout")
+//                .logoutSuccessUrl("/")
+//                .invalidateHttpSession(true)
+//                .permitAll()
+//                .logoutSuccessHandler(new LogoutSuccessHandlerImpl())
+//                .and().exceptionHandling()
+//                .accessDeniedPage("/403")
+//                .and().csrf()
+//                .disable();
     }
 
     @Override
@@ -106,9 +103,5 @@ public class WebAuthConfig extends WebSecurityConfigurerAdapter {
             stringBuilder.append(line);
         }
         return stringBuilder.toString();
-    }
-
-    public static class SecurityWebInitializer extends AbstractSecurityWebApplicationInitializer {
-        // Si esta clase no esta, no corre
     }
 }

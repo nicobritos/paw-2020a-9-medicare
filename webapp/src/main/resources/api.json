@@ -1,0 +1,1002 @@
+{
+    "openapi": "3.0.0",
+    "info": {
+        "title": "API",
+        "description": "API",
+        "version": "1.0.0"
+    },
+    "servers": [
+        {
+            "url": "/"
+        }
+    ],
+    "components": {
+        "schemas": {
+            "country": {
+                "properties": {
+                    "id": {
+                        "type": "string"
+                    },
+                    "name": {
+                        "type": "string"
+                    }
+                }
+            },
+            "province": {
+                "properties": {
+                    "id": {
+                        "type": "integer"
+                    },
+                    "name": {
+                        "type": "string"
+                    },
+                    "country": {
+                        "$ref": "#/components/schemas/country"
+                    }
+                }
+            },
+            "locality": {
+                "properties": {
+                    "id": {
+                        "type": "integer"
+                    },
+                    "name": {
+                        "type": "string"
+                    },
+                    "province": {
+                        "$ref": "#/components/schemas/province"
+                    }
+                }
+            },
+
+            "user": {
+                "properties": {
+                    "id": {
+                        "type": "integer"
+                    },
+                    "email": {
+                        "type": "string",
+                        "format": "email"
+                    },
+                    "firstName": {
+                        "type": "string"
+                    },
+                    "surname": {
+                        "type": "string"
+                    },
+                    "verified": {
+                        "type": "boolean"
+                    },
+                    "phone": {
+                        "type": "string"
+                    },
+                    "profilePictureId": {
+                        "type": "integer"
+                    }
+                }
+            },
+            "updateUser": {
+                "properties": {
+                    "email": {
+                        "type": "string",
+                        "format": "email",
+                        "nullable": false
+                    },
+                    "firstName": {
+                        "type": "string",
+                        "nullable": false
+                    },
+                    "surname": {
+                        "type": "string",
+                        "nullable": false
+                    },
+                    "phone": {
+                        "type": "string"
+                    },
+                    "profilePictureId": {
+                        "type": "integer"
+                    }
+                }
+            },
+
+            "office": {
+                "properties": {
+                    "id": {
+                        "type": "integer"
+                    },
+                    "phone": {
+                        "type": "string"
+                    },
+                    "email": {
+                        "type": "string",
+                        "format": "email"
+                    },
+                    "street": {
+                        "type": "string"
+                    },
+                    "url": {
+                        "type": "string"
+                    },
+                    "localityId": {
+                        "type": "integer"
+                    }
+                }
+            },
+
+            "staff": {
+                "properties": {
+                    "id": {
+                        "type": "integer"
+                    },
+                    "phone": {
+                        "type": "string"
+                    },
+                    "email": {
+                        "type": "email",
+                        "format": "email"
+                    },
+                    "registrationNumber": {
+                        "type": "integer"
+                    },
+                    "user": {
+                        "$ref": "#/components/schemas/user"
+                    },
+                    "office": {
+                        "$ref": "#/components/schemas/office"
+                    },
+                    "staffSpecialtyIds": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/staffSpecialty"
+                        }
+                    }
+                }
+            },
+            "staffSpecialty": {
+                "properties": {
+                    "id": {
+                        "type": "integer"
+                    },
+                    "name": {
+                        "type": "string"
+                    }
+                }
+            },
+            "updateStaff": {
+                "properties": {
+                    "phone": {
+                        "type": "string"
+                    },
+                    "email": {
+                        "type": "email",
+                        "format": "email"
+                    },
+                    "registrationNumber": {
+                        "type": "integer"
+                    },
+                    "staffSpecialtyIds": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/staffSpecialty"
+                        },
+                        "nullable": false,
+                        "minLength": 1
+                    }
+                }
+            },
+
+            "patient": {
+                "properties": {
+                    "id": {
+                        "type": "integer"
+                    },
+                    "user": {
+                        "$ref": "#/components/schemas/user"
+                    },
+                    "officeId": {
+                        "type": "integer"
+                    }
+                }
+            },
+
+            "workday": {
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "minimum": 1
+                    },
+                    "start": {
+                        "type": "object",
+                        "properties": {
+                            "hour": {
+                                "type": "integer",
+                                "minimum": 0,
+                                "maximum": 23
+                            },
+                            "minute": {
+                                "type": "integer",
+                                "minimum": 0,
+                                "maximum": 59
+                            }
+                        }
+                    },
+                    "end": {
+                        "type": "object",
+                        "properties": {
+                            "hour": {
+                                "type": "integer",
+                                "minimum": 0,
+                                "maximum": 23
+                            },
+                            "minute": {
+                                "type": "integer",
+                                "minimum": 0,
+                                "maximum": 59
+                            }
+                        }
+                    },
+                    "day": {
+                        "type": "string",
+                        "enum": [
+                            "MONDAY",
+                            "TUESDAY",
+                            "WEDNESDAY",
+                            "THURSDAY",
+                            "FRIDAY",
+                            "SATURDAY",
+                            "SUNDAY"
+                        ]
+                    },
+                    "staffId": {
+                        "type": "integer"
+                    }
+                }
+            },
+            "createWorkday": {
+                "properties": {
+                    "start": {
+                        "type": "object",
+                        "properties": {
+                            "hour": {
+                                "type": "integer",
+                                "minimum": 0,
+                                "maximum": 23,
+                                "required": true
+                            },
+                            "minute": {
+                                "type": "integer",
+                                "minimum": 0,
+                                "maximum": 59,
+                                "required": true
+                            }
+                        },
+                        "required": true
+                    },
+                    "end": {
+                        "type": "object",
+                        "properties": {
+                            "hour": {
+                                "type": "integer",
+                                "minimum": 0,
+                                "maximum": 23,
+                                "required": true
+                            },
+                            "minute": {
+                                "type": "integer",
+                                "minimum": 0,
+                                "maximum": 59,
+                                "required": true
+                            }
+                        },
+                        "required": true
+                    },
+                    "day": {
+                        "type": "string",
+                        "enum": [
+                            "MONDAY",
+                            "TUESDAY",
+                            "WEDNESDAY",
+                            "THURSDAY",
+                            "FRIDAY",
+                            "SATURDAY",
+                            "SUNDAY"
+                        ],
+                        "required": true
+                    }
+                }
+            },
+
+            "appointment": {
+                "properties": {
+                    "id": {
+                        "type": "integer"
+                    },
+                    "status": {
+                        "type": "string",
+                        "enum": [
+                            "PENDING",
+                            "COMPLETE",
+                            "CANCELLED",
+                            "WAITING",
+                            "SEEN"
+                        ]
+                    },
+                    "from": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "message": {
+                        "type": "string"
+                    },
+                    "motive": {
+                        "type": "string"
+                    },
+                    "patientId": {
+                        "type": "integer"
+                    },
+                    "staffId": {
+                        "type": "integer"
+                    }
+                }
+            },
+            "createAppointment": {
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "required": true
+                    },
+                    "status": {
+                        "type": "string",
+                        "enum": [
+                            "PENDING",
+                            "COMPLETE",
+                            "CANCELLED",
+                            "WAITING",
+                            "SEEN"
+                        ],
+                        "required": true
+                    },
+                    "from": {
+                        "type": "string",
+                        "format": "date-time",
+                        "required": true
+                    },
+                    "message": {
+                        "type": "string"
+                    },
+                    "motive": {
+                        "type": "string"
+                    },
+                    "staffId": {
+                        "type": "integer",
+                        "required": true
+                    }
+                }
+            },
+
+            "error": {
+                "properties": {
+                    "code": {
+                        "type": "integer"
+                    },
+                    "message": {
+                        "type": "string"
+                    }
+                }
+            }
+        }
+    },
+
+    "paths": {
+        "/staffs": {
+            "get": {
+                "summary": "List all staffs",
+                "parameters": [
+                    {
+                        "in": "query",
+                        "name": "page",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "in": "query",
+                        "name": "items",
+                        "schema": {
+                            "type": "integer"
+                        },
+                        "description": "items per page"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful",
+
+                        "content": {
+                            "application/json; medicare-schema=staff-list; version=1.0": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/staff"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/staffs/{id}": {
+            "get": {
+                "summary": "Gets a specific staff",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "schema": {
+                            "type": "integer"
+                        },
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful",
+                        "content": {
+                            "application/json; medicare-schema=staff; version=1.0": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/staff"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Not found",
+                        "content": {
+                            "application/json; medicare-schema=error; version=1.0": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/error"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "put": {
+                "summary": "Updates a staff",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json; medicare-schema=update-staff; version=1.0": {
+                            "schema": {
+                                "$ref": "#/components/schemas/updateStaff"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Successful",
+                        "content": {
+                            "application/json; medicare-schema=staff; version=1.0": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/staff"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Not found",
+                        "content": {
+                            "application/json; medicare-schema=error; version=1.0": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/error"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/users/{id}": {
+            "get": {
+                "summary": "Gets a specific user",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "schema": {
+                            "type": "integer"
+                        },
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful",
+                        "content": {
+                            "application/json; medicare-schema=user; version=1.0": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/user"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Not found",
+                        "content": {
+                            "application/json; medicare-schema=error; version=1.0": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/error"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "put": {
+                "summary": "Updates a user",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json; medicare-schema=update-user; version=1.0": {
+                            "schema": {
+                                "$ref": "#/components/schemas/updateUser"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Successful",
+                        "content": {
+                            "application/json; medicare-schema=user; version=1.0": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/user"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Not found",
+                        "content": {
+                            "application/json; medicare-schema=error; version=1.0": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/error"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/appointments": {
+            "get": {
+                "summary": "List all appointments",
+                "responses": {
+                    "200": {
+                        "description": "Successful",
+
+                        "content": {
+                            "application/json; medicare-schema=appointment-list; version=1.0": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/appointment"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/appointments/{id}": {
+            "get": {
+                "summary": "Gets a specific appointment",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "schema": {
+                            "type": "integer"
+                        },
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful",
+                        "content": {
+                            "application/json; medicare-schema=appointment; version=1.0": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/appointment"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Not found",
+                        "content": {
+                            "application/json; medicare-schema=error; version=1.0": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/error"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "summary": "Creates an appointment",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json; medicare-schema=create-appointment; version=1.0": {
+                            "schema": {
+                                "$ref": "#/components/schemas/createAppointment"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Successful",
+                        "content": {
+                            "application/json; medicare-schema=appointment; version=1.0": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/appointment"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Not found",
+                        "content": {
+                            "application/json; medicare-schema=error; version=1.0": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/error"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "summary": "Deletes an appointment",
+                "responses": {
+                    "204": {
+                        "description": "Successful"
+                    },
+                    "404": {
+                        "description": "Not found",
+                        "content": {
+                            "application/json; medicare-schema=error; version=1.0": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/error"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/specialties": {
+            "get": {
+                "summary": "List all staff specialties",
+                "responses": {
+                    "200": {
+                        "description": "Successful",
+
+                        "content": {
+                            "application/json; medicare-schema=specialty-list; version=1.0": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/staffSpecialty"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/countries": {
+            "get": {
+                "summary": "List all countries",
+                "responses": {
+                    "200": {
+                        "description": "Successful",
+
+                        "content": {
+                            "application/json; medicare-schema=country-list; version=1.0": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/country"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/countries/{id}": {
+            "get": {
+                "summary": "Gets a specific country",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "schema": {
+                            "type": "integer"
+                        },
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful",
+                        "content": {
+                            "application/json; medicare-schema=country; version=1.0": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/country"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Not found",
+                        "content": {
+                            "application/json; medicare-schema=error; version=1.0": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/error"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/provinces": {
+            "get": {
+                "summary": "List all provinces",
+                "responses": {
+                    "200": {
+                        "description": "Successful",
+
+                        "content": {
+                            "application/json; medicare-schema=province-list; version=1.0": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/province"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/provinces/{id}": {
+            "get": {
+                "summary": "Gets a specific province",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "schema": {
+                            "type": "integer"
+                        },
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful",
+                        "content": {
+                            "application/json; medicare-schema=province; version=1.0": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/province"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Not found",
+                        "content": {
+                            "application/json; medicare-schema=error; version=1.0": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/error"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/localities": {
+            "get": {
+                "summary": "List all localities",
+                "responses": {
+                    "200": {
+                        "description": "Successful",
+
+                        "content": {
+                            "application/json; medicare-schema=locality-list; version=1.0": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/locality"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/localities/{id}": {
+            "get": {
+                "summary": "Gets a specific locality",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "schema": {
+                            "type": "integer"
+                        },
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful",
+                        "content": {
+                            "application/json; medicare-schema=locality; version=1.0": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/locality"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Not found",
+                        "content": {
+                            "application/json; medicare-schema=error; version=1.0": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/error"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/workdays": {
+            "get": {
+                "summary": "List all workdays",
+                "parameters": [
+                    {
+                        "in": "query",
+                        "name": "staffId",
+                        "schema": {
+                            "type": "integer"
+                        },
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful",
+
+                        "content": {
+                            "application/json; medicare-schema=workday-list; version=1.0": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/workday"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/workdays/{id}": {
+            "get": {
+                "summary": "Get a specific workday",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "schema": {
+                            "type": "integer"
+                        },
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful",
+
+                        "content": {
+                            "application/json; medicare-schema=workday; version=1.0": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/workday"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Not found",
+                        "content": {
+                            "application/json; medicare-schema=error; version=1.0": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/error"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "summary": "Creates a workday",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json; medicare-schema=create-workday; version=1.0": {
+                            "schema": {
+                                "$ref": "#/components/schemas/createWorkday"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Successful",
+                        "content": {
+                            "application/json; medicare-schema=workday; version=1.0": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/workday"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Not found",
+                        "content": {
+                            "application/json; medicare-schema=error; version=1.0": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/error"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "summary": "Deletes an appointment",
+                "responses": {
+                    "204": {
+                        "description": "Successful"
+                    },
+                    "404": {
+                        "description": "Not found",
+                        "content": {
+                            "application/json; medicare-schema=error; version=1.0": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/error"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
