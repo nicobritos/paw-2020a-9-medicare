@@ -413,7 +413,7 @@
                         "description": "Successful",
 
                         "content": {
-                            "application/json; medicare-schema=staff-list; version=1.0": {
+                            "application/vnd.staff.list.get.v1+json": {
                                 "schema": {
                                     "type": "array",
                                     "items": {
@@ -443,7 +443,7 @@
                     "200": {
                         "description": "Successful",
                         "content": {
-                            "application/json; medicare-schema=staff; version=1.0": {
+                            "application/vnd.staff.get.v1+json": {
                                 "schema": {
                                     "$ref": "#/components/schemas/staff"
                                 }
@@ -453,7 +453,7 @@
                     "404": {
                         "description": "Not found",
                         "content": {
-                            "application/json; medicare-schema=error; version=1.0": {
+                            "application/vnd.error.v1+json": {
                                 "schema": {
                                     "$ref": "#/components/schemas/error"
                                 }
@@ -467,7 +467,7 @@
                 "requestBody": {
                     "required": true,
                     "content": {
-                        "application/json; medicare-schema=update-staff; version=1.0": {
+                        "application/vnd.staff.update.v1+json": {
                             "schema": {
                                 "$ref": "#/components/schemas/updateStaff"
                             }
@@ -478,7 +478,7 @@
                     "200": {
                         "description": "Successful",
                         "content": {
-                            "application/json; medicare-schema=staff; version=1.0": {
+                            "application/vnd.staff.get.v1+json": {
                                 "schema": {
                                     "$ref": "#/components/schemas/staff"
                                 }
@@ -488,7 +488,7 @@
                     "404": {
                         "description": "Not found",
                         "content": {
-                            "application/json; medicare-schema=error; version=1.0": {
+                            "application/vnd.error.v1+json": {
                                 "schema": {
                                     "$ref": "#/components/schemas/error"
                                 }
@@ -515,7 +515,7 @@
                     "200": {
                         "description": "Successful",
                         "content": {
-                            "application/json; medicare-schema=user; version=1.0": {
+                            "application/vnd.user.get.v1+json": {
                                 "schema": {
                                     "$ref": "#/components/schemas/user"
                                 }
@@ -525,7 +525,7 @@
                     "404": {
                         "description": "Not found",
                         "content": {
-                            "application/json; medicare-schema=error; version=1.0": {
+                            "application/vnd.error.v1+json": {
                                 "schema": {
                                     "$ref": "#/components/schemas/error"
                                 }
@@ -539,7 +539,7 @@
                 "requestBody": {
                     "required": true,
                     "content": {
-                        "application/json; medicare-schema=update-user; version=1.0": {
+                        "application/vnd.user.update.v1+json": {
                             "schema": {
                                 "$ref": "#/components/schemas/updateUser"
                             }
@@ -550,7 +550,7 @@
                     "200": {
                         "description": "Successful",
                         "content": {
-                            "application/json; medicare-schema=user; version=1.0": {
+                            "application/vnd.user.get.v1+json": {
                                 "schema": {
                                     "$ref": "#/components/schemas/user"
                                 }
@@ -560,7 +560,7 @@
                     "404": {
                         "description": "Not found",
                         "content": {
-                            "application/json; medicare-schema=error; version=1.0": {
+                            "application/vnd.error.v1+json": {
                                 "schema": {
                                     "$ref": "#/components/schemas/error"
                                 }
@@ -578,7 +578,7 @@
                         "description": "Successful",
 
                         "content": {
-                            "application/json; medicare-schema=appointment-list; version=1.0": {
+                            "application/vnd.appointment.list.get.v1+json": {
                                 "schema": {
                                     "type": "array",
                                     "items": {
@@ -608,7 +608,7 @@
                     "200": {
                         "description": "Successful",
                         "content": {
-                            "application/json; medicare-schema=appointment; version=1.0": {
+                            "application/vnd.appointment.get.v1+json": {
                                 "schema": {
                                     "$ref": "#/components/schemas/appointment"
                                 }
@@ -618,7 +618,7 @@
                     "404": {
                         "description": "Not found",
                         "content": {
-                            "application/json; medicare-schema=error; version=1.0": {
+                            "application/vnd.error.v1+json": {
                                 "schema": {
                                     "$ref": "#/components/schemas/error"
                                 }
@@ -632,7 +632,7 @@
                 "requestBody": {
                     "required": true,
                     "content": {
-                        "application/json; medicare-schema=create-appointment; version=1.0": {
+                        "application/vnd.appointment.create.v1+json": {
                             "schema": {
                                 "$ref": "#/components/schemas/createAppointment"
                             }
@@ -643,7 +643,7 @@
                     "201": {
                         "description": "Successful",
                         "content": {
-                            "application/json; medicare-schema=appointment; version=1.0": {
+                            "application/vnd.appointment.get.v1+json": {
                                 "schema": {
                                     "$ref": "#/components/schemas/appointment"
                                 }
@@ -653,7 +653,7 @@
                     "400": {
                         "description": "Not found",
                         "content": {
-                            "application/json; medicare-schema=error; version=1.0": {
+                            "application/vnd.error.v1+json": {
                                 "schema": {
                                     "$ref": "#/components/schemas/error"
                                 }
@@ -671,7 +671,7 @@
                     "404": {
                         "description": "Not found",
                         "content": {
-                            "application/json; medicare-schema=error; version=1.0": {
+                            "application/vnd.error.v1+json": {
                                 "schema": {
                                     "$ref": "#/components/schemas/error"
                                 }
@@ -689,7 +689,7 @@
                         "description": "Successful",
 
                         "content": {
-                            "application/json; medicare-schema=specialty-list; version=1.0": {
+                            "application/vnd.specialty.list.get.v1+json": {
                                 "schema": {
                                     "type": "array",
                                     "items": {
@@ -710,7 +710,7 @@
                         "description": "Successful",
 
                         "content": {
-                            "application/json; medicare-schema=country-list; version=1.0": {
+                            "application/vnd.country.list.get.v1+json": {
                                 "schema": {
                                     "type": "array",
                                     "items": {
@@ -740,7 +740,7 @@
                     "200": {
                         "description": "Successful",
                         "content": {
-                            "application/json; medicare-schema=country; version=1.0": {
+                            "application/vnd.country.get.v1+json": {
                                 "schema": {
                                     "$ref": "#/components/schemas/country"
                                 }
@@ -750,7 +750,7 @@
                     "404": {
                         "description": "Not found",
                         "content": {
-                            "application/json; medicare-schema=error; version=1.0": {
+                            "application/vnd.error.v1+json": {
                                 "schema": {
                                     "$ref": "#/components/schemas/error"
                                 }
@@ -768,7 +768,7 @@
                         "description": "Successful",
 
                         "content": {
-                            "application/json; medicare-schema=province-list; version=1.0": {
+                            "application/vnd.province.list.get.v1+json": {
                                 "schema": {
                                     "type": "array",
                                     "items": {
@@ -798,7 +798,7 @@
                     "200": {
                         "description": "Successful",
                         "content": {
-                            "application/json; medicare-schema=province; version=1.0": {
+                            "application/vnd.province.get.v1+json": {
                                 "schema": {
                                     "$ref": "#/components/schemas/province"
                                 }
@@ -808,7 +808,7 @@
                     "404": {
                         "description": "Not found",
                         "content": {
-                            "application/json; medicare-schema=error; version=1.0": {
+                            "application/vnd.error.v1+json": {
                                 "schema": {
                                     "$ref": "#/components/schemas/error"
                                 }
@@ -826,7 +826,7 @@
                         "description": "Successful",
 
                         "content": {
-                            "application/json; medicare-schema=locality-list; version=1.0": {
+                            "application/vnd.locality.list.get.v1+json": {
                                 "schema": {
                                     "type": "array",
                                     "items": {
@@ -856,7 +856,7 @@
                     "200": {
                         "description": "Successful",
                         "content": {
-                            "application/json; medicare-schema=locality; version=1.0": {
+                            "application/vnd.locality.get.v1+json": {
                                 "schema": {
                                     "$ref": "#/components/schemas/locality"
                                 }
@@ -866,7 +866,7 @@
                     "404": {
                         "description": "Not found",
                         "content": {
-                            "application/json; medicare-schema=error; version=1.0": {
+                            "application/vnd.error.v1+json": {
                                 "schema": {
                                     "$ref": "#/components/schemas/error"
                                 }
@@ -894,7 +894,7 @@
                         "description": "Successful",
 
                         "content": {
-                            "application/json; medicare-schema=workday-list; version=1.0": {
+                            "application/vnd.workday.list.get.v1+json": {
                                 "schema": {
                                     "type": "array",
                                     "items": {
@@ -925,7 +925,7 @@
                         "description": "Successful",
 
                         "content": {
-                            "application/json; medicare-schema=workday; version=1.0": {
+                            "application/vnd.workday.get.v1+json": {
                                 "schema": {
                                     "$ref": "#/components/schemas/workday"
                                 }
@@ -935,7 +935,7 @@
                     "404": {
                         "description": "Not found",
                         "content": {
-                            "application/json; medicare-schema=error; version=1.0": {
+                            "application/vnd.error.v1+json": {
                                 "schema": {
                                     "$ref": "#/components/schemas/error"
                                 }
@@ -949,7 +949,7 @@
                 "requestBody": {
                     "required": true,
                     "content": {
-                        "application/json; medicare-schema=create-workday; version=1.0": {
+                        "application/vnd.workday.create.v1+json": {
                             "schema": {
                                 "$ref": "#/components/schemas/createWorkday"
                             }
@@ -960,7 +960,7 @@
                     "201": {
                         "description": "Successful",
                         "content": {
-                            "application/json; medicare-schema=workday; version=1.0": {
+                            "application/vnd.workday.get.v1+json": {
                                 "schema": {
                                     "$ref": "#/components/schemas/workday"
                                 }
@@ -970,7 +970,7 @@
                     "400": {
                         "description": "Not found",
                         "content": {
-                            "application/json; medicare-schema=error; version=1.0": {
+                            "application/vnd.error.v1+json": {
                                 "schema": {
                                     "$ref": "#/components/schemas/error"
                                 }
@@ -988,7 +988,7 @@
                     "404": {
                         "description": "Not found",
                         "content": {
-                            "application/json; medicare-schema=error; version=1.0": {
+                            "application/vnd.error.v1+json": {
                                 "schema": {
                                     "$ref": "#/components/schemas/error"
                                 }
