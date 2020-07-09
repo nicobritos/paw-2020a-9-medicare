@@ -1,8 +1,12 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
+import MedicList from '@/views/medicList';
+import Landing from '@/views/landing';
 
 Vue.use(VueRouter)
   const routes = [
+  // example
+  // TODO: CHECK best behavior for component
   // {
   //   path: '/about',
   //   name: 'About',
@@ -11,6 +15,16 @@ Vue.use(VueRouter)
   //   // which is lazy-loaded when the route is visited.
   //   component: () => import(/* webpackChunkName: "about" */ '../views/About.vue')
   // }
+  {
+    path:'/mediclist/:page',
+    name:'mediclist',
+    component: MedicList
+  },
+  {
+    path:'/',
+    name:'landing',
+    component: Landing
+  }
 ]
 
 const router = new VueRouter({
