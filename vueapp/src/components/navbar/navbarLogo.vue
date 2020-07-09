@@ -6,7 +6,7 @@
 </template>
 
 <script>
-import logo from "@/assets/logo.svg";
+import logo from "@/assets/whiteLogo.svg";
 import utils from "@/js/medicareUtils";
 
 export default {
