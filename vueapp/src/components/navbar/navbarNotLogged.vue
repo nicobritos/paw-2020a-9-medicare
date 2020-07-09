@@ -6,7 +6,7 @@
     </div>
 </template>
 <script>
-import utils from "@/js/medicareUtils";
+import utils from "@/scripts/utils";
 
 
 export default {

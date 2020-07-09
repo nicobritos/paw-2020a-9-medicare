@@ -7,7 +7,7 @@
 
 <script>
 import logo from "@/assets/whiteLogo.svg";
-import utils from "@/js/medicareUtils";
+import utils from "@/scripts/utils";
 
 export default {
     name:"NavbarLogo",
