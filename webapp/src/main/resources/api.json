@@ -7,7 +7,7 @@
     },
     "servers": [
         {
-            "url": "/"
+            "url": "/api/"
         }
     ],
     "components": {
