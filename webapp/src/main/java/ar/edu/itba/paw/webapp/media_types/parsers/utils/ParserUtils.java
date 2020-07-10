@@ -1,4 +1,4 @@
-package ar.edu.itba.paw.webapp.media_types.parsers;
+package ar.edu.itba.paw.webapp.media_types.parsers.utils;
 
 import org.json.JSONArray;
 import org.json.JSONException;

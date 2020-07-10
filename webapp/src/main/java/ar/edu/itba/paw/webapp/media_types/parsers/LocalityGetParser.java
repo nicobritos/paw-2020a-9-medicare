@@ -1,8 +1,8 @@
 package ar.edu.itba.paw.webapp.media_types.parsers;
 
-import ar.edu.itba.paw.models.Staff;
-import ar.edu.itba.paw.webapp.media_types.StaffMIME;
-import ar.edu.itba.paw.webapp.media_types.parsers.serializers.StaffSerializer;
+import ar.edu.itba.paw.models.Locality;
+import ar.edu.itba.paw.webapp.media_types.LocalityMIME;
+import ar.edu.itba.paw.webapp.media_types.parsers.serializers.LocalitySerializer;
 import ar.edu.itba.paw.webapp.media_types.parsers.utils.GenericParser;
 import org.glassfish.jersey.message.internal.ReaderWriter;
 
@@ -17,18 +17,18 @@ import java.io.OutputStreamWriter;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
 
-@Produces(StaffMIME.GET)
-public class StaffGetParser extends GenericParser<Staff> {
+@Produces(LocalityMIME.GET)
+public class LocalityGetParser extends GenericParser<Locality> {
     @Override
     public boolean isWriteable(Class<?> aClass, Type type, Annotation[] annotations, MediaType mediaType) {
         return true;
     }
 
     @Override
-    public void writeTo(Staff staff, Class<?> aClass, Type type, Annotation[] annotations, MediaType mediaType, MultivaluedMap<String, Object> multivaluedMap, OutputStream outputStream) throws IOException, WebApplicationException {
+    public void writeTo(Locality locality, Class<?> aClass, Type type, Annotation[] annotations, MediaType mediaType, MultivaluedMap<String, Object> multivaluedMap, OutputStream outputStream) throws IOException, WebApplicationException {
         try {
             OutputStreamWriter writer = new OutputStreamWriter(outputStream, ReaderWriter.getCharset(mediaType));
-            writer.write(StaffSerializer.instance.toJson(staff).toString());
+            writer.write(LocalitySerializer.instance.toJson(locality).toString());
             writer.flush();
         } catch (Exception e) {
             throw new InternalServerErrorException();
