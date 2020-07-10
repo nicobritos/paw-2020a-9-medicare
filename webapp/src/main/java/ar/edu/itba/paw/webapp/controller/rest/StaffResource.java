@@ -23,7 +23,7 @@ import java.util.stream.Collectors;
 
 @Path("/staffs")
 @Component
-public class StaffController extends GenericRestController {
+public class StaffResource extends GenericResource {
     @Autowired
     private StaffSpecialtyService staffSpecialtyService;
     @Autowired

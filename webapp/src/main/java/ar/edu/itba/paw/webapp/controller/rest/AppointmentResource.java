@@ -16,7 +16,7 @@ import java.util.Optional;
 
 @Path("/users")
 @Component
-public class UserController extends GenericRestController {
+public class AppointmentResource extends GenericResource {
     @Autowired
     private UserService userService;
 

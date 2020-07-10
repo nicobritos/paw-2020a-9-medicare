@@ -19,7 +19,7 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-public abstract class GenericRestController {
+public abstract class GenericResource {
     protected static final String PAGINATOR_PAGE_QUERY = "page";
     protected static final String PAGINATOR_PER_PAGE_QUERY = "per_page";
     protected static final int PAGINATOR_PER_PAGE_DEFAULT = 10;
