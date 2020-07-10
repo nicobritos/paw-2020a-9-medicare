@@ -23,7 +23,7 @@ public class UserController extends GenericRestController {
     @GET
     @Path("/{id}")
     @Produces({UserMIME.GET, ErrorMIME.ERROR})
-    public Response getStaff(
+    public Response getEntity(
             @Context HttpHeaders httpheaders,
             @PathParam("id") Integer id)
     {
@@ -43,7 +43,7 @@ public class UserController extends GenericRestController {
     @Path("/{id}")
     @Produces({UserMIME.GET, ErrorMIME.ERROR})
     @Consumes(UserMIME.UPDATE)
-    public Response updateStaff(
+    public Response updateEntity(
             User user,
             @Context HttpHeaders httpheaders,
             @PathParam("id") Integer id)

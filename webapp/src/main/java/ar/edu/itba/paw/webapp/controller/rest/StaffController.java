@@ -34,7 +34,7 @@ public class StaffController extends GenericRestController {
     // TODO: i18n
     @GET
     @Produces({StaffMIME.GET_LIST, ErrorMIME.ERROR})
-    public Response getStaffs(
+    public Response getCollection(
             @Context HttpHeaders httpheaders,
             @Context UriInfo uriInfo,
             @QueryParam("name") String name,
@@ -76,7 +76,7 @@ public class StaffController extends GenericRestController {
     @GET
     @Path("/{id}")
     @Produces({StaffMIME.GET, ErrorMIME.ERROR})
-    public Response getStaff(
+    public Response getEntity(
             @Context HttpHeaders httpheaders,
             @PathParam("id") Integer id)
     {
@@ -96,7 +96,7 @@ public class StaffController extends GenericRestController {
     @Path("/{id}")
     @Produces({StaffMIME.GET, ErrorMIME.ERROR})
     @Consumes(StaffMIME.UPDATE)
-    public Response updateStaff(
+    public Response updateEntity(
             Staff staff,
             @Context HttpHeaders httpheaders,
             @PathParam("id") Integer id)
