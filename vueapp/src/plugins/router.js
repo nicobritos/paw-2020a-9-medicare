@@ -17,12 +17,12 @@ Vue.use(VueRouter)
   // }
   {
     path:'/mediclist/:page',
-    name:'mediclist',
+    name:'MedicList',
     component: MedicList
   },
   {
     path:'/',
-    name:'landing',
+    name:'Landing',
     component: Landing
   }
 ]
