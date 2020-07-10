@@ -8,11 +8,6 @@ import org.json.JSONObject;
 public class AppointmentDeserializer extends JsonDeserializer<Appointment> {
     public static final AppointmentDeserializer instance = new AppointmentDeserializer();
 
-    private static final int MIN_HOUR = 0;
-    private static final int MAX_HOUR = 23;
-    private static final int MIN_MINUTE = 0;
-    private static final int MAX_MINUTE = 59;
-
     private AppointmentDeserializer() {}
 
     @Override
