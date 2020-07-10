@@ -41,7 +41,8 @@
             <param-name>jersey.config.server.provider.packages</param-name>
             <param-value>
                 ar.edu.itba.paw.webapp.controller.rest,
-                ar.edu.itba.paw.webapp.exceptions
+                ar.edu.itba.paw.webapp.exceptions,
+                ar.edu.itba.paw.webapp.media_types.parsers
             </param-value>
         </init-param>
 <!--        <init-param>-->
