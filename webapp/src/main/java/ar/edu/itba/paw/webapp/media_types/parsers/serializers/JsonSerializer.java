@@ -1,19 +1,18 @@
 package ar.edu.itba.paw.webapp.media_types.parsers.serializers;
 
-import org.json.JSONArray;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 
 import java.util.Collection;
 
 public abstract class JsonSerializer<T> {
-    // Lo dejamos en Object porque podria devolver un JSONArray tranquilamente
-    // y JSONObject no extiende ninguna clase o implementa alguna interfaz como
-    // para diferenciarlos
-    public abstract Object toJson(T t);
+    public abstract JsonNode toJson(T t);
 
-    public JSONArray toJsonArray(Collection<T> ts) {
-        JSONArray array = new JSONArray();
+    public ArrayNode toJsonArray(Collection<T> ts) {
+        ArrayNode array = JsonNodeFactory.instance.arrayNode();
         for (T t : ts) {
-            array.put(this.toJson(t));
+            array.add(this.toJson(t));
         }
         return array;
     }

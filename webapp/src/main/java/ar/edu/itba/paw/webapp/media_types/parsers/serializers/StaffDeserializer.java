@@ -2,8 +2,9 @@ package ar.edu.itba.paw.webapp.media_types.parsers.serializers;
 
 import ar.edu.itba.paw.models.Staff;
 import ar.edu.itba.paw.models.StaffSpecialty;
-import org.json.JSONArray;
-import org.json.JSONObject;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import java.util.Collection;
 import java.util.LinkedList;
@@ -14,19 +15,25 @@ public class StaffDeserializer extends JsonDeserializer<Staff> {
     private StaffDeserializer() {}
 
     @Override
-    public Staff fromJson(Object o) {
-        if (!(o instanceof JSONObject)) {
+    public Staff fromJson(JsonNode o) {
+        if (!(o instanceof ObjectNode)) {
             throw new IllegalArgumentException();
         }
 
-        JSONObject jsonObject = (JSONObject) o;
+        ObjectNode jsonObject = (ObjectNode) o;
 
         Staff staff = new Staff();
 
-        staff.setPhone(jsonObject.getString("phone"));
-        staff.setEmail(jsonObject.getString("email"));
+        JsonNode node = jsonObject.get("phone");
+        if (!node.isNull()) {
+            staff.setPhone(jsonObject.get("phone").asText());
+        }
+        node = jsonObject.get("email");
+        if (!node.isNull()) {
+            staff.setEmail(jsonObject.get("email").asText());
+        }
 
-        JSONArray jsonSpecialtiesIds = jsonObject.getJSONArray("staffSpecialtyIds");
+        ArrayNode jsonSpecialtiesIds = (ArrayNode) jsonObject.get("staffSpecialtyIds");
         Collection<StaffSpecialty> staffSpecialties = new LinkedList<>();
         for (Object o1 : jsonSpecialtiesIds) {
             if (!(o1 instanceof Integer))

@@ -1,7 +1,9 @@
 package ar.edu.itba.paw.webapp.media_types.parsers.serializers;
 
 import ar.edu.itba.paw.models.Patient;
-import org.json.JSONObject;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 public class PatientSerializer extends JsonSerializer<Patient> {
     public static final PatientSerializer instance = new PatientSerializer();
@@ -9,11 +11,11 @@ public class PatientSerializer extends JsonSerializer<Patient> {
     private PatientSerializer() {}
 
     @Override
-    public Object toJson(Patient patient) {
-        JSONObject jsonObject = new JSONObject();
+    public JsonNode toJson(Patient patient) {
+        ObjectNode jsonObject = JsonNodeFactory.instance.objectNode();
 
         jsonObject.put("id", patient.getId());
-        jsonObject.put("user", UserSerializer.instance.toJson(patient.getUser()));
+        jsonObject.replace("user", UserSerializer.instance.toJson(patient.getUser()));
         jsonObject.put("officeId", patient.getOffice().getId());
 
         return jsonObject;

@@ -1,7 +1,9 @@
 package ar.edu.itba.paw.webapp.media_types.parsers.serializers;
 
 import ar.edu.itba.paw.models.User;
-import org.json.JSONObject;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 public class UserSerializer extends JsonSerializer<User> {
     public static final UserSerializer instance = new UserSerializer();
@@ -9,8 +11,8 @@ public class UserSerializer extends JsonSerializer<User> {
     private UserSerializer() {}
 
     @Override
-    public Object toJson(User user) {
-        JSONObject jsonObject = new JSONObject();
+    public JsonNode toJson(User user) {
+        ObjectNode jsonObject = JsonNodeFactory.instance.objectNode();
 
         jsonObject.put("id", user.getId());
         jsonObject.put("email", user.getEmail());
@@ -18,7 +20,7 @@ public class UserSerializer extends JsonSerializer<User> {
         jsonObject.put("surname", user.getSurname());
         jsonObject.put("verified", user.getVerified());
         jsonObject.put("phone", user.getPhone());
-        jsonObject.put("profilePictureId", user.getProfilePicture().getId());
+        jsonObject.put("profilePictureId", user.getProfilePicture() != null ? user.getProfilePicture().getId() : null);
 
         return jsonObject;
     }

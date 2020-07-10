@@ -1,8 +1,10 @@
 package ar.edu.itba.paw.webapp.media_types.parsers.serializers;
 
 import ar.edu.itba.paw.models.Appointment;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.joda.time.DateTimeZone;
-import org.json.JSONObject;
 
 public class AppointmentSerializer extends JsonSerializer<Appointment> {
     public static final AppointmentSerializer instance = new AppointmentSerializer();
@@ -10,8 +12,8 @@ public class AppointmentSerializer extends JsonSerializer<Appointment> {
     private AppointmentSerializer() {}
 
     @Override
-    public Object toJson(Appointment appointment) {
-        JSONObject jsonObject = new JSONObject();
+    public JsonNode toJson(Appointment appointment) {
+        ObjectNode jsonObject = JsonNodeFactory.instance.objectNode();
 
         jsonObject.put("id", appointment.getId());
         jsonObject.put("status", appointment.getAppointmentStatus().toString());

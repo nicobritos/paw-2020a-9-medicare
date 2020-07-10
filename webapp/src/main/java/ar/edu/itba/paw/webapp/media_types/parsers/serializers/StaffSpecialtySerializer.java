@@ -1,7 +1,9 @@
 package ar.edu.itba.paw.webapp.media_types.parsers.serializers;
 
 import ar.edu.itba.paw.models.StaffSpecialty;
-import org.json.JSONObject;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 public class StaffSpecialtySerializer extends JsonSerializer<StaffSpecialty> {
     public static final StaffSpecialtySerializer instance = new StaffSpecialtySerializer();
@@ -9,8 +11,8 @@ public class StaffSpecialtySerializer extends JsonSerializer<StaffSpecialty> {
     private StaffSpecialtySerializer() {}
 
     @Override
-    public Object toJson(StaffSpecialty staffSpecialty) {
-        JSONObject jsonObject = new JSONObject();
+    public JsonNode toJson(StaffSpecialty staffSpecialty) {
+        ObjectNode jsonObject = JsonNodeFactory.instance.objectNode();
 
         jsonObject.put("id", staffSpecialty.getId());
         jsonObject.put("name", staffSpecialty.getName());

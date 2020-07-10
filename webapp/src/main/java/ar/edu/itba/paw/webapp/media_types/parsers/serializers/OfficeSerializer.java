@@ -1,7 +1,9 @@
 package ar.edu.itba.paw.webapp.media_types.parsers.serializers;
 
 import ar.edu.itba.paw.models.Office;
-import org.json.JSONObject;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 public class OfficeSerializer extends JsonSerializer<Office> {
     public static final OfficeSerializer instance = new OfficeSerializer();
@@ -9,8 +11,8 @@ public class OfficeSerializer extends JsonSerializer<Office> {
     private OfficeSerializer() {}
 
     @Override
-    public Object toJson(Office office) {
-        JSONObject jsonObject = new JSONObject();
+    public JsonNode toJson(Office office) {
+        ObjectNode jsonObject = JsonNodeFactory.instance.objectNode();
 
         jsonObject.put("id", office.getId());
         jsonObject.put("name", office.getName());

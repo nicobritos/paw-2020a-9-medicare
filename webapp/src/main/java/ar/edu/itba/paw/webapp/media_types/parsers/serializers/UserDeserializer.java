@@ -2,7 +2,8 @@ package ar.edu.itba.paw.webapp.media_types.parsers.serializers;
 
 import ar.edu.itba.paw.models.Picture;
 import ar.edu.itba.paw.models.User;
-import org.json.JSONObject;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 public class UserDeserializer extends JsonDeserializer<User> {
     public static final UserDeserializer instance = new UserDeserializer();
@@ -10,24 +11,38 @@ public class UserDeserializer extends JsonDeserializer<User> {
     private UserDeserializer() {}
 
     @Override
-    public User fromJson(Object o) {
-        if (!(o instanceof JSONObject)) {
+    public User fromJson(JsonNode o) {
+        if (!(o instanceof ObjectNode)) {
             throw new IllegalArgumentException();
         }
 
-        JSONObject jsonObject = (JSONObject) o;
+        ObjectNode jsonObject = (ObjectNode) o;
 
         User user = new User();
 
-        user.setEmail(jsonObject.getString("email"));
-        user.setFirstName(jsonObject.getString("firstName"));
-        user.setSurname(jsonObject.getString("surname"));
-        user.setPhone(jsonObject.getString("phone"));
+        JsonNode node = jsonObject.get("email");
+        if (!node.isNull()) {
+            user.setEmail(node.asText());
+        }
+        node = jsonObject.get("firstName");
+        if (!node.isNull()) {
+            user.setFirstName(node.asText());
+        }
+        node = jsonObject.get("surname");
+        if (!node.isNull()) {
+            user.setSurname(node.asText());
+        }
+        node = jsonObject.get("phone");
+        if (!node.isNull()) {
+            user.setPhone(node.asText());
+        }
 
-        Picture picture = new Picture();
-        picture.setId(jsonObject.getInt("profilePictureId"));
-
-        user.setProfilePicture(picture);
+        node = jsonObject.get("profilePictureId");
+        if (!node.isNull()) {
+            Picture picture = new Picture();
+            picture.setId(node.asInt());
+            user.setProfilePicture(picture);
+        }
 
         return user;
     }

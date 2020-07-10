@@ -2,11 +2,15 @@ package ar.edu.itba.paw.webapp.media_types.parsers.serializers;
 
 import ar.edu.itba.paw.models.Appointment;
 import ar.edu.itba.paw.models.AppointmentTimeSlot;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.joda.time.LocalDate;
-import org.json.JSONArray;
-import org.json.JSONObject;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 
 public class AppointmentTimeSlotSerializer extends JsonSerializer<AppointmentTimeSlot> {
     public static final AppointmentTimeSlotSerializer instance = new AppointmentTimeSlotSerializer();
@@ -14,8 +18,8 @@ public class AppointmentTimeSlotSerializer extends JsonSerializer<AppointmentTim
     private AppointmentTimeSlotSerializer() {}
 
     @Override
-    public Object toJson(AppointmentTimeSlot timeSlot) {
-        JSONObject jsonObject = new JSONObject();
+    public JsonNode toJson(AppointmentTimeSlot timeSlot) {
+        ObjectNode jsonObject = JsonNodeFactory.instance.objectNode();
 
         jsonObject.put("hour", timeSlot.getDate().getHourOfDay());
         jsonObject.put("minute", timeSlot.getDate().getMinuteOfHour());
@@ -25,27 +29,27 @@ public class AppointmentTimeSlotSerializer extends JsonSerializer<AppointmentTim
     }
 
     @Override
-    public JSONArray toJsonArray(Collection<AppointmentTimeSlot> appointmentTimeSlots) {
-        JSONArray jsonArray = new JSONArray();
+    public ArrayNode toJsonArray(Collection<AppointmentTimeSlot> appointmentTimeSlots) {
+        ArrayNode jsonArray = JsonNodeFactory.instance.arrayNode();
 
-        Map<LocalDate, List<Object>> timeSlotsPerDay = new HashMap<>();
+        Map<LocalDate, ArrayNode> timeSlotsPerDay = new HashMap<>();
         for (AppointmentTimeSlot appointmentTimeSlot : appointmentTimeSlots) {
-            List<Object> transformedTimeSlots = timeSlotsPerDay.computeIfAbsent(appointmentTimeSlot.getDate().toLocalDate(), k -> new LinkedList<>());
+            ArrayNode transformedTimeSlots = timeSlotsPerDay.computeIfAbsent(appointmentTimeSlot.getDate().toLocalDate(), k -> JsonNodeFactory.instance.arrayNode());
             transformedTimeSlots.add(this.toJson(appointmentTimeSlot));
         }
 
-        for (Map.Entry<LocalDate, List<Object>> dateList : timeSlotsPerDay.entrySet()) {
-            JSONObject jsonObject = new JSONObject();
-            jsonObject.put("date", this.transformDate(dateList.getKey()));
-            jsonObject.put("timeslots", dateList.getValue());
-            jsonArray.put(jsonObject);
+        for (Map.Entry<LocalDate, ArrayNode> dateList : timeSlotsPerDay.entrySet()) {
+            ObjectNode jsonObject = JsonNodeFactory.instance.objectNode();
+            jsonObject.replace("date", this.transformDate(dateList.getKey()));
+            jsonObject.replace("timeslots", dateList.getValue());
+            jsonArray.add(jsonObject);
         }
 
         return jsonArray;
     }
 
-    private JSONObject transformDate(LocalDate date) {
-        JSONObject jsonObject = new JSONObject();
+    private ObjectNode transformDate(LocalDate date) {
+        ObjectNode jsonObject = JsonNodeFactory.instance.objectNode();
 
         jsonObject.put("year", date.getYear());
         jsonObject.put("month", date.getMonthOfYear());

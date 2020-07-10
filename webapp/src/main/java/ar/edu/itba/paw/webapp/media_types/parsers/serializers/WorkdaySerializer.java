@@ -1,7 +1,9 @@
 package ar.edu.itba.paw.webapp.media_types.parsers.serializers;
 
 import ar.edu.itba.paw.models.Workday;
-import org.json.JSONObject;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 public class WorkdaySerializer extends JsonSerializer<Workday> {
     public static final WorkdaySerializer instance = new WorkdaySerializer();
@@ -9,20 +11,20 @@ public class WorkdaySerializer extends JsonSerializer<Workday> {
     private WorkdaySerializer() {}
 
     @Override
-    public Object toJson(Workday workday) {
-        JSONObject jsonObject = new JSONObject();
+    public JsonNode toJson(Workday workday) {
+        ObjectNode jsonObject = JsonNodeFactory.instance.objectNode();
 
         jsonObject.put("id", workday.getId());
-        jsonObject.put("start", this.timeToJson(workday.getStartHour(), workday.getStartMinute()));
-        jsonObject.put("end", this.timeToJson(workday.getEndHour(), workday.getEndMinute()));
+        jsonObject.replace("start", this.timeToJson(workday.getStartHour(), workday.getStartMinute()));
+        jsonObject.replace("end", this.timeToJson(workday.getEndHour(), workday.getEndMinute()));
         jsonObject.put("day", workday.getDay().name());
         jsonObject.put("staffId", workday.getStaff().getId());
 
         return jsonObject;
     }
 
-    private JSONObject timeToJson(int hour, int minute) {
-        JSONObject jsonObject = new JSONObject();
+    private ObjectNode timeToJson(int hour, int minute) {
+        ObjectNode jsonObject = JsonNodeFactory.instance.objectNode();
 
         jsonObject.put("hour", hour);
         jsonObject.put("minute", minute);
