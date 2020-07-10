@@ -370,6 +370,45 @@
                     }
                 }
             },
+            "appointmentTimeslot": {
+                "properties": {
+                    "hour": {
+                        "type": "integer"
+                    },
+                    "minute": {
+                        "type": "integer"
+                    },
+                    "duration": {
+                        "type": "integer"
+                    }
+                }
+            },
+            "appointmentTimeslotDate": {
+                "properties": {
+                    "date": {
+                        "type": "object",
+                        "properties": {
+                            "day": {
+                                "type": "integer"
+                            },
+                            "month": {
+                                "type": "integer"
+                            },
+                            "year": {
+                                "type": "integer"
+                            }
+                        }
+                    },
+                    "timeslots": {
+                        "type": "array",
+                        "items": [
+                            {
+                                "$ref": "#/components/schemas/appointmentTimeslot"
+                            }
+                        ]
+                    }
+                }
+            },
 
             "error": {
                 "properties": {
@@ -909,6 +948,100 @@
                 "responses": {
                     "204": {
                         "description": "Successful"
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/error-404"
+                    }
+                }
+            }
+        },
+        "/appointmentTimeSlots": {
+            "get": {
+                "summary": "List all appointment time slots",
+                "parameters": [
+                    {
+                        "in": "query",
+                        "name": "staffId",
+                        "schema": {
+                            "type": "integer"
+                        },
+                        "required": true
+                    },
+                    {
+                        "in": "query",
+                        "name": "fromYear",
+                        "schema": {
+                            "type": "integer",
+                            "minimum": 2000,
+                            "maximum": 2100
+                        },
+                        "required": true
+                    },
+                    {
+                        "in": "query",
+                        "name": "fromMonth",
+                        "schema": {
+                            "type": "integer",
+                            "minimum": 1,
+                            "maximum": 12
+                        },
+                        "required": true
+                    },
+                    {
+                        "in": "query",
+                        "name": "fromDay",
+                        "schema": {
+                            "type": "integer",
+                            "minimum": 1,
+                            "maximum": 31
+                        },
+                        "required": true
+                    },
+                    {
+                        "in": "query",
+                        "name": "toYear",
+                        "schema": {
+                            "type": "integer",
+                            "minimum": 2000,
+                            "maximum": 2100
+                        },
+                        "required": true
+                    },
+                    {
+                        "in": "query",
+                        "name": "toMonth",
+                        "schema": {
+                            "type": "integer",
+                            "minimum": 1,
+                            "maximum": 12
+                        },
+                        "required": true
+                    },
+                    {
+                        "in": "query",
+                        "name": "toDay",
+                        "schema": {
+                            "type": "integer",
+                            "minimum": 1,
+                            "maximum": 31
+                        },
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful",
+
+                        "content": {
+                            "application/vnd.appointment-timeslot.list.get.v1+json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/appointmentTimeslotDate"
+                                    }
+                                }
+                            }
+                        }
                     },
                     "404": {
                         "$ref": "#/components/responses/error-404"
