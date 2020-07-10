@@ -2,6 +2,7 @@ import Vue from 'vue'
 import VueRouter from 'vue-router'
 import MedicList from '@/views/medicList';
 import Landing from '@/views/landing';
+import Unverified from '@/views/unverified';
 
 Vue.use(VueRouter)
   const routes = [
@@ -19,6 +20,11 @@ Vue.use(VueRouter)
     path:'/mediclist/:page',
     name:'MedicList',
     component: MedicList
+  },
+  {
+    path:"/unverified",
+    name:"Unverified",
+    component:Unverified
   },
   {
     path:'/',

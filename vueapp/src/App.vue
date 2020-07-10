@@ -1,8 +1,12 @@
 <template>
-  <div id="app">
+  <!-- 
+    TODO:CHECK
+    lo dejo asi checkear si el resto funciona bien con esto
+  -->
+  <span id="app">
     <Navbar :user="user" :logged="logged" />
     <router-view />
-  </div>
+  </span>
 </template>
 
 <script>
