@@ -35,12 +35,12 @@ public class StaffDeserializer extends JsonDeserializer<Staff> {
 
         ArrayNode jsonSpecialtiesIds = (ArrayNode) jsonObject.get("staffSpecialtyIds");
         Collection<StaffSpecialty> staffSpecialties = new LinkedList<>();
-        for (Object o1 : jsonSpecialtiesIds) {
-            if (!(o1 instanceof Integer))
+        for (JsonNode o1 : jsonSpecialtiesIds) {
+            if (!o1.isInt())
                 throw new IllegalArgumentException();
 
             StaffSpecialty staffSpecialty = new StaffSpecialty();
-            staffSpecialty.setId((Integer) o1);
+            staffSpecialty.setId(o1.asInt());
             staffSpecialties.add(staffSpecialty);
         }
 
