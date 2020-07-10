@@ -72,46 +72,51 @@ public abstract class GenericRestController {
     }
 
     protected ResponseBuilder createPaginatorResponse(Paginator<?> paginator, UriInfo uriInfo) {
-        int nextPage = 0, previousPage = 0;
-        int firstPage = 1, lastPage = paginator.getTotalPages();
-
-        if (paginator.getRemainingPages() > 0) {
-            nextPage = paginator.getPage() + 1;
-        }
-        if (paginator.getPage() > firstPage) {
-            previousPage = paginator.getPage() - 1;
-        }
-
-        StringBuilder header = new StringBuilder();
-        header
-                .append("<")
-                .append(this.formatPaginatorUrl(firstPage, paginator.getPageSize(), uriInfo))
-                .append(">; rel=")
-                .append("\"first\"")
-                .append(", <")
-                .append(this.formatPaginatorUrl(lastPage, paginator.getPageSize(), uriInfo))
-                .append(">; rel=")
-                .append("\"last\"");
-        if (nextPage > 0) {
-            header
-                    .append(", <")
-                    .append(this.formatPaginatorUrl(nextPage, paginator.getPageSize(), uriInfo))
-                    .append(">; rel=")
-                    .append("\"next\"");
-        }
-        if (previousPage > 0) {
-            header
-                    .append(", <")
-                    .append(this.formatPaginatorUrl(previousPage, paginator.getPageSize(), uriInfo))
-                    .append(">; rel=")
-                    .append("\"previous\"");
-        }
-
-        return Response
+        ResponseBuilder responseBuilder = Response
                 .ok()
                 .entity(paginator.getModels())
-                .header("Link", header.toString())
                 .header("Total-Items", String.valueOf(paginator.getTotalCount()));
+
+        if (paginator.getTotalCount() > 0) {
+            int nextPage = 0, previousPage = 0;
+            int firstPage = 1, lastPage = paginator.getTotalPages();
+
+            if (paginator.getRemainingPages() > 0) {
+                nextPage = paginator.getPage() + 1;
+            }
+            if (paginator.getPage() > firstPage) {
+                previousPage = paginator.getPage() - 1;
+            }
+
+            StringBuilder header = new StringBuilder();
+            header
+                    .append("<")
+                    .append(this.formatPaginatorUrl(firstPage, paginator.getPageSize(), uriInfo))
+                    .append(">; rel=")
+                    .append("\"first\"")
+                    .append(", <")
+                    .append(this.formatPaginatorUrl(lastPage, paginator.getPageSize(), uriInfo))
+                    .append(">; rel=")
+                    .append("\"last\"");
+            if (nextPage > 0) {
+                header
+                        .append(", <")
+                        .append(this.formatPaginatorUrl(nextPage, paginator.getPageSize(), uriInfo))
+                        .append(">; rel=")
+                        .append("\"next\"");
+            }
+            if (previousPage > 0) {
+                header
+                        .append(", <")
+                        .append(this.formatPaginatorUrl(previousPage, paginator.getPageSize(), uriInfo))
+                        .append(">; rel=")
+                        .append("\"previous\"");
+            }
+
+            responseBuilder.header("Link", header.toString());
+        }
+
+        return responseBuilder;
     }
 
     private String formatPaginatorUrl(int page, int perPage, UriInfo uriInfo) {
