@@ -430,6 +430,14 @@
                             "$ref": "#/components/schemas/staff"
                         }
                     }
+                },
+                "headers": {
+                    "Link": {
+                        "schema": {
+                            "type": "string",
+                            "description": "Returns a string formatted as specified in RFC 8288 with pagination information. Always has a rel: first and last, and may provide a link to next and/or previous"
+                        }
+                    }
                 }
             },
             "get-user": {
@@ -499,7 +507,7 @@
                     },
                     {
                         "in": "query",
-                        "name": "items",
+                        "name": "per_page",
                         "schema": {
                             "type": "integer"
                         },
