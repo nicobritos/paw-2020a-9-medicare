@@ -15,6 +15,7 @@ import javax.ws.rs.core.UriInfo;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -47,6 +48,27 @@ public abstract class GenericRestController {
                 throw new MissingAcceptsException();
             mediaTypes.remove(type);
         }
+    }
+
+    protected Set<Integer> stringToIntegerList(String list) {
+        return this.stringToIntegerList(list, ",");
+    }
+
+    protected Set<Integer> stringToIntegerList(String list, String regexSeparator) {
+        Set<Integer> specialtiesIds = new HashSet<>();
+        if (list != null) {
+            // split strings to get all items and create the list
+            for (String s : list.split(regexSeparator)) {
+                try {
+                    int id = Integer.parseInt(s);
+                    if (id >= 0) {
+                        specialtiesIds.add(id);
+                    }
+                } catch (NumberFormatException ignored) {
+                }
+            }
+        }
+        return specialtiesIds;
     }
 
     protected ResponseBuilder createPaginatorResponse(Paginator<?> paginator, UriInfo uriInfo) {

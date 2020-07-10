@@ -59,8 +59,8 @@ public class StaffController extends GenericRestController {
             perPage = PAGINATOR_PER_PAGE_DEFAULT;
         }
 
-        Collection<StaffSpecialty> searchedSpecialties = this.staffSpecialtyService.findByIds(this.parseListAsInteger(specialties));
-        Collection<Locality> searchedLocalities = this.localityService.findByIds(this.parseListAsInteger(localities));
+        Collection<StaffSpecialty> searchedSpecialties = this.staffSpecialtyService.findByIds(this.stringToIntegerList(specialties));
+        Collection<Locality> searchedLocalities = this.localityService.findByIds(this.stringToIntegerList(localities));
 
         Paginator<Staff> staffPaginator;
         if (name != null && !(name = name.trim()).equals("")) {
@@ -127,22 +127,5 @@ public class StaffController extends GenericRestController {
         this.staffService.update(savedStaff);
 
         return Response.ok(staffOptional.get()).build();
-    }
-
-    private Set<Integer> parseListAsInteger(String list) {
-        Set<Integer> specialtiesIds = new HashSet<>();
-        if (list != null) {
-            // split strings to get all items and create the list
-            for (String s : list.split(",")) {
-                try {
-                    int id = Integer.parseInt(s);
-                    if (id >= 0) {
-                        specialtiesIds.add(id);
-                    }
-                } catch (NumberFormatException ignored) {
-                }
-            }
-        }
-        return specialtiesIds;
     }
 }
