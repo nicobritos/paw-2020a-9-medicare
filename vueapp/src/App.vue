@@ -4,7 +4,7 @@
     lo dejo asi checkear si el resto funciona bien con esto
   -->
   <span id="app">
-    <Navbar :user="user" :logged="logged" />
+    <Navbar v-if="shouldShowNavbar" :user="user" :logged="logged" />
     <router-view />
   </span>
 </template>
@@ -19,6 +19,11 @@ export default {
   name: "App",
   components: {
     Navbar: Navbar,
+  },
+  computed:{
+    shouldShowNavbar(){
+      return !["Login","Signup","SignupStaff","SignupPatient"].includes(this.$route.name);
+    }
   },
   data: function() {
     return {

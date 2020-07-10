@@ -3,6 +3,11 @@ import VueRouter from 'vue-router'
 import MedicList from '@/views/medicList';
 import Landing from '@/views/landing';
 import Unverified from '@/views/unverified';
+import Login from '@/views/authentication/login';
+import Signup from '@/views/authentication/signup';
+import SignupPatient from '@/views/authentication/signupPatient';
+import SignupStaff from '@/views/authentication/signupStaff';
+
 
 Vue.use(VueRouter)
   const routes = [
@@ -30,6 +35,24 @@ Vue.use(VueRouter)
     path:'/',
     name:'Landing',
     component: Landing
+  },{
+    path:"/login",
+    name:"Login",
+    component:Login
+  },{
+    path:"/signup",
+    name:"Signup",
+    component:Signup
+  },
+  {
+    path:"/signup/staff",
+    name:"SignupStaff",
+    component:SignupStaff
+  },
+  {
+    path:"/signup/patient",
+    name:"SignupPatient",
+    component:SignupPatient
   }
 ]
 
