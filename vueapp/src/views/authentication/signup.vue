@@ -1,35 +1,137 @@
-<html>
-<head>
-    <%@ include file="../../partials/head.jsp" %>
-    <link rel="stylesheet" href='<c:url value="/css/authentication/register.css"/> '>
-</head>
-<body>
-<div class="container w-100 h-100 d-flex flex-column justify-content-center align-items-center">
-    <c:url value="/login" var="loginUrl"/>
-    <div class="register-form border p-5 rounded">
-        <div class="row">
-            <h6>Medicare <img src='<c:url value="/img/logo.svg"/>' id="logo"/></h6>
-        </div>
-        <div class="row justify-content-start">
-            <h1 class="register-form-title"><spring:message code="CreateAccount"/></h1>
-        </div>
-        <div class="form-row justify-content-between align-items-end">
-            <div class="d-flex flex-column mr-5 align-items-center card card-shadow pointer p-2" id="signup-patient">
-                <i class="fas fa-hospital-user" style="font-size: 80px;"></i>
-                <h4 class="mt-2"><spring:message code="LookingForMedics"/></h4>
+<template>
+    <div class="container-fluid w-100 h-100 d-flex flex-column justify-content-center align-items-center signup-container">
+        <div class="register-form border p-5 rounded">
+            <div class="row">
+                <h6>Medicare <img :src='logo' id="logo"/></h6>
             </div>
-            <div class="d-flex flex-column align-items-center card card-shadow pointer p-2" id="signup-staff">
-                <i class="fa fa-user-md" style="font-size: 80px;"></i>
-                <h4 class="mt-2"><spring:message code="IMAMedic"/></h4>
+            <div class="row justify-content-start">
+                <h1 class="register-form-title">{{$t("CreateAccount")}}</h1>
+            </div>
+            <div class="form-row justify-content-between align-items-end">
+                <div class="d-flex flex-column mr-5 align-items-center card card-shadow pointer p-2" id="signup-patient">
+                    <!-- TODO: solve icons -->
+                    <i class="fa fa-hospital-user" style="font-size: 80px;"></i>
+                    <h4 class="mt-2">{{$t("LookingForMedics")}}</h4>
+                </div>
+                <div class="d-flex flex-column align-items-center card card-shadow pointer p-2" id="signup-staff">
+                    <!-- TODO: solve icons -->
+                    <i class="fa fa-user-md" style="font-size: 80px;"></i>
+                    <h4 class="mt-2">{{$t("IMAMedic")}}</h4>
+                </div>
             </div>
         </div>
     </div>
-</div>
-<script src='<c:url value="/js/scripts/authentication/Register.js"/> '></script>
+</template>
+
 <script>
-    $(document).ready(() => {
-        Register.init();
-    })
+import logo from "@/assets/logo.svg";
+
+export default {
+    name:"SignUp",
+    data(){
+        return {
+            logo:logo
+        }
+    }
+}
 </script>
-</body>
-</html>
+
+<style scoped>
+.signup-container {
+    background-color: rgba(0, 196, 186, 0.205);
+}
+
+.register-form {
+    background-color: #fff;
+    border-radius: 1em !important;
+    box-shadow: 10px 9px 12px 0px rgba(0, 196, 186, 0.205);
+    box-sizing: border-box;
+}
+
+
+.form-link:hover {
+    text-decoration: none;
+}
+
+.register-form input, .register-form select {
+    background-color: #f0f0f0;
+}
+
+.register-form input:focus, .register-form select:focus {
+    background-color: #e0e0e0;
+}
+
+.register-form-title {
+    margin-bottom: 1em;
+}
+
+.register-form #logo {
+    width: 1em;
+}
+
+.register-form button {
+    background-color: #00C4BA;
+    color: white;
+}
+
+.register-form button:hover {
+    background-color: rgb(1, 150, 142);
+    color: #fafafa;
+}
+
+.form-password {
+    position: relative;
+}
+
+.toggle-visibility {
+    position: absolute;
+    right: 2em;
+    top: 0.6em;
+    bottom: auto;
+    left: auto;
+    z-index: 1;
+
+    cursor: pointer;
+}
+
+.form-back-btn {
+    background-color: grey !important;
+    color: white;
+}
+
+.form-back-btn:hover {
+    background-color: rgb(94, 94, 94) !important;
+    color: white;
+}
+
+.card.card-shadow {
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.15);
+    transition: box-shadow 0.3s ease-in-out;
+}
+
+.card.card-shadow:hover {
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+}
+
+.pointer {
+    cursor: pointer;
+}
+
+.profile-picture-container {
+    display: inline-block;
+    position: relative;
+    width: 100%;
+}
+
+.profile-picture {
+    object-fit: cover;
+    height: 100%;
+    width: 100%;
+    top: 0;
+    bottom: 0;
+    right: 0;
+    left: 0;
+    position: absolute;
+}
+
+</style>
