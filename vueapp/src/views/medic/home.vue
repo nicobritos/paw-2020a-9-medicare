@@ -1,233 +1,338 @@
-<!DOCTYPE html>
-<html lang="en">
-<%@ include file="../../partials/head.jsp" %>
-<link rel="stylesheet" href='<c:url value="/css/staff/homeMedico.css"/> '/>
-</head>
-<body>
-<%@ include file="../navbar/navbarLogged.jsp" %>
-<div class="container h-75 w-100 mt-5">
-    <div class="row h-100">
-        <div class="col-4 h-100 pl-0 mr-3 w-100">
-            <h4><spring:message code="AgendaFor"/> <spring:message code="today"/></h4>
-            <ul class="list-group turno-list mr-2 w-100 h-100 overflow-auto">
-                <c:if test="${todayAppointments.isEmpty()}">
-                    <div class="container-fluid justify-content-center">
-                        <p class="text-left mt-4" style="color:grey;"><spring:message code="NoAppointmentsToday"/></p>
+<template>    
+    <div class="container h-75 w-100 mt-5">
+        <div class="row h-100">
+            <div class="col-4 h-100 pl-0 mr-3 w-100">
+                <h4>{{$t("AgendaFor")}} {{$t("today")}}</h4>
+                <ul class="list-group turno-list mr-2 w-100 h-100 overflow-auto">
+                    <div v-if="!todayAppointments" class="container-fluid justify-content-center">
+                        <p class="text-left mt-4" style="color:grey;">{{$t("NoAppointmentsToday")}}</p>
                     </div>
-                </c:if>
-                <c:forEach var="appointment" items="${todayAppointments}">
-                    <li class="list-group-item turno-item mb-3" id="lit">
+                    <li v-for="appointment in todayAppointments" :key="appointment.id" class="list-group-item turno-item mb-3" id="lit">
                         <div class="container">
                             <div class="row">
                                 <div class="col-4 d-flex flex-column justify-content-center">
                                     <div class="profile-picture-container">
                                         <div style="margin-top: 100%;"></div>
+                                        <!-- TODO: profile pic -->
                                         <img
                                                 class="profile-picture rounded-circle"
-                                                src="<c:url value="/profilePics/${appointment.patient.user.profilePicture.id}"/>"
-                                                alt=""
+                                                :src='"/profilePics/"+appointment.patient.user.profilePicture.id'
+                                                alt="profile pic"
                                         />
                                     </div>
                                 </div>
                                 <div class="col-6">
                                     <div class="row justify-content-start">
-                                        <h5><spring:message code="name_surname" arguments="${appointment.patient.user.firstName};${appointment.patient.user.surname}" argumentSeparator=";"/></h5>
+                                        <h5>{{$t("name_surname",[appointment.patient.user.firstName,appointment.patient.user.surname])}}</h5>
                                     </div>
                                     <div class="row">
                                         <p class="m-0">
-                                            <c:choose>
-                                                <c:when test="${appointment.fromDate.hourOfDay < 10}"><c:set value="0${appointment.fromDate.hourOfDay}" var="vafromHourOfDay"/></c:when>
-                                                <c:otherwise><c:set value="${appointment.fromDate.hourOfDay}" var="vafromHourOfDay"/></c:otherwise>
-                                            </c:choose>
-                                            <c:choose>
-                                                <c:when test="${appointment.fromDate.minuteOfHour < 10}"><c:set value="0${appointment.fromDate.minuteOfHour}" var="vafromMinuteOfHour"/></c:when>
-                                                <c:otherwise><c:set value="${appointment.fromDate.minuteOfHour}" var="vafromMinuteOfHour"/></c:otherwise>
-                                            </c:choose>
-                                            <c:choose>
-                                                <c:when test="${appointment.toDate.hourOfDay < 10}"><c:set value="0${appointment.toDate.hourOfDay}" var="vatoHourOfDay"/></c:when>
-                                                <c:otherwise><c:set value="${appointment.toDate.hourOfDay}" var="vatoHourOfDay"/></c:otherwise>
-                                            </c:choose>
-                                            <c:choose>
-                                                <c:when test="${appointment.toDate.minuteOfHour < 10}"><c:set value="0${appointment.toDate.minuteOfHour}" var="vatoMinuteOfHour"/></c:when>
-                                                <c:otherwise><c:set value="${appointment.toDate.minuteOfHour}" var="vatoMinuteOfHour"/></c:otherwise>
-                                            </c:choose>
-                                            <spring:message argumentSeparator=";" arguments="${vafromHourOfDay};${vafromMinuteOfHour};${vatoHourOfDay};${vatoMinuteOfHour}" code="fhom_fmoh_thod_tmoh"/>
+                                            {{$t(
+                                                "fhom_fmoh_thod_tmoh",
+                                                [
+                                                    timeWithZero(appointment.fromDate.hourOfDay),
+                                                    timeWithZero(appointment.fromDate.minuteOfHour),
+                                                    timeWithZero(appointment.toDate.hourOfDay),
+                                                    timeWithZero(appointment.toDate.minuteOfHour)
+                                                ]
+                                            )}}
                                         </p>
                                     </div>
                                 </div>
                                 <div class="col-2 justify-content-start">
                                     <div class="dropdown">
                                         <img
-                                                src='<c:url value="/img/moreOptions.svg" />'
+                                                :src='moreOptions'
                                                 class="moreOptionsButton"
                                                 alt=""
                                                 data-toggle="dropdown"
                                         />
                                         <div class="dropdown-menu">
                                             <!-- TODO add reprogramar -->
-
-                                            <form action="<c:url value="/staff/appointment/${appointment.id}${query}"/>" method="post">
-                                                <button type="submit" class="dropdown-item"><spring:message code="Cancel"/></button>
-                                            </form>
+                                            <!-- TODO cancel -->
+                                            <button type="submit" class="dropdown-item">{{$t("Cancel")}}</button>
                                         </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </li>
-                </c:forEach>
-            </ul>
-        </div>
-        <div class="col">
-            <h4><spring:message code="WeeklyAgenda"/></h4>
-            <table class="table table-borderless">
-                <tr>
-                    <td class="px-0">
-                        <button type="button" class="btn" id="prevWeekBtn"><</button>
-                    </td>
-                    <c:forEach var="i" begin="0" end="6">
+                </ul>
+            </div>
+            <div class="col">
+                <h4>{{$t("WeeklyAgenda")}}</h4>
+                <table class="table table-borderless">
+                    <tr>
                         <td class="px-0">
+                            <!-- TODO:connect button -->
+                            <button type="button" class="btn" id="prevWeekBtn">{{prev}}</button>
+                        </td>
+                        <!-- TODO:check, should be 0 to 6 -->
+                        <td v-for="i in 7" :key="i" class="px-0">
                             <!-- day of the week -->
-                            <span class="medicare-day-span container px-0 mx-2 d-flex flex-column align-items-center text-center"
-                                  data-day="<c:out value="${monday.plusDays(i)}"/>"
-                                  <c:if test="${monday.plusDays(i).dayOfYear == today.dayOfYear && monday.plusDays(i).year == today.year}">style="font-weight:bold"</c:if>>
-                                <p class="mb-0">
-                                  <c:choose>
-                                      <c:when test="${monday.plusDays(i).dayOfWeek == 1}"><spring:message code="MondayAbbreviated"/></c:when>
-                                      <c:when test="${monday.plusDays(i).dayOfWeek == 2}"><spring:message code="TuesdayAbbreviated"/></c:when>
-                                      <c:when test="${monday.plusDays(i).dayOfWeek == 3}"><spring:message code="WednesdayAbbreviated"/></c:when>
-                                      <c:when test="${monday.plusDays(i).dayOfWeek == 4}"><spring:message code="ThursdayAbbreviated"/></c:when>
-                                      <c:when test="${monday.plusDays(i).dayOfWeek == 5}"><spring:message code="FridayAbbreviated"/></c:when>
-                                      <c:when test="${monday.plusDays(i).dayOfWeek == 6}"><spring:message code="SaturdayAbbreviated"/></c:when>
-                                      <c:when test="${monday.plusDays(i).dayOfWeek == 7}"><spring:message code="SundayAbbreviated"/></c:when>
-                                      <c:otherwise><c:out value="${monday.plusDays(i).dayOfWeek}"/></c:otherwise>
-                                  </c:choose>
-                                </p>
+                            <!-- TODO:CHECK -->
+                            <span class="medicare-day-span container px-0 mx-2 d-flex flex-column align-items-center text-center" :data-day="monday.plusDays(i)"
+                                :style='(monday.plusDays(i-1) == today)?"font-weight:bold":""'>
+                                <p class="mb-0" v-if="monday.plusDays(i-1).getDay() == 1">{{$t("MondayAbbreviated")}}</p>
+                                <p class="mb-0" v-else-if="monday.plusDays(i-1).getDay() == 2">{{$t("TuesdayAbbreviated")}}</p>
+                                <p class="mb-0" v-else-if="monday.plusDays(i-1).getDay() == 3">{{$t("WednesdayAbbreviated")}}</p>
+                                <p class="mb-0" v-else-if="monday.plusDays(i-1).getDay() == 4">{{$t("ThursdayAbbreviated")}}</p>
+                                <p class="mb-0" v-else-if="monday.plusDays(i-1).getDay() == 5">{{$t("FridayAbbreviated")}}</p>
+                                <p class="mb-0" v-else-if="monday.plusDays(i-1).getDay() == 6">{{$t("SaturdayAbbreviated")}}</p>
+                                <p class="mb-0" v-else-if="monday.plusDays(i-1).getDay() == 0">{{$t("SundayAbbreviated")}}</p>
+                                <p class="mb-0" v-else>{{monday.plusDays(i-1).getDay()}}</p>
                                 <!-- day/month -->
                                 <p class="my-0">
-                                    <c:choose>
-                                        <c:when test="${monday.plusDays(i).monthOfYear == 1}"><spring:message code="JanuaryAbbreviated" var="mpdMonthOfYear"/></c:when>
-                                        <c:when test="${monday.plusDays(i).monthOfYear == 2}"><spring:message code="FebruaryAbbreviated" var="mpdMonthOfYear"/></c:when>
-                                        <c:when test="${monday.plusDays(i).monthOfYear == 3}"><spring:message code="MarchAbbreviated" var="mpdMonthOfYear"/></c:when>
-                                        <c:when test="${monday.plusDays(i).monthOfYear == 4}"><spring:message code="AprilAbbreviated" var="mpdMonthOfYear"/></c:when>
-                                        <c:when test="${monday.plusDays(i).monthOfYear == 5}"><spring:message code="MayAbbreviated" var="mpdMonthOfYear"/></c:when>
-                                        <c:when test="${monday.plusDays(i).monthOfYear == 6}"><spring:message code="JuneAbbreviated" var="mpdMonthOfYear"/></c:when>
-                                        <c:when test="${monday.plusDays(i).monthOfYear == 7}"><spring:message code="JulyAbbreviated" var="mpdMonthOfYear"/></c:when>
-                                        <c:when test="${monday.plusDays(i).monthOfYear == 8}"><spring:message code="AugustAbbreviated" var="mpdMonthOfYear"/></c:when>
-                                        <c:when test="${monday.plusDays(i).monthOfYear == 9}"><spring:message code="SeptemberAbbreviated" var="mpdMonthOfYear"/></c:when>
-                                        <c:when test="${monday.plusDays(i).monthOfYear == 10}"><spring:message code="OctoberAbbreviated" var="mpdMonthOfYear"/></c:when>
-                                        <c:when test="${monday.plusDays(i).monthOfYear == 11}"><spring:message code="NovemberAbbreviated" var="mpdMonthOfYear"/></c:when>
-                                        <c:when test="${monday.plusDays(i).monthOfYear == 12}"><spring:message code="DecemberAbbreviated" var="mpdMonthOfYear"/></c:when>
-                                        <c:otherwise><c:set value="${monday.plusDays(i).monthOfYear}" var="mpdMonthOfYear"/> </c:otherwise>
-                                    </c:choose>
-                                    <spring:message code="dom_moy" argumentSeparator=";" arguments="${monday.plusDays(i).dayOfMonth};${mpdMonthOfYear}"/>
+                                    {{$t("dom_moy",[monday.plusDays(i-1).getDate(),getMpdMonthOfYear(monday.plusDays(i-1).getMonth())])}}
                                 </p>
                                 <p>
-                                    <c:choose>
-                                        <c:when test="${weekAppointments.get(monday.plusDays(i).dayOfWeek).size() == 1}"><spring:message code="appointmentAbbreviated" var="vwapp"/></c:when>
-                                        <c:otherwise><spring:message code="appointmentsAbbreviated" var="vwapp"/></c:otherwise>
-                                    </c:choose>
-                                    <spring:message arguments="${weekAppointments.get(monday.plusDays(i).dayOfWeek).size()};${vwapp}" argumentSeparator=";" code="NumberedAppointments"/>
+                                    {{$t(
+                                        "NumberedAppointments",
+                                        [
+                                            weekAppointments[monday.plusDays(i-1).getDay()].length,
+                                            (weekAppointments[monday.plusDays(i-1).getDay()].length == 1) ?
+                                                    $t("appointmentAbbreviated"):
+                                                    $t("appointmentsAbbreviated")
+                                        ]
+                                    )}}
                                 </p>
                             </span>
                         </td>
-                    </c:forEach>
-                    <td class="px-0">
-                        <button type="button" class="btn" id="nextWeekBtn">></button>
-                    </td>
-                </tr>
-                <tr>
-                    <td colspan="9">
-                        <div class="container-fluid d-flex justify-content-center">
-                            <ul class="list-group turno-list mr-2 w-50 overflow-auto">
-                                <c:if test="${weekAppointments.get(today.dayOfWeek).isEmpty()}">
-                                    <div class="container-fluid justify-content-center">
-                                        <p class="text-center mt-4" style="color:grey;"><spring:message code="NoAppointmentsThisDay"/></p>
+                        <td class="px-0">
+                            <!-- TODO: connect button -->
+                            <button type="button" class="btn" id="nextWeekBtn">{{next}}</button>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td colspan="9">
+                            <div class="container-fluid d-flex justify-content-center">
+                                <ul class="list-group turno-list mr-2 w-50 overflow-auto">
+                                    <div v-if="!weekAppointments[today.getDay()]" class="container-fluid justify-content-center">
+                                        <p class="text-center mt-4" style="color:grey;">{{$t("NoAppointmentsThisDay")}}</p>
                                     </div>
-                                </c:if>
-                                <c:forEach var="appointment" items="${weekAppointments.get(today.dayOfWeek)}">
-                                    <li class="list-group-item turno-item mb-3">
+                                    <li v-for="appointment in weekAppointments[today.getDay()]" :key="appointment.id" class="list-group-item turno-item mb-3">
                                         <div class="container">
                                             <div class="row">
                                                 <div class="col-4 d-flex flex-column justify-content-center">
                                                     <div class="profile-picture-container">
                                                         <div style="margin-top: 100%;"></div>
-                                                        <%--TODO: check this--%>
-                                                        <img
+                                                        <imgmonth
                                                                 class="profile-picture rounded-circle"
-                                                                src="<c:url value="/profilePics/${appointment.patient.user.profilePicture.id}"/>"
-                                                                alt=""
+                                                                :src='"/profilePics/"+appointment.patient.user.profilePicture.id'
+                                                                alt="profile pic"
                                                         />
                                                     </div>
                                                 </div>
                                                 <div class="col-6">
                                                     <div class="row justify-content-start">
-                                                        <h5><c:out value="${appointment.patient.user.firstName} ${appointment.patient.user.surname}"/></h5>
+                                                        <h5>{{appointment.patient.user.firstName+ " "+ appointment.patient.user.surname}}</h5>
                                                     </div>
                                                     <div class="row">
                                                         <p class="m-0">
-                                                            <c:choose>
-                                                                <c:when test="${appointment.fromDate.hourOfDay < 10}"><c:set value="0${appointment.fromDate.hourOfDay}" var="vafromHourOfDay"/></c:when>
-                                                                <c:otherwise><c:set value="${appointment.fromDate.hourOfDay}" var="vafromHourOfDay"/></c:otherwise>
-                                                            </c:choose>
-                                                            <c:choose>
-                                                                <c:when test="${appointment.fromDate.minuteOfHour < 10}"><c:set value="0${appointment.fromDate.minuteOfHour}" var="vafromMinuteOfHour"/></c:when>
-                                                                <c:otherwise><c:set value="${appointment.fromDate.minuteOfHour}" var="vafromMinuteOfHour"/></c:otherwise>
-                                                            </c:choose>
-                                                            <c:choose>
-                                                                <c:when test="${appointment.toDate.hourOfDay < 10}"><c:set value="0${appointment.toDate.hourOfDay}" var="vatoHourOfDay"/></c:when>
-                                                                <c:otherwise><c:set value="${appointment.toDate.hourOfDay}" var="vatoHourOfDay"/></c:otherwise>
-                                                            </c:choose>
-                                                            <c:choose>
-                                                                <c:when test="${appointment.toDate.minuteOfHour < 10}"><c:set value="0${appointment.toDate.minuteOfHour}" var="vatoMinuteOfHour"/></c:when>
-                                                                <c:otherwise><c:set value="${appointment.toDate.minuteOfHour}" var="vatoMinuteOfHour"/></c:otherwise>
-                                                            </c:choose>
-                                                            <spring:message argumentSeparator=";" arguments="${vafromHourOfDay};${vafromMinuteOfHour};${vatoHourOfDay};${vatoMinuteOfHour}" code="fhom_fmoh_thod_tmoh"/>
+                                                            {{$t(
+                                                                "fhom_fmoh_thod_tmoh",
+                                                                [
+                                                                    timeWithZero(appointment.fromDate.hourOfDay),
+                                                                    timeWithZero(appointment.fromDate.minuteOfHour),
+                                                                    timeWithZero(appointment.toDate.hourOfDay),
+                                                                    timeWithZero(appointment.toDate.minuteOfHour)
+                                                                ]
+                                                            )}}
                                                         </p>
                                                     </div>
                                                 </div>
                                                 <div class="col-2 justify-content-start">
                                                     <div class="dropdown">
                                                         <img
-                                                                src='<c:url value="/img/moreOptions.svg"/> '
+                                                                :src='moreOptions'
                                                                 class="moreOptionsButton"
                                                                 alt="more options"
                                                                 data-toggle="dropdown"
                                                         />
                                                         <div class="dropdown-menu">
                                                             <!-- TODO add reprogramar -->
-                                                            <form action="<c:url value="/staff/appointment/${appointment.id}${query}"/>"
-                                                                  method="post" class="cancel-appt-form">
-                                                                <button type="button" class="dropdown-item cancel-appt-btn">
-                                                                    <spring:message code="Cancel"/></button>
-                                                            </form>
+                                                            <!-- TODO connect button -->
+                                                            <button type="button" class="dropdown-item cancel-appt-btn">{{$t("Cancel")}}</button>
                                                         </div>
                                                     </div>
                                                 </div>
                                             </div>
                                         </div>
                                     </li>
-                                </c:forEach>
-                            </ul>
-                        </div>
-                    </td>
-                </tr>
-            </table>
+                                </ul>
+                            </div>
+                        </td>
+                    </tr>
+                </table>
+            </div>
         </div>
     </div>
-</div>
-<script type="text/javascript">
-    let strings = new Array();
-    strings['title'] = "<spring:message code='YouAreAboutToCancelAnAppointment' javaScriptEscape='true' />";
-    strings['body'] = "<spring:message code='DoYouWantToContinue' javaScriptEscape='true' />";
-    strings['accept'] = "<spring:message code='Accept' javaScriptEscape='true' />";
-    strings['cancel'] = "<spring:message code='Cancel' javaScriptEscape='true' />";
-</script>
-<script src='<c:url value="/js/scripts/staff/MedicHome.js"/> '></script>
+</template>
+
 <script>
-    $(document).ready(() => {
-        MedicHome.init()
-    });
+import moreOptions from "@/assets/moreOptions.svg";
+
+// TODO:check
+Date.prototype.plusDays = function(i) {
+    let date = new Date(this.valueOf());
+    date.setDate(date.getDate() + i);
+    return date;
+}
+
+export default {
+    name:"MedicHome",
+    data(){
+        return {
+            next:">",
+            prev:"<",
+            moreOptions:moreOptions,
+            monday: new Date(2020,7,6),
+            today:new Date(2020,7,9),
+            todayAppointments:[],
+            weekAppointments:[[],[],[],[],[],[],[]]
+        }
+    },
+    methods:{
+        timeWithZero(time){
+            if(time<10){
+                return "0"+time;
+            }else{
+                return time;
+            }
+        },
+        getMpdMonthOfYear(i){
+            switch(this.monday.plusDays(i).monthOfYear){
+                case 0:
+                    return this.$t("JanuaryAbbreviated");
+                case 1:
+                    return this.$t("FebruaryAbbreviated");
+                case 2:
+                    return this.$t("MarchAbbreviated");
+                case 3:
+                    return this.$t("AprilAbbreviated");
+                case 4:
+                    return this.$t("MayAbbreviated");
+                case 5:
+                    return this.$t("JuneAbbreviated");
+                case 6:
+                    return this.$t("JulyAbbreviated");
+                case 7:
+                    return this.$t("AugustAbbreviated");
+                case 8:
+                    return this.$t("SeptemberAbbreviated");
+                case 9:
+                    return this.$t("OctoberAbbreviated");
+                case 10:
+                    return this.$t("NovemberAbbreviated");
+                case 11:
+                    return this.$t("DecemberAbbreviated");
+                default:
+                    return this.monday.plusDays(i).monthOfYear;
+            }
+        }
+    }
+}
 </script>
-</body>
-</html>
+
+<style scoped>
+.header {
+    background-color: #00C4BA;
+}
+
+.header-brand {
+    font-weight: bold;
+}
+
+.header-brand:hover {
+    font-weight: bold;
+    color: white !important;
+}
+
+.header-a-element {
+    color: white;
+}
+
+.header-a-element:hover {
+    color: #e0e0e0;
+}
+
+.header-btn-element {
+    color: #00C4BA;
+    font-weight: bold;
+}
+
+.header-btn-element:hover {
+    color: rgb(0, 160, 152);
+    font-weight: bold;
+}
+
+.green-text {
+    color: #00C4BA;
+}
+
+#navbar-logo {
+    width: 2em;
+}
+
+.filter-form {
+    background-color: #00C4BA;
+    border-radius: 1em;
+}
+
+.form-title {
+    color: white;
+}
+
+.form-control {
+    background-color: rgba(214, 214, 214);
+}
+
+.white-text {
+    color: white !important;
+}
+
+#navbarUserImage {
+    width: 3em;
+}
+
+.turno-item {
+    border-radius: 2em !important;
+    background-color: rgba(214, 214, 214);
+}
+
+.turno-list {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+    height: 59vh;
+}
+
+.turno-list::-webkit-scrollbar {
+    display: none;
+}
+
+.moreOptionsButton {
+    height: 1.5em;
+    cursor: pointer;
+}
+
+.profile-picture-container {
+    display: inline-block;
+    position: relative;
+    width: 100%;
+}
+
+.profile-picture {
+    object-fit: cover;
+    height: 100%;
+    width: 100%;
+    top: 0;
+    bottom: 0;
+    right: 0;
+    left: 0;
+    position: absolute;
+}
+
+.medicare-day-span{
+    cursor: pointer;
+}
+</style>

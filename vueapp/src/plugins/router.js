@@ -7,6 +7,7 @@ import Login from '@/views/authentication/login';
 import Signup from '@/views/authentication/signup';
 import SignupPatient from '@/views/authentication/signupPatient';
 import SignupStaff from '@/views/authentication/signupStaff';
+import MedicHome from '@/views/medic/home';
 
 
 Vue.use(VueRouter)
@@ -53,6 +54,11 @@ Vue.use(VueRouter)
     path:"/signup/patient",
     name:"SignupPatient",
     component:SignupPatient
+  },
+  {
+    path:"/staff/home",
+    name:"MedicHome",
+    component:MedicHome
   }
 ]
 

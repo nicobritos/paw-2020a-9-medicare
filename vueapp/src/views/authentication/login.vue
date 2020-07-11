@@ -33,7 +33,7 @@
                     <label for="medicare_remember_me" class="mb-0">{{$t("RememberMe")}}</label>
                 </div>
                 <div class="col-8">
-                    <checkbox id="medicare_remember_me" name="medicare_remember_me"/>
+                    <input type="checkbox" id="medicare_remember_me" name="medicare_remember_me"/>
                 </div>
             </div>
             <div class="form-row justify-content-between align-items-end mt-2">
@@ -61,7 +61,8 @@ export default {
             logo:logo,
             eye:eye,
             noeye:noeye,
-            showPassword:false
+            showPassword:false,
+            invalidCredentials:false
         }
     },
     methods:{
