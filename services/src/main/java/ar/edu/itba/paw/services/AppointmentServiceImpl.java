@@ -11,9 +11,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
-import java.time.DayOfWeek;
-import static org.joda.time.DateTimeConstants.MONDAY;
-import static org.joda.time.DateTimeConstants.SUNDAY;
 
 @Service
 public class AppointmentServiceImpl extends GenericServiceImpl<AppointmentDao, Appointment, Integer> implements AppointmentService {
@@ -36,7 +33,7 @@ public class AppointmentServiceImpl extends GenericServiceImpl<AppointmentDao, A
     }
 
     @Override
-    public List<Appointment> findByStaffs(List<Staff> staffs) {
+    public List<Appointment> findByStaffs(Collection<Staff> staffs) {
         return this.repository.findByStaffs(staffs);
     }
 
@@ -46,17 +43,17 @@ public class AppointmentServiceImpl extends GenericServiceImpl<AppointmentDao, A
     }
 
     @Override
-    public List<Appointment> findByPatients(List<Patient> patients) {
+    public List<Appointment> findByPatients(Collection<Patient> patients) {
         return this.repository.findByPatients(patients);
     }
 
     @Override
-    public List<Appointment> findByPatientsFromDate(List<Patient> patients, LocalDateTime from) {
+    public List<Appointment> findByPatientsFromDay(Collection<Patient> patients, LocalDateTime from) {
         return this.repository.findByPatientsFromDate(patients, from);
     }
 
     @Override
-    public List<Appointment> findToday(List<Staff> staffs) {
+    public List<Appointment> findToday(Collection<Staff> staffs) {
         return this.findByStaffsAndDay(staffs, LocalDateTime.now());
     }
 
@@ -71,34 +68,22 @@ public class AppointmentServiceImpl extends GenericServiceImpl<AppointmentDao, A
     }
 
     @Override
-    public List<Appointment> findByStaffsAndDay(List<Staff> staffs, LocalDateTime date) {
+    public List<Appointment> findByStaffsAndDay(Collection<Staff> staffs, LocalDateTime date) {
         return this.repository.findByStaffsAndDate(staffs, date);
     }
 
     @Override
-    public List<List<Appointment>> findByStaffsAndDay(List<Staff> staffs, LocalDateTime from, LocalDateTime to) {
-        if(from.isBefore(LocalDateTime.now())) {
+    public List<Appointment> findByStaffsAndDay(Collection<Staff> staffs, LocalDateTime from, LocalDateTime to) {
+        if (from.isBefore(LocalDateTime.now())) {
             from = LocalDateTime.now();
         }
-        List<Appointment> appointments = this.repository.findByStaffsAndDate(staffs, from, to);
-        List<List<Appointment>> weekAppointments = new LinkedList<>();
-        for (int i = 0; i < DayOfWeek.values().length + 1; i++) { // +1 para guardar basura en caso que la haya (no deberia)
-            weekAppointments.add(new LinkedList<>());
-        }
 
-        for (Appointment appointment : appointments) {
-            if (appointment.getFromDate().getDayOfWeek() < MONDAY|| appointment.getFromDate().getDayOfWeek() > SUNDAY) { // Los dias en JodaTime van de Monday a Sunday
-                weekAppointments.get(0).add(appointment); // Basura (1 = Monday => 0 = libre)
-            } else {
-                weekAppointments.get(appointment.getFromDate().getDayOfWeek()).add(appointment);
-            }
-        }
-        return weekAppointments;
+        return this.repository.findByStaffsAndDate(staffs, from, to);
     }
 
     @Override
-    public List<Appointment> findByPatientsAndDay(List<Patient> patients, LocalDateTime date) {
-        return this.repository.findByPatientsAndDate(patients, date);
+    public List<Appointment> findByPatientsAndDay(Collection<Patient> patients, LocalDateTime from, LocalDateTime to) {
+        return this.repository.findByPatientsAndDate(patients, from, to);
     }
 
     @Override
@@ -170,7 +155,7 @@ public class AppointmentServiceImpl extends GenericServiceImpl<AppointmentDao, A
                     firstStartMinute = fromDate.getMinuteOfHour();
                 }
                 firstStartMinute = (int) Math.ceil((double) firstStartMinute / Appointment.DURATION) * Appointment.DURATION;
-                if(firstStartMinute == 60){
+                if (firstStartMinute == 60) {
                     firstStartMinute = 0;
                     startHour++;
                 }
@@ -236,8 +221,8 @@ public class AppointmentServiceImpl extends GenericServiceImpl<AppointmentDao, A
         List<Appointment> cancelled = new LinkedList<>();
         List<Appointment> appointments = findByWorkday(workday);
         //check if user is allowed to cancel
-        for(Appointment a: appointments) {
-            if(workday.getStaff().equals(a.getStaff())) {
+        for (Appointment a : appointments) {
+            if (workday.getStaff().equals(a.getStaff())) {
                 remove(a.getId());
                 cancelled.add(a);
             }
@@ -254,11 +239,11 @@ public class AppointmentServiceImpl extends GenericServiceImpl<AppointmentDao, A
     public Map<Workday, Integer> appointmentQtyByWorkdayOfUser(User user) {
         Map<Workday, Integer> appointmentMap = new HashMap<>();
         List<Workday> workdays = this.workdayService.findByUser(user);
-        for(Workday workday: workdays){
+        for (Workday workday : workdays) {
             List<Appointment> appointments = findByWorkday(workday);
             List<Appointment> myAppts = new LinkedList<>();
-            for(Appointment appointment : appointments){
-                if(appointment.getStaff().getUser().equals(user)){
+            for (Appointment appointment : appointments) {
+                if (appointment.getStaff().getUser().equals(user)) {
                     myAppts.add(appointment);
                 }
             }
@@ -270,7 +255,7 @@ public class AppointmentServiceImpl extends GenericServiceImpl<AppointmentDao, A
     @Override
     public void remove(Integer id, User user) {
         Optional<Appointment> appointment = findById(id);
-        if(appointment.isPresent()) {
+        if (appointment.isPresent()) {
             //get staff for current user
             List<Staff> staffs = this.staffService.findByUser(user); // TODO: add staff list inside User model
             //get patient for current user

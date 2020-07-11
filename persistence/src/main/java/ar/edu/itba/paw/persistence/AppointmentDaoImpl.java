@@ -24,7 +24,7 @@ public class AppointmentDaoImpl extends GenericDaoImpl<Appointment, Integer> imp
     }
 
     @Override
-    public List<Appointment> findByPatients(List<Patient> patients) {
+    public List<Appointment> findByPatients(Collection<Patient> patients) {
         return this.findByIn(Appointment_.patient, patients);
     }
 
@@ -34,7 +34,7 @@ public class AppointmentDaoImpl extends GenericDaoImpl<Appointment, Integer> imp
     }
 
     @Override
-    public List<Appointment> findByStaffs(List<Staff> staffs) {
+    public List<Appointment> findByStaffs(Collection<Staff> staffs) {
         return this.findByIn(Appointment_.staff, staffs);
     }
 
@@ -111,8 +111,8 @@ public class AppointmentDaoImpl extends GenericDaoImpl<Appointment, Integer> imp
     }
 
     @Override
-    public List<Appointment> findByPatientsAndDate(Collection<Patient> patients, LocalDateTime date) {
-        if (date == null || patients == null)
+    public List<Appointment> findByPatientsAndDate(Collection<Patient> patients, LocalDateTime fromDate, LocalDateTime toDate) {
+        if (fromDate == null || patients == null)
             throw new IllegalArgumentException();
         if (patients.isEmpty())
             return Collections.emptyList();
@@ -120,9 +120,6 @@ public class AppointmentDaoImpl extends GenericDaoImpl<Appointment, Integer> imp
         CriteriaBuilder builder = this.getEntityManager().getCriteriaBuilder();
         CriteriaQuery<Appointment> query = builder.createQuery(Appointment.class);
         Root<Appointment> root = query.from(Appointment.class);
-
-        LocalDateTime fromDate = new LocalDateTime(date.getYear(), date.getMonthOfYear(), date.getDayOfMonth(), 0, 0);
-        LocalDateTime toDate = new LocalDateTime(date.getYear(), date.getMonthOfYear(), date.getDayOfMonth(), 23, 59);
 
         query.select(root);
         Path<?> expression = root.get(Appointment_.patient);
@@ -146,7 +143,10 @@ public class AppointmentDaoImpl extends GenericDaoImpl<Appointment, Integer> imp
 
         List<Patient> patients = new LinkedList<>();
         patients.add(patient);
-        return this.findByPatientsAndDate(patients, date);
+
+        LocalDateTime toDate = new LocalDateTime(date.getYear(), date.getMonthOfYear(), date.getDayOfMonth(), 23, 59);
+
+        return this.findByPatientsAndDate(patients, date, toDate);
     }
 
     @Override

@@ -7,31 +7,32 @@ import ar.edu.itba.paw.interfaces.services.generic.GenericService;
 import ar.edu.itba.paw.models.*;
 import org.joda.time.LocalDateTime;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
 public interface AppointmentService extends GenericService<Appointment, Integer> {
     List<Appointment> find(Staff staff);
 
-    List<Appointment> findByStaffs(List<Staff> staffs);
+    List<Appointment> findByStaffs(Collection<Staff> staffs);
 
     List<Appointment> find(Patient patient);
 
-    List<Appointment> findByPatients(List<Patient> patients);
+    List<Appointment> findByPatients(Collection<Patient> patients);
 
-    List<Appointment> findByPatientsFromDate(List<Patient> patients, LocalDateTime from);
-
-    List<Appointment> findToday(List<Staff> staff);
+    List<Appointment> findToday(Collection<Staff> staff);
 
     List<Appointment> findToday(Patient patient);
 
     List<Appointment> findByDay(Staff staff, LocalDateTime date);
 
-    List<Appointment> findByStaffsAndDay(List<Staff> staffs, LocalDateTime date);
+    List<Appointment> findByStaffsAndDay(Collection<Staff> staffs, LocalDateTime date);
 
-    List<List<Appointment>> findByStaffsAndDay(List<Staff> staffs, LocalDateTime from, LocalDateTime to);
+    List<Appointment> findByStaffsAndDay(Collection<Staff> staffs, LocalDateTime from, LocalDateTime to);
 
-    List<Appointment> findByPatientsAndDay(List<Patient> patients, LocalDateTime date);
+    List<Appointment> findByPatientsFromDay(Collection<Patient> patients, LocalDateTime from);
+
+    List<Appointment> findByPatientsAndDay(Collection<Patient> patients, LocalDateTime from, LocalDateTime to);
 
     List<Appointment> findByWorkday(Workday workday);
 
