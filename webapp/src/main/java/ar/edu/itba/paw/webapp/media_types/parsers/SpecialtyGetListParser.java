@@ -1,7 +1,7 @@
 package ar.edu.itba.paw.webapp.media_types.parsers;
 
 import ar.edu.itba.paw.models.StaffSpecialty;
-import ar.edu.itba.paw.webapp.media_types.SpecialtyMIME;
+import ar.edu.itba.paw.webapp.media_types.StaffSpecialtyMIME;
 import ar.edu.itba.paw.webapp.media_types.parsers.serializers.StaffSpecialtySerializer;
 import ar.edu.itba.paw.webapp.media_types.parsers.utils.GenericParser;
 import org.glassfish.jersey.message.internal.ReaderWriter;
@@ -20,7 +20,7 @@ import java.lang.reflect.Type;
 import java.util.Collection;
 
 @Provider
-@Produces(SpecialtyMIME.GET_LIST)
+@Produces(StaffSpecialtyMIME.GET_LIST)
 public class SpecialtyGetListParser extends GenericParser<Collection<StaffSpecialty>> {
     @Override
     public boolean isWriteable(Class<?> aClass, Type type, Annotation[] annotations, MediaType mediaType) {
