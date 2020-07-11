@@ -103,7 +103,7 @@ public class StaffResource extends GenericResource {
     {
         this.assertAcceptedTypes(httpheaders, StaffMIME.GET);
 
-        if (id == null || staff.getStaffSpecialties().isEmpty())
+        if (id == null || staff == null || staff.getStaffSpecialties().isEmpty())
             return this.error(Status.BAD_REQUEST.getStatusCode(), Status.BAD_REQUEST.toString());
 
         Optional<Staff> staffOptional = this.staffService.findById(id);
@@ -126,6 +126,6 @@ public class StaffResource extends GenericResource {
 
         this.staffService.update(savedStaff);
 
-        return Response.ok(staffOptional.get()).build();
+        return Response.status(Status.CREATED).entity(staffOptional.get()).build();
     }
 }
