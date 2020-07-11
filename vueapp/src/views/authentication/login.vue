@@ -37,7 +37,7 @@
                 </div>
             </div>
             <div class="form-row justify-content-between align-items-end mt-2">
-                <a class="form-link" :href="signupUrl">{{$t("CreateAccount")}}</a>
+                <a class="form-link" :href='getUrl("signup")'>{{$t("CreateAccount")}}</a>
                 <button type="submit" class="btn btn-primary">{{$t("Confirm")}}</button>
             </div>
             <p v-if="invalidCredentials" class="mt-4 mb-0 text-danger">
@@ -52,6 +52,7 @@ import logo from "@/assets/logo.svg";
 //TODO:change to bootstrap icons
 import eye from "@/assets/eye.svg";
 import noeye from "@/assets/noeye.svg";
+import utils from "@/scripts/utils.js";
 
 export default {
     name:"Login",
@@ -66,7 +67,8 @@ export default {
     methods:{
         toggleShowPassword(){
             this.showPassword = !this.showPassword;
-        }
+        },
+        getUrl:utils.getUrl
     }
 }
 </script>

@@ -61,7 +61,7 @@
                 </div>
             </div>
             <div class="form-row justify-content-between align-items-end mt-2">
-                <a class="form-link" href="${loginUrl}">{{$t("Login")}}</a>
+                <router-link class="form-link" href="${loginUrl}">{{$t("Login")}}</router-link>
                 <button type="submit" class="btn btn-primary">{{$t("Confirm")}}</button>
             </div>
         </form>

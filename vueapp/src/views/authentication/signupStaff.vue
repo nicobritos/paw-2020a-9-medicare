@@ -1,114 +1,229 @@
-<html>
-<head>
-    <%@ include file="../../partials/head.jsp" %>
-    <link rel="stylesheet" href='<c:url value="/css/authentication/register.css"/> '>
-</head>
-<body class="container-fluid w-100 m-0 p-0 d-flex flex-column justify-content-center align-items-center">
-<c:url value="/login" var="loginUrl"/>
-<c:url value="/signup/staff" var="signupUrl"/>
-<form:form modelAttribute="signupForm" class="register-form border p-5 rounded" action="${signupUrl}" method="POST"
-           enctype="application/x-www-form-urlencoded">
-    <div class="row">
-        <h6>Medicare <img src='<c:url value="/img/logo.svg"/>' id="logo" alt="logo"/></h6>
+<template>
+    <div class="container-fluid w-100 m-0 p-0 d-flex flex-column justify-content-center align-items-center signup-container">
+        <form class="register-form border my-3 p-5 rounded">
+            <div class="row">
+                <h6>Medicare <img :src='logo' id="logo" alt="logo"/></h6>
+            </div>
+            <div class="row justify-content-start">
+                <h1 class="register-form-title">{{$t("CreateAccount")}}</h1>
+            </div>
+            <div class="form-group row">
+                <div class="col">
+                    <label for="first_name">{{$t("Name")}}</label>
+                </div>
+                <div class="col-8">
+                    <input class="form-control" type="text" name="firstName" id="first_name"/>
+                </div>
+            </div>
+            <div class="form-group row">
+                <div class="col">
+                    <label for="surname">{{$t("Surname")}}</label>
+                </div>
+                <div class="col-8">
+                    <input class="form-control" type="text" name="surname" id="surname"/>
+                </div>
+            </div>
+            <div class="form-group row">
+                <div class="col">
+                    <label for="medicare_email">{{$t("Email")}}</label>
+                </div>
+                <div class="col-8">
+                    <input class="form-control" type="email" name="medicare_email" id="medicare_email"/>
+                </div>
+            </div>
+            <div class="form-group row">
+                <div class="col">
+                    <label for="medicare_password">{{$t("Password")}}</label>
+                </div>
+                <div class="col-8">
+                    <input  class="form-control pr-5" 
+                            :type='showPassword?"text":"password"' name="medicare_password"
+                                id="medicare_password"/>
+                    <label for="medicare_password" class="toggle-visibility" @click="toggleShowPassword()">
+                        <img v-if="!showPassword" :src='eye'>
+                        <img v-else :src='noeye'>
+                    </label>
+                </div>
+            </div>
+            <div class="form-group row">
+                <div class="col">
+                    <label for="medicare_repeatPassword">{{$t("RepeatPassword")}}</label>
+                </div>
+                <div class="col-8">
+                    <input  class="form-control pr-5" 
+                            :type='showRepeatPassword?"text":"password"' name="medicare_repeatPassword"
+                            id="medicare_repeatPassword"/>
+                    <label for="medicare_repeatPassword" class="toggle-visibility" @click="toggleShowRepeatPassword()">
+                        <img v-if="!showRepeatPassword" :src='eye'>
+                        <img v-else :src='noeye'>
+                    </label>
+                </div>
+            </div>
+            <div class="form-group row">
+                <div class="col">
+                    <label for="country">{{$t("Country")}}</label>
+                </div>
+                <div class="col-8">
+                    <select class="form-control" style="width: 100%;" items="${countryMap}" id="country"/>
+                </div>
+            </div>
+            <div class="form-group row" id="province-container">
+                <div class="col">
+                    <label for="province">{{$t("Province")}}</label>
+                </div>
+                <div class="col-8">
+                    <select class="form-control" style="width: 100%;" id="province"/>
+                </div>
+            </div>
+            <div class="form-group row" id="locality-container">
+                <div class="col">
+                    <label for="locality">{{$t("Locality")}}</label>
+                </div>
+                <div class="col-8">
+                    <select class="form-control" style="width: 100%;" id="locality"/>
+                </div>
+            </div>
+            <div class="form-group row">
+                <div class="col">
+                    <label for="address">{{$t("Address")}}</label>
+                </div>
+                <div class="col-8">
+                    <input class="form-control" type="text" name="address" id="address"/>
+                </div>
+            </div>
+            <div class="form-row justify-content-between align-items-end mt-2">
+                <router-link class="form-link" :href='getUrl("login")'>{{$t("Login")}}</router-link>
+                <button type="submit" class="btn btn-primary">{{$t("Confirm")}}</button>
+            </div>
+        </form>
     </div>
-    <div class="row justify-content-start">
-        <h1 class="register-form-title"><spring:message code="CreateAccount"/></h1>
-    </div>
-    <div class="form-group row">
-        <div class="col">
-            <label for="first_name"><spring:message code="Name"/></label>
-        </div>
-        <div class="col-8">
-            <form:input path="firstName" class="form-control" type="text" name="firstName" id="first_name"/>
-        </div>
-    </div>
-    <div class="form-group row">
-        <div class="col">
-            <label for="surname"><spring:message code="Surname"/></label>
-        </div>
-        <div class="col-8">
-            <form:input path="surname" class="form-control" type="text" name="surname" id="surname"/>
-        </div>
-    </div>
-    <div class="form-group row">
-        <div class="col">
-            <label for="medicare_email"><spring:message code="Email"/></label>
-        </div>
-        <div class="col-8">
-            <form:input path="email" class="form-control" type="email" name="medicare_email" id="medicare_email"/>
-        </div>
-    </div>
-    <div class="form-group row">
-        <div class="col">
-            <label for="medicare_password"><spring:message code="Password"/></label>
-        </div>
-        <div class="col-8">
-            <form:input path="password" class="form-control pr-5" type="password" name="medicare_password"
-                        id="medicare_password"/>
-            <!-- For this to work for must be the id of the password input -->
-            <label for="medicare_password" class="toggle-visibility"><img src='<c:url value="/img/eye.svg"/> '
-                                                                          alt="not visible password"><img
-                    src='<c:url value="/img/noeye.svg"/>' style="display: none;" alt="visible password"></label>
-        </div>
-    </div>
-    <div class="form-group row">
-        <div class="col">
-            <label for="medicare_repeatPassword"><spring:message code="RepeatPassword"/></label>
-        </div>
-        <div class="col-8">
-            <form:input path="repeatPassword" class="form-control pr-5" type="password" name="medicare_repeatPassword"
-                        id="medicare_repeatPassword"/>
-            <!-- For this to work for must be the id of the password input -->
-            <label for="medicare_repeatPassword" class="toggle-visibility"><img src='<c:url value="/img/eye.svg"/> '
-                                                                                alt="not visible password"><img
-                    src='<c:url value="/img/noeye.svg"/> ' style="display: none;" alt="visible password"></label>
-        </div>
-    </div>
-    <div class="form-group row">
-        <div class="col">
-            <label for="country"><spring:message code="Country"/></label>
-        </div>
-        <div class="col-8">
-            <form:select cssClass="form-control" cssStyle="width: 100%;" path="countryId" items="${countryMap}"
-                         id="country"/>
-        </div>
-    </div>
-    <div class="form-group row" id="province-container">
-        <div class="col">
-            <label for="province"><spring:message code="Province"/></label>
-        </div>
-        <div class="col-8">
-            <form:select cssClass="form-control" cssStyle="width: 100%;" path="provinceId" id="province"/>
-        </div>
-    </div>
-    <div class="form-group row" id="locality-container">
-        <div class="col">
-            <label for="locality"><spring:message code="Locality"/></label>
-        </div>
-        <div class="col-8">
-            <form:select cssClass="form-control" cssStyle="width: 100%;" path="localityId" id="locality"/>
-        </div>
-    </div>
-    <div class="form-group row">
-        <div class="col">
-            <label for="address"><spring:message code="Address"/></label>
-        </div>
-        <div class="col-8">
-            <form:input path="address" class="form-control" type="text" name="address" id="address"/>
-        </div>
-    </div>
-    <div class="form-row justify-content-between align-items-end mt-2">
-        <a class="form-link" href="${loginUrl}"><spring:message code="Login"/></a>
-        <button type="submit" class="btn btn-primary"><spring:message code="Confirm"/></button>
-    </div>
+</template>
 
-    <form:errors path="*" cssClass="mt-4 mb-0 text-danger" element="p"/>
-</form:form>
-<script src='<c:url value="/js/scripts/authentication/Register.js"/> '></script>
 <script>
-    $(document).ready(() => {
-        Register.initStaff();
-    })
+import eye from "@/assets/eye.svg";
+import noeye from "@/assets/noeye.svg";
+import logo from "@/assets/logo.svg";
+import utils from "@/scripts/utils";
+
+
+export default {
+    name:"SignupStaff",
+    data(){
+        return {
+            showPassword:false,
+            showRepeatPassword:false,
+            logo:logo,
+            eye:eye,
+            noeye:noeye
+        }
+    },
+    methods:{
+        toggleShowPassword(){
+            this.showPassword = !this.showPassword;
+        },
+        toggleShowRepeatPassword(){
+            this.showRepeatPassword = !this.showRepeatPassword;
+        },
+        getUrl:utils.getUrl
+    }
+}
 </script>
-</body>
-</html>
+
+<style scoped>
+.signup-container {
+    background-color: rgba(0, 196, 186, 0.205);
+}
+
+.register-form {
+    background-color: #fff;
+    border-radius: 1em !important;
+    box-shadow: 10px 9px 12px 0px rgba(0, 196, 186, 0.205);
+    box-sizing: border-box;
+}
+
+
+.form-link:hover {
+    text-decoration: none;
+}
+
+.register-form input, .register-form select {
+    background-color: #f0f0f0;
+}
+
+.register-form input:focus, .register-form select:focus {
+    background-color: #e0e0e0;
+}
+
+.register-form-title {
+    margin-bottom: 1em;
+}
+
+.register-form #logo {
+    width: 1em;
+}
+
+.register-form button {
+    background-color: #00C4BA;
+    color: white;
+}
+
+.register-form button:hover {
+    background-color: rgb(1, 150, 142);
+    color: #fafafa;
+}
+
+.form-password {
+    position: relative;
+}
+
+.toggle-visibility {
+    position: absolute;
+    right: 2em;
+    top: 0.6em;
+    bottom: auto;
+    left: auto;
+    z-index: 1;
+
+    cursor: pointer;
+}
+
+.form-back-btn {
+    background-color: grey !important;
+    color: white;
+}
+
+.form-back-btn:hover {
+    background-color: rgb(94, 94, 94) !important;
+    color: white;
+}
+
+.card.card-shadow {
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.15);
+    transition: box-shadow 0.3s ease-in-out;
+}
+
+.card.card-shadow:hover {
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+}
+
+.pointer {
+    cursor: pointer;
+}
+
+.profile-picture-container {
+    display: inline-block;
+    position: relative;
+    width: 100%;
+}
+
+.profile-picture {
+    object-fit: cover;
+    height: 100%;
+    width: 100%;
+    top: 0;
+    bottom: 0;
+    right: 0;
+    left: 0;
+    position: absolute;
+}
+</style>

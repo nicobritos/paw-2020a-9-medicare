@@ -8,16 +8,16 @@
                 <h1 class="register-form-title">{{$t("CreateAccount")}}</h1>
             </div>
             <div class="form-row justify-content-between align-items-end">
-                <div class="d-flex flex-column mr-5 align-items-center card card-shadow pointer p-2" id="signup-patient">
+                <router-link :to='getUrl("signup/patient")' tag="div" class="d-flex flex-column mr-5 align-items-center card card-shadow pointer p-2" id="signup-patient">
                     <!-- TODO: solve icons -->
                     <i class="fa fa-hospital-user" style="font-size: 80px;"></i>
                     <h4 class="mt-2">{{$t("LookingForMedics")}}</h4>
-                </div>
-                <div class="d-flex flex-column align-items-center card card-shadow pointer p-2" id="signup-staff">
+                </router-link>
+                <router-link :to='getUrl("signup/staff")' tag="div" class="d-flex flex-column align-items-center card card-shadow pointer p-2" id="signup-staff">
                     <!-- TODO: solve icons -->
                     <i class="fa fa-user-md" style="font-size: 80px;"></i>
                     <h4 class="mt-2">{{$t("IMAMedic")}}</h4>
-                </div>
+                </router-link>
             </div>
         </div>
     </div>
@@ -25,13 +25,17 @@
 
 <script>
 import logo from "@/assets/logo.svg";
+import utils from "@/scripts/utils";
 
 export default {
-    name:"SignUp",
+    name:"Signup",
     data(){
         return {
             logo:logo
         }
+    },
+    methods:{
+        getUrl:utils.getUrl
     }
 }
 </script>
