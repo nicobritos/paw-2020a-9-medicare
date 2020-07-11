@@ -4,7 +4,7 @@
     lo dejo asi checkear si el resto funciona bien con esto
   -->
   <span id="app">
-    <Navbar v-if="shouldShowNavbar" :user="user" :logged="logged" />
+    <Navbar v-if="!isAuth" :user="user" :logged="logged" />
     <router-view />
   </span>
 </template>
@@ -21,8 +21,8 @@ export default {
     Navbar: Navbar,
   },
   computed:{
-    shouldShowNavbar(){
-      return !["Login","Signup","SignupStaff","SignupPatient"].includes(this.$route.name);
+    isAuth(){
+      return ["Login","Signup","SignupStaff","SignupPatient"].includes(this.$route.name);
     }
   },
   data: function() {

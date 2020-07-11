@@ -1,5 +1,5 @@
 <template>
-    <div class="container w-100 h-100 d-flex flex-column justify-content-center align-items-center">
+    <div class="container-fluid w-100 h-100 d-flex flex-column justify-content-center align-items-center login-container">
         <form class="register-form border p-5 rounded">
             <div class="row">
                 <h6>Medicare <img :src='logo' id="logo"/></h6>
@@ -71,9 +71,12 @@ export default {
 }
 </script>
 
-<style>
+<style scoped>
 body, html {
     height: 100%;
+}
+
+.login-container{
     background-color: rgba(0, 196, 186, 0.205);
 }
 
