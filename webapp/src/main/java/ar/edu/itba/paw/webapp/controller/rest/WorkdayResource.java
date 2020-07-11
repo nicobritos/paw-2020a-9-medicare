@@ -30,8 +30,7 @@ public class WorkdayResource extends GenericResource {
     @GET
     @Produces({WorkdayMIME.GET_LIST, ErrorMIME.ERROR})
     public Response getCollection(
-            @Context HttpHeaders httpheaders)
-    {
+            @Context HttpHeaders httpheaders) {
         this.assertAcceptedTypes(httpheaders, WorkdayMIME.GET_LIST);
 
         // TODO: Get staff id from JWT
@@ -54,8 +53,7 @@ public class WorkdayResource extends GenericResource {
     @Consumes(WorkdayMIME.CREATE_LIST)
     public Response createEntities(
             Collection<Workday> workdays,
-            @Context HttpHeaders httpheaders)
-    {
+            @Context HttpHeaders httpheaders) {
         this.assertAcceptedTypes(httpheaders, WorkdayMIME.GET_LIST);
 
         if (workdays == null || workdays.isEmpty())
@@ -75,8 +73,7 @@ public class WorkdayResource extends GenericResource {
         Status error = null;
         for (Workday workday : workdays) {
             if (workday.getStartHour() > workday.getEndHour()
-                || ((workday.getStartHour().equals(workday.getEndHour())) && (workday.getStartHour() > workday.getEndHour())))
-            {
+                    || ((workday.getStartHour().equals(workday.getEndHour())) && (workday.getStartHour() > workday.getEndHour()))) {
                 // We need to rollback
                 error = Status.BAD_REQUEST;
                 break;
@@ -114,8 +111,7 @@ public class WorkdayResource extends GenericResource {
     @Consumes(WorkdayMIME.CREATE)
     public Response createEntity(
             Workday workday,
-            @Context HttpHeaders httpheaders)
-    {
+            @Context HttpHeaders httpheaders) {
         this.assertAcceptedTypes(httpheaders, WorkdayMIME.GET);
 
         if (workday == null || workday.getDay() == null)
@@ -132,8 +128,7 @@ public class WorkdayResource extends GenericResource {
 
         if (
                 workday.getStartHour() > workday.getEndHour()
-                        || ((workday.getStartHour().equals(workday.getEndHour())) && (workday.getStartHour() > workday.getEndHour())))
-        {
+                        || ((workday.getStartHour().equals(workday.getEndHour())) && (workday.getStartHour() > workday.getEndHour()))) {
             return this.error(Status.BAD_REQUEST.getStatusCode(), Status.BAD_REQUEST.toString());
         }
 
@@ -148,8 +143,7 @@ public class WorkdayResource extends GenericResource {
     @Produces({WorkdayMIME.GET, ErrorMIME.ERROR})
     public Response getEntity(
             @Context HttpHeaders httpheaders,
-            @PathParam("id") Integer id)
-    {
+            @PathParam("id") Integer id) {
         this.assertAcceptedTypes(httpheaders, WorkdayMIME.GET);
 
         if (id == null)
@@ -175,8 +169,7 @@ public class WorkdayResource extends GenericResource {
     @Produces({MediaType.WILDCARD, ErrorMIME.ERROR})
     public Response deleteEntity(
             @Context HttpHeaders httpheaders,
-            @PathParam("id") Integer id)
-    {
+            @PathParam("id") Integer id) {
         if (id == null)
             return this.error(Status.BAD_REQUEST.getStatusCode(), Status.BAD_REQUEST.toString());
 

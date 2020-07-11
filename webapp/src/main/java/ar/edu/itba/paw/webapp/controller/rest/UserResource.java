@@ -25,8 +25,7 @@ public class UserResource extends GenericResource {
     @Produces({UserMIME.GET, ErrorMIME.ERROR})
     public Response getEntity(
             @Context HttpHeaders httpheaders,
-            @PathParam("id") Integer id)
-    {
+            @PathParam("id") Integer id) {
         this.assertAcceptedTypes(httpheaders, UserMIME.GET);
 
         if (id == null)
@@ -46,8 +45,7 @@ public class UserResource extends GenericResource {
     public Response updateEntity(
             User user,
             @Context HttpHeaders httpheaders,
-            @PathParam("id") Integer id)
-    {
+            @PathParam("id") Integer id) {
         this.assertAcceptedTypes(httpheaders, UserMIME.GET);
 
         if (id == null || user == null || user.getFirstName() == null || user.getSurname() == null || user.getEmail() == null)

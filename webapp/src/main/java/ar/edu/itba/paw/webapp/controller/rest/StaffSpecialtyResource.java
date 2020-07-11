@@ -22,8 +22,7 @@ public class StaffSpecialtyResource extends GenericResource {
     @GET
     @Produces({StaffSpecialtyMIME.GET_LIST, ErrorMIME.ERROR})
     public Response getCollection(
-            @Context HttpHeaders httpheaders)
-    {
+            @Context HttpHeaders httpheaders) {
         this.assertAcceptedTypes(httpheaders, StaffSpecialtyMIME.GET_LIST);
 
         return Response

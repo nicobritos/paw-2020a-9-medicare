@@ -26,8 +26,7 @@ public class LocalityResource extends GenericResource {
     @GET
     @Produces({LocalityMIME.GET_LIST, ErrorMIME.ERROR})
     public Response getCollection(
-            @Context HttpHeaders httpheaders)
-    {
+            @Context HttpHeaders httpheaders) {
         this.assertAcceptedTypes(httpheaders, LocalityMIME.GET_LIST);
 
         return Response
@@ -41,8 +40,7 @@ public class LocalityResource extends GenericResource {
     @Produces({LocalityMIME.GET, ErrorMIME.ERROR})
     public Response getEntity(
             @Context HttpHeaders httpheaders,
-            @PathParam("id") Integer id)
-    {
+            @PathParam("id") Integer id) {
         this.assertAcceptedTypes(httpheaders, LocalityMIME.GET);
 
         if (id == null)

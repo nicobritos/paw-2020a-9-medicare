@@ -44,8 +44,7 @@ public class AppointmentResource extends GenericResource {
             @QueryParam("from_day") Integer fromDay,
             @QueryParam("to_year") Integer toYear,
             @QueryParam("to_month") Integer toMonth,
-            @QueryParam("to_day") Integer toDay)
-    {
+            @QueryParam("to_day") Integer toDay) {
         this.assertAcceptedTypes(httpheaders, AppointmentMIME.GET_LIST);
 
         // TODO: Get staff/patient id from JWT
@@ -90,8 +89,7 @@ public class AppointmentResource extends GenericResource {
     @Consumes(AppointmentMIME.CREATE)
     public Response createEntity(
             Appointment appointment,
-            @Context HttpHeaders httpheaders)
-    {
+            @Context HttpHeaders httpheaders) {
         this.assertAcceptedTypes(httpheaders, AppointmentMIME.GET);
 
         if (appointment == null || appointment.getFromDate() == null || appointment.getFromDate().isBefore(LocalDateTime.now()))
@@ -128,8 +126,7 @@ public class AppointmentResource extends GenericResource {
     @Produces({AppointmentMIME.GET, ErrorMIME.ERROR})
     public Response getEntity(
             @Context HttpHeaders httpheaders,
-            @PathParam("id") Integer id)
-    {
+            @PathParam("id") Integer id) {
         this.assertAcceptedTypes(httpheaders, AppointmentMIME.GET);
 
         if (id == null)
@@ -154,8 +151,7 @@ public class AppointmentResource extends GenericResource {
     @Produces({MediaType.WILDCARD, ErrorMIME.ERROR})
     public Response deleteEntity(
             @Context HttpHeaders httpheaders,
-            @PathParam("id") Integer id)
-    {
+            @PathParam("id") Integer id) {
         if (id == null)
             return this.error(Status.BAD_REQUEST.getStatusCode(), Status.BAD_REQUEST.toString());
 

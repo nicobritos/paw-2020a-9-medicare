@@ -26,8 +26,7 @@ public class ProvinceResource extends GenericResource {
     @GET
     @Produces({ProvinceMIME.GET_LIST, ErrorMIME.ERROR})
     public Response getCollection(
-            @Context HttpHeaders httpheaders)
-    {
+            @Context HttpHeaders httpheaders) {
         this.assertAcceptedTypes(httpheaders, ProvinceMIME.GET_LIST);
 
         return Response
@@ -41,8 +40,7 @@ public class ProvinceResource extends GenericResource {
     @Produces({ProvinceMIME.GET, ErrorMIME.ERROR})
     public Response getEntity(
             @Context HttpHeaders httpheaders,
-            @PathParam("id") Integer id)
-    {
+            @PathParam("id") Integer id) {
         this.assertAcceptedTypes(httpheaders, ProvinceMIME.GET_LIST);
 
         if (id == null)

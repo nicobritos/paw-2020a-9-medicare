@@ -40,8 +40,7 @@ public class AppointmentTimeSlotResource extends GenericResource {
             @QueryParam("from_day") Integer fromDay,
             @QueryParam("to_year") Integer toYear,
             @QueryParam("to_month") Integer toMonth,
-            @QueryParam("to_day") Integer toDay)
-    {
+            @QueryParam("to_day") Integer toDay) {
         this.assertAcceptedTypes(httpheaders, AppointmentTimeSlotMIME.GET_LIST);
 
         if (staffId == null || fromYear == null || fromMonth == null || fromDay == null || toYear == null || toMonth == null || toDay == null)

@@ -26,8 +26,7 @@ public class CountryResource extends GenericResource {
     @GET
     @Produces({CountryMIME.GET_LIST, ErrorMIME.ERROR})
     public Response getCollection(
-            @Context HttpHeaders httpheaders)
-    {
+            @Context HttpHeaders httpheaders) {
         this.assertAcceptedTypes(httpheaders, CountryMIME.GET_LIST);
 
         return Response
@@ -41,8 +40,7 @@ public class CountryResource extends GenericResource {
     @Produces({CountryMIME.GET, ErrorMIME.ERROR})
     public Response getEntity(
             @Context HttpHeaders httpheaders,
-            @PathParam("id") String id)
-    {
+            @PathParam("id") String id) {
         this.assertAcceptedTypes(httpheaders, CountryMIME.GET_LIST);
 
         if (id == null || id.isEmpty())
