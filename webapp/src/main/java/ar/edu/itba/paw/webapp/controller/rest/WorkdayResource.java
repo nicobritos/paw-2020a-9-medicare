@@ -19,7 +19,7 @@ import java.util.Collection;
 import java.util.LinkedList;
 import java.util.Optional;
 
-@Path("/localities")
+@Path("/workdays")
 @Component
 public class WorkdayResource extends GenericResource {
     @Autowired
@@ -144,7 +144,7 @@ public class WorkdayResource extends GenericResource {
     }
 
     @GET
-    @Path("/{id}")
+    @Path("{id}")
     @Produces({WorkdayMIME.GET, ErrorMIME.ERROR})
     public Response getEntity(
             @Context HttpHeaders httpheaders,
@@ -171,7 +171,7 @@ public class WorkdayResource extends GenericResource {
     }
 
     @DELETE
-    @Path("/{id}")
+    @Path("{id}")
     @Produces({MediaType.WILDCARD, ErrorMIME.ERROR})
     public Response deleteEntity(
             @Context HttpHeaders httpheaders,

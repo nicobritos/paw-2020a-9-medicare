@@ -74,7 +74,7 @@ public class StaffResource extends GenericResource {
     }
 
     @GET
-    @Path("/{id}")
+    @Path("{id}")
     @Produces({StaffMIME.GET, ErrorMIME.ERROR})
     public Response getEntity(
             @Context HttpHeaders httpheaders,
@@ -93,7 +93,7 @@ public class StaffResource extends GenericResource {
     }
 
     @PUT
-    @Path("/{id}")
+    @Path("{id}")
     @Produces({StaffMIME.GET, ErrorMIME.ERROR})
     @Consumes(StaffMIME.UPDATE)
     public Response updateEntity(

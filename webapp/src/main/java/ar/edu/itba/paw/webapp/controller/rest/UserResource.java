@@ -21,7 +21,7 @@ public class UserResource extends GenericResource {
     private UserService userService;
 
     @GET
-    @Path("/{id}")
+    @Path("{id}")
     @Produces({UserMIME.GET, ErrorMIME.ERROR})
     public Response getEntity(
             @Context HttpHeaders httpheaders,
@@ -40,7 +40,7 @@ public class UserResource extends GenericResource {
     }
 
     @PUT
-    @Path("/{id}")
+    @Path("{id}")
     @Produces({UserMIME.GET, ErrorMIME.ERROR})
     @Consumes(UserMIME.UPDATE)
     public Response updateEntity(

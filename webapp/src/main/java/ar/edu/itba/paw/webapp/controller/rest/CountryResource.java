@@ -37,7 +37,7 @@ public class CountryResource extends GenericResource {
     }
 
     @GET
-    @Path("/{id}")
+    @Path("{id}")
     @Produces({CountryMIME.GET, ErrorMIME.ERROR})
     public Response getEntity(
             @Context HttpHeaders httpheaders,

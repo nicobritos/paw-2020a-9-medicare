@@ -37,7 +37,7 @@ public class ProvinceResource extends GenericResource {
     }
 
     @GET
-    @Path("/{id}")
+    @Path("{id}")
     @Produces({ProvinceMIME.GET, ErrorMIME.ERROR})
     public Response getEntity(
             @Context HttpHeaders httpheaders,

@@ -124,7 +124,7 @@ public class AppointmentResource extends GenericResource {
     }
 
     @GET
-    @Path("/{id}")
+    @Path("{id}")
     @Produces({AppointmentMIME.GET, ErrorMIME.ERROR})
     public Response getEntity(
             @Context HttpHeaders httpheaders,
@@ -150,7 +150,7 @@ public class AppointmentResource extends GenericResource {
     }
 
     @DELETE
-    @Path("/{id}")
+    @Path("{id}")
     @Produces({MediaType.WILDCARD, ErrorMIME.ERROR})
     public Response deleteEntity(
             @Context HttpHeaders httpheaders,
