@@ -6,6 +6,7 @@ import ar.edu.itba.paw.interfaces.services.StaffService;
 import ar.edu.itba.paw.models.Appointment;
 import ar.edu.itba.paw.models.Patient;
 import ar.edu.itba.paw.models.Staff;
+import ar.edu.itba.paw.models.User;
 import ar.edu.itba.paw.webapp.media_types.AppointmentMIME;
 import ar.edu.itba.paw.webapp.media_types.ErrorMIME;
 import org.joda.time.Days;
@@ -20,7 +21,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 import java.util.Collection;
-import java.util.LinkedList;
+import java.util.Collections;
 import java.util.Optional;
 
 @Path("/appointments")
@@ -47,11 +48,20 @@ public class AppointmentResource extends GenericResource {
             @QueryParam("to_day") Integer toDay) {
         this.assertAcceptedTypes(httpheaders, AppointmentMIME.GET_LIST);
 
-        // TODO: Get staff/patient id from JWT
-        Integer staffId = 1;
-        Integer patientId = 1;
-        if (staffId == null && patientId == null)
-            return this.error(Status.FORBIDDEN.getStatusCode(), Status.FORBIDDEN.toString());
+        User user = this.getUser().get();
+        Collection<Staff> staffs;
+        Collection<Patient> patients;
+        if (this.isStaff()) {
+            patients = Collections.emptyList();
+            staffs = this.staffService.findByUser(user);
+            if (staffs.isEmpty())
+                return this.error(Status.FORBIDDEN.getStatusCode(), Status.FORBIDDEN.toString());
+        } else {
+            staffs = Collections.emptyList();
+            patients = this.patientService.findByUser(user);
+            if (patients.isEmpty())
+                return this.error(Status.FORBIDDEN.getStatusCode(), Status.FORBIDDEN.toString());
+        }
 
         if (fromYear == null || fromMonth == null || fromDay == null || toYear == null || toMonth == null || toDay == null)
             return this.error(Status.BAD_REQUEST.getStatusCode(), Status.BAD_REQUEST.toString());
@@ -63,24 +73,10 @@ public class AppointmentResource extends GenericResource {
         if (daysBetween > MAX_DAYS_APPOINTMENTS || dateTo.isBefore(dateFrom))
             return this.error(Status.BAD_REQUEST.getStatusCode(), Status.BAD_REQUEST.toString());
 
-        if (staffId != null) {
-            Optional<Staff> staffOptional = this.staffService.findById(staffId);
-            if (!staffOptional.isPresent())
-                return this.error(Status.BAD_REQUEST.getStatusCode(), Status.BAD_REQUEST.toString());
-
-            Collection<Staff> staffWrapper = new LinkedList<>();
-            staffWrapper.add(staffOptional.get());
-
-            return Response.ok(this.appointmentService.findByStaffsAndDay(staffWrapper, dateFrom, dateTo)).build();
+        if (this.isStaff()) {
+            return Response.ok(this.appointmentService.findByStaffsAndDay(staffs, dateFrom, dateTo)).build();
         } else {
-            Optional<Patient> patientOptional = this.patientService.findById(staffId);
-            if (!patientOptional.isPresent())
-                return this.error(Status.BAD_REQUEST.getStatusCode(), Status.BAD_REQUEST.toString());
-
-            Collection<Patient> patientWrapper = new LinkedList<>();
-            patientWrapper.add(patientOptional.get());
-
-            return Response.ok(this.appointmentService.findByPatientsAndDay(patientWrapper, dateFrom, dateTo)).build();
+            return Response.ok(this.appointmentService.findByPatientsAndDay(patients, dateFrom, dateTo)).build();
         }
     }
 
@@ -94,19 +90,17 @@ public class AppointmentResource extends GenericResource {
 
         if (appointment == null || appointment.getFromDate() == null || appointment.getFromDate().isBefore(LocalDateTime.now()))
             return this.error(Status.BAD_REQUEST.getStatusCode(), Status.BAD_REQUEST.toString());
-
-        // TODO: Get patient id from JWT
-        Integer patientId = 1;
-        if (patientId == null)
-            return this.error(Status.FORBIDDEN.getStatusCode(), Status.FORBIDDEN.toString());
-
-        Optional<Patient> patientOptional = this.patientService.findById(patientId);
-        if (!patientOptional.isPresent())
+        if (this.isStaff())
             return this.error(Status.FORBIDDEN.getStatusCode(), Status.FORBIDDEN.toString());
 
         Optional<Staff> staffOptional = this.staffService.findById(appointment.getStaff().getId());
         if (!staffOptional.isPresent())
             return this.error(Status.BAD_REQUEST.getStatusCode(), Status.BAD_REQUEST.toString());
+
+        User user = this.getUser().get();
+        Optional<Patient> patientOptional = this.patientService.findByUserAndOffice(user, staffOptional.get().getOffice());
+        if (!patientOptional.isPresent())
+            return this.error(Status.FORBIDDEN.getStatusCode(), Status.FORBIDDEN.toString());
 
         Appointment newAppointment = new Appointment();
         newAppointment.setStaff(staffOptional.get());
@@ -132,16 +126,32 @@ public class AppointmentResource extends GenericResource {
         if (id == null)
             return this.error(Status.BAD_REQUEST.getStatusCode(), Status.BAD_REQUEST.toString());
 
-        // TODO: Get patient id from JWT
-        Integer patientId = 1;
-        if (patientId == null)
-            return this.error(Status.FORBIDDEN.getStatusCode(), Status.FORBIDDEN.toString());
+        User user = this.getUser().get();
+        Collection<Staff> staffs;
+        Collection<Patient> patients;
+        if (this.isStaff()) {
+            patients = Collections.emptyList();
+            staffs = this.staffService.findByUser(user);
+            if (staffs.isEmpty())
+                return this.error(Status.FORBIDDEN.getStatusCode(), Status.FORBIDDEN.toString());
+        } else {
+            staffs = Collections.emptyList();
+            patients = this.patientService.findByUser(user);
+            if (patients.isEmpty())
+                return this.error(Status.FORBIDDEN.getStatusCode(), Status.FORBIDDEN.toString());
+        }
 
         Optional<Appointment> appointmentOptional = this.appointmentService.findById(id);
         if (!appointmentOptional.isPresent())
             return this.error(Status.NOT_FOUND.getStatusCode(), Status.NOT_FOUND.toString());
-        if (!appointmentOptional.get().getPatient().getId().equals(patientId))
-            return this.error(Status.FORBIDDEN.getStatusCode(), Status.FORBIDDEN.toString());
+
+        if (this.isStaff()) {
+            if (!staffs.contains(appointmentOptional.get().getStaff()))
+                return this.error(Status.FORBIDDEN.getStatusCode(), Status.FORBIDDEN.toString());
+        } else {
+            if (!patients.contains(appointmentOptional.get().getPatient()))
+                return this.error(Status.FORBIDDEN.getStatusCode(), Status.FORBIDDEN.toString());
+        }
 
         return Response.ok(appointmentOptional.get()).build();
     }
@@ -155,18 +165,21 @@ public class AppointmentResource extends GenericResource {
         if (id == null)
             return this.error(Status.BAD_REQUEST.getStatusCode(), Status.BAD_REQUEST.toString());
 
-        // TODO: Get patient id from JWT
-        Integer patientId = 1;
-        if (patientId == null)
+        if (this.isStaff())
             return this.error(Status.FORBIDDEN.getStatusCode(), Status.FORBIDDEN.toString());
 
         Optional<Appointment> appointmentOptional = this.appointmentService.findById(id);
         if (!appointmentOptional.isPresent())
             return this.error(Status.NOT_FOUND.getStatusCode(), Status.NOT_FOUND.toString());
-        if (!appointmentOptional.get().getPatient().getId().equals(patientId))
+
+        User user = this.getUser().get();
+        Collection<Patient> patients = this.patientService.findByUser(user);
+        if (patients.isEmpty())
+            return this.error(Status.FORBIDDEN.getStatusCode(), Status.FORBIDDEN.toString());
+        if (!patients.contains(appointmentOptional.get().getPatient()))
             return this.error(Status.FORBIDDEN.getStatusCode(), Status.FORBIDDEN.toString());
 
-        this.appointmentService.remove(patientId);
+        this.appointmentService.remove(appointmentOptional.get().getId());
 
         return Response.status(Status.NO_CONTENT).build();
     }
