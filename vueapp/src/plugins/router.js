@@ -9,6 +9,7 @@ import SignupPatient from '@/views/authentication/signupPatient';
 import SignupStaff from '@/views/authentication/signupStaff';
 import MedicHome from '@/views/medic/home';
 import MedicProfile from '@/views/medic/profile';
+import PatientProfile from '@/views/patient/profile';
 
 
 Vue.use(VueRouter)
@@ -65,6 +66,11 @@ Vue.use(VueRouter)
     path:"/staff/profile",
     name:"MedicProfile",
     component:MedicProfile
+  },
+  {
+    path:"/patient/profile",
+    name:"PatientProfile",
+    component:PatientProfile
   }
 ]
 
