@@ -1,142 +1,271 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <%@ include file="../../partials/head.jsp" %>
-    <link rel="stylesheet" href='<c:url value="/css/reservarTurno.css"/>'/>
-</head>
-<body class="container-fluid p-0 m-0 d-flex flex-column">
-<%@ include file="../navbar/navbarLogged.jsp" %>
-<div class="container fill-height">
-    <div class="row mt-4">
-        <c:url value="/patient/appointment/${staffId}/${year}/${month}/${day}/${hour}/${minute}"
-               var="createAppointmentUrl"/>
-        <form:form modelAttribute="appointmentForm" action="${createAppointmentUrl}" method="post"
-                   class="col d-flex flex-column" id="appointment-request-form">
-            <h4 class="text-muted"><spring:message code="ScheduleAppointment"/></h4>
-            <p class="mt-3 text-muted"><spring:message code="Motive"/></p>
-            <spring:message var="motivePlaceholder" code="Motive"/>
-            <label for="motive"></label><form:input path="motive" placeholder="${motivePlaceholder}" type="text"
-                                                    name="motive" id="motive" class="form-control w-50"/>
-            <p class="mt-3 text-muted mb-1"><spring:message code="PersonalData"/></p>
-            <div class="container-fluid p-0 mb-1 d-flex flex-row">
-                <div class="col px-0">
-                    <p><c:out value="${user.get().firstName}"/></p>
+<template>
+    <div class="container fill-height">
+        <div class="row mt-4">
+            <!-- TODO:connect form -->
+            <form class="col d-flex flex-column" id="appointment-request-form">
+                <h4 class="text-muted">{{$t("ScheduleAppointment")}}</h4>
+                <p class="mt-3 text-muted">{{$t("Motive")}}</p>
+                <label for="motive"></label>
+                <input  :placeholder="$t('Motive')" type="text" 
+                        name="motive" id="motive" class="form-control w-50"/>
+                <p class="mt-3 text-muted mb-1">{{$t("PersonalData")}}</p>
+                <div class="container-fluid p-0 mb-1 d-flex flex-row">
+                    <div class="col px-0">
+                        <p>{{user.firstName}}</p>
+                    </div>
+                    <div class="col p-0 ml-2">
+                        <p>{{user.surname}}</p>
+                    </div>
                 </div>
-                <div class="col p-0 ml-2">
-                    <p><c:out value="${user.get().surname}"/></p>
-                </div>
-            </div>
-            <spring:message var="phonePlaceholder" code="Phone"/>
-            <form:input path="phone" placeholder="${phonePlaceholder}" type="text" name="phone" id="phone"
+                <input  :placeholder='$t("Phone")' type="text" name="phone" id="phone"
                         class="form-control w-50 mb-1"/>
-            <p><c:out value="${user.get().email}"/></p>
-            <spring:message var="commentPlaceholder" code="OptionalComment"/>
-            <form:textarea path="comment" placeholder="${commentPlaceholder}" class="form-control mt-3" name="comment"
-                           id="comment" cols="30" rows="5"/>
-            <button type="button" id="appointment-request-button" class="btn btn-info mt-3 w-100"><spring:message code="ScheduleAppointment"/></button>
-
-            <form:errors path="*" cssClass="mt-4 mb-0 text-danger" element="p"/>
-        </form:form>
-        <div class="col">
-            <div class="container details-container mt-5 p-3 w-75">
-                <div class="row justify-content-center">
-                    <h4 class="white-text"><spring:message code="AppointmentDetails"/></h4>
-                </div>
-                <div class="row justify-content-center border-top border-light py-2">
-                    <div class="col-3 d-flex flex-column justify-content-center">
-                        <div class="profile-picture-container">
-                            <div style="margin-top: 100%;"></div>
-                            <img
-                                    class="profile-picture rounded-circle"
-                                    src="<c:url value="/profilePics/${staff.user.profilePicture.id}"/>"
-                                    alt=""
-                            />
+                <p>{{user.email}}</p>
+                <textarea :placeholder="$t('OptionalComment')" class="form-control mt-3" name="comment"
+                            id="comment" cols="30" rows="5"/>
+                <button type="submit" id="appointment-request-button" class="btn btn-info mt-3 w-100">{{$t("ScheduleAppointment")}}</button>
+            </form>
+            <div class="col">
+                <div class="container details-container mt-5 p-3 w-75">
+                    <div class="row justify-content-center">
+                        <h4 class="white-text">{{$t("AppointmentDetails")}}/></h4>
+                    </div>
+                    <div class="row justify-content-center border-top border-light py-2">
+                        <div class="col-3 d-flex flex-column justify-content-center">
+                            <div class="profile-picture-container">
+                                <div style="margin-top: 100%;"></div>
+                                <img
+                                        class="profile-picture rounded-circle"
+                                        :src="getUrl('profilePics/'+ staff.user.profilePicturId)"
+                                        alt="profile pic"
+                                />
+                            </div>
+                        </div>
+                        <div class="col p-0">
+                            <p class="m-0 white-text">{{staff.user.firstName}} {{staff.user.surname}}</p>
+                            <small class="white-text">
+                                <!-- TODO: check -->
+                                {{staff.staffSpecialties}}
+                            </small>
                         </div>
                     </div>
-                    <div class="col p-0">
-                        <p class="m-0 white-text"><c:out value="${staff.user.firstName} ${staff.user.surname}"/></p>
-                        <small class="white-text">
-                            <c:forEach var="specialty" items="${staff.staffSpecialties}" varStatus="loop">
-                                <c:out value="${specialty.name} "/>
-                                <c:if test="${!loop.last}">,</c:if>
-                            </c:forEach>
-                        </small>
+                    <div class="row justify-content-center border-top border-light py-2">
+                        <div class="col-3 d-flex align-items-center justify-content-center">
+                            <img :src='calendarIcon' class="w-75" alt="calendar icon">
+                        </div>
+                        <div class="col p-0">
+                            <p class="m-0 white-text">
+                                {{$t(
+                                    "dow_dom_moy_hod_moh",
+                                    [
+                                        getDoW(date.getDay()),
+                                        date.getDate(),
+                                        getMoY(date.getMonth()),
+                                        timeWithZero(date.getHours()),
+                                        timeWithZero(date.getMinutes())
+                                    ]
+                                )}}
+                            </p>
+                            <a :href="getUrl('appointment/'+staff.id+'/0')"><small class="white-text">{{$t("ChangeDate")}}</small></a>
+                        </div>
                     </div>
-                </div>
-                <div class="row justify-content-center border-top border-light py-2">
-                    <div class="col-3 d-flex align-items-center justify-content-center">
-                        <img src='<c:url value="/img/calendarIcon.svg"/>' class="w-75" alt="calendar icon">
-                    </div>
-                    <div class="col p-0">
-                        <p class="m-0 white-text">
-                            <c:choose>
-                                <c:when test="${date.dayOfWeek == 1}"><spring:message code="Monday" var="vdateDayOfWeek"/></c:when>
-                                <c:when test="${date.dayOfWeek == 2}"><spring:message code="Tuesday" var="vdateDayOfWeek"/></c:when>
-                                <c:when test="${date.dayOfWeek == 3}"><spring:message code="Wednesday" var="vdateDayOfWeek"/></c:when>
-                                <c:when test="${date.dayOfWeek == 4}"><spring:message code="Thursday" var="vdateDayOfWeek"/></c:when>
-                                <c:when test="${date.dayOfWeek == 5}"><spring:message code="Friday" var="vdateDayOfWeek"/></c:when>
-                                <c:when test="${date.dayOfWeek == 6}"><spring:message code="Saturday" var="vdateDayOfWeek"/></c:when>
-                                <c:when test="${date.dayOfWeek == 7}"><spring:message code="Sunday" var="vdateDayOfWeek"/></c:when>
-                                <c:otherwise><c:set var="vdateDayOfWeek" value="${date.dayOfWeek}"/></c:otherwise>
-                            </c:choose>
-                             <c:choose>
-                                <c:when test="${date.monthOfYear == 1}"><spring:message code="January" var="vdateMonthOfYear"/></c:when>
-                                <c:when test="${date.monthOfYear == 2}"><spring:message code="February" var="vdateMonthOfYear"/></c:when>
-                                <c:when test="${date.monthOfYear == 3}"><spring:message code="March" var="vdateMonthOfYear"/></c:when>
-                                <c:when test="${date.monthOfYear == 4}"><spring:message code="April" var="vdateMonthOfYear"/></c:when>
-                                <c:when test="${date.monthOfYear == 5}"><spring:message code="May" var="vdateMonthOfYear"/></c:when>
-                                <c:when test="${date.monthOfYear == 6}"><spring:message code="June" var="vdateMonthOfYear"/></c:when>
-                                <c:when test="${date.monthOfYear == 7}"><spring:message code="July" var="vdateMonthOfYear"/></c:when>
-                                <c:when test="${date.monthOfYear == 8}"><spring:message code="August" var="vdateMonthOfYear"/></c:when>
-                                <c:when test="${date.monthOfYear == 9}"><spring:message code="September" var="vdateMonthOfYear"/></c:when>
-                                <c:when test="${date.monthOfYear == 10}"><spring:message code="October" var="vdateMonthOfYear"/></c:when>
-                                <c:when test="${date.monthOfYear == 11}"><spring:message code="November" var="vdateMonthOfYear"/></c:when>
-                                <c:when test="${date.monthOfYear == 12}"><spring:message code="December" var="vdateMonthOfYear"/></c:when>
-                                <c:otherwise><c:set value="${date.monthOfYear}" var="vdateMonthOfYear"/></c:otherwise>
-                            </c:choose>
-                            <c:choose>
-                                <c:when test="${date.hourOfDay < 10}"><c:set var="vdateHourOfDay" value="0${date.hourOfDay}"/></c:when>
-                                <c:otherwise><c:set var="vdateHourOfDay" value="${date.hourOfDay}"/></c:otherwise>
-                            </c:choose>
-                            <c:choose>
-                                <c:when test="${date.minuteOfHour < 10}"><c:set var="vdateMinuteOfHour" value="0${date.minuteOfHour}"/></c:when>
-                                <c:otherwise><c:set var="vdateMinuteOfHour" value="${date.minuteOfHour}"/></c:otherwise>
-                            </c:choose>
-                            <spring:message arguments="${vdateDayOfWeek};${date.dayOfMonth};${vdateMonthOfYear};${vdateHourOfDay};${vdateMinuteOfHour}" argumentSeparator=";" code="dow_dom_moy_hod_moh"/>
-                        </p>
-                        <a href="<c:url value="/appointment/${staffId}/0"/> "><small class="white-text"><spring:message
-                                code="ChangeDate"/></small></a>
-                    </div>
-                </div>
-                <div class="row justify-content-center border-top border-light py-2">
-                    <div class="col-3 d-flex align-items-center justify-content-center">
-                        <img src='<c:url value="/img/mapIcon.svg"/> ' class="w-75" alt="map icon">
-                    </div>
-                    <div class="col p-0">
-                        <p class="m-0 white-text"><c:out value="${staff.office.street} - ${staff.office.locality.name}"/></p>
-                        <a
-                                class="link"
-                                href="https://www.google.com/maps/search/?api=1&query=${staff.office.locality.name},${staff.office.street}"
-                                target="_blank"
-                        >
-                            <small class="white-text m-0"><spring:message code="SeeInGoogleMaps"/></small>
-                        </a>
+                    <div class="row justify-content-center border-top border-light py-2">
+                        <div class="col-3 d-flex align-items-center justify-content-center">
+                            <img :src='mapIcon ' class="w-75" alt="map icon">
+                        </div>
+                        <div class="col p-0">
+                            <!-- TODO: check -->
+                            <p class="m-0 white-text">{{staff.office.street}} - {{getLocality(staff.office.localityId)}}</p>
+                            <a
+                                    class="link"
+                                    :href="'https://www.google.com/maps/search/?api=1&query='+getLocality(staff.office.localityId)+','+staff.office.street"
+                                    target="_blank"
+                            >
+                                <small class="white-text m-0">{{$t("SeeInGoogleMaps")}}</small>
+                            </a>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-</div>
-</body>
-<script type="text/javascript">
-    let strings = new Array();
-    strings['title'] = "<spring:message code='YouAreAboutToScheduleAnAppointment' javaScriptEscape='true' />";
-    strings['body'] = "<spring:message code='DoYouWantToContinue' javaScriptEscape='true' />";
-    strings['accept'] = "<spring:message code='Accept' javaScriptEscape='true' />";
-    strings['cancel'] = "<spring:message code='Cancel' javaScriptEscape='true' />";
-</script>
-<script src="<c:url value="/js/scripts/AppointmentRequest.js"/>"></script>
+</template>
+
 <script>
-    AppointmentRequest.init();
+import apiTypes from "@/scripts/apiTypes";
+import utils from "@/scripts/utils";
+import mapIcon from "@/assets/mapIcon.svg";
+import calendarIcon from "@/assets/calendarIcon.svg";
+
+let user = new apiTypes.User(1,"example@email.com","firstName","surname",true,"0000-0000",1);
+export default {
+    name:"RequestAppointment",
+    data(){
+        return {
+            mapIcon:mapIcon,
+            calendarIcon:calendarIcon,
+            date:new Date(2020,1,10),
+            staff:new apiTypes.Staff(
+                1,
+                "0000-0000",
+                "example@email.com",
+                1,user,
+                new apiTypes.Office(1,user.phone,user.email,"street","url",1),
+                []
+            ),
+            user:user
+        }
+    },
+    methods:{
+        getDoW(t){
+            switch (t) {
+                case 1:
+                    return this.$t("Monday");
+                case 2:
+                    return this.$t("Tuesday");
+                case 3:
+                    return this.$t("Wednesday");
+                case 4:
+                    return this.$t("Thursday");
+                case 5:
+                    return this.$t("Friday");
+                case 6:
+                    return this.$t("Saturday");
+                case 7:
+                    return this.$t("Sunday");
+                default:
+                    return t;
+            }
+        },
+        getMoY(t){
+            switch(t){
+                case 1:
+                    return this.$t("January");
+                case 2:
+                    return this.$t("February");
+                case 3:
+                    return this.$t("March");
+                case 4:
+                    return this.$t("April");
+                case 5:
+                    return this.$t("May");
+                case 6:
+                    return this.$t("June");
+                case 7:
+                    return this.$t("July");
+                case 8:
+                    return this.$t("August");
+                case 9:
+                    return this.$t("September");
+                case 10:
+                    return this.$t("October");
+                case 11:
+                    return this.$t("November");
+                case 12:
+                    return this.$t("December");
+                default:
+                    return t;
+            }
+        },
+        timeWithZero(t){
+            if(t<10){
+                return "0"+t;
+            }else{
+                return t;
+            }
+        },
+        getUrl:utils.getUrl,
+        getLocality(id){
+            return "Locality" + id;
+        }
+    }
+}
 </script>
-</html>
+
+<style scoped>
+.header {
+    background-color: #00C4BA;
+}
+
+.header-brand {
+    font-weight: bold;
+}
+
+.header-brand:hover {
+    font-weight: bold;
+    color: white !important;
+}
+
+.header-a-element {
+    color: white;
+}
+
+.header-a-element:hover {
+    color: #e0e0e0;
+}
+
+.header-btn-element {
+    color: #00C4BA;
+    font-weight: bold;
+}
+
+.header-btn-element:hover {
+    color: rgb(0, 160, 152);
+    font-weight: bold;
+}
+
+.green-text {
+    color: #00C4BA;
+}
+
+#navbar-logo {
+    width: 2em;
+}
+
+.filter-form {
+    background-color: #00C4BA;
+    border-radius: 1em;
+}
+
+.form-title {
+    color: white;
+}
+
+.form-control {
+    background-color: rgba(214, 214, 214);
+}
+
+.fill-height {
+    flex: 1 1 auto;
+}
+
+.white-text {
+    color: white !important;
+}
+
+#navbarUserImage {
+    width: 3em;
+}
+
+.details-container {
+    background-color: #00C4BA;
+    border-radius: 3em;
+}
+
+.profile-picture-container {
+    display: inline-block;
+    position: relative;
+    width: 100%;
+}
+
+.profile-picture {
+    object-fit: cover;
+    height: 100%;
+    width: 100%;
+    top: 0;
+    bottom: 0;
+    right: 0;
+    left: 0;
+    position: absolute;
+}
+
+</style>

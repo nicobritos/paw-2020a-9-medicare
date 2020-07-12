@@ -12,6 +12,7 @@ import MedicProfile from '@/views/medic/profile';
 import PatientProfile from '@/views/patient/profile';
 import PatientHome from '@/views/patient/home';
 import SelectAppointment from '@/views/selectAppointment';
+import RequestAppointment from '@/views/patient/requestAppointment';
 
 
 Vue.use(VueRouter)
@@ -83,6 +84,11 @@ Vue.use(VueRouter)
     path:"/selectAppointment",
     name:"SelectAppointment",
     component:SelectAppointment
+  },
+  {
+    path:"/requestAppointment",
+    name:"RequestAppointment",
+    component:RequestAppointment
   }
 ]
 
