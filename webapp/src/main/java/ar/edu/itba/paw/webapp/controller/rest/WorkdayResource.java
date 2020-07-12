@@ -33,12 +33,10 @@ public class WorkdayResource extends GenericResource {
             @Context HttpHeaders httpheaders) {
         this.assertAcceptedTypes(httpheaders, WorkdayMIME.GET_LIST);
 
-        // TODO: Get staff id from JWT
-        Integer staffId = 1;
-        if (staffId == null)
+        if (!this.isStaff())
             return this.error(Status.FORBIDDEN.getStatusCode(), Status.FORBIDDEN.toString());
 
-        Optional<Staff> staffOptional = this.staffService.findById(staffId);
+        Optional<Staff> staffOptional = this.staffService.findByUser(this.getUser().get()).stream().findFirst();
         if (!staffOptional.isPresent())
             return this.error(Status.FORBIDDEN.getStatusCode(), Status.FORBIDDEN.toString()); // TODO: Log, esto es inconsistencia, no deberia de pasar
 
@@ -59,12 +57,10 @@ public class WorkdayResource extends GenericResource {
         if (workdays == null || workdays.isEmpty())
             return this.error(Status.BAD_REQUEST.getStatusCode(), Status.BAD_REQUEST.toString());
 
-        // TODO: Get staff id from JWT
-        Integer staffId = 1;
-        if (staffId == null)
+        if (!this.isStaff())
             return this.error(Status.FORBIDDEN.getStatusCode(), Status.FORBIDDEN.toString());
 
-        Optional<Staff> staffOptional = this.staffService.findById(staffId);
+        Optional<Staff> staffOptional = this.staffService.findByUser(this.getUser().get()).stream().findFirst();
         if (!staffOptional.isPresent())
             return this.error(Status.FORBIDDEN.getStatusCode(), Status.FORBIDDEN.toString()); // TODO: Log, esto es inconsistencia, no deberia de pasar
 
@@ -117,18 +113,15 @@ public class WorkdayResource extends GenericResource {
         if (workday == null || workday.getDay() == null)
             return this.error(Status.BAD_REQUEST.getStatusCode(), Status.BAD_REQUEST.toString());
 
-        // TODO: Get staff id from JWT
-        Integer staffId = 1;
-        if (staffId == null)
+        if (!this.isStaff())
             return this.error(Status.FORBIDDEN.getStatusCode(), Status.FORBIDDEN.toString());
 
-        Optional<Staff> staffOptional = this.staffService.findById(staffId);
+        Optional<Staff> staffOptional = this.staffService.findByUser(this.getUser().get()).stream().findFirst();
         if (!staffOptional.isPresent())
             return this.error(Status.FORBIDDEN.getStatusCode(), Status.FORBIDDEN.toString()); // TODO: Log, esto es inconsistencia, no deberia de pasar
 
-        if (
-                workday.getStartHour() > workday.getEndHour()
-                        || ((workday.getStartHour().equals(workday.getEndHour())) && (workday.getStartHour() > workday.getEndHour()))) {
+        if (workday.getStartHour() > workday.getEndHour()
+            || ((workday.getStartHour().equals(workday.getEndHour())) && (workday.getStartHour() > workday.getEndHour()))) {
             return this.error(Status.BAD_REQUEST.getStatusCode(), Status.BAD_REQUEST.toString());
         }
 
@@ -149,14 +142,19 @@ public class WorkdayResource extends GenericResource {
         if (id == null)
             return this.error(Status.BAD_REQUEST.getStatusCode(), Status.BAD_REQUEST.toString());
 
-        // TODO: Get staff id from JWT
-        Integer staffId = 1;
-        if (staffId == null)
+        if (!this.isStaff())
             return this.error(Status.FORBIDDEN.getStatusCode(), Status.FORBIDDEN.toString());
+
+        Optional<Staff> staffOptional = this.staffService.findByUser(this.getUser().get()).stream().findFirst();
+        if (!staffOptional.isPresent())
+            return this.error(Status.FORBIDDEN.getStatusCode(), Status.FORBIDDEN.toString()); // TODO: Log, esto es inconsistencia, no deberia de pasar
 
         Optional<Workday> workdayOptional = this.workdayService.findById(id);
         if (!workdayOptional.isPresent())
             return this.error(Status.NOT_FOUND.getStatusCode(), Status.NOT_FOUND.toString());
+
+        if (!staffOptional.get().equals(workdayOptional.get().getStaff()))
+            return this.error(Status.FORBIDDEN.getStatusCode(), Status.FORBIDDEN.toString());
 
         return Response
                 .ok()
@@ -173,16 +171,18 @@ public class WorkdayResource extends GenericResource {
         if (id == null)
             return this.error(Status.BAD_REQUEST.getStatusCode(), Status.BAD_REQUEST.toString());
 
-        // TODO: Get staff id from JWT
-        Integer staffId = 1;
-        if (staffId == null)
+        if (!this.isStaff())
             return this.error(Status.FORBIDDEN.getStatusCode(), Status.FORBIDDEN.toString());
+
+        Optional<Staff> staffOptional = this.staffService.findByUser(this.getUser().get()).stream().findFirst();
+        if (!staffOptional.isPresent())
+            return this.error(Status.FORBIDDEN.getStatusCode(), Status.FORBIDDEN.toString()); // TODO: Log, esto es inconsistencia, no deberia de pasar
 
         Optional<Workday> workdayOptional = this.workdayService.findById(id);
         if (!workdayOptional.isPresent())
             return this.error(Status.NOT_FOUND.getStatusCode(), Status.NOT_FOUND.toString());
 
-        if (!workdayOptional.get().getStaff().getId().equals(staffId))
+        if (!workdayOptional.get().getStaff().equals(staffOptional.get()))
             return this.error(Status.FORBIDDEN.getStatusCode(), Status.FORBIDDEN.toString());
 
         this.workdayService.remove(id);
