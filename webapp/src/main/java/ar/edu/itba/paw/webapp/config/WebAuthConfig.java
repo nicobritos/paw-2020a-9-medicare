@@ -2,7 +2,6 @@ package ar.edu.itba.paw.webapp.config;
 
 import ar.edu.itba.paw.webapp.auth.JWTAuthenticationEntryPoint;
 import ar.edu.itba.paw.webapp.auth.JWTAuthenticationFilter;
-import ar.edu.itba.paw.webapp.auth.JWTAuthenticator;
 import ar.edu.itba.paw.webapp.auth.JWTAuthorizationFilter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -21,7 +20,6 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import javax.ws.rs.HttpMethod;
-import java.io.IOException;
 
 @EnableWebSecurity
 @Configuration
@@ -34,11 +32,6 @@ public class WebAuthConfig extends WebSecurityConfigurerAdapter {
     @Override
     public AuthenticationManager authenticationManagerBean() throws Exception {
         return super.authenticationManagerBean();
-    }
-
-    @Bean
-    public JWTAuthenticator jwtAuthenticator() throws IOException {
-        return new JWTAuthenticator();
     }
 
     @Bean
