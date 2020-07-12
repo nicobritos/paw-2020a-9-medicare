@@ -158,8 +158,8 @@ public class PatientDaoImplTest {
             u.setSurname(SURNAME);
             u.setPhone(PHONE);
             u.setProfilePicture(pictureModel());
-            u.setToken(TOKEN);
-            u.setTokenCreatedDate(null);
+//            u.setVerificationToken(TOKEN);
+//            u.setVerificationTokenCreatedDate(null);
             u.setVerified(true);
             u.setId(STARTING_ID);
         } catch (Exception e) {
@@ -199,8 +199,8 @@ public class PatientDaoImplTest {
             u.setSurname(SURNAME_2);
             u.setPhone(PHONE_2);
             u.setProfilePicture(pictureModel2());
-            u.setToken(null);
-            u.setTokenCreatedDate(null);
+//            u.setVerificationToken(null);
+//            u.setVerificationTokenCreatedDate(null);
             u.setVerified(true);
             u.setId(STARTING_ID + 1);
         } catch (Exception e) {

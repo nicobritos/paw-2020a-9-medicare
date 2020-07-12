@@ -1,11 +1,12 @@
 package ar.edu.itba.paw.webapp.config;
 
+import ar.edu.itba.paw.webapp.auth.JWTAuthenticationEntryPoint;
+import ar.edu.itba.paw.webapp.auth.JWTAuthenticationFilter;
+import ar.edu.itba.paw.webapp.auth.JWTAuthorizationFilter;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.core.io.Resource;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.BeanIds;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
@@ -13,14 +14,12 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.nio.charset.StandardCharsets;
+import javax.ws.rs.HttpMethod;
 
 @EnableWebSecurity
 @Configuration
@@ -28,8 +27,6 @@ import java.nio.charset.StandardCharsets;
 public class WebAuthConfig extends WebSecurityConfigurerAdapter {
     @Autowired
     private UserDetailsService userDetailsService;
-    @Value("classpath:rememberMe.key")
-    private Resource secret;
 
     @Bean(name = BeanIds.AUTHENTICATION_MANAGER)
     @Override
@@ -42,6 +39,18 @@ public class WebAuthConfig extends WebSecurityConfigurerAdapter {
         return new BCryptPasswordEncoder();
     }
 
+    @Bean
+    public JWTAuthenticationFilter jwtAuthenticationFilter() throws Exception {
+        JWTAuthenticationFilter authenticationFilter = new JWTAuthenticationFilter();
+        authenticationFilter.setAuthenticationManager(this.authenticationManagerBean());
+        return authenticationFilter;
+    }
+
+    @Bean
+    public JWTAuthorizationFilter jwtAuthorizationFilter() throws Exception {
+        return new JWTAuthorizationFilter(this.authenticationManager());
+    }
+
     @Override
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
         auth
@@ -51,57 +60,23 @@ public class WebAuthConfig extends WebSecurityConfigurerAdapter {
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
-        http.authorizeRequests().anyRequest().permitAll().and().csrf().disable();
-
-//        http.sessionManagement()
-//                .invalidSessionUrl("/")
-//                .and().authorizeRequests()
-//                .antMatchers("/").permitAll()
-//                .antMatchers("/verifyEmail").permitAll()
-//                .antMatchers("/mediclist/**").hasAnyRole(UserRole.ANONYMOUS.name(), UserRole.PATIENT.name())
-//                .antMatchers("/login").anonymous()
-//                .antMatchers("/signup/**").anonymous()
-//                .antMatchers("/patient/**").hasRole(UserRole.PATIENT.name())
-//                .antMatchers("/staff/**").hasRole(UserRole.STAFF.name())
-//                .antMatchers("/img/**").permitAll()
-//                .antMatchers("/profilePics/**").permitAll()
-//                .antMatchers("/**").authenticated()
-//                .and().formLogin()
-//                .usernameParameter("email")
-//                .passwordParameter("password")
-//                .loginPage("/login")
-//                .permitAll()
-//                .successHandler(new AuthenticationSuccessHandlerImpl())
-//                .and().rememberMe()
-//                .rememberMeParameter("rememberMe")
-//                .userDetailsService(this.userDetailsService)
-//                .key(this.getSecretKey())
-//                .tokenValiditySeconds((int) TimeUnit.DAYS.toSeconds(30))
-//                .and().logout()
-//                .logoutUrl("/logout")
-//                .logoutSuccessUrl("/")
-//                .invalidateHttpSession(true)
-//                .permitAll()
-//                .logoutSuccessHandler(new LogoutSuccessHandlerImpl())
-//                .and().exceptionHandling()
-//                .accessDeniedPage("/403")
-//                .and().csrf()
-//                .disable();
+        http
+                .antMatcher("/api/**")
+                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                .and().csrf().disable()
+                .authorizeRequests()
+                .antMatchers("/").permitAll()
+                .antMatchers(HttpMethod.POST, "/login").permitAll()
+                .antMatchers(HttpMethod.POST, "/verify").permitAll()
+                .antMatchers(HttpMethod.POST, "/refresh").permitAll()
+                .anyRequest().authenticated().and()
+                .httpBasic().authenticationEntryPoint(new JWTAuthenticationEntryPoint()).and()
+                .addFilter(this.jwtAuthenticationFilter())
+                .addFilter(this.jwtAuthorizationFilter());
     }
 
     @Override
-    public void configure(WebSecurity web) throws Exception {
+    public void configure(WebSecurity web) {
         web.ignoring().antMatchers("/js/**", "/css/**", "/img/**", "/403", "/500", "/404");
-    }
-
-    private String getSecretKey() throws IOException {
-        InputStreamReader streamReader = new InputStreamReader(this.secret.getInputStream(), StandardCharsets.UTF_8);
-        BufferedReader reader = new BufferedReader(streamReader);
-
-        StringBuilder stringBuilder = new StringBuilder();
-        for (String line; (line = reader.readLine()) != null; ) {
-            stringBuilder.append(line);
-        }
-        return stringBuilder.toString();
     }
 }

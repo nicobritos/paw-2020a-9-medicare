@@ -12,7 +12,9 @@ import java.util.Optional;
 public interface UserService extends GenericSearchableService<User, Integer> {
     Optional<User> findByUsername(String username);
 
-    Optional<User> findByToken(String token);
+    Optional<User> findByVerificationTokenId(Integer id);
+
+    Optional<User> findByRefreshTokenId(Integer id);
 
     boolean isStaff(User user);
 
@@ -26,7 +28,9 @@ public interface UserService extends GenericSearchableService<User, Integer> {
 
     String generateVerificationToken(User user);
 
-    boolean confirm(User user, String token);
+    String generateRefreshToken(User user);
+
+    boolean verify(User user, String token);
 
     void setProfile(User user, Picture picture);
 }

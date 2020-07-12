@@ -1,10 +1,16 @@
 package ar.edu.itba.paw.webapp.controller.rest;
 
+import ar.edu.itba.paw.interfaces.services.UserService;
 import ar.edu.itba.paw.models.Paginator;
+import ar.edu.itba.paw.models.User;
+import ar.edu.itba.paw.webapp.auth.UserRole;
 import ar.edu.itba.paw.webapp.exceptions.MissingAcceptsException;
 import ar.edu.itba.paw.webapp.media_types.ApplicationMIME;
 import ar.edu.itba.paw.webapp.media_types.ErrorMIME;
 import ar.edu.itba.paw.webapp.models.APIError;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
 
 import javax.ws.rs.InternalServerErrorException;
 import javax.ws.rs.core.HttpHeaders;
@@ -15,14 +21,40 @@ import javax.ws.rs.core.UriInfo;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.util.Collection;
 import java.util.HashSet;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 public abstract class GenericResource {
+    protected static final String PAGINATOR_COUNT_HEADER = "Total-Items";
     protected static final String PAGINATOR_PAGE_QUERY = "page";
     protected static final String PAGINATOR_PER_PAGE_QUERY = "per_page";
     protected static final int PAGINATOR_PER_PAGE_DEFAULT = 10;
+
+    @Autowired
+    private UserService userService;
+
+    protected boolean isStaff() {
+        if (!SecurityContextHolder.getContext().getAuthentication().isAuthenticated())
+            return false;
+
+        Collection<? extends GrantedAuthority> authorities = SecurityContextHolder.getContext().getAuthentication().getAuthorities();
+        if (authorities.isEmpty())
+            return false;
+
+        GrantedAuthority authority = authorities.stream().findFirst().orElse(null);
+        return authority.getAuthority().equals(UserRole.STAFF.getAsRole());
+    }
+
+    protected Optional<User> getUser() {
+        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        if (principal instanceof org.springframework.security.core.userdetails.User) {
+            return this.userService.findByUsername(((org.springframework.security.core.userdetails.User) principal).getUsername());
+        }
+        return Optional.empty();
+    }
 
     protected Response error(int code, String message) {
         return Response
@@ -75,7 +107,7 @@ public abstract class GenericResource {
         ResponseBuilder responseBuilder = Response
                 .ok()
                 .entity(paginator.getModels())
-                .header("Total-Items", String.valueOf(paginator.getTotalCount()));
+                .header(PAGINATOR_COUNT_HEADER, String.valueOf(paginator.getTotalCount()));
 
         if (paginator.getTotalCount() > 0) {
             int nextPage = 0, previousPage = 0;
@@ -113,7 +145,7 @@ public abstract class GenericResource {
                         .append("\"previous\"");
             }
 
-            responseBuilder.header("Link", header.toString());
+            responseBuilder.header(HttpHeaders.LINK, header.toString());
         }
 
         return responseBuilder;

@@ -67,8 +67,8 @@ create table if not exists users
     surname            varchar(255) not null,
     phone              varchar(255),
     verified           boolean default false,
-    token              varchar(1023),
-    token_created_date timestamp,
+    verification_token              varchar(1023),
+    verification_token_created_date timestamp,
     profile_id         int
         constraint users_picture_picture_id_fk
             foreign key references picture

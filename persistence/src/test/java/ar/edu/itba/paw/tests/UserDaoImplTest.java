@@ -125,8 +125,8 @@ public class UserDaoImplTest {
         u.setSurname(SURNAME);
         u.setPhone(PHONE);
         u.setProfilePicture(pictureModel());
-        u.setToken(TOKEN);
-        u.setTokenCreatedDate(null);
+//        u.setVerificationToken(TOKEN);
+//        u.setVerificationTokenCreatedDate(null);
         u.setVerified(true);
         u.setId(STARTING_ID);
         return u;
@@ -694,35 +694,6 @@ public class UserDaoImplTest {
         assertFalse(existsEmail);
     }
 
-    /* --------------------- MÉTODO: userDao.existsToken(String) -------------------------------------------- */
-
-    @Test
-    public void testUserExistsToken() {
-        // 1. Precondiciones
-
-        insertUser();
-        insertAnotherUser();
-
-        // 2. Ejercitar
-        boolean existsToken = this.userDao.existsToken(TOKEN);
-
-        // 3. Postcondiciones
-        assertTrue(existsToken);
-    }
-
-    @Test
-    public void testUserDoesntExistsToken() {
-        // 1. Precondiciones
-
-        insertAnotherUser();
-
-        // 2. Ejercitar
-        boolean existsToken = this.userDao.existsToken(TOKEN);
-
-        // 3. Postcondiciones
-        assertFalse(existsToken);
-    }
-
     /* --------------------- MÉTODO: userDao.findByEmail(String) -------------------------------------------- */
 
     @Test
@@ -762,51 +733,6 @@ public class UserDaoImplTest {
 
         // 2. Ejercitar
         Optional<User> userOptional = this.userDao.findByEmail(null);
-
-        // 3. Postcondiciones
-        // metodo tira NullPointerException
-        assertFalse(userOptional.isPresent());
-    }
-
-    /* --------------------- MÉTODO: userDao.findByToken(String) -------------------------------------------- */
-
-    @Test
-    public void testUserFindByToken() {
-        // 1. Precondiciones
-
-        insertUser();
-        insertAnotherUser();
-
-        // 2. Ejercitar
-        Optional<User> userOptional = this.userDao.findByToken(TOKEN);
-
-        // 3. Postcondiciones
-        assertTrue(userOptional.isPresent());
-        assertEquals(TOKEN, userOptional.get().getToken());
-    }
-
-    @Test
-    public void testUserFindByTokenDoesntExists() {
-        // 1. Precondiciones
-
-        insertAnotherUser();
-
-        // 2. Ejercitar
-        Optional<User> userOptional = this.userDao.findByToken(TOKEN);
-
-        // 3. Postcondiciones
-        assertFalse(userOptional.isPresent());
-    }
-
-    @Test
-    public void testUserFindByTokenNull() {
-        // 1. Precondiciones
-
-        insertAnotherUser();
-        expectedException.expect(IllegalArgumentException.class);
-
-        // 2. Ejercitar
-        Optional<User> userOptional = this.userDao.findByToken(null);
 
         // 3. Postcondiciones
         // metodo tira NullPointerException

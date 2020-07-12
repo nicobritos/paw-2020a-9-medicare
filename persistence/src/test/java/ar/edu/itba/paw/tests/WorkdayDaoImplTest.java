@@ -168,8 +168,8 @@ public class WorkdayDaoImplTest
             u.setSurname(SURNAME);
             u.setPhone(PHONE);
             u.setProfilePicture(pictureModel());
-            u.setToken(TOKEN);
-            u.setTokenCreatedDate(null);
+//            u.setVerificationToken(TOKEN);
+//            u.setVerificationTokenCreatedDate(null);
             u.setVerified(true);
             u.setId(STARTING_ID);
         } catch (Exception e) {
@@ -223,8 +223,8 @@ public class WorkdayDaoImplTest
         map.put("email", EMAIL);
         map.put("phone", PHONE);
         map.put("profile_id", PROFILE_ID);
-        map.put("token", TOKEN);
-        map.put("token_created_date", null);
+        map.put("verification_token", TOKEN);
+        map.put("verification_token_created_date", null);
         userJdbcInsert.execute(map);
     }
 
@@ -1064,8 +1064,8 @@ public class WorkdayDaoImplTest
         userMap.put("email", EMAIL);
         userMap.put("phone", PHONE);
         userMap.put("profile_id", PROFILE_ID);
-        userMap.put("token", null);
-        userMap.put("token_created_date", null);
+        userMap.put("verification_token", null);
+        userMap.put("verification_token_created_date", null);
         userJdbcInsert.execute(userMap);
 
         Map<String, Object> staffMap = new HashMap<>();
@@ -1113,8 +1113,8 @@ public class WorkdayDaoImplTest
         userMap.put("email", EMAIL);
         userMap.put("phone", PHONE);
         userMap.put("profile_id", PROFILE_ID);
-        userMap.put("token", null);
-        userMap.put("token_created_date", null);
+        userMap.put("verification_token", null);
+        userMap.put("verification_token_created_date", null);
         userJdbcInsert.execute(userMap);
 
         Map<String, Object> staffMap = new HashMap<>();
@@ -1179,8 +1179,8 @@ public class WorkdayDaoImplTest
         userMap.put("email", EMAIL);
         userMap.put("phone", PHONE);
         userMap.put("profile_id", PROFILE_ID);
-        userMap.put("token", null);
-        userMap.put("token_created_date", null);
+        userMap.put("verification_token", null);
+        userMap.put("verification_token_created_date", null);
         userJdbcInsert.execute(userMap);
 
         Map<String, Object> staffMap = new HashMap<>();
@@ -1228,8 +1228,8 @@ public class WorkdayDaoImplTest
         userMap.put("email", EMAIL);
         userMap.put("phone", PHONE);
         userMap.put("profile_id", PROFILE_ID);
-        userMap.put("token", null);
-        userMap.put("token_created_date", null);
+        userMap.put("verification_token", null);
+        userMap.put("verification_token_created_date", null);
         userJdbcInsert.execute(userMap);
 
         Map<String, Object> staffMap = new HashMap<>();
@@ -1292,8 +1292,8 @@ public class WorkdayDaoImplTest
         userMap.put("email", EMAIL);
         userMap.put("phone", PHONE);
         userMap.put("profile_id", PROFILE_ID);
-        userMap.put("token", null);
-        userMap.put("token_created_date", null);
+        userMap.put("verification_token", null);
+        userMap.put("verification_token_created_date", null);
         userJdbcInsert.execute(userMap);
 
         Map<String, Object> staffMap = new HashMap<>();
@@ -1356,8 +1356,8 @@ public class WorkdayDaoImplTest
         userMap.put("email", EMAIL);
         userMap.put("phone", PHONE);
         userMap.put("profile_id", PROFILE_ID);
-        userMap.put("token", null);
-        userMap.put("token_created_date", null);
+        userMap.put("verification_token", null);
+        userMap.put("verification_token_created_date", null);
         userJdbcInsert.execute(userMap);
 
         Map<String, Object> staffMap = new HashMap<>();
@@ -1404,8 +1404,8 @@ public class WorkdayDaoImplTest
         userMap.put("email", EMAIL);
         userMap.put("phone", PHONE);
         userMap.put("profile_id", PROFILE_ID);
-        userMap.put("token", null);
-        userMap.put("token_created_date", null);
+        userMap.put("verification_token", null);
+        userMap.put("verification_token_created_date", null);
         userJdbcInsert.execute(userMap);
 
         Map<String, Object> staffMap = new HashMap<>();
@@ -1453,8 +1453,8 @@ public class WorkdayDaoImplTest
         userMap.put("email", EMAIL);
         userMap.put("phone", PHONE);
         userMap.put("profile_id", PROFILE_ID);
-        userMap.put("token", null);
-        userMap.put("token_created_date", null);
+        userMap.put("verification_token", null);
+        userMap.put("verification_token_created_date", null);
         userJdbcInsert.execute(userMap);
 
         Map<String, Object> staffMap = new HashMap<>();

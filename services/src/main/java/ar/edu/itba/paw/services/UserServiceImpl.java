@@ -8,7 +8,6 @@ import ar.edu.itba.paw.interfaces.services.exceptions.InvalidEmailDomain;
 import ar.edu.itba.paw.models.*;
 import ar.edu.itba.paw.services.generics.GenericSearchableServiceImpl;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,7 +18,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
-import java.util.*;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Optional;
+import java.util.Set;
 
 @Service
 public class UserServiceImpl extends GenericSearchableServiceImpl<UserDao, User, Integer> implements UserService {
@@ -35,6 +37,10 @@ public class UserServiceImpl extends GenericSearchableServiceImpl<UserDao, User,
     private PatientService patientService;
     @Autowired
     private PictureService pictureService;
+    @Autowired
+    private RefreshTokenService refreshTokenService;
+    @Autowired
+    private VerificationTokenService verificationTokenService;
     @Autowired
     private PasswordEncoder passwordEncoder;
 
@@ -113,6 +119,9 @@ public class UserServiceImpl extends GenericSearchableServiceImpl<UserDao, User,
     @Override
     public void updatePassword(User user, String newPassword) {
         user.setPassword(this.passwordEncoder.encode(newPassword));
+        if (user.getRefreshToken() != null)
+            this.refreshTokenService.remove(user.getRefreshToken().getId());
+
         super.update(user);
     }
 
@@ -131,12 +140,24 @@ public class UserServiceImpl extends GenericSearchableServiceImpl<UserDao, User,
                 if (!this.isValidEmailDomain(user.getEmail()))
                     throw new InvalidEmailDomain();
                 user.setVerified(false);
-                user.setToken(null);
-            } else {
-                Optional<User> userToken = this.repository.findByToken(user.getToken());
-                if (userToken.isPresent() && !userToken.get().equals(user)) {
-                    throw new MediCareException("Confirmation token already exists");
+                if (user.getVerificationToken() != null) {
+                    this.verificationTokenService.remove(user.getVerificationToken().getId());
+                    user.setVerificationToken(null);
                 }
+            }
+        }
+
+        if (user.getVerificationToken() != null) {
+            Optional<User> userToken = this.repository.findByVerificationTokenId(user.getVerificationToken().getId());
+            if (userToken.isPresent() && !userToken.get().equals(user)) {
+                throw new MediCareException("Verification token already exists");
+            }
+        }
+
+        if (user.getRefreshToken() != null) {
+            Optional<User> userToken = this.repository.findByRefreshTokenId(user.getRefreshToken().getId());
+            if (userToken.isPresent() && !userToken.get().equals(user)) {
+                throw new MediCareException("Verification token already exists");
             }
         }
 
@@ -149,51 +170,58 @@ public class UserServiceImpl extends GenericSearchableServiceImpl<UserDao, User,
     }
 
     @Override
-    public Optional<User> findByToken(String token) {
-        return this.repository.findByToken(token);
+    public Optional<User> findByVerificationTokenId(Integer id) {
+        return this.repository.findByVerificationTokenId(id);
+    }
+
+    @Override
+    public Optional<User> findByRefreshTokenId(Integer id) {
+        return this.repository.findByRefreshTokenId(id);
     }
 
     @Override
     @Transactional
     public String generateVerificationToken(User user) {
         user = this.findById(user.getId()).get();
+
         if (user.getVerified())
             return null;
-        if (user.getToken() != null) {
-            user.setTokenCreatedDate(DateTime.now());
+
+        if (user.getVerificationToken() != null) {
+            return this.verificationTokenService.refresh(user.getVerificationToken());
+        } else {
+            VerificationToken verificationToken = this.verificationTokenService.generate();
+            user.setVerificationToken(verificationToken);
             this.update(user);
-            return user.getToken();
+            return verificationToken.getToken();
         }
+    }
 
-        boolean set = false;
-        int tries = 10;
-        user.setVerified(false);
-        do {
-            try {
-                user.setToken(UUID.randomUUID().toString());
-                user.setTokenCreatedDate(DateTime.now());
-                this.update(user);
-                set = true;
-            } catch (MediCareException ignored) {
-                tries--;
-            }
-        } while (!set && tries > 0);
-        if (!set)
-            throw new MediCareException("");
+    @Override
+    public String generateRefreshToken(User user) {
+        user = this.findById(user.getId()).get();
 
-        return user.getToken();
+        if (user.getRefreshToken() != null) {
+            return this.refreshTokenService.refresh(user.getRefreshToken());
+        } else {
+            RefreshToken refreshToken = this.refreshTokenService.generate();
+            user.setRefreshToken(refreshToken);
+            this.update(user);
+            return refreshToken.getToken();
+        }
     }
 
     @Override
     @Transactional
-    public boolean confirm(User user, String token) {
+    public boolean verify(User user, String token) {
         if (user.getVerified()) {
             return false;
         }
-        if (user.getToken() != null && user.getToken().equals(token)) {
+
+        if (user.getVerificationToken() != null && user.getVerificationToken().getToken().equals(token)) {
             user.setVerified(true);
-            user.setToken(null);
-            user.setTokenCreatedDate(null);
+            this.verificationTokenService.remove(user.getVerificationToken().getId());
+            user.setVerificationToken(null);
             this.update(user);
             return true;
         } else {
