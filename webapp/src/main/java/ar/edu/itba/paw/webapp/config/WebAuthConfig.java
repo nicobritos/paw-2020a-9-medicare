@@ -66,14 +66,14 @@ public class WebAuthConfig extends WebSecurityConfigurerAdapter {
                 .authorizeRequests()
                 .antMatchers("/").permitAll()
                 .antMatchers(HttpMethod.POST, "/login").permitAll()
-                .antMatchers(HttpMethod.POST, "/verify/**").permitAll() // Verifies a user
+                .antMatchers(HttpMethod.GET, "/verify/**").permitAll() // Verifies a user
                 .antMatchers(HttpMethod.POST, "/refresh/**").permitAll() // Refreshes the access token
                 .antMatchers(HttpMethod.POST, "/users").anonymous() // Creates a user
                 .anyRequest().permitAll().and()
 //                .anyRequest().authenticated().and()
-                .httpBasic().authenticationEntryPoint(new JWTAuthenticationEntryPoint()).and()
-                .addFilter(this.jwtAuthenticationFilter())
-                .addFilter(this.jwtAuthorizationFilter());
+                .httpBasic().authenticationEntryPoint(new JWTAuthenticationEntryPoint()).and() // Handles exceptions
+                .addFilter(this.jwtAuthenticationFilter()) // Authenticates a user and sends JWT and Refresh token
+                .addFilter(this.jwtAuthorizationFilter()); // Verifies JWT if provided
     }
 
     @Override
