@@ -44,7 +44,7 @@ public class StaffResource extends GenericResource {
             @QueryParam("localities") String localities,
             @QueryParam(PAGINATOR_PAGE_QUERY) Integer page,
             @QueryParam(PAGINATOR_PER_PAGE_QUERY) Integer perPage) {
-        MIMEHelper.assertAcceptedTypes(httpheaders, StaffMIME.GET_LIST);
+        MIMEHelper.assertServerType(httpheaders, StaffMIME.GET_LIST);
 
         // TODO: <= o < ??
         if (page != null) {
@@ -80,7 +80,7 @@ public class StaffResource extends GenericResource {
     public Response getEntity(
             @Context HttpHeaders httpheaders,
             @PathParam("id") Integer id) {
-        MIMEHelper.assertAcceptedTypes(httpheaders, StaffMIME.GET);
+        MIMEHelper.assertServerType(httpheaders, StaffMIME.GET);
 
         if (id == null)
             return this.error(Status.BAD_REQUEST.getStatusCode(), Status.BAD_REQUEST.toString());
@@ -100,7 +100,7 @@ public class StaffResource extends GenericResource {
             Staff staff,
             @Context HttpHeaders httpheaders,
             @PathParam("id") Integer id) {
-        MIMEHelper.assertAcceptedTypes(httpheaders, StaffMIME.GET);
+        MIMEHelper.assertServerType(httpheaders, StaffMIME.GET);
 
         if (id == null || staff == null || staff.getStaffSpecialties().isEmpty())
             return this.error(Status.BAD_REQUEST.getStatusCode(), Status.BAD_REQUEST.toString());

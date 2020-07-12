@@ -49,7 +49,7 @@ public class UserResource extends GenericAuthenticationResource {
             @Context HttpServletRequest request,
             @Context HttpServletResponse response,
             @Context HttpHeaders httpheaders) {
-        MIMEHelper.assertAcceptedTypes(httpheaders, UserMIME.GET);
+        MIMEHelper.assertServerType(httpheaders, UserMIME.GET);
         if (this.getUser().isPresent())
             return this.error(Status.FORBIDDEN.getStatusCode(), Status.FORBIDDEN.toString());
         if (this.userService.findByUsername(staffSignUp.getUser().getEmail()).isPresent())
@@ -110,7 +110,7 @@ public class UserResource extends GenericAuthenticationResource {
             @Context HttpServletRequest request,
             @Context HttpServletResponse response,
             @Context HttpHeaders httpheaders) {
-        MIMEHelper.assertAcceptedTypes(httpheaders, UserMIME.GET);
+        MIMEHelper.assertServerType(httpheaders, UserMIME.GET);
         if (this.getUser().isPresent())
             return this.error(Status.FORBIDDEN.getStatusCode(), Status.FORBIDDEN.toString());
         if (this.userService.findByUsername(patientSignUp.getUser().getEmail()).isPresent())
@@ -125,7 +125,7 @@ public class UserResource extends GenericAuthenticationResource {
     public Response getEntity(
             @Context HttpHeaders httpheaders,
             @PathParam("id") Integer id) {
-        MIMEHelper.assertAcceptedTypes(httpheaders, UserMIME.GET);
+        MIMEHelper.assertServerType(httpheaders, UserMIME.GET);
 
         if (id == null)
             return this.error(Status.BAD_REQUEST.getStatusCode(), Status.BAD_REQUEST.toString());
@@ -145,7 +145,7 @@ public class UserResource extends GenericAuthenticationResource {
             User user,
             @Context HttpHeaders httpheaders,
             @PathParam("id") Integer id) {
-        MIMEHelper.assertAcceptedTypes(httpheaders, UserMIME.GET);
+        MIMEHelper.assertServerType(httpheaders, UserMIME.GET);
 
         if (id == null || user == null || user.getFirstName() == null || user.getSurname() == null || user.getEmail() == null)
             return this.error(Status.BAD_REQUEST.getStatusCode(), Status.BAD_REQUEST.toString());

@@ -29,7 +29,7 @@ public class ProvinceResource extends GenericResource {
     @Produces({ProvinceMIME.GET_LIST, ErrorMIME.ERROR})
     public Response getCollection(
             @Context HttpHeaders httpheaders) {
-        MIMEHelper.assertAcceptedTypes(httpheaders, ProvinceMIME.GET_LIST);
+        MIMEHelper.assertServerType(httpheaders, ProvinceMIME.GET_LIST);
 
         return Response
                 .ok()
@@ -43,7 +43,7 @@ public class ProvinceResource extends GenericResource {
     public Response getEntity(
             @Context HttpHeaders httpheaders,
             @PathParam("id") Integer id) {
-        MIMEHelper.assertAcceptedTypes(httpheaders, ProvinceMIME.GET_LIST);
+        MIMEHelper.assertServerType(httpheaders, ProvinceMIME.GET_LIST);
 
         if (id == null)
             return this.error(Status.BAD_REQUEST.getStatusCode(), Status.BAD_REQUEST.toString());

@@ -25,7 +25,7 @@ public class StaffSpecialtyResource extends GenericResource {
     @Produces({StaffSpecialtyMIME.GET_LIST, ErrorMIME.ERROR})
     public Response getCollection(
             @Context HttpHeaders httpheaders) {
-        MIMEHelper.assertAcceptedTypes(httpheaders, StaffSpecialtyMIME.GET_LIST);
+        MIMEHelper.assertServerType(httpheaders, StaffSpecialtyMIME.GET_LIST);
 
         return Response
                 .ok()

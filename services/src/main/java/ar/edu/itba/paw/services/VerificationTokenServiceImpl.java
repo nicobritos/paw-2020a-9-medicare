@@ -5,16 +5,18 @@ import ar.edu.itba.paw.interfaces.daos.VerificationTokenDao;
 import ar.edu.itba.paw.interfaces.services.VerificationTokenService;
 import ar.edu.itba.paw.models.VerificationToken;
 import ar.edu.itba.paw.services.generics.GenericServiceImpl;
+import org.apache.commons.lang3.RandomStringUtils;
 import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
-import java.util.UUID;
 import java.util.function.Consumer;
 
 @Service
 public class VerificationTokenServiceImpl extends GenericServiceImpl<VerificationTokenDao, VerificationToken, Integer> implements VerificationTokenService {
+    private static final int RANDOM_LENGTH = 256;
+
     @Autowired
     private VerificationTokenDao repository;
 
@@ -63,7 +65,7 @@ public class VerificationTokenServiceImpl extends GenericServiceImpl<Verificatio
 
         do {
             try {
-                verificationToken.setToken(UUID.randomUUID().toString());
+                verificationToken.setToken(RandomStringUtils.random(RANDOM_LENGTH, true, false));
                 verificationToken.setCreatedDate(DateTime.now());
                 saver.accept(verificationToken);
                 set = true;

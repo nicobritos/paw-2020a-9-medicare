@@ -15,7 +15,6 @@ import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Component;
 
 import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.core.HttpHeaders;
 import java.io.IOException;
 import java.util.*;
@@ -35,7 +34,7 @@ public class JWTAuthenticator {
         this.secret = this.getSecretKey();
     }
 
-    public Authentication attemptAuthentication(UserCredentials credentials, HttpServletResponse response) throws AuthenticationException {
+    public Authentication attemptAuthentication(UserCredentials credentials) throws AuthenticationException {
         try {
             return this.authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(
@@ -48,14 +47,13 @@ public class JWTAuthenticator {
         }
     }
 
-    public Authentication attemptAuthentication(UserCredentials credentials, HttpServletResponse response, Collection<? extends GrantedAuthority> authorities) throws AuthenticationException {
+    public Authentication createAuthentication(UserCredentials credentials, Collection<? extends GrantedAuthority> authorities) throws AuthenticationException {
         try {
-            return this.authenticationManager.authenticate(
-                    new UsernamePasswordAuthenticationToken(
+            return new UsernamePasswordAuthenticationToken(
                             credentials.getUsername(),
                             credentials.getPassword(),
                             authorities
-                    ));
+           );
         } catch (AuthenticationException e) {
             return null;
         }
@@ -71,7 +69,17 @@ public class JWTAuthenticator {
     public Map<String, String> createAndRefreshJWT(Authentication authentication, ar.edu.itba.paw.models.User user) throws IOException, ServletException {
         Map<String, Object> claims = new HashMap<>();
 
-        claims.put(Constants.JWT_CLAIMS_USERNAME, ((User) authentication.getPrincipal()).getUsername());
+        Object principal = authentication.getPrincipal();
+        String username;
+        if (principal instanceof User) {
+            username = ((User) principal).getUsername();
+        } else if (principal instanceof String) {
+            username = (String) principal;
+        } else {
+            throw new IllegalArgumentException();
+        }
+
+        claims.put(Constants.JWT_CLAIMS_USERNAME, username);
         Optional<? extends GrantedAuthority> authority = authentication.getAuthorities().stream().findFirst();
         authority.ifPresent(grantedAuthority -> claims.put(Constants.JWT_CLAIMS_ROLE, grantedAuthority.getAuthority()));
 
@@ -79,7 +87,7 @@ public class JWTAuthenticator {
                 .setIssuedAt(new Date())
                 .setIssuer(Constants.ISSUER_INFO)
                 .setClaims(claims)
-                .setExpiration(new Date(System.currentTimeMillis() + Constants.JWT_EXPIRATION_TIME))
+                .setExpiration(new Date(System.currentTimeMillis() + Constants.JWT_EXPIRATION_MILLIS))
                 .signWith(SignatureAlgorithm.HS512, this.secret)
                 .compact();
 

@@ -4,6 +4,7 @@ import ar.edu.itba.paw.interfaces.services.RefreshTokenService;
 import ar.edu.itba.paw.interfaces.services.UserService;
 import ar.edu.itba.paw.models.RefreshToken;
 import ar.edu.itba.paw.models.User;
+import ar.edu.itba.paw.webapp.auth.Constants;
 import ar.edu.itba.paw.webapp.controller.rest.utils.GenericAuthenticationResource;
 import ar.edu.itba.paw.webapp.media_types.ErrorMIME;
 import ar.edu.itba.paw.webapp.models.UserCredentials;
@@ -53,13 +54,17 @@ public class RefreshTokenResource extends GenericAuthenticationResource {
         Optional<User> userOptional = this.userService.findByRefreshTokenId(refreshTokenOptional.get().getId());
         if (!userOptional.isPresent())
             return this.error(Status.NOT_FOUND.getStatusCode(), Status.NOT_FOUND.toString());
+        if (userOptional.get().getRefreshToken().getCreatedDate().plusMillis((int) Constants.JWT_REFRESH_EXPIRATION_MILLIS).isBeforeNow())
+            return this.error(Status.UNAUTHORIZED.getStatusCode(), Status.UNAUTHORIZED.toString());
 
         UserCredentials userCredentials = new UserCredentials();
         userCredentials.setUsername(userOptional.get().getEmail());
         userCredentials.setPassword(token);
 
-        ResponseBuilder responseBuilder = Response.ok();
-        this.createJWTHeaders(responseBuilder, userCredentials, userOptional.get(), response, LOGGER);
+        ResponseBuilder responseBuilder = Response.status(Status.OK);
+        if (!this.createJWTHeaders(responseBuilder, userCredentials, userOptional.get(), response, LOGGER)) {
+            responseBuilder.status(Status.INTERNAL_SERVER_ERROR);
+        }
 
         return responseBuilder.build();
     }

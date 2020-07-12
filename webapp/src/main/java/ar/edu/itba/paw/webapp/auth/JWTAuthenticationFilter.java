@@ -57,7 +57,8 @@ public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilte
             return null;
         }
         try {
-            MIMEHelper.assertAcceptedTypes(request, LoginMIME.POST);
+            MIMEHelper.assertServerType(request);
+            MIMEHelper.assertClientType(request, LoginMIME.POST);
         } catch (MissingAcceptsException e) {
             ExceptionResponseWriter.setError(response, Status.NOT_ACCEPTABLE);
             return null;
@@ -74,7 +75,7 @@ public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilte
             return null;
         }
 
-        return this.authenticator.attemptAuthentication(credentials, response);
+        return this.authenticator.attemptAuthentication(credentials);
     }
 
     @Override

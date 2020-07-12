@@ -29,7 +29,7 @@ public class CountryResource extends GenericResource {
     @Produces({CountryMIME.GET_LIST, ErrorMIME.ERROR})
     public Response getCollection(
             @Context HttpHeaders httpheaders) {
-        MIMEHelper.assertAcceptedTypes(httpheaders, CountryMIME.GET_LIST);
+        MIMEHelper.assertServerType(httpheaders, CountryMIME.GET_LIST);
 
         return Response
                 .ok()
@@ -43,7 +43,7 @@ public class CountryResource extends GenericResource {
     public Response getEntity(
             @Context HttpHeaders httpheaders,
             @PathParam("id") String id) {
-        MIMEHelper.assertAcceptedTypes(httpheaders, CountryMIME.GET_LIST);
+        MIMEHelper.assertServerType(httpheaders, CountryMIME.GET_LIST);
 
         if (id == null || id.isEmpty())
             return this.error(Status.BAD_REQUEST.getStatusCode(), Status.BAD_REQUEST.toString());

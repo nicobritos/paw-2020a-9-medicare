@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.BeanIds;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
@@ -18,8 +19,6 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-
-import javax.ws.rs.HttpMethod;
 
 @EnableWebSecurity
 @Configuration
@@ -67,10 +66,11 @@ public class WebAuthConfig extends WebSecurityConfigurerAdapter {
                 .authorizeRequests()
                 .antMatchers("/").permitAll()
                 .antMatchers(HttpMethod.POST, "/login").permitAll()
-                .antMatchers(HttpMethod.POST, "/verify").permitAll() // Verifies a user
-                .antMatchers(HttpMethod.POST, "/refresh").permitAll() // Refreshes the access token
+                .antMatchers(HttpMethod.POST, "/verify/**").permitAll() // Verifies a user
+                .antMatchers(HttpMethod.POST, "/refresh/**").permitAll() // Refreshes the access token
                 .antMatchers(HttpMethod.POST, "/users").anonymous() // Creates a user
-                .anyRequest().authenticated().and()
+                .anyRequest().permitAll().and()
+//                .anyRequest().authenticated().and()
                 .httpBasic().authenticationEntryPoint(new JWTAuthenticationEntryPoint()).and()
                 .addFilter(this.jwtAuthenticationFilter())
                 .addFilter(this.jwtAuthorizationFilter());

@@ -5,16 +5,18 @@ import ar.edu.itba.paw.interfaces.daos.RefreshTokenDao;
 import ar.edu.itba.paw.interfaces.services.RefreshTokenService;
 import ar.edu.itba.paw.models.RefreshToken;
 import ar.edu.itba.paw.services.generics.GenericServiceImpl;
+import org.apache.commons.lang3.RandomStringUtils;
 import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
-import java.util.UUID;
 import java.util.function.Consumer;
 
 @Service
 public class RefreshTokenServiceImpl extends GenericServiceImpl<RefreshTokenDao, RefreshToken, Integer> implements RefreshTokenService {
+    private static final int RANDOM_LENGTH = 256;
+
     @Autowired
     private RefreshTokenDao repository;
 
@@ -63,7 +65,7 @@ public class RefreshTokenServiceImpl extends GenericServiceImpl<RefreshTokenDao,
 
         do {
             try {
-                refreshToken.setToken(UUID.randomUUID().toString());
+                refreshToken.setToken(RandomStringUtils.random(RANDOM_LENGTH, true, false));
                 refreshToken.setCreatedDate(DateTime.now());
                 saver.accept(refreshToken);
                 set = true;

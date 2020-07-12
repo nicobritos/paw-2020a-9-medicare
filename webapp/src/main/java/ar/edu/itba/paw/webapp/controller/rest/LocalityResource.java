@@ -29,7 +29,7 @@ public class LocalityResource extends GenericResource {
     @Produces({LocalityMIME.GET_LIST, ErrorMIME.ERROR})
     public Response getCollection(
             @Context HttpHeaders httpheaders) {
-        MIMEHelper.assertAcceptedTypes(httpheaders, LocalityMIME.GET_LIST);
+        MIMEHelper.assertServerType(httpheaders, LocalityMIME.GET_LIST);
 
         return Response
                 .ok()
@@ -43,7 +43,7 @@ public class LocalityResource extends GenericResource {
     public Response getEntity(
             @Context HttpHeaders httpheaders,
             @PathParam("id") Integer id) {
-        MIMEHelper.assertAcceptedTypes(httpheaders, LocalityMIME.GET);
+        MIMEHelper.assertServerType(httpheaders, LocalityMIME.GET);
 
         if (id == null)
             return this.error(Status.BAD_REQUEST.getStatusCode(), Status.BAD_REQUEST.toString());

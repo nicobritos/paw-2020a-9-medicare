@@ -12,31 +12,35 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 public abstract class MIMEHelper {
-    public static void assertAcceptedTypes(HttpServletRequest request, String... types) throws MissingAcceptsException {
-        Enumeration headerNames = request.getHeaderNames();
-
-        if (request.getHeaderNames() == null)
-            throw new MissingAcceptsException();
-
-        Set<String> mediaTypes = new HashSet<>();
-        while (!headerNames.hasMoreElements()) {
-            Object o = headerNames.nextElement();
-            if (o instanceof String)
-                mediaTypes.add(request.getHeader((String) o));
-        }
-        assertAcceptedTypes(mediaTypes, types);
+    public static void assertServerType(HttpServletRequest request, String... types) throws MissingAcceptsException {
+        assertServerType(getHeadersValues(request, HttpHeaders.ACCEPT), types);
     }
 
-    public static void assertAcceptedTypes(HttpHeaders httpHeaders, String... types) throws MissingAcceptsException {
+    public static void assertClientType(HttpServletRequest request, String... types) throws MissingAcceptsException {
+        assertClientType(getHeadersValues(request, HttpHeaders.CONTENT_TYPE), types);
+    }
+
+    public static void assertServerType(HttpHeaders httpHeaders, String... types) throws MissingAcceptsException {
         Set<String> mediaTypes = httpHeaders.getAcceptableMediaTypes()
                 .stream()
                 .map(MediaType::toString)
                 .collect(Collectors.toSet());
 
-        assertAcceptedTypes(mediaTypes, types);
+        assertServerType(mediaTypes, types);
     }
 
-    private static void assertAcceptedTypes(Collection<String> mediaTypes, String... types) throws MissingAcceptsException {
+    private static void assertClientType(Collection<String> mediaTypes, String... types) throws MissingAcceptsException {
+        if (mediaTypes.contains(MediaType.WILDCARD) || mediaTypes.contains(ApplicationMIME.WILDCARD))
+            return;
+
+        for (String type : types) {
+            if (!mediaTypes.contains(type))
+                throw new MissingAcceptsException();
+            mediaTypes.remove(type);
+        }
+    }
+
+    private static void assertServerType(Collection<String> mediaTypes, String... types) throws MissingAcceptsException {
         if (mediaTypes.contains(MediaType.WILDCARD) || mediaTypes.contains(ApplicationMIME.WILDCARD))
             return;
 
@@ -49,5 +53,21 @@ public abstract class MIMEHelper {
                 throw new MissingAcceptsException();
             mediaTypes.remove(type);
         }
+    }
+
+    private static Set<String> getHeadersValues(HttpServletRequest request, String header) {
+        Enumeration headerNames = request.getHeaderNames();
+
+        if (request.getHeaderNames() == null)
+            throw new MissingAcceptsException();
+
+        Set<String> values = new HashSet<>();
+        while (headerNames.hasMoreElements()) {
+            Object o = headerNames.nextElement();
+            if (o instanceof String && ((String) o).equalsIgnoreCase(header))
+                values.add(request.getHeader((String) o));
+        }
+
+        return values;
     }
 }

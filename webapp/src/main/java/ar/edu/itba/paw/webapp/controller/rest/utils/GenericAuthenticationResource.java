@@ -28,7 +28,7 @@ public abstract class GenericAuthenticationResource extends GenericResource {
     @Autowired
     private UserService userService;
 
-    protected void createJWTHeaders(ResponseBuilder responseBuilder, UserCredentials credentials, User user, HttpServletResponse response, Logger logger) {
+    protected boolean createJWTHeaders(ResponseBuilder responseBuilder, UserCredentials credentials, User user, HttpServletResponse response, Logger logger) {
         Collection<? extends GrantedAuthority> authorities;
         if (!user.getVerified()) {
             authorities = Collections.singletonList(new SimpleGrantedAuthority(UserRole.UNVERIFIED.getAsRole()));
@@ -42,16 +42,18 @@ public abstract class GenericAuthenticationResource extends GenericResource {
 
         Map<String, String> headers;
         try {
-            Authentication authentication = this.authenticator.attemptAuthentication(credentials, response, authorities);
+            Authentication authentication = this.authenticator.createAuthentication(credentials, authorities);
             headers = this.authenticator.createAndRefreshJWT(authentication, user);
         } catch (Exception e) {
             logger.error("Error creating JWT token for user id: {} with mail: {}", user.getId(), user.getEmail());
-            return;
+            return false;
         }
 
         for (Map.Entry<String, String> header : headers.entrySet()) {
             responseBuilder.header(header.getKey(), header.getValue());
         }
+
+        return true;
     }
 
     protected void sendConfirmationEmail(HttpServletRequest request, User newUser) {

@@ -33,7 +33,7 @@ public class WorkdayResource extends GenericResource {
     @Produces({WorkdayMIME.GET_LIST, ErrorMIME.ERROR})
     public Response getCollection(
             @Context HttpHeaders httpheaders) {
-        MIMEHelper.assertAcceptedTypes(httpheaders, WorkdayMIME.GET_LIST);
+        MIMEHelper.assertServerType(httpheaders, WorkdayMIME.GET_LIST);
 
         if (!this.isStaff())
             return this.error(Status.FORBIDDEN.getStatusCode(), Status.FORBIDDEN.toString());
@@ -54,7 +54,7 @@ public class WorkdayResource extends GenericResource {
     public Response createEntities(
             Collection<Workday> workdays,
             @Context HttpHeaders httpheaders) {
-        MIMEHelper.assertAcceptedTypes(httpheaders, WorkdayMIME.GET_LIST);
+        MIMEHelper.assertServerType(httpheaders, WorkdayMIME.GET_LIST);
 
         if (workdays == null || workdays.isEmpty())
             return this.error(Status.BAD_REQUEST.getStatusCode(), Status.BAD_REQUEST.toString());
@@ -110,7 +110,7 @@ public class WorkdayResource extends GenericResource {
     public Response createEntity(
             Workday workday,
             @Context HttpHeaders httpheaders) {
-        MIMEHelper.assertAcceptedTypes(httpheaders, WorkdayMIME.GET);
+        MIMEHelper.assertServerType(httpheaders, WorkdayMIME.GET);
 
         if (workday == null || workday.getDay() == null)
             return this.error(Status.BAD_REQUEST.getStatusCode(), Status.BAD_REQUEST.toString());
@@ -139,7 +139,7 @@ public class WorkdayResource extends GenericResource {
     public Response getEntity(
             @Context HttpHeaders httpheaders,
             @PathParam("id") Integer id) {
-        MIMEHelper.assertAcceptedTypes(httpheaders, WorkdayMIME.GET);
+        MIMEHelper.assertServerType(httpheaders, WorkdayMIME.GET);
 
         if (id == null)
             return this.error(Status.BAD_REQUEST.getStatusCode(), Status.BAD_REQUEST.toString());

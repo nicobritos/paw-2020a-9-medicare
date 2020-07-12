@@ -43,7 +43,7 @@ public class AppointmentTimeSlotResource extends GenericResource {
             @QueryParam("to_year") Integer toYear,
             @QueryParam("to_month") Integer toMonth,
             @QueryParam("to_day") Integer toDay) {
-        MIMEHelper.assertAcceptedTypes(httpheaders, AppointmentTimeSlotMIME.GET_LIST);
+        MIMEHelper.assertServerType(httpheaders, AppointmentTimeSlotMIME.GET_LIST);
 
         if (staffId == null || fromYear == null || fromMonth == null || fromDay == null || toYear == null || toMonth == null || toDay == null)
             return this.error(Status.BAD_REQUEST.getStatusCode(), Status.BAD_REQUEST.toString());

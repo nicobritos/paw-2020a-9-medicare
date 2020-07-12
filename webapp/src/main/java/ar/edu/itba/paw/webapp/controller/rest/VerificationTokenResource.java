@@ -24,9 +24,9 @@ import java.util.Optional;
 @Component
 public class VerificationTokenResource extends GenericResource {
     @Autowired
-    private UserService userService;
-    @Autowired
     private VerificationTokenService verificationTokenService;
+    @Autowired
+    private UserService userService;
 
     @POST
     @Path("{token}")

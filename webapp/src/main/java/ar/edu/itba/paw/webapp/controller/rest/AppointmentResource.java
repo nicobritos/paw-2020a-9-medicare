@@ -48,7 +48,7 @@ public class AppointmentResource extends GenericResource {
             @QueryParam("to_year") Integer toYear,
             @QueryParam("to_month") Integer toMonth,
             @QueryParam("to_day") Integer toDay) {
-        MIMEHelper.assertAcceptedTypes(httpheaders, AppointmentMIME.GET_LIST);
+        MIMEHelper.assertServerType(httpheaders, AppointmentMIME.GET_LIST);
 
         User user = this.getUser().get();
         Collection<Staff> staffs;
@@ -88,7 +88,7 @@ public class AppointmentResource extends GenericResource {
     public Response createEntity(
             Appointment appointment,
             @Context HttpHeaders httpheaders) {
-        MIMEHelper.assertAcceptedTypes(httpheaders, AppointmentMIME.GET);
+        MIMEHelper.assertServerType(httpheaders, AppointmentMIME.GET);
 
         if (appointment == null || appointment.getFromDate() == null || appointment.getFromDate().isBefore(LocalDateTime.now()))
             return this.error(Status.BAD_REQUEST.getStatusCode(), Status.BAD_REQUEST.toString());
@@ -123,7 +123,7 @@ public class AppointmentResource extends GenericResource {
     public Response getEntity(
             @Context HttpHeaders httpheaders,
             @PathParam("id") Integer id) {
-        MIMEHelper.assertAcceptedTypes(httpheaders, AppointmentMIME.GET);
+        MIMEHelper.assertServerType(httpheaders, AppointmentMIME.GET);
 
         if (id == null)
             return this.error(Status.BAD_REQUEST.getStatusCode(), Status.BAD_REQUEST.toString());

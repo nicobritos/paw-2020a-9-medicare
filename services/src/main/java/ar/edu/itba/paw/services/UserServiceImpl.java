@@ -80,23 +80,17 @@ public class UserServiceImpl extends GenericSearchableServiceImpl<UserDao, User,
 
     @Override
     @Transactional
-    public User createAsStaff(User user, Office office) throws EmailAlreadyExistsException {
+    public User createAsStaff(User user, Staff staff) throws EmailAlreadyExistsException {
         User newUser = this.create(user);
-        if(office.getId()==null){
-            office = this.officeService.create(office);
-        }else{
-            Optional<Office> officeOptional = this.officeService.findById(office.getId());
-            if (!officeOptional.isPresent()) {
-                office = this.officeService.create(office);
-            }
-            else {
-                office = officeOptional.get();
-            }
+        Office office;
+
+        if (staff.getOffice().getId() == null) {
+            office = this.officeService.create(staff.getOffice());
+        } else {
+            Optional<Office> officeOptional = this.officeService.findById(staff.getOffice().getId());
+            office = officeOptional.orElseGet(() -> this.officeService.create(staff.getOffice()));
         }
 
-        Staff staff = new Staff();
-        staff.setEmail(newUser.getEmail());
-        staff.setUser(newUser);
         staff.setOffice(office);
         this.staffService.create(staff);
 
