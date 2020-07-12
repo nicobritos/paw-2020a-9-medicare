@@ -161,6 +161,9 @@ class Appointment {
     motive;
     patientId;
     staffId;
+
+    // TODO:check
+    to;
     constructor(id,status,from,message,motive,patientId,staffId){
         this.id = id;
         this.status = status;
@@ -169,6 +172,9 @@ class Appointment {
         this.motive = motive;
         this.patientId = patientId;
         this.staffId = staffId;
+        // TODO:check
+        this.to = new Date(from.valueof());
+        this.to.setMinute(this.to.getMinute()+15);
     }
 }
 
