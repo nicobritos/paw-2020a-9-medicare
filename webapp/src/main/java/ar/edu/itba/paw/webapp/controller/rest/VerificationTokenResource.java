@@ -4,6 +4,7 @@ import ar.edu.itba.paw.interfaces.services.UserService;
 import ar.edu.itba.paw.interfaces.services.VerificationTokenService;
 import ar.edu.itba.paw.models.User;
 import ar.edu.itba.paw.models.VerificationToken;
+import ar.edu.itba.paw.webapp.controller.rest.utils.GenericResource;
 import ar.edu.itba.paw.webapp.media_types.ErrorMIME;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;

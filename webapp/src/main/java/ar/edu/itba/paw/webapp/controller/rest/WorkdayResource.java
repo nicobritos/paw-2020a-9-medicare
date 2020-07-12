@@ -4,7 +4,9 @@ import ar.edu.itba.paw.interfaces.services.StaffService;
 import ar.edu.itba.paw.interfaces.services.WorkdayService;
 import ar.edu.itba.paw.models.Staff;
 import ar.edu.itba.paw.models.Workday;
+import ar.edu.itba.paw.webapp.controller.rest.utils.GenericResource;
 import ar.edu.itba.paw.webapp.media_types.ErrorMIME;
+import ar.edu.itba.paw.webapp.media_types.MIMEHelper;
 import ar.edu.itba.paw.webapp.media_types.WorkdayMIME;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -31,7 +33,7 @@ public class WorkdayResource extends GenericResource {
     @Produces({WorkdayMIME.GET_LIST, ErrorMIME.ERROR})
     public Response getCollection(
             @Context HttpHeaders httpheaders) {
-        this.assertAcceptedTypes(httpheaders, WorkdayMIME.GET_LIST);
+        MIMEHelper.assertAcceptedTypes(httpheaders, WorkdayMIME.GET_LIST);
 
         if (!this.isStaff())
             return this.error(Status.FORBIDDEN.getStatusCode(), Status.FORBIDDEN.toString());
@@ -52,7 +54,7 @@ public class WorkdayResource extends GenericResource {
     public Response createEntities(
             Collection<Workday> workdays,
             @Context HttpHeaders httpheaders) {
-        this.assertAcceptedTypes(httpheaders, WorkdayMIME.GET_LIST);
+        MIMEHelper.assertAcceptedTypes(httpheaders, WorkdayMIME.GET_LIST);
 
         if (workdays == null || workdays.isEmpty())
             return this.error(Status.BAD_REQUEST.getStatusCode(), Status.BAD_REQUEST.toString());
@@ -108,7 +110,7 @@ public class WorkdayResource extends GenericResource {
     public Response createEntity(
             Workday workday,
             @Context HttpHeaders httpheaders) {
-        this.assertAcceptedTypes(httpheaders, WorkdayMIME.GET);
+        MIMEHelper.assertAcceptedTypes(httpheaders, WorkdayMIME.GET);
 
         if (workday == null || workday.getDay() == null)
             return this.error(Status.BAD_REQUEST.getStatusCode(), Status.BAD_REQUEST.toString());
@@ -137,7 +139,7 @@ public class WorkdayResource extends GenericResource {
     public Response getEntity(
             @Context HttpHeaders httpheaders,
             @PathParam("id") Integer id) {
-        this.assertAcceptedTypes(httpheaders, WorkdayMIME.GET);
+        MIMEHelper.assertAcceptedTypes(httpheaders, WorkdayMIME.GET);
 
         if (id == null)
             return this.error(Status.BAD_REQUEST.getStatusCode(), Status.BAD_REQUEST.toString());

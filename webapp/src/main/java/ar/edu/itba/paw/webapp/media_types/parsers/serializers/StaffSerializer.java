@@ -31,7 +31,7 @@ public class StaffSerializer extends JsonSerializer<Staff> {
             specialtiesArray.add(staffSpecialty.getId());
         }
 
-        jsonObject.replace("staffSpecialtyIds", specialtiesArray);
+        jsonObject.replace("specialtyIds", specialtiesArray);
 
         return jsonObject;
     }

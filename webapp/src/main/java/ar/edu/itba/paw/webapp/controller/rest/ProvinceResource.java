@@ -2,7 +2,9 @@ package ar.edu.itba.paw.webapp.controller.rest;
 
 import ar.edu.itba.paw.interfaces.services.ProvinceService;
 import ar.edu.itba.paw.models.Province;
+import ar.edu.itba.paw.webapp.controller.rest.utils.GenericResource;
 import ar.edu.itba.paw.webapp.media_types.ErrorMIME;
+import ar.edu.itba.paw.webapp.media_types.MIMEHelper;
 import ar.edu.itba.paw.webapp.media_types.ProvinceMIME;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -27,7 +29,7 @@ public class ProvinceResource extends GenericResource {
     @Produces({ProvinceMIME.GET_LIST, ErrorMIME.ERROR})
     public Response getCollection(
             @Context HttpHeaders httpheaders) {
-        this.assertAcceptedTypes(httpheaders, ProvinceMIME.GET_LIST);
+        MIMEHelper.assertAcceptedTypes(httpheaders, ProvinceMIME.GET_LIST);
 
         return Response
                 .ok()
@@ -41,7 +43,7 @@ public class ProvinceResource extends GenericResource {
     public Response getEntity(
             @Context HttpHeaders httpheaders,
             @PathParam("id") Integer id) {
-        this.assertAcceptedTypes(httpheaders, ProvinceMIME.GET_LIST);
+        MIMEHelper.assertAcceptedTypes(httpheaders, ProvinceMIME.GET_LIST);
 
         if (id == null)
             return this.error(Status.BAD_REQUEST.getStatusCode(), Status.BAD_REQUEST.toString());

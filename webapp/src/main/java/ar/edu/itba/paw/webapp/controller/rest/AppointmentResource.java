@@ -7,8 +7,10 @@ import ar.edu.itba.paw.models.Appointment;
 import ar.edu.itba.paw.models.Patient;
 import ar.edu.itba.paw.models.Staff;
 import ar.edu.itba.paw.models.User;
+import ar.edu.itba.paw.webapp.controller.rest.utils.GenericResource;
 import ar.edu.itba.paw.webapp.media_types.AppointmentMIME;
 import ar.edu.itba.paw.webapp.media_types.ErrorMIME;
+import ar.edu.itba.paw.webapp.media_types.MIMEHelper;
 import org.joda.time.Days;
 import org.joda.time.LocalDateTime;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -46,7 +48,7 @@ public class AppointmentResource extends GenericResource {
             @QueryParam("to_year") Integer toYear,
             @QueryParam("to_month") Integer toMonth,
             @QueryParam("to_day") Integer toDay) {
-        this.assertAcceptedTypes(httpheaders, AppointmentMIME.GET_LIST);
+        MIMEHelper.assertAcceptedTypes(httpheaders, AppointmentMIME.GET_LIST);
 
         User user = this.getUser().get();
         Collection<Staff> staffs;
@@ -86,7 +88,7 @@ public class AppointmentResource extends GenericResource {
     public Response createEntity(
             Appointment appointment,
             @Context HttpHeaders httpheaders) {
-        this.assertAcceptedTypes(httpheaders, AppointmentMIME.GET);
+        MIMEHelper.assertAcceptedTypes(httpheaders, AppointmentMIME.GET);
 
         if (appointment == null || appointment.getFromDate() == null || appointment.getFromDate().isBefore(LocalDateTime.now()))
             return this.error(Status.BAD_REQUEST.getStatusCode(), Status.BAD_REQUEST.toString());
@@ -121,7 +123,7 @@ public class AppointmentResource extends GenericResource {
     public Response getEntity(
             @Context HttpHeaders httpheaders,
             @PathParam("id") Integer id) {
-        this.assertAcceptedTypes(httpheaders, AppointmentMIME.GET);
+        MIMEHelper.assertAcceptedTypes(httpheaders, AppointmentMIME.GET);
 
         if (id == null)
             return this.error(Status.BAD_REQUEST.getStatusCode(), Status.BAD_REQUEST.toString());

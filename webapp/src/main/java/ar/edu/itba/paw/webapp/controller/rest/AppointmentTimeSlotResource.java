@@ -3,8 +3,10 @@ package ar.edu.itba.paw.webapp.controller.rest;
 import ar.edu.itba.paw.interfaces.services.AppointmentService;
 import ar.edu.itba.paw.interfaces.services.StaffService;
 import ar.edu.itba.paw.models.Staff;
+import ar.edu.itba.paw.webapp.controller.rest.utils.GenericResource;
 import ar.edu.itba.paw.webapp.media_types.AppointmentTimeSlotMIME;
 import ar.edu.itba.paw.webapp.media_types.ErrorMIME;
+import ar.edu.itba.paw.webapp.media_types.MIMEHelper;
 import org.joda.time.Days;
 import org.joda.time.LocalDateTime;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,7 +43,7 @@ public class AppointmentTimeSlotResource extends GenericResource {
             @QueryParam("to_year") Integer toYear,
             @QueryParam("to_month") Integer toMonth,
             @QueryParam("to_day") Integer toDay) {
-        this.assertAcceptedTypes(httpheaders, AppointmentTimeSlotMIME.GET_LIST);
+        MIMEHelper.assertAcceptedTypes(httpheaders, AppointmentTimeSlotMIME.GET_LIST);
 
         if (staffId == null || fromYear == null || fromMonth == null || fromDay == null || toYear == null || toMonth == null || toDay == null)
             return this.error(Status.BAD_REQUEST.getStatusCode(), Status.BAD_REQUEST.toString());

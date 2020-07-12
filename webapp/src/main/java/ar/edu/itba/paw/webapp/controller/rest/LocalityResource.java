@@ -2,8 +2,10 @@ package ar.edu.itba.paw.webapp.controller.rest;
 
 import ar.edu.itba.paw.interfaces.services.LocalityService;
 import ar.edu.itba.paw.models.Locality;
+import ar.edu.itba.paw.webapp.controller.rest.utils.GenericResource;
 import ar.edu.itba.paw.webapp.media_types.ErrorMIME;
 import ar.edu.itba.paw.webapp.media_types.LocalityMIME;
+import ar.edu.itba.paw.webapp.media_types.MIMEHelper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -27,7 +29,7 @@ public class LocalityResource extends GenericResource {
     @Produces({LocalityMIME.GET_LIST, ErrorMIME.ERROR})
     public Response getCollection(
             @Context HttpHeaders httpheaders) {
-        this.assertAcceptedTypes(httpheaders, LocalityMIME.GET_LIST);
+        MIMEHelper.assertAcceptedTypes(httpheaders, LocalityMIME.GET_LIST);
 
         return Response
                 .ok()
@@ -41,7 +43,7 @@ public class LocalityResource extends GenericResource {
     public Response getEntity(
             @Context HttpHeaders httpheaders,
             @PathParam("id") Integer id) {
-        this.assertAcceptedTypes(httpheaders, LocalityMIME.GET);
+        MIMEHelper.assertAcceptedTypes(httpheaders, LocalityMIME.GET);
 
         if (id == null)
             return this.error(Status.BAD_REQUEST.getStatusCode(), Status.BAD_REQUEST.toString());

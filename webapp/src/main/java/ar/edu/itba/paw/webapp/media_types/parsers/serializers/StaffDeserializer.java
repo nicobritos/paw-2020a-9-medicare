@@ -33,7 +33,7 @@ public class StaffDeserializer extends JsonDeserializer<Staff> {
             staff.setEmail(jsonObject.get("email").asText());
         }
 
-        ArrayNode jsonSpecialtiesIds = (ArrayNode) jsonObject.get("staffSpecialtyIds");
+        ArrayNode jsonSpecialtiesIds = (ArrayNode) jsonObject.get("specialtyIds");
         Collection<StaffSpecialty> staffSpecialties = new LinkedList<>();
         for (JsonNode o1 : jsonSpecialtiesIds) {
             if (!o1.isInt())
@@ -43,7 +43,6 @@ public class StaffDeserializer extends JsonDeserializer<Staff> {
             staffSpecialty.setId(o1.asInt());
             staffSpecialties.add(staffSpecialty);
         }
-
         staff.setStaffSpecialties(staffSpecialties);
 
         return staff;

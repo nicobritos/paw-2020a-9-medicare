@@ -1,12 +1,9 @@
-package ar.edu.itba.paw.webapp.controller.rest;
+package ar.edu.itba.paw.webapp.controller.rest.utils;
 
 import ar.edu.itba.paw.interfaces.services.UserService;
 import ar.edu.itba.paw.models.Paginator;
 import ar.edu.itba.paw.models.User;
 import ar.edu.itba.paw.webapp.auth.UserRole;
-import ar.edu.itba.paw.webapp.exceptions.MissingAcceptsException;
-import ar.edu.itba.paw.webapp.media_types.ApplicationMIME;
-import ar.edu.itba.paw.webapp.media_types.ErrorMIME;
 import ar.edu.itba.paw.webapp.models.APIError;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.GrantedAuthority;
@@ -14,7 +11,6 @@ import org.springframework.security.core.context.SecurityContextHolder;
 
 import javax.ws.rs.InternalServerErrorException;
 import javax.ws.rs.core.HttpHeaders;
-import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.ResponseBuilder;
 import javax.ws.rs.core.UriInfo;
@@ -25,7 +21,6 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 public abstract class GenericResource {
     protected static final String PAGINATOR_COUNT_HEADER = "Total-Items";
@@ -61,25 +56,6 @@ public abstract class GenericResource {
                 .status(code)
                 .entity(new APIError(code, message))
                 .build();
-    }
-
-    protected void assertAcceptedTypes(HttpHeaders httpHeaders, String... types) {
-        Set<String> mediaTypes = httpHeaders.getAcceptableMediaTypes()
-                .stream()
-                .map(MediaType::toString)
-                .collect(Collectors.toSet());
-        if (mediaTypes.contains(MediaType.WILDCARD) || mediaTypes.contains(ApplicationMIME.WILDCARD))
-            return;
-
-        // Como cada endpoint puede devolver un error, entonces lo comparamos contra ese tipo
-        if (!mediaTypes.contains(ErrorMIME.ERROR))
-            throw new MissingAcceptsException();
-
-        for (String type : types) {
-            if (!mediaTypes.contains(type))
-                throw new MissingAcceptsException();
-            mediaTypes.remove(type);
-        }
     }
 
     protected Set<Integer> stringToIntegerList(String list) {

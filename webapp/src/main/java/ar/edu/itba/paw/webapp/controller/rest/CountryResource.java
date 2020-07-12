@@ -2,8 +2,10 @@ package ar.edu.itba.paw.webapp.controller.rest;
 
 import ar.edu.itba.paw.interfaces.services.CountryService;
 import ar.edu.itba.paw.models.Country;
+import ar.edu.itba.paw.webapp.controller.rest.utils.GenericResource;
 import ar.edu.itba.paw.webapp.media_types.CountryMIME;
 import ar.edu.itba.paw.webapp.media_types.ErrorMIME;
+import ar.edu.itba.paw.webapp.media_types.MIMEHelper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -27,7 +29,7 @@ public class CountryResource extends GenericResource {
     @Produces({CountryMIME.GET_LIST, ErrorMIME.ERROR})
     public Response getCollection(
             @Context HttpHeaders httpheaders) {
-        this.assertAcceptedTypes(httpheaders, CountryMIME.GET_LIST);
+        MIMEHelper.assertAcceptedTypes(httpheaders, CountryMIME.GET_LIST);
 
         return Response
                 .ok()
@@ -41,7 +43,7 @@ public class CountryResource extends GenericResource {
     public Response getEntity(
             @Context HttpHeaders httpheaders,
             @PathParam("id") String id) {
-        this.assertAcceptedTypes(httpheaders, CountryMIME.GET_LIST);
+        MIMEHelper.assertAcceptedTypes(httpheaders, CountryMIME.GET_LIST);
 
         if (id == null || id.isEmpty())
             return this.error(Status.BAD_REQUEST.getStatusCode(), Status.BAD_REQUEST.toString());

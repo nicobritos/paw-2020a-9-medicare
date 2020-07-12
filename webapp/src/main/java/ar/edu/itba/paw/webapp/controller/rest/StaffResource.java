@@ -7,7 +7,9 @@ import ar.edu.itba.paw.models.Locality;
 import ar.edu.itba.paw.models.Paginator;
 import ar.edu.itba.paw.models.Staff;
 import ar.edu.itba.paw.models.StaffSpecialty;
+import ar.edu.itba.paw.webapp.controller.rest.utils.GenericResource;
 import ar.edu.itba.paw.webapp.media_types.ErrorMIME;
+import ar.edu.itba.paw.webapp.media_types.MIMEHelper;
 import ar.edu.itba.paw.webapp.media_types.StaffMIME;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -42,7 +44,7 @@ public class StaffResource extends GenericResource {
             @QueryParam("localities") String localities,
             @QueryParam(PAGINATOR_PAGE_QUERY) Integer page,
             @QueryParam(PAGINATOR_PER_PAGE_QUERY) Integer perPage) {
-        this.assertAcceptedTypes(httpheaders, StaffMIME.GET_LIST);
+        MIMEHelper.assertAcceptedTypes(httpheaders, StaffMIME.GET_LIST);
 
         // TODO: <= o < ??
         if (page != null) {
@@ -78,7 +80,7 @@ public class StaffResource extends GenericResource {
     public Response getEntity(
             @Context HttpHeaders httpheaders,
             @PathParam("id") Integer id) {
-        this.assertAcceptedTypes(httpheaders, StaffMIME.GET);
+        MIMEHelper.assertAcceptedTypes(httpheaders, StaffMIME.GET);
 
         if (id == null)
             return this.error(Status.BAD_REQUEST.getStatusCode(), Status.BAD_REQUEST.toString());
@@ -98,7 +100,7 @@ public class StaffResource extends GenericResource {
             Staff staff,
             @Context HttpHeaders httpheaders,
             @PathParam("id") Integer id) {
-        this.assertAcceptedTypes(httpheaders, StaffMIME.GET);
+        MIMEHelper.assertAcceptedTypes(httpheaders, StaffMIME.GET);
 
         if (id == null || staff == null || staff.getStaffSpecialties().isEmpty())
             return this.error(Status.BAD_REQUEST.getStatusCode(), Status.BAD_REQUEST.toString());
