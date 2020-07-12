@@ -75,6 +75,116 @@
                     }
                 }
             },
+            "createUserStaff": {
+                "properties": {
+                    "email": {
+                        "type": "string",
+                        "format": "email",
+                        "nullable": false
+                    },
+                    "password": {
+                        "type": "string",
+                        "nullable": false,
+                        "minLength": 8,
+                        "maxLength": 100
+                    },
+                    "firstName": {
+                        "type": "string",
+                        "nullable": false,
+                        "minLength": 2,
+                        "maxLength": 20
+                    },
+                    "surname": {
+                        "type": "string",
+                        "nullable": false,
+                        "minLength": 2,
+                        "maxLength": 20
+                    },
+                    "phone": {
+                        "type": "string"
+                    },
+                    "registrationNumber": {
+                        "type": "integer",
+                        "nullable": false
+                    },
+                    "specialtyIds": {
+                        "type": "array",
+                        "items": [
+                            {
+                                "type": "integer"
+                            }
+                        ]
+                    },
+                    "office": {
+                        "type": "object",
+                        "properties": {
+                            "name": {
+                                "type": "string"
+                            },
+                            "phone": {
+                                "type": "string"
+                            },
+                            "email": {
+                                "type": "string"
+                            },
+                            "street": {
+                                "type": "string",
+                                "minLength": 2
+                            },
+                            "localityId": {
+                                "type": "integer"
+                            }
+                        },
+                        "required": [
+                            "localityId",
+                            "street"
+                        ]
+                    }
+                },
+                "required": [
+                    "email",
+                    "password",
+                    "firstName",
+                    "surname",
+                    "office"
+                ]
+            },
+            "createUserPatient": {
+                "properties": {
+                    "email": {
+                        "type": "string",
+                        "format": "email",
+                        "nullable": false
+                    },
+                    "password": {
+                        "type": "string",
+                        "nullable": false,
+                        "minLength": 8,
+                        "maxLength": 100
+                    },
+                    "firstName": {
+                        "type": "string",
+                        "nullable": false,
+                        "minLength": 2,
+                        "maxLength": 20
+                    },
+                    "surname": {
+                        "type": "string",
+                        "nullable": false,
+                        "minLength": 2,
+                        "maxLength": 20
+                    },
+                    "phone": {
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "email",
+                    "password",
+                    "firstName",
+                    "surname"
+                ]
+            },
             "updateUser": {
                 "properties": {
                     "email": {
@@ -154,7 +264,7 @@
                     "office": {
                         "$ref": "#/components/schemas/office"
                     },
-                    "staffSpecialtyIds": {
+                    "specialtyIds": {
                         "type": "array",
                         "items": {
                             "type": "integer"
@@ -181,7 +291,7 @@
                         "type": "email",
                         "format": "email"
                     },
-                    "staffSpecialtyIds": {
+                    "specialtyIds": {
                         "type": "array",
                         "items": {
                             "$ref": "#/components/schemas/staffSpecialty"
@@ -193,7 +303,7 @@
                 "required": [
                     "phone",
                     "email",
-                    "staffSpecialtyIds"
+                    "specialtyIds"
                 ]
             },
 
@@ -592,6 +702,34 @@
                                 }
                             }
                         }
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/error-404"
+                    }
+                }
+            }
+        },
+        "/users": {
+            "post": {
+                "summary": "Creates a user",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/vnd.user.staff.create.v1+json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/createUserStaff"
+                            }
+                        },
+                        "application/vnd.user.patient.create.v1+json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/createUserPatient"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "$ref": "#/components/responses/get-user"
                     },
                     "404": {
                         "$ref": "#/components/responses/error-404"
