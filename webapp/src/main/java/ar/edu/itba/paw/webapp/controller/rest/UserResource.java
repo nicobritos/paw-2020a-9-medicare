@@ -20,6 +20,20 @@ public class UserResource extends GenericResource {
     @Autowired
     private UserService userService;
 
+    // TODO
+//    @POST
+//    @Produces({UserMIME.GET, ErrorMIME.ERROR})
+//    @Consumes(UserMIME.CREATE)
+//    public Response createEntity(
+//            User user,
+//            @Context HttpHeaders httpheaders) {
+//        this.assertAcceptedTypes(httpheaders, UserMIME.GET);
+//
+//
+//
+//        return Response.ok(userOptional.get()).build();
+//    }
+
     @GET
     @Path("{id}")
     @Produces({UserMIME.GET, ErrorMIME.ERROR})
