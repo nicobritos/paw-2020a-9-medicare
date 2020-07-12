@@ -69,6 +69,7 @@ public class WebAuthConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers(HttpMethod.POST, "/login").permitAll()
                 .antMatchers(HttpMethod.POST, "/verify").permitAll()
                 .antMatchers(HttpMethod.POST, "/refresh").permitAll()
+                .antMatchers(HttpMethod.POST, "/users").anonymous()
                 .anyRequest().authenticated().and()
                 .httpBasic().authenticationEntryPoint(new JWTAuthenticationEntryPoint()).and()
                 .addFilter(this.jwtAuthenticationFilter())
