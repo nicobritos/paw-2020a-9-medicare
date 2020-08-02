@@ -56,6 +56,7 @@
 </template>
 <script>
 import Api from "@/scripts/api";
+import utils from "@/scripts/utils";
 
 export default {
     name:"Landing",
@@ -81,7 +82,7 @@ export default {
                 query.localities = e.target["localities"].value;
             }
             
-            this.$router.push({path:process.env.BASE_URL+"mediclist",query:query});
+            this.$router.push({path:utils.getUrl("mediclist"),query:query});
         }
     },
     // TODO: handle error

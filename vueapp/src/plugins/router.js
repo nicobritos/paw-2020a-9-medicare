@@ -31,6 +31,9 @@ Vue.use(VueRouter)
     path:'/mediclist/:page',
     name:'MedicList',
     component: MedicList
+  },{
+    path:'/mediclist',
+    redirect:"/mediclist/1"
   },
   {
     path:"/unverified",

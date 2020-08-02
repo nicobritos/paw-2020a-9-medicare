@@ -64,9 +64,10 @@
                                     <div class="col-3 d-flex flex-column justify-content-center">
                                         <div class="profile-picture-container">
                                             <div style="margin-top: 100%;"></div>
+                                            <!-- TODO:check src url -->
                                             <img
                                                     class="profile-picture rounded-circle"
-                                                    :src='getUrl("/profilePics/"+member.user.profilePicture.id)'
+                                                    :src='getUrl("profilePics/"+member.user.profilePictureId)'
                                                     alt="profile pic"
                                             />
                                         </div>
@@ -78,15 +79,15 @@
                                         <div class="row">
                                             <p class="m-0">
                                                 <!-- TODO:super check this -->
-                                                {{member.staffSpecialties}}
+                                                {{member.staffSpecialtyIds.map((v)=>{return getSpecialtyName(v)}).join(', ')}}
                                             </p>
                                         </div>
                                         <div class="row">
-                                            <p class="m-0">{{member.office.street + " - " + member.office.locality.name}}</p>
+                                            <p class="m-0">{{member.office.street + " - " + getLocalityName(member.office.localityId)}}</p>
                                         </div>
                                         <a
                                             class="link"
-                                            :href='"https://www.google.com/maps/search/?api=1&query="+member.office.locality.name + "," + member.office.street'
+                                            :href='"https://www.google.com/maps/search/?api=1&query="+getLocalityName(member.office.localityId) + "," + member.office.street'
                                             target="_blank"
                                         >
                                             <div class="row">
@@ -128,6 +129,8 @@
 </template>
 <script>
 import apiTypes from "@/scripts/apiTypes";
+import Api from "@/scripts/api";
+import utils from "@/scripts/utils";
 
 export default {
     name:"MedicList",
@@ -170,6 +173,9 @@ export default {
             nextPage:">",
             lastPage:">>",
 
+            /*
+                possible values: "NoResultsFound","SearchResults1","SearchResults2More"
+            */
             resultsMessage:"NoResultsFound",
             resultsMessageParam:null,
             paginator:{
@@ -181,6 +187,43 @@ export default {
 
             specialties:[],
             localities:[]
+        }
+    },
+    methods:{
+        getUrl:utils.getUrl,
+        getSpecialtyName(id){
+            for (const s of this.specialties) {
+                if(s.id == id){
+                    return s.name;
+                }
+            }
+            return id
+        },
+        getLocalityName(id){
+            for (const l of this.localities) {
+                if(l.id == id){
+                    return l.name;
+                }
+            }
+            return id
+        }
+    },
+    // TODO: handle error
+    async mounted(){
+        this.specialties = await Api.getSpecialties();
+
+        this.localities = await Api.getLocalities();
+
+        this.staff = await Api.getStaff();
+
+        //TODO: this is not the way
+        if (this.staff.length >= 2) {
+            this.resultsMessage =  "SearchResults2More";
+            this.resultsMessageParam = [this.staff.length];
+        }else if(this.staff.length == 1){
+            this.resultsMessage = "SearchResults1";
+        }else{
+            this.resultsMessage = "NoResultsFound";
         }
     }
 }

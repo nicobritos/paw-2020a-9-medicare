@@ -2,6 +2,20 @@ import apiTypes from "./apiTypes";
 
 
 export default {
+    //TODO:check
+    async getStaff(){
+        let res = await fetch(process.env.VUE_APP_BASE_API_URL + "staffs");
+        if(!res.ok){
+            // TODO: better error
+            throw new Error();
+        }
+        let json = await res.json();
+        let staff = [];
+        for (const s of json) {
+            staff.push(new apiTypes.Staff(s.id,s.phone,s.email,s.registrationNumber,s.user,s.office,s.specialtyIds));
+        }
+        return staff;
+    },
     async getSpecialties(){
         let res = await fetch(process.env.VUE_APP_BASE_API_URL + "specialties");
         if(!res.ok){
