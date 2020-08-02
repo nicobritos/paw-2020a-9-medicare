@@ -6,7 +6,7 @@
         </div>
         <div class="container h-50 justify-content-center">
             <!-- TODO:FORM -->
-            <form class="filter-form p-3" > 
+            <form class="filter-form p-3" @submit="submitForm"> 
                 <div class="form-row">
                     <div class="col">
                         <h2 class="ml-5 mt-3 form-title">{{$t("SearchMedics")}}</h2>
@@ -36,7 +36,7 @@
                     </div>
                 </div>
                 <div class="form-row px-5 mt-4 mb-3">
-                    <button class="w-100 btn rounded-pill btn-light header-btn-element">{{$t("SearchMedics")}}</button>
+                    <button type="submit" class="w-100 btn rounded-pill btn-light header-btn-element">{{$t("SearchMedics")}}</button>
                 </div>
             </form>
             <br>
@@ -55,6 +55,8 @@
     </span>
 </template>
 <script>
+import Api from "@/scripts/api";
+
 export default {
     name:"Landing",
     data:function() {
@@ -64,15 +66,31 @@ export default {
         }
     },
     methods:{
-        sumbitForm:function(e){
+        submitForm:function(e){
             e.preventDefault();
-            alert("this form is not implemented yet");
-            /* 
-                TODO: should apply filters and go to /mediclist/1
-                probaby should also change the current way of doing this
-                (with event) to a more view way ( v-model and validations)
-             */
+            let query = {};
+            if(e.target["name"].value){
+                query.name = e.target["name"].value;
+            }
+            //TODO:Check
+            if(e.target["specialties"].value && e.target["specialties"].value>0){
+                query.specialties = e.target["specialties"].value;
+            }
+            //TODO:Check
+            if(e.target["localities"].value && e.target["localities"].value > 0){
+                query.localities = e.target["localities"].value;
+            }
+            
+            this.$router.push({path:process.env.BASE_URL+"mediclist",query:query});
         }
+    },
+    // TODO: handle error
+    async mounted(){
+        let specialties = await Api.getSpecialties();
+        this.specialties = specialties;
+
+        let localities = await Api.getLocalities();
+        this.localities = localities;
     }
 }
 </script>

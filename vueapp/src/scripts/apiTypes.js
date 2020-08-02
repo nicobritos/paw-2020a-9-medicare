@@ -1,6 +1,11 @@
 class Country{
     id;
     name;
+    /**
+     * 
+     * @param {Number} id 
+     * @param {string} name 
+     */
     constructor(id,name){
         this.id = id;
         this.name = name;
@@ -10,6 +15,12 @@ class Province{
     id;
     name;
     country;
+    /**
+     * 
+     * @param {Number} id 
+     * @param {String} name 
+     * @param {Country} country 
+     */
     constructor(id,name,country){
         this.id = id;
         this.name = name;
@@ -20,6 +31,12 @@ class Locality{
     id;
     name;
     province;
+    /**
+     * 
+     * @param {Number} id 
+     * @param {String} name 
+     * @param {Province} province 
+     */
     constructor(id,name,province){
         this.id = id;
         this.name = name;
@@ -34,6 +51,16 @@ class User{
     verified;
     phone;
     profilePictureId;
+    /**
+     * 
+     * @param {Number} id 
+     * @param {String} email 
+     * @param {String} firstName 
+     * @param {String} surname 
+     * @param {Boolean} verified 
+     * @param {String} phone 
+     * @param {Number} profilePictureId 
+     */
     constructor(id,email,firstName,surname,verified,phone,profilePictureId){
         this.id = id;
         this.email = email;
@@ -50,6 +77,14 @@ class UpdateUser {
     surname;
     phone;
     profilePictureId;
+    /**
+     * 
+     * @param {String} email 
+     * @param {String} firstName 
+     * @param {String} surname 
+     * @param {String} phone 
+     * @param {Number} profilePictureId 
+     */
     constructor(email,firstName,surname,phone,profilePictureId){
         this.email = email;
         this.firstName = firstName;
@@ -66,6 +101,15 @@ class Office {
     street;
     url;
     localityId;
+    /**
+     * 
+     * @param {Number} id 
+     * @param {String} phone 
+     * @param {String} email 
+     * @param {String} street 
+     * @param {String} url 
+     * @param {Number} localityId 
+     */
     constructor(id,phone,email,street,url,localityId){
         this.id = id;
         this.phone = phone;
@@ -84,6 +128,16 @@ class Staff {
     user;
     office;
     staffSpecialtyIds;
+    /**
+     * 
+     * @param {Number} id 
+     * @param {String} phone 
+     * @param {String} email 
+     * @param {Number} registrationNumber 
+     * @param {User} user 
+     * @param {Office} office 
+     * @param {[Numbers]} staffSpecialtyIds 
+     */
     constructor(id,phone,email,registrationNumber,user,office,staffSpecialtyIds){
         this.id = id;
         this.phone = phone;
@@ -97,6 +151,11 @@ class Staff {
 class StaffSpecialty {
     id;
     name;
+    /**
+     * 
+     * @param {Number} id 
+     * @param {String} name 
+     */
     constructor(id,name){
         this.id = id;
         this.name = name;
@@ -108,6 +167,13 @@ class UpdateStaff {
     email;
     registrationNumber;
     staffSpecialtyIds;
+    /**
+     * 
+     * @param {String} phone 
+     * @param {String} email 
+     * @param {Number} registrationNumber 
+     * @param {[Number]} staffSpecialtyIds 
+     */
     constructor(phone,email,registrationNumber,staffSpecialtyIds){
         this.phone = phone;
         this.email = email;
@@ -120,6 +186,12 @@ class Patient {
     id;
     user;
     officeId;
+    /**
+     * 
+     * @param {Number} id 
+     * @param {User} user 
+     * @param {Number} officeId 
+     */
     constructor(id,user,officeId){
         this.id = id;
         this.user = user;
@@ -133,6 +205,14 @@ class Workday {
     end;
     day;
     staffId;
+    /**
+     * 
+     * @param {Number} id 
+     * @param {{Hour:Number,Minute:Number}} start 
+     * @param {{Hour:Number,Minute:Number}} end 
+     * @param {"MONDAY"|"TUESDAY"|"WEDNESDAY"|"THURSDAY"|"FRIDAY"|"SATURDAY"|"SUNDAY"} day 
+     * @param {Number} staffId 
+     */
     constructor(id,start,end,day,staffId){
         this.id = id;
         this.start = start;
@@ -146,6 +226,12 @@ class CreateWorkday {
     start;
     end;
     day;
+    /**
+     * 
+     * @param {{Hour:Number,Minute:Number}} start 
+     * @param {{Hour:Number,Minute:Number}} end 
+     * @param {"MONDAY"|"TUESDAY"|"WEDNESDAY"|"THURSDAY"|"FRIDAY"|"SATURDAY"|"SUNDAY"} day 
+     */
     constructor(start,end,day){
         this.start = start;
         this.end = end;
@@ -156,7 +242,7 @@ class CreateWorkday {
 class Appointment {
     id;
     status;
-    from;
+    date_from;
     message;
     motive;
     patientId;
@@ -164,40 +250,100 @@ class Appointment {
 
     // TODO:check
     to;
-    constructor(id,status,from,message,motive,patientId,staffId){
+    /**
+     * 
+     * @param {Number} id 
+     * @param {"PENDING"|"COMPLETE"|"CANCELLED"|"WAITING"|"SEEN"} status 
+     * @param {Number} date_from in epoch milliseconds
+     * @param {String} message 
+     * @param {String} motive 
+     * @param {Number} patientId 
+     * @param {Number} staffId 
+     */
+    constructor(id,status,date_from,message,motive,patientId,staffId){
         this.id = id;
         this.status = status;
-        this.from = from;
+        this.date_from = date_from;
         this.message = message;
         this.motive = motive;
         this.patientId = patientId;
         this.staffId = staffId;
-        // TODO:check
-        this.to = new Date(from.valueof());
-        this.to.setMinute(this.to.getMinute()+15);
+
+        //TODO:check
+        //basically add fifteen minutes in milliseconds
+        this.to = date_from + 15 * 60 * 1000;
     }
 }
 
 class CreateAppointment {
     id;
     status;
-    from;
+    date_from;
     message;
     motive;
     staffId;
-    constructor(id,status,from,message,motive,staffId){
+    /**
+     * 
+     * @param {Number} id 
+     * @param {"PENDING"|"COMPLETE"|"CANCELLED"|"WAITING"|"SEEN"} status 
+     * @param {Number} date_from in epoch milliseconds
+     * @param {String} message 
+     * @param {String} motive 
+     * @param {Number} staffId 
+     */
+    constructor(id,status,date_from,message,motive,staffId){
         this.id = id;
         this.status = status;
-        this.from = from;
+        this.date_from = date_from;
         this.message = message;
         this.motive = motive;
         this.staffId = staffId;
     }
 }
 
+class AppointmentTimeslot{
+    hour;
+    minute;
+    duration;
+    /**
+     * 
+     * @param {Number} hour 
+     * @param {Number} minute 
+     * @param {Number} duration 
+     */
+    constructor(hour,minute,duration){
+        this.hour = hour;
+        this.minute = minute;
+        this.duration = duration;
+    }
+     
+}
+
+class AppointmentTimeslotDate{
+    date;
+    timeslots;
+    /**
+     * 
+     * @param {{day:Number,month:Number,year:Number}} date 
+     * @param {AppointmentTimeslot} timeslots 
+     */
+    constructor(date,timeslots){
+        this.date = date;
+        this.timeslots = timeslots;
+    }
+}
+
+AppointmentTimeslot;
+AppointmentTimeslotDate;
+
 class Error {
     code;
     message;
+    /**
+     * 
+     * @param {Number} code 
+     * @param {String} message 
+     */
     constructor(code,message){
         this.code = code;
         this.message = message;

@@ -11,6 +11,11 @@ module.exports = {
       }
     },
     devServer: {
-      proxy: 'http://localhost:8080/medicare'
+      /* 
+      add a .env.local with this property
+      example:
+      LOCAL_PROXY_SERVER = 'http://localhost:8080/medicare'
+      */
+      proxy: process.env.LOCAL_PROXY_SERVER
     }
 }
