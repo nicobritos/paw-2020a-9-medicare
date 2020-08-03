@@ -1,6 +1,6 @@
 <template>
     <div class="container-fluid w-100 h-100 d-flex flex-column justify-content-center align-items-center login-container">
-        <form class="register-form border p-5 rounded">
+        <form class="register-form border p-5 rounded" @submit="submitForm">
             <div class="row">
                 <h6>Medicare <img :src='logo' id="logo"/></h6>
             </div>
@@ -53,6 +53,7 @@ import logo from "@/assets/logo.svg";
 import eye from "@/assets/eye.svg";
 import noeye from "@/assets/noeye.svg";
 import utils from "@/scripts/utils.js";
+import apiTypes from "@/scripts/apiTypes.js";
 
 export default {
     name:"Login",
@@ -69,7 +70,13 @@ export default {
         toggleShowPassword(){
             this.showPassword = !this.showPassword;
         },
-        getUrl:utils.getUrl
+        getUrl:utils.getUrl,
+        submitForm(e){
+            e.preventDefault();
+            // TODO:connect to api
+            this.$emit("input",new apiTypes.User(1,e.target["medicare_email"].value,"firstName","surname",true,"1111-1111",1))
+            this.$router.push(this.getUrl())
+        }
     }
 }
 </script>

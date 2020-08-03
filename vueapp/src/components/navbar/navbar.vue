@@ -2,7 +2,7 @@
   <!--TODO:check -->
   <nav class="navbar navbar-expand header">       
     <NavbarLogo/>
-    <NavbarLogged v-if="logged" :user="user"></NavbarLogged>
+    <NavbarLogged v-if="value" :user="value" @logout="logout"></NavbarLogged>
     <NavbarNotLogged v-else/>
   </nav>
 </template>
@@ -11,18 +11,19 @@
 import NavbarNotLogged from "./navbarNotLogged";
 import NavbarLogged from "./navbarLogged";
 import NavbarLogo from "./navbarLogo";
-import apiTypes from "@/scripts/apiTypes";
 
 export default {
   name: "Navbar",
-  props:{
-    user:apiTypes.User,
-    logged:Boolean
-  },
+  props:["value"],
   components: {
     NavbarLogged:NavbarLogged, 
     NavbarLogo:NavbarLogo,
     NavbarNotLogged:NavbarNotLogged
+  },
+  methods:{
+    logout(){
+      this.$emit("input",null);
+    }
   }
 };
 </script>

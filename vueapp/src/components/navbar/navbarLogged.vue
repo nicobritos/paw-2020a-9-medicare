@@ -15,7 +15,7 @@
                     {{user.firstName+" "+ user.surname}}
                 </p>
             </router-link>
-            <router-link :to='getUrl("logout")' class="m-0 p-0 header-a-element"><small class="m-0 p-0">{{$t("Logout")}}</small></router-link>
+            <a @click="logout" href="" class="m-0 p-0 header-a-element"><small class="m-0 p-0">{{$t("Logout")}}</small></a>
         </div>
         <img v-if="!user.verified" id="navbarUnverifiedUserImage" class="ml-2" src="https://fonts.gstatic.com/s/i/materialicons/account_circle/v4/24px.svg" alt="unverified user image">
         <router-link v-else-if="!staffs" :to='getUrl("patient/profile")'>
@@ -49,19 +49,18 @@
 </template>
 <script>
 import utils from "@/scripts/utils";
-import apiTypes from "@/scripts/apiTypes";
 
 export default {
     name:"NavbarLogged",
-    props:{
-        user:{
-            type:apiTypes.User,
-            required:true
-        },
-        staffs:[apiTypes.Staff]
-    },
+    props:["user","staffs"],
     methods:{
-        getUrl:utils.getUrl
+        getUrl:utils.getUrl,
+        logout(e){
+            e.preventDefault();
+            this.$emit("logout");
+            // TODO:check because it throws an error if redundant navigation to same url
+            this.$router.push(utils.getUrl());
+        }
     }
 }
 </script>

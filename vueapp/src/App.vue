@@ -4,8 +4,8 @@
     lo dejo asi checkear si el resto funciona bien con esto
   -->
   <span id="app">
-    <Navbar v-if="!isAuth" :user="user" :logged="logged" />
-    <router-view />
+    <Navbar v-if="!isAuth" v-model="user" />
+    <router-view v-model="user" />
   </span>
 </template>
 
