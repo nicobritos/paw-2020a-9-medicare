@@ -2,12 +2,6 @@ import {APIError} from '~/src/logic/models/APIError';
 import {User} from '~/src/logic/models/User';
 import {Nullable} from '~/src/logic/models/utils/Utils';
 
-export const UserMIME = {
-    CREATE_PATIENT: 'application/vnd.user.patient.create.v1+json',
-    CREATE_STAFF: 'application/vnd.user.staff.create.v1+json',
-    GET: 'application/vnd.user.get.v1+json'
-};
-
 interface CreateUser {
     email: string;
     password: string;

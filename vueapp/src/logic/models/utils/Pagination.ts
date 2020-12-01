@@ -1,4 +1,4 @@
-interface PaginationLinks {
+export interface PaginationLinks {
     first: string;
     last: string;
     next?: string;
