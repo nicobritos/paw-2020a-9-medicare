@@ -91,8 +91,8 @@
 </template>
 
 <script>
-import apiTypes from "@/scripts/apiTypes";
-import utils from "@/scripts/utils";
+import apiTypes from "@/logic/apiTypes";
+import utils from "@/logic/utils";
 import mapIcon from "@/assets/mapIcon.svg";
 import calendarIcon from "@/assets/calendarIcon.svg";
 

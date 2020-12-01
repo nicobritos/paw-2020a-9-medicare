@@ -6,7 +6,7 @@
     </div>
 </template>
 <script>
-import utils from "@/scripts/utils";
+import utils from "@/logic/utils";
 
 
 export default {

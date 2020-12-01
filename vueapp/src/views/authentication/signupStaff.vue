@@ -103,7 +103,7 @@
 import eye from "@/assets/eye.svg";
 import noeye from "@/assets/noeye.svg";
 import logo from "@/assets/logo.svg";
-import utils from "@/scripts/utils";
+import utils from "@/logic/utils";
 
 
 export default {

@@ -55,8 +55,8 @@
     </span>
 </template>
 <script>
-import Api from "@/scripts/api";
-import utils from "@/scripts/utils";
+import Api from "@/logic/api";
+import utils from "@/logic/utils";
 
 export default {
     name:"Landing",

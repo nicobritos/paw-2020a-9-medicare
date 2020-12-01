@@ -13,7 +13,7 @@
 </template>
 
 <script>
-import apiTypes from "@/scripts/apiTypes";
+import apiTypes from "@/logic/apiTypes";
 
 export default {
     name:"Unverified",

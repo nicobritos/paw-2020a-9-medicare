@@ -128,9 +128,9 @@
     </form>    
 </template>
 <script>
-import apiTypes from "@/scripts/apiTypes";
-import Api from "@/scripts/api";
-import utils from "@/scripts/utils";
+import apiTypes from "@/logic/apiTypes";
+import Api from "@/logic/api";
+import utils from "@/logic/utils";
 
 export default {
     name:"MedicList",

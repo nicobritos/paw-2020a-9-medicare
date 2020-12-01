@@ -154,11 +154,11 @@
 
 <script>
 import moreOptions from "@/assets/moreOptions.svg";
-import utils from "@/scripts/utils";
+import utils from "@/logic/utils";
 import editPencil from "@/assets/editPencil.svg";
 import eye from "@/assets/eye.svg";
 import noeye from "@/assets/noeye.svg";
-import apiTypes from "@/scripts/apiTypes";
+import apiTypes from "@/logic/apiTypes";
 
 export default {
     name:"MedicProfile",

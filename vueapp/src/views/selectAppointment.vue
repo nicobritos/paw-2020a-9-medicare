@@ -109,8 +109,8 @@
 </template>
 
 <script>
-import utils from "@/scripts/utils";
-import apiTypes from "@/scripts/apiTypes";
+import utils from "@/logic/utils";
+import apiTypes from "@/logic/apiTypes";
 
 // TODO:check
 Date.prototype.plusDays = function(i) {

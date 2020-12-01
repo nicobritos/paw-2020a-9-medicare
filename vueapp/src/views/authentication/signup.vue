@@ -25,7 +25,7 @@
 
 <script>
 import logo from "@/assets/logo.svg";
-import utils from "@/scripts/utils";
+import utils from "@/logic/utils";
 
 export default {
     name:"Signup",

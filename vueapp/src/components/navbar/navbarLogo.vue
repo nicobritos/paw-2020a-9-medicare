@@ -7,7 +7,7 @@
 
 <script>
 import logo from "@/assets/whiteLogo.svg";
-import utils from "@/scripts/utils";
+import utils from "@/logic/utils";
 
 export default {
     name:"NavbarLogo",

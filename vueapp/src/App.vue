@@ -12,7 +12,7 @@
 <script>
 import "bootstrap/dist/css/bootstrap.css";
 import "bootstrap-vue/dist/bootstrap-vue.css";
-import apiTypes from "@/scripts/apiTypes";
+import apiTypes from "@/logic/apiTypes";
 import Navbar from "./components/navbar/navbar.vue";
 
 export default {

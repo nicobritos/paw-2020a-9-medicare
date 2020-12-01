@@ -52,8 +52,8 @@ import logo from "@/assets/logo.svg";
 //TODO:change to bootstrap icons
 import eye from "@/assets/eye.svg";
 import noeye from "@/assets/noeye.svg";
-import utils from "@/scripts/utils.js";
-import apiTypes from "@/scripts/apiTypes.js";
+import utils from "@/logic/utils.js";
+import apiTypes from "@/logic/apiTypes.js";
 
 export default {
     name:"Login",

@@ -105,8 +105,8 @@
 import noeye from "@/assets/noeye.svg";
 import eye from "@/assets/eye.svg";
 import editPencil from "@/assets/editPencil.svg";
-import utils from "@/scripts/utils";
-import apiTypes from "@/scripts/apiTypes";
+import utils from "@/logic/utils";
+import apiTypes from "@/logic/apiTypes";
 
 
 export default {
