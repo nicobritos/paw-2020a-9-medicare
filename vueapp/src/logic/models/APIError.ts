@@ -3,23 +3,20 @@ import {JSONSerializable, JSONSerializableKeys} from '~/src/logic/models/utils/J
 export const ErrorMIME = 'application/vnd.error.v1+json';
 
 export class APIError implements JSONSerializable<APIError> {
-    private _code: number;
-    private _message: number;
+    private readonly _code: number;
+    private readonly _message: number;
+
+    constructor(code: number, message: number) {
+        this._code = code;
+        this._message = message;
+    }
 
     public get code(): number {
         return this._code;
     }
 
-    public set code(value: number) {
-        this._code = value;
-    }
-
     public get message(): number {
         return this._message;
-    }
-
-    public set message(value: number) {
-        this._message = value;
     }
 
     public toJSON(): JSONSerializableKeys<APIError> {
