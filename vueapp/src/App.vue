@@ -9,29 +9,25 @@
   </span>
 </template>
 
-<script>
+<script lang="ts">
 import "bootstrap/dist/css/bootstrap.css";
 import "bootstrap-vue/dist/bootstrap-vue.css";
-import apiTypes from "@/logic/apiTypes";
 import Navbar from "./components/navbar/navbar.vue";
+import {Component, Vue} from 'vue-property-decorator';
+import {User} from '~/src/logic/models/User';
 
-export default {
-  name: "App",
-  components: {
-    Navbar: Navbar,
-  },
-  computed:{
-    isAuth(){
-      return ["Login","Signup","SignupStaff","SignupPatient"].includes(this.$route.name);
+@Component({
+    components: {
+        Navbar
     }
-  },
-  data: function() {
-    return {
-      user: new apiTypes.User(0,"default@useremail.com","firstName","surname",false,"0000-0000",0),
-      logged: false,
-    };
-  },
-};
+})
+export default class App extends Vue {
+    private readonly user: User = new User();
+
+    get isAuth(): boolean {
+        return ["Login","Signup","SignupStaff","SignupPatient"].includes(this.$route.name);
+    }
+}
 </script>
 
 <style>

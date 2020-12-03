@@ -12,16 +12,23 @@
     </div>
 </template>
 
-<script>
-import apiTypes from "@/logic/apiTypes";
+<script lang="ts">
+import {Component, Vue} from 'vue-property-decorator';
+import {User} from '@/logic/models/User.ts';
 
-export default {
-    name:"Unverified",
-    data:function() {
-        return {
-            user:new apiTypes.User(1,"email","firstName","surname",false,"00.000",1),
-            tokenError:false
-        }
+@Component
+export default class Unverified extends Vue {
+    private readonly user: User = new User();
+    private readonly tokenError: boolean = false;
+
+    created(): void {
+        this.user.id = 1;
+        this.user.email = 'email';
+        this.user.firstName = 'firstName';
+        this.user.surname = 'surname';
+        this.user.verified = false;
+        this.user.profilePictureId = 1;
+        this.user.phone = '00000000';
     }
 }
 </script>

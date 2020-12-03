@@ -21,17 +21,17 @@
                             <p>
                                 <!-- TODO:check -->
                                 <span v-for="(specialty,index) in staff.staffSpecialtyIds" :key="specialty.id">
-                                    {{index != staff.staffSpecialtyIds.length-1? getSpecialty(specialty) + "," : getSpecialty(specialty)}}
+                                    {{index != staff.staffSpecialtyIds.length-1? "SPECIALTY" + "," : "SPECIALTY"}}
                                 </span>
                             </p>
                         </div>
                     </div>
                 </div>
                 <div class="row mt-3 pl-4">
-                    <p class="m-0"><b>{{$t("Address")}}:</b> {{staff.office.street}} - {{getLocality(staff.office.localityId)}}</p>
+                    <p class="m-0"><b>{{$t("Address")}}:</b> {{staff.office.street}} - TODO Locality</p>
                     <a
                         class="link"
-                        :href="'https://www.google.com/maps/search/?api=1&query='+getLocality(staff.office.localityId)+','+staff.office.street"
+                        :href="'https://www.google.com/maps/search/?api=1&query=TODOLocality'+','+staff.office.street"
                         target="_blank"
                     >
                         <small class="m-1">{{$t("SeeInGoogleMaps")}}</small>
@@ -108,98 +108,106 @@
     </div>    
 </template>
 
-<script>
+<script lang="ts">
 import utils from "@/logic/utils";
-import apiTypes from "@/logic/apiTypes";
+import {Component} from 'vue';
+import {Vue} from 'vue-property-decorator';
+import {User} from '../logic/models/User';
+import {Staff} from '../logic/models/Staff';
+import {Office} from '../logic/models/Office';
 
 // TODO:check
 Date.prototype.plusDays = function(i) {
     let date = new Date(this.valueOf());
     date.setDate(date.getDate() + i);
     return date;
-}
+};
 
+@Component
+export default class SelectAppointment extends Vue {
+    private readonly user = new User();
+    private readonly prev = '<';
+    private readonly next = '>';
+    private readonly monday = new Date(2020, 7, 13);
+    private readonly weekSlots = [[], [], [], [], [], [], []];
+    private readonly timeslots = [];
+    private readonly staff = new Staff();
 
-export default {
-    name:"SelectAppointment",
-    data(){
-        let user = new apiTypes.User(1,"example@email.com","firstName","surname",true,"0000-0000",1);
-        return {
-            prev:"<",
-            next:">",
+    created(): void {
+        this.user.id = 1;
+        this.user.email = 'example@email.com';
+        this.user.firstName = 'firstName';
+        this.user.surname = 'surname';
+        this.user.verified = true;
+        this.user.phone = '00000000';
+        this.user.profilePictureId = 1;
 
-            monday:new Date(2020,7,13),
-            weekSlots:[[],[],[],[],[],[],[]],
-            timeslots:[],
-            user:user,
-            staff:new apiTypes.Staff(
-                1,
-                "0000-0000",
-                "example@email.com",
-                1,
-                user,
-                new apiTypes.Office(1,"0000-0000","example@email.com","street","url",1),
-                [1])
+        let office = new Office();
+        office.id = 1;
+        office.name = 'Consultorio de ' + this.user.surname;
+        office.phone = this.user.phone;
+        office.email = this.user.email;
+        office.street = 'Street 1234';
+        office.url = 'example.com';
+
+        this.staff.id = 1;
+        this.staff.user = this.user;
+        this.staff.phone = this.user.phone;
+        this.staff.email = this.user.email;
+        this.staff.registrationNumber = 12345;
+        this.staff.specialtyIds = [1];
+    }
+
+    public getMoY(t): string {
+        switch(t){
+            case 0:
+                return this.$t("January");
+            case 1:
+                return this.$t("February");
+            case 2:
+                return this.$t("March");
+            case 3:
+                return this.$t("April");
+            case 4:
+                return this.$t("May");
+            case 5:
+                return this.$t("June");
+            case 6:
+                return this.$t("July");
+            case 7:
+                return this.$t("August");
+            case 8:
+                return this.$t("September");
+            case 9:
+                return this.$t("October");
+            case 10:
+                return this.$t("November");
+            case 11:
+                return this.$t("December");
+            default:
+                return t;
         }
-    },
-    methods:{
-        getLocality(id){
-            return "locality" + id;
-        },
-        getSpecialty(id){
-            return "Specialty" + id;
-        },
-        getMoY(t){
-            switch(t){
-                case 0:
-                    return this.$t("January");
-                case 1:
-                    return this.$t("February");
-                case 2:
-                    return this.$t("March");
-                case 3:
-                    return this.$t("April");
-                case 4:
-                    return this.$t("May");
-                case 5:
-                    return this.$t("June");
-                case 6:
-                    return this.$t("July");
-                case 7:
-                    return this.$t("August");
-                case 8:
-                    return this.$t("September");
-                case 9:
-                    return this.$t("October");
-                case 10:
-                    return this.$t("November");
-                case 11:
-                    return this.$t("December");
-                default:
-                    return t;
-            }
-        },
-        getDoW(t){
-            switch (t) {   
-                case 1:
-                    return this.$t("Monday");
-                case 2:
-                    return this.$t("Tuesday");
-                case 3:
-                    return this.$t("Wednesday");
-                case 4:
-                    return this.$t("Thursday");
-                case 5:
-                    return this.$t("Friday");
-                case 6:
-                    return this.$t("Saturday");
-                case 0:
-                    return this.$t("Sunday");
-                default:
-                    return t;
-            }
-        },
-        getUrl:utils.getUrl
+    }
+
+    public getDoW(t): string {
+        switch (t) {
+            case 1:
+                return this.$t("Monday");
+            case 2:
+                return this.$t("Tuesday");
+            case 3:
+                return this.$t("Wednesday");
+            case 4:
+                return this.$t("Thursday");
+            case 5:
+                return this.$t("Friday");
+            case 6:
+                return this.$t("Saturday");
+            case 0:
+                return this.$t("Sunday");
+            default:
+                return t;
+        }
     }
 }
 </script>

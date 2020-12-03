@@ -24,7 +24,8 @@
             "@/*": [
                 "./*"
             ]
-        }
+        },
+        "typeRoots" : ["./src/types"]
     },
     "include": [
         "./**/*.ts",
