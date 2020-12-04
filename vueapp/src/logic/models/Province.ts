@@ -3,15 +3,15 @@ import {JSONSerializableKeys} from '~/src/logic/models/utils/JSONSerializable';
 import {Country} from '~/src/logic/models/Country';
 
 export class Province extends GenericEntity<Province> {
-    private _id: string;
+    private _id: number;
     private _name: string;
     private _country: Country;
 
-    public get id(): string {
+    public get id(): number {
         return this._id;
     }
 
-    public set id(value: string) {
+    public set id(value: number) {
         this._id = value;
     }
 
