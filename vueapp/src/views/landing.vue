@@ -2,41 +2,47 @@
     <!-- TODO: check this tag -->
     <span>
         <div class="container w-100 ml-4 mb-5">
-            <h2 class="display-5 mt-5 green-text">{{$t("FindingMedicQuickAndEasy")}}</h2>
+            <h2 class="display-5 mt-5 green-text">{{ $t('FindingMedicQuickAndEasy') }}</h2>
         </div>
         <div class="container h-50 justify-content-center">
             <!-- TODO:FORM -->
             <form class="filter-form p-3" @submit="submitForm"> 
                 <div class="form-row">
                     <div class="col">
-                        <h2 class="ml-5 mt-3 form-title">{{$t("SearchMedics")}}</h2>
+                        <h2 class="ml-5 mt-3 form-title">{{ $t('SearchMedics') }}</h2>
                     </div>
                 </div>
                 <div class="form-row justify-content-center justify-content-around mt-3">
                     <div class="col-5 pl-5">
                         <label for="name"></label>
-                        <input class="w-100 form-control" type="text" name="name" id="name" :placeholder='$t("NameAndOrSurname")'>
+                        <input class="w-100 form-control" type="text" name="name" id="name"
+                               :placeholder='$t("NameAndOrSurname")'>
                     </div>
                     <div class="col">
                         <label for="specialties"></label>
                         <select name="specialties" class="select-css form-control" id="specialties">
-                            <option value="-1" disabled selected>{{$t("Specialty")}}</option>
-                            <option value="-1">{{$t("Any")}}</option>
-                            <option v-for="specialty in specialties" :key="specialty.id" :value="specialty.id">{{specialty.name}}</option>
+                            <option value="-1" disabled selected>{{ $t('Specialty') }}</option>
+                            <option value="-1">{{ $t('Any') }}</option>
+                            <option v-for="specialty in specialties" :key="specialty.id"
+                                    :value="specialty.id">{{ specialty.name }}</option>
                         </select>
                     </div>
                     <div class="col pr-5">
                         <label for="localities">
                         </label>
                         <select name="localities" class="select-css form-control" id="localities">
-                            <option value="-1" disabled selected>{{$t("Locality")}}</option>
-                            <option value="-1">{{$t("Any")}}</option>
-                            <option v-for="locality in localities" :key="locality.id" :value="locality.id">{{locality.name}}</option>
+                            <option value="-1" disabled selected>{{ $t('Locality') }}</option>
+                            <option value="-1">{{ $t('Any') }}</option>
+                            <option v-for="locality in localities" :key="locality.id"
+                                    :value="locality.id">{{ locality.name }}</option>
                         </select>
                     </div>
                 </div>
                 <div class="form-row px-5 mt-4 mb-3">
-                    <button type="submit" class="w-100 btn rounded-pill btn-light header-btn-element">{{$t("SearchMedics")}}</button>
+                    <button type="submit"
+                            class="w-100 btn rounded-pill btn-light header-btn-element">{{
+                            $t('SearchMedics')
+                        }}</button>
                 </div>
             </form>
             <br>
@@ -54,39 +60,36 @@
         </div>
     </span>
 </template>
-<script>
-import Api from "@/logic/api";
-import utils from "@/logic/utils";
 
-export default {
-    name:"Landing",
-    data:function() {
-        return{
-            localities:[],
-            specialties:[]
+<script lang="ts">
+import utils from '@/logic/utils';
+import {Component, Vue} from 'vue-property-decorator';
+
+@Component
+export default class Landing extends Vue {
+    private localities: [];
+    private specialties: [];
+
+    submitForm(e: Event): void {
+        e.preventDefault();
+        let query = {};
+        if (e.target['name'].value) {
+            query.name = e.target['name'].value;
         }
-    },
-    methods:{
-        submitForm:function(e){
-            e.preventDefault();
-            let query = {};
-            if(e.target["name"].value){
-                query.name = e.target["name"].value;
-            }
-            //TODO:Check
-            if(e.target["specialties"].value && e.target["specialties"].value>0){
-                query.specialties = e.target["specialties"].value;
-            }
-            //TODO:Check
-            if(e.target["localities"].value && e.target["localities"].value > 0){
-                query.localities = e.target["localities"].value;
-            }
-            
-            this.$router.push({path:utils.getUrl("mediclist"),query:query});
+        //TODO:Check
+        if (e.target['specialties'].value && e.target['specialties'].value > 0) {
+            query.specialties = e.target['specialties'].value;
         }
-    },
+        //TODO:Check
+        if (e.target['localities'].value && e.target['localities'].value > 0) {
+            query.localities = e.target['localities'].value;
+        }
+
+        this.$router.push({path: utils.getUrl('mediclist'), query: query});
+    }
+
     // TODO: handle error
-    async mounted(){
+    async mounted(): void {
         let specialties = await Api.getSpecialties();
         this.specialties = specialties;
 
@@ -147,7 +150,7 @@ export default {
 }
 
 .form-control {
-    background-color: rgba(214, 214, 214);
+    background-color: rgb(214, 214, 214);
 }
 
 .white-text {
@@ -176,22 +179,22 @@ export default {
 }
 
 .shareDiv {
-	display: flex;
-	padding: 0% 10%;
-	justify-content: center;
+    display: flex;
+    padding: 0% 10%;
+    justify-content: center;
 }
 
 .shareTitle {
-	font-size: 1.5em;
-	padding-top: 14px;
+    font-size: 1.5em;
+    padding-top: 14px;
 }
 
 .shareSocial {
-	margin-left: 30px;
+    margin-left: 30px;
 }
 
 .jssocials-share-link {
-	box-shadow: none;
-	border: none !important;
+    box-shadow: none;
+    border: none !important;
 }
 </style>

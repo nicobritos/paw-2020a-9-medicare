@@ -7,10 +7,10 @@
                         <div class="profile-picture-container">
                             <div style="margin-top: 100%;"></div>
                             <img
-                                    id="profilePic"
-                                    class="profile-picture rounded-circle"
-                                    :src="getUrl('profilePics/'+user.profilePictureId)"
-                                    alt="profile pics"
+                                id="profilePic"
+                                class="profile-picture rounded-circle"
+                                :src="getUrl('profilePics/'+user.profilePictureId)"
+                                alt="profile pics"
                             />
                         </div>
                     </div>
@@ -26,62 +26,62 @@
                     <form>
                         <div class="row">
                             <div class="col p-0 m-0">
-                                <h3>{{$t("Name")}} 
+                                <h3>{{ $t('Name') }}
                                     <label for="firstName" class="toggle-readonly">
                                         <img type="button" :src='editPencil' alt="editar"/>
                                     </label>
                                 </h3>
-                                <input  class="form-control mb-3 w-75" id="firstName" name="firstName"
-                                        :value="user.firstName" readonly="true"/>
+                                <input class="form-control mb-3 w-75" id="firstName" name="firstName"
+                                       :value="user.firstName" readonly="true"/>
                             </div>
                             <div class="col p-0 m-0">
-                                <h3>{{$t("Surname")}} 
+                                <h3>{{ $t('Surname') }}
                                     <label for="surname" class="toggle-readonly">
                                         <img type="button" :src='editPencil' alt="editar"/>
                                     </label>
                                 </h3>
                                 <input class="form-control mb-3 w-75" name="surname" id="surname"
-                                            :value="user.surname" readonly="true"/>
+                                       :value="user.surname" readonly="true"/>
                             </div>
                         </div>
                         <div class="row">
                             <div class="col p-0 m-0">
-                                <h3>{{$t("Phone")}}
+                                <h3>{{ $t('Phone') }}
                                     <label for="phone" class="toggle-readonly">
                                         <img type="button" :src='editPencil' alt="editar"/>
                                     </label>
                                 </h3>
-                                <input  class="form-control mb-3 w-75" id="phone" name="phone"
-                                        :value="user.phone" readonly="true"/>
+                                <input class="form-control mb-3 w-75" id="phone" name="phone"
+                                       :value="user.phone" readonly="true"/>
                             </div>
                             <div class="col p-0 m-0">
-                                <h3>{{$t("Email")}} 
+                                <h3>{{ $t('Email') }}
                                     <label for="email" class="toggle-readonly">
                                         <img type="button" :src='editPencil' alt="editar"/>
                                     </label>
                                 </h3>
-                                <input  class="form-control mb-3 w-75" id="email" name="email"
-                                        :value="user.email" readonly="true"/>
+                                <input class="form-control mb-3 w-75" id="email" name="email"
+                                       :value="user.email" readonly="true"/>
                             </div>
                         </div>
                         <div class="row">
                             <div class="col p-0 m-0">
-                                <h3>{{$t("Password")}} 
+                                <h3>{{ $t('Password') }}
                                     <label for="password" class="toggle-readonly">
                                         <img type="button" :src='editPencil' alt="editar"/>
                                     </label>
                                 </h3>
-                                <input  type="password" class="form-control mb-3 w-75" id="password" name="password"
-                                        readonly="true"/>
+                                <input type="password" class="form-control mb-3 w-75" id="password" name="password"
+                                       readonly="true"/>
                                 <label for="password" class="toggle-visibility">
                                     <img :src='eye' style="display: none;">
                                     <img :src='noeye' style="display: none;">
                                 </label>
                             </div>
                             <div class="col p-0 m-0" id="repeat-password-container" style="display: none">
-                                <h3>{{$t("RepeatPassword")}}</h3>
-                                <input  visible="false" type="password" class="form-control mb-3 w-75"
-                                        id="repeatPassword" name="repeatPassword"  readonly="true"/>
+                                <h3>{{ $t('RepeatPassword') }}</h3>
+                                <input visible="false" type="password" class="form-control mb-3 w-75"
+                                       id="repeatPassword" name="repeatPassword" readonly="true"/>
                                 <label for="repeatPassword" class="toggle-visibility">
                                     <img :src='eye' style="display: none;">
                                     <img :src='noeye' style="display: none;">
@@ -89,59 +89,63 @@
                             </div>
                         </div>
                         <div class="row justify-content-center align-items-end mt-2">
-                            <button type="submit" class="btn btn-info">{{$t("ConfirmChanges")}}</button>
+                            <button type="submit" class="btn btn-info">{{ $t('ConfirmChanges') }}</button>
                         </div>
                     </form>
                     <div class="row mb-3">
-                        <h3>{{$t("Office")}}</h3>
+                        <h3>{{ $t('Office') }}</h3>
                         <div v-for="staff in staffs" :key="staff.id" class="container p-0 m-0 pl-3">
                             <div class="row d-flex align-items-center justify-content-between">
-                                <p class="m-0">{{"- "+ staff.office.name + " - TEL: "+ staff.office.phone}}</p>
+                                <p class="m-0">{{ '- ' + staff.office.name + ' - TEL: ' + staff.office.phone }}</p>
                             </div>
                         </div>
                     </div>
                     <div class="row">
-                        <h3>{{$t("Schedule")}}</h3>
+                        <h3>{{ $t('Schedule') }}</h3>
                         <div class="container p-0 m-0 pl-3">
                             <div v-if="workdays.length == 0" class="container-fluid justify-content-center">
-                                <p class="text-center mt-2" style="color:grey;">{{$t("NoSchedule")}}</p>
+                                <p class="text-center mt-2" style="color:grey;">{{ $t('NoSchedule') }}</p>
                             </div>
-                            <div v-for="workday in workdays" :key="workday.id" class="row d-flex align-items-center justify-content-between">
+                            <div v-for="workday in workdays" :key="workday.id"
+                                 class="row d-flex align-items-center justify-content-between">
                                 <p class="m-0">-
-                                    {{$t("wkd_from_wksh_wksm_to_wkeh_wkem_cons",
-                                        [
-                                            getDow(workday.getDay()),
-                                            timeWithZero(workday.startHour),
-                                            timeWithZero(workday.startMinute),
-                                            timeWithZero(workday.endHour),
-                                            timeWithZero(workday.endMinute),
-                                            workday.staff.office.name
-                                        ])}}
+                                    {{
+                                        $t('wkd_from_wksh_wksm_to_wkeh_wkem_cons',
+                                            [
+                                                getDow(workday.getDay()),
+                                                timeWithZero(workday.startHour),
+                                                timeWithZero(workday.startMinute),
+                                                timeWithZero(workday.endHour),
+                                                timeWithZero(workday.endMinute),
+                                                workday.staff.office.name
+                                            ])
+                                    }}
                                 </p>
                                 <!-- TODO: connect button -->
                                 <button class="btn cancel-workday-btn" type="button">X</button>
                             </div>
                             <div class="row d-flex align-items-center justify-content-center my-3">
                                 <a :href="getUrl('staff/profile/workday')" type="button" class="btn btn-info">
-                                {{$t("AddSchedule")}}</a>
+                                    {{ $t('AddSchedule') }}</a>
                             </div>
                         </div>
                     </div>
                     <div class="row mb-3">
-                        <h3>{{$t("Specialties")}}</h3>
+                        <h3>{{ $t('Specialties') }}</h3>
                         <div v-if="specialties.length == 0" class="container-fluid justify-content-center">
-                            <p class="text-center mt-2" style="color:grey;">{{$t("NoSpecialties")}}</p>
+                            <p class="text-center mt-2" style="color:grey;">{{ $t('NoSpecialties') }}</p>
                         </div>
                         <div v-for="specialty in specialties" :key="specialty.id" class="container p-0 m-0 pl-3">
                             <div class="row d-flex align-items-center justify-content-between">
-                                <p class="m-0">{{specialty.name}}</p>
+                                <p class="m-0">{{ specialty.name }}</p>
                                 <!-- TODO:connect button -->
                                 <button class="btn cancel-specialty-btn" type="button">X</button>
                             </div>
                         </div>
                     </div>
                     <div class="row d-flex align-items-center justify-content-center my-3">
-                        <a :href="getUrl('/staff/profile/specialty')" type="button" class="btn btn-info">{{$t("AddSpecialty")}}</a>
+                        <a :href="getUrl('/staff/profile/specialty')" type="button"
+                           class="btn btn-info">{{ $t('AddSpecialty') }}</a>
                     </div>
                 </div>
             </div>
@@ -149,60 +153,54 @@
             </div>
         </div>
     </div>
-        
+
 </template>
 
-<script>
-import moreOptions from "@/assets/moreOptions.svg";
-import utils from "@/logic/utils";
-import editPencil from "@/assets/editPencil.svg";
-import eye from "@/assets/eye.svg";
-import noeye from "@/assets/noeye.svg";
-import apiTypes from "@/logic/apiTypes";
+<script lang="ts">
+import moreOptions from '@/assets/moreOptions.svg';
+import editPencil from '@/assets/editPencil.svg';
+import eye from '@/assets/eye.svg';
+import noeye from '@/assets/noeye.svg';
+import {Component, Vue} from 'vue-property-decorator';
 
-export default {
-    name:"MedicProfile",
-    data(){
-        return {
-            moreOptions:moreOptions,
-            editPencil:editPencil,
-            eye:eye,
-            noeye:noeye,
-            user:new apiTypes.User(1,"email","firstName","surname",true,"0000-0000",1),
-            staffs:[],
-            workdays:[],
-            specialties:[]
+@Component
+export default class MedicProfile extends Vue {
+    private moreOptions = moreOptions;
+    private editPencil = editPencil;
+    private eye = eye;
+    private noeye = noeye;
+    private user = new apiTypes.User(1, 'email', 'firstName', 'surname', true, '0000-0000', 1);
+    private staffs = [];
+    private workdays = [];
+    private specialties = [];
+
+    getDow(day: Date): string {
+        switch (day.getDay()) {
+            case 1:
+                return this.$t('Monday');
+            case 2:
+                return this.$t('Tuesday');
+            case 3:
+                return this.$t('Wednesday');
+            case 4:
+                return this.$t('Thursday');
+            case 5:
+                return this.$t('Friday');
+            case 6:
+                return this.$t('Saturday');
+            case 0:
+                return this.$t('Sunday');
+            default:
+                return day.getDay();
         }
-    },
-    methods:{
-        getDow(day){
-            switch(day.getDay()){
-                case 1:
-                    return this.$t("Monday");
-                case 2:
-                    return this.$t("Tuesday")
-                case 3:    
-                    return this.$t("Wednesday")
-                case 4:    
-                    return this.$t("Thursday")
-                case 5:    
-                    return this.$t("Friday")
-                case 6:    
-                    return this.$t("Saturday")
-                case 0:    
-                    return this.$t("Sunday")
-                default:
-                    return day.getDay();
-            }
-        },
-        timeWithZero(t){
-            if(t<10){
-                return "0" + t;
-            }else{
-                return t;
-            }
-        },
-        getUrl:utils.getUrl                    
+    }
+
+    timeWithZero(t: number): string {
+        if (t < 10) {
+            return '0' + t;
+        } else {
+            return t.toString();
+        }
     }
 }
 </script>
@@ -257,7 +255,7 @@ export default {
 }
 
 .form-control {
-    background-color: rgba(214, 214, 214);
+    background-color: rgb(214, 214, 214);
 }
 
 .white-text {
@@ -270,7 +268,7 @@ export default {
 
 .turno-item {
     border-radius: 2em !important;
-    background-color: rgba(214, 214, 214);
+    background-color: rgb(214, 214, 214);
 }
 
 .turno-list {

@@ -1,13 +1,13 @@
-<template>    
+<template>
     <div class="container flex-grow-1 d-flex flex-column w-100 h-100 justify-content-center align-items-center">
         <div class="px-5 py-3 d-flex flex-column align-items-center justify-content-center styled-container">
-            <h1 class="mb-4">{{$t("MissingEmailVerification")}}</h1>
-            <h4>{{$t("VerificationEmailSent")}}:</h4>
-            <h4>"{{user.email}}"</h4>
-            <h4>{{$t("UntilVerifiedCantContinue")}}</h4>
+            <h1 class="mb-4">{{ $t('MissingEmailVerification') }}</h1>
+            <h4>{{ $t('VerificationEmailSent') }}:</h4>
+            <h4>"{{ user.email }}"</h4>
+            <h4>{{ $t('UntilVerifiedCantContinue') }}</h4>
         </div>
         <div v-if="tokenError" class="alert alert-danger medicare-alert-error">
-            {{$t("TokenError.loginForm")}}
+            {{ $t('TokenError.loginForm') }}
         </div>
     </div>
 </template>

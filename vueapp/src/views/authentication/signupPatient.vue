@@ -1,44 +1,45 @@
-<template>    
-    <div class="container-fluid w-100 h-100 d-flex flex-column justify-content-center align-items-center signup-container">
+<template>
+    <div
+        class="container-fluid w-100 h-100 d-flex flex-column justify-content-center align-items-center signup-container">
         <form class="register-form border p-5 rounded">
             <div class="row">
                 <h6>Medicare <img :src='logo.svg' id="logo" alt="logo"/></h6>
             </div>
             <div class="row justify-content-start">
-                <h1 class="register-form-title">{{$t("CreateAccount")}}</h1>
+                <h1 class="register-form-title">{{ $t('CreateAccount') }}</h1>
             </div>
             <div class="form-group row">
                 <div class="col">
-                    <label for="first_name">{{$t("Name")}}</label>
+                    <label for="first_name">{{ $t('Name') }}</label>
                 </div>
                 <div class="col-8">
-                    <input  class="form-control" type="text" name="firstName" id="first_name"/>
-                </div>
-            </div>
-            <div class="form-group row">
-                <div class="col">
-                    <label for="surname">{{$t("Surname")}}</label>
-                </div>
-                <div class="col-8">
-                    <input  class="form-control" type="text" name="surname" id="surname"/>
+                    <input class="form-control" type="text" name="firstName" id="first_name"/>
                 </div>
             </div>
             <div class="form-group row">
                 <div class="col">
-                    <label for="medicare_email">{{$t("Email")}}</label>
+                    <label for="surname">{{ $t('Surname') }}</label>
                 </div>
                 <div class="col-8">
-                    <input  class="form-control" type="email" name="medicare_email" id="medicare_email"/>
+                    <input class="form-control" type="text" name="surname" id="surname"/>
                 </div>
             </div>
             <div class="form-group row">
                 <div class="col">
-                    <label for="medicare_password">{{$t("Password")}}</label>
+                    <label for="medicare_email">{{ $t('Email') }}</label>
                 </div>
                 <div class="col-8">
-                    <input  class="form-control pr-5" 
-                            :type='showPassword?"text":"password"' name="medicare_password"
-                            id="medicare_password" />
+                    <input class="form-control" type="email" name="medicare_email" id="medicare_email"/>
+                </div>
+            </div>
+            <div class="form-group row">
+                <div class="col">
+                    <label for="medicare_password">{{ $t('Password') }}</label>
+                </div>
+                <div class="col-8">
+                    <input class="form-control pr-5"
+                           :type='showPassword?"text":"password"' name="medicare_password"
+                           id="medicare_password"/>
                     <label for="medicare_password" class="toggle-visibility" @click="toggleShowPassword()">
                         <!-- TODO: check icons -->
                         <img v-if="!showPassword" :src='eye'>
@@ -48,12 +49,12 @@
             </div>
             <div class="form-group row">
                 <div class="col">
-                    <label for="medicare_repeatPassword">{{$t("RepeatPassword")}}</label>
+                    <label for="medicare_repeatPassword">{{ $t('RepeatPassword') }}</label>
                 </div>
                 <div class="col-8">
-                    <input  class="form-control pr-5" 
-                            :type='showRepeatPassword?"text":"password"' name="medicare_repeatPassword" 
-                            id="medicare_repeatPassword" />
+                    <input class="form-control pr-5"
+                           :type='showRepeatPassword?"text":"password"' name="medicare_repeatPassword"
+                           id="medicare_repeatPassword"/>
                     <label for="medicare_repeatPassword" class="toggle-visibility" @click="toggleShowRepeatPassword()">
                         <!-- TODO: check icons -->
                         <img v-if="!showRepeatPassword" :src='eye'>
@@ -61,37 +62,33 @@
                 </div>
             </div>
             <div class="form-row justify-content-between align-items-end mt-2">
-                <router-link class="form-link" href="${loginUrl}">{{$t("Login")}}</router-link>
-                <button type="submit" class="btn btn-primary">{{$t("Confirm")}}</button>
+                <router-link class="form-link" href="${loginUrl}">{{ $t('Login') }}</router-link>
+                <button type="submit" class="btn btn-primary">{{ $t('Confirm') }}</button>
             </div>
         </form>
     </div>
 </template>
 
-<script>
-import logo from "@/assets/logo.svg";
-import eye from "@/assets/eye.svg";
-import noeye from "@/assets/noeye.svg";
+<script lang="ts">
+import logo from '@/assets/logo.svg';
+import eye from '@/assets/eye.svg';
+import noeye from '@/assets/noeye.svg';
+import {Component, Vue} from 'vue-property-decorator';
 
-export default {
-    name:"SignupPatient",
-    data(){
-        return {
-            logo:logo,
-            showPassword:false,
-            showRepeatPassword:false,
-            eye:eye,
-            noeye:noeye
-        }
-    },
-    methods:{
-        toggleShowPassword(){
-            this.showPassword = !this.showPassword;
-        },
-        toggleShowRepeatPassword(){
-            this.showRepeatPassword = !this.showRepeatPassword;
-        }
-        
+@Component
+export default class SignupPatient extends Vue {
+    private logo = logo;
+    private showPassword = false;
+    private showRepeatPassword = false;
+    private eye = eye;
+    private noeye = noeye;
+
+    toggleShowPassword(): void {
+        this.showPassword = !this.showPassword;
+    }
+
+    toggleShowRepeatPassword(): void {
+        this.showRepeatPassword = !this.showRepeatPassword;
     }
 }
 </script>

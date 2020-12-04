@@ -1,15 +1,16 @@
 <template>
-    <div class="container-fluid w-100 m-0 p-0 d-flex flex-column justify-content-center align-items-center signup-container">
+    <div
+        class="container-fluid w-100 m-0 p-0 d-flex flex-column justify-content-center align-items-center signup-container">
         <form class="register-form border my-3 p-5 rounded">
             <div class="row">
                 <h6>Medicare <img :src='logo' id="logo" alt="logo"/></h6>
             </div>
             <div class="row justify-content-start">
-                <h1 class="register-form-title">{{$t("CreateAccount")}}</h1>
+                <h1 class="register-form-title">{{ $t('CreateAccount') }}</h1>
             </div>
             <div class="form-group row">
                 <div class="col">
-                    <label for="first_name">{{$t("Name")}}</label>
+                    <label for="first_name">{{ $t('Name') }}</label>
                 </div>
                 <div class="col-8">
                     <input class="form-control" type="text" name="firstName" id="first_name"/>
@@ -17,7 +18,7 @@
             </div>
             <div class="form-group row">
                 <div class="col">
-                    <label for="surname">{{$t("Surname")}}</label>
+                    <label for="surname">{{ $t('Surname') }}</label>
                 </div>
                 <div class="col-8">
                     <input class="form-control" type="text" name="surname" id="surname"/>
@@ -25,7 +26,7 @@
             </div>
             <div class="form-group row">
                 <div class="col">
-                    <label for="medicare_email">{{$t("Email")}}</label>
+                    <label for="medicare_email">{{ $t('Email') }}</label>
                 </div>
                 <div class="col-8">
                     <input class="form-control" type="email" name="medicare_email" id="medicare_email"/>
@@ -33,12 +34,12 @@
             </div>
             <div class="form-group row">
                 <div class="col">
-                    <label for="medicare_password">{{$t("Password")}}</label>
+                    <label for="medicare_password">{{ $t('Password') }}</label>
                 </div>
                 <div class="col-8">
-                    <input  class="form-control pr-5" 
-                            :type='showPassword?"text":"password"' name="medicare_password"
-                                id="medicare_password"/>
+                    <input class="form-control pr-5"
+                           :type='showPassword?"text":"password"' name="medicare_password"
+                           id="medicare_password"/>
                     <label for="medicare_password" class="toggle-visibility" @click="toggleShowPassword()">
                         <img v-if="!showPassword" :src='eye'>
                         <img v-else :src='noeye'>
@@ -47,12 +48,12 @@
             </div>
             <div class="form-group row">
                 <div class="col">
-                    <label for="medicare_repeatPassword">{{$t("RepeatPassword")}}</label>
+                    <label for="medicare_repeatPassword">{{ $t('RepeatPassword') }}</label>
                 </div>
                 <div class="col-8">
-                    <input  class="form-control pr-5" 
-                            :type='showRepeatPassword?"text":"password"' name="medicare_repeatPassword"
-                            id="medicare_repeatPassword"/>
+                    <input class="form-control pr-5"
+                           :type='showRepeatPassword?"text":"password"' name="medicare_repeatPassword"
+                           id="medicare_repeatPassword"/>
                     <label for="medicare_repeatPassword" class="toggle-visibility" @click="toggleShowRepeatPassword()">
                         <img v-if="!showRepeatPassword" :src='eye'>
                         <img v-else :src='noeye'>
@@ -61,7 +62,7 @@
             </div>
             <div class="form-group row">
                 <div class="col">
-                    <label for="country">{{$t("Country")}}</label>
+                    <label for="country">{{ $t('Country') }}</label>
                 </div>
                 <div class="col-8">
                     <select class="form-control" style="width: 100%;" items="${countryMap}" id="country"/>
@@ -69,7 +70,7 @@
             </div>
             <div class="form-group row" id="province-container">
                 <div class="col">
-                    <label for="province">{{$t("Province")}}</label>
+                    <label for="province">{{ $t('Province') }}</label>
                 </div>
                 <div class="col-8">
                     <select class="form-control" style="width: 100%;" id="province"/>
@@ -77,7 +78,7 @@
             </div>
             <div class="form-group row" id="locality-container">
                 <div class="col">
-                    <label for="locality">{{$t("Locality")}}</label>
+                    <label for="locality">{{ $t('Locality') }}</label>
                 </div>
                 <div class="col-8">
                     <select class="form-control" style="width: 100%;" id="locality"/>
@@ -85,46 +86,40 @@
             </div>
             <div class="form-group row">
                 <div class="col">
-                    <label for="address">{{$t("Address")}}</label>
+                    <label for="address">{{ $t('Address') }}</label>
                 </div>
                 <div class="col-8">
                     <input class="form-control" type="text" name="address" id="address"/>
                 </div>
             </div>
             <div class="form-row justify-content-between align-items-end mt-2">
-                <router-link class="form-link" :href='getUrl("login")'>{{$t("Login")}}</router-link>
-                <button type="submit" class="btn btn-primary">{{$t("Confirm")}}</button>
+                <router-link class="form-link" :href='getUrl("login")'>{{ $t('Login') }}</router-link>
+                <button type="submit" class="btn btn-primary">{{ $t('Confirm') }}</button>
             </div>
         </form>
     </div>
 </template>
 
-<script>
-import eye from "@/assets/eye.svg";
-import noeye from "@/assets/noeye.svg";
-import logo from "@/assets/logo.svg";
-import utils from "@/logic/utils";
+<script lang="ts">
+import eye from '@/assets/eye.svg';
+import noeye from '@/assets/noeye.svg';
+import logo from '@/assets/logo.svg';
+import {Component, Vue} from 'vue-property-decorator';
 
+@Component
+export default class SignupStaff extends Vue {
+    private showPassword = false;
+    private showRepeatPassword = false;
+    private logo = logo;
+    private eye = eye;
+    private noeye = noeye;
 
-export default {
-    name:"SignupStaff",
-    data(){
-        return {
-            showPassword:false,
-            showRepeatPassword:false,
-            logo:logo,
-            eye:eye,
-            noeye:noeye
-        }
-    },
-    methods:{
-        toggleShowPassword(){
-            this.showPassword = !this.showPassword;
-        },
-        toggleShowRepeatPassword(){
-            this.showRepeatPassword = !this.showRepeatPassword;
-        },
-        getUrl:utils.getUrl
+    toggleShowPassword(): void {
+        this.showPassword = !this.showPassword;
+    }
+
+    toggleShowRepeatPassword(): void {
+        this.showRepeatPassword = !this.showRepeatPassword;
     }
 }
 </script>

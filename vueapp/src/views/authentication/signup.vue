@@ -1,42 +1,40 @@
 <template>
-    <div class="container-fluid w-100 h-100 d-flex flex-column justify-content-center align-items-center signup-container">
+    <div
+        class="container-fluid w-100 h-100 d-flex flex-column justify-content-center align-items-center signup-container">
         <div class="register-form border p-5 rounded">
             <div class="row">
                 <h6>Medicare <img :src='logo' id="logo"/></h6>
             </div>
             <div class="row justify-content-start">
-                <h1 class="register-form-title">{{$t("CreateAccount")}}</h1>
+                <h1 class="register-form-title">{{ $t('CreateAccount') }}</h1>
             </div>
             <div class="form-row justify-content-between align-items-end">
-                <router-link :to='getUrl("signup/patient")' tag="div" class="d-flex flex-column mr-5 align-items-center card card-shadow pointer p-2" id="signup-patient">
+                <router-link :to='getUrl("signup/patient")' tag="div"
+                             class="d-flex flex-column mr-5 align-items-center card card-shadow pointer p-2"
+                             id="signup-patient">
                     <!-- TODO: solve icons -->
                     <i class="fa fa-hospital-user" style="font-size: 80px;"></i>
-                    <h4 class="mt-2">{{$t("LookingForMedics")}}</h4>
+                    <h4 class="mt-2">{{ $t('LookingForMedics') }}</h4>
                 </router-link>
-                <router-link :to='getUrl("signup/staff")' tag="div" class="d-flex flex-column align-items-center card card-shadow pointer p-2" id="signup-staff">
+                <router-link :to='getUrl("signup/staff")' tag="div"
+                             class="d-flex flex-column align-items-center card card-shadow pointer p-2"
+                             id="signup-staff">
                     <!-- TODO: solve icons -->
                     <i class="fa fa-user-md" style="font-size: 80px;"></i>
-                    <h4 class="mt-2">{{$t("IMAMedic")}}</h4>
+                    <h4 class="mt-2">{{ $t('IMAMedic') }}</h4>
                 </router-link>
             </div>
         </div>
     </div>
 </template>
 
-<script>
-import logo from "@/assets/logo.svg";
-import utils from "@/logic/utils";
+<script lang="ts">
+import logo from '@/assets/logo.svg';
+import {Component, Vue} from 'vue-property-decorator';
 
-export default {
-    name:"Signup",
-    data(){
-        return {
-            logo:logo
-        }
-    },
-    methods:{
-        getUrl:utils.getUrl
-    }
+@Component
+export default class Signup extends Vue {
+    private logo = logo;
 }
 </script>
 
