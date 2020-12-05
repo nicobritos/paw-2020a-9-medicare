@@ -1,3 +1,6 @@
+const path = require("path");
+const vueSrc = "./src";
+
 module.exports = {
     //TODO: check if theres a way to do this better without a need for an actual path
     publicPath: process.env.NODE_ENV === 'production' ? '/paw-2020a-9/' : '/',
@@ -17,5 +20,13 @@ module.exports = {
       LOCAL_PROXY_SERVER = 'http://localhost:8080/medicare'
       */
       proxy: process.env.LOCAL_PROXY_SERVER
+    },
+    configureWebpack: {
+        resolve: {
+            alias: {
+                '@': path.join(__dirname, vueSrc),
+                '~': path.join(__dirname, vueSrc),
+            }
+        }
     }
 }
