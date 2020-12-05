@@ -1,8 +1,8 @@
-import {GenericEntity} from '~/src/logic/models/utils/GenericEntity';
-import {JSONSerializableKeys} from '~/src/logic/models/utils/JSONSerializable';
-import {Nullable} from '~/src/logic/models/utils/Utils';
-import {User} from '~/src/logic/models/User';
-import {Office} from '~/src/logic/models/Office';
+import {GenericEntity} from '~/logic/models/utils/GenericEntity';
+import {JSONSerializableKeys} from '~/logic/models/utils/JSONSerializable';
+import {Nullable} from '~/logic/models/utils/Utils';
+import {User} from '~/logic/models/User';
+import {Office} from '~/logic/models/Office';
 
 export class Staff extends GenericEntity<Staff> {
     private _id: number;

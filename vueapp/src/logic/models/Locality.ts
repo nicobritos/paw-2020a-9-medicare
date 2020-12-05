@@ -1,17 +1,17 @@
-import {GenericEntity} from '~/src/logic/models/utils/GenericEntity';
-import {JSONSerializableKeys} from '~/src/logic/models/utils/JSONSerializable';
-import {Province} from '~/src/logic/models/Province';
+import {GenericEntity} from '~/logic/models/utils/GenericEntity';
+import {JSONSerializableKeys} from '~/logic/models/utils/JSONSerializable';
+import {Province} from '~/logic/models/Province';
 
 export class Locality extends GenericEntity<Locality> {
-    private _id: string;
+    private _id: number;
     private _name: string;
     private _province: Province;
 
-    public get id(): string {
+    public get id(): number {
         return this._id;
     }
 
-    public set id(value: string) {
+    public set id(value: number) {
         this._id = value;
     }
 

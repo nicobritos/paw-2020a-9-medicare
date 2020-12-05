@@ -1,6 +1,6 @@
-import {GenericEntity} from '~/src/logic/models/utils/GenericEntity';
-import {JSONSerializableKeys} from '~/src/logic/models/utils/JSONSerializable';
-import {Locality} from '~/src/logic/models/Locality';
+import {GenericEntity} from '~/logic/models/utils/GenericEntity';
+import {JSONSerializableKeys} from '~/logic/models/utils/JSONSerializable';
+import {Locality} from '~/logic/models/Locality';
 
 export class Office extends GenericEntity<Office> {
     private _id: number;

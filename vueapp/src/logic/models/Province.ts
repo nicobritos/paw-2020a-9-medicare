@@ -1,6 +1,6 @@
-import {GenericEntity} from '~/src/logic/models/utils/GenericEntity';
-import {JSONSerializableKeys} from '~/src/logic/models/utils/JSONSerializable';
-import {Country} from '~/src/logic/models/Country';
+import {GenericEntity} from '~/logic/models/utils/GenericEntity';
+import {JSONSerializableKeys} from '~/logic/models/utils/JSONSerializable';
+import {Country} from '~/logic/models/Country';
 
 export class Province extends GenericEntity<Province> {
     private _id: number;

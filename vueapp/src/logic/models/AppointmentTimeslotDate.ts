@@ -1,5 +1,5 @@
-import {JSONSerializable, JSONSerializableKeys} from '~/src/logic/models/utils/JSONSerializable';
-import {AppointmentTimeslot} from '~/src/logic/models/AppointmentTimeslot';
+import {JSONSerializable, JSONSerializableKeys} from '~/logic/models/utils/JSONSerializable';
+import {AppointmentTimeslot} from '~/logic/models/AppointmentTimeslot';
 
 export interface TimeslotDate {
     hour: number;

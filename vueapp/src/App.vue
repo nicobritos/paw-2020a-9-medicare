@@ -14,7 +14,7 @@ import "bootstrap/dist/css/bootstrap.css";
 import "bootstrap-vue/dist/bootstrap-vue.css";
 import Navbar from "./components/navbar/navbar.vue";
 import {Component, Vue} from 'vue-property-decorator';
-import {User} from '~/src/logic/models/User';
+import {User} from '~/logic/models/User';
 
 @Component({
     components: {
@@ -25,7 +25,7 @@ export default class App extends Vue {
     private readonly user: User = new User();
 
     get isAuth(): boolean {
-        return ["Login","Signup","SignupStaff","SignupPatient"].includes(this.$route.name);
+        return ["Login","Signup","SignupStaff","SignupPatient"].includes(this.$route.name!);
     }
 }
 </script>

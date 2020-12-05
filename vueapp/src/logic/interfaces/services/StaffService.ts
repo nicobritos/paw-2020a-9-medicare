@@ -1,8 +1,8 @@
-import {Staff} from '~/src/logic/models/Staff';
-import {StaffSpecialty} from '~/src/logic/models/StaffSpecialty';
-import {APIError} from '~/src/logic/models/APIError';
-import {Pagination} from '~/src/logic/models/utils/Pagination';
-import {Nullable} from '~/src/logic/models/utils/Utils';
+import {Staff} from '~/logic/models/Staff';
+import {StaffSpecialty} from '~/logic/models/StaffSpecialty';
+import {APIError} from '~/logic/models/APIError';
+import {Pagination} from '~/logic/models/utils/Pagination';
+import {Nullable} from '~/logic/models/utils/Utils';
 
 // TODO: Ver los required en api doc
 export interface UpdateStaff {

@@ -1,17 +1,17 @@
-import {GenericEntity} from '~/src/logic/models/utils/GenericEntity';
-import {JSONSerializableKeys} from '~/src/logic/models/utils/JSONSerializable';
-import {User} from '~/src/logic/models/User';
+import {GenericEntity} from '~/logic/models/utils/GenericEntity';
+import {JSONSerializableKeys} from '~/logic/models/utils/JSONSerializable';
+import {User} from '~/logic/models/User';
 
 export class Patient extends GenericEntity<Patient> {
-    private _id: string;
+    private _id: number;
     private _user: User;
     private _officeId: number;
 
-    public get id(): string {
+    public get id(): number {
         return this._id;
     }
 
-    public set id(value: string) {
+    public set id(value: number) {
         this._id = value;
     }
 

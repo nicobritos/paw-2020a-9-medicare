@@ -1,6 +1,6 @@
-import {Province} from '~/src/logic/models/Province';
-import {CacheableAsyncProperty, DefineTypes} from '~/src/store/utils/helper.types';
-import {Nullable} from '~/src/logic/models/utils/Utils';
+import {Province} from '~/logic/models/Province';
+import {CacheableAsyncProperty, DefineTypes} from '~/store/utils/helper.types';
+import {Nullable} from '~/logic/models/utils/Utils';
 
 export interface ProvinceStateType {
     [countryId: string]: Array<Province>;

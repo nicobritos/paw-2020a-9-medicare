@@ -1,11 +1,11 @@
-import {Nullable} from '~/src/logic/models/utils/Utils';
+import {Nullable} from '~/logic/models/utils/Utils';
 import {inject, injectable} from 'inversify';
-import TYPES from '~/src/logic/types';
-import {RestRepository} from '~/src/logic/interfaces/repositories/RestRepository';
-import {getPathWithId} from '~/src/logic/services/Utils';
-import {APIError} from '~/src/logic/models/APIError';
-import {WorkdayService} from '~/src/logic/interfaces/services/WorkdayService';
-import {Workday} from '~/src/logic/models/Workday';
+import TYPES from '~/logic/types';
+import {RestRepository} from '~/logic/interfaces/repositories/RestRepository';
+import {getPathWithId} from '~/logic/services/Utils';
+import {APIError} from '~/logic/models/APIError';
+import {WorkdayService} from '~/logic/interfaces/services/WorkdayService';
+import {Workday} from '~/logic/models/Workday';
 
 const WorkdayMIME = {
     LIST: 'application/vnd.workday.list.get.v1+json',

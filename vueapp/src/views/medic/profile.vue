@@ -162,6 +162,11 @@ import editPencil from '@/assets/editPencil.svg';
 import eye from '@/assets/eye.svg';
 import noeye from '@/assets/noeye.svg';
 import {Component, Vue} from 'vue-property-decorator';
+import {User} from '~/logic/models/User';
+
+let user = new User();
+user.email = user.firstName = user.phone = user.surname = 'asd';
+user.id = user.profilePictureId = 1;
 
 @Component
 export default class MedicProfile extends Vue {
@@ -169,7 +174,7 @@ export default class MedicProfile extends Vue {
     private editPencil = editPencil;
     private eye = eye;
     private noeye = noeye;
-    private user = new apiTypes.User(1, 'email', 'firstName', 'surname', true, '0000-0000', 1);
+    private user: User = user;
     private staffs = [];
     private workdays = [];
     private specialties = [];
@@ -177,21 +182,21 @@ export default class MedicProfile extends Vue {
     getDow(day: Date): string {
         switch (day.getDay()) {
             case 1:
-                return this.$t('Monday');
+                return this.$t('Monday').toString();
             case 2:
-                return this.$t('Tuesday');
+                return this.$t('Tuesday').toString();
             case 3:
-                return this.$t('Wednesday');
+                return this.$t('Wednesday').toString();
             case 4:
-                return this.$t('Thursday');
+                return this.$t('Thursday').toString();
             case 5:
-                return this.$t('Friday');
+                return this.$t('Friday').toString();
             case 6:
-                return this.$t('Saturday');
+                return this.$t('Saturday').toString();
             case 0:
-                return this.$t('Sunday');
+                return this.$t('Sunday').toString();
             default:
-                return day.getDay();
+                return day.getDay().toString();
         }
     }
 

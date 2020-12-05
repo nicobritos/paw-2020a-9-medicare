@@ -202,6 +202,7 @@
 import moreOptions from '@/assets/moreOptions.svg';
 import {Component, Vue} from 'vue-property-decorator';
 
+// @ts-ignore
 Date.prototype.plusDays = function (i) {
     let date = new Date(this.valueOf());
     date.setDate(date.getDate() + i);
@@ -227,32 +228,34 @@ export default class MedicHome extends Vue {
     }
 
     getMpdMonthOfYear(i: number): string {
+        // @ts-ignore
         switch (this.monday.plusDays(i).monthOfYear) {
             case 0:
-                return this.$t('JanuaryAbbreviated');
+                return this.$t('JanuaryAbbreviated').toString();
             case 1:
-                return this.$t('FebruaryAbbreviated');
+                return this.$t('FebruaryAbbreviated').toString();
             case 2:
-                return this.$t('MarchAbbreviated');
+                return this.$t('MarchAbbreviated').toString();
             case 3:
-                return this.$t('AprilAbbreviated');
+                return this.$t('AprilAbbreviated').toString();
             case 4:
-                return this.$t('MayAbbreviated');
+                return this.$t('MayAbbreviated').toString();
             case 5:
-                return this.$t('JuneAbbreviated');
+                return this.$t('JuneAbbreviated').toString();
             case 6:
-                return this.$t('JulyAbbreviated');
+                return this.$t('JulyAbbreviated').toString();
             case 7:
-                return this.$t('AugustAbbreviated');
+                return this.$t('AugustAbbreviated').toString();
             case 8:
-                return this.$t('SeptemberAbbreviated');
+                return this.$t('SeptemberAbbreviated').toString();
             case 9:
-                return this.$t('OctoberAbbreviated');
+                return this.$t('OctoberAbbreviated').toString();
             case 10:
-                return this.$t('NovemberAbbreviated');
+                return this.$t('NovemberAbbreviated').toString();
             case 11:
-                return this.$t('DecemberAbbreviated');
+                return this.$t('DecemberAbbreviated').toString();
             default:
+                // @ts-ignore
                 return this.monday.plusDays(i).monthOfYear;
         }
     }

@@ -5,11 +5,11 @@ import {
     PostConfig,
     PutConfig,
     RestRepository,
-} from '~/src/logic/interfaces/repositories/RestRepository';
-import {APIError, ErrorMIME} from '~/src/logic/models/APIError';
-import {APIResponse, APIResponseFactory} from '~/src/logic/models/APIResponse';
-import {Pagination, PaginationLinks} from '~/src/logic/models/utils/Pagination';
-const parseLinkHeader = require('parse-link-header');
+} from '~/logic/interfaces/repositories/RestRepository';
+import {APIError, ErrorMIME} from '~/logic/models/APIError';
+import {APIResponse, APIResponseFactory} from '~/logic/models/APIResponse';
+import {Pagination, PaginationLinks} from '~/logic/models/utils/Pagination';
+import parseLinkHeader from 'parse-link-header';
 
 export class RestRepositoryImpl implements RestRepository {
     public async get<R, T = any>(path: string, config: GetConfig<T>): Promise<APIResponse<R>> {

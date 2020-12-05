@@ -1,6 +1,5 @@
-import {Nullable} from '~/src/logic/models/utils/Utils';
-import {Province} from '~/src/logic/models/Province';
-import {Locality} from '~/src/logic/models/Locality';
+import {Nullable} from '~/logic/models/utils/Utils';
+import {Locality} from '~/logic/models/Locality';
 
 export interface LocalityService {
     // TODO: Sin provincia?

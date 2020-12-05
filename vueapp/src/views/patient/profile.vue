@@ -108,6 +108,12 @@ import noeye from '@/assets/noeye.svg';
 import eye from '@/assets/eye.svg';
 import editPencil from '@/assets/editPencil.svg';
 import {Component, Vue} from 'vue-property-decorator';
+import {User} from '~/logic/models/User';
+
+
+let user = new User();
+user.email = user.firstName = user.phone = user.surname = 'asd';
+user.id = user.profilePictureId = 1;
 
 @Component
 export default class PatientProfile extends Vue {
@@ -115,6 +121,6 @@ export default class PatientProfile extends Vue {
     private eye = eye;
     private editPencil = editPencil;
 
-    private user = new apiTypes.User(1, 'email', 'firstName', 'surname', true, '0000-0000', 1);
+    private user = user;
 }
 </script>

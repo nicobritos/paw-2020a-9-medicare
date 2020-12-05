@@ -1,5 +1,5 @@
-import {Nullable} from '~/src/logic/models/utils/Utils';
-import {Province} from '~/src/logic/models/Province';
+import {Nullable} from '~/logic/models/utils/Utils';
+import {Province} from '~/logic/models/Province';
 
 export interface ProvinceService {
     // TODO: Sin pais?

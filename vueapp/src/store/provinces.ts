@@ -1,17 +1,19 @@
-import {ProvinceService} from '~/src/logic/interfaces/services/ProvinceService';
-import container from '~/src/plugins/inversify.config';
-import TYPES from '~/src/logic/types';
+import {ProvinceService} from '~/logic/interfaces/services/ProvinceService';
+import container from '~/plugins/inversify.config';
+import TYPES from '~/logic/types';
 import {
     ProvinceActionReturnTypes,
-    ProvinceActions, ProvinceMutations, provinceMutationTypes,
+    ProvinceActions,
+    ProvinceMutations,
+    provinceMutationTypes,
     ProvincePromiseStateType,
     ProvinceState,
     ProvinceStateType,
-} from '~/src/store/types/provinces.types';
-import {DefineActionTree, DefineMutationTree} from '~/src/store/utils/helper.types';
-import {RootState} from '~/src/store/types/root.types';
-import {Nullable} from '~/src/logic/models/utils/Utils';
-import {Province} from '~/src/logic/models/Province';
+} from '~/store/types/provinces.types';
+import {DefineActionTree, DefineMutationTree} from '~/store/utils/helper.types';
+import {RootState} from '~/store/types/root.types';
+import {Nullable} from '~/logic/models/utils/Utils';
+import {Province} from '~/logic/models/Province';
 import Vue from 'vue';
 import {Module} from 'vuex';
 

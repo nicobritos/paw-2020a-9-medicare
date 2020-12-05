@@ -1,4 +1,4 @@
-import {APIError} from '~/src/logic/models/APIError';
+import {APIError} from '~/logic/models/APIError';
 
 export abstract class APIResponseFactory {
     public static error<T>(error: APIError): APIResponse<T> {

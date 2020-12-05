@@ -1,6 +1,6 @@
-import {GenericEntity} from '~/src/logic/models/utils/GenericEntity';
-import {JSONSerializableKeys} from '~/src/logic/models/utils/JSONSerializable';
-import {Nullable} from '~/src/logic/models/utils/Utils';
+import {GenericEntity} from '~/logic/models/utils/GenericEntity';
+import {JSONSerializableKeys} from '~/logic/models/utils/JSONSerializable';
+import {Nullable} from '~/logic/models/utils/Utils';
 
 export class User extends GenericEntity<User> {
     private _id: number;

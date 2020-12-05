@@ -1,7 +1,7 @@
-import {APIError} from '~/src/logic/models/APIError';
-import {Nullable} from '~/src/logic/models/utils/Utils';
-import {Appointment} from '~/src/logic/models/Appointment';
-import {DateRange} from '~/src/logic/models/utils/DateRange';
+import {APIError} from '~/logic/models/APIError';
+import {Nullable} from '~/logic/models/utils/Utils';
+import {Appointment} from '~/logic/models/Appointment';
+import {DateRange} from '~/logic/models/utils/DateRange';
 
 export interface CreateAppointment {
     date_from: Date;

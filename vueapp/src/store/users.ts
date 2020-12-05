@@ -1,13 +1,12 @@
-import container from '~/src/plugins/inversify.config';
-import TYPES from '~/src/logic/types';
-import {DefineActionTree, DefineMutationTree} from '~/src/store/utils/helper.types';
-import {RootState} from '~/src/store/types/root.types';
-import {Nullable} from '~/src/logic/models/utils/Utils';
-import Vue from 'vue';
+import container from '~/plugins/inversify.config';
+import TYPES from '~/logic/types';
+import {DefineActionTree, DefineMutationTree} from '~/store/utils/helper.types';
+import {RootState} from '~/store/types/root.types';
+import {Nullable} from '~/logic/models/utils/Utils';
 import {Module} from 'vuex';
-import {UserService} from '~/src/logic/interfaces/services/UserService';
-import {UserActions, UserMutations, UserState} from '~/src/store/types/user.types';
-import {User} from '~/src/logic/models/User';
+import {UserService} from '~/logic/interfaces/services/UserService';
+import {UserActions, UserMutations, UserState} from '~/store/types/user.types';
+import {User} from '~/logic/models/User';
 
 function getService(): UserService {
     return container.get(TYPES.Services.UserService);

@@ -1,10 +1,10 @@
-import {Nullable} from '~/src/logic/models/utils/Utils';
+import {Nullable} from '~/logic/models/utils/Utils';
 import {inject, injectable} from 'inversify';
-import TYPES from '~/src/logic/types';
-import {RestRepository} from '~/src/logic/interfaces/repositories/RestRepository';
-import {getPathWithId} from '~/src/logic/services/Utils';
-import {LocalityService} from '~/src/logic/interfaces/services/LocalityService';
-import {Locality} from '~/src/logic/models/Locality';
+import TYPES from '~/logic/types';
+import {RestRepository} from '~/logic/interfaces/repositories/RestRepository';
+import {getPathWithId} from '~/logic/services/Utils';
+import {LocalityService} from '~/logic/interfaces/services/LocalityService';
+import {Locality} from '~/logic/models/Locality';
 
 const LocalityMIME = {
     LIST: 'application/vnd.locality.list.get.v1+json',

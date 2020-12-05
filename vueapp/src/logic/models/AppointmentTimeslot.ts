@@ -1,4 +1,4 @@
-import {JSONSerializable, JSONSerializableKeys} from '~/src/logic/models/utils/JSONSerializable';
+import {JSONSerializable, JSONSerializableKeys} from '~/logic/models/utils/JSONSerializable';
 
 export class AppointmentTimeslot implements JSONSerializable<AppointmentTimeslot> {
     private _hour: number;

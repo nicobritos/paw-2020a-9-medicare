@@ -1,5 +1,5 @@
-import {Country} from '~/src/logic/models/Country';
-import {Nullable} from '~/src/logic/models/utils/Utils';
+import {Country} from '~/logic/models/Country';
+import {Nullable} from '~/logic/models/utils/Utils';
 
 export interface CountryService {
     list(): Promise<Country[]>;

@@ -1,6 +1,6 @@
-import {CacheableAsyncProperty, DefineTypes} from '~/src/store/utils/helper.types';
-import {Nullable} from '~/src/logic/models/utils/Utils';
-import {User} from '~/src/logic/models/User';
+import {CacheableAsyncProperty, DefineTypes} from '~/store/utils/helper.types';
+import {Nullable} from '~/logic/models/utils/Utils';
+import {User} from '~/logic/models/User';
 
 export interface UserState {
     user: Nullable<User>

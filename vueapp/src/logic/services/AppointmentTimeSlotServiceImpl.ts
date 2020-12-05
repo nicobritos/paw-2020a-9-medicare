@@ -1,10 +1,10 @@
 import {inject, injectable} from 'inversify';
-import TYPES from '~/src/logic/types';
-import {RestRepository} from '~/src/logic/interfaces/repositories/RestRepository';
-import {APIError} from '~/src/logic/models/APIError';
-import {DateRange} from '~/src/logic/models/utils/DateRange';
-import {AppointmentTimeSlotService} from '~/src/logic/interfaces/services/AppointmentTimeSlotService';
-import {AppointmentTimeslotDate} from '~/src/logic/models/AppointmentTimeslotDate';
+import TYPES from '~/logic/types';
+import {RestRepository} from '~/logic/interfaces/repositories/RestRepository';
+import {APIError} from '~/logic/models/APIError';
+import {DateRange} from '~/logic/models/utils/DateRange';
+import {AppointmentTimeSlotService} from '~/logic/interfaces/services/AppointmentTimeSlotService';
+import {AppointmentTimeslotDate} from '~/logic/models/AppointmentTimeslotDate';
 
 const AppointmentTimeSlotMIME = {
     LIST: 'application/vnd.appointment-timeslot.list.get.v1+json',

@@ -1,12 +1,12 @@
-import {Nullable} from '~/src/logic/models/utils/Utils';
+import {Nullable} from '~/logic/models/utils/Utils';
 import {inject, injectable} from 'inversify';
-import TYPES from '~/src/logic/types';
-import {RestRepository} from '~/src/logic/interfaces/repositories/RestRepository';
-import {getPathWithId} from '~/src/logic/services/Utils';
-import {AppointmentService, CreateAppointment} from '~/src/logic/interfaces/services/AppointmentService';
-import {Appointment} from '~/src/logic/models/Appointment';
-import {APIError} from '~/src/logic/models/APIError';
-import {DateRange} from '~/src/logic/models/utils/DateRange';
+import TYPES from '~/logic/types';
+import {RestRepository} from '~/logic/interfaces/repositories/RestRepository';
+import {getPathWithId} from '~/logic/services/Utils';
+import {AppointmentService, CreateAppointment} from '~/logic/interfaces/services/AppointmentService';
+import {Appointment} from '~/logic/models/Appointment';
+import {APIError} from '~/logic/models/APIError';
+import {DateRange} from '~/logic/models/utils/DateRange';
 
 const AppointmentMIME = {
     LIST: 'application/vnd.appointment.list.get.v1+json',

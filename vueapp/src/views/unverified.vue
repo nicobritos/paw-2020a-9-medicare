@@ -14,7 +14,7 @@
 
 <script lang="ts">
 import {Component, Vue} from 'vue-property-decorator';
-import {User} from '@/logic/models/User.ts';
+import {User} from '@/logic/models/User';
 
 @Component
 export default class Unverified extends Vue {

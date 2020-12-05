@@ -1,11 +1,11 @@
-import {Nullable} from '~/src/logic/models/utils/Utils';
+import {Nullable} from '~/logic/models/utils/Utils';
 import {inject, injectable} from 'inversify';
-import TYPES from '~/src/logic/types';
-import {RestRepository} from '~/src/logic/interfaces/repositories/RestRepository';
-import {getPathWithId} from '~/src/logic/services/Utils';
-import {APIError} from '~/src/logic/models/APIError';
-import {CreateUserPatient, CreateUserStaff, UpdateUser, UserService} from '~/src/logic/interfaces/services/UserService';
-import {User} from '~/src/logic/models/User';
+import TYPES from '~/logic/types';
+import {RestRepository} from '~/logic/interfaces/repositories/RestRepository';
+import {getPathWithId} from '~/logic/services/Utils';
+import {APIError} from '~/logic/models/APIError';
+import {CreateUserPatient, CreateUserStaff, UpdateUser, UserService} from '~/logic/interfaces/services/UserService';
+import {User} from '~/logic/models/User';
 
 const UserMIME = {
     CREATE_PATIENT: 'application/vnd.user.patient.create.v1+json',

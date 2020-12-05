@@ -71,8 +71,8 @@ export default class Login extends Vue {
     public submitForm(e: Event) {
         e.preventDefault();
         // TODO:connect to api
-        this.$emit('input', new apiTypes.User(1, e.target['medicare_email'].value, 'firstName', 'surname', true, '1111-1111', 1));
-        this.$router.push(this.getUrl());
+        // this.$emit('input', new User(1, e.target['medicare_email'].value, 'firstName', 'surname', true, '1111-1111', 1));
+        // this.$router.push(this.getUrl());
     }
 }
 </script>

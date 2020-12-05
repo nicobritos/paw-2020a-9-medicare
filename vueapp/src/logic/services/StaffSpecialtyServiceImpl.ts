@@ -1,8 +1,8 @@
 import {inject, injectable} from 'inversify';
-import TYPES from '~/src/logic/types';
-import {RestRepository} from '~/src/logic/interfaces/repositories/RestRepository';
-import {StaffSpecialtyService} from '~/src/logic/interfaces/services/StaffSpecialtyService';
-import {StaffSpecialty} from '~/src/logic/models/StaffSpecialty';
+import TYPES from '~/logic/types';
+import {RestRepository} from '~/logic/interfaces/repositories/RestRepository';
+import {StaffSpecialtyService} from '~/logic/interfaces/services/StaffSpecialtyService';
+import {StaffSpecialty} from '~/logic/models/StaffSpecialty';
 
 const StaffSpecialtyMIME = {
     LIST: 'application/vnd.specialty.list.get.v1+json',

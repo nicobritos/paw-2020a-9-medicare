@@ -1,10 +1,10 @@
-import {Country} from '~/src/logic/models/Country';
-import {Nullable} from '~/src/logic/models/utils/Utils';
-import {CountryService} from '~/src/logic/interfaces/services/CountryService';
+import {Country} from '~/logic/models/Country';
+import {Nullable} from '~/logic/models/utils/Utils';
+import {CountryService} from '~/logic/interfaces/services/CountryService';
 import {inject, injectable} from 'inversify';
-import TYPES from '~/src/logic/types';
-import {RestRepository} from '~/src/logic/interfaces/repositories/RestRepository';
-import {getPathWithId} from '~/src/logic/services/Utils';
+import TYPES from '~/logic/types';
+import {RestRepository} from '~/logic/interfaces/repositories/RestRepository';
+import {getPathWithId} from '~/logic/services/Utils';
 
 const CountryServiceMIME = {
     LIST: 'application/vnd.country.list.get.v1+json',

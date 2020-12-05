@@ -114,13 +114,13 @@
 </template>
 
 <script lang="ts">
-import {Component} from 'vue';
-import {Vue} from 'vue-property-decorator';
-import {User} from '../logic/models/User';
-import {Staff} from '../logic/models/Staff';
-import {Office} from '../logic/models/Office';
+import {Component, Vue} from 'vue-property-decorator';
+import {User} from '~/logic/models/User';
+import {Staff} from '~/logic/models/Staff';
+import {Office} from '~/logic/models/Office';
 
 // TODO:check
+// @ts-ignore
 Date.prototype.plusDays = function (i) {
     let date = new Date(this.valueOf());
     date.setDate(date.getDate() + i);
@@ -162,55 +162,55 @@ export default class SelectAppointment extends Vue {
         this.staff.specialtyIds = [1];
     }
 
-    public getMoY(t): string {
+    public getMoY(t: number): string {
         switch (t) {
             case 0:
-                return this.$t('January');
+                return this.$t('January').toString();
             case 1:
-                return this.$t('February');
+                return this.$t('February').toString();
             case 2:
-                return this.$t('March');
+                return this.$t('March').toString();
             case 3:
-                return this.$t('April');
+                return this.$t('April').toString();
             case 4:
-                return this.$t('May');
+                return this.$t('May').toString();
             case 5:
-                return this.$t('June');
+                return this.$t('June').toString();
             case 6:
-                return this.$t('July');
+                return this.$t('July').toString();
             case 7:
-                return this.$t('August');
+                return this.$t('August').toString();
             case 8:
-                return this.$t('September');
+                return this.$t('September').toString();
             case 9:
-                return this.$t('October');
+                return this.$t('October').toString();
             case 10:
-                return this.$t('November');
+                return this.$t('November').toString();
             case 11:
-                return this.$t('December');
+                return this.$t('December').toString();
             default:
-                return t;
+                return t.toString();
         }
     }
 
-    public getDoW(t): string {
+    public getDoW(t: number): string {
         switch (t) {
             case 1:
-                return this.$t('Monday');
+                return this.$t('Monday').toString();
             case 2:
-                return this.$t('Tuesday');
+                return this.$t('Tuesday').toString();
             case 3:
-                return this.$t('Wednesday');
+                return this.$t('Wednesday').toString();
             case 4:
-                return this.$t('Thursday');
+                return this.$t('Thursday').toString();
             case 5:
-                return this.$t('Friday');
+                return this.$t('Friday').toString();
             case 6:
-                return this.$t('Saturday');
+                return this.$t('Saturday').toString();
             case 0:
-                return this.$t('Sunday');
+                return this.$t('Sunday').toString();
             default:
-                return t;
+                return t.toString();
         }
     }
 }

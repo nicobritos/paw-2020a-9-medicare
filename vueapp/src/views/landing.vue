@@ -62,7 +62,6 @@
 </template>
 
 <script lang="ts">
-import utils from '@/logic/utils';
 import {Component, Vue} from 'vue-property-decorator';
 
 @Component
@@ -71,30 +70,30 @@ export default class Landing extends Vue {
     private specialties: [];
 
     submitForm(e: Event): void {
-        e.preventDefault();
-        let query = {};
-        if (e.target['name'].value) {
-            query.name = e.target['name'].value;
-        }
-        //TODO:Check
-        if (e.target['specialties'].value && e.target['specialties'].value > 0) {
-            query.specialties = e.target['specialties'].value;
-        }
-        //TODO:Check
-        if (e.target['localities'].value && e.target['localities'].value > 0) {
-            query.localities = e.target['localities'].value;
-        }
-
-        this.$router.push({path: utils.getUrl('mediclist'), query: query});
+        // e.preventDefault();
+        // let query = {};
+        // if (e.target['name'].value) {
+        //     query.name = e.target['name'].value;
+        // }
+        // //TODO:Check
+        // if (e.target['specialties'].value && e.target['specialties'].value > 0) {
+        //     query.specialties = e.target['specialties'].value;
+        // }
+        // //TODO:Check
+        // if (e.target['localities'].value && e.target['localities'].value > 0) {
+        //     query.localities = e.target['localities'].value;
+        // }
+        //
+        // this.$router.push({path: utils.getUrl('mediclist'), query: query});
     }
 
     // TODO: handle error
-    async mounted(): void {
-        let specialties = await Api.getSpecialties();
-        this.specialties = specialties;
-
-        let localities = await Api.getLocalities();
-        this.localities = localities;
+    async mounted(): Promise<void> {
+        // let specialties = await Api.getSpecialties();
+        // this.specialties = specialties;
+        //
+        // let localities = await Api.getLocalities();
+        // this.localities = localities;
     }
 }
 </script>

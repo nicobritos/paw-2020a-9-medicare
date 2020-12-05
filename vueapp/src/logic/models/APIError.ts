@@ -1,4 +1,4 @@
-import {JSONSerializable, JSONSerializableKeys} from '~/src/logic/models/utils/JSONSerializable';
+import {JSONSerializable, JSONSerializableKeys} from '~/logic/models/utils/JSONSerializable';
 
 export const ErrorMIME = 'application/vnd.error.v1+json';
 

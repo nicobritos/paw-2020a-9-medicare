@@ -145,6 +145,8 @@
 
 <script lang="ts">
 import {Component, Prop, Vue} from 'vue-property-decorator';
+import {StaffSpecialty} from '~/logic/models/StaffSpecialty';
+import {Locality} from '~/logic/models/Locality';
 
 @Component
 export default class MedicList extends Vue {
@@ -169,69 +171,83 @@ export default class MedicList extends Vue {
 
     get searchedSpecialties() {
         let aux = this.$route.query.specialties;
-        if (typeof aux == 'undefined') {
-            aux = [];
+        let specialties: StaffSpecialty[];
+
+        if (typeof aux !== 'string') {
+            specialties = [];
         } else {
-            aux = aux.split(',').map(v => {
+            specialties = aux.split(',').map(v => {
+                let specialty = new StaffSpecialty();
+                specialty.id = parseInt(v);
+                specialty.name = 'Name';
                 // TODO:get specialty name instead of placeholder
-                return new apiTypes.StaffSpecialty(parseInt(v), 'placeholder');
+                return specialty;
             });
         }
-        return aux;
+
+        return specialties;
     }
 
     get searchedLocalities() {
         let aux = this.$route.query.localities;
-        if (typeof aux == 'undefined') {
-            aux = [];
+        let localities: Locality[] = [];
+
+        if (typeof aux !== 'string') {
+            localities = [];
         } else {
-            aux = aux.split(',').map(v => {
+            localities = aux.split(',').map(v => {
+                let locality = new Locality();
+                locality.id = parseInt(v);
+                locality.name = 'Name';
+
                 // TODO:get locality name instead of placeholder
-                return new apiTypes.Locality(parseInt(v), 'placeholder');
+                return locality;
             });
         }
-        return aux;
+
+        return localities;
     }
 
     get name(): string {
-        return this.$route.query.name;
+        return 'name';
+        // return this.$route.query.name!;
     }
 
-    getSpecialtyName(id) {
-        for (const s of this.specialties) {
-            if (s.id == id) {
-                return s.name;
-            }
-        }
+    getSpecialtyName(id: number) {
+        // for (const s of this.specialties) {
+        //     if (s.id == id) {
+        //         return s.name;
+        //     }
+        // }
         return id;
     }
 
-    getLocalityName(id) {
-        for (const l of this.localities) {
-            if (l.id == id) {
-                return l.name;
-            }
-        }
+    getLocalityName(id: number) {
+        // for (const l of this.localities) {
+        //     if (l.id == id) {
+        //         return l.name;
+        //     }
+        // }
         return id;
     }
 
     // TODO: handle error
     async mounted() {
-        this.specialties = await Api.getSpecialties();
-
-        this.localities = await Api.getLocalities();
-
-        this.staff = await Api.getStaff();
-
-        //TODO: this is not the way
-        if (this.staff.length >= 2) {
-            this.resultsMessage = 'SearchResults2More';
-            this.resultsMessageParam = [this.staff.length];
-        } else if (this.staff.length == 1) {
-            this.resultsMessage = 'SearchResults1';
-        } else {
-            this.resultsMessage = 'NoResultsFound';
-        }
+        // this.specialties = await Api.getSpecialties();
+        //
+        // this.localities = await Api.getLocalities();
+        //
+        // this.staff = await Api.getStaff();
+        //
+        // //TODO: this is not the way
+        // if (this.staff.length >= 2) {
+        //     this.resultsMessage = 'SearchResults2More';
+        //     this.resultsMessageParam = [this.staff.length];
+        // } else if (this.staff.length == 1) {
+        //     this.resultsMessage = 'SearchResults1';
+        // } else {
+        //     this.resultsMessage = 'NoResultsFound';
+        // }
     }
 }
 </script>

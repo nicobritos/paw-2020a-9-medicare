@@ -1,11 +1,11 @@
 import Vue from 'vue';
-import {CountryService} from '~/src/logic/interfaces/services/CountryService';
-import container from '~/src/plugins/inversify.config';
-import TYPES from '~/src/logic/types';
-import {CountryActions, CountryMutations, countryMutationTypes, CountryState} from '~/src/store/types/countries.types';
-import {Country} from '~/src/logic/models/Country';
-import {DefineActionTree, DefineMutationTree} from '~/src/store/utils/helper.types';
-import {RootState} from '~/src/store/types/root.types';
+import {CountryService} from '~/logic/interfaces/services/CountryService';
+import container from '~/plugins/inversify.config';
+import TYPES from '~/logic/types';
+import {CountryActions, CountryMutations, countryMutationTypes, CountryState} from '~/store/types/countries.types';
+import {Country} from '~/logic/models/Country';
+import {DefineActionTree, DefineMutationTree} from '~/store/utils/helper.types';
+import {RootState} from '~/store/types/root.types';
 import {Module} from 'vuex';
 
 function getService(): CountryService {

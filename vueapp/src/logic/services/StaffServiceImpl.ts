@@ -1,12 +1,12 @@
-import {Nullable} from '~/src/logic/models/utils/Utils';
+import {Nullable} from '~/logic/models/utils/Utils';
 import {inject, injectable} from 'inversify';
-import TYPES from '~/src/logic/types';
-import {RestRepository} from '~/src/logic/interfaces/repositories/RestRepository';
-import {getPathWithId} from '~/src/logic/services/Utils';
-import {APIError} from '~/src/logic/models/APIError';
-import {StaffService, UpdateStaff} from '~/src/logic/interfaces/services/StaffService';
-import {Staff} from '~/src/logic/models/Staff';
-import {Pagination} from '~/src/logic/models/utils/Pagination';
+import TYPES from '~/logic/types';
+import {RestRepository} from '~/logic/interfaces/repositories/RestRepository';
+import {getPathWithId} from '~/logic/services/Utils';
+import {APIError} from '~/logic/models/APIError';
+import {StaffService, UpdateStaff} from '~/logic/interfaces/services/StaffService';
+import {Staff} from '~/logic/models/Staff';
+import {Pagination} from '~/logic/models/utils/Pagination';
 
 const StaffMIME = {
     LIST: 'application/vnd.staff.list.get.v1+json',

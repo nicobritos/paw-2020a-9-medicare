@@ -1,4 +1,4 @@
-import {APIResponse} from '~/src/logic/models/APIResponse';
+import {APIResponse} from '~/logic/models/APIResponse';
 
 export type PostConfig<T> = {
     params?: any;
