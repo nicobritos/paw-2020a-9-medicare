@@ -13,8 +13,6 @@ import java.util.List;
 
 @Service
 public class StaffServiceImpl extends GenericServiceImpl<StaffDao, Staff, Integer> implements StaffService {
-    private static final int PAGE_SIZE = 10;
-
     @Autowired
     private StaffDao repository;
 
@@ -30,14 +28,14 @@ public class StaffServiceImpl extends GenericServiceImpl<StaffDao, Staff, Intege
 
     @Override
     @Transactional
-    public Paginator<Staff> findBy(String name, String surname, Collection<Office> offices, Collection<StaffSpecialty> staffSpecialties, Collection<Locality> localities, int page) {
-        return this.repository.findBy(name, surname, offices, staffSpecialties, localities, page, PAGE_SIZE);
+    public Paginator<Staff> findBy(String name, String surname, Collection<Office> offices, Collection<StaffSpecialty> staffSpecialties, Collection<Locality> localities, int page, int perPage) {
+        return this.repository.findBy(name, surname, offices, staffSpecialties, localities, page, perPage);
     }
 
     @Override
     @Transactional
-    public Paginator<Staff> findBy(Collection<String> name, Collection<String> surname, Collection<Office> offices, Collection<StaffSpecialty> staffSpecialties, Collection<Locality> localities, int page) {
-        return this.repository.findBy(name, surname, offices, staffSpecialties, localities, page, PAGE_SIZE);
+    public Paginator<Staff> findBy(Collection<String> name, Collection<String> surname, Collection<Office> offices, Collection<StaffSpecialty> staffSpecialties, Collection<Locality> localities, int page, int perPage) {
+        return this.repository.findBy(name, surname, offices, staffSpecialties, localities, page, perPage);
     }
 
     @Override

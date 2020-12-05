@@ -1,7 +1,5 @@
 package ar.edu.itba.paw.models;
 
-import org.joda.time.DateTime;
-
 import javax.persistence.*;
 
 @Entity
@@ -10,7 +8,8 @@ import javax.persistence.*;
         indexes = {
                 @Index(columnList = "users_id", name = "user_users_id_uindex", unique = true),
                 @Index(columnList = "email", name = "user_email_uindex", unique = true),
-                @Index(columnList = "token", name = "users_token_uindex", unique = true),
+                @Index(columnList = "verification_token_id", name = "users_verification_token_id_index", unique = true),
+                @Index(columnList = "refresh_token_id", name = "users_refresh_token_id_index", unique = true),
                 @Index(columnList = "email", name = "user_email_uindex", unique = true),
         }
 )
@@ -30,10 +29,12 @@ public class User extends GenericModel<Integer> {
     private String surname;
     @Column(name = "verified")
     private Boolean verified = false;
-    @Column(name = "token")
-    private String token;
-    @Column(name = "token_created_date")
-    private DateTime tokenCreatedDate;
+    @JoinColumn(name = "verification_token_id")
+    @ManyToOne(fetch = FetchType.EAGER)
+    private VerificationToken verificationToken;
+    @JoinColumn(name = "refresh_token_id")
+    @ManyToOne(fetch = FetchType.EAGER)
+    private RefreshToken refreshToken;
     @JoinColumn(name = "profile_id")
     @ManyToOne(fetch = FetchType.EAGER)
     private Picture profilePicture;
@@ -98,24 +99,24 @@ public class User extends GenericModel<Integer> {
         this.verified = verified;
     }
 
-    public String getToken() {
-        return this.token;
+    public VerificationToken getVerificationToken() {
+        return this.verificationToken;
     }
 
-    public void setToken(String token) {
-        this.token = token;
+    public void setVerificationToken(VerificationToken verificationToken) {
+        this.verificationToken = verificationToken;
+    }
+
+    public RefreshToken getRefreshToken() {
+        return this.refreshToken;
+    }
+
+    public void setRefreshToken(RefreshToken refreshToken) {
+        this.refreshToken = refreshToken;
     }
 
     public String getDisplayName() {
         return this.firstName + " " + this.surname;
-    }
-
-    public DateTime getTokenCreatedDate() {
-        return this.tokenCreatedDate;
-    }
-
-    public void setTokenCreatedDate(DateTime tokenCreatedDate) {
-        this.tokenCreatedDate = tokenCreatedDate;
     }
 
     public String getPhone() {

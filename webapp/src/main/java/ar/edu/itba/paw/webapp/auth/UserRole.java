@@ -14,4 +14,8 @@ public enum UserRole {
         }
         return roles;
     }
+
+    public String getAsRole() {
+        return "ROLE_" + this.name();
+    }
 }

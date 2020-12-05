@@ -196,8 +196,8 @@ public class AppointmentDaoImplTest {
         u.setSurname(SURNAME);
         u.setPhone(PHONE);
         u.setProfilePicture(pictureModel());
-        u.setToken(TOKEN);
-        u.setTokenCreatedDate(null);
+//        u.setVerificationToken(TOKEN);
+//        u.setVerificationTokenCreatedDate(null);
         u.setVerified(true);
         u.setId(USER_ID_1);
         return u;
@@ -223,8 +223,8 @@ public class AppointmentDaoImplTest {
         u.setSurname(SURNAME_2);
         u.setPhone(PHONE_2);
         u.setProfilePicture(pictureModel());
-        u.setToken(null);
-        u.setTokenCreatedDate(null);
+//        u.setVerificationToken(null);
+//        u.setVerificationTokenCreatedDate(null);
         u.setVerified(true);
         u.setId(USER_ID_2);
         return u;
@@ -1427,7 +1427,10 @@ public class AppointmentDaoImplTest {
         insertAnotherAppointment();
 
         // 2. Ejercitar
-        List<Appointment> appointments = this.appointmentDao.findByPatientsAndDate(Collections.singletonList(patientModel()), new LocalDateTime(YEAR, MONTH, DAY, HOUR, MINUTE));
+        List<Appointment> appointments = this.appointmentDao.findByPatientsAndDate(
+                Collections.singletonList(patientModel()),
+                new LocalDateTime(YEAR, MONTH, DAY, HOUR, MINUTE),
+                LocalDateTime.now());
 
         // 3. Postcondiciones
         assertNotNull(appointments);
@@ -1447,7 +1450,7 @@ public class AppointmentDaoImplTest {
         expectedException.expect(IllegalArgumentException.class);
 
         // 2. Ejercitar
-        List<Appointment> appointments = this.appointmentDao.findByPatientsAndDate(Collections.singletonList(patientModel()), null);
+        List<Appointment> appointments = this.appointmentDao.findByPatientsAndDate(Collections.singletonList(patientModel()), null, null);
 
         // 3. Postcondiciones
         // Que tire NullPointerException
@@ -1463,7 +1466,7 @@ public class AppointmentDaoImplTest {
         expectedException.expect(IllegalArgumentException.class);
 
         // 2. Ejercitar
-        List<Appointment> appointments = this.appointmentDao.findByPatientsAndDate(null, new LocalDateTime(YEAR, MONTH, DAY, HOUR, MINUTE));
+        List<Appointment> appointments = this.appointmentDao.findByPatientsAndDate(null, new LocalDateTime(YEAR, MONTH, DAY, HOUR, MINUTE), LocalDateTime.now());
 
         // 3. Postcondiciones
         // Que tire NullPointerException
@@ -1479,7 +1482,7 @@ public class AppointmentDaoImplTest {
         expectedException.expect(IllegalArgumentException.class);
 
         // 2. Ejercitar
-        List<Appointment> appointments = this.appointmentDao.findByPatientsAndDate(null, null);
+        List<Appointment> appointments = this.appointmentDao.findByPatientsAndDate(null, null, null);
 
         // 3. Postcondiciones
         // Que tire NullPointerException
@@ -1495,7 +1498,7 @@ public class AppointmentDaoImplTest {
         insertAnotherAppointment();
 
         // 2. Ejercitar
-        List<Appointment> appointments = this.appointmentDao.findByPatientsAndDate(Collections.singletonList(patientModel()), new LocalDateTime(YEAR, MONTH, DAY, HOUR, MINUTE));
+        List<Appointment> appointments = this.appointmentDao.findByPatientsAndDate(Collections.singletonList(patientModel()), new LocalDateTime(YEAR, MONTH, DAY, HOUR, MINUTE), LocalDateTime.now());
 
         // 3. Postcondiciones
         assertNotNull(appointments);
@@ -1512,7 +1515,7 @@ public class AppointmentDaoImplTest {
         insertAnotherAppointment();
 
         // 2. Ejercitar
-        List<Appointment> appointments = this.appointmentDao.findByPatientsAndDate(Collections.singletonList(patientModel()), new LocalDateTime(2021, MONTH, DAY, HOUR, MINUTE));
+        List<Appointment> appointments = this.appointmentDao.findByPatientsAndDate(Collections.singletonList(patientModel()), new LocalDateTime(2021, MONTH, DAY, HOUR, MINUTE), LocalDateTime.now().plusYears(1));
 
         // 3. Postcondiciones
         assertNotNull(appointments);

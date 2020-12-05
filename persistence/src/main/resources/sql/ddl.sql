@@ -208,7 +208,7 @@ create unique index workday_workday_id_uindex
     on workday (workday_id);
 
 create unique index users_token_uindex
-    on users (token);
+    on users (verification_token);
 
 create function unaccent(text) returns text
     immutable

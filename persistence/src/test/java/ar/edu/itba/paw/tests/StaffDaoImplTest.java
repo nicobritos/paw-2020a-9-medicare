@@ -165,8 +165,8 @@ public class StaffDaoImplTest
             u.setSurname(SURNAME);
             u.setPhone(PHONE);
             u.setProfilePicture(pictureModel());
-            u.setToken(TOKEN);
-            u.setTokenCreatedDate(null);
+//            u.setVerificationToken(TOKEN);
+//            u.setVerificationTokenCreatedDate(null);
             u.setVerified(true);
             u.setId(STARTING_ID);
         } catch (Exception e) {
