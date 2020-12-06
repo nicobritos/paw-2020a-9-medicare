@@ -1,7 +1,5 @@
-import {CountryState} from '~/store/types/countries.types';
-import {ProvinceState} from '~/store/types/provinces.types';
+import {LocalityState} from '~/store/types/localities.types';
 
 export interface RootState {
-    countries: CountryState,
-    provinces: ProvinceState
+    localities: LocalityState,
 }

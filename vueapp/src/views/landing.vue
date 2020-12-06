@@ -1,6 +1,6 @@
 <template>
     <!-- TODO: check this tag -->
-    <span>
+    <div>
         <div class="container w-100 ml-4 mb-5">
             <h2 class="display-5 mt-5 green-text">{{ $t('FindingMedicQuickAndEasy') }}</h2>
         </div>
@@ -58,7 +58,7 @@
             <br>
             <br>
         </div>
-    </span>
+    </div>
 </template>
 
 <script lang="ts">
