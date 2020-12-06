@@ -84,7 +84,7 @@ export default class Landing extends Vue {
     // TODO: handle error
     mounted(): void {
         this.$store.dispatch('localities/loadLocalities', localityActionTypes.loadLocalities());
-        this.$store.dispatch('staffSpecialties/loadStaffSpecialties', doctorSpecialtyActionTypes.loadDoctorSpecialties());
+        this.$store.dispatch('doctorSpecialties/loadDoctorSpecialties', doctorSpecialtyActionTypes.loadDoctorSpecialties());
     }
 
     search(): void {

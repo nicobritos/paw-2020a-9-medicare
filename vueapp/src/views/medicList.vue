@@ -253,6 +253,10 @@ export default class MedicList extends Vue {
         // } else {
         //     this.resultsMessage = 'NoResultsFound';
         // }
+
+
+        this.$store.dispatch('localities/loadLocalities', localityActionTypes.loadLocalities());
+        this.$store.dispatch('doctorSpecialties/loadDoctorSpecialties', doctorSpecialtyActionTypes.loadDoctorSpecialties());
     }
 }
 </script>
