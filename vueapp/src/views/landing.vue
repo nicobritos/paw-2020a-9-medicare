@@ -67,7 +67,7 @@
 import {Component, Vue} from 'vue-property-decorator';
 import {State} from 'vuex-class';
 import {localityActionTypes} from '~/store/types/localities.types';
-import {staffSpecialtyActionTypes} from '~/store/types/doctorSpecialties.types';
+import {doctorSpecialtyActionTypes} from '~/store/types/doctorSpecialties.types';
 import {Hash, Nullable} from '~/logic/models/utils/Utils';
 
 @Component
@@ -84,7 +84,7 @@ export default class Landing extends Vue {
     // TODO: handle error
     mounted(): void {
         this.$store.dispatch('localities/loadLocalities', localityActionTypes.loadLocalities());
-        this.$store.dispatch('staffSpecialties/loadStaffSpecialties', staffSpecialtyActionTypes.loadStaffSpecialties());
+        this.$store.dispatch('staffSpecialties/loadStaffSpecialties', doctorSpecialtyActionTypes.loadDoctorSpecialties());
     }
 
     search(): void {

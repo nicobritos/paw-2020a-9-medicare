@@ -6,20 +6,20 @@ export interface DoctorSpecialtyState {
     _listLoading: CacheableAsyncProperty<DoctorSpecialty[]>
 }
 
-export interface StaffSpecialtyActions {
-    loadStaffSpecialties: void
+export interface DoctorSpecialtyActions {
+    loadDoctorSpecialties: void
 }
 
-export const staffSpecialtyActionTypes: DefineTypes<StaffSpecialtyActions> = {
-    loadStaffSpecialties: payload => ({payload, type: 'loadStaffSpecialties'})
+export const doctorSpecialtyActionTypes: DefineTypes<DoctorSpecialtyActions> = {
+    loadDoctorSpecialties: payload => ({payload, type: 'loadDoctorSpecialties'})
 };
 
-export interface StaffSpecialtyMutations {
+export interface DoctorSpecialtyMutations {
     setPromise: Promise<DoctorSpecialty[]>,
-    setStaffSpecialties: DoctorSpecialty[]
+    setDoctorSpecialties: DoctorSpecialty[]
 }
 
-export const staffSpecialtyMutationTypes: DefineTypes<StaffSpecialtyMutations> = {
+export const doctorSpecialtyMutationTypes: DefineTypes<DoctorSpecialtyMutations> = {
     setPromise: payload => ({payload, type: 'setPromise'}),
-    setStaffSpecialties: payload => ({payload, type: 'setStaffSpecialties'})
+    setDoctorSpecialties: payload => ({payload, type: 'setDoctorSpecialties'})
 };

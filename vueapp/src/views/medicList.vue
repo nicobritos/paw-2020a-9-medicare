@@ -149,7 +149,7 @@ import {DoctorSpecialty} from '~/logic/models/DoctorSpecialty';
 import {Locality} from '~/logic/models/Locality';
 import {State} from 'vuex-class';
 import {localityActionTypes} from '~/store/types/localities.types';
-import {staffSpecialtyActionTypes} from '~/store/types/doctorSpecialties.types';
+import {doctorSpecialtyActionTypes} from '~/store/types/doctorSpecialties.types';
 
 @Component
 export default class MedicList extends Vue {

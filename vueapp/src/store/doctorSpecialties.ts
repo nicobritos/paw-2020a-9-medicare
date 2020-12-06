@@ -4,8 +4,8 @@ import {DefineActionTree, DefineMutationTree} from '~/store/utils/helper.types';
 import {RootState} from '~/store/types/root.types';
 import {Module} from 'vuex';
 import {
-    StaffSpecialtyActions, StaffSpecialtyMutations,
-    staffSpecialtyMutationTypes,
+    DoctorSpecialtyActions, DoctorSpecialtyMutations,
+    doctorSpecialtyMutationTypes,
     DoctorSpecialtyState,
 } from '~/store/types/doctorSpecialties.types';
 import {DoctorSpecialtyService} from '~/logic/interfaces/services/DoctorSpecialtyService';
@@ -23,13 +23,13 @@ export const state = (): DoctorSpecialtyState => ({
     doctorSpecialties: [] as DoctorSpecialty[]
 });
 
-export const actions: DefineActionTree<StaffSpecialtyActions, DoctorSpecialtyState, RootState> = {
-    async loadStaffSpecialties({state, commit}) {
+export const actions: DefineActionTree<DoctorSpecialtyActions, DoctorSpecialtyState, RootState> = {
+    async loadDoctorSpecialties({state, commit}) {
         if (state._listLoading.loaded) return;
         if (state._listLoading.promise) return;
 
         let promise = getService().list();
-        commit(staffSpecialtyMutationTypes.setPromise(promise));
+        commit(doctorSpecialtyMutationTypes.setPromise(promise));
 
         let data: DoctorSpecialty[] = [];
         try {
@@ -38,15 +38,15 @@ export const actions: DefineActionTree<StaffSpecialtyActions, DoctorSpecialtySta
             console.error(e);
         }
 
-        commit(staffSpecialtyMutationTypes.setStaffSpecialties(data));
+        commit(doctorSpecialtyMutationTypes.setDoctorSpecialties(data));
     }
 };
 
-export const mutations: DefineMutationTree<StaffSpecialtyMutations, DoctorSpecialtyState> = {
+export const mutations: DefineMutationTree<DoctorSpecialtyMutations, DoctorSpecialtyState> = {
     setPromise(state, {payload}): void {
         state._listLoading.promise = payload;
     },
-    setStaffSpecialties(state, {payload}): void {
+    setDoctorSpecialties(state, {payload}): void {
         state.doctorSpecialties = payload;
         state._listLoading.loaded = true;
         state._listLoading.promise = null;
