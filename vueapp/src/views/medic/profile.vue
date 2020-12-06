@@ -94,9 +94,9 @@
                     </form>
                     <div class="row mb-3">
                         <h3>{{ $t('Office') }}</h3>
-                        <div v-for="staff in staffs" :key="staff.id" class="container p-0 m-0 pl-3">
+                        <div v-for="doctor in doctors" :key="doctor.id" class="container p-0 m-0 pl-3">
                             <div class="row d-flex align-items-center justify-content-between">
-                                <p class="m-0">{{ '- ' + staff.office.name + ' - TEL: ' + staff.office.phone }}</p>
+                                <p class="m-0">{{ '- ' + doctor.office.name + ' - TEL: ' + doctor.office.phone }}</p>
                             </div>
                         </div>
                     </div>
@@ -117,7 +117,7 @@
                                                 timeWithZero(workday.startMinute),
                                                 timeWithZero(workday.endHour),
                                                 timeWithZero(workday.endMinute),
-                                                workday.staff.office.name
+                                                workday.doctor.office.name
                                             ])
                                     }}
                                 </p>
@@ -125,7 +125,7 @@
                                 <button class="btn cancel-workday-btn" type="button">X</button>
                             </div>
                             <div class="row d-flex align-items-center justify-content-center my-3">
-                                <a :href="getUrl('staff/profile/workday')" type="button" class="btn btn-info">
+                                <a :href="getUrl('doctor/profile/workday')" type="button" class="btn btn-info">
                                     {{ $t('AddSchedule') }}</a>
                             </div>
                         </div>
@@ -144,7 +144,7 @@
                         </div>
                     </div>
                     <div class="row d-flex align-items-center justify-content-center my-3">
-                        <a :href="getUrl('/staff/profile/specialty')" type="button"
+                        <a :href="getUrl('/doctor/profile/specialty')" type="button"
                            class="btn btn-info">{{ $t('AddSpecialty') }}</a>
                     </div>
                 </div>
@@ -175,7 +175,7 @@ export default class MedicProfile extends Vue {
     private eye = eye;
     private noeye = noeye;
     private user: User = user;
-    private staffs = [];
+    private doctors = [];
     private workdays = [];
     private specialties = [];
 

@@ -36,8 +36,8 @@ public class Appointment extends GenericModel<Integer> {
     @JoinColumn(name = "patient_id", nullable = false)
     private Patient patient;
     @ManyToOne(fetch = FetchType.EAGER, optional = false)
-    @JoinColumn(name = "staff_id", nullable = false)
-    private Staff staff;
+    @JoinColumn(name = "doctor_id", nullable = false)
+    private Doctor doctor;
 
     @Override
     public Integer getId() {
@@ -65,12 +65,12 @@ public class Appointment extends GenericModel<Integer> {
         this.patient = patient;
     }
 
-    public Staff getStaff() {
-        return this.staff;
+    public Doctor getDoctor() {
+        return this.doctor;
     }
 
-    public void setStaff(Staff staff) {
-        this.staff = staff;
+    public void setDoctor(Doctor doctor) {
+        this.doctor = doctor;
     }
 
     public LocalDateTime getFromDate() {

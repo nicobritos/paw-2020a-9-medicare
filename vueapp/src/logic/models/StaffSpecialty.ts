@@ -1,7 +1,7 @@
 import {GenericEntity} from '~/logic/models/utils/GenericEntity';
 import {JSONSerializableKeys} from '~/logic/models/utils/JSONSerializable';
 
-export class StaffSpecialty extends GenericEntity<StaffSpecialty> {
+export class DoctorSpecialty extends GenericEntity<DoctorSpecialty> {
     private _id: number;
     private _name: string;
 
@@ -21,7 +21,7 @@ export class StaffSpecialty extends GenericEntity<StaffSpecialty> {
         this._name = value;
     }
 
-    public toJSON(): JSONSerializableKeys<StaffSpecialty> {
+    public toJSON(): JSONSerializableKeys<DoctorSpecialty> {
         return {
             id: this.id,
             name: this.name

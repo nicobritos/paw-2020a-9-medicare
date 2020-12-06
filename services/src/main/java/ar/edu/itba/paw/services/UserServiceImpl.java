@@ -32,7 +32,7 @@ public class UserServiceImpl extends GenericSearchableServiceImpl<UserDao, User,
     @Autowired
     private OfficeService officeService;
     @Autowired
-    private StaffService staffService;
+    private DoctorService doctorService;
     @Autowired
     private PatientService patientService;
     @Autowired
@@ -68,8 +68,8 @@ public class UserServiceImpl extends GenericSearchableServiceImpl<UserDao, User,
     }
 
     @Override
-    public boolean isStaff(User user) {
-        return !this.staffService.findByUser(user).isEmpty();
+    public boolean isDoctor(User user) {
+        return !this.doctorService.findByUser(user).isEmpty();
     }
 
     @Override
@@ -80,19 +80,19 @@ public class UserServiceImpl extends GenericSearchableServiceImpl<UserDao, User,
 
     @Override
     @Transactional
-    public User createAsStaff(User user, Staff staff) throws EmailAlreadyExistsException {
+    public User createAsDoctor(User user, Doctor doctor) throws EmailAlreadyExistsException {
         User newUser = this.create(user);
         Office office;
 
-        if (staff.getOffice().getId() == null) {
-            office = this.officeService.create(staff.getOffice());
+        if (doctor.getOffice().getId() == null) {
+            office = this.officeService.create(doctor.getOffice());
         } else {
-            Optional<Office> officeOptional = this.officeService.findById(staff.getOffice().getId());
-            office = officeOptional.orElseGet(() -> this.officeService.create(staff.getOffice()));
+            Optional<Office> officeOptional = this.officeService.findById(doctor.getOffice().getId());
+            office = officeOptional.orElseGet(() -> this.officeService.create(doctor.getOffice()));
         }
 
-        staff.setOffice(office);
-        this.staffService.create(staff);
+        doctor.setOffice(office);
+        this.doctorService.create(doctor);
 
         return newUser;
     }

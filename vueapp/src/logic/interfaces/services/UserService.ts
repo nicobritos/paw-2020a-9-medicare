@@ -10,7 +10,7 @@ interface CreateUser {
     phone?: string;
 }
 
-export interface CreateUserStaff extends CreateUser {
+export interface CreateUserDoctor extends CreateUser {
     registrationNumber?: number;
     specialtyIds: number[]; // TODO: APIDocs dice que no es mandatory
 }
@@ -29,7 +29,7 @@ export interface UpdateUser {
 
 export interface UserService {
     // TODO: API Doc ver 404
-    createAsStaff(staff: CreateUserStaff): Promise<User | APIError>;
+    createAsDoctor(doctor: CreateUserDoctor): Promise<User | APIError>;
 
     createAsPatient(patient: CreateUserPatient): Promise<User | APIError>;
 

@@ -4,12 +4,12 @@ import TYPES from '~/logic/types';
 import {RestRepository} from '~/logic/interfaces/repositories/RestRepository';
 import {getPathWithId} from '~/logic/services/Utils';
 import {APIError} from '~/logic/models/APIError';
-import {CreateUserPatient, CreateUserStaff, UpdateUser, UserService} from '~/logic/interfaces/services/UserService';
+import {CreateUserPatient, CreateUserDoctor, UpdateUser, UserService} from '~/logic/interfaces/services/UserService';
 import {User} from '~/logic/models/User';
 
 const UserMIME = {
     CREATE_PATIENT: 'application/vnd.user.patient.create.v1+json',
-    CREATE_STAFF: 'application/vnd.user.staff.create.v1+json',
+    CREATE_DOCTOR: 'application/vnd.user.doctor.create.v1+json',
     GET: 'application/vnd.user.get.v1+json',
     UPDATE: 'application/vnd.user.update.v1+json'
 };
@@ -28,11 +28,11 @@ export class UserServiceImpl implements UserService {
         return response.isOk() ? response.data! : null;
     }
 
-    public async createAsStaff(staff: CreateUserStaff): Promise<User | APIError> {
-        let response = await this.rest.post<User, CreateUserStaff>(UserServiceImpl.PATH, {
+    public async createAsDoctor(doctor: CreateUserDoctor): Promise<User | APIError> {
+        let response = await this.rest.post<User, CreateUserDoctor>(UserServiceImpl.PATH, {
             accepts: UserMIME.GET,
-            data: staff,
-            contentType: UserMIME.CREATE_STAFF
+            data: doctor,
+            contentType: UserMIME.CREATE_DOCTOR
         });
         return response.isOk() ? response.data! : response.error!;
     }

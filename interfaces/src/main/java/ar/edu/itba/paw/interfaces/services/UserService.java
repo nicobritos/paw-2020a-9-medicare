@@ -4,7 +4,7 @@ import ar.edu.itba.paw.interfaces.services.exceptions.EmailAlreadyExistsExceptio
 import ar.edu.itba.paw.interfaces.services.generic.GenericSearchableService;
 import ar.edu.itba.paw.models.Patient;
 import ar.edu.itba.paw.models.Picture;
-import ar.edu.itba.paw.models.Staff;
+import ar.edu.itba.paw.models.Doctor;
 import ar.edu.itba.paw.models.User;
 
 import java.util.Optional;
@@ -16,9 +16,9 @@ public interface UserService extends GenericSearchableService<User, Integer> {
 
     Optional<User> findByRefreshTokenId(Integer id);
 
-    boolean isStaff(User user);
+    boolean isDoctor(User user);
 
-    User createAsStaff(User user, Staff staff) throws EmailAlreadyExistsException;
+    User createAsDoctor(User user, Doctor doctor) throws EmailAlreadyExistsException;
 
     void updatePassword(User user, String newPassword);
 

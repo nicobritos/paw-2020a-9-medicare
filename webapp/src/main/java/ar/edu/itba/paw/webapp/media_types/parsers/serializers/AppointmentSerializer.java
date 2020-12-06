@@ -21,7 +21,7 @@ public class AppointmentSerializer extends JsonSerializer<Appointment> {
         jsonObject.put("message", appointment.getMessage());
         jsonObject.put("motive", appointment.getMotive());
         jsonObject.put("patientId", appointment.getPatient().getId());
-        jsonObject.put("staffId", appointment.getStaff().getId());
+        jsonObject.put("doctorId", appointment.getDoctor().getId());
 
         return jsonObject;
     }

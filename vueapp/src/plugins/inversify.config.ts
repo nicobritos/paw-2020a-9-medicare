@@ -13,14 +13,14 @@ import {LocalityService} from '~/logic/interfaces/services/LocalityService';
 import {AppointmentTimeSlotService} from '~/logic/interfaces/services/AppointmentTimeSlotService';
 import {ProvinceService} from '~/logic/interfaces/services/ProvinceService';
 import {ProvinceServiceImpl} from '~/logic/services/ProvinceServiceImpl';
-import {StaffServiceImpl} from '~/logic/services/StaffServiceImpl';
-import {StaffService} from '~/logic/interfaces/services/StaffService';
-import {StaffSpecialtyService} from '~/logic/interfaces/services/StaffSpecialtyService';
+import {DoctorServiceImpl} from '~/logic/services/DoctorServiceImpl';
+import {DoctorService} from '~/logic/interfaces/services/DoctorService';
+import {DoctorSpecialtyService} from '~/logic/interfaces/services/DoctorSpecialtyService';
 import {UserService} from '~/logic/interfaces/services/UserService';
 import {WorkdayService} from '~/logic/interfaces/services/WorkdayService';
 import {WorkdayServiceImpl} from '~/logic/services/WorkdayServiceImpl';
 import {UserServiceImpl} from '~/logic/services/UserServiceImpl';
-import {StaffSpecialtyServiceImpl} from '~/logic/services/StaffSpecialtyServiceImpl';
+import {DoctorSpecialtyServiceImpl} from '~/logic/services/DoctorSpecialtyServiceImpl';
 
 const container = new Container();
 
@@ -31,8 +31,8 @@ container.bind<AppointmentTimeSlotService>(TYPES.Services.AppointmentTimeSlotSer
 container.bind<CountryService>(TYPES.Services.CountryService).to(CountryServiceImpl).inSingletonScope();
 container.bind<LocalityService>(TYPES.Services.LocalityService).to(LocalityServiceImpl).inSingletonScope();
 container.bind<ProvinceService>(TYPES.Services.ProvinceService).to(ProvinceServiceImpl).inSingletonScope();
-container.bind<StaffService>(TYPES.Services.StaffService).to(StaffServiceImpl).inSingletonScope();
-container.bind<StaffSpecialtyService>(TYPES.Services.StaffSpecialtyService).to(StaffSpecialtyServiceImpl).inSingletonScope();
+container.bind<DoctorService>(TYPES.Services.DoctorService).to(DoctorServiceImpl).inSingletonScope();
+container.bind<DoctorSpecialtyService>(TYPES.Services.DoctorSpecialtyService).to(DoctorSpecialtyServiceImpl).inSingletonScope();
 container.bind<UserService>(TYPES.Services.UserService).to(UserServiceImpl).inSingletonScope();
 container.bind<WorkdayService>(TYPES.Services.WorkdayService).to(WorkdayServiceImpl).inSingletonScope();
 

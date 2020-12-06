@@ -33,8 +33,8 @@ public abstract class GenericAuthenticationResource extends GenericResource {
         if (!user.getVerified()) {
             authorities = Collections.singletonList(new SimpleGrantedAuthority(UserRole.UNVERIFIED.getAsRole()));
         } else {
-            if (this.userService.isStaff(user)) {
-                authorities = Collections.singletonList(new SimpleGrantedAuthority(UserRole.STAFF.getAsRole()));
+            if (this.userService.isDoctor(user)) {
+                authorities = Collections.singletonList(new SimpleGrantedAuthority(UserRole.DOCTOR.getAsRole()));
             } else {
                 authorities = Collections.singletonList(new SimpleGrantedAuthority(UserRole.PATIENT.getAsRole()));
             }

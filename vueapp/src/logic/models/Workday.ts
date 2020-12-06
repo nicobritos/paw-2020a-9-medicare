@@ -21,7 +21,7 @@ export class Workday extends GenericEntity<Workday> {
     private _start: WorkdayHour;
     private _end: WorkdayHour;
     private _day: WorkdayDay;
-    private _staffId: number;
+    private _doctorId: number;
 
     public get id(): number {
         return this._id;
@@ -55,12 +55,12 @@ export class Workday extends GenericEntity<Workday> {
         this._day = value;
     }
 
-    public get staffId(): number {
-        return this._staffId;
+    public get doctorId(): number {
+        return this._doctorId;
     }
 
-    public set staffId(value: number) {
-        this._staffId = value;
+    public set doctorId(value: number) {
+        this._doctorId = value;
     }
 
     public toJSON(): JSONSerializableKeys<Workday> {
@@ -69,7 +69,7 @@ export class Workday extends GenericEntity<Workday> {
             day: this.day,
             end: this.end,
             start: this.start,
-            staffId: this.staffId
+            doctorId: this.doctorId
         };
     }
 }

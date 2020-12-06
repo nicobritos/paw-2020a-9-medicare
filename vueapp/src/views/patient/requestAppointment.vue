@@ -37,16 +37,16 @@
                                 <div style="margin-top: 100%;"></div>
                                 <img
                                     class="profile-picture rounded-circle"
-                                    :src="getUrl('profilePics/'+ staff.user.profilePicturId)"
+                                    :src="getUrl('profilePics/'+ doctor.user.profilePicturId)"
                                     alt="profile pic"
                                 />
                             </div>
                         </div>
                         <div class="col p-0">
-                            <p class="m-0 white-text">{{ staff.user.firstName }} {{ staff.user.surname }}</p>
+                            <p class="m-0 white-text">{{ doctor.user.firstName }} {{ doctor.user.surname }}</p>
                             <small class="white-text">
                                 <!-- TODO: check -->
-                                {{ staff.staffSpecialties }}
+                                {{ doctor.doctorSpecialties }}
                             </small>
                         </div>
                     </div>
@@ -69,7 +69,7 @@
                                     )
                                 }}
                             </p>
-                            <a :href="getUrl('appointment/'+staff.id+'/0')"><small
+                            <a :href="getUrl('appointment/'+doctor.id+'/0')"><small
                                 class="white-text">{{ $t('ChangeDate') }}</small></a>
                         </div>
                     </div>
@@ -79,11 +79,11 @@
                         </div>
                         <div class="col p-0">
                             <!-- TODO: check -->
-                            <p class="m-0 white-text">{{ staff.office.street }} -
-                                {{ getLocality(staff.office.localityId) }}</p>
+                            <p class="m-0 white-text">{{ doctor.office.street }} -
+                                {{ getLocality(doctor.office.localityId) }}</p>
                             <a
                                 class="link"
-                                :href="'https://www.google.com/maps/search/?api=1&query='+getLocality(staff.office.localityId)+','+staff.office.street"
+                                :href="'https://www.google.com/maps/search/?api=1&query='+getLocality(doctor.office.localityId)+','+doctor.office.street"
                                 target="_blank"
                             >
                                 <small class="white-text m-0">{{ $t('SeeInGoogleMaps') }}</small>
@@ -101,20 +101,20 @@ import mapIcon from '@/assets/mapIcon.svg';
 import calendarIcon from '@/assets/calendarIcon.svg';
 import {Component, Vue} from 'vue-property-decorator';
 import {User} from '~/logic/models/User';
-import {Staff} from '~/logic/models/Staff';
+import {Doctor} from '~/logic/models/Doctor';
 
 let user = new User();
-let staff = new Staff();
+let doctor = new Doctor();
 
-staff.email = staff.phone = user.email = user.firstName = user.phone = user.surname = 'asd';
-user.id = user.profilePictureId = staff.id = 1;
+doctor.email = doctor.phone = user.email = user.firstName = user.phone = user.surname = 'asd';
+user.id = user.profilePictureId = doctor.id = 1;
 
 @Component
 export default class RequestAppointment extends Vue {
     private mapIcon = mapIcon;
     private calendarIcon = calendarIcon;
     private date = new Date(2020, 1, 10);
-    private staff = staff;
+    private doctor = doctor;
     private user = user;
 
     getDoW(t: number): string {

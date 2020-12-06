@@ -107,7 +107,7 @@ import logo from '@/assets/logo.svg';
 import {Component, Vue} from 'vue-property-decorator';
 
 @Component
-export default class SignupStaff extends Vue {
+export default class SignupDoctor extends Vue {
     private showPassword = false;
     private showRepeatPassword = false;
     private logo = logo;

@@ -30,8 +30,8 @@ public class UserDetailsServiceImpl implements UserDetailsService {
         if (!user.get().getVerified()) {
             authorities = Collections.singletonList(new SimpleGrantedAuthority(UserRole.UNVERIFIED.getAsRole()));
         } else {
-            if (this.userService.isStaff(user.get())) {
-                authorities = Collections.singletonList(new SimpleGrantedAuthority(UserRole.STAFF.getAsRole()));
+            if (this.userService.isDoctor(user.get())) {
+                authorities = Collections.singletonList(new SimpleGrantedAuthority(UserRole.DOCTOR.getAsRole()));
             } else {
                 authorities = Collections.singletonList(new SimpleGrantedAuthority(UserRole.PATIENT.getAsRole()));
             }

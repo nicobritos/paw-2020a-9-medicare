@@ -7,7 +7,7 @@ export interface CreateAppointment {
     date_from: Date;
     message?: string;
     motive?: string;
-    staffId: number;
+    doctorId: number;
 }
 
 export interface AppointmentService {

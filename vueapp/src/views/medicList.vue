@@ -62,10 +62,10 @@
                     </div>
                     <ul class="list-group turno-list mr-2 w-100">
                         <!-- TODO:CHECK THIS IF -->
-                        <div v-if="staff.length == 0" class="container-fluid justify-content-center">
+                        <div v-if="doctor.length == 0" class="container-fluid justify-content-center">
                             <p class="text-center" style="color:grey;">{{ $t('NoMedicsFound') }}</p>
                         </div>
-                        <li v-for="member in staff" :key="member.id" class="list-group-item turno-item mb-3">
+                        <li v-for="member in doctor" :key="member.id" class="list-group-item turno-item mb-3">
                             <div class="container">
                                 <div class="row">
                                     <div class="col-3 d-flex flex-column justify-content-center">
@@ -87,7 +87,7 @@
                                             <p class="m-0">
                                                 <!-- TODO:super check this -->
                                                 {{
-                                                    member.staffSpecialtyIds.map((v) => {
+                                                    member.doctorSpecialtyIds.map((v) => {
                                                         return getSpecialtyName(v);
                                                     }).join(', ')
                                                 }}
@@ -145,7 +145,7 @@
 
 <script lang="ts">
 import {Component, Prop, Vue} from 'vue-property-decorator';
-import {StaffSpecialty} from '~/logic/models/StaffSpecialty';
+import {DoctorSpecialty} from '~/logic/models/DoctorSpecialty';
 import {Locality} from '~/logic/models/Locality';
 
 @Component
@@ -165,19 +165,19 @@ export default class MedicList extends Vue {
         remainingPages: 0,
         totalPages: 0,
     };
-    private staff = [];
+    private doctor = [];
     private specialties = [];
     private localities = [];
 
     get searchedSpecialties() {
         let aux = this.$route.query.specialties;
-        let specialties: StaffSpecialty[];
+        let specialties: DoctorSpecialty[];
 
         if (typeof aux !== 'string') {
             specialties = [];
         } else {
             specialties = aux.split(',').map(v => {
-                let specialty = new StaffSpecialty();
+                let specialty = new DoctorSpecialty();
                 specialty.id = parseInt(v);
                 specialty.name = 'Name';
                 // TODO:get specialty name instead of placeholder
@@ -237,13 +237,13 @@ export default class MedicList extends Vue {
         //
         // this.localities = await Api.getLocalities();
         //
-        // this.staff = await Api.getStaff();
+        // this.doctor = await Api.getDoctor();
         //
         // //TODO: this is not the way
-        // if (this.staff.length >= 2) {
+        // if (this.doctor.length >= 2) {
         //     this.resultsMessage = 'SearchResults2More';
-        //     this.resultsMessageParam = [this.staff.length];
-        // } else if (this.staff.length == 1) {
+        //     this.resultsMessageParam = [this.doctor.length];
+        // } else if (this.doctor.length == 1) {
         //     this.resultsMessage = 'SearchResults1';
         // } else {
         //     this.resultsMessage = 'NoResultsFound';

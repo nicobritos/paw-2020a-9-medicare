@@ -4,8 +4,8 @@ export default {
     CountryService: Symbol('CountryService'),
     LocalityService: Symbol('LocalityService'),
     ProvinceService: Symbol('ProvinceService'),
-    StaffService: Symbol('StaffService'),
-    StaffSpecialtyService: Symbol('StaffSpecialtyService'),
+    DoctorService: Symbol('DoctorService'),
+    DoctorSpecialtyService: Symbol('DoctorSpecialtyService'),
     UserService: Symbol('UserService'),
     WorkdayService: Symbol('WorkdayService'),
 };

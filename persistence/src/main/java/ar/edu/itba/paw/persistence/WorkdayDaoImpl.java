@@ -26,8 +26,8 @@ public class WorkdayDaoImpl extends GenericDaoImpl<Workday, Integer> implements 
         CriteriaBuilder builder = this.getEntityManager().getCriteriaBuilder();
         CriteriaQuery<Workday> query = builder.createQuery(Workday.class);
         Root<Workday> root = query.from(Workday.class);
-        Join<Workday, Staff> staffJoin = root.join(Workday_.staff);
-        Join<Staff, User> userJoin = staffJoin.join(Staff_.user);
+        Join<Workday, Doctor> doctorJoin = root.join(Workday_.doctor);
+        Join<Doctor, User> userJoin = doctorJoin.join(Doctor_.user);
 
         query.select(root);
         query.where(builder.equal(userJoin.get(User_.id), user.getId()));
@@ -36,30 +36,30 @@ public class WorkdayDaoImpl extends GenericDaoImpl<Workday, Integer> implements 
     }
 
     @Override
-    public List<Workday> findByStaff(Staff staff) {
-        if (staff == null) {
+    public List<Workday> findByDoctor(Doctor doctor) {
+        if (doctor == null) {
             throw new IllegalArgumentException();
         }
-        return this.findBy(Workday_.staff, staff);
+        return this.findBy(Workday_.doctor, doctor);
     }
 
     @Override
-    public List<Workday> findByStaff(Staff staff, WorkdayDay day) {
-        if (staff == null || day == null) {
+    public List<Workday> findByDoctor(Doctor doctor, WorkdayDay day) {
+        if (doctor == null || day == null) {
             throw new IllegalArgumentException();
         }
         Map<SingularAttribute<? super Workday, ?>, Object> parametersValues = new HashMap<>();
-        parametersValues.put(Workday_.staff, staff);
+        parametersValues.put(Workday_.doctor, doctor);
         parametersValues.put(Workday_.day, day);
         return this.findBy(parametersValues);
     }
 
     @Override
-    public boolean isStaffWorking(Staff staff, AppointmentTimeSlot timeSlot) {
-        if (staff == null || timeSlot == null)
+    public boolean doctorWorks(Doctor doctor, AppointmentTimeSlot timeSlot) {
+        if (doctor == null || timeSlot == null)
             throw new IllegalArgumentException();
 
-        List<Workday> workdays = findByStaff(staff, WorkdayDay.from(timeSlot.getDate()));
+        List<Workday> workdays = findByDoctor(doctor, WorkdayDay.from(timeSlot.getDate()));
         for (Workday workday : workdays){
             if((workday.getStartTime().compareTo(timeSlot.getDate().toLocalTime()) <= 0) &&
                     (workday.getEndTime().compareTo(timeSlot.getToDate().toLocalTime()) >= 0)){

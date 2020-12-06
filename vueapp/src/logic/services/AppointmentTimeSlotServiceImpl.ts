@@ -17,7 +17,7 @@ export class AppointmentTimeSlotServiceImpl implements AppointmentTimeSlotServic
     @inject(TYPES.Repositories.RestRepository)
     private rest: RestRepository;
 
-    public async list(staffId: number, dateRange: DateRange): Promise<AppointmentTimeslotDate[] | APIError> {
+    public async list(doctorId: number, dateRange: DateRange): Promise<AppointmentTimeslotDate[] | APIError> {
         let response = await this.rest.get<AppointmentTimeslotDate[]>(AppointmentTimeSlotServiceImpl.PATH, {
             accepts: AppointmentTimeSlotMIME.LIST
         });

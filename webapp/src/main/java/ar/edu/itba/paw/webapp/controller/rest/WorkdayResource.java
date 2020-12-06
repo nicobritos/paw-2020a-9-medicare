@@ -1,8 +1,8 @@
 package ar.edu.itba.paw.webapp.controller.rest;
 
-import ar.edu.itba.paw.interfaces.services.StaffService;
+import ar.edu.itba.paw.interfaces.services.DoctorService;
 import ar.edu.itba.paw.interfaces.services.WorkdayService;
-import ar.edu.itba.paw.models.Staff;
+import ar.edu.itba.paw.models.Doctor;
 import ar.edu.itba.paw.models.Workday;
 import ar.edu.itba.paw.webapp.controller.rest.utils.GenericResource;
 import ar.edu.itba.paw.webapp.media_types.ErrorMIME;
@@ -27,7 +27,7 @@ public class WorkdayResource extends GenericResource {
     @Autowired
     private WorkdayService workdayService;
     @Autowired
-    private StaffService staffService;
+    private DoctorService doctorService;
 
     @GET
     @Produces({WorkdayMIME.GET_LIST, ErrorMIME.ERROR})
@@ -35,16 +35,16 @@ public class WorkdayResource extends GenericResource {
             @Context HttpHeaders httpheaders) {
         MIMEHelper.assertServerType(httpheaders, WorkdayMIME.GET_LIST);
 
-        if (!this.isStaff())
+        if (!this.isDoctor())
             return this.error(Status.FORBIDDEN.getStatusCode(), Status.FORBIDDEN.toString());
 
-        Optional<Staff> staffOptional = this.staffService.findByUser(this.getUser().get()).stream().findFirst();
-        if (!staffOptional.isPresent())
+        Optional<Doctor> doctorOptional = this.doctorService.findByUser(this.getUser().get()).stream().findFirst();
+        if (!doctorOptional.isPresent())
             return this.error(Status.FORBIDDEN.getStatusCode(), Status.FORBIDDEN.toString()); // TODO: Log, esto es inconsistencia, no deberia de pasar
 
         return Response
                 .ok()
-                .entity(this.workdayService.findByStaff(staffOptional.get()))
+                .entity(this.workdayService.findByDoctor(doctorOptional.get()))
                 .build();
     }
 
@@ -59,11 +59,11 @@ public class WorkdayResource extends GenericResource {
         if (workdays == null || workdays.isEmpty())
             return this.error(Status.BAD_REQUEST.getStatusCode(), Status.BAD_REQUEST.toString());
 
-        if (!this.isStaff())
+        if (!this.isDoctor())
             return this.error(Status.FORBIDDEN.getStatusCode(), Status.FORBIDDEN.toString());
 
-        Optional<Staff> staffOptional = this.staffService.findByUser(this.getUser().get()).stream().findFirst();
-        if (!staffOptional.isPresent())
+        Optional<Doctor> doctorOptional = this.doctorService.findByUser(this.getUser().get()).stream().findFirst();
+        if (!doctorOptional.isPresent())
             return this.error(Status.FORBIDDEN.getStatusCode(), Status.FORBIDDEN.toString()); // TODO: Log, esto es inconsistencia, no deberia de pasar
 
         Collection<Workday> newWorkdays = new LinkedList<>();
@@ -78,7 +78,7 @@ public class WorkdayResource extends GenericResource {
             }
 
             try {
-                newWorkdays.add(this.workdayService.create(this.createWorkday(workday, staffOptional.get())));
+                newWorkdays.add(this.workdayService.create(this.createWorkday(workday, doctorOptional.get())));
             } catch (Exception e) {
                 // We need to rollback
                 error = Status.INTERNAL_SERVER_ERROR;
@@ -115,11 +115,11 @@ public class WorkdayResource extends GenericResource {
         if (workday == null || workday.getDay() == null)
             return this.error(Status.BAD_REQUEST.getStatusCode(), Status.BAD_REQUEST.toString());
 
-        if (!this.isStaff())
+        if (!this.isDoctor())
             return this.error(Status.FORBIDDEN.getStatusCode(), Status.FORBIDDEN.toString());
 
-        Optional<Staff> staffOptional = this.staffService.findByUser(this.getUser().get()).stream().findFirst();
-        if (!staffOptional.isPresent())
+        Optional<Doctor> doctorOptional = this.doctorService.findByUser(this.getUser().get()).stream().findFirst();
+        if (!doctorOptional.isPresent())
             return this.error(Status.FORBIDDEN.getStatusCode(), Status.FORBIDDEN.toString()); // TODO: Log, esto es inconsistencia, no deberia de pasar
 
         if (workday.getStartHour() > workday.getEndHour()
@@ -129,7 +129,7 @@ public class WorkdayResource extends GenericResource {
 
         return Response
                 .status(Status.CREATED)
-                .entity(this.workdayService.create(this.createWorkday(workday, staffOptional.get())))
+                .entity(this.workdayService.create(this.createWorkday(workday, doctorOptional.get())))
                 .build();
     }
 
@@ -144,18 +144,18 @@ public class WorkdayResource extends GenericResource {
         if (id == null)
             return this.error(Status.BAD_REQUEST.getStatusCode(), Status.BAD_REQUEST.toString());
 
-        if (!this.isStaff())
+        if (!this.isDoctor())
             return this.error(Status.FORBIDDEN.getStatusCode(), Status.FORBIDDEN.toString());
 
-        Optional<Staff> staffOptional = this.staffService.findByUser(this.getUser().get()).stream().findFirst();
-        if (!staffOptional.isPresent())
+        Optional<Doctor> doctorOptional = this.doctorService.findByUser(this.getUser().get()).stream().findFirst();
+        if (!doctorOptional.isPresent())
             return this.error(Status.FORBIDDEN.getStatusCode(), Status.FORBIDDEN.toString()); // TODO: Log, esto es inconsistencia, no deberia de pasar
 
         Optional<Workday> workdayOptional = this.workdayService.findById(id);
         if (!workdayOptional.isPresent())
             return this.error(Status.NOT_FOUND.getStatusCode(), Status.NOT_FOUND.toString());
 
-        if (!staffOptional.get().equals(workdayOptional.get().getStaff()))
+        if (!doctorOptional.get().equals(workdayOptional.get().getDoctor()))
             return this.error(Status.FORBIDDEN.getStatusCode(), Status.FORBIDDEN.toString());
 
         return Response
@@ -173,18 +173,18 @@ public class WorkdayResource extends GenericResource {
         if (id == null)
             return this.error(Status.BAD_REQUEST.getStatusCode(), Status.BAD_REQUEST.toString());
 
-        if (!this.isStaff())
+        if (!this.isDoctor())
             return this.error(Status.FORBIDDEN.getStatusCode(), Status.FORBIDDEN.toString());
 
-        Optional<Staff> staffOptional = this.staffService.findByUser(this.getUser().get()).stream().findFirst();
-        if (!staffOptional.isPresent())
+        Optional<Doctor> doctorOptional = this.doctorService.findByUser(this.getUser().get()).stream().findFirst();
+        if (!doctorOptional.isPresent())
             return this.error(Status.FORBIDDEN.getStatusCode(), Status.FORBIDDEN.toString()); // TODO: Log, esto es inconsistencia, no deberia de pasar
 
         Optional<Workday> workdayOptional = this.workdayService.findById(id);
         if (!workdayOptional.isPresent())
             return this.error(Status.NOT_FOUND.getStatusCode(), Status.NOT_FOUND.toString());
 
-        if (!workdayOptional.get().getStaff().equals(staffOptional.get()))
+        if (!workdayOptional.get().getDoctor().equals(doctorOptional.get()))
             return this.error(Status.FORBIDDEN.getStatusCode(), Status.FORBIDDEN.toString());
 
         this.workdayService.remove(id);
@@ -194,10 +194,10 @@ public class WorkdayResource extends GenericResource {
                 .build();
     }
 
-    private Workday createWorkday(Workday workday, Staff staff) {
+    private Workday createWorkday(Workday workday, Doctor doctor) {
         Workday copy = new Workday();
 
-        copy.setStaff(staff);
+        copy.setDoctor(doctor);
         copy.setDay(workday.getDay());
         copy.setStartHour(workday.getStartHour());
         copy.setStartMinute(workday.getStartMinute());

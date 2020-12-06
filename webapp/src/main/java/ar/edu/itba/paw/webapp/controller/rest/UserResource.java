@@ -1,7 +1,7 @@
 package ar.edu.itba.paw.webapp.controller.rest;
 
 import ar.edu.itba.paw.interfaces.services.LocalityService;
-import ar.edu.itba.paw.interfaces.services.StaffSpecialtyService;
+import ar.edu.itba.paw.interfaces.services.DoctorSpecialtyService;
 import ar.edu.itba.paw.interfaces.services.UserService;
 import ar.edu.itba.paw.models.*;
 import ar.edu.itba.paw.webapp.controller.rest.utils.GenericAuthenticationResource;
@@ -9,7 +9,7 @@ import ar.edu.itba.paw.webapp.media_types.ErrorMIME;
 import ar.edu.itba.paw.webapp.media_types.MIMEHelper;
 import ar.edu.itba.paw.webapp.media_types.UserMIME;
 import ar.edu.itba.paw.webapp.models.PatientSignUp;
-import ar.edu.itba.paw.webapp.models.StaffSignUp;
+import ar.edu.itba.paw.webapp.models.DoctorSignUp;
 import ar.edu.itba.paw.webapp.models.UserCredentials;
 import ar.edu.itba.paw.webapp.models.UserSignUp;
 import org.slf4j.Logger;
@@ -35,7 +35,7 @@ public class UserResource extends GenericAuthenticationResource {
     private static final Logger LOGGER = LoggerFactory.getLogger(UserResource.class);
 
     @Autowired
-    private StaffSpecialtyService staffSpecialtyService;
+    private DoctorSpecialtyService doctorSpecialtyService;
     @Autowired
     private LocalityService localityService;
     @Autowired
@@ -43,63 +43,63 @@ public class UserResource extends GenericAuthenticationResource {
 
     @POST
     @Produces({UserMIME.GET, ErrorMIME.ERROR})
-    @Consumes(UserMIME.CREATE_STAFF)
-    public Response createStaff(
-            StaffSignUp staffSignUp,
+    @Consumes(UserMIME.CREATE_DOCTOR)
+    public Response createDoctor(
+            DoctorSignUp doctorSignUp,
             @Context HttpServletRequest request,
             @Context HttpServletResponse response,
             @Context HttpHeaders httpheaders) {
         MIMEHelper.assertServerType(httpheaders, UserMIME.GET);
         if (this.getUser().isPresent())
             return this.error(Status.FORBIDDEN.getStatusCode(), Status.FORBIDDEN.toString());
-        if (this.userService.findByUsername(staffSignUp.getUser().getEmail()).isPresent())
+        if (this.userService.findByUsername(doctorSignUp.getUser().getEmail()).isPresent())
             return this.error(Status.BAD_REQUEST.getStatusCode(), Status.BAD_REQUEST.toString());
 
-        Optional<Locality> locality = this.localityService.findById(staffSignUp.getOffice().getLocality().getId());
+        Optional<Locality> locality = this.localityService.findById(doctorSignUp.getOffice().getLocality().getId());
         if (!locality.isPresent())
             return this.error(Status.BAD_REQUEST.getStatusCode(), Status.BAD_REQUEST.toString());
 
-        Collection<StaffSpecialty> staffSpecialties = this.staffSpecialtyService.findByIds(
-                staffSignUp
-                        .getStaffSpecialties()
+        Collection<DoctorSpecialty> doctorSpecialties = this.doctorSpecialtyService.findByIds(
+                doctorSignUp
+                        .getDoctorSpecialties()
                         .stream()
-                        .map(StaffSpecialty::getId)
+                        .map(DoctorSpecialty::getId)
                         .collect(Collectors.toList())
         );
-        if (staffSpecialties.size() != staffSignUp.getStaffSpecialties().size())
+        if (doctorSpecialties.size() != doctorSignUp.getDoctorSpecialties().size())
             return this.error(Status.BAD_REQUEST.getStatusCode(), Status.BAD_REQUEST.toString());
 
-        User user = this.copyUser(staffSignUp);
+        User user = this.copyUser(doctorSignUp);
 
         Office office = new Office();
         office.setLocality(locality.get());
-        office.setStreet(staffSignUp.getOffice().getStreet());
+        office.setStreet(doctorSignUp.getOffice().getStreet());
 
-        if (staffSignUp.getOffice().getName() != null) {
-            office.setName(staffSignUp.getOffice().getName());
+        if (doctorSignUp.getOffice().getName() != null) {
+            office.setName(doctorSignUp.getOffice().getName());
         } else {
             // TODO: i18n
             office.setName("Consultorio de " + user.getFirstName() + " " + user.getSurname());
         }
-        if (staffSignUp.getOffice().getPhone() != null) {
-            office.setName(staffSignUp.getOffice().getPhone());
+        if (doctorSignUp.getOffice().getPhone() != null) {
+            office.setName(doctorSignUp.getOffice().getPhone());
         } else {
-            office.setPhone(staffSignUp.getUser().getPhone());
+            office.setPhone(doctorSignUp.getUser().getPhone());
         }
-        if (staffSignUp.getOffice().getEmail() != null) {
-            office.setName(staffSignUp.getOffice().getEmail());
+        if (doctorSignUp.getOffice().getEmail() != null) {
+            office.setName(doctorSignUp.getOffice().getEmail());
         } else {
-            office.setPhone(staffSignUp.getUser().getEmail());
+            office.setPhone(doctorSignUp.getUser().getEmail());
         }
 
-        Staff staff = new Staff();
-        staff.setOffice(office);
-        staff.setStaffSpecialties(staffSpecialties);
-        staff.setRegistrationNumber(staffSignUp.getRegistrationNumber());
-        staff.setPhone(office.getPhone());
-        staff.setEmail(office.getEmail());
+        Doctor doctor = new Doctor();
+        doctor.setOffice(office);
+        doctor.setDoctorSpecialties(doctorSpecialties);
+        doctor.setRegistrationNumber(doctorSignUp.getRegistrationNumber());
+        doctor.setPhone(office.getPhone());
+        doctor.setEmail(office.getEmail());
 
-        return this.finishSignUp(request, response, staffSignUp, this.userService.createAsStaff(user, staff));
+        return this.finishSignUp(request, response, doctorSignUp, this.userService.createAsDoctor(user, doctor));
     }
 
     @POST

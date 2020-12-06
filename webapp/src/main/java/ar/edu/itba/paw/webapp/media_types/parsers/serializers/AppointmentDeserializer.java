@@ -1,7 +1,7 @@
 package ar.edu.itba.paw.webapp.media_types.parsers.serializers;
 
 import ar.edu.itba.paw.models.Appointment;
-import ar.edu.itba.paw.models.Staff;
+import ar.edu.itba.paw.models.Doctor;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.joda.time.LocalDateTime;
@@ -36,13 +36,13 @@ public class AppointmentDeserializer extends JsonDeserializer<Appointment> {
             appointment.setMotive(node.asText());
         }
 
-        Staff staff = new Staff();
+        Doctor doctor = new Doctor();
 
-        node = jsonObject.get("staffId");
+        node = jsonObject.get("doctorId");
         if (node.isNull())
             throw new IllegalArgumentException();
-        staff.setId(node.asInt());
-        appointment.setStaff(staff);
+        doctor.setId(node.asInt());
+        appointment.setDoctor(doctor);
 
         return appointment;
     }

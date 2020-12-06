@@ -6,7 +6,7 @@ import Unverified from '@/views/unverified';
 import Login from '@/views/authentication/login';
 import Signup from '@/views/authentication/signup';
 import SignupPatient from '@/views/authentication/signupPatient';
-import SignupStaff from '@/views/authentication/signupStaff';
+import SignupDoctor from '@/views/authentication/signupDoctor';
 import MedicHome from '@/views/medic/home';
 import MedicProfile from '@/views/medic/profile';
 import PatientProfile from '@/views/patient/profile';
@@ -54,9 +54,9 @@ Vue.use(VueRouter)
     component:Signup
   },
   {
-    path:"/signup/staff",
-    name:"SignupStaff",
-    component:SignupStaff
+    path:"/signup/doctor",
+    name:"SignupDoctor",
+    component:SignupDoctor
   },
   {
     path:"/signup/patient",
@@ -64,12 +64,12 @@ Vue.use(VueRouter)
     component:SignupPatient
   },
   {
-    path:"/staff/home",
+    path:"/doctor/home",
     name:"MedicHome",
     component:MedicHome
   },
   {
-    path:"/staff/profile",
+    path:"/doctor/profile",
     name:"MedicProfile",
     component:MedicProfile
   },

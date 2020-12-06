@@ -6,12 +6,12 @@ select setval('patient_patient_id_seq', max(patient_id))
 from patient;
 select setval('picture_picture_id_seq', max(picture_id))
 from picture;
-select setval('staff_staff_id_seq', max(staff_id))
-from staff;
+select setval('doctor_doctor_id_seq', max(doctor_id))
+from doctor;
 select setval('system_province_province_id_seq', max(province_id))
 from system_province;
 select setval('system_locality_locality_id_seq', max(specialty_id))
-from system_staff_specialty;
+from system_doctor_specialty;
 select setval('users_users_id_seq', max(users_id))
 from users;
 select setval('workday_workday_id_seq', max(workday_id))

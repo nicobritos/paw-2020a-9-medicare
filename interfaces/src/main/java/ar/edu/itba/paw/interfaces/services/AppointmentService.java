@@ -12,27 +12,25 @@ import java.util.List;
 import java.util.Map;
 
 public interface AppointmentService extends GenericService<Appointment, Integer> {
-    List<Appointment> find(Staff staff);
+    List<Appointment> findAllAppointments(Doctor doctor);
 
-    List<Appointment> findByStaffs(Collection<Staff> staffs);
+    List<Appointment> findAllAppointmentsOfDoctors(Collection<Doctor> doctors);
 
-    List<Appointment> find(Patient patient);
+    List<Appointment> findAllAppointments(Patient patient);
 
-    List<Appointment> findByPatients(Collection<Patient> patients);
+    List<Appointment> findAllAppointmentsOfPatients(Collection<Patient> patients);
 
-    List<Appointment> findToday(Collection<Staff> staff);
+    List<Appointment> findTodayAppointments(Collection<Doctor> doctor);
 
-    List<Appointment> findToday(Patient patient);
+    List<Appointment> findTodayAppointments(Patient patient);
 
-    List<Appointment> findByDay(Staff staff, LocalDateTime date);
+    List<Appointment> findByDate(Doctor doctor, LocalDateTime date);
 
-    List<Appointment> findByStaffsAndDay(Collection<Staff> staffs, LocalDateTime date);
+    List<Appointment> findAppointmentsOfDoctorsFromDate(Collection<Doctor> doctors, LocalDateTime date);
 
-    List<Appointment> findByStaffsAndDay(Collection<Staff> staffs, LocalDateTime from, LocalDateTime to);
+    List<Appointment> findAppointmentsOfDoctorsInDateInterval(Collection<Doctor> doctors, LocalDateTime from, LocalDateTime to);
 
-    List<Appointment> findByPatientsFromDay(Collection<Patient> patients, LocalDateTime from);
-
-    List<Appointment> findByPatientsAndDay(Collection<Patient> patients, LocalDateTime from, LocalDateTime to);
+    List<Appointment> findAppointmentsOfPatientsInDateInterval(Collection<Patient> patients, LocalDateTime from, LocalDateTime to);
 
     List<Appointment> findByWorkday(Workday workday);
 
@@ -41,9 +39,9 @@ public interface AppointmentService extends GenericService<Appointment, Integer>
             InvalidAppointmentStatusChangeException,
             AppointmentAlreadyCompletedException;
 
-    List<AppointmentTimeSlot> findAvailableTimeslots(Staff staff, LocalDateTime fromDate, LocalDateTime toDate);
+    List<AppointmentTimeSlot> findAvailableTimeslotsInDateInterval(Doctor doctor, LocalDateTime fromDate, LocalDateTime toDate);
 
-    List<AppointmentTimeSlot> findAvailableTimeslots(Staff staff, LocalDateTime date);
+    List<AppointmentTimeSlot> findAvailableTimeslotsfromDate(Doctor doctor, LocalDateTime date);
 
     List<Appointment> cancelAppointments(Workday workday);
 
@@ -51,5 +49,5 @@ public interface AppointmentService extends GenericService<Appointment, Integer>
 
     void remove(Integer id, User user);
 
-    List<List<AppointmentTimeSlot>> findWeekTimeslots(Staff staff, LocalDateTime from, LocalDateTime to);
+    List<List<AppointmentTimeSlot>> findTimeslotsSortedByWeekday(Doctor doctor, LocalDateTime from, LocalDateTime to);
 }

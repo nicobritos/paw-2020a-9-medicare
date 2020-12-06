@@ -18,7 +18,7 @@ const Register = function () {
         }
     };
 
-    let bindStaffElements = function () {
+    let bindDoctorElements = function () {
         let togglers = document.getElementsByClassName("toggle-visibility");
         for (let t of togglers) {
             let eyes = t.getElementsByTagName("img");
@@ -52,7 +52,7 @@ const Register = function () {
     };
 
     let getProvinces = function (countryId) {
-        App.get('/signup/staff/provinces/' + countryId).then(provinces => {
+        App.get('/signup/doctor/provinces/' + countryId).then(provinces => {
             let provinceSelect = $('#province');
             if (provinces.length > 0) {
                 for (let province of provinces) {
@@ -68,7 +68,7 @@ const Register = function () {
     };
 
     let getLocalities = function (provinceId) {
-        App.get('/signup/staff/localities/' + provinceId).then(localities => {
+        App.get('/signup/doctor/localities/' + provinceId).then(localities => {
             let localitySelect = $('#locality');
             if (localities.length > 0) {
                 for (let locality of localities) {
@@ -100,8 +100,8 @@ const Register = function () {
         $('#signup-patient').click(() => {
             App.goto('/signup/patient');
         });
-        $('#signup-staff').click(() => {
-            App.goto('/signup/staff');
+        $('#signup-doctor').click(() => {
+            App.goto('/signup/doctor');
         });
     };
 
@@ -109,8 +109,8 @@ const Register = function () {
         initPatient: function () {
             bindElements();
         },
-        initStaff: function () {
-            bindStaffElements();
+        initDoctor: function () {
+            bindDoctorElements();
         },
         init: function () {
             bindChooserElements();

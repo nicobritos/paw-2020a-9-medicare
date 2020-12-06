@@ -3,7 +3,7 @@ package ar.edu.itba.paw.interfaces.daos;
 import ar.edu.itba.paw.interfaces.daos.generic.GenericDao;
 import ar.edu.itba.paw.models.Appointment;
 import ar.edu.itba.paw.models.Patient;
-import ar.edu.itba.paw.models.Staff;
+import ar.edu.itba.paw.models.Doctor;
 import ar.edu.itba.paw.models.Workday;
 import org.joda.time.LocalDateTime;
 
@@ -15,19 +15,19 @@ public interface AppointmentDao extends GenericDao<Appointment, Integer> {
 
     List<Appointment> findByPatients(Collection<Patient> patient);
 
-    List<Appointment> find(Staff staff);
+    List<Appointment> find(Doctor doctor);
 
-    List<Appointment> findByStaffs(Collection<Staff> staffs);
+    List<Appointment> findByDoctors(Collection<Doctor> doctors);
 
     List<Appointment> findPending(Patient patient);
 
-    List<Appointment> findPending(Staff staff);
+    List<Appointment> findPending(Doctor doctor);
 
-    List<Appointment> findPending(Patient patient, Staff staff);
+    List<Appointment> findPending(Patient patient, Doctor doctor);
 
-    List<Appointment> findByStaffsAndDate(Collection<Staff> staffs, LocalDateTime date);
+    List<Appointment> findByDoctorsAndDate(Collection<Doctor> doctors, LocalDateTime date);
 
-    List<Appointment> findByStaffsAndDate(Collection<Staff> staffs, LocalDateTime fromDate, LocalDateTime toDate);
+    List<Appointment> findByDoctorsAndDate(Collection<Doctor> doctors, LocalDateTime fromDate, LocalDateTime toDate);
 
     List<Appointment> findByPatientsAndDate(Collection<Patient> patients, LocalDateTime fromDate, LocalDateTime toDate);
 

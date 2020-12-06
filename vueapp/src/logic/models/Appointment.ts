@@ -16,7 +16,7 @@ export class Appointment extends GenericEntity<Appointment> {
     private _message: string;
     private _motive: string;
     private _patientId: number;
-    private _staffId: number;
+    private _doctorId: number;
 
     public get id(): number {
         return this._id;
@@ -66,12 +66,12 @@ export class Appointment extends GenericEntity<Appointment> {
         this._patientId = value;
     }
 
-    public get staffId(): number {
-        return this._staffId;
+    public get doctorId(): number {
+        return this._doctorId;
     }
 
-    public set staffId(value: number) {
-        this._staffId = value;
+    public set doctorId(value: number) {
+        this._doctorId = value;
     }
 
     public toJSON(): JSONSerializableKeys<Appointment> {
@@ -81,7 +81,7 @@ export class Appointment extends GenericEntity<Appointment> {
             message: this.message,
             motive: this.motive,
             patientId: this.patientId,
-            staffId: this.staffId,
+            doctorId: this.doctorId,
             status: this.status
         };
     }

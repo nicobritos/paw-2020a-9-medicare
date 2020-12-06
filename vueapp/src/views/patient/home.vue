@@ -20,24 +20,24 @@
                                         <div style="margin-top: 100%;"></div>
                                         <img
                                             class="profile-picture rounded-circle"
-                                            :src="getUrl('profilePics/'+appointment.staff.user.profilePictureId)"
+                                            :src="getUrl('profilePics/'+appointment.doctor.user.profilePictureId)"
                                             alt="profile pic"
                                         />
                                     </div>
                                 </div>
                                 <div class="col-7">
                                     <div class="row justify-content-start">
-                                        <h5>{{ appointment.staff.user.firstName }}
-                                            {{ appointment.staff.user.surname }}</h5>
+                                        <h5>{{ appointment.doctor.user.firstName }}
+                                            {{ appointment.doctor.user.surname }}</h5>
                                     </div>
                                     <div class="row">
                                         <p class="m-0">
                                             <!-- TODO: check -->
-                                            {{ appointment.staff.staffSpecialties }}
+                                            {{ appointment.doctor.doctorSpecialties }}
                                         </p>
                                     </div>
                                     <div class="row">
-                                        <p class="m-0">{{ appointment.staff.office.street }}</p>
+                                        <p class="m-0">{{ appointment.doctor.office.street }}</p>
                                     </div>
                                     <div class="row">
                                         <p class="m-0">

@@ -8,50 +8,50 @@
                             <div style="margin-top: 100%;"></div>
                             <img
                                 class="profile-picture rounded-circle"
-                                :src='getUrl("profilePics/"+staff.user.profilePictureId)'
+                                :src='getUrl("profilePics/"+doctor.user.profilePictureId)'
                                 alt="profile pic"
                             />
                         </div>
                     </div>
                     <div class="col mr-3">
                         <div class="row mt-2">
-                            <h5>{{ staff.user.firstName + ' ' + staff.user.surname }}}</h5>
+                            <h5>{{ doctor.user.firstName + ' ' + doctor.user.surname }}}</h5>
                         </div>
                         <div class="row mt-3 d-flex justify-content-start">
                             <p>
                                 <!-- TODO:check -->
-                                <span v-for="(specialty,index) in staff.staffSpecialtyIds" :key="specialty.id">
-                                    {{ index != staff.staffSpecialtyIds.length - 1 ? 'SPECIALTY' + ',' : 'SPECIALTY' }}
+                                <span v-for="(specialty,index) in doctor.doctorSpecialtyIds" :key="specialty.id">
+                                    {{ index != doctor.doctorSpecialtyIds.length - 1 ? 'SPECIALTY' + ',' : 'SPECIALTY' }}
                                 </span>
                             </p>
                         </div>
                     </div>
                 </div>
                 <div class="row mt-3 pl-4">
-                    <p class="m-0"><b>{{ $t('Address') }}:</b> {{ staff.office.street }} - TODO Locality</p>
+                    <p class="m-0"><b>{{ $t('Address') }}:</b> {{ doctor.office.street }} - TODO Locality</p>
                     <a
                         class="link"
-                        :href="'https://www.google.com/maps/search/?api=1&query=TODOLocality'+','+staff.office.street"
+                        :href="'https://www.google.com/maps/search/?api=1&query=TODOLocality'+','+doctor.office.street"
                         target="_blank"
                     >
                         <small class="m-1">{{ $t('SeeInGoogleMaps') }}</small>
                     </a>
                 </div>
                 <span
-                    v-if="(!!staff.user.phone && staff.user.phone.length) || (!!staff.office.phone && staff.office.phone.length)">
+                    v-if="(!!doctor.user.phone && doctor.user.phone.length) || (!!doctor.office.phone && doctor.office.phone.length)">
                     <div class="row mt-3 pl-4">
                         <p><b>{{ $t('Phones') }}:</b></p>
                     </div>
                     <ul>
-                        <li v-if="!!staff.user.phone && staff.user.phone.length">{{ staff.user.phone }} ({{ $t('Personal') }})</li>
-                        <li v-if="!!staff.office.phone && staff.office.phone.length">{{ staff.office.phone }} ({{ staff.office.name }})</li>
+                        <li v-if="!!doctor.user.phone && doctor.user.phone.length">{{ doctor.user.phone }} ({{ $t('Personal') }})</li>
+                        <li v-if="!!doctor.office.phone && doctor.office.phone.length">{{ doctor.office.phone }} ({{ doctor.office.name }})</li>
                     </ul>
                 </span>
                 <div v-else class="row mt-3 pl-4">
                     <p><b>{{ $t('Phones') }}:</b> {{ $t('UserWithNoPhones') }}</p>
                 </div>
                 <div class="row mt-3 pl-4">
-                    <p><b>{{ $t('Email') }}:</b> {{ staff.email }}</p>
+                    <p><b>{{ $t('Email') }}:</b> {{ doctor.email }}</p>
                 </div>
             </div>
             <div class="col ml-5 mt-3 p-0">
@@ -88,7 +88,7 @@
                         <div class="d-flex flex-column align-content-center">
                             <router-link
                                 v-for="timeslot in weekSlots[monday.plusDays(i).getDay()]" :key="timeslot.id"
-                                :to="'patient/appointment/'+staff.id+'/'+timeslot.date.year+'/'+timeslot.date.monthOfYear+'/'+timeslot.date.dayOfMonth+'/'+timeslot.date.hourOfDay+'/'+timeslot.date.minuteOfHour"
+                                :to="'patient/appointment/'+doctor.id+'/'+timeslot.date.year+'/'+timeslot.date.monthOfYear+'/'+timeslot.date.dayOfMonth+'/'+timeslot.date.hourOfDay+'/'+timeslot.date.minuteOfHour"
                                 class="btn btn-sm btn-secondary mb-2">
                                 <p class="m-0">
                                     {{
@@ -116,7 +116,7 @@
 <script lang="ts">
 import {Component, Vue} from 'vue-property-decorator';
 import {User} from '~/logic/models/User';
-import {Staff} from '~/logic/models/Staff';
+import {Doctor} from '~/logic/models/Doctor';
 import {Office} from '~/logic/models/Office';
 
 // TODO:check
@@ -135,7 +135,7 @@ export default class SelectAppointment extends Vue {
     private readonly monday = new Date(2020, 7, 13);
     private readonly weekSlots = [[], [], [], [], [], [], []];
     private readonly timeslots = [];
-    private readonly staff = new Staff();
+    private readonly doctor = new Doctor();
 
     created(): void {
         this.user.id = 1;
@@ -154,12 +154,12 @@ export default class SelectAppointment extends Vue {
         office.street = 'Street 1234';
         office.url = 'example.com';
 
-        this.staff.id = 1;
-        this.staff.user = this.user;
-        this.staff.phone = this.user.phone;
-        this.staff.email = this.user.email;
-        this.staff.registrationNumber = 12345;
-        this.staff.specialtyIds = [1];
+        this.doctor.id = 1;
+        this.doctor.user = this.user;
+        this.doctor.phone = this.user.phone;
+        this.doctor.email = this.user.email;
+        this.doctor.registrationNumber = 12345;
+        this.doctor.specialtyIds = [1];
     }
 
     public getMoY(t: number): string {

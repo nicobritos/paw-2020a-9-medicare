@@ -4,7 +4,7 @@ import {Nullable} from '~/logic/models/utils/Utils';
 import {User} from '~/logic/models/User';
 import {Office} from '~/logic/models/Office';
 
-export class Staff extends GenericEntity<Staff> {
+export class Doctor extends GenericEntity<Doctor> {
     private _id: number;
     private _phone: Nullable<string>; // TODO: CHeck si peude ser null. --> Update api.json
     private _email: string;
@@ -69,7 +69,7 @@ export class Staff extends GenericEntity<Staff> {
         this._specialtyIds = value;
     }
 
-    public toJSON(): JSONSerializableKeys<Staff> {
+    public toJSON(): JSONSerializableKeys<Doctor> {
         return {
             id: this.id,
             email: this.email,

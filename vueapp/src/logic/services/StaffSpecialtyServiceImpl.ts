@@ -1,24 +1,24 @@
 import {inject, injectable} from 'inversify';
 import TYPES from '~/logic/types';
 import {RestRepository} from '~/logic/interfaces/repositories/RestRepository';
-import {StaffSpecialtyService} from '~/logic/interfaces/services/StaffSpecialtyService';
-import {StaffSpecialty} from '~/logic/models/StaffSpecialty';
+import {DoctorSpecialtyService} from '~/logic/interfaces/services/DoctorSpecialtyService';
+import {DoctorSpecialty} from '~/logic/models/DoctorSpecialty';
 
-const StaffSpecialtyMIME = {
+const DoctorSpecialtyMIME = {
     LIST: 'application/vnd.specialty.list.get.v1+json',
 };
 
 @injectable()
-export class StaffSpecialtyServiceImpl implements StaffSpecialtyService {
+export class DoctorSpecialtyServiceImpl implements DoctorSpecialtyService {
     private static PATH = 'specialties';
 
     @inject(TYPES.Repositories.RestRepository)
     private rest: RestRepository;
 
     // TODO: Manage errors
-    public async list(): Promise<StaffSpecialty[]> {
-        let response = await this.rest.get<StaffSpecialty[]>(StaffSpecialtyServiceImpl.PATH, {
-            accepts: StaffSpecialtyMIME.LIST
+    public async list(): Promise<DoctorSpecialty[]> {
+        let response = await this.rest.get<DoctorSpecialty[]>(DoctorSpecialtyServiceImpl.PATH, {
+            accepts: DoctorSpecialtyMIME.LIST
         });
         return response.isOk() ? response.data! : [];
     }

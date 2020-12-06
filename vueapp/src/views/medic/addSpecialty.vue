@@ -6,7 +6,7 @@
 </head>
 <body>
 <div class="container w-100 h-100 d-flex flex-column justify-content-center align-items-center">
-    <c:url var="addSpecialtyUrl" value="/staff/profile/specialty"/>
+    <c:url var="addSpecialtyUrl" value="/doctor/profile/specialty"/>
     <form:form modelAttribute="specialtyForm" class="addturn-form border p-5 rounded" action="${addSpecialtyUrl}"
                method="post">
         <div class="row">
@@ -36,7 +36,7 @@
         </div>
 
         <div class="form-row justify-content-between">
-            <a href="<c:url value="/staff/profile"/>">
+            <a href="<c:url value="/doctor/profile"/>">
             <form:button class="form-atras-btn btn" type="button">
                 <spring:message
                     code="Back"/>

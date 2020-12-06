@@ -1,8 +1,8 @@
 package ar.edu.itba.paw.webapp.media_types.parsers;
 
-import ar.edu.itba.paw.models.StaffSpecialty;
-import ar.edu.itba.paw.webapp.media_types.StaffSpecialtyMIME;
-import ar.edu.itba.paw.webapp.media_types.parsers.serializers.StaffSpecialtySerializer;
+import ar.edu.itba.paw.models.DoctorSpecialty;
+import ar.edu.itba.paw.webapp.media_types.DoctorSpecialtyMIME;
+import ar.edu.itba.paw.webapp.media_types.parsers.serializers.DoctorSpecialtySerializer;
 import ar.edu.itba.paw.webapp.media_types.parsers.utils.GenericParser;
 import org.glassfish.jersey.message.internal.ReaderWriter;
 
@@ -20,18 +20,18 @@ import java.lang.reflect.Type;
 import java.util.Collection;
 
 @Provider
-@Produces(StaffSpecialtyMIME.GET_LIST)
-public class SpecialtyGetListParser extends GenericParser<Collection<StaffSpecialty>> {
+@Produces(DoctorSpecialtyMIME.GET_LIST)
+public class SpecialtyGetListParser extends GenericParser<Collection<DoctorSpecialty>> {
     @Override
     public boolean isWriteable(Class<?> aClass, Type type, Annotation[] annotations, MediaType mediaType) {
         return true;
     }
 
     @Override
-    public void writeTo(Collection<StaffSpecialty> staffSpecialties, Class<?> aClass, Type type, Annotation[] annotations, MediaType mediaType, MultivaluedMap<String, Object> multivaluedMap, OutputStream outputStream) throws IOException, WebApplicationException {
+    public void writeTo(Collection<DoctorSpecialty> doctorSpecialties, Class<?> aClass, Type type, Annotation[] annotations, MediaType mediaType, MultivaluedMap<String, Object> multivaluedMap, OutputStream outputStream) throws IOException, WebApplicationException {
         try {
             OutputStreamWriter writer = new OutputStreamWriter(outputStream, ReaderWriter.getCharset(mediaType));
-            writer.write(StaffSpecialtySerializer.instance.toJsonArray(staffSpecialties).toString());
+            writer.write(DoctorSpecialtySerializer.instance.toJsonArray(doctorSpecialties).toString());
             writer.flush();
         } catch (Exception e) {
             throw new InternalServerErrorException();

@@ -25,7 +25,7 @@ export default class App extends Vue {
     private readonly user: User = new User();
 
     get isAuth(): boolean {
-        return ["Login","Signup","SignupStaff","SignupPatient"].includes(this.$route.name!);
+        return ["Login","Signup","SignupDoctor","SignupPatient"].includes(this.$route.name!);
     }
 }
 </script>

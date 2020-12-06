@@ -31,7 +31,7 @@ public abstract class GenericResource {
     @Autowired
     private UserService userService;
 
-    protected boolean isStaff() {
+    protected boolean isDoctor() {
         if (!SecurityContextHolder.getContext().getAuthentication().isAuthenticated())
             return false;
 
@@ -40,7 +40,7 @@ public abstract class GenericResource {
             return false;
 
         GrantedAuthority authority = authorities.stream().findFirst().orElse(null);
-        return authority.getAuthority().equals(UserRole.STAFF.getAsRole());
+        return authority.getAuthority().equals(UserRole.DOCTOR.getAsRole());
     }
 
     protected Optional<User> getUser() {

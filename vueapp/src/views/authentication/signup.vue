@@ -16,9 +16,9 @@
                     <i class="fa fa-hospital-user" style="font-size: 80px;"></i>
                     <h4 class="mt-2">{{ $t('LookingForMedics') }}</h4>
                 </router-link>
-                <router-link :to='getUrl("signup/staff")' tag="div"
+                <router-link :to='getUrl("signup/doctor")' tag="div"
                              class="d-flex flex-column align-items-center card card-shadow pointer p-2"
-                             id="signup-staff">
+                             id="signup-doctor">
                     <!-- TODO: solve icons -->
                     <i class="fa fa-user-md" style="font-size: 80px;"></i>
                     <h4 class="mt-2">{{ $t('IMAMedic') }}</h4>

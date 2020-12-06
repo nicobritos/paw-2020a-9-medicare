@@ -18,7 +18,7 @@ public class WorkdaySerializer extends JsonSerializer<Workday> {
         jsonObject.replace("start", this.timeToJson(workday.getStartHour(), workday.getStartMinute()));
         jsonObject.replace("end", this.timeToJson(workday.getEndHour(), workday.getEndMinute()));
         jsonObject.put("day", workday.getDay().name());
-        jsonObject.put("staffId", workday.getStaff().getId());
+        jsonObject.put("doctorId", workday.getDoctor().getId());
 
         return jsonObject;
     }

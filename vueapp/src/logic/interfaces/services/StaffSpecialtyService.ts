@@ -1,5 +1,5 @@
-import {StaffSpecialty} from '~/logic/models/StaffSpecialty';
+import {DoctorSpecialty} from '~/logic/models/DoctorSpecialty';
 
-export interface StaffSpecialtyService {
-    list(): Promise<StaffSpecialty[]>;
+export interface DoctorSpecialtyService {
+    list(): Promise<DoctorSpecialty[]>;
 }

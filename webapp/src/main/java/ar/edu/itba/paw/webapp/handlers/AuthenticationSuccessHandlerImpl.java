@@ -34,8 +34,8 @@ public class AuthenticationSuccessHandlerImpl implements AuthenticationSuccessHa
                 String query = request.getQueryString();
                 return "/verifyEmail" + ((query == null) ? "" : ("?" + query));
             }
-            if (authority.getAuthority().equals("ROLE_" + UserRole.STAFF.name())) {
-                return "/staff/home";
+            if (authority.getAuthority().equals("ROLE_" + UserRole.DOCTOR.name())) {
+                return "/doctor/home";
             } else if (authority.getAuthority().equals("ROLE_" + UserRole.PATIENT.name())) {
                 isPatient = true;
             }

@@ -13,7 +13,7 @@ public interface OfficeService extends GenericSearchableService<Office, Integer>
 
     List<Office> findByLocality(Locality locality);
 
-    void addStaff(Office office, Staff staff);
+    void addDoctor(Office office, Doctor doctor);
 
-    void addStaffs(Office office, Collection<Staff> staffs);
+    void addDoctors(Office office, Collection<Doctor> doctors);
 }

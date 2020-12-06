@@ -1,3 +1,3 @@
-INSERT INTO public.appointment (appointment_id, status, patient_id, staff_id, from_date, motive, message) VALUES (6, 'PENDING', 3, 56, '2020-05-13 11:00:00.000000', null, null);
-INSERT INTO public.appointment (appointment_id, status, patient_id, staff_id, from_date, motive, message) VALUES (12, 'PENDING', 6, 80, '2020-05-18 15:30:00.000000', null, null);
-INSERT INTO public.appointment (appointment_id, status, patient_id, staff_id, from_date, motive, message) VALUES (13, 'PENDING', 7, 167, '2020-05-14 09:00:00.000000', null, null);
+INSERT INTO public.appointment (appointment_id, status, patient_id, doctor_id, from_date, motive, message) VALUES (6, 'PENDING', 3, 56, '2020-05-13 11:00:00.000000', null, null);
+INSERT INTO public.appointment (appointment_id, status, patient_id, doctor_id, from_date, motive, message) VALUES (12, 'PENDING', 6, 80, '2020-05-18 15:30:00.000000', null, null);
+INSERT INTO public.appointment (appointment_id, status, patient_id, doctor_id, from_date, motive, message) VALUES (13, 'PENDING', 7, 167, '2020-05-14 09:00:00.000000', null, null);

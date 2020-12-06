@@ -41,12 +41,12 @@ public class AppointmentServiceImplTest {
     private static final int DAY_OF_MONTH = 29;
     private static final int HOUR = 12;
     private static final int MINUTE = 0;
-    private static final String STAFF_PHONE = "1111223344";
-    private static final String STAFF_EMAIL = "staffemail@testmail.com";
-    private static final String STAFF_SURNAME = "StSurname";
-    private static final String STAFF_FIRSTNAME = "StFirstname";
+    private static final String DOCTOR_PHONE = "1111223344";
+    private static final String DOCTOR_EMAIL = "doctoremail@testmail.com";
+    private static final String DOCTOR_SURNAME = "StSurname";
+    private static final String DOCTOR_FIRSTNAME = "StFirstname";
     private static final int REGISTRATION_NUMBER = 1;
-    private static final int STAFF_ID = 1;
+    private static final int DOCTOR_ID = 1;
     private static final int APPOINTMENT_ID = 1;
     @InjectMocks
     private AppointmentServiceImpl appointmentService = new AppointmentServiceImpl();
@@ -91,13 +91,13 @@ public class AppointmentServiceImplTest {
         return patient;
     }
 
-    private Staff staffModel() {
-        Staff staff = new Staff();
-        staff.setPhone(STAFF_PHONE);
-        staff.setEmail(STAFF_EMAIL);
-        staff.setRegistrationNumber(REGISTRATION_NUMBER);
-        staff.setId(STAFF_ID);
-        return staff;
+    private Doctor doctorModel() {
+        Doctor doctor = new Doctor();
+        doctor.setPhone(DOCTOR_PHONE);
+        doctor.setEmail(DOCTOR_EMAIL);
+        doctor.setRegistrationNumber(REGISTRATION_NUMBER);
+        doctor.setId(DOCTOR_ID);
+        return doctor;
     }
 
     private LocalDateTime dateModel() {
@@ -108,7 +108,7 @@ public class AppointmentServiceImplTest {
         Appointment appointment = new Appointment();
         appointment.setFromDate(dateModel());
         appointment.setPatient(patientModel());
-        appointment.setStaff(staffModel());
+        appointment.setDoctor(doctorModel());
         appointment.setId(APPOINTMENT_ID);
         appointment.setAppointmentStatus(AppointmentStatus.PENDING);
         return appointment;
@@ -116,9 +116,9 @@ public class AppointmentServiceImplTest {
 
 //    @Test
 //    public void mockExample() {
-//        Staff staff = staffModel();
-//        Mockito.when(mockDao.find(Mockito.eq(staff))).thenReturn(Collections.singletonList(appointmentModel()));
-//        List<Appointment> appointments = appointmentService.find(staff);
+//        Doctor doctor = doctorModel();
+//        Mockito.when(mockDao.find(Mockito.eq(doctor))).thenReturn(Collections.singletonList(appointmentModel()));
+//        List<Appointment> appointments = appointmentService.find(doctor);
 //        assertEquals(appointments, Collections.singletonList(appointmentModel()));
 //    }
 

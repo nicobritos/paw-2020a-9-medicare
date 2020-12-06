@@ -3,5 +3,5 @@ import {AppointmentTimeslotDate} from '~/logic/models/AppointmentTimeslotDate';
 import {APIError} from '~/logic/models/APIError';
 
 export interface AppointmentTimeSlotService {
-    list(staffId: number, dateRange: DateRange): Promise<AppointmentTimeslotDate[] | APIError>;
+    list(doctorId: number, dateRange: DateRange): Promise<AppointmentTimeslotDate[] | APIError>;
 }

@@ -8,7 +8,7 @@
 </head>
 <body>
 <div class="container w-100 h-100 d-flex flex-column justify-content-center align-items-center">
-    <c:url var="addTurnUrl" value="/staff/profile/workday"/>
+    <c:url var="addTurnUrl" value="/doctor/profile/workday"/>
     <form:form modelAttribute="workdayForm" class="addturn-form border p-5 rounded" action="${addTurnUrl}"
                method="post">
 
@@ -125,9 +125,9 @@
             </div>
             <div class="col-8">
                 <form:select class="form-control" name="officeId" id="officeId" path="officeId">
-                    <c:forEach items="${staffs}" var="staff">
-                        <form:option value="${staff.office.id}">
-                            <c:out value="${staff.office.name}"/>
+                    <c:forEach items="${doctors}" var="doctor">
+                        <form:option value="${doctor.office.id}">
+                            <c:out value="${doctor.office.name}"/>
                         </form:option>
                     </c:forEach>
                 </form:select>
@@ -135,7 +135,7 @@
         </div>
 
         <div class="form-row justify-content-between">
-            <a href="<c:url value="/staff/profile"/>">
+            <a href="<c:url value="/doctor/profile"/>">
             <form:button class="form-atras-btn btn" type="button">
                 <spring:message
                     code="Back"/>

@@ -8,9 +8,9 @@ import java.util.List;
 public interface WorkdayDao extends GenericDao<Workday, Integer> {
     List<Workday> findByUser(User user);
 
-    List<Workday> findByStaff(Staff staff);
+    List<Workday> findByDoctor(Doctor doctor);
 
-    List<Workday> findByStaff(Staff staff, WorkdayDay day);
+    List<Workday> findByDoctor(Doctor doctor, WorkdayDay day);
 
-    boolean isStaffWorking(Staff staff, AppointmentTimeSlot timeSlot);
+    boolean doctorWorks(Doctor doctor, AppointmentTimeSlot timeSlot);
 }

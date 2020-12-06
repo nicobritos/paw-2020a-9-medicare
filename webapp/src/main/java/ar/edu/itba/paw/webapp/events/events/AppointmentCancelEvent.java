@@ -8,17 +8,17 @@ import java.util.Locale;
 
 public class AppointmentCancelEvent extends ApplicationEvent {
     private User userCancelling;
-    private boolean isCancellingStaff;
+    private boolean isCancellingDoctor;
     private User userCancelled;
     private Appointment appointment;
     private Locale locale;
     private String baseUrl;
 
-    public AppointmentCancelEvent(User userCancelling, boolean isCancellingStaff, User userCancelled, Appointment appointment, Locale locale, String baseUrl) {
+    public AppointmentCancelEvent(User userCancelling, boolean isCancellingDoctor, User userCancelled, Appointment appointment, Locale locale, String baseUrl) {
         super(userCancelling);
         this.baseUrl = baseUrl;
         this.userCancelling = userCancelling;
-        this.isCancellingStaff = isCancellingStaff;
+        this.isCancellingDoctor = isCancellingDoctor;
         this.userCancelled = userCancelled;
         this.appointment = appointment;
         this.locale = locale;
@@ -44,7 +44,7 @@ public class AppointmentCancelEvent extends ApplicationEvent {
         return baseUrl;
     }
 
-    public boolean isCancellingStaff() {
-        return isCancellingStaff;
+    public boolean isCancellingDoctor() {
+        return isCancellingDoctor;
     }
 }

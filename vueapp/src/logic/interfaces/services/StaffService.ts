@@ -1,20 +1,20 @@
-import {Staff} from '~/logic/models/Staff';
-import {StaffSpecialty} from '~/logic/models/StaffSpecialty';
+import {Doctor} from '~/logic/models/Doctor';
+import {DoctorSpecialty} from '~/logic/models/DoctorSpecialty';
 import {APIError} from '~/logic/models/APIError';
 import {Pagination} from '~/logic/models/utils/Pagination';
 import {Nullable} from '~/logic/models/utils/Utils';
 
 // TODO: Ver los required en api doc
-export interface UpdateStaff {
+export interface UpdateDoctor {
     phone?: string;
     email?: string;
-    specialtyIds?: StaffSpecialty[]; // TODO: No tendrian q ser ids?
+    specialtyIds?: DoctorSpecialty[]; // TODO: No tendrian q ser ids?
 }
 
-export interface StaffService {
-    list(): Promise<Pagination<Staff>>;
+export interface DoctorService {
+    list(): Promise<Pagination<Doctor>>;
 
-    get(id: number): Promise<Nullable<Staff>>;
+    get(id: number): Promise<Nullable<Doctor>>;
 
-    update(id: number, staff: UpdateStaff): Promise<Staff | APIError>
+    update(id: number, doctor: UpdateDoctor): Promise<Doctor | APIError>
 }
