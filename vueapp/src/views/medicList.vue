@@ -147,11 +147,18 @@
 import {Component, Prop, Vue} from 'vue-property-decorator';
 import {DoctorSpecialty} from '~/logic/models/DoctorSpecialty';
 import {Locality} from '~/logic/models/Locality';
+import {State} from 'vuex-class';
+import {localityActionTypes} from '~/store/types/localities.types';
+import {staffSpecialtyActionTypes} from '~/store/types/doctorSpecialties.types';
 
 @Component
 export default class MedicList extends Vue {
     @Prop({type: Number})
     private readonly page: number;
+    @State(state => state.localities.localities)
+    private readonly localities: [];
+    @State(state => state.staffSpecialties.staffSpecialties)
+    private readonly specialties: [];
     private prevPage = '<';
     private firstPage = '<<';
     private nextPage = '>';
@@ -166,8 +173,6 @@ export default class MedicList extends Vue {
         totalPages: 0,
     };
     private doctor = [];
-    private specialties = [];
-    private localities = [];
 
     get searchedSpecialties() {
         let aux = this.$route.query.specialties;
@@ -237,13 +242,13 @@ export default class MedicList extends Vue {
         //
         // this.localities = await Api.getLocalities();
         //
-        // this.doctor = await Api.getDoctor();
+        // this.staff = await Api.getStaff();
         //
         // //TODO: this is not the way
-        // if (this.doctor.length >= 2) {
+        // if (this.staff.length >= 2) {
         //     this.resultsMessage = 'SearchResults2More';
-        //     this.resultsMessageParam = [this.doctor.length];
-        // } else if (this.doctor.length == 1) {
+        //     this.resultsMessageParam = [this.staff.length];
+        // } else if (this.staff.length == 1) {
         //     this.resultsMessage = 'SearchResults1';
         // } else {
         //     this.resultsMessage = 'NoResultsFound';

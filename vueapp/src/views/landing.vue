@@ -5,8 +5,7 @@
             <h2 class="display-5 mt-5 green-text">{{ $t('FindingMedicQuickAndEasy') }}</h2>
         </div>
         <div class="container h-50 justify-content-center">
-            <!-- TODO:FORM -->
-            <form class="filter-form p-3" @submit="submitForm"> 
+            <form class="filter-form p-3">
                 <div class="form-row">
                     <div class="col">
                         <h2 class="ml-5 mt-3 form-title">{{ $t('SearchMedics') }}</h2>
@@ -16,13 +15,14 @@
                     <div class="col-5 pl-5">
                         <label for="name"></label>
                         <input class="w-100 form-control" type="text" name="name" id="name"
+                               v-model="name"
                                :placeholder='$t("NameAndOrSurname")'>
                     </div>
                     <div class="col">
                         <label for="specialties"></label>
-                        <select name="specialties" class="select-css form-control" id="specialties">
-                            <option value="-1" disabled selected>{{ $t('Specialty') }}</option>
-                            <option value="-1">{{ $t('Any') }}</option>
+                        <select name="specialties" class="select-css form-control" id="specialties" v-model="specialtyId">
+                            <option :value="null" disabled selected>{{ $t('Specialty') }}</option>
+                            <option :value="null">{{ $t('Any') }}</option>
                             <option v-for="specialty in specialties" :key="specialty.id"
                                     :value="specialty.id">{{ specialty.name }}</option>
                         </select>
@@ -30,19 +30,21 @@
                     <div class="col pr-5">
                         <label for="localities">
                         </label>
-                        <select name="localities" class="select-css form-control" id="localities">
-                            <option value="-1" disabled selected>{{ $t('Locality') }}</option>
-                            <option value="-1">{{ $t('Any') }}</option>
+                        <select name="localities" class="select-css form-control" id="localities" v-model="localityId">
+                            <option :value="null" disabled selected>{{ $t('Locality') }}</option>
+                            <option :value="null">{{ $t('Any') }}</option>
                             <option v-for="locality in localities" :key="locality.id"
                                     :value="locality.id">{{ locality.name }}</option>
                         </select>
                     </div>
                 </div>
                 <div class="form-row px-5 mt-4 mb-3">
-                    <button type="submit"
-                            class="w-100 btn rounded-pill btn-light header-btn-element">{{
-                            $t('SearchMedics')
-                        }}</button>
+                    <button
+                        class="w-100 btn rounded-pill btn-light header-btn-element"
+                        @click="search"
+                    >
+                        {{ $t('SearchMedics') }}
+                    </button>
                 </div>
             </form>
             <br>
@@ -65,35 +67,39 @@
 import {Component, Vue} from 'vue-property-decorator';
 import {State} from 'vuex-class';
 import {localityActionTypes} from '~/store/types/localities.types';
+import {staffSpecialtyActionTypes} from '~/store/types/doctorSpecialties.types';
+import {Hash, Nullable} from '~/logic/models/utils/Utils';
 
 @Component
 export default class Landing extends Vue {
     @State(state => state.localities.localities)
     private readonly localities: [];
+    @State(state => state.staffSpecialties.staffSpecialties)
+    private readonly specialties: [];
 
-    private specialties: [];
-
-    submitForm(e: Event): void {
-        // e.preventDefault();
-        // let query = {};
-        // if (e.target['name'].value) {
-        //     query.name = e.target['name'].value;
-        // }
-        // //TODO:Check
-        // if (e.target['specialties'].value && e.target['specialties'].value > 0) {
-        //     query.specialties = e.target['specialties'].value;
-        // }
-        // //TODO:Check
-        // if (e.target['localities'].value && e.target['localities'].value > 0) {
-        //     query.localities = e.target['localities'].value;
-        // }
-        //
-        // this.$router.push({path: utils.getUrl('mediclist'), query: query});
-    }
+    private name: string = '';
+    private localityId: Nullable<number> = null;
+    private specialtyId: Nullable<number> = null;
 
     // TODO: handle error
     mounted(): void {
         this.$store.dispatch('localities/loadLocalities', localityActionTypes.loadLocalities());
+        this.$store.dispatch('staffSpecialties/loadStaffSpecialties', staffSpecialtyActionTypes.loadStaffSpecialties());
+    }
+
+    search(): void {
+        let query: Hash<string> = {};
+        if (this.name)
+            query.name = this.name.trim();
+        if (this.localityId)
+            query.locality = this.localityId.toString();
+        if (this.specialtyId)
+            query.specialty = this.specialtyId.toString();
+
+        this.$router.push({
+            name: 'MedicList',
+            query
+        });
     }
 }
 </script>
