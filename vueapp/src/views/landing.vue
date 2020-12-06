@@ -63,10 +63,14 @@
 
 <script lang="ts">
 import {Component, Vue} from 'vue-property-decorator';
+import {State} from 'vuex-class';
+import {localityActionTypes} from '~/store/types/localities.types';
 
 @Component
 export default class Landing extends Vue {
-    private localities: [];
+    @State(state => state.localities.localities)
+    private readonly localities: [];
+
     private specialties: [];
 
     submitForm(e: Event): void {
@@ -88,12 +92,8 @@ export default class Landing extends Vue {
     }
 
     // TODO: handle error
-    async mounted(): Promise<void> {
-        // let specialties = await Api.getSpecialties();
-        // this.specialties = specialties;
-        //
-        // let localities = await Api.getLocalities();
-        // this.localities = localities;
+    mounted(): void {
+        this.$store.dispatch('localities/loadLocalities', localityActionTypes.loadLocalities());
     }
 }
 </script>

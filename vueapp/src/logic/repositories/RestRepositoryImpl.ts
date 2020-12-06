@@ -10,32 +10,28 @@ import {APIError, ErrorMIME} from '~/logic/models/APIError';
 import {APIResponse, APIResponseFactory} from '~/logic/models/APIResponse';
 import {Pagination, PaginationLinks} from '~/logic/models/utils/Pagination';
 import parseLinkHeader from 'parse-link-header';
+import {injectable} from 'inversify';
 
+@injectable()
 export class RestRepositoryImpl implements RestRepository {
     public async get<R, T = any>(path: string, config: GetConfig<T>): Promise<APIResponse<R>> {
         let axiosConfig = RestRepositoryImpl.getAxiosConfig(config);
-        return RestRepositoryImpl.formatResponse(await axios.get(RestRepositoryImpl.formatPath(path), axiosConfig));
+        return RestRepositoryImpl.formatResponse(await axios.get(path, axiosConfig));
     }
 
     public async post<R, T>(path: string, config: PostConfig<T>): Promise<APIResponse<R>> {
         let axiosConfig = RestRepositoryImpl.getAxiosConfig(config);
-        return RestRepositoryImpl.formatResponse(await axios.post(RestRepositoryImpl.formatPath(path), axiosConfig));
+        return RestRepositoryImpl.formatResponse(await axios.post(path, axiosConfig));
     }
 
     public async put<R, T>(path: string, config: PutConfig<T>): Promise<APIResponse<R>> {
         let axiosConfig = RestRepositoryImpl.getAxiosConfig(config);
-        return RestRepositoryImpl.formatResponse(await axios.put(RestRepositoryImpl.formatPath(path), axiosConfig));
+        return RestRepositoryImpl.formatResponse(await axios.put(path, axiosConfig));
     }
 
     public async delete<R = any, T = any>(path: string, config?: DeleteConfig<T>): Promise<APIResponse<R>> {
         let axiosConfig = RestRepositoryImpl.getAxiosConfig(config || {});
-        return RestRepositoryImpl.formatResponse(await axios.delete(RestRepositoryImpl.formatPath(path), axiosConfig));
-    }
-
-    private static formatPath(path: string): string {
-        // TODO: Agarrar esto del .env
-        // FIXME: antes de produccion
-        return '/api/' + path;
+        return RestRepositoryImpl.formatResponse(await axios.delete(path, axiosConfig));
     }
 
     private static getAxiosConfig<R>(config: GetConfig<R> | PostConfig<R> | PutConfig<R> | DeleteConfig<R>): AxiosRequestConfig {

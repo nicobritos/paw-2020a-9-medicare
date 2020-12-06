@@ -1,6 +1,4 @@
-import {Province} from '~/logic/models/Province';
 import {CacheableAsyncProperty, DefineTypes} from '~/store/utils/helper.types';
-import {Nullable} from '~/logic/models/utils/Utils';
 import {Locality} from '~/logic/models/Locality';
 
 export interface LocalityState {
