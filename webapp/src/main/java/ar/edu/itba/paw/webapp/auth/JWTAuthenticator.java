@@ -34,8 +34,10 @@ public class JWTAuthenticator {
     @Autowired
     private UserService userService;
 
-    @Value("${app.subpath}")
+    @Value("${app.api.path}")
     private String APP_SUBPATH;
+    @Value("${app.host}")
+    private String APP_HOST;
 
     private final String secret;
 
@@ -44,16 +46,12 @@ public class JWTAuthenticator {
     }
 
     public Authentication attemptAuthentication(UserCredentials credentials) throws AuthenticationException {
-        try {
-            return this.authenticationManager.authenticate(
-                    new UsernamePasswordAuthenticationToken(
-                            credentials.getUsername(),
-                            credentials.getPassword(),
-                            new LinkedList<>()
-                    ));
-        } catch (AuthenticationException e) {
-            return null;
-        }
+        return this.authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(
+                        credentials.getUsername(),
+                        credentials.getPassword(),
+                        new LinkedList<>()
+                ));
     }
 
     public Authentication createAuthentication(UserCredentials credentials, Collection<? extends GrantedAuthority> authorities) throws AuthenticationException {
@@ -94,7 +92,7 @@ public class JWTAuthenticator {
 
         String token = Jwts.builder()
                 .setIssuedAt(new Date())
-                .setIssuer(Constants.ISSUER_INFO)
+                .setIssuer(this.APP_HOST)
                 .setClaims(claims)
                 .setExpiration(new Date(System.currentTimeMillis() + Constants.JWT_EXPIRATION_MILLIS))
                 .signWith(SignatureAlgorithm.HS512, this.secret)
@@ -107,20 +105,22 @@ public class JWTAuthenticator {
             refreshToken = this.userService.generateRefreshToken(user);
         }
 
-        Cookie jwtCookie = new Cookie("x-jwt", token);
+        Cookie jwtCookie = new Cookie(Constants.JWT_COOKIE_NAME, token);
         // No usamos secure porque paw no tiene ssl
         // jwtCookie.setSecure(true);
         jwtCookie.setMaxAge((int) ((System.currentTimeMillis() + Constants.JWT_EXPIRATION_MILLIS) / 1000)); // Seconds
-        jwtCookie.setDomain(this.APP_SUBPATH);
+        jwtCookie.setDomain(this.APP_HOST);
+        jwtCookie.setPath(this.APP_SUBPATH);
 
-        Cookie refreshCookie = new Cookie("x-refresh-token", refreshToken);
+        Cookie refreshCookie = new Cookie(Constants.REFRESH_TOKEN_COOKIEN_NAME, refreshToken);
         // No usamos secure porque paw no tiene ssl
         // refreshCookie.setSecure(true);
         refreshCookie.setMaxAge((int) ((System.currentTimeMillis() + Constants.JWT_REFRESH_EXPIRATION_MILLIS) / 1000)); // Seconds
-        refreshCookie.setPath(this.APP_SUBPATH);
+        refreshCookie.setDomain(this.APP_HOST);
+        refreshCookie.setPath(this.APP_SUBPATH + Constants.REFRESH_TOKEN_ENDPOINT);
 
         CookieUtils.setHttpOnlyCookie(response, jwtCookie);
-        CookieUtils.setHttpOnlyCookie(response, jwtCookie);
+        CookieUtils.setHttpOnlyCookie(response, refreshCookie);
     }
 
     private String getSecretKey() throws IOException {

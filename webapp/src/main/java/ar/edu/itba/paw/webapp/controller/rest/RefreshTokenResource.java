@@ -13,20 +13,20 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
-import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import javax.ws.rs.core.Response.ResponseBuilder;
 import javax.ws.rs.core.Response.Status;
+import java.util.Arrays;
 import java.util.Optional;
 
-@Path("/refresh")
+@Path("/" + Constants.REFRESH_TOKEN_ENDPOINT)
 @Component
 public class RefreshTokenResource extends GenericAuthenticationResource {
     private static final Logger LOGGER = LoggerFactory.getLogger(RefreshTokenResource.class);
@@ -37,13 +37,17 @@ public class RefreshTokenResource extends GenericAuthenticationResource {
     private UserService userService;
 
     @POST
-    @Path("{token}")
     @Produces({MediaType.WILDCARD, ErrorMIME.ERROR})
     public Response getEntity(
-            @Context HttpServletResponse response,
-            @Context HttpHeaders httpheaders,
-            @PathParam("token") String token)
+            @Context HttpServletRequest request,
+            @Context HttpServletResponse response)
     {
+        String token = Arrays.stream(request.getCookies())
+                .filter(cookie -> cookie.getName().equals(Constants.REFRESH_TOKEN_COOKIEN_NAME))
+                .map(Cookie::getValue)
+                .findFirst()
+                .orElse(null);
+
         if (token == null)
             return this.error(Status.BAD_REQUEST.getStatusCode(), Status.BAD_REQUEST.toString());
 
@@ -61,11 +65,9 @@ public class RefreshTokenResource extends GenericAuthenticationResource {
         userCredentials.setUsername(userOptional.get().getEmail());
         userCredentials.setPassword(token);
 
-        ResponseBuilder responseBuilder = Response.status(Status.OK);
-        if (!this.createJWTHeaders(responseBuilder, userCredentials, userOptional.get(), response, LOGGER)) {
-            responseBuilder.status(Status.INTERNAL_SERVER_ERROR);
+        if (!this.createJWTCookies(userCredentials, userOptional.get(), response, LOGGER)) {
+            return Response.status(Status.INTERNAL_SERVER_ERROR).build();
         }
-
-        return responseBuilder.build();
+        return Response.status(Status.NO_CONTENT).build();
     }
 }

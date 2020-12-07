@@ -648,10 +648,36 @@
                 },
                 "responses": {
                     "204": {
-                        "description": "Successful. Returns two http-only cookies with the jwt tokens"
+                        "description": "Successful. Returns two http-only cookies with the jwt tokens. Note that the refresh token cookie is only sent in /refresh endpoint"
                     },
                     "403": {
                         "$ref": "#/components/responses/error-403"
+                    }
+                }
+            }
+        },
+        "/refresh": {
+            "post": {
+                "summary": "Refreshes the JWT tokens",
+                "responses": {
+                    "204": {
+                        "description": "Successful. Returns two http-only cookies with the jwt tokens. Note that the refresh token cookie is only sent in /refresh endpoint"
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/error-404"
+                    }
+                }
+            }
+        },
+        "/verify": {
+            "post": {
+                "summary": "Verifies the email",
+                "responses": {
+                    "204": {
+                        "description": "Successful"
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/error-404"
                     }
                 }
             }

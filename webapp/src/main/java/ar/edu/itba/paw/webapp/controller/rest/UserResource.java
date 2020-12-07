@@ -1,15 +1,15 @@
 package ar.edu.itba.paw.webapp.controller.rest;
 
-import ar.edu.itba.paw.interfaces.services.LocalityService;
 import ar.edu.itba.paw.interfaces.services.DoctorSpecialtyService;
+import ar.edu.itba.paw.interfaces.services.LocalityService;
 import ar.edu.itba.paw.interfaces.services.UserService;
 import ar.edu.itba.paw.models.*;
 import ar.edu.itba.paw.webapp.controller.rest.utils.GenericAuthenticationResource;
 import ar.edu.itba.paw.webapp.media_types.ErrorMIME;
 import ar.edu.itba.paw.webapp.media_types.MIMEHelper;
 import ar.edu.itba.paw.webapp.media_types.UserMIME;
-import ar.edu.itba.paw.webapp.models.PatientSignUp;
 import ar.edu.itba.paw.webapp.models.DoctorSignUp;
+import ar.edu.itba.paw.webapp.models.PatientSignUp;
 import ar.edu.itba.paw.webapp.models.UserCredentials;
 import ar.edu.itba.paw.webapp.models.UserSignUp;
 import org.slf4j.Logger;
@@ -190,7 +190,7 @@ public class UserResource extends GenericAuthenticationResource {
         credentials.setUsername(userSignUp.getUser().getEmail());
         credentials.setPassword(userSignUp.getUser().getPassword());
 
-        this.createJWTHeaders(responseBuilder, credentials, newUser, response, LOGGER);
+        this.createJWTCookies(credentials, newUser, response, LOGGER);
         return responseBuilder
                 .entity(newUser)
                 .build();

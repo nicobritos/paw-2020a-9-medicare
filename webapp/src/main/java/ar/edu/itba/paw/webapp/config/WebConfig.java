@@ -42,7 +42,6 @@ import java.util.Properties;
         "ar.edu.itba.paw.services",
         "ar.edu.itba.paw.persistence",
         "ar.edu.itba.paw.webapp.media_types.parsers.serializers",
-        "ar.edu.itba.paw.webapp.events",
         "ar.edu.itba.paw.webapp.exceptions"
 })
 @Configuration

@@ -20,4 +20,15 @@ public abstract class ExceptionResponseWriter {
             // TODO: Log
         }
     }
+
+    public static void setError(HttpServletResponse response, Status status, String message) {
+        response.setStatus(status.getStatusCode());
+        response.setContentType(ErrorMIME.ERROR);
+
+        try {
+            response.getWriter().write(APIErrorSerializer.instance.toJson(new APIError(status.getStatusCode(), message)).toString());
+        } catch (IOException e) {
+            // TODO: Log
+        }
+    }
 }

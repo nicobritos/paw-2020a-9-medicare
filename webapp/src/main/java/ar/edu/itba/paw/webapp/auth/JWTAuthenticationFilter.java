@@ -70,16 +70,25 @@ public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilte
             ExceptionResponseWriter.setError(response, Status.BAD_REQUEST);
             return null;
         } catch (IOException e) {
-            ExceptionResponseWriter.setError(response, Status.SERVICE_UNAVAILABLE);
+            ExceptionResponseWriter.setError(response, Status.INTERNAL_SERVER_ERROR);
             return null;
         }
 
-        return this.authenticator.attemptAuthentication(credentials);
+        try {
+            return this.authenticator.attemptAuthentication(credentials);
+        } catch (AuthenticationException e) {
+            ExceptionResponseWriter.setError(response, Status.FORBIDDEN, "Invalid username or password");
+            return null;
+        } catch (Exception e) {
+            ExceptionResponseWriter.setError(response, Status.INTERNAL_SERVER_ERROR);
+            return null;
+        }
     }
 
     @Override
     protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response, FilterChain chain, Authentication authentication) throws IOException, ServletException {
         ar.edu.itba.paw.models.User user = this.userService.findByUsername(((User) authentication.getPrincipal()).getUsername()).get();
         this.authenticator.createAndRefreshJWT(authentication, user, response);
+        response.setStatus(Status.NO_CONTENT.getStatusCode());
     }
 }

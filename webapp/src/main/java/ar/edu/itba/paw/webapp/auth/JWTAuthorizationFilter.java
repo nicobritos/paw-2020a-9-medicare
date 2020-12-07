@@ -15,10 +15,11 @@ import org.springframework.stereotype.Component;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.ws.rs.core.HttpHeaders;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
@@ -37,25 +38,27 @@ public class JWTAuthorizationFilter extends BasicAuthenticationFilter {
 
     @Override
     protected void doFilterInternal(HttpServletRequest req, HttpServletResponse res, FilterChain chain) throws IOException, ServletException {
-        String header = req.getHeader(HttpHeaders.AUTHORIZATION);
-        if (header == null || !header.startsWith(Constants.TOKEN_BEARER_PREFIX)) {
-            chain.doFilter(req, res);
-            return;
-        }
         UsernamePasswordAuthenticationToken authentication = this.getAuthentication(req);
-        SecurityContextHolder.getContext().setAuthentication(authentication);
+
+        if (authentication != null)
+            SecurityContextHolder.getContext().setAuthentication(authentication);
+
         chain.doFilter(req, res);
     }
 
     private UsernamePasswordAuthenticationToken getAuthentication(HttpServletRequest request) {
-        String token = request.getHeader(HttpHeaders.AUTHORIZATION);
-        if (token == null)
+        Cookie[] cookies = request.getCookies();
+        if (cookies == null || cookies.length == 0)
+            return null;
+
+        Cookie jwtCookie = Arrays.stream(cookies).filter(cookie -> cookie.getName().equals(Constants.JWT_COOKIE_NAME)).findFirst().orElse(null);
+        if (jwtCookie == null)
             return null;
 
         // Procesamos los claims guardados. En este caso, el username y el rol
         Claims claims = Jwts.parser()
                 .setSigningKey(this.secret)
-                .parseClaimsJws(token.replace(Constants.TOKEN_BEARER_PREFIX, ""))
+                .parseClaimsJws(jwtCookie.getValue())
                 .getBody();
 
         if (claims.getExpiration().before(new Date()))

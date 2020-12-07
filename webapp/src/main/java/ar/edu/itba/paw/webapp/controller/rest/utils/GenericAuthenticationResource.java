@@ -7,25 +7,21 @@ import ar.edu.itba.paw.webapp.auth.UserRole;
 import ar.edu.itba.paw.webapp.models.UserCredentials;
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
 import javax.servlet.http.HttpServletResponse;
-import javax.ws.rs.core.Response.ResponseBuilder;
 import java.util.Collection;
 import java.util.Collections;
 
 public abstract class GenericAuthenticationResource extends GenericResource {
     @Autowired
-    private ApplicationEventPublisher eventPublisher;
-    @Autowired
     private JWTAuthenticator authenticator;
     @Autowired
     private UserService userService;
 
-    protected boolean createJWTHeaders(ResponseBuilder responseBuilder, UserCredentials credentials, User user, HttpServletResponse response, Logger logger) {
+    protected boolean createJWTCookies(UserCredentials credentials, User user, HttpServletResponse response, Logger logger) {
         Collection<? extends GrantedAuthority> authorities;
         if (!user.getVerified()) {
             authorities = Collections.singletonList(new SimpleGrantedAuthority(UserRole.UNVERIFIED.getAsRole()));
