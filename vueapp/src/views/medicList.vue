@@ -157,7 +157,7 @@ export default class MedicList extends Vue {
     private readonly page: number;
     @State(state => state.localities.localities)
     private readonly localities: [];
-    @State(state => state.staffSpecialties.staffSpecialties)
+    @State(state => state.doctorSpecialties.doctorSpecialties)
     private readonly specialties: [];
     private prevPage = '<';
     private firstPage = '<<';

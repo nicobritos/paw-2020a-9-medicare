@@ -74,7 +74,7 @@ import {Hash, Nullable} from '~/logic/models/utils/Utils';
 export default class Landing extends Vue {
     @State(state => state.localities.localities)
     private readonly localities: [];
-    @State(state => state.staffSpecialties.staffSpecialties)
+    @State(state => state.doctorSpecialties.doctorSpecialties)
     private readonly specialties: [];
 
     private name: string = '';
