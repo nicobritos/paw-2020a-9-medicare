@@ -1,11 +1,13 @@
 package ar.edu.itba.paw.services.email;
 
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
 
 import java.util.Properties;
 
+@Configuration
 public class EmailSender {
     protected static final int EMAIL_PORT = 587;
     protected static final String EMAIL_URL = "smtp.gmail.com";
