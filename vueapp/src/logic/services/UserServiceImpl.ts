@@ -7,7 +7,7 @@ import {APIError} from '~/logic/models/APIError';
 import {CreateUserPatient, CreateUserDoctor, UpdateUser, UserService} from '~/logic/interfaces/services/UserService';
 import {User} from '~/logic/models/User';
 
-const UserMIME = {
+export const UserMIME = {
     CREATE_PATIENT: 'application/vnd.user.patient.create.v1+json',
     CREATE_DOCTOR: 'application/vnd.user.doctor.create.v1+json',
     GET: 'application/vnd.user.get.v1+json',
