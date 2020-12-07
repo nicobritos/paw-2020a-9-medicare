@@ -61,6 +61,8 @@ import {User} from '~/logic/models/User';
 import {Doctor} from '~/logic/models/Doctor';
 import {Patient} from '~/logic/models/Patient';
 
+import { getUrl } from "~/logic/utils";
+
 @Component
 export default class NavbarLogged extends Vue {
     @State(state => state.auth.user)
@@ -78,6 +80,10 @@ export default class NavbarLogged extends Vue {
         // TODO:check because it throws an error if redundant navigation to same url
         this.$router.push('Landing');
         this.$emit('logout');
+    };
+    //TODO:check typescript
+    getUrl(url:String):String{
+        return getUrl(url);
     }
 }
 </script>

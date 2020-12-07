@@ -117,6 +117,8 @@
 
 import {Component, Vue} from 'vue-property-decorator';
 
+import { getUrl } from "~/logic/utils";
+
 @Component
 export default class PatientHome extends Vue {
     private appointments = [];
@@ -182,6 +184,12 @@ export default class PatientHome extends Vue {
             return t.toString();
         }
     }
+
+    //TODO: check typescript
+    getUrl(url:String):String{
+        return getUrl(url);
+    }
+
 }
 </script>
 

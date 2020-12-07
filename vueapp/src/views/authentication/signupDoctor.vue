@@ -106,6 +106,8 @@ import noeye from '@/assets/noeye.svg';
 import logo from '@/assets/logo.svg';
 import {Component, Vue} from 'vue-property-decorator';
 
+import { getUrl } from "~/logic/utils";
+
 @Component
 export default class SignupDoctor extends Vue {
     private showPassword = false;
@@ -121,6 +123,12 @@ export default class SignupDoctor extends Vue {
     toggleShowRepeatPassword(): void {
         this.showRepeatPassword = !this.showRepeatPassword;
     }
+
+    //TODO: check typescript
+    getUrl(url:String):String{
+        return getUrl(url);
+    }
+
 }
 </script>
 

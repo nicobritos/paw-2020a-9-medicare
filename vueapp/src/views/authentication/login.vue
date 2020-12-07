@@ -56,6 +56,8 @@ import eye from '@/assets/eye.svg';
 import noeye from '@/assets/noeye.svg';
 import {Component, Vue} from 'vue-property-decorator';
 
+import { getUrl } from "~/logic/utils";
+
 @Component
 export default class Login extends Vue {
     private logo = logo;
@@ -73,6 +75,11 @@ export default class Login extends Vue {
         // TODO:connect to api
         // this.$emit('input', new User(1, e.target['medicare_email'].value, 'firstName', 'surname', true, '1111-1111', 1));
         // this.$router.push(this.getUrl());
+    }
+
+    //TODO:check typescript
+    getUrl(url:String):String{
+        return getUrl(url);
     }
 }
 </script>

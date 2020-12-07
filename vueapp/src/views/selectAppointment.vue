@@ -119,6 +119,8 @@ import {User} from '~/logic/models/User';
 import {Doctor} from '~/logic/models/Doctor';
 import {Office} from '~/logic/models/Office';
 
+import { getUrl } from "~/logic/utils";
+
 // TODO:check
 // @ts-ignore
 Date.prototype.plusDays = function (i) {
@@ -212,6 +214,11 @@ export default class SelectAppointment extends Vue {
             default:
                 return t.toString();
         }
+    }
+
+    //TODO:check typescript
+    getUrl(url:String):String{
+        return getUrl(url);
     }
 }
 </script>

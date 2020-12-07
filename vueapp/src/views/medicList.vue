@@ -151,6 +151,8 @@ import {State} from 'vuex-class';
 import {localityActionTypes} from '~/store/types/localities.types';
 import {doctorSpecialtyActionTypes} from '~/store/types/doctorSpecialties.types';
 
+import { getUrl } from "~/logic/utils";
+
 @Component
 export default class MedicList extends Vue {
     @Prop({type: Number})
@@ -234,6 +236,11 @@ export default class MedicList extends Vue {
         //     }
         // }
         return id;
+    }
+
+    //TODO:check typescript
+    getUrl(url:String):String{
+        return getUrl(url);
     }
 
     // TODO: handle error

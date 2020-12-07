@@ -11,7 +11,13 @@
 <script lang="ts">
 import {Component, Vue} from 'vue-property-decorator';
 
+import {getUrl} from "~/logic/utils";
+
 @Component
 export default class NavbarNotLogged extends Vue {
+    //TODO:check typescript
+    getUrl(url:String):String{
+        return getUrl(url);
+    }
 }
 </script>
