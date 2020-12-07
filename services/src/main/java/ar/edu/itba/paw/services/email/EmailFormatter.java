@@ -1,4 +1,4 @@
-package ar.edu.itba.paw.webapp.email;
+package ar.edu.itba.paw.services.email;
 
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;

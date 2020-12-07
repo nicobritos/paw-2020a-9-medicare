@@ -1,19 +1,12 @@
-package ar.edu.itba.paw.webapp.config;
+package ar.edu.itba.paw.services.email;
 
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
 
 import java.util.Properties;
 
-@Configuration
-@ComponentScan({
-        "ar.edu.itba.paw.webapp.events",
-        "ar.edu.itba.paw.webapp.email"
-})
-public class WebEmailConfig {
+public class EmailSender {
     protected static final int EMAIL_PORT = 587;
     protected static final String EMAIL_URL = "smtp.gmail.com";
     protected static final String EMAIL_USER = "medicare.paw@gmail.com";
@@ -34,5 +27,9 @@ public class WebEmailConfig {
         properties.put("mail.debug", "false");
 
         return mailSender;
+    }
+
+    static String getEmailUser() {
+        return EMAIL_USER;
     }
 }

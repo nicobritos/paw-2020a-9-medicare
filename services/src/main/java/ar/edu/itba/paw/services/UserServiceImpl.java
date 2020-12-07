@@ -17,11 +17,9 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.mail.MessagingException;
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 
 @Service
 public class UserServiceImpl extends GenericSearchableServiceImpl<UserDao, User, Integer> implements UserService {
@@ -41,6 +39,8 @@ public class UserServiceImpl extends GenericSearchableServiceImpl<UserDao, User,
     private RefreshTokenService refreshTokenService;
     @Autowired
     private VerificationTokenService verificationTokenService;
+    @Autowired
+    private EmailService emailService;
     @Autowired
     private PasswordEncoder passwordEncoder;
 
@@ -175,20 +175,29 @@ public class UserServiceImpl extends GenericSearchableServiceImpl<UserDao, User,
 
     @Override
     @Transactional
-    public String generateVerificationToken(User user) {
+    public String generateVerificationToken(User user, String baseUrl, Locale locale, String confirmationRelativeUrl) {
         user = this.findById(user.getId()).get();
 
         if (user.getVerified())
             return null;
 
+        String token;
         if (user.getVerificationToken() != null) {
-            return this.verificationTokenService.refresh(user.getVerificationToken());
+            token = this.verificationTokenService.refresh(user.getVerificationToken());
         } else {
             VerificationToken verificationToken = this.verificationTokenService.generate();
             user.setVerificationToken(verificationToken);
             this.update(user);
-            return verificationToken.getToken();
+            token = verificationToken.getToken();
         }
+
+        try {
+            emailService.sendEmailConfirmationEmail(user, token, confirmationRelativeUrl, locale, baseUrl);
+        } catch (MessagingException e) {
+            LOGGER.error("Couldn't send email confirmation mail to: {}", user.getEmail());
+        }
+
+        return token;
     }
 
     @Override

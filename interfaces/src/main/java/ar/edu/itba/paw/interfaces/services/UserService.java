@@ -7,6 +7,7 @@ import ar.edu.itba.paw.models.Picture;
 import ar.edu.itba.paw.models.Doctor;
 import ar.edu.itba.paw.models.User;
 
+import java.util.Locale;
 import java.util.Optional;
 
 public interface UserService extends GenericSearchableService<User, Integer> {
@@ -26,7 +27,7 @@ public interface UserService extends GenericSearchableService<User, Integer> {
 
     Patient createNewPatient(Patient patient);
 
-    String generateVerificationToken(User user);
+    String generateVerificationToken(User user, String baseUrl, Locale locale, String confirmationRelativeUrl);
 
     String generateRefreshToken(User user);
 

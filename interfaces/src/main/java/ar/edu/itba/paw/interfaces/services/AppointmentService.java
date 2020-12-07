@@ -2,6 +2,7 @@ package ar.edu.itba.paw.interfaces.services;
 
 import ar.edu.itba.paw.interfaces.services.exceptions.AppointmentAlreadyCancelledException;
 import ar.edu.itba.paw.interfaces.services.exceptions.AppointmentAlreadyCompletedException;
+import ar.edu.itba.paw.interfaces.services.exceptions.InvalidAppointmentDateException;
 import ar.edu.itba.paw.interfaces.services.exceptions.InvalidAppointmentStatusChangeException;
 import ar.edu.itba.paw.interfaces.services.generic.GenericService;
 import ar.edu.itba.paw.models.*;
@@ -9,6 +10,7 @@ import org.joda.time.LocalDateTime;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 public interface AppointmentService extends GenericService<Appointment, Integer> {
@@ -43,11 +45,25 @@ public interface AppointmentService extends GenericService<Appointment, Integer>
 
     List<AppointmentTimeSlot> findAvailableTimeslotsfromDate(Doctor doctor, LocalDateTime date);
 
-    List<Appointment> cancelAppointments(Workday workday);
+    List<Appointment> cancelAppointments(Workday workday, String baseUrl, Locale locale);
 
     Map<Workday, Integer> appointmentQtyByWorkdayOfUser(User user);
 
-    void remove(Integer id, User user);
+    @Override
+    @Deprecated
+    default void remove(Integer id){
+        throw new UnsupportedOperationException();
+    }
+
+    void remove(Integer id, User user, String baseUrl, Locale locale);
+
+    @Override
+    @Deprecated
+    default Appointment create(Appointment model){
+        throw new UnsupportedOperationException();
+    }
+
+    Appointment create(Appointment model, Locale locale, String baseUrl) throws InvalidAppointmentDateException;
 
     List<List<AppointmentTimeSlot>> findTimeslotsSortedByWeekday(Doctor doctor, LocalDateTime from, LocalDateTime to);
 }

@@ -7,13 +7,18 @@ import ar.edu.itba.paw.interfaces.services.exceptions.*;
 import ar.edu.itba.paw.models.*;
 import ar.edu.itba.paw.services.generics.GenericServiceImpl;
 import org.joda.time.LocalDateTime;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.mail.MessagingException;
 import java.util.*;
 
 @Service
 public class AppointmentServiceImpl extends GenericServiceImpl<AppointmentDao, Appointment, Integer> implements AppointmentService {
+    private static final Logger LOGGER = LoggerFactory.getLogger(AppointmentServiceImpl.class);
+
     @Autowired
     private AppointmentDao appointmentRepository;
     @Autowired
@@ -26,6 +31,8 @@ public class AppointmentServiceImpl extends GenericServiceImpl<AppointmentDao, A
     private UserService userService;
     @Autowired
     private OfficeService officeService;
+    @Autowired
+    private EmailService emailService;
 
     @Override
     public List<Appointment> findAllAppointments(Doctor doctor) {
@@ -102,7 +109,7 @@ public class AppointmentServiceImpl extends GenericServiceImpl<AppointmentDao, A
     }
 
     @Override
-    public Appointment create(Appointment model) throws InvalidAppointmentDateException {
+    public Appointment create(Appointment model, Locale locale, String baseUrl) throws InvalidAppointmentDateException {
         if (model.getFromDate().getMinuteOfHour() % 15 != 0)
             throw new InvalidMinutesException();
         if (!this.isValidDate(model.getDoctor(), model.getFromDate()))
@@ -117,7 +124,15 @@ public class AppointmentServiceImpl extends GenericServiceImpl<AppointmentDao, A
                 throw new MediCareException("Workday date overlaps with an existing one");
             }
         }
-        return this.appointmentRepository.create(model);
+        Appointment appointment = this.appointmentRepository.create(model);
+        try {
+            emailService.sendNewAppointmentNotificationEmail(appointment.getPatient().getUser(),
+                    appointment.getDoctor().getUser(),
+                    appointment, locale, baseUrl, appointment.getMotive(), appointment.getMessage());
+        } catch (MessagingException e) {
+            LOGGER.error("Couldn't send new appointment email to: {}, to notify appointment: {}", appointment.getDoctor().getEmail(), appointment);
+        }
+        return appointment;
     }
 
     @Override
@@ -212,13 +227,13 @@ public class AppointmentServiceImpl extends GenericServiceImpl<AppointmentDao, A
     }
 
     @Override
-    public List<Appointment> cancelAppointments(Workday workday) {
+    public List<Appointment> cancelAppointments(Workday workday, String baseUrl, Locale locale) {
         List<Appointment> cancelled = new LinkedList<>();
         List<Appointment> appointments = findByWorkday(workday);
         //check if user is allowed to cancel
         for (Appointment a : appointments) {
             if (workday.getDoctor().equals(a.getDoctor())) {
-                remove(a.getId());
+                remove(a.getId(), a.getDoctor().getUser(), baseUrl, locale);
                 cancelled.add(a);
             }
         }
@@ -248,7 +263,7 @@ public class AppointmentServiceImpl extends GenericServiceImpl<AppointmentDao, A
     }
 
     @Override
-    public void remove(Integer id, User user) {
+    public void remove(Integer id, User user, String baseUrl, Locale locale) {
         Optional<Appointment> appointment = findById(id);
         if (appointment.isPresent()) {
             //get doctor for current user
@@ -257,9 +272,11 @@ public class AppointmentServiceImpl extends GenericServiceImpl<AppointmentDao, A
             List<Patient> patient = this.patientService.findByUser(user);
             //check if user is allowed to cancel
             boolean isAllowed = false;
+            boolean isDoctor = false;
             for (Patient p : patient) {
                 if (p.equals(appointment.get().getPatient())) {
                     isAllowed = true;
+                    isDoctor = false;
                     break;
                 }
             }
@@ -267,11 +284,19 @@ public class AppointmentServiceImpl extends GenericServiceImpl<AppointmentDao, A
             for (Doctor s : doctors) {
                 if (s.equals(appointment.get().getDoctor())) {
                     isAllowed = true;
+                    isDoctor = true;
                     break;
                 }
             }
             if (isAllowed) {
                 super.remove(id);
+                try {
+                    emailService.sendCanceledAppointmentNotificationEmail(user, isDoctor,
+                            isDoctor? appointment.get().getPatient().getUser():appointment.get().getDoctor().getUser(),
+                            appointment.get(), baseUrl, locale);
+                } catch (MessagingException e) {
+                    LOGGER.error("Couldn't send cancelled appointment email to: {}, to notify appointment: {}", user.getEmail(), appointment);
+                }
             }
         }
     }
