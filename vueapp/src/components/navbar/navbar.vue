@@ -8,12 +8,12 @@
 </template>
 
 <script lang="ts">
-import NavbarNotLogged from './navbarNotLogged';
-import NavbarLogged from './navbarLogged';
-import NavbarLogo from './navbarLogo';
-import {Component} from 'vue-property-decorator';
+import {Component, Vue} from 'vue-property-decorator';
 import {authActionTypes} from '~/store/types/auth.types';
 import {Getter} from 'vuex-class';
+import NavbarLogged from '~/components/navbar/navbarLogged.vue';
+import NavbarLogo from '~/components/navbar/navbarLogo.vue';
+import NavbarNotLogged from '~/components/navbar/navbarNotLogged.vue';
 
 @Component({
     components: {

@@ -7,7 +7,7 @@
 
 <script lang="ts">
 import logo from '@/assets/whiteLogo.svg';
-import {Component} from 'vue-property-decorator';
+import {Component, Vue} from 'vue-property-decorator';
 
 @Component
 export default class NavbarLogo extends Vue {

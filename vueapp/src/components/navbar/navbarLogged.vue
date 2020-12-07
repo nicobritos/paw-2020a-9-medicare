@@ -55,7 +55,7 @@
 </template>
 
 <script lang="ts">
-import {Component} from 'vue-property-decorator';
+import {Component, Vue} from 'vue-property-decorator';
 import {State} from 'vuex-class';
 import {User} from '~/logic/models/User';
 import {Doctor} from '~/logic/models/Doctor';
