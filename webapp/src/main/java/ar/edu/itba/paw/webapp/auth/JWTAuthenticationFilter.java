@@ -26,7 +26,6 @@ import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.HttpMethod;
 import javax.ws.rs.core.Response.Status;
 import java.io.IOException;
-import java.util.Map;
 
 @Component
 public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilter {
@@ -81,9 +80,6 @@ public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilte
     @Override
     protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response, FilterChain chain, Authentication authentication) throws IOException, ServletException {
         ar.edu.itba.paw.models.User user = this.userService.findByUsername(((User) authentication.getPrincipal()).getUsername()).get();
-        Map<String, String> headers = this.authenticator.createAndRefreshJWT(authentication, user);
-        for (Map.Entry<String, String> header : headers.entrySet()) {
-            response.addHeader(header.getKey(), header.getValue());
-        }
+        this.authenticator.createAndRefreshJWT(authentication, user, response);
     }
 }

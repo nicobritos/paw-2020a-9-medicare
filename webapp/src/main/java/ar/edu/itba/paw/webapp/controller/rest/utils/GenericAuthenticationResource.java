@@ -16,7 +16,6 @@ import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.core.Response.ResponseBuilder;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Map;
 
 public abstract class GenericAuthenticationResource extends GenericResource {
     @Autowired
@@ -38,17 +37,12 @@ public abstract class GenericAuthenticationResource extends GenericResource {
             }
         }
 
-        Map<String, String> headers;
         try {
             Authentication authentication = this.authenticator.createAuthentication(credentials, authorities);
-            headers = this.authenticator.createAndRefreshJWT(authentication, user);
+            this.authenticator.createAndRefreshJWT(authentication, user, response);
         } catch (Exception e) {
             logger.error("Error creating JWT token for user id: {} with mail: {}", user.getId(), user.getEmail());
             return false;
-        }
-
-        for (Map.Entry<String, String> header : headers.entrySet()) {
-            responseBuilder.header(header.getKey(), header.getValue());
         }
 
         return true;
