@@ -64,12 +64,12 @@ const routes = [
         component: SignupPatient
     },
     {
-        path: '/staff/home',
+        path: '/doctor/home',
         name: 'MedicHome',
         component: MedicHome
     },
     {
-        path: '/staff/profile',
+        path: '/doctor/profile',
         name: 'MedicProfile',
         component: MedicProfile
     },

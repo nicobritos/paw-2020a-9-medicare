@@ -1,109 +1,113 @@
 <template>
-  <!--TODO:check -->
-  <nav class="navbar navbar-expand header">       
-    <NavbarLogo/>
-    <NavbarLogged v-if="value" :user="value" @logout="logout"></NavbarLogged>
-    <NavbarNotLogged v-else/>
-  </nav>
+    <!--TODO:check -->
+    <nav class="navbar navbar-expand header">
+        <NavbarLogo/>
+        <NavbarLogged v-if="loggedIn" @logout="logout"/>
+        <NavbarNotLogged v-else/>
+    </nav>
 </template>
 
-<script>
-import NavbarNotLogged from "./navbarNotLogged";
-import NavbarLogged from "./navbarLogged";
-import NavbarLogo from "./navbarLogo";
+<script lang="ts">
+import NavbarNotLogged from './navbarNotLogged';
+import NavbarLogged from './navbarLogged';
+import NavbarLogo from './navbarLogo';
+import {Component} from 'vue-property-decorator';
+import {authActionTypes} from '~/store/types/auth.types';
+import {Getter} from 'vuex-class';
 
-export default {
-  name: "Navbar",
-  props:["value"],
-  components: {
-    NavbarLogged:NavbarLogged, 
-    NavbarLogo:NavbarLogo,
-    NavbarNotLogged:NavbarNotLogged
-  },
-  methods:{
-    logout(){
-      this.$emit("input",null);
+@Component({
+    components: {
+        NavbarLogged,
+        NavbarLogo,
+        NavbarNotLogged,
+    },
+})
+export default class Navbar extends Vue {
+    @Getter('auth/loggedIn')
+    private readonly loggedIn: boolean;
+
+    logout(): void {
+        this.$store.dispatch('auth/logout', authActionTypes.logout());
     }
-  }
-};
+}
 </script>
 
-<style>
+<style scoped>
 /* TODO:Check probably should use scoped with deep selector */
 html,
 body {
-  height: 100%;
+    height: 100%;
 }
 
 .header {
-  background-color: #00c4ba;
+    background-color: #00c4ba;
 }
 
 .header-brand {
-  font-weight: bold;
+    font-weight: bold;
 }
 
 .header-brand:hover {
-  font-weight: bold;
-  color: white !important;
+    font-weight: bold;
+    color: white !important;
 }
 
 .header-a-element {
-  color: white;
+    color: white;
 }
 
 .header-a-element:hover {
-  color: #e0e0e0;
+    color: #e0e0e0;
 }
 
 .header-btn-element {
-  color: #00c4ba;
-  font-weight: bold;
+    color: #00c4ba;
+    font-weight: bold;
 }
 
 .header-btn-element:hover {
-  color: rgb(0, 160, 152);
-  font-weight: bold;
+    color: rgb(0, 160, 152);
+    font-weight: bold;
 }
 
 .green-text {
-  color: #00c4ba !important;
+    color: #00c4ba !important;
 }
 
 #navbar-logo {
-  width: 2em;
+    width: 2em;
 }
 
 .white-text {
-  color: white !important;
+    color: white !important;
 }
 
 #navbarUserImage {
-  width: 3em;
+    width: 3em;
 }
 
 .grey-background {
-  background-color: rgba(214, 214, 214);
+    background-color: rgba(214, 214, 214);
 }
 
 .fill-height {
-  flex: 1 1 auto;
+    flex: 1 1 auto;
 }
 
 .profile-picture-container {
-  display: inline-block;
-  position: relative;
-  width: 100%;
+    display: inline-block;
+    position: relative;
+    width: 100%;
 }
 
 .profile-picture {
-  object-fit: cover;
-  height: 100%;
-  width: 100%;
-  top: 0;
-  bottom: 0;
-  right: 0;
-  left: 0;
-  position: absolute;
+    object-fit: cover;
+    height: 100%;
+    width: 100%;
+    top: 0;
+    bottom: 0;
+    right: 0;
+    left: 0;
+    position: absolute;
 }
 </style>

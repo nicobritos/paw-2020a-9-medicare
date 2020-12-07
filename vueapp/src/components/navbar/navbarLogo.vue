@@ -1,23 +1,16 @@
 <template>
     <div class="container w-100 justify-content-start">
         <img class="navbar-brand" :src='logo' alt="logo" id="navbar-logo">
-        <router-link :to='getUrl()' class="navbar-brand header-brand header-a-element" >MediCare</router-link>
+        <router-link :to='getUrl()' class="navbar-brand header-brand header-a-element">MediCare</router-link>
     </div>
 </template>
 
-<script>
-import logo from "@/assets/whiteLogo.svg";
-import utils from "@/logic/utils";
+<script lang="ts">
+import logo from '@/assets/whiteLogo.svg';
+import {Component} from 'vue-property-decorator';
 
-export default {
-    name:"NavbarLogo",
-    data:function() {
-        return {
-            logo:logo
-        }
-    },
-    methods:{
-        getUrl:utils.getUrl
-    }
+@Component
+export default class NavbarLogo extends Vue {
+    private readonly logo = logo;
 }
 </script>

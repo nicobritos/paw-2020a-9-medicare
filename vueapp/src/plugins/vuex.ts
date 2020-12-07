@@ -1,9 +1,9 @@
 import Vue from 'vue';
 import Vuex from 'vuex';
-import users from '../store/users';
-import localities from '../store/localities';
+import users from '~/store/users';
+import localities from '~/store/localities';
 import doctorSpecialties from '~/store/doctorSpecialties';
-import auth from '../store/auth';
+import auth from '~/store/auth';
 
 Vue.use(Vuex);
 

@@ -2,7 +2,7 @@ import {inject, injectable} from 'inversify';
 import TYPES from '~/logic/types';
 import {RestRepository} from '~/logic/interfaces/repositories/RestRepository';
 import {Nullable} from '~/logic/models/utils/Utils';
-import {AuthService, LoginUser} from '~/logic/interfaces/services/AuthService';
+import {AuthService, LoginUser, UserDoctors, UserPatients} from '~/logic/interfaces/services/AuthService';
 import {User} from '~/logic/models/User';
 import {ErrorMIME} from '~/logic/models/APIError';
 import {JSON_MIME} from '~/logic/services/Utils';
@@ -21,8 +21,8 @@ export class AuthServiceImpl implements AuthService {
     @inject(TYPES.Repositories.RestRepository)
     private rest: RestRepository;
 
-    public async login(loginUser: LoginUser): Promise<Nullable<User>> {
-        let response = await this.rest.post<User, LoginUser>(AuthServiceImpl.LOGIN_PATH, {
+    public async login(loginUser: LoginUser): Promise<Nullable<UserPatients | UserDoctors>> {
+        let response = await this.rest.post<UserPatients | UserDoctors, LoginUser>(AuthServiceImpl.LOGIN_PATH, {
             accepts: UserMIME.GET,
             data: loginUser,
             contentType: AuthMIME.LOGIN
@@ -31,8 +31,8 @@ export class AuthServiceImpl implements AuthService {
         return response.isOk() ? response.data! : null;
     }
 
-    public async refresh(): Promise<Nullable<User>> {
-        let response = await this.rest.post<User, void>(AuthServiceImpl.REFRESH_PATH, {
+    public async refresh(): Promise<Nullable<UserPatients | UserDoctors>> {
+        let response = await this.rest.post<UserPatients | UserDoctors, void>(AuthServiceImpl.REFRESH_PATH, {
             accepts: UserMIME.GET,
             data: undefined,
             contentType: JSON_MIME

@@ -7,5 +7,5 @@ export interface RootState {
     auth: AuthState,
     localities: LocalityState,
     users: UserState,
-    staffSpecialties: DoctorSpecialtyState
+    doctorSpecialties: DoctorSpecialtyState
 }

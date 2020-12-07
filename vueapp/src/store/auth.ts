@@ -1,4 +1,4 @@
-import {AuthService} from '~/logic/interfaces/services/AuthService';
+import {AuthService, UserDoctors, UserPatients} from '~/logic/interfaces/services/AuthService';
 import {User} from '~/logic/models/User';
 import TYPES from '~/logic/types';
 import container from '~/plugins/inversify.config';
@@ -6,7 +6,9 @@ import {AuthActions, AuthGetters, AuthMutations, authMutationTypes, AuthState} f
 import {RootState} from '~/store/types/root.types';
 import {DefineActionTree, DefineGetterTree, DefineMutationTree} from '~/store/utils/helper.types';
 import {Nullable} from '~/logic/models/utils/Utils';
-import {Module} from 'vuex';
+import {Commit, Module} from 'vuex';
+import {Doctor} from '~/logic/models/Doctor';
+import {Patient} from '~/logic/models/Patient';
 
 function getService(): AuthService {
     return container.get(TYPES.Services.AuthService);
@@ -18,7 +20,10 @@ const state = (): AuthState => ({
     },
     loggingIn: false,
     loggingOut: false,
-    user: null as Nullable<User>
+    user: null as Nullable<User>,
+    doctors: [] as Doctor[],
+    patients: [] as Patient[],
+    isDoctor: false
 });
 
 const getters: DefineGetterTree<AuthGetters, AuthState, RootState> = {
@@ -42,15 +47,7 @@ const actions: DefineActionTree<AuthActions, AuthState, RootState> = {
             username: payload.email,
             password: payload.password
         });
-        commit(authMutationTypes.setPromise(promise));
-
-        let data = null;
-        try {
-            data = await promise;
-        } catch (e) {
-            console.error(e);
-        }
-        commit(authMutationTypes.setUser(data));
+        await finishLogin(commit, promise);
     },
     async logout({state, commit}) {
         if (!state._userLoading.promise && !state.user) return;
@@ -65,22 +62,36 @@ const actions: DefineActionTree<AuthActions, AuthState, RootState> = {
             console.error(e);
         }
         commit(authMutationTypes.setUser(null));
+        commit(authMutationTypes.setPatients([]));
+        commit(authMutationTypes.setDoctors([]));
     },
     async refresh({state, commit}) {
         if (state.user) return;
 
         let promise = getService().refresh();
-        commit(authMutationTypes.setPromise(promise));
-
-        let data = null;
-        try {
-            data = await promise;
-        } catch (e) {
-            console.error(e);
-        }
-        commit(authMutationTypes.setUser(data));
+        await finishLogin(commit, promise);
     }
 };
+
+async function finishLogin(commit: Commit, promise: Promise<Nullable<UserDoctors | UserPatients>>): Promise<void> {
+    commit(authMutationTypes.setPromise(promise));
+
+    let data = null;
+    try {
+        data = await promise;
+    } catch (e) {
+        console.error(e);
+    }
+
+    commit(authMutationTypes.setUser(data == null ? data : data.user));
+    if (data != null) {
+        if ((data as UserPatients).patients != null) {
+            commit(authMutationTypes.setPatients((data as UserPatients).patients));
+        } else {
+            commit(authMutationTypes.setDoctors((data as UserDoctors).doctors));
+        }
+    }
+}
 
 const mutations: DefineMutationTree<AuthMutations, AuthState> = {
     setPromise(state, {payload}): void {
@@ -93,7 +104,17 @@ const mutations: DefineMutationTree<AuthMutations, AuthState> = {
 
         state.user = payload;
         state._userLoading.promise = null;
-    }
+    },
+    setPatients(state, {payload}): void {
+        state.patients = payload;
+        if (payload !== null)
+            state.isDoctor = false;
+    },
+    setDoctors(state, {payload}): void {
+        state.doctors = payload;
+        if (payload !== null)
+            state.isDoctor = true;
+    },
 };
 
 const store: Module<any, any> = {
