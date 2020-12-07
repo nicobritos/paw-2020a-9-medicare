@@ -1,7 +1,10 @@
 package ar.edu.itba.paw.webapp.controller.rest;
 
+import ar.edu.itba.paw.interfaces.services.DoctorService;
+import ar.edu.itba.paw.interfaces.services.PatientService;
 import ar.edu.itba.paw.interfaces.services.RefreshTokenService;
 import ar.edu.itba.paw.interfaces.services.UserService;
+import ar.edu.itba.paw.models.Doctor;
 import ar.edu.itba.paw.models.RefreshToken;
 import ar.edu.itba.paw.models.User;
 import ar.edu.itba.paw.webapp.auth.Constants;
@@ -9,6 +12,7 @@ import ar.edu.itba.paw.webapp.controller.rest.utils.GenericAuthenticationResourc
 import ar.edu.itba.paw.webapp.media_types.ErrorMIME;
 import ar.edu.itba.paw.webapp.media_types.UserMIME;
 import ar.edu.itba.paw.webapp.models.UserCredentials;
+import ar.edu.itba.paw.webapp.models.UserMe;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,6 +28,7 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Optional;
 
 @Path("/" + Constants.AUTH_ENDPOINT)
@@ -35,9 +40,13 @@ public class AuthResource extends GenericAuthenticationResource {
     private RefreshTokenService refreshTokenService;
     @Autowired
     private UserService userService;
+    @Autowired
+    private DoctorService doctorService;
+    @Autowired
+    private PatientService patientService;
 
     @POST
-    @Produces({UserMIME.GET, ErrorMIME.ERROR})
+    @Produces({UserMIME.ME, ErrorMIME.ERROR})
     @Path("/" + Constants.REFRESH_TOKEN_ENDPOINT)
     public Response refreshToken(
             @Context HttpServletRequest request,
@@ -66,9 +75,19 @@ public class AuthResource extends GenericAuthenticationResource {
             return Response.status(Status.INTERNAL_SERVER_ERROR).build();
         }
 
+        UserMe userMe = new UserMe();
+        userMe.setUser(userOptional.get());
+
+        Collection<Doctor> doctors = this.doctorService.findByUser(userOptional.get());
+        if (doctors.size() == 0) {
+            userMe.setPatients(this.patientService.findByUser(userOptional.get()));
+        } else {
+            userMe.setDoctors(doctors);
+        }
+
         return Response
                 .status(Status.OK)
-                .entity(userOptional.get())
+                .entity(userMe)
                 .build();
     }
 

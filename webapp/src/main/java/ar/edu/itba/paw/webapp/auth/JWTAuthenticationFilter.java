@@ -1,13 +1,16 @@
 package ar.edu.itba.paw.webapp.auth;
 
-import ar.edu.itba.paw.interfaces.services.RefreshTokenService;
+import ar.edu.itba.paw.interfaces.services.DoctorService;
+import ar.edu.itba.paw.interfaces.services.PatientService;
 import ar.edu.itba.paw.interfaces.services.UserService;
+import ar.edu.itba.paw.models.Doctor;
 import ar.edu.itba.paw.webapp.exceptions.ExceptionResponseWriter;
 import ar.edu.itba.paw.webapp.exceptions.MissingAcceptsException;
 import ar.edu.itba.paw.webapp.media_types.LoginMIME;
 import ar.edu.itba.paw.webapp.media_types.MIMEHelper;
-import ar.edu.itba.paw.webapp.media_types.parsers.serializers.UserSerializer;
+import ar.edu.itba.paw.webapp.media_types.parsers.serializers.UserMeSerializer;
 import ar.edu.itba.paw.webapp.models.UserCredentials;
+import ar.edu.itba.paw.webapp.models.UserMe;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.exc.UnrecognizedPropertyException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,13 +30,16 @@ import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.HttpMethod;
 import javax.ws.rs.core.Response.Status;
 import java.io.IOException;
+import java.util.Collection;
 
 @Component
 public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilter {
     @Autowired
-    private RefreshTokenService refreshTokenService;
-    @Autowired
     private UserService userService;
+    @Autowired
+    private DoctorService doctorService;
+    @Autowired
+    private PatientService patientService;
     @Autowired
     private JWTAuthenticator authenticator;
 
@@ -91,7 +97,17 @@ public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilte
         ar.edu.itba.paw.models.User user = this.userService.findByUsername(((User) authentication.getPrincipal()).getUsername()).get();
         this.authenticator.createAndRefreshJWT(authentication, user, response);
 
+        UserMe userMe = new UserMe();
+        userMe.setUser(user);
+
+        Collection<Doctor> doctors = this.doctorService.findByUser(user);
+        if (doctors.size() == 0) {
+            userMe.setPatients(this.patientService.findByUser(user));
+        } else {
+            userMe.setDoctors(doctors);
+        }
+
         response.setStatus(Status.OK.getStatusCode());
-        response.getWriter().append(UserSerializer.instance.toJson(user).toString());
+        response.getWriter().append(UserMeSerializer.instance.toJson(userMe).toString());
     }
 }

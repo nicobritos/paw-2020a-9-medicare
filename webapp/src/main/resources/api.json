@@ -88,6 +88,25 @@
                     }
                 }
             },
+            "user-me": {
+                "properties": {
+                    "user": {
+                        "$ref": "#/components/schemas/user"
+                    },
+                    "doctors": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/staff"
+                        }
+                    },
+                    "patients": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/patient"
+                        }
+                    }
+                }
+            },
             "createUserStaff": {
                 "properties": {
                     "email": {
@@ -579,6 +598,16 @@
                     }
                 }
             },
+            "get-user-me": {
+                "description": "Successful",
+                "content": {
+                    "application/vnd.user.me.v1+json": {
+                        "schema": {
+                            "$ref": "#/components/schemas/user-me"
+                        }
+                    }
+                }
+            },
             "get-appointment": {
                 "description": "Successful",
                 "content": {
@@ -648,7 +677,7 @@
                 },
                 "responses": {
                     "200": {
-                        "$ref": "#/components/responses/get-staff"
+                        "$ref": "#/components/responses/get-user-me"
                     },
                     "403": {
                         "$ref": "#/components/responses/error-403"
