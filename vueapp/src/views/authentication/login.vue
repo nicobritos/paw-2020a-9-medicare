@@ -39,7 +39,7 @@
                 </div>
             </div>
             <div class="form-row justify-content-between align-items-end mt-2">
-                <a class="form-link" :href='getUrl("signup")'>{{ $t('CreateAccount') }}</a>
+                <RouterLink class="form-link" to="Signup">{{ $t('CreateAccount') }}</RouterLink>
                 <button type="submit" class="btn btn-primary">{{ $t('Confirm') }}</button>
             </div>
             <p v-if="invalidCredentials" class="mt-4 mb-0 text-danger">

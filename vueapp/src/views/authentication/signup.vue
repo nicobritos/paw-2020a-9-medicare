@@ -9,20 +9,20 @@
                 <h1 class="register-form-title">{{ $t('CreateAccount') }}</h1>
             </div>
             <div class="form-row justify-content-between align-items-end">
-                <router-link :to='getUrl("signup/patient")' tag="div"
+                <RouterLink :to='getUrl("signup/patient")' tag="div"
                              class="d-flex flex-column mr-5 align-items-center card card-shadow pointer p-2"
                              id="signup-patient">
                     <!-- TODO: solve icons -->
                     <i class="fa fa-hospital-user" style="font-size: 80px;"></i>
                     <h4 class="mt-2">{{ $t('LookingForMedics') }}</h4>
-                </router-link>
-                <router-link :to='getUrl("signup/doctor")' tag="div"
+                </RouterLink>
+                <RouterLink :to='getUrl("signup/doctor")' tag="div"
                              class="d-flex flex-column align-items-center card card-shadow pointer p-2"
                              id="signup-doctor">
                     <!-- TODO: solve icons -->
                     <i class="fa fa-user-md" style="font-size: 80px;"></i>
                     <h4 class="mt-2">{{ $t('IMAMedic') }}</h4>
-                </router-link>
+                </RouterLink>
             </div>
         </div>
     </div>

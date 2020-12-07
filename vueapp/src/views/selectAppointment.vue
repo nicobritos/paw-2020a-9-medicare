@@ -86,7 +86,7 @@
                                 </p>
                             </span>
                         <div class="d-flex flex-column align-content-center">
-                            <router-link
+                            <RouterLink
                                 v-for="timeslot in weekSlots[monday.plusDays(i).getDay()]" :key="timeslot.id"
                                 :to="'patient/appointment/'+doctor.id+'/'+timeslot.date.year+'/'+timeslot.date.monthOfYear+'/'+timeslot.date.dayOfMonth+'/'+timeslot.date.hourOfDay+'/'+timeslot.date.minuteOfHour"
                                 class="btn btn-sm btn-secondary mb-2">
@@ -98,7 +98,7 @@
                                         )
                                     }}
                                 </p>
-                            </router-link>
+                            </RouterLink>
                         </div>
                     </div>
                     <div class="col-1 p-0 flex-shrink-1">

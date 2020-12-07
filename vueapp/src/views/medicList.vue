@@ -110,12 +110,12 @@
                                         </a>
                                     </div>
                                     <div class="col d-flex justify-content-center align-items-center">
-                                        <router-link :to="getUrl(`appointment/${member.id}/0`)">
+                                        <RouterLink :to="getUrl(`appointment/${member.id}/0`)">
                                             <button type="button" class="btn btn-info available-appointments-button"
                                                     :data-id="member.id">
                                                 {{ $t('AvailableAppointments') }}
                                             </button>
-                                        </router-link>
+                                        </RouterLink>
                                     </div>
                                 </div>
                             </div>
