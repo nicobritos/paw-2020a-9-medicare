@@ -5,10 +5,13 @@ import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.PropertySource;
+import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
 import org.springframework.context.support.ReloadableResourceBundleMessageSource;
 import org.springframework.jdbc.datasource.SimpleDriverDataSource;
 import org.springframework.orm.jpa.JpaTransactionManager;
@@ -45,13 +48,25 @@ import java.util.Properties;
 @Configuration
 @EnableTransactionManagement
 @EnableAsync
+@PropertySource("classpath:application-prod.properties")
+@PropertySource("classpath:application-local.properties") // This will precede previous properties
 public class WebConfig {
-//    protected static final String DB_URL = "jdbc:postgresql://10.16.1.110:5432/paw-2020a-9?useUnicode=true&amp;characterEncoding=utf8";
-//    protected static final String DB_USER = "paw-2020a-9";
-//    protected static final String DB_PASSWORD = "N4wC7cmxe";
-    protected static final String DB_URL = "jdbc:postgresql://localhost:5433/paw?useUnicode=true&amp;characterEncoding=utf8";
-    protected static final String DB_USER = "postgres";
-    protected static final String DB_PASSWORD = "postgres";
+    @Value("${db.host}")
+    private String DB_HOST;
+    @Value("${db.port}")
+    private String DB_PORT;
+    @Value("${db.user}")
+    private String DB_USER;
+    @Value("${db.pass}")
+    private String DB_PASS;
+    @Value("${db.db}")
+    private String DB_DB;
+
+    //Used in addition of @PropertySource
+    @Bean
+    public static PropertySourcesPlaceholderConfigurer propertySourcesPlaceholderConfigurer() {
+        return new PropertySourcesPlaceholderConfigurer();
+    }
 
     @Bean
     public MessageSource messageSource() {
@@ -79,9 +94,9 @@ public class WebConfig {
         final SimpleDriverDataSource dataSource = new SimpleDriverDataSource();
 
         dataSource.setDriverClass(org.postgresql.Driver.class);
-        dataSource.setUrl(DB_URL);
-        dataSource.setUsername(DB_USER);
-        dataSource.setPassword(DB_PASSWORD);
+        dataSource.setUrl(this.buildJDBCUrl());
+        dataSource.setUsername(this.DB_USER);
+        dataSource.setPassword(this.DB_PASS);
 
         return dataSource;
     }
@@ -141,6 +156,10 @@ public class WebConfig {
 
         factoryBean.setJpaProperties(properties);
         return factoryBean;
+    }
+
+    private String buildJDBCUrl() {
+        return "jdbc:postgresql://" + this.DB_HOST + ":" + this.DB_PORT + "/" + this.DB_DB + "?useUnicode=true&amp;characterEncoding=utf8";
     }
 
     private static class MappingExceptionResolver extends SimpleMappingExceptionResolver {
