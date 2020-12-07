@@ -4,7 +4,6 @@ import ar.edu.itba.paw.interfaces.services.UserService;
 import ar.edu.itba.paw.models.User;
 import ar.edu.itba.paw.webapp.auth.JWTAuthenticator;
 import ar.edu.itba.paw.webapp.auth.UserRole;
-import ar.edu.itba.paw.webapp.events.events.UserConfirmationTokenGenerationEvent;
 import ar.edu.itba.paw.webapp.models.UserCredentials;
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,7 +12,6 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.core.Response.ResponseBuilder;
 import java.util.Collection;
@@ -54,11 +52,5 @@ public abstract class GenericAuthenticationResource extends GenericResource {
         }
 
         return true;
-    }
-
-    protected void sendConfirmationEmail(HttpServletRequest request, User newUser) {
-        StringBuilder baseUrl = new StringBuilder(request.getRequestURL());
-        baseUrl.replace(request.getRequestURL().lastIndexOf(request.getServletPath()), request.getRequestURL().length(), "");
-        this.eventPublisher.publishEvent(new UserConfirmationTokenGenerationEvent(baseUrl.toString(), newUser, "/verify", request.getLocale()));
     }
 }
