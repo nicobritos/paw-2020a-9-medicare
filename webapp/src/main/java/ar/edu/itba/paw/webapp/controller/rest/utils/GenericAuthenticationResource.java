@@ -17,7 +17,7 @@ import java.util.Collections;
 
 public abstract class GenericAuthenticationResource extends GenericResource {
     @Autowired
-    private JWTAuthenticator authenticator;
+    protected JWTAuthenticator authenticator;
     @Autowired
     private UserService userService;
 

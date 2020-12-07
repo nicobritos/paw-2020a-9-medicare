@@ -5,6 +5,7 @@ import ar.edu.itba.paw.models.RefreshToken;
 import ar.edu.itba.paw.models.RefreshToken_;
 import ar.edu.itba.paw.persistence.generics.GenericDaoImpl;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
@@ -23,6 +24,17 @@ public class RefreshTokenDaoImpl extends GenericDaoImpl<RefreshToken, Integer> i
             throw new IllegalArgumentException();
         }
         return this.findBy(RefreshToken_.token, token).stream().findFirst();
+    }
+
+    @Override
+    @Transactional
+    public void removeByToken(String token) {
+        if (token == null) {
+            throw new IllegalArgumentException();
+        }
+
+        Optional<RefreshToken> refreshToken = this.findByToken(token);
+        refreshToken.ifPresent(value -> this.getEntityManager().remove(value));
     }
 
     @Override

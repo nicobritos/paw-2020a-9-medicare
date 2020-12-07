@@ -7,6 +7,7 @@ import ar.edu.itba.paw.models.User;
 import ar.edu.itba.paw.webapp.auth.Constants;
 import ar.edu.itba.paw.webapp.controller.rest.utils.GenericAuthenticationResource;
 import ar.edu.itba.paw.webapp.media_types.ErrorMIME;
+import ar.edu.itba.paw.webapp.media_types.UserMIME;
 import ar.edu.itba.paw.webapp.models.UserCredentials;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,16 +21,15 @@ import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
-import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 import java.util.Arrays;
 import java.util.Optional;
 
-@Path("/" + Constants.REFRESH_TOKEN_ENDPOINT)
+@Path("/" + Constants.AUTH_ENDPOINT)
 @Component
-public class RefreshTokenResource extends GenericAuthenticationResource {
-    private static final Logger LOGGER = LoggerFactory.getLogger(RefreshTokenResource.class);
+public class AuthResource extends GenericAuthenticationResource {
+    private static final Logger LOGGER = LoggerFactory.getLogger(AuthResource.class);
 
     @Autowired
     private RefreshTokenService refreshTokenService;
@@ -37,16 +37,13 @@ public class RefreshTokenResource extends GenericAuthenticationResource {
     private UserService userService;
 
     @POST
-    @Produces({MediaType.WILDCARD, ErrorMIME.ERROR})
-    public Response getEntity(
+    @Produces({UserMIME.GET, ErrorMIME.ERROR})
+    @Path("/" + Constants.REFRESH_TOKEN_ENDPOINT)
+    public Response refreshToken(
             @Context HttpServletRequest request,
             @Context HttpServletResponse response)
     {
-        String token = Arrays.stream(request.getCookies())
-                .filter(cookie -> cookie.getName().equals(Constants.REFRESH_TOKEN_COOKIEN_NAME))
-                .map(Cookie::getValue)
-                .findFirst()
-                .orElse(null);
+        String token = this.getRefreshtToken(request);
 
         if (token == null)
             return this.error(Status.BAD_REQUEST.getStatusCode(), Status.BAD_REQUEST.toString());
@@ -68,6 +65,35 @@ public class RefreshTokenResource extends GenericAuthenticationResource {
         if (!this.createJWTCookies(userCredentials, userOptional.get(), response, LOGGER)) {
             return Response.status(Status.INTERNAL_SERVER_ERROR).build();
         }
-        return Response.status(Status.NO_CONTENT).build();
+
+        return Response
+                .status(Status.OK)
+                .entity(userOptional.get())
+                .build();
+    }
+
+    @POST
+    @Produces({ErrorMIME.ERROR})
+    @Path("/" + Constants.LOGOUT_ENDPOINT)
+    public Response invalidateToken(
+            @Context HttpServletRequest request,
+            @Context HttpServletResponse response)
+    {
+        String token = this.getRefreshtToken(request);
+        if (token != null) this.refreshTokenService.removeByToken(token);
+
+        this.authenticator.invalidateJWTCookies(response);
+
+        return Response
+                .status(Status.NO_CONTENT)
+                .build();
+    }
+
+    private String getRefreshtToken(HttpServletRequest request) {
+        return Arrays.stream(request.getCookies())
+                .filter(cookie -> cookie.getName().equals(Constants.REFRESH_TOKEN_COOKIEN_NAME))
+                .map(Cookie::getValue)
+                .findFirst()
+                .orElse(null);
     }
 }

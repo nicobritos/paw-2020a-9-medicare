@@ -647,8 +647,8 @@
                     }
                 },
                 "responses": {
-                    "204": {
-                        "description": "Successful. Returns two http-only cookies with the jwt tokens. Note that the refresh token cookie is only sent in /refresh endpoint"
+                    "200": {
+                        "$ref": "#/components/responses/get-staff"
                     },
                     "403": {
                         "$ref": "#/components/responses/error-403"
@@ -656,12 +656,25 @@
                 }
             }
         },
-        "/refresh": {
+        "/auth/refresh": {
             "post": {
                 "summary": "Refreshes the JWT tokens",
                 "responses": {
+                    "200": {
+                        "$ref": "#/components/responses/get-staff"
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/error-404"
+                    }
+                }
+            }
+        },
+        "/auth/logout": {
+            "post": {
+                "summary": "Removes the refresh token and instructs the client to invalidate the JWT cookies",
+                "responses": {
                     "204": {
-                        "description": "Successful. Returns two http-only cookies with the jwt tokens. Note that the refresh token cookie is only sent in /refresh endpoint"
+                        "description": "Successful."
                     },
                     "404": {
                         "$ref": "#/components/responses/error-404"

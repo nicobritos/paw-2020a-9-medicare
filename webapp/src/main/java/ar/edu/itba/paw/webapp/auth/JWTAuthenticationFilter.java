@@ -6,6 +6,7 @@ import ar.edu.itba.paw.webapp.exceptions.ExceptionResponseWriter;
 import ar.edu.itba.paw.webapp.exceptions.MissingAcceptsException;
 import ar.edu.itba.paw.webapp.media_types.LoginMIME;
 import ar.edu.itba.paw.webapp.media_types.MIMEHelper;
+import ar.edu.itba.paw.webapp.media_types.parsers.serializers.UserSerializer;
 import ar.edu.itba.paw.webapp.models.UserCredentials;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.exc.UnrecognizedPropertyException;
@@ -89,6 +90,8 @@ public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilte
     protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response, FilterChain chain, Authentication authentication) throws IOException, ServletException {
         ar.edu.itba.paw.models.User user = this.userService.findByUsername(((User) authentication.getPrincipal()).getUsername()).get();
         this.authenticator.createAndRefreshJWT(authentication, user, response);
-        response.setStatus(Status.NO_CONTENT.getStatusCode());
+
+        response.setStatus(Status.OK.getStatusCode());
+        response.getWriter().append(UserSerializer.instance.toJson(user).toString());
     }
 }

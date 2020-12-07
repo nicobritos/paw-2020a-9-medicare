@@ -7,4 +7,6 @@ import java.util.Optional;
 
 public interface RefreshTokenDao extends GenericDao<RefreshToken, Integer> {
     Optional<RefreshToken> findByToken(String token);
+
+    void removeByToken(String token);
 }

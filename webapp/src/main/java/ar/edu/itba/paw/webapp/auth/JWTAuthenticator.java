@@ -105,22 +105,39 @@ public class JWTAuthenticator {
             refreshToken = this.userService.generateRefreshToken(user);
         }
 
-        Cookie jwtCookie = new Cookie(Constants.JWT_COOKIE_NAME, token);
+        CookieUtils.setHttpOnlyCookie(response, this.createJWTCookie(token));
+        CookieUtils.setHttpOnlyCookie(response, this.createRefreshTokenCookie(refreshToken));
+    }
+
+    public void invalidateJWTCookies(HttpServletResponse response) {
+        CookieUtils.setHttpOnlyCookie(response, this.createJWTCookie(Constants.EMPTY_COOKIE));
+        CookieUtils.setHttpOnlyCookie(response, this.createRefreshTokenCookie(Constants.EMPTY_COOKIE));
+    }
+
+    private Cookie createJWTCookie(String token) {
+        Cookie cookie = new Cookie(Constants.JWT_COOKIE_NAME, token);
         // No usamos secure porque paw no tiene ssl
         // jwtCookie.setSecure(true);
-        jwtCookie.setMaxAge((int) ((System.currentTimeMillis() + Constants.JWT_EXPIRATION_MILLIS) / 1000)); // Seconds
-        jwtCookie.setDomain(this.APP_HOST);
-        jwtCookie.setPath(this.APP_SUBPATH);
 
-        Cookie refreshCookie = new Cookie(Constants.REFRESH_TOKEN_COOKIEN_NAME, refreshToken);
+        int maxAge = token.isEmpty() ? 0 : (int) ((System.currentTimeMillis() + Constants.JWT_EXPIRATION_MILLIS) / 1000);
+        cookie.setMaxAge(maxAge); // Seconds
+        cookie.setDomain(this.APP_HOST);
+        cookie.setPath(this.APP_SUBPATH);
+
+        return cookie;
+    }
+
+    private Cookie createRefreshTokenCookie(String token) {
+        Cookie cookie = new Cookie(Constants.JWT_COOKIE_NAME, token);
         // No usamos secure porque paw no tiene ssl
-        // refreshCookie.setSecure(true);
-        refreshCookie.setMaxAge((int) ((System.currentTimeMillis() + Constants.JWT_REFRESH_EXPIRATION_MILLIS) / 1000)); // Seconds
-        refreshCookie.setDomain(this.APP_HOST);
-        refreshCookie.setPath(this.APP_SUBPATH + Constants.REFRESH_TOKEN_ENDPOINT);
+        // jwtCookie.setSecure(true);
 
-        CookieUtils.setHttpOnlyCookie(response, jwtCookie);
-        CookieUtils.setHttpOnlyCookie(response, refreshCookie);
+        int maxAge = token.isEmpty() ? 0 : (int) ((System.currentTimeMillis() + Constants.JWT_REFRESH_EXPIRATION_MILLIS) / 1000);
+        cookie.setMaxAge(maxAge); // Seconds
+        cookie.setDomain(this.APP_HOST);
+        cookie.setPath(this.APP_SUBPATH + Constants.AUTH_ENDPOINT);
+
+        return cookie;
     }
 
     private String getSecretKey() throws IOException {

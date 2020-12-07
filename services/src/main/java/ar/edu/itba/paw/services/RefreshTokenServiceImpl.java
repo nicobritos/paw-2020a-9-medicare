@@ -51,6 +51,11 @@ public class RefreshTokenServiceImpl extends GenericServiceImpl<RefreshTokenDao,
     }
 
     @Override
+    public void removeByToken(String token) {
+        this.repository.removeByToken(token);
+    }
+
+    @Override
     protected RefreshTokenDao getRepository() {
         return this.repository;
     }
