@@ -64,8 +64,15 @@ public abstract class MIMEHelper {
         Set<String> values = new HashSet<>();
         while (headerNames.hasMoreElements()) {
             Object o = headerNames.nextElement();
-            if (o instanceof String && ((String) o).equalsIgnoreCase(header))
-                values.add(request.getHeader((String) o));
+            if (o instanceof String && ((String) o).equalsIgnoreCase(header)) {
+                values.addAll(org.springframework.http.MediaType.parseMediaTypes(
+                        request
+                                .getHeader((String) o))
+                                .stream()
+                                .map(Object::toString)
+                                .collect(Collectors.toList())
+                );
+            }
         }
 
         return values;
