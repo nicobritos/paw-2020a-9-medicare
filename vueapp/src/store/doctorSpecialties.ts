@@ -15,7 +15,7 @@ function getService(): DoctorSpecialtyService {
     return container.get(TYPES.Services.DoctorSpecialtyService);
 }
 
-export const state = (): DoctorSpecialtyState => ({
+const state = (): DoctorSpecialtyState => ({
     _listLoading: {
         loaded: false,
         promise: null
@@ -23,7 +23,7 @@ export const state = (): DoctorSpecialtyState => ({
     doctorSpecialties: [] as DoctorSpecialty[]
 });
 
-export const actions: DefineActionTree<DoctorSpecialtyActions, DoctorSpecialtyState, RootState> = {
+const actions: DefineActionTree<DoctorSpecialtyActions, DoctorSpecialtyState, RootState> = {
     async loadDoctorSpecialties({state, commit}) {
         if (state._listLoading.loaded) return;
         if (state._listLoading.promise) return;
@@ -42,7 +42,7 @@ export const actions: DefineActionTree<DoctorSpecialtyActions, DoctorSpecialtySt
     }
 };
 
-export const mutations: DefineMutationTree<DoctorSpecialtyMutations, DoctorSpecialtyState> = {
+const mutations: DefineMutationTree<DoctorSpecialtyMutations, DoctorSpecialtyState> = {
     setPromise(state, {payload}): void {
         state._listLoading.promise = payload;
     },

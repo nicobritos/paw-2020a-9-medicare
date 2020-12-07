@@ -12,7 +12,7 @@ function getService(): UserService {
     return container.get(TYPES.Services.UserService);
 }
 
-export const state = (): UserState => ({
+const state = (): UserState => ({
     _loadingPromise: {
         promise: null,
         loaded: false
@@ -20,7 +20,7 @@ export const state = (): UserState => ({
     user: null as Nullable<User>
 });
 
-export const actions: DefineActionTree<UserActions, UserState, RootState> = {
+const actions: DefineActionTree<UserActions, UserState, RootState> = {
     async getUser({state, commit}, {payload}) {
         // try {
             // let data = await getService().get(me);
@@ -33,7 +33,7 @@ export const actions: DefineActionTree<UserActions, UserState, RootState> = {
     }
 };
 
-export const mutations: DefineMutationTree<UserMutations, UserState> = {
+const mutations: DefineMutationTree<UserMutations, UserState> = {
     setPromise(state, {payload}): void {
         state._loadingPromise.promise = payload;
     },

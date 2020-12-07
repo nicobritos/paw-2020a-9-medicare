@@ -11,7 +11,7 @@ function getService(): LocalityService {
     return container.get(TYPES.Services.LocalityService);
 }
 
-export const state = (): LocalityState => ({
+const state = (): LocalityState => ({
     _listLoading: {
         loaded: false,
         promise: null
@@ -19,7 +19,7 @@ export const state = (): LocalityState => ({
     localities: [] as Locality[]
 });
 
-export const actions: DefineActionTree<LocalityActions, LocalityState, RootState> = {
+const actions: DefineActionTree<LocalityActions, LocalityState, RootState> = {
     async loadLocalities({state, commit}) {
         if (state._listLoading.loaded) return;
         if (state._listLoading.promise) return;
@@ -38,7 +38,7 @@ export const actions: DefineActionTree<LocalityActions, LocalityState, RootState
     }
 };
 
-export const mutations: DefineMutationTree<LocalityMutations, LocalityState> = {
+const mutations: DefineMutationTree<LocalityMutations, LocalityState> = {
     setPromise(state, {payload}): void {
         state._listLoading.promise = payload;
     },

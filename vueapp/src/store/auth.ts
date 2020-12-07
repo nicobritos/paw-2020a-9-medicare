@@ -6,12 +6,13 @@ import {AuthActions, AuthGetters, AuthMutations, authMutationTypes, AuthState} f
 import {RootState} from '~/store/types/root.types';
 import {DefineActionTree, DefineGetterTree, DefineMutationTree} from '~/store/utils/helper.types';
 import {Nullable} from '~/logic/models/utils/Utils';
+import {Module} from 'vuex';
 
 function getService(): AuthService {
     return container.get(TYPES.Services.AuthService);
 }
 
-export const state = (): AuthState => ({
+const state = (): AuthState => ({
     _userLoading: {
         promise: null
     },
@@ -20,13 +21,13 @@ export const state = (): AuthState => ({
     user: null as Nullable<User>
 });
 
-export const getters: DefineGetterTree<AuthGetters, AuthState, RootState> = {
+const getters: DefineGetterTree<AuthGetters, AuthState, RootState> = {
     loggedIn(state): boolean {
         return !!state.user;
     }
 };
 
-export const actions: DefineActionTree<AuthActions, AuthState, RootState> = {
+const actions: DefineActionTree<AuthActions, AuthState, RootState> = {
     async invalidate({state, commit}) {
         if (state._userLoading.promise)
             await state._userLoading.promise;
@@ -81,7 +82,7 @@ export const actions: DefineActionTree<AuthActions, AuthState, RootState> = {
     }
 };
 
-export const mutations: DefineMutationTree<AuthMutations, AuthState> = {
+const mutations: DefineMutationTree<AuthMutations, AuthState> = {
     setPromise(state, {payload}): void {
         if (payload) state.loggingIn = true;
         else state.loggingOut = true;
@@ -94,3 +95,13 @@ export const mutations: DefineMutationTree<AuthMutations, AuthState> = {
         state._userLoading.promise = null;
     }
 };
+
+const store: Module<any, any> = {
+    namespaced: true,
+    actions,
+    mutations,
+    getters,
+    state
+};
+
+export default store;
