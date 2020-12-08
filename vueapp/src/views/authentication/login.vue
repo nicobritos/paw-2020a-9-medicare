@@ -1,7 +1,7 @@
 <template>
     <div
         class="container-fluid w-100 h-100 d-flex flex-column justify-content-center align-items-center login-container">
-        <form class="register-form border p-5 rounded" @submit="submitForm">
+        <div class="register-form border p-5 rounded">
             <div class="row">
                 <h6>Medicare <img :src='logo' id="logo"/></h6>
             </div>
@@ -13,7 +13,7 @@
                     <label for="medicare_email">{{ $t('Email') }}</label>
                 </div>
                 <div class="col-8">
-                    <input class="form-control" type="email" name="medicare_email" id="medicare_email"/>
+                    <input v-model="email" class="form-control" type="email" name="medicare_email" id="medicare_email"/>
                 </div>
             </div>
             <div class="form-group row">
@@ -21,7 +21,7 @@
                     <label for="medicare_password">{{ $t('Password') }}</label>
                 </div>
                 <div class="col-8">
-                    <input class="form-control pr-5" :type='showPassword?"text":"password"' name="medicare_password"
+                    <input v-model="password" class="form-control pr-5" :type='showPassword?"text":"password"' name="medicare_password"
                            id="medicare_password"/>
                     <!-- For this to work for must be the id of the password input -->
                     <label for="medicare_password" class="toggle-visibility" @click="toggleShowPassword()">
@@ -40,12 +40,16 @@
             </div>
             <div class="form-row justify-content-between align-items-end mt-2">
                 <RouterLink class="form-link" to="Signup">{{ $t('CreateAccount') }}</RouterLink>
-                <button type="submit" class="btn btn-primary">{{ $t('Confirm') }}</button>
+                <button
+                    @click="login"
+                    :disabled="disabledButton"
+                    class="btn btn-primary"
+                >{{ $t('Confirm') }}</button>
             </div>
             <p v-if="invalidCredentials" class="mt-4 mb-0 text-danger">
                 {{ $t('InvalidCredentials.loginForm') }}
             </p>
-        </form>
+        </div>
     </div>
 </template>
 
@@ -54,7 +58,11 @@ import logo from '@/assets/logo.svg';
 //TODO:change to bootstrap icons
 import eye from '@/assets/eye.svg';
 import noeye from '@/assets/noeye.svg';
-import {Component, Vue} from 'vue-property-decorator';
+import {Component, Vue, Watch} from 'vue-property-decorator';
+import {isValidEmail, Nullable} from '~/logic/models/utils/Utils';
+import {authActionTypes} from '~/store/types/auth.types';
+import {State} from 'vuex-class';
+import {User} from '~/logic/models/User';
 
 @Component
 export default class Login extends Vue {
@@ -63,16 +71,43 @@ export default class Login extends Vue {
     private noeye = noeye;
     private showPassword = false;
     private invalidCredentials = false;
+    private email = '';
+    private password = '';
+    @State(state => state.auth.user)
+    private readonly user: Nullable<User>;
+
+    get disabledButton(): boolean {
+        let trimmedEmail = this.email.trim();
+
+        return !(trimmedEmail.length > 2 && isValidEmail(trimmedEmail) && this.password.length > 0);
+    }
+
+    @Watch('user')
+    public goBack(): void {
+        if (this.user && this.$route.query && this.$route.query.previous) {
+            let previous = typeof this.$route.query.previous === 'string' ? this.$route.query.previous : this.$route.query.previous[0];
+            if (previous !== null && !this.$route.matched[0].regex.test(previous)) {
+                this.$router.push(previous);
+            } else {
+                this.$router.push({
+                    name: 'Landing',
+                });
+            }
+        }
+    }
 
     public toggleShowPassword(): void {
         this.showPassword = !this.showPassword;
     }
 
-    public submitForm(e: Event) {
+    public login(e: Event) {
         e.preventDefault();
-        // TODO:connect to api
-        // this.$emit('input', new User(1, e.target['medicare_email'].value, 'firstName', 'surname', true, '1111-1111', 1));
-        // this.$router.push(this.getUrl());
+        if (this.disabledButton) return;
+
+        this.$store.dispatch('auth/login', authActionTypes.login({
+            password: this.password,
+            email: this.email
+        }));
     }
 }
 </script>

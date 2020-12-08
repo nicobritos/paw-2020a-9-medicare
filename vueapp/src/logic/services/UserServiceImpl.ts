@@ -11,6 +11,7 @@ export const UserMIME = {
     CREATE_PATIENT: 'application/vnd.user.patient.create.v1+json',
     CREATE_DOCTOR: 'application/vnd.user.doctor.create.v1+json',
     GET: 'application/vnd.user.get.v1+json',
+    ME: 'application/vnd.user.me.v1+json',
     UPDATE: 'application/vnd.user.update.v1+json'
 };
 

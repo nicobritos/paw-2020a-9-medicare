@@ -21,12 +21,12 @@ export class RestRepositoryImpl implements RestRepository {
 
     public async post<R, T>(path: string, config: PostConfig<T>): Promise<APIResponse<R>> {
         let axiosConfig = RestRepositoryImpl.getAxiosConfig(config);
-        return RestRepositoryImpl.formatResponse(await axios.post(path, axiosConfig));
+        return RestRepositoryImpl.formatResponse(await axios.post(path, axiosConfig.data, axiosConfig));
     }
 
     public async put<R, T>(path: string, config: PutConfig<T>): Promise<APIResponse<R>> {
         let axiosConfig = RestRepositoryImpl.getAxiosConfig(config);
-        return RestRepositoryImpl.formatResponse(await axios.put(path, axiosConfig));
+        return RestRepositoryImpl.formatResponse(await axios.put(path, axiosConfig.data, axiosConfig));
     }
 
     public async delete<R = any, T = any>(path: string, config?: DeleteConfig<T>): Promise<APIResponse<R>> {
@@ -52,14 +52,16 @@ export class RestRepositoryImpl implements RestRepository {
         };
 
         if (config.contentType)
-            RestRepositoryImpl.setContentType(config, config.contentType);
+            RestRepositoryImpl.setContentType(axiosConfig, config.contentType);
         if (config.data)
             axiosConfig.data = config.data;
 
-        return config;
+        return axiosConfig;
     }
 
     private static setContentType(config: AxiosRequestConfig, contentType: string): void {
+        if (!config.headers)
+            config.headers = {};
         config.headers['Content-Type'] = contentType;
     }
 

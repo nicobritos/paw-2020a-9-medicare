@@ -21,6 +21,8 @@ import {WorkdayService} from '~/logic/interfaces/services/WorkdayService';
 import {WorkdayServiceImpl} from '~/logic/services/WorkdayServiceImpl';
 import {UserServiceImpl} from '~/logic/services/UserServiceImpl';
 import {DoctorSpecialtyServiceImpl} from '~/logic/services/DoctorSpecialtyServiceImpl';
+import {AuthService} from '~/logic/interfaces/services/AuthService';
+import {AuthServiceImpl} from '~/logic/services/AuthServiceImpl';
 
 const container = new Container();
 
@@ -28,6 +30,7 @@ container.bind<RestRepository>(TYPES.Repositories.RestRepository).to(RestReposit
 
 container.bind<AppointmentService>(TYPES.Services.AppointmentService).to(AppointmentServiceImpl).inSingletonScope();
 container.bind<AppointmentTimeSlotService>(TYPES.Services.AppointmentTimeSlotService).to(AppointmentTimeSlotServiceImpl).inSingletonScope();
+container.bind<AuthService>(TYPES.Services.AuthService).to(AuthServiceImpl).inSingletonScope();
 container.bind<CountryService>(TYPES.Services.CountryService).to(CountryServiceImpl).inSingletonScope();
 container.bind<LocalityService>(TYPES.Services.LocalityService).to(LocalityServiceImpl).inSingletonScope();
 container.bind<ProvinceService>(TYPES.Services.ProvinceService).to(ProvinceServiceImpl).inSingletonScope();

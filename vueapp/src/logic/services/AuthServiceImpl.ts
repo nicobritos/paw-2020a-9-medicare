@@ -23,7 +23,7 @@ export class AuthServiceImpl implements AuthService {
 
     public async login(loginUser: LoginUser): Promise<Nullable<UserPatients | UserDoctors>> {
         let response = await this.rest.post<UserPatients | UserDoctors, LoginUser>(AuthServiceImpl.LOGIN_PATH, {
-            accepts: UserMIME.GET,
+            accepts: UserMIME.ME,
             data: loginUser,
             contentType: AuthMIME.LOGIN
         });
@@ -33,7 +33,7 @@ export class AuthServiceImpl implements AuthService {
 
     public async refresh(): Promise<Nullable<UserPatients | UserDoctors>> {
         let response = await this.rest.post<UserPatients | UserDoctors, void>(AuthServiceImpl.REFRESH_PATH, {
-            accepts: UserMIME.GET,
+            accepts: UserMIME.ME,
             data: undefined,
             contentType: JSON_MIME
         });
