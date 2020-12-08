@@ -49,6 +49,8 @@ public interface AppointmentService extends GenericService<Appointment, Integer>
 
     Map<Workday, Integer> appointmentQtyByWorkdayOfUser(User user);
 
+    List<Appointment> findAllAppointmentsToNotify();
+
     @Override
     @Deprecated
     default void remove(Integer id){

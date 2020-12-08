@@ -126,9 +126,10 @@ public class AppointmentServiceImpl extends GenericServiceImpl<AppointmentDao, A
         }
         Appointment appointment = this.appointmentRepository.create(model);
         try {
-            emailService.sendNewAppointmentNotificationEmail(appointment.getPatient().getUser(),
-                    appointment.getDoctor().getUser(),
-                    appointment, locale, baseUrl, appointment.getMotive(), appointment.getMessage());
+            emailService.sendNewAppointmentNotificationEmail(
+                    appointment, locale, baseUrl);
+            emailService.scheduleNotifyAppointmentEmail(
+                    appointment, locale, baseUrl);
         } catch (MessagingException e) {
             LOGGER.error("Couldn't send new appointment email to: {}, to notify appointment: {}", appointment.getDoctor().getEmail(), appointment);
         }
@@ -243,6 +244,11 @@ public class AppointmentServiceImpl extends GenericServiceImpl<AppointmentDao, A
     @Override
     public List<Appointment> findByWorkday(Workday workday) {
         return this.appointmentRepository.findByWorkday(workday);
+    }
+
+    @Override
+    public List<Appointment> findAllAppointmentsToNotify() {
+        return this.appointmentRepository.findAllAppointmentsToNotifyFrom(LocalDateTime.now());
     }
 
     @Override

@@ -4,6 +4,7 @@ import org.hibernate.annotations.Type;
 import org.joda.time.LocalDateTime;
 
 import javax.persistence.*;
+import java.util.Locale;
 
 @Entity
 @Table(
@@ -38,6 +39,12 @@ public class Appointment extends GenericModel<Integer> {
     @ManyToOne(fetch = FetchType.EAGER, optional = false)
     @JoinColumn(name = "doctor_id", nullable = false)
     private Doctor doctor;
+    @Column(name = "locale", nullable = false)
+    private String locale;
+    @Column(name = "base_url", nullable = false)
+    private String baseUrl;
+    @Column(name = "email_sent", nullable = false)
+    private boolean wasNotificationEmailSent;
 
     @Override
     public Integer getId() {
@@ -99,6 +106,30 @@ public class Appointment extends GenericModel<Integer> {
 
     public void setMotive(String motive) {
         this.motive = motive;
+    }
+
+    public Locale getLocale() {
+        return new Locale(locale);
+    }
+
+    public void setLocale(Locale locale) {
+        this.locale = locale.toString();
+    }
+
+    public String getBaseUrl() {
+        return baseUrl;
+    }
+
+    public void setBaseUrl(String baseUrl) {
+        this.baseUrl = baseUrl;
+    }
+
+    public boolean wasNotificationEmailSent() {
+        return wasNotificationEmailSent;
+    }
+
+    public void setWasNotificationEmailSent(boolean wasNotificationEmailSent) {
+        this.wasNotificationEmailSent = wasNotificationEmailSent;
     }
 
     @Override

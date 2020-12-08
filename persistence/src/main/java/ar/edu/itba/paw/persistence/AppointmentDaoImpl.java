@@ -229,6 +229,25 @@ public class AppointmentDaoImpl extends GenericDaoImpl<Appointment, Integer> imp
         return this.selectQuery(builder, query, root);
     }
 
+    @Override
+    public List<Appointment> findAllAppointmentsToNotifyFrom(LocalDateTime from) {
+        if (from == null)
+            throw new IllegalArgumentException();
+
+        CriteriaBuilder builder = this.getEntityManager().getCriteriaBuilder();
+        CriteriaQuery<Appointment> query = builder.createQuery(Appointment.class);
+        Root<Appointment> root = query.from(Appointment.class);
+
+        query.select(root);
+        query.where(builder.and(
+                builder.equal(root.get(Appointment_.wasNotificationEmailSent),true),
+                builder.greaterThanOrEqualTo(root.get(Appointment_.fromDate), from)
+        ));
+        query.where(builder.greaterThanOrEqualTo(root.get(Appointment_.fromDate), from));
+
+        return this.selectQuery(builder, query, root);
+    }
+
     @Transactional
     @Override
     public void cancelAppointments(Collection<Appointment> appointments) {

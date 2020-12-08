@@ -1,16 +1,20 @@
 package ar.edu.itba.paw.services.email;
 
+import ar.edu.itba.paw.interfaces.services.AppointmentService;
 import ar.edu.itba.paw.interfaces.services.EmailService;
 import ar.edu.itba.paw.models.Appointment;
 import ar.edu.itba.paw.models.User;
 import org.apache.commons.text.StringSubstitutor;
 import org.joda.time.DateTime;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.PostConstruct;
 import javax.mail.MessagingException;
 import javax.mail.internet.AddressException;
 import javax.mail.internet.InternetAddress;
@@ -19,9 +23,7 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
-import java.util.HashMap;
-import java.util.Locale;
-import java.util.Map;
+import java.util.*;
 
 import static org.joda.time.DateTimeConstants.*;
 
@@ -31,9 +33,17 @@ public class EmailServiceImpl implements EmailService {
     private JavaMailSender javaMailSender;
     @Autowired
     private MessageSource messageSource;
+    @Autowired
+    private AppointmentService appointmentService;
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(EmailServiceImpl.class);
+
+    Timer timer = new Timer();
 
     private static final String MESSAGE_CANCEL_SOURCE_BODY_PREFIX = "appointment.cancel.email.body";
     private static final String MESSAGE_NEW_APPOINTMENT_SOURCE_BODY_PREFIX = "appointment.new.email.body";
+    private static final String MESSAGE_APPOINTMENT_NOTIFICATION_DOCTOR_SOURCE_BODY_PREFIX = "appointment.notification.email.doctor.body";
+    private static final String MESSAGE_APPOINTMENT_NOTIFICATION_PATIENT_SOURCE_BODY_PREFIX = "appointment.notification.email.patient.body";
     private static final String MESSAGE_CONFIRMATION_SOURCE_BODY_PREFIX = "signup.confirmation.email.body";
     private static final String MESSAGE_SOURCE_DISCLAIMER = "email.disclaimer";
 
@@ -130,20 +140,27 @@ public class EmailServiceImpl implements EmailService {
                 month = null;
         }
 
-        String html = getCancellingHTML(baseUrl,
-                userCancelling, userTitle, appointment,
-                this.messageSource.getMessage(dowMessage, null, locale),
-                this.messageSource.getMessage(month, null, locale),
-                baseUrl + (isDoctorCancelling?"/mediclist/1":""),
-                isDoctorCancelling,
-                locale);
+        String html = null;
+        try {
+            html = getCancellingHTML(baseUrl,
+                    userCancelling, userTitle, appointment,
+                    this.messageSource.getMessage(dowMessage, null, locale),
+                    this.messageSource.getMessage(month, null, locale),
+                    baseUrl + (isDoctorCancelling?"/mediclist/1":""),
+                    isDoctorCancelling,
+                    locale);
+        } catch (IOException e) {
+            LOGGER.error("Couldn't send cancelling appointment email to user: {}, to notify appointment: {} caused by: {}",
+                    userCancelled, appointment, e.getMessage());
+            return;
+        }
 
         sendEmail(userCancelled.getEmail(), subject, html);
     }
 
     @Override
-    public void sendNewAppointmentNotificationEmail(User patient, User doctor, Appointment appointment, Locale locale,
-                                             String baseUrl, String motive, String comment) throws MessagingException {
+    public void sendNewAppointmentNotificationEmail(Appointment appointment, Locale locale,
+                                                    String baseUrl) throws MessagingException {
         String subject = this.messageSource.getMessage("appointment.new.email.subject", null, locale);
         String dowMessage;
         switch (appointment.getFromDate().getDayOfWeek()) {
@@ -212,13 +229,20 @@ public class EmailServiceImpl implements EmailService {
             default:
                 month = null;
         }
-        String html = getNewAppointmentHTML(
-                baseUrl, doctor, patient, appointment,
-                this.messageSource.getMessage(dowMessage, null, locale),
-                this.messageSource.getMessage(month, null, locale),
-                locale, motive, comment);
+        String html = null;
+        try {
+            html = getNewAppointmentHTML(
+                    baseUrl, appointment.getDoctor().getUser(), appointment.getPatient().getUser(), appointment,
+                    this.messageSource.getMessage(dowMessage, null, locale),
+                    this.messageSource.getMessage(month, null, locale),
+                    locale, appointment.getMotive(), appointment.getMessage());
+        } catch (IOException e) {
+            LOGGER.error("Couldn't send new appointment email to doctor: {}, to notify appointment: {} caused by: {}",
+                    appointment.getDoctor(), appointment, e.getMessage());
+            return;
+        }
 
-        sendEmail(doctor.getEmail(), subject, html);
+        sendEmail(appointment.getDoctor().getEmail(), subject, html);
     }
 
     @Override
@@ -231,11 +255,146 @@ public class EmailServiceImpl implements EmailService {
         } catch (UnsupportedEncodingException e) {
             throw new RuntimeException("Error converting token to UTF-8");
         }
-        String html = getConfirmationHTML(baseUrl, confirmationUrl, user, locale);
+        String html = null;
+        try {
+            html = getConfirmationHTML(baseUrl, confirmationUrl, user, locale);
+        } catch (IOException e) {
+            LOGGER.error("Couldn't send verification token email to user: {}, the generated token was: {}, caused by: {}",
+                    user, token, e.getMessage());
+            return;
+        }
         sendEmail(user.getEmail(), subject, html);
     }
 
-    private String getCancellingHTML(String baseUrl, User userCancelling, String userTitle, Appointment appointment, String dow, String month, String link, boolean isCancellingDoctor, Locale locale)  {
+    @Override
+    public void scheduleNotifyAppointmentEmail(Appointment appointment, Locale locale, String baseUrl) {
+        String doctorSubject = this.messageSource.getMessage("appointment.notification.email.doctor.subject", null, locale);
+        String patientSubject = this.messageSource.getMessage("appointment.notification.email.patient.subject", null, locale);
+        String dowMessage;
+        switch (appointment.getFromDate().getDayOfWeek()) {
+            case MONDAY:
+                dowMessage = "Monday";
+                break;
+            case TUESDAY:
+                dowMessage = "Tuesday";
+                break;
+            case WEDNESDAY:
+                dowMessage = "Wednesday";
+                break;
+            case THURSDAY:
+                dowMessage = "Thursday";
+                break;
+            case FRIDAY:
+                dowMessage = "Friday";
+                break;
+            case SATURDAY:
+                dowMessage = "Saturday";
+                break;
+            case SUNDAY:
+                dowMessage = "Sunday";
+                break;
+            default:
+                dowMessage = null;
+        }
+        String month;
+        switch (appointment.getFromDate().getMonthOfYear()) {
+            case JANUARY:
+                month = "January";
+                break;
+            case FEBRUARY:
+                month = "February";
+                break;
+            case MARCH:
+                month = "March";
+                break;
+            case APRIL:
+                month = "April";
+                break;
+            case MAY:
+                month = "May";
+                break;
+            case JUNE:
+                month = "June";
+                break;
+            case JULY:
+                month = "July";
+                break;
+            case AUGUST:
+                month = "August";
+                break;
+            case SEPTEMBER:
+                month = "September";
+                break;
+            case OCTOBER:
+                month = "October";
+                break;
+            case NOVEMBER:
+                month = "November";
+                break;
+            case DECEMBER:
+                month = "December";
+                break;
+            default:
+                month = null;
+        }
+        String doctorHtml = null;
+        try {
+            doctorHtml = getNotifyingDoctorHtml(
+                    baseUrl, appointment.getDoctor().getUser(), appointment.getPatient().getUser(), appointment,
+                    this.messageSource.getMessage(dowMessage, null, locale),
+                    this.messageSource.getMessage(month, null, locale),
+                    locale, appointment.getMotive(), appointment.getMessage());
+        } catch (IOException e) {
+            LOGGER.error("Couldn't send notifying appointment email to doctor: {}, to notify appointment: {} caused by: {}",
+                    appointment.getDoctor(), appointment, e.getMessage());
+            return;
+        }
+        String patientHtml = null;
+        try {
+            patientHtml = getNotifyingPatientHtml(
+                    baseUrl, appointment.getDoctor().getUser(), appointment.getPatient().getUser(), appointment,
+                    this.messageSource.getMessage(dowMessage, null, locale),
+                    this.messageSource.getMessage(month, null, locale),
+                    locale, appointment.getMotive(), appointment.getMessage());
+        } catch (IOException e) {
+            LOGGER.error("Couldn't send notifying appointment email to patient: {}, to notify appointment: {} caused by: {}",
+                    appointment.getPatient(), appointment, e.getMessage());
+            return;
+        }
+
+        String finalDoctorHtml = doctorHtml;
+        String finalPatientHtml = patientHtml;
+        timer.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                try {
+                    sendEmail(appointment.getDoctor().getEmail(), doctorSubject, finalDoctorHtml);
+                } catch (MessagingException e) {
+                    LOGGER.error("Couldn't send notifying appointment email to doctor: {}, to notify appointment: {}",
+                            appointment.getDoctor().getEmail(), appointment);
+                }
+                try {
+                    sendEmail(appointment.getPatient().getUser().getEmail(), patientSubject, finalPatientHtml);
+                } catch (MessagingException e) {
+                    LOGGER.error("Couldn't send notifying appointment email to patient: {}, to notify appointment: {}",
+                            appointment.getDoctor().getEmail(), appointment);
+                }
+
+            }
+        }, appointment.getFromDate().minusDays(1).toDate());
+
+    }
+
+    @PostConstruct
+    @Override
+    public void initScheduleEmails() {
+        List<Appointment> appointments = appointmentService.findAllAppointmentsToNotify();
+        for (Appointment appointment: appointments){
+            scheduleNotifyAppointmentEmail(appointment, appointment.getLocale(), appointment.getBaseUrl());
+        }
+    }
+
+    private String getCancellingHTML(String baseUrl, User userCancelling, String userTitle, Appointment appointment, String dow, String month, String link, boolean isCancellingDoctor, Locale locale) throws IOException {
         Map<String, String> values = new HashMap<>();
         values.put("baseUrl", baseUrl);
         values.put("year", String.valueOf(DateTime.now().getYear()));
@@ -266,13 +425,13 @@ public class EmailServiceImpl implements EmailService {
         try {
             html = emailFormatter.format(emailFormatter.getHTMLFromFilename("cancel"));
         } catch (IOException e){
-            throw new RuntimeException("Can't find HTML file cancel.html");
+            throw new IOException("Can't find HTML file cancel.html");
         }
         StringSubstitutor substitutor = new StringSubstitutor(values, "${", "}");
         return substitutor.replace(html);
     }
 
-    private String getNewAppointmentHTML(String baseUrl, User doctor, User patient, Appointment appointment, String dow, String month, Locale locale, String motive, String comment) {
+    private String getNewAppointmentHTML(String baseUrl, User doctor, User patient, Appointment appointment, String dow, String month, Locale locale, String motive, String comment) throws IOException {
         Map<String, String> values = new HashMap<>();
         values.put("baseUrl", baseUrl);
         values.put("year", String.valueOf(DateTime.now().getYear()));
@@ -303,20 +462,108 @@ public class EmailServiceImpl implements EmailService {
             try {
                 html = emailFormatter.format(emailFormatter.getHTMLFromFilename("newAppointmentWithComment"));
             } catch (IOException e){
-                throw new RuntimeException("Can't find HTML file newAppointmentWithComment.html");
+                throw new IOException("Can't find HTML file newAppointmentWithComment.html");
             }
         } else {
             try {
                 html = emailFormatter.format(emailFormatter.getHTMLFromFilename("newAppointment"));
             } catch (IOException e){
-                throw new RuntimeException("Can't find HTML file newAppointment.html");
+                throw new IOException("Can't find HTML file newAppointment.html");
             }
         }
         StringSubstitutor substitutor = new StringSubstitutor(values, "${", "}");
         return substitutor.replace(html);
     }
 
-    private String getConfirmationHTML(String baseUrl, String url, User user, Locale locale) {
+    private String getNotifyingDoctorHtml(String baseUrl, User doctor, User patient, Appointment appointment, String dow, String month, Locale locale, String motive, String comment) throws IOException {
+        Map<String, String> values = new HashMap<>();
+        values.put("baseUrl", baseUrl);
+        values.put("year", String.valueOf(DateTime.now().getYear()));
+        values.put("body", this.messageSource.getMessage(MESSAGE_APPOINTMENT_NOTIFICATION_DOCTOR_SOURCE_BODY_PREFIX + ".body",
+                new Object[]{
+                        doctor.getFirstName(),
+                        patient.getDisplayName(),
+                        dow,
+                        appointment.getFromDate().getDayOfMonth(),
+                        month,
+                        Integer.toString(appointment.getFromDate().getYear()),
+                        ((appointment.getFromDate().getHourOfDay() < 10) ? "0" : "") + appointment.getFromDate().getHourOfDay(),
+                        ((appointment.getFromDate().getMinuteOfHour() < 10) ? "0" : "") + appointment.getFromDate().getMinuteOfHour(),
+                        ((appointment.getToDate().getHourOfDay() < 10) ? "0" : "") + appointment.getToDate().getHourOfDay(),
+                        ((appointment.getToDate().getMinuteOfHour() < 10) ? "0" : "") + appointment.getToDate().getMinuteOfHour(),
+                        motive
+                },
+                locale));
+        values.put("comment", this.messageSource.getMessage(MESSAGE_APPOINTMENT_NOTIFICATION_DOCTOR_SOURCE_BODY_PREFIX + ".comment", new Object[]{comment}, locale));
+        values.put("link", baseUrl);
+        values.put("buttonText", this.messageSource.getMessage(MESSAGE_APPOINTMENT_NOTIFICATION_DOCTOR_SOURCE_BODY_PREFIX + ".buttonText", new Object[]{comment}, locale));
+        values.put("disclaimer", this.messageSource.getMessage(MESSAGE_SOURCE_DISCLAIMER, null, locale));
+        values.put("title", this.messageSource.getMessage(MESSAGE_APPOINTMENT_NOTIFICATION_DOCTOR_SOURCE_BODY_PREFIX + ".title", null, locale));
+
+        EmailFormatter emailFormatter = new EmailFormatter();
+        String html;
+        if (comment != null && !comment.isEmpty()) {
+            try {
+                html = emailFormatter.format(emailFormatter.getHTMLFromFilename("newAppointmentWithComment"));
+            } catch (IOException e){
+                throw new IOException("Can't find HTML file newAppointmentWithComment.html");
+            }
+        } else {
+            try {
+                html = emailFormatter.format(emailFormatter.getHTMLFromFilename("newAppointment"));
+            } catch (IOException e){
+                throw new IOException("Can't find HTML file newAppointment.html");
+            }
+        }
+        StringSubstitutor substitutor = new StringSubstitutor(values, "${", "}");
+        return substitutor.replace(html);
+    }
+
+    private String getNotifyingPatientHtml(String baseUrl, User doctor, User patient, Appointment appointment, String dow, String month, Locale locale, String motive, String comment) throws IOException {
+        Map<String, String> values = new HashMap<>();
+        values.put("baseUrl", baseUrl);
+        values.put("year", String.valueOf(DateTime.now().getYear()));
+        values.put("body", this.messageSource.getMessage(MESSAGE_APPOINTMENT_NOTIFICATION_PATIENT_SOURCE_BODY_PREFIX + ".body",
+                new Object[]{
+                        doctor.getFirstName(),
+                        patient.getDisplayName(),
+                        dow,
+                        appointment.getFromDate().getDayOfMonth(),
+                        month,
+                        Integer.toString(appointment.getFromDate().getYear()),
+                        ((appointment.getFromDate().getHourOfDay() < 10) ? "0" : "") + appointment.getFromDate().getHourOfDay(),
+                        ((appointment.getFromDate().getMinuteOfHour() < 10) ? "0" : "") + appointment.getFromDate().getMinuteOfHour(),
+                        ((appointment.getToDate().getHourOfDay() < 10) ? "0" : "") + appointment.getToDate().getHourOfDay(),
+                        ((appointment.getToDate().getMinuteOfHour() < 10) ? "0" : "") + appointment.getToDate().getMinuteOfHour(),
+                        motive
+                },
+                locale));
+        values.put("comment", this.messageSource.getMessage(MESSAGE_APPOINTMENT_NOTIFICATION_PATIENT_SOURCE_BODY_PREFIX + ".comment", new Object[]{comment}, locale));
+        values.put("link", baseUrl);
+        values.put("buttonText", this.messageSource.getMessage(MESSAGE_APPOINTMENT_NOTIFICATION_PATIENT_SOURCE_BODY_PREFIX + ".buttonText", new Object[]{comment}, locale));
+        values.put("disclaimer", this.messageSource.getMessage(MESSAGE_SOURCE_DISCLAIMER, null, locale));
+        values.put("title", this.messageSource.getMessage(MESSAGE_APPOINTMENT_NOTIFICATION_PATIENT_SOURCE_BODY_PREFIX + ".title", null, locale));
+
+        EmailFormatter emailFormatter = new EmailFormatter();
+        String html;
+        if (comment != null && !comment.isEmpty()) {
+            try {
+                html = emailFormatter.format(emailFormatter.getHTMLFromFilename("newAppointmentWithComment"));
+            } catch (IOException e){
+                throw new IOException("Can't find HTML file newAppointmentWithComment.html");
+            }
+        } else {
+            try {
+                html = emailFormatter.format(emailFormatter.getHTMLFromFilename("newAppointment"));
+            } catch (IOException e){
+                throw new IOException("Can't find HTML file newAppointment.html");
+            }
+        }
+        StringSubstitutor substitutor = new StringSubstitutor(values, "${", "}");
+        return substitutor.replace(html);
+    }
+
+    private String getConfirmationHTML(String baseUrl, String url, User user, Locale locale) throws IOException {
         Map<String, String> values = new HashMap<>();
         values.put("url", url);
         values.put("baseUrl", baseUrl);
@@ -333,7 +580,7 @@ public class EmailServiceImpl implements EmailService {
         try {
             html = emailFormatter.format(emailFormatter.getHTMLFromFilename("signup"));
         } catch (IOException e){
-            throw new RuntimeException("Can't find HTML file signup.html");
+            throw new IOException("Can't find HTML file signup.html");
         }
         StringSubstitutor substitutor = new StringSubstitutor(values, "${", "}");
         return substitutor.replace(html);
