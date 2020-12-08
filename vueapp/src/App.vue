@@ -4,7 +4,7 @@
     lo dejo asi checkear si el resto funciona bien con esto
   -->
   <span id="app">
-    <Navbar v-if="!isAuth"/>
+    <Navbar v-if="!hideNav"/>
     <router-view/>
   </span>
 </template>
@@ -21,8 +21,8 @@ import {Component, Vue} from 'vue-property-decorator';
     }
 })
 export default class App extends Vue {
-    get isAuth(): boolean {
-        return ["Login","Signup","SignupDoctor","SignupPatient"].includes(this.$route.name!);
+    get hideNav(): boolean {
+        return this.$route.meta.hideNav;
     }
 }
 </script>

@@ -13,7 +13,9 @@ import PatientProfile from '@/views/patient/profile';
 import PatientHome from '@/views/patient/home';
 import SelectAppointment from '@/views/selectAppointment';
 import RequestAppointment from '@/views/patient/requestAppointment';
-
+import Error403 from "@/views/error/403";
+import Error404 from "@/views/error/404";
+import Error500 from "@/views/error/500";
 
 Vue.use(VueRouter);
 const routes = [
@@ -47,21 +49,33 @@ const routes = [
     }, {
         path: '/login',
         name: 'Login',
-        component: Login
+        component: Login,
+        meta:{
+            hideNav:true
+        }
     }, {
         path: '/signup',
         name: 'Signup',
-        component: Signup
+        component: Signup,
+        meta:{
+            hideNav:true
+        }
     },
     {
         path: '/signup/doctor',
         name: 'SignupDoctor',
-        component: SignupDoctor
+        component: SignupDoctor,
+        meta:{
+            hideNav:true
+        }
     },
     {
         path: '/signup/patient',
         name: 'SignupPatient',
-        component: SignupPatient
+        component: SignupPatient,
+        meta:{
+            hideNav:true
+        }
     },
     {
         path: '/doctor/home',
@@ -92,6 +106,22 @@ const routes = [
         path: '/requestAppointment',
         name: 'RequestAppointment',
         component: RequestAppointment
+    },
+    //TODO: names
+    {
+        path:"/error404",
+        name:"Error404",
+        component:Error404
+    },//TODO: names
+    {
+        path:"/error403",
+        name:"Error403",
+        component:Error403
+    },//TODO: names
+    {
+        path:"/error500",
+        name:"Error500",
+        component:Error500
     }
 ];
 

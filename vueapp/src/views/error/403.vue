@@ -1,24 +1,47 @@
-<html>
-<head>
-    <%@ include file="../../partials/head.jsp" %>
-    <link rel="stylesheet" href="<c:url value="
-    /css/errorPage.css"/>"/>
-</head>
-<body>
-<div class="container h-100 d-flex flex-column justify-content-center align-items-center">
-    <div>
-        <h1>MediCare<img src="<c:url value="/img/logo.svg"/>" alt="logo" class="logo-for-error"></h1>
-        <h4><h4 class="d-inline">403</h4>.
-            <spring:message code="ThereWasAnError"/>
-            .
-        </h4>
-        <h6>
-            <spring:message code="NoPermissionForThisPage"/>
-        </h6>
-        <a href="<c:url value="/"/>" class="btn btn-secondary" id="homeBtn">
-        <spring:message code="BackToHome"/>
-        </a>
+<template>
+    <div class="container h-100 d-flex flex-column justify-content-center align-items-center">
+        <div>
+            <h1>MediCare<img :src="logo" alt="logo" class="logo-for-error"></h1>
+            <h4><h4 class="d-inline">403</h4>.
+                 {{$t("ThereWasAnError")}}
+                .
+            </h4>
+            <h6>
+                 {{$t("NoPermissionForThisPage")}}
+            </h6>
+            <a :href="getUrl()" class="btn btn-secondary" id="homeBtn">
+             {{$t("BackToHome")}}
+            </a>
+        </div>
     </div>
-</div>
-</body>
-</html>
+</template>
+
+<script lang="ts">
+import {Component, Vue} from 'vue-property-decorator';
+import {getUrl} from "~/logic/utils";
+import Logo from "@/assets/logo.svg";
+
+@Component
+export default class Error403 extends Vue {
+    private logo = Logo;
+    getUrl(url:String):String{
+        return getUrl(url);
+    }
+
+}
+</script>
+
+<style scoped>
+body, html {
+    height: 100%;
+}
+
+.logo-for-error {
+    height: 1em;
+}
+
+#homeBtn {
+    margin-top: 10px;
+    margin-bottom: 50px;
+}
+</style>
