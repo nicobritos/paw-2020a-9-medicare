@@ -11,27 +11,28 @@ import {APIResponse, APIResponseFactory} from '~/logic/models/APIResponse';
 import {Pagination, PaginationLinks} from '~/logic/models/utils/Pagination';
 import parseLinkHeader from 'parse-link-header';
 import {injectable} from 'inversify';
+import { createPath } from '../models/utils/Utils';
 
 @injectable()
 export class RestRepositoryImpl implements RestRepository {
     public async get<R, T = any>(path: string, config: GetConfig<T>): Promise<APIResponse<R>> {
         let axiosConfig = RestRepositoryImpl.getAxiosConfig(config);
-        return RestRepositoryImpl.formatResponse(await axios.get(path, axiosConfig));
+        return RestRepositoryImpl.formatResponse(await axios.get(createPath(path), axiosConfig));
     }
 
     public async post<R, T>(path: string, config: PostConfig<T>): Promise<APIResponse<R>> {
         let axiosConfig = RestRepositoryImpl.getAxiosConfig(config);
-        return RestRepositoryImpl.formatResponse(await axios.post(path, axiosConfig.data, axiosConfig));
+        return RestRepositoryImpl.formatResponse(await axios.post(createPath(path), axiosConfig.data, axiosConfig));
     }
 
     public async put<R, T>(path: string, config: PutConfig<T>): Promise<APIResponse<R>> {
         let axiosConfig = RestRepositoryImpl.getAxiosConfig(config);
-        return RestRepositoryImpl.formatResponse(await axios.put(path, axiosConfig.data, axiosConfig));
+        return RestRepositoryImpl.formatResponse(await axios.put(createPath(path), axiosConfig.data, axiosConfig));
     }
 
     public async delete<R = any, T = any>(path: string, config?: DeleteConfig<T>): Promise<APIResponse<R>> {
         let axiosConfig = RestRepositoryImpl.getAxiosConfig(config || {});
-        return RestRepositoryImpl.formatResponse(await axios.delete(path, axiosConfig));
+        return RestRepositoryImpl.formatResponse(await axios.delete(createPath(path), axiosConfig));
     }
 
     private static getAxiosConfig<R>(config: GetConfig<R> | PostConfig<R> | PutConfig<R> | DeleteConfig<R>): AxiosRequestConfig {
