@@ -3,7 +3,7 @@
         class="container-fluid w-100 h-100 d-flex flex-column justify-content-center align-items-center signup-container">
         <form class="register-form border p-5 rounded">
             <div class="row">
-                <h6>Medicare <img :src='logo.svg' id="logo" alt="logo"/></h6>
+                <h6>Medicare <img :src='logo' id="logo" alt="logo"/></h6>
             </div>
             <div class="row justify-content-start">
                 <h1 class="register-form-title">{{ $t('CreateAccount') }}</h1>
@@ -62,7 +62,7 @@
                 </div>
             </div>
             <div class="form-row justify-content-between align-items-end mt-2">
-                <RouterLink class="form-link" href="${loginUrl}">{{ $t('Login') }}</RouterLink>
+                <RouterLink class="form-link" :to='getUrl("login")'>{{ $t('Login') }}</RouterLink>
                 <button type="submit" class="btn btn-primary">{{ $t('Confirm') }}</button>
             </div>
         </form>
@@ -74,6 +74,8 @@ import logo from '@/assets/logo.svg';
 import eye from '@/assets/eye.svg';
 import noeye from '@/assets/noeye.svg';
 import {Component, Vue} from 'vue-property-decorator';
+
+import { getUrl } from "~/logic/utils";
 
 @Component
 export default class SignupPatient extends Vue {
@@ -89,6 +91,10 @@ export default class SignupPatient extends Vue {
 
     toggleShowRepeatPassword(): void {
         this.showRepeatPassword = !this.showRepeatPassword;
+    }
+
+    getUrl(url:String):String{
+        return getUrl(url);
     }
 }
 </script>

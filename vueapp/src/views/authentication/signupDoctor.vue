@@ -93,7 +93,7 @@
                 </div>
             </div>
             <div class="form-row justify-content-between align-items-end mt-2">
-                <RouterLink class="form-link" :href='getUrl("login")'>{{ $t('Login') }}</RouterLink>
+                <RouterLink class="form-link" :to='getUrl("login")'>{{ $t('Login') }}</RouterLink>
                 <button type="submit" class="btn btn-primary">{{ $t('Confirm') }}</button>
             </div>
         </form>
