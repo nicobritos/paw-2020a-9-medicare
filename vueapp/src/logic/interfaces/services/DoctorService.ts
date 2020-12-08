@@ -2,7 +2,7 @@ import {Doctor} from '~/logic/models/Doctor';
 import {DoctorSpecialty} from '~/logic/models/DoctorSpecialty';
 import {APIError} from '~/logic/models/APIError';
 import {Pagination} from '~/logic/models/utils/Pagination';
-import {Nullable} from '~/logic/models/utils/Utils';
+import {Nullable} from '~/logic/Utils';
 
 // TODO: Ver los required en api doc
 export interface UpdateDoctor {

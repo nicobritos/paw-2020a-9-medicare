@@ -11,7 +11,7 @@ import {APIResponse, APIResponseFactory} from '~/logic/models/APIResponse';
 import {Pagination, PaginationLinks} from '~/logic/models/utils/Pagination';
 import parseLinkHeader from 'parse-link-header';
 import {injectable} from 'inversify';
-import { createPath } from '../models/utils/Utils';
+import { createPath } from '../Utils';
 
 @injectable()
 export class RestRepositoryImpl implements RestRepository {

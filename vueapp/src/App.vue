@@ -5,7 +5,7 @@
   -->
   <span id="app">
     <Navbar v-if="!hideNav"/>
-    <router-view/>
+    <RouterView/>
   </span>
 </template>
 

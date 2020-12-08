@@ -61,7 +61,7 @@ import {User} from '~/logic/models/User';
 import {Doctor} from '~/logic/models/Doctor';
 import {Patient} from '~/logic/models/Patient';
 
-import { getUrl } from "~/logic/utils";
+import {createPath} from "~/logic/Utils";
 
 @Component
 export default class NavbarLogged extends Vue {
@@ -82,8 +82,8 @@ export default class NavbarLogged extends Vue {
         this.$emit('logout');
     };
     //TODO:check typescript
-    getUrl(url:String):String{
-        return getUrl(url);
+    getUrl(url:string):string{
+        return createPath(url);
     }
 }
 </script>

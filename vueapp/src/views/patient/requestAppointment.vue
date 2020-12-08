@@ -103,7 +103,7 @@ import {Component, Vue} from 'vue-property-decorator';
 import {User} from '~/logic/models/User';
 import {Doctor} from '~/logic/models/Doctor';
 
-import { getUrl } from "~/logic/utils";
+import {createPath} from "~/logic/Utils";
 
 let user = new User();
 let doctor = new Doctor();
@@ -184,8 +184,8 @@ export default class RequestAppointment extends Vue {
     }
 
     //TODO: check typescript
-    getUrl(url:String):String{
-        return getUrl(url);
+    getUrl(url:string):string{
+        return createPath(url);
     }
 
 }

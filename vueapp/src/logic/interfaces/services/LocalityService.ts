@@ -1,4 +1,4 @@
-import {Nullable} from '~/logic/models/utils/Utils';
+import {Nullable} from '~/logic/Utils';
 import {Locality} from '~/logic/models/Locality';
 
 export interface LocalityService {

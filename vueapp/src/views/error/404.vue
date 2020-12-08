@@ -17,14 +17,14 @@
 </template>
 <script lang="ts">
 import {Component, Vue} from 'vue-property-decorator';
-import {getUrl} from "~/logic/utils";
+import {createPath} from "~/logic/Utils";
 import Logo from "@/assets/logo.svg";
 
 @Component
 export default class Error404 extends Vue {
     private logo = Logo;
-    getUrl(url:String):String{
-        return getUrl(url);
+    getUrl(url:string):string{
+        return createPath(url);
     }
 
 }

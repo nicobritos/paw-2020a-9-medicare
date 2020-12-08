@@ -1,5 +1,5 @@
 import {User} from '~/logic/models/User';
-import {Nullable} from '~/logic/models/utils/Utils';
+import {Nullable} from '~/logic/Utils';
 import {Patient} from '~/logic/models/Patient';
 import {Doctor} from '~/logic/models/Doctor';
 

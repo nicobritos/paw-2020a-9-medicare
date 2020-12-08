@@ -1,6 +1,6 @@
 import {GenericEntity} from '~/logic/models/utils/GenericEntity';
 import {JSONSerializableKeys} from '~/logic/models/utils/JSONSerializable';
-import {Nullable} from '~/logic/models/utils/Utils';
+import {Nullable} from '~/logic/Utils';
 import {User} from '~/logic/models/User';
 import {Office} from '~/logic/models/Office';
 

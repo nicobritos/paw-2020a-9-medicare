@@ -2,7 +2,7 @@ import container from '~/plugins/inversify.config';
 import TYPES from '~/logic/types';
 import {DefineActionTree, DefineMutationTree} from '~/store/utils/helper.types';
 import {RootState} from '~/store/types/root.types';
-import {Nullable} from '~/logic/models/utils/Utils';
+import {Nullable} from '~/logic/Utils';
 import {Module} from 'vuex';
 import {UserService} from '~/logic/interfaces/services/UserService';
 import {UserActions, UserMutations, UserState} from '~/store/types/user.types';

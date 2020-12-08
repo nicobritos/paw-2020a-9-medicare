@@ -110,7 +110,7 @@ import editPencil from '@/assets/editPencil.svg';
 import {Component, Vue} from 'vue-property-decorator';
 import {User} from '~/logic/models/User';
 
-import { getUrl } from "~/logic/utils";
+import {createPath} from "~/logic/Utils";
 
 let user = new User();
 user.email = user.firstName = user.phone = user.surname = 'asd';
@@ -125,8 +125,8 @@ export default class PatientProfile extends Vue {
     private user = user;
 
     //TODO: check typescript
-    getUrl(url:String):String{
-        return getUrl(url);
+    getUrl(url:string):string{
+        return createPath(url);
     }
 
 }

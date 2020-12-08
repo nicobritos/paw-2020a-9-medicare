@@ -1,7 +1,7 @@
 import {inject, injectable} from 'inversify';
 import TYPES from '~/logic/types';
 import {RestRepository} from '~/logic/interfaces/repositories/RestRepository';
-import {Nullable} from '~/logic/models/utils/Utils';
+import {Nullable} from '~/logic/Utils';
 import {AuthService, LoginUser, UserDoctors, UserPatients} from '~/logic/interfaces/services/AuthService';
 import {User} from '~/logic/models/User';
 import {ErrorMIME} from '~/logic/models/APIError';

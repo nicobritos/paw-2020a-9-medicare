@@ -59,12 +59,12 @@ import logo from '@/assets/logo.svg';
 import eye from '@/assets/eye.svg';
 import noeye from '@/assets/noeye.svg';
 import {Component, Vue, Watch} from 'vue-property-decorator';
-import {isValidEmail, Nullable} from '~/logic/models/utils/Utils';
+import {isValidEmail, Nullable} from '~/logic/Utils';
 import {authActionTypes} from '~/store/types/auth.types';
 import {State} from 'vuex-class';
 import {User} from '~/logic/models/User';
 
-import { getUrl } from "~/logic/utils";
+import {createPath} from "~/logic/Utils";
 
 @Component
 export default class Login extends Vue {
@@ -113,8 +113,8 @@ export default class Login extends Vue {
     }
 
     //TODO:check typescript
-    getUrl(url:String):String{
-        return getUrl(url);
+    getUrl(url:string):string{
+        return createPath(url);
     }
 }
 </script>

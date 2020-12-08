@@ -1,6 +1,6 @@
 import {User} from '~/logic/models/User';
 import {CacheableAsyncProperty, DefineTypes} from '~/store/utils/helper.types';
-import {Nullable} from '~/logic/models/utils/Utils';
+import {Nullable} from '~/logic/Utils';
 import {Doctor} from '~/logic/models/Doctor';
 import {Patient} from '~/logic/models/Patient';
 import {UserDoctors, UserPatients} from '~/logic/interfaces/services/AuthService';

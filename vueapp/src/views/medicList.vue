@@ -151,7 +151,7 @@ import {State} from 'vuex-class';
 import {localityActionTypes} from '~/store/types/localities.types';
 import {doctorSpecialtyActionTypes} from '~/store/types/doctorSpecialties.types';
 
-import { getUrl } from "~/logic/utils";
+import {createPath} from "~/logic/Utils";
 
 @Component
 export default class MedicList extends Vue {
@@ -239,8 +239,8 @@ export default class MedicList extends Vue {
     }
 
     //TODO:check typescript
-    getUrl(url:String):String{
-        return getUrl(url);
+    getUrl(url:string):string{
+        return createPath(url);
     }
 
     // TODO: handle error

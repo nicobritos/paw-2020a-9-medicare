@@ -119,7 +119,7 @@ import {User} from '~/logic/models/User';
 import {Doctor} from '~/logic/models/Doctor';
 import {Office} from '~/logic/models/Office';
 
-import { getUrl } from "~/logic/utils";
+import {createPath} from "~/logic/Utils";
 
 // TODO:check
 // @ts-ignore
@@ -217,8 +217,8 @@ export default class SelectAppointment extends Vue {
     }
 
     //TODO:check typescript
-    getUrl(url:String):String{
-        return getUrl(url);
+    getUrl(url:string):string{
+        return createPath(url);
     }
 }
 </script>

@@ -1,6 +1,6 @@
 import {APIError} from '~/logic/models/APIError';
 import {Workday} from '~/logic/models/Workday';
-import {Nullable} from '~/logic/models/utils/Utils';
+import {Nullable} from '~/logic/Utils';
 
 export interface WorkdayService {
     list(): Promise<Workday[] | APIError>;

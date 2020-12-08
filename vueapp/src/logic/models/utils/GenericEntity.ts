@@ -1,5 +1,5 @@
 import {JSONSerializable, JSONSerializableKeys} from './JSONSerializable';
-import {ID} from '~/logic/models/utils/Utils';
+import {ID} from '~/logic/Utils';
 
 interface GenericEntityID {
     id: ID;

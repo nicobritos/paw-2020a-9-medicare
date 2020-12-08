@@ -106,7 +106,7 @@ import noeye from '@/assets/noeye.svg';
 import logo from '@/assets/logo.svg';
 import {Component, Vue} from 'vue-property-decorator';
 
-import { getUrl } from "~/logic/utils";
+import {createPath} from "~/logic/Utils";
 
 @Component
 export default class SignupDoctor extends Vue {
@@ -125,8 +125,8 @@ export default class SignupDoctor extends Vue {
     }
 
     //TODO: check typescript
-    getUrl(url:String):String{
-        return getUrl(url);
+    getUrl(url:string):string{
+        return createPath(url);
     }
 
 }

@@ -10,14 +10,14 @@
 import logo from '@/assets/whiteLogo.svg';
 import {Component, Vue} from 'vue-property-decorator';
 
-import { getUrl } from "~/logic/utils";
+import {createPath} from "~/logic/Utils";
 
 @Component
 export default class NavbarLogo extends Vue {
     private readonly logo = logo;
 
-    getUrl(url:String):String{
-        return getUrl(url);
+    getUrl(url:string):string{
+        return createPath(url);
     }
 }
 </script>

@@ -1,5 +1,5 @@
 import {APIError} from '~/logic/models/APIError';
-import {Nullable} from '~/logic/models/utils/Utils';
+import {Nullable} from '~/logic/Utils';
 import {Appointment} from '~/logic/models/Appointment';
 import {DateRange} from '~/logic/models/utils/DateRange';
 

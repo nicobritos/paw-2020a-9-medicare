@@ -68,7 +68,7 @@ import {Component, Vue} from 'vue-property-decorator';
 import {State} from 'vuex-class';
 import {localityActionTypes} from '~/store/types/localities.types';
 import {doctorSpecialtyActionTypes} from '~/store/types/doctorSpecialties.types';
-import {Hash, Nullable} from '~/logic/models/utils/Utils';
+import {Hash, Nullable} from '~/logic/Utils';
 
 @Component
 export default class Landing extends Vue {

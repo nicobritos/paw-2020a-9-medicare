@@ -1,6 +1,6 @@
 import {APIError} from '~/logic/models/APIError';
 import {User} from '~/logic/models/User';
-import {Nullable} from '~/logic/models/utils/Utils';
+import {Nullable} from '~/logic/Utils';
 
 interface CreateUser {
     email: string;

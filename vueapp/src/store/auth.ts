@@ -5,7 +5,7 @@ import container from '~/plugins/inversify.config';
 import {AuthActions, AuthGetters, AuthMutations, authMutationTypes, AuthState} from '~/store/types/auth.types';
 import {RootState} from '~/store/types/root.types';
 import {DefineActionTree, DefineGetterTree, DefineMutationTree} from '~/store/utils/helper.types';
-import {Nullable} from '~/logic/models/utils/Utils';
+import {Nullable} from '~/logic/Utils';
 import {Commit, Module} from 'vuex';
 import {Doctor} from '~/logic/models/Doctor';
 import {Patient} from '~/logic/models/Patient';

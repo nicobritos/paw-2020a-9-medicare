@@ -75,7 +75,7 @@ import eye from '@/assets/eye.svg';
 import noeye from '@/assets/noeye.svg';
 import {Component, Vue} from 'vue-property-decorator';
 
-import { getUrl } from "~/logic/utils";
+import {createPath} from "~/logic/Utils";
 
 @Component
 export default class SignupPatient extends Vue {
@@ -93,8 +93,8 @@ export default class SignupPatient extends Vue {
         this.showRepeatPassword = !this.showRepeatPassword;
     }
 
-    getUrl(url:String):String{
-        return getUrl(url);
+    getUrl(url:string):string{
+        return createPath(url);
     }
 }
 </script>

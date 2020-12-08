@@ -1,5 +1,5 @@
 import {Country} from '~/logic/models/Country';
-import {Nullable} from '~/logic/models/utils/Utils';
+import {Nullable} from '~/logic/Utils';
 import {CountryService} from '~/logic/interfaces/services/CountryService';
 import {inject, injectable} from 'inversify';
 import TYPES from '~/logic/types';

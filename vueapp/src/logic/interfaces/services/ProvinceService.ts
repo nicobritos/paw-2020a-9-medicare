@@ -1,4 +1,4 @@
-import {Nullable} from '~/logic/models/utils/Utils';
+import {Nullable} from '~/logic/Utils';
 import {Province} from '~/logic/models/Province';
 
 export interface ProvinceService {
