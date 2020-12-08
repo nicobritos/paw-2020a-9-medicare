@@ -60,11 +60,18 @@ public class WebConfig {
     private String DB_PASS;
     @Value("${db.db}")
     private String DB_DB;
+    @Value("${app.host}")
+    private String baseUrl;
 
     //Used in addition of @PropertySource
     @Bean
     public static PropertySourcesPlaceholderConfigurer propertySourcesPlaceholderConfigurer() {
         return new PropertySourcesPlaceholderConfigurer();
+    }
+
+    @Bean
+    public String baseUrl(){
+        return "http://" + baseUrl;
     }
 
     @Bean
