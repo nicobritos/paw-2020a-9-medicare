@@ -175,7 +175,7 @@ public class UserServiceImpl extends GenericSearchableServiceImpl<UserDao, User,
 
     @Override
     @Transactional
-    public String generateVerificationToken(User user, String baseUrl, Locale locale, String confirmationRelativeUrl) {
+    public String generateVerificationToken(User user, Locale locale, String confirmationRelativeUrl) {
         user = this.findById(user.getId()).get();
 
         if (user.getVerified())
@@ -192,7 +192,7 @@ public class UserServiceImpl extends GenericSearchableServiceImpl<UserDao, User,
         }
 
         try {
-            emailService.sendEmailConfirmationEmail(user, token, confirmationRelativeUrl, locale, baseUrl);
+            emailService.sendEmailConfirmationEmail(user, token, confirmationRelativeUrl, locale);
         } catch (MessagingException e) {
             LOGGER.error("Couldn't send email confirmation mail to: {}", user.getEmail());
         }

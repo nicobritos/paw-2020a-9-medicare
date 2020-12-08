@@ -45,7 +45,7 @@ public interface AppointmentService extends GenericService<Appointment, Integer>
 
     List<AppointmentTimeSlot> findAvailableTimeslotsfromDate(Doctor doctor, LocalDateTime date);
 
-    List<Appointment> cancelAppointments(Workday workday, String baseUrl, Locale locale);
+    List<Appointment> cancelAppointments(Workday workday, Locale locale);
 
     Map<Workday, Integer> appointmentQtyByWorkdayOfUser(User user);
 
@@ -57,7 +57,7 @@ public interface AppointmentService extends GenericService<Appointment, Integer>
         throw new UnsupportedOperationException();
     }
 
-    void remove(Integer id, User user, String baseUrl, Locale locale);
+    void remove(Integer id, User user, Locale locale);
 
     @Override
     @Deprecated
@@ -65,7 +65,7 @@ public interface AppointmentService extends GenericService<Appointment, Integer>
         throw new UnsupportedOperationException();
     }
 
-    Appointment create(Appointment model, Locale locale, String baseUrl) throws InvalidAppointmentDateException;
+    Appointment create(Appointment model, Locale locale) throws InvalidAppointmentDateException;
 
     List<List<AppointmentTimeSlot>> findTimeslotsSortedByWeekday(Doctor doctor, LocalDateTime from, LocalDateTime to);
 }

@@ -27,7 +27,7 @@ public interface UserService extends GenericSearchableService<User, Integer> {
 
     Patient createNewPatient(Patient patient);
 
-    String generateVerificationToken(User user, String baseUrl, Locale locale, String confirmationRelativeUrl);
+    String generateVerificationToken(User user, Locale locale, String confirmationRelativeUrl);
 
     String generateRefreshToken(User user);
 

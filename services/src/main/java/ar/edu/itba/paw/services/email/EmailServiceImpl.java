@@ -35,6 +35,8 @@ public class EmailServiceImpl implements EmailService {
     private MessageSource messageSource;
     @Autowired
     private AppointmentService appointmentService;
+    @Autowired
+    private String baseUrl;
 
     private static final Logger LOGGER = LoggerFactory.getLogger(EmailServiceImpl.class);
 
@@ -69,7 +71,7 @@ public class EmailServiceImpl implements EmailService {
     @Override
     public void sendCanceledAppointmentNotificationEmail(User userCancelling, boolean isDoctorCancelling,
                                                          User userCancelled, Appointment appointment,
-                                                         String baseUrl, Locale locale) throws MessagingException {
+                                                         Locale locale) throws MessagingException {
         String subject = this.messageSource.getMessage("appointment.cancel.email.subject", null, locale);
         String userTitle = isDoctorCancelling ? this.messageSource.getMessage("doctor", null, locale) : this.messageSource.getMessage("patient", null, locale);
         String dowMessage;
@@ -159,8 +161,7 @@ public class EmailServiceImpl implements EmailService {
     }
 
     @Override
-    public void sendNewAppointmentNotificationEmail(Appointment appointment, Locale locale,
-                                                    String baseUrl) throws MessagingException {
+    public void sendNewAppointmentNotificationEmail(Appointment appointment, Locale locale) throws MessagingException {
         String subject = this.messageSource.getMessage("appointment.new.email.subject", null, locale);
         String dowMessage;
         switch (appointment.getFromDate().getDayOfWeek()) {
@@ -246,7 +247,7 @@ public class EmailServiceImpl implements EmailService {
     }
 
     @Override
-    public void sendEmailConfirmationEmail(User user, String token, String confirmationPageRelativeUrl, Locale locale, String baseUrl) throws MessagingException {
+    public void sendEmailConfirmationEmail(User user, String token, String confirmationPageRelativeUrl, Locale locale) throws MessagingException {
 
         String subject = this.messageSource.getMessage("signup.confirmation.email.subject", null, locale);
         String confirmationUrl;
@@ -267,7 +268,7 @@ public class EmailServiceImpl implements EmailService {
     }
 
     @Override
-    public void scheduleNotifyAppointmentEmail(Appointment appointment, Locale locale, String baseUrl) {
+    public void scheduleNotifyAppointmentEmail(Appointment appointment, Locale locale) {
         String doctorSubject = this.messageSource.getMessage("appointment.notification.email.doctor.subject", null, locale);
         String patientSubject = this.messageSource.getMessage("appointment.notification.email.patient.subject", null, locale);
         String dowMessage;
@@ -390,7 +391,7 @@ public class EmailServiceImpl implements EmailService {
     public void initScheduleEmails() {
         List<Appointment> appointments = appointmentService.findAllAppointmentsToNotify();
         for (Appointment appointment: appointments){
-            scheduleNotifyAppointmentEmail(appointment, appointment.getLocale(), appointment.getBaseUrl());
+            scheduleNotifyAppointmentEmail(appointment, appointment.getLocale());
         }
     }
 
