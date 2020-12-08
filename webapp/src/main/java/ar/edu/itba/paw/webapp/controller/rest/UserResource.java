@@ -180,9 +180,7 @@ public class UserResource extends GenericAuthenticationResource {
     }
 
     private Response finishSignUp(HttpServletRequest request, HttpServletResponse response, UserSignUp userSignUp, User newUser) {
-        StringBuilder baseUrl = new StringBuilder(request.getRequestURL());
-        baseUrl.replace(request.getRequestURL().lastIndexOf(request.getServletPath()), request.getRequestURL().length(), "");
-        userService.generateVerificationToken(newUser, baseUrl.toString(), request.getLocale(), "/verify");
+        userService.generateVerificationToken(newUser, request.getLocale(), "/verify");
 
         ResponseBuilder responseBuilder = Response.status(Status.CREATED);
 

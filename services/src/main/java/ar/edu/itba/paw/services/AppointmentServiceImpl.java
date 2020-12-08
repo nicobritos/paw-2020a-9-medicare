@@ -109,7 +109,7 @@ public class AppointmentServiceImpl extends GenericServiceImpl<AppointmentDao, A
     }
 
     @Override
-    public Appointment create(Appointment model, Locale locale, String baseUrl) throws InvalidAppointmentDateException {
+    public Appointment create(Appointment model, Locale locale) throws InvalidAppointmentDateException {
         if (model.getFromDate().getMinuteOfHour() % 15 != 0)
             throw new InvalidMinutesException();
         if (!this.isValidDate(model.getDoctor(), model.getFromDate()))
@@ -127,9 +127,9 @@ public class AppointmentServiceImpl extends GenericServiceImpl<AppointmentDao, A
         Appointment appointment = this.appointmentRepository.create(model);
         try {
             emailService.sendNewAppointmentNotificationEmail(
-                    appointment, locale, baseUrl);
+                    appointment, locale);
             emailService.scheduleNotifyAppointmentEmail(
-                    appointment, locale, baseUrl);
+                    appointment, locale);
         } catch (MessagingException e) {
             LOGGER.error("Couldn't send new appointment email to: {}, to notify appointment: {}", appointment.getDoctor().getEmail(), appointment);
         }
@@ -228,13 +228,13 @@ public class AppointmentServiceImpl extends GenericServiceImpl<AppointmentDao, A
     }
 
     @Override
-    public List<Appointment> cancelAppointments(Workday workday, String baseUrl, Locale locale) {
+    public List<Appointment> cancelAppointments(Workday workday, Locale locale) {
         List<Appointment> cancelled = new LinkedList<>();
         List<Appointment> appointments = findByWorkday(workday);
         //check if user is allowed to cancel
         for (Appointment a : appointments) {
             if (workday.getDoctor().equals(a.getDoctor())) {
-                remove(a.getId(), a.getDoctor().getUser(), baseUrl, locale);
+                remove(a.getId(), a.getDoctor().getUser(), locale);
                 cancelled.add(a);
             }
         }
@@ -269,7 +269,7 @@ public class AppointmentServiceImpl extends GenericServiceImpl<AppointmentDao, A
     }
 
     @Override
-    public void remove(Integer id, User user, String baseUrl, Locale locale) {
+    public void remove(Integer id, User user, Locale locale) {
         Optional<Appointment> appointment = findById(id);
         if (appointment.isPresent()) {
             //get doctor for current user
@@ -299,7 +299,7 @@ public class AppointmentServiceImpl extends GenericServiceImpl<AppointmentDao, A
                 try {
                     emailService.sendCanceledAppointmentNotificationEmail(user, isDoctor,
                             isDoctor? appointment.get().getPatient().getUser():appointment.get().getDoctor().getUser(),
-                            appointment.get(), baseUrl, locale);
+                            appointment.get(), locale);
                 } catch (MessagingException e) {
                     LOGGER.error("Couldn't send cancelled appointment email to: {}, to notify appointment: {}", user.getEmail(), appointment);
                 }
