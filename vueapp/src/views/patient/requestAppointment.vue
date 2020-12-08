@@ -103,6 +103,8 @@ import {Component, Vue} from 'vue-property-decorator';
 import {User} from '~/logic/models/User';
 import {Doctor} from '~/logic/models/Doctor';
 
+import { getUrl } from "~/logic/utils";
+
 let user = new User();
 let doctor = new Doctor();
 
@@ -180,6 +182,12 @@ export default class RequestAppointment extends Vue {
     getLocality(id: number): string {
         return 'Locality' + id;
     }
+
+    //TODO: check typescript
+    getUrl(url:String):String{
+        return getUrl(url);
+    }
+
 }
 </script>
 

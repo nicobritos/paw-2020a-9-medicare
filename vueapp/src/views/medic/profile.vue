@@ -164,6 +164,8 @@ import noeye from '@/assets/noeye.svg';
 import {Component, Vue} from 'vue-property-decorator';
 import {User} from '~/logic/models/User';
 
+import { getUrl } from "~/logic/utils";
+
 let user = new User();
 user.email = user.firstName = user.phone = user.surname = 'asd';
 user.id = user.profilePictureId = 1;
@@ -207,6 +209,12 @@ export default class MedicProfile extends Vue {
             return t.toString();
         }
     }
+    
+    //TODO: check typescript
+    getUrl(url:String):String{
+        return getUrl(url);
+    }
+
 }
 </script>
 

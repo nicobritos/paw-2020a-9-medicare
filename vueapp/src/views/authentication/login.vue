@@ -64,6 +64,8 @@ import {authActionTypes} from '~/store/types/auth.types';
 import {State} from 'vuex-class';
 import {User} from '~/logic/models/User';
 
+import { getUrl } from "~/logic/utils";
+
 @Component
 export default class Login extends Vue {
     private logo = logo;
@@ -108,6 +110,11 @@ export default class Login extends Vue {
             password: this.password,
             email: this.email
         }));
+    }
+
+    //TODO:check typescript
+    getUrl(url:String):String{
+        return getUrl(url);
     }
 }
 </script>

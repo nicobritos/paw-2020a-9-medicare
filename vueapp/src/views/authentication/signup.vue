@@ -32,9 +32,16 @@
 import logo from '@/assets/logo.svg';
 import {Component, Vue} from 'vue-property-decorator';
 
+import { getUrl } from "~/logic/utils";
+
 @Component
 export default class Signup extends Vue {
     private logo = logo;
+
+    //TODO: check typescript
+    getUrl(url:String):String{
+        return getUrl(url);
+    }
 }
 </script>
 

@@ -6,6 +6,9 @@ function getUrl(url) {
     }
 }
 
+
+export {getUrl};
+
 export default {
     getUrl:getUrl
 };
