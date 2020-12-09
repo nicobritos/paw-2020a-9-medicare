@@ -13,7 +13,11 @@
                     <label for="first_name">{{ $t('Name') }}</label>
                 </div>
                 <div class="col-8">
-                    <input class="form-control" type="text" name="firstName" id="first_name"/>
+                    <!-- TODO: maybe add state to input -->
+                    <b-input v-model="firstname" class="form-control" type="text" name="firstName" id="first_name"/>
+                    <!-- TODO: maybe expand feedback-->
+                    <!-- TODO: check the i18n-->
+                    <b-form-invalid-feedback :state="validFirstname">{{$t("Size.signupForm.firstName",[0,maxFirstnameLength,minFirstnameLength])}}</b-form-invalid-feedback>
                 </div>
             </div>
             <div class="form-group row">
@@ -21,7 +25,11 @@
                     <label for="surname">{{ $t('Surname') }}</label>
                 </div>
                 <div class="col-8">
-                    <input class="form-control" type="text" name="surname" id="surname"/>
+                    <!-- TODO: maybe add state to input -->
+                    <b-input v-model="surname" class="form-control" type="text" name="surname" id="surname"/>
+                    <!-- TODO: maybe expand feedback-->
+                    <!-- TODO: check the i18n-->
+                    <b-form-invalid-feedback :state="validSurname">{{$t("Size.signupForm.surname",[0,maxSurnameLength,minSurnameLength])}}</b-form-invalid-feedback>
                 </div>
             </div>
             <div class="form-group row">
@@ -29,7 +37,11 @@
                     <label for="medicare_email">{{ $t('Email') }}</label>
                 </div>
                 <div class="col-8">
-                    <input class="form-control" type="email" name="medicare_email" id="medicare_email"/>
+                    <!-- TODO: maybe add state to input -->
+                    <b-input v-model="email" class="form-control" type="email" name="medicare_email" id="medicare_email"/>
+                    <!-- TODO: maybe expand feedback-->
+                    <!-- TODO: check the i18n-->
+                    <b-form-invalid-feedback :state="validEmail">{{$t("Email.signupForm.email")}}</b-form-invalid-feedback>
                 </div>
             </div>
             <div class="form-group row">
@@ -37,13 +49,17 @@
                     <label for="medicare_password">{{ $t('Password') }}</label>
                 </div>
                 <div class="col-8">
-                    <input class="form-control pr-5"
+                    <!-- TODO: maybe add state to input -->
+                    <b-input v-model="password" class="form-control pr-5"
                            :type='showPassword?"text":"password"' name="medicare_password"
                            id="medicare_password"/>
                     <label for="medicare_password" class="toggle-visibility" @click="toggleShowPassword()">
                         <img v-if="!showPassword" :src='eye'>
                         <img v-else :src='noeye'>
                     </label>
+                    <!-- TODO: maybe expand feedback-->
+                    <!-- TODO: check the i18n-->
+                    <b-form-invalid-feedback :state="validPassword">{{$t("Size.signupForm.password",[0,maxPasswordLength,minPasswordLength])}}</b-form-invalid-feedback>
                 </div>
             </div>
             <div class="form-group row">
@@ -51,13 +67,17 @@
                     <label for="medicare_repeatPassword">{{ $t('RepeatPassword') }}</label>
                 </div>
                 <div class="col-8">
-                    <input class="form-control pr-5"
+                    <!-- TODO: maybe add state to input -->
+                    <b-input v-model="repeatPassword" class="form-control pr-5"
                            :type='showRepeatPassword?"text":"password"' name="medicare_repeatPassword"
                            id="medicare_repeatPassword"/>
                     <label for="medicare_repeatPassword" class="toggle-visibility" @click="toggleShowRepeatPassword()">
                         <img v-if="!showRepeatPassword" :src='eye'>
                         <img v-else :src='noeye'>
                     </label>
+                    <!-- TODO: maybe expand feedback-->
+                    <!-- TODO: check the i18n-->
+                    <b-form-invalid-feedback :state="validRepeatPassword">{{$t("Equals.signupForm.repeatPassword")}}</b-form-invalid-feedback>
                 </div>
             </div>
             <div class="form-group row">
@@ -65,7 +85,11 @@
                     <label for="country">{{ $t('Country') }}</label>
                 </div>
                 <div class="col-8">
-                    <select class="form-control" style="width: 100%;" items="${countryMap}" id="country"/>
+                    <!-- TODO: maybe add state to input -->
+                    <select v-model="country" class="form-control" style="width: 100%;" items="${countryMap}" id="country"/>
+                    <!-- TODO: maybe expand feedback-->
+                    <!-- TODO: check the i18n-->
+                    <b-form-invalid-feedback :state="validCountry">{{$t("NotEmpty.signupForm.address")}}</b-form-invalid-feedback>
                 </div>
             </div>
             <div class="form-group row" id="province-container">
@@ -73,7 +97,11 @@
                     <label for="province">{{ $t('Province') }}</label>
                 </div>
                 <div class="col-8">
-                    <select class="form-control" style="width: 100%;" id="province"/>
+                    <!-- TODO: maybe add state to input -->
+                    <select v-model="province" class="form-control" style="width: 100%;" id="province"/>
+                    <!-- TODO: maybe expand feedback-->
+                    <!-- TODO: check the i18n-->
+                    <b-form-invalid-feedback :state="validProvince">{{$t("NotEmpty.signupForm.address")}}</b-form-invalid-feedback>
                 </div>
             </div>
             <div class="form-group row" id="locality-container">
@@ -81,7 +109,11 @@
                     <label for="locality">{{ $t('Locality') }}</label>
                 </div>
                 <div class="col-8">
-                    <select class="form-control" style="width: 100%;" id="locality"/>
+                    <!-- TODO: maybe add state to input -->
+                    <select v-model="locality" class="form-control" style="width: 100%;" id="locality"/>
+                    <!-- TODO: maybe expand feedback-->
+                    <!-- TODO: check the i18n-->
+                    <b-form-invalid-feedback :state="validLocality">{{$t("NotEmpty.signupForm.address")}}</b-form-invalid-feedback>
                 </div>
             </div>
             <div class="form-group row">
@@ -89,7 +121,11 @@
                     <label for="address">{{ $t('Address') }}</label>
                 </div>
                 <div class="col-8">
-                    <input class="form-control" type="text" name="address" id="address"/>
+                    <!-- TODO: maybe add state to input -->
+                    <b-input v-model="address" class="form-control" type="text" name="address" id="address"/>
+                    <!-- TODO: maybe expand feedback-->
+                    <!-- TODO: check the i18n-->
+                    <b-form-invalid-feedback :state="validAddress">{{$t("NotEmpty.signupForm.address")}}</b-form-invalid-feedback>
                 </div>
             </div>
             <div class="form-row justify-content-between align-items-end mt-2">
@@ -106,7 +142,7 @@ import noeye from '@/assets/noeye.svg';
 import logo from '@/assets/logo.svg';
 import {Component, Vue} from 'vue-property-decorator';
 
-import {createPath} from "~/logic/Utils";
+import {createPath,isValidEmail} from "~/logic/Utils";
 
 @Component
 export default class SignupDoctor extends Vue {
@@ -116,12 +152,66 @@ export default class SignupDoctor extends Vue {
     private eye = eye;
     private noeye = noeye;
 
+    //TODO:check properties
+    private readonly minFirstnameLength = 2;
+    private readonly maxFirstnameLength = 20;
+    private readonly minSurnameLength = 2;
+    private readonly maxSurnameLength = 20;
+    private readonly minPasswordLength = 8;
+    private readonly maxPasswordLength = 100;
+
+    //form values
+    private firstname:string = "";
+    private surname:string = "";
+    private email:string = "";
+    private password:string = "";
+    private repeatPassword:string = "";
+    //TODO:do this props
+    private country=null;
+    private province=null;
+    private locality=null;
+    private address="";
+
     toggleShowPassword(): void {
         this.showPassword = !this.showPassword;
     }
 
     toggleShowRepeatPassword(): void {
         this.showRepeatPassword = !this.showRepeatPassword;
+    }
+
+    get validFirstname():boolean {
+        return  this.firstname.length>=this.minFirstnameLength 
+                && this.firstname.length<=this.maxFirstnameLength;
+    }
+
+    get validSurname():boolean {
+        return  this.surname.length>=this.minSurnameLength 
+                && this.surname.length<=this.maxSurnameLength;
+    }
+    get validEmail():boolean {
+        return isValidEmail(this.email);
+    }
+    get validPassword():boolean {
+        return this.password.length>=this.minPasswordLength 
+                && this.password.length<=this.maxPasswordLength;;
+    }
+    get validRepeatPassword():boolean {
+        return this.password === this.repeatPassword;
+    }
+
+    //TODO:do this validations
+    get validCountry():boolean{
+        return true;
+    }
+    get validProvince():boolean{
+        return true;
+    }
+    get validLocality():boolean{
+        return true;
+    }
+    get validAddress():boolean{
+        return this.address.length!=0;
     }
 
     //TODO: check typescript

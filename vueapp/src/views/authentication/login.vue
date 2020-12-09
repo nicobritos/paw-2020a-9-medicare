@@ -12,8 +12,11 @@
                 <div class="col">
                     <label for="medicare_email">{{ $t('Email') }}</label>
                 </div>
-                <div class="col-8">
-                    <input v-model="email" class="form-control" type="email" name="medicare_email" id="medicare_email"/>
+                <div class="col-8">           
+                    <!-- TODO: maybe add state to input -->
+                    <b-input v-model="email" class="form-control" type="email" name="medicare_email" id="medicare_email"/>
+                    <!-- TODO:maybe expand email feedback-->
+                    <b-form-invalid-feedback :state="validEmail">{{$t("Email.signupForm.email")}}</b-form-invalid-feedback>
                 </div>
             </div>
             <div class="form-group row">
@@ -21,13 +24,15 @@
                     <label for="medicare_password">{{ $t('Password') }}</label>
                 </div>
                 <div class="col-8">
-                    <input v-model="password" class="form-control pr-5" :type='showPassword?"text":"password"' name="medicare_password"
+                    <!-- TODO: maybe add state to input -->
+                    <b-input v-model="password" class="form-control pr-5" :type='showPassword?"text":"password"' name="medicare_password"
                            id="medicare_password"/>
-                    <!-- For this to work for must be the id of the password input -->
                     <label for="medicare_password" class="toggle-visibility" @click="toggleShowPassword()">
                         <img v-if="!showPassword" :src='eye'>
                         <img v-else :src='noeye'>
                     </label>
+                    <!-- TODO:maybe expand feedback -->
+                    <b-form-invalid-feedback :state="validPassword">{{$t("NotEmpty.signupForm.password")}}</b-form-invalid-feedback>
                 </div>
             </div>
             <div class="form-group row align-items-center">
@@ -59,12 +64,10 @@ import logo from '@/assets/logo.svg';
 import eye from '@/assets/eye.svg';
 import noeye from '@/assets/noeye.svg';
 import {Component, Vue, Watch} from 'vue-property-decorator';
-import {isValidEmail, Nullable} from '~/logic/Utils';
+import {isValidEmail, Nullable, createPath} from '~/logic/Utils';
 import {authActionTypes} from '~/store/types/auth.types';
 import {State} from 'vuex-class';
 import {User} from '~/logic/models/User';
-
-import {createPath} from "~/logic/Utils";
 
 @Component
 export default class Login extends Vue {
@@ -110,6 +113,14 @@ export default class Login extends Vue {
             password: this.password,
             email: this.email
         }));
+    }
+
+    get validEmail():boolean{
+        return isValidEmail(this.email);
+    }
+
+    get validPassword():boolean{
+        return this.password.length!=0;
     }
 
     //TODO:check typescript
