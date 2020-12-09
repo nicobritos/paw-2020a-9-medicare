@@ -31,7 +31,7 @@ export class UserServiceImpl implements UserService {
     }
 
     public async createAsDoctor(doctor: CreateUserDoctor): Promise<UserDoctors | APIError> {
-        let response = await this.rest.post<User, CreateUserDoctor>(UserServiceImpl.PATH, {
+        let response = await this.rest.post<UserDoctors, CreateUserDoctor>(UserServiceImpl.PATH, {
             accepts: UserMIME.ME,
             data: doctor,
             contentType: UserMIME.CREATE_DOCTOR
@@ -40,7 +40,7 @@ export class UserServiceImpl implements UserService {
     }
 
     public async createAsPatient(patient: CreateUserPatient): Promise<UserPatients | APIError> {
-        let response = await this.rest.post<User, CreateUserPatient>(UserServiceImpl.PATH, {
+        let response = await this.rest.post<UserPatients, CreateUserPatient>(UserServiceImpl.PATH, {
             accepts: UserMIME.ME,
             data: patient,
             contentType: UserMIME.CREATE_PATIENT
