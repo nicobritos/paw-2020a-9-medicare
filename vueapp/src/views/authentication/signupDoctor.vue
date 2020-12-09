@@ -1,7 +1,7 @@
 <template>
     <div
         class="container-fluid w-100 m-0 p-0 d-flex flex-column justify-content-center align-items-center signup-container">
-        <form class="register-form border my-3 p-5 rounded">
+        <form class="register-form border my-3 p-5 rounded" @submit="submitForm">
             <div class="row">
                 <h6>Medicare <img :src='logo' id="logo" alt="logo"/></h6>
             </div>
@@ -143,6 +143,7 @@ import logo from '@/assets/logo.svg';
 import {Component, Vue} from 'vue-property-decorator';
 
 import {createPath,isValidEmail} from "~/logic/Utils";
+import {userActionTypes} from '~/store/types/user.types';
 
 @Component
 export default class SignupDoctor extends Vue {
@@ -214,11 +215,27 @@ export default class SignupDoctor extends Vue {
         return this.address.length!=0;
     }
 
-    //TODO: check typescript
     getUrl(url:string):string{
         return createPath(url);
     }
 
+    // TODO: Guido
+    public validate(): boolean {
+        return true;
+    }
+
+    public submitForm(): string {
+        this.validate();
+
+        this.$store.dispatch('users/createAsDoctor', userActionTypes.createAsDoctor({
+            doctor: {
+                email: this.email,
+                firstName: this.firstname,
+                password: this.password,
+                surname: this.surname
+            }
+        }));
+    }
 }
 </script>
 

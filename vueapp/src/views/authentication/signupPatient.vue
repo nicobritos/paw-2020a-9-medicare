@@ -1,7 +1,7 @@
 <template>
     <div
         class="container-fluid w-100 h-100 d-flex flex-column justify-content-center align-items-center signup-container">
-        <form class="register-form border p-5 rounded">
+        <form class="register-form border p-5 rounded" @submit="submitForm">
             <div class="row">
                 <h6>Medicare <img :src='logo' id="logo" alt="logo"/></h6>
             </div>
@@ -98,6 +98,7 @@ import noeye from '@/assets/noeye.svg';
 import {Component, Vue} from 'vue-property-decorator';
 
 import {createPath, isValidEmail} from "~/logic/Utils";
+import {userActionTypes} from '~/store/types/user.types';
 
 @Component
 export default class SignupPatient extends Vue {
@@ -153,6 +154,24 @@ export default class SignupPatient extends Vue {
 
     getUrl(url:string):string{
         return createPath(url);
+    }
+
+    // TODO: Guido
+    public validate(): boolean {
+        return true;
+    }
+
+    public submitForm(): string {
+        this.validate();
+
+        this.$store.dispatch('users/createAsPatient', userActionTypes.createAsPatient({
+            patient: {
+                email: this.email,
+                firstName: this.firstname,
+                password: this.password,
+                surname: this.surname
+            }
+        }));
     }
 }
 </script>

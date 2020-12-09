@@ -108,11 +108,16 @@ export default class Login extends Vue {
     public login(e: Event) {
         e.preventDefault();
         if (this.disabledButton) return;
+        this.validate(); // TODO: Guido
 
         this.$store.dispatch('auth/login', authActionTypes.login({
             password: this.password,
             email: this.email
         }));
+    }
+
+    public validate(): boolean {
+        return true; // TODO: Guido
     }
 
     get validEmail():boolean{
