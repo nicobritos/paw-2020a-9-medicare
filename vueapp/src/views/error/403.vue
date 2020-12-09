@@ -9,7 +9,7 @@
             <h6>
                  {{$t("NoPermissionForThisPage")}}
             </h6>
-            <a :href="getUrl()" class="btn btn-secondary" id="homeBtn">
+            <a :href='getUrl("")' class="btn btn-secondary" id="homeBtn">
              {{$t("BackToHome")}}
             </a>
         </div>
