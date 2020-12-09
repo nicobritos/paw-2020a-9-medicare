@@ -224,7 +224,7 @@ export default class SignupDoctor extends Vue {
         return true;
     }
 
-    public submitForm(): string {
+    public submitForm(): void {
         this.validate();
 
         this.$store.dispatch('users/createAsDoctor', userActionTypes.createAsDoctor({
@@ -232,7 +232,8 @@ export default class SignupDoctor extends Vue {
                 email: this.email,
                 firstName: this.firstname,
                 password: this.password,
-                surname: this.surname
+                surname: this.surname,
+                specialtyIds: []
             }
         }));
     }

@@ -5,9 +5,9 @@ import {RootState} from '~/store/types/root.types';
 import {Nullable} from '~/logic/Utils';
 import {Module} from 'vuex';
 import {UserService} from '~/logic/interfaces/services/UserService';
-import {UserActionReturnTypes, UserActions, UserMutations, UserState} from '~/store/types/user.types';
+import {UserActionReturnTypes, UserActions, UserState} from '~/store/types/user.types';
 import {User} from '~/logic/models/User';
-import {authActionTypes, authMutationTypes} from '~/store/types/auth.types';
+import {authMutationTypes} from '~/store/types/auth.types';
 import {APIError} from '~/logic/models/APIError';
 
 function getService(): UserService {
@@ -15,9 +15,9 @@ function getService(): UserService {
 }
 
 const actions: DefineActionTree<UserActions, UserState, RootState, UserActionReturnTypes> = {
-    async getUser({state, commit}, {payload}): Nullable<User> {
+    async getUser({state, commit}, {payload}): Promise<Nullable<User>> {
         try {
-            return await getService().get(payload);
+            return await getService().get(payload.id);
         } catch (e) {
             console.error(e);
             return null;

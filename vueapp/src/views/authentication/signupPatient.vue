@@ -161,7 +161,7 @@ export default class SignupPatient extends Vue {
         return true;
     }
 
-    public submitForm(): string {
+    public submitForm(): void {
         this.validate();
 
         this.$store.dispatch('users/createAsPatient', userActionTypes.createAsPatient({

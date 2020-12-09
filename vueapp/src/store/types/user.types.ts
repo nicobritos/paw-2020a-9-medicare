@@ -3,6 +3,10 @@ import {CreateUserDoctor, CreateUserPatient, UpdateUser} from '~/logic/interface
 import {Nullable} from '~/logic/Utils';
 import {User} from '~/logic/models/User';
 
+export interface UserState {
+
+}
+
 export interface UserActions {
     getUser: {
         id: number
@@ -20,8 +24,8 @@ export interface UserActions {
 }
 
 export interface UserActionReturnTypes {
-    getUser: Nullable<User>,
-    updateUer: Nullable<User>
+    getUser: Promise<Nullable<User>>,
+    updateUer: Promise<Nullable<User>>
 }
 
 export const userActionTypes: DefineTypes<UserActions> = {
