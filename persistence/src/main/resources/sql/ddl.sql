@@ -49,12 +49,18 @@ create table users
     surname    text   not null,
     phone      text,
     verified bool default false,
-    token text,
-    token_created_date timestamp,
+    verification_token_id int,
+    refresh_token_id int,
     profile_id int,
     constraint users_picture_picture_id_fk
         foreign key (profile_id) references picture
-            on update cascade on delete set null
+            on update cascade on delete set null,
+    constraint users_refresh_token_refresh_token_id_fk
+        foreign key (refresh_token_id) references refresh_token
+            on update restrict on delete cascade,
+    constraint users_verification_token_verification_token_id_fk
+        foreign key (verification_token_id) references verification_token
+        on update restrict on delete cascade
 );
 
 create table office
@@ -142,7 +148,9 @@ create table appointment
     message text,
     constraint appointment_doctor_doctor_id_fk
         foreign key (doctor_id) references doctor
-            on update set null on delete set null
+            on update set null on delete set null,
+    locale text,
+    was_notification_email_sent boolean
 );
 
 create table workday
@@ -157,6 +165,20 @@ create table workday
     start_minute int    not null default 0,
     end_minute   int    not null default 0,
     day          text   not null
+);
+
+create table verification_token
+(
+    verification_token_id serial not null primary key ,
+    token text not null,
+    created_date timestamp not null
+);
+
+create table refresh_token
+(
+    refresh_token_id serial not null primary key,
+    token text not null,
+    created_date timestamp not null
 );
 
 create unique index system_country_country_id_uindex
@@ -207,8 +229,17 @@ create index workday_day_index
 create unique index workday_workday_id_uindex
     on workday (workday_id);
 
-create unique index users_token_uindex
-    on users (verification_token);
+create unique index verification_token_verification_token_id_uindex
+    on verification_token (verification_token_id);
+
+create unique index refresh_token_refresh_token_id_uindex
+    on refresh_token (refresh_token_id);
+
+create index users_verification_token_id_index
+    on users (verification_token_id);
+
+create index users_refresh_token_id_index
+    on users (refresh_token_id);
 
 create function unaccent(text) returns text
     immutable
