@@ -1,6 +1,6 @@
 <template>
     <div class="container w-100 justify-content-end">
-        <RouterLink v-if="user.verified" to="Landing" class="header-a-element nav-link mx-3">
+        <RouterLink v-if="user.verified" :to="getUrl('/')" class="header-a-element nav-link mx-3">
             {{ $t('MyAppointments') }}
         </RouterLink>
         <RouterLink v-if="user.verified && !isDoctor" :to='getUrl("mediclist/1")'
@@ -8,13 +8,13 @@
         </RouterLink>
 
         <div class="d-inline-flex flex-column align-items-end">
-            <RouterLink v-if="!isDoctor" to="PatientProfile">
+            <RouterLink v-if="!isDoctor" :to="getUrl('patient/profile')">
                 <!-- TODO:remove style -->
                 <p style="font-weight: 400;" class="m-0 p-0 text-muted white-text">
                     {{ user.firstName + ' ' + user.surname }}
                 </p>
             </RouterLink>
-            <RouterLink v-else to="MedicProfile">
+            <RouterLink v-else :to="getUrl('doctor/profile')">
                 <p style="font-weight: 400;" class="m-0 p-0 text-muted white-text">
                     {{ user.firstName + ' ' + user.surname }}
                 </p>

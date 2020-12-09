@@ -44,7 +44,7 @@
                 </div>
             </div>
             <div class="form-row justify-content-between align-items-end mt-2">
-                <RouterLink class="form-link" to="Signup">{{ $t('CreateAccount') }}</RouterLink>
+                <RouterLink class="form-link" :to="getUrl('/signup')">{{ $t('CreateAccount') }}</RouterLink>
                 <button
                     @click="login"
                     :disabled="disabledButton"
@@ -123,7 +123,6 @@ export default class Login extends Vue {
         return this.password.length!=0;
     }
 
-    //TODO:check typescript
     getUrl(url:string):string{
         return createPath(url);
     }
