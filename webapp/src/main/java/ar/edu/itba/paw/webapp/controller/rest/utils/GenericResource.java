@@ -15,8 +15,10 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.ResponseBuilder;
 import javax.ws.rs.core.UriInfo;
 import java.io.UnsupportedEncodingException;
+import java.net.URI;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Paths;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Optional;
@@ -125,6 +127,10 @@ public abstract class GenericResource {
         }
 
         return responseBuilder;
+    }
+
+    protected URI joinPaths(String start, String... paths) {
+        return Paths.get(start, paths).toUri();
     }
 
     private String formatPaginatorUrl(int page, int perPage, UriInfo uriInfo) {

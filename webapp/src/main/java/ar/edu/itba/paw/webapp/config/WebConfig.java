@@ -62,6 +62,8 @@ public class WebConfig {
     private String DB_DB;
     @Value("${app.host}")
     private String baseUrl;
+    @Value("${app.api.path}")
+    private String apiPath;
 
     //Used in addition of @PropertySource
     @Bean
@@ -71,7 +73,12 @@ public class WebConfig {
 
     @Bean
     public String baseUrl(){
-        return "http://" + baseUrl;
+        return "http://" + this.baseUrl;
+    }
+
+    @Bean
+    public String apiPath(){
+        return this.apiPath;
     }
 
     @Bean

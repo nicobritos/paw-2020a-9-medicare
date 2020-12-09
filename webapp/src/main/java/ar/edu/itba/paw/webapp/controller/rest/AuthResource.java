@@ -13,6 +13,7 @@ import ar.edu.itba.paw.webapp.media_types.ErrorMIME;
 import ar.edu.itba.paw.webapp.media_types.UserMIME;
 import ar.edu.itba.paw.webapp.models.UserCredentials;
 import ar.edu.itba.paw.webapp.models.UserMe;
+import ar.edu.itba.paw.webapp.models.UserMeFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -75,14 +76,12 @@ public class AuthResource extends GenericAuthenticationResource {
             return Response.status(Status.INTERNAL_SERVER_ERROR).build();
         }
 
-        UserMe userMe = new UserMe();
-        userMe.setUser(userOptional.get());
-
+        UserMe userMe;
         Collection<Doctor> doctors = this.doctorService.findByUser(userOptional.get());
         if (doctors.size() == 0) {
-            userMe.setPatients(this.patientService.findByUser(userOptional.get()));
+            userMe = UserMeFactory.withPatients(userOptional.get(), this.patientService.findByUser(userOptional.get()));
         } else {
-            userMe.setDoctors(doctors);
+            userMe = UserMeFactory.withDoctors(userOptional.get(), doctors);
         }
 
         return Response

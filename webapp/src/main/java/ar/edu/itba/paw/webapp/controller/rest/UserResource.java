@@ -8,10 +8,7 @@ import ar.edu.itba.paw.webapp.controller.rest.utils.GenericAuthenticationResourc
 import ar.edu.itba.paw.webapp.media_types.ErrorMIME;
 import ar.edu.itba.paw.webapp.media_types.MIMEHelper;
 import ar.edu.itba.paw.webapp.media_types.UserMIME;
-import ar.edu.itba.paw.webapp.models.DoctorSignUp;
-import ar.edu.itba.paw.webapp.models.PatientSignUp;
-import ar.edu.itba.paw.webapp.models.UserCredentials;
-import ar.edu.itba.paw.webapp.models.UserSignUp;
+import ar.edu.itba.paw.webapp.models.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,9 +20,9 @@ import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.Response;
-import javax.ws.rs.core.Response.ResponseBuilder;
 import javax.ws.rs.core.Response.Status;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -40,9 +37,13 @@ public class UserResource extends GenericAuthenticationResource {
     private LocalityService localityService;
     @Autowired
     private UserService userService;
+    @Autowired
+    private String baseUrl;
+    @Autowired
+    private String apiPath;
 
     @POST
-    @Produces({UserMIME.GET, ErrorMIME.ERROR})
+    @Produces({UserMIME.ME, ErrorMIME.ERROR})
     @Consumes(UserMIME.CREATE_DOCTOR)
     public Response createDoctor(
             DoctorSignUp doctorSignUp,
@@ -99,11 +100,16 @@ public class UserResource extends GenericAuthenticationResource {
         doctor.setPhone(office.getPhone());
         doctor.setEmail(office.getEmail());
 
-        return this.finishSignUp(request, response, doctorSignUp, this.userService.createAsDoctor(user, doctor));
+        User newUser = this.userService.createAsDoctor(user, doctor);
+        this.finishSignUp(request, response, doctorSignUp, newUser);
+        return Response
+                .created(this.joinPaths(this.baseUrl, this.apiPath, "/users/" + newUser.getId()))
+                .entity(UserMeFactory.withDoctors(newUser, Collections.singletonList(doctor)))
+                .build();
     }
 
     @POST
-    @Produces({UserMIME.GET, ErrorMIME.ERROR})
+    @Produces({UserMIME.ME, ErrorMIME.ERROR})
     @Consumes(UserMIME.CREATE_PATIENT)
     public Response createPatient(
             PatientSignUp patientSignUp,
@@ -116,7 +122,12 @@ public class UserResource extends GenericAuthenticationResource {
         if (this.userService.findByUsername(patientSignUp.getUser().getEmail()).isPresent())
             return this.error(Status.BAD_REQUEST.getStatusCode(), Status.BAD_REQUEST.toString());
 
-        return this.finishSignUp(request, response, patientSignUp, this.userService.create(this.copyUser(patientSignUp)));
+        User newUser = this.userService.create(this.copyUser(patientSignUp));
+        this.finishSignUp(request, response, patientSignUp, newUser);
+        return Response
+                .created(this.joinPaths(this.baseUrl, this.apiPath, "/users/" + newUser.getId()))
+                .entity(UserMeFactory.withPatients(newUser, Collections.emptyList()))
+                .build();
     }
 
     @GET
@@ -179,18 +190,13 @@ public class UserResource extends GenericAuthenticationResource {
         return user;
     }
 
-    private Response finishSignUp(HttpServletRequest request, HttpServletResponse response, UserSignUp userSignUp, User newUser) {
+    private void finishSignUp(HttpServletRequest request, HttpServletResponse response, UserSignUp userSignUp, User newUser) {
         userService.generateVerificationToken(newUser, request.getLocale(), "/verify");
-
-        ResponseBuilder responseBuilder = Response.status(Status.CREATED);
 
         UserCredentials credentials = new UserCredentials();
         credentials.setUsername(userSignUp.getUser().getEmail());
         credentials.setPassword(userSignUp.getUser().getPassword());
 
         this.createJWTCookies(credentials, newUser, response, LOGGER);
-        return responseBuilder
-                .entity(newUser)
-                .build();
     }
 }
