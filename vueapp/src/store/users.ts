@@ -5,50 +5,69 @@ import {RootState} from '~/store/types/root.types';
 import {Nullable} from '~/logic/Utils';
 import {Module} from 'vuex';
 import {UserService} from '~/logic/interfaces/services/UserService';
-import {UserActions, UserMutations, UserState} from '~/store/types/user.types';
+import {UserActionReturnTypes, UserActions, UserMutations, UserState} from '~/store/types/user.types';
 import {User} from '~/logic/models/User';
+import {authActionTypes, authMutationTypes} from '~/store/types/auth.types';
+import {APIError} from '~/logic/models/APIError';
 
 function getService(): UserService {
     return container.get(TYPES.Services.UserService);
 }
 
-const state = (): UserState => ({
-    _loadingPromise: {
-        promise: null,
-        loaded: false
-    } as UserState['_loadingPromise'],
-    user: null as Nullable<User>
-});
-
-const actions: DefineActionTree<UserActions, UserState, RootState> = {
-    async getUser({state, commit}, {payload}) {
-        // try {
-            // let data = await getService().get(me);
-            // commit(provinceMutationTypes.setProvince({countryId: data?.country.id, data: data, id: payload.id}));
-            // return data;
-        // } catch (e) {
-        //     console.error(e);
-        //     throw e;
-        // }
-    }
-};
-
-const mutations: DefineMutationTree<UserMutations, UserState> = {
-    setPromise(state, {payload}): void {
-        state._loadingPromise.promise = payload;
+const actions: DefineActionTree<UserActions, UserState, RootState, UserActionReturnTypes> = {
+    async getUser({state, commit}, {payload}): Nullable<User> {
+        try {
+            return await getService().get(payload);
+        } catch (e) {
+            console.error(e);
+            return null;
+        }
     },
-    setUser(state, {payload}): void {
-        state.user = payload;
-        state._loadingPromise.loaded = true;
-        state._loadingPromise.promise = null;
+
+    async updateUser({state, commit}, {payload}) {
+        try {
+            return await getService().update(payload.id, payload.user);
+        } catch (e) {
+            console.error(e);
+            return null;
+        }
+    },
+
+    async createAsDoctor({state, commit, dispatch}, {payload}) {
+        try {
+            let userDoctor = await getService().createAsDoctor(payload.doctor);
+            if (userDoctor instanceof APIError) {
+                console.error(userDoctor); // TODO: Guido
+                return;
+            }
+
+            commit('auth/setUser', authMutationTypes.setUser(userDoctor.user));
+            commit('auth/setDoctors', authMutationTypes.setDoctors(userDoctor.doctors));
+        } catch (e) {
+            console.error(e);
+        }
+    },
+
+    async createAsPatient({state, commit}, {payload}) {
+        try {
+            let userPatient = await getService().createAsPatient(payload.patient);
+            if (userPatient instanceof APIError) {
+                console.error(userPatient); // TODO: Guido
+                return;
+            }
+
+            commit('auth/setUser', authMutationTypes.setUser(userPatient.user));
+            commit('auth/setPatients', authMutationTypes.setPatients(userPatient.patients));
+        } catch (e) {
+            console.error(e);
+            return null;
+        }
     }
 };
 
 const store: Module<any, any> = {
     namespaced: true,
-    actions,
-    mutations,
-    state
+    actions
 };
 
 export default store;

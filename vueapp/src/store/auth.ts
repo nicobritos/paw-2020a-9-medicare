@@ -16,7 +16,8 @@ function getService(): AuthService {
 
 const state = (): AuthState => ({
     _userLoading: {
-        promise: null
+        promise: null,
+        loaded: false
     },
     loggingIn: false,
     loggingOut: false,
@@ -104,6 +105,7 @@ const mutations: DefineMutationTree<AuthMutations, AuthState> = {
 
         state.user = payload;
         state._userLoading.promise = null;
+        state._userLoading.loaded = true;
     },
     setPatients(state, {payload}): void {
         state.patients = payload;

@@ -135,7 +135,7 @@ public class JWTAuthenticator {
         int maxAge = token.isEmpty() ? 0 : (int) ((System.currentTimeMillis() + Constants.JWT_REFRESH_EXPIRATION_MILLIS) / 1000);
         cookie.setMaxAge(maxAge); // Seconds
         cookie.setDomain(this.APP_HOST);
-        cookie.setPath(this.APP_SUBPATH + Constants.AUTH_ENDPOINT);
+        cookie.setPath(this.APP_SUBPATH + '/' + Constants.AUTH_ENDPOINT);
 
         return cookie;
     }

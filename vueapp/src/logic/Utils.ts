@@ -11,7 +11,22 @@ export function isValidEmail(email: string): boolean {
     return re.test(email);
 }
 
+function _joinPath(start: string, end: string): string {
+    if (start.endsWith('/') && end.startsWith('/')) {
+        return start + end.substring(-1);
+    }
+    if (!start.endsWith('/') && !end.startsWith('/')) {
+        return start + '/' + end;
+    }
+    return start + end;
+}
+
 export function createPath(path: string): string {
     // @ts-ignore
-    return process.env.VUE_APP_API_PATH + path;
+    return _joinPath(process.env.VUE_APP_ROOT_PATH, path);
+}
+
+export function createApiPath(path: string): string {
+    // @ts-ignore
+    return _joinPath(createPath(process.env.VUE_APP_API_PATH), path);
 }

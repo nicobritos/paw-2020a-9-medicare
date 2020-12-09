@@ -11,6 +11,7 @@ import ar.edu.itba.paw.webapp.media_types.MIMEHelper;
 import ar.edu.itba.paw.webapp.media_types.parsers.serializers.UserMeSerializer;
 import ar.edu.itba.paw.webapp.models.UserCredentials;
 import ar.edu.itba.paw.webapp.models.UserMe;
+import ar.edu.itba.paw.webapp.models.UserMeFactory;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.exc.UnrecognizedPropertyException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -97,14 +98,12 @@ public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilte
         ar.edu.itba.paw.models.User user = this.userService.findByUsername(((User) authentication.getPrincipal()).getUsername()).get();
         this.authenticator.createAndRefreshJWT(authentication, user, response);
 
-        UserMe userMe = new UserMe();
-        userMe.setUser(user);
-
+        UserMe userMe;
         Collection<Doctor> doctors = this.doctorService.findByUser(user);
         if (doctors.size() == 0) {
-            userMe.setPatients(this.patientService.findByUser(user));
+            userMe = UserMeFactory.withPatients(user, this.patientService.findByUser(user));
         } else {
-            userMe.setDoctors(doctors);
+            userMe = UserMeFactory.withDoctors(user, doctors);
         }
 
         response.setStatus(Status.OK.getStatusCode());

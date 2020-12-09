@@ -1,6 +1,7 @@
 import {APIError} from '~/logic/models/APIError';
 import {User} from '~/logic/models/User';
 import {Nullable} from '~/logic/Utils';
+import {UserDoctors, UserPatients} from '~/logic/interfaces/services/AuthService';
 
 interface CreateUser {
     email: string;
@@ -29,9 +30,10 @@ export interface UpdateUser {
 
 export interface UserService {
     // TODO: API Doc ver 404
-    createAsDoctor(doctor: CreateUserDoctor): Promise<User | APIError>;
+    // TODO: API
+    createAsDoctor(doctor: CreateUserDoctor): Promise<UserDoctors | APIError>;
 
-    createAsPatient(patient: CreateUserPatient): Promise<User | APIError>;
+    createAsPatient(patient: CreateUserPatient): Promise<UserPatients | APIError>;
 
     get(id: number): Promise<Nullable<User>>;
 

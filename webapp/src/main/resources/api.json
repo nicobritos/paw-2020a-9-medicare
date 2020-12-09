@@ -826,7 +826,7 @@
                 },
                 "responses": {
                     "201": {
-                        "$ref": "#/components/responses/get-user"
+                        "$ref": "#/components/responses/get-user-me"
                     },
                     "404": {
                         "$ref": "#/components/responses/error-404"
