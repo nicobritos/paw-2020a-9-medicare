@@ -40,6 +40,20 @@ create table picture
     data       bytea  not null
 );
 
+create table verification_token
+(
+    verification_token_id serial not null primary key ,
+    token text not null,
+    created_date timestamp not null
+);
+
+create table refresh_token
+(
+    refresh_token_id serial not null primary key,
+    token text not null,
+    created_date timestamp not null
+);
+
 create table users
 (
     email      text   not null,
@@ -165,20 +179,6 @@ create table workday
     start_minute int    not null default 0,
     end_minute   int    not null default 0,
     day          text   not null
-);
-
-create table verification_token
-(
-    verification_token_id serial not null primary key ,
-    token text not null,
-    created_date timestamp not null
-);
-
-create table refresh_token
-(
-    refresh_token_id serial not null primary key,
-    token text not null,
-    created_date timestamp not null
 );
 
 create unique index system_country_country_id_uindex
