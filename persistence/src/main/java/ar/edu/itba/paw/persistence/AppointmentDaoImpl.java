@@ -230,7 +230,7 @@ public class AppointmentDaoImpl extends GenericDaoImpl<Appointment, Integer> imp
     }
 
     @Override
-    public List<Appointment> findAllAppointmentsToNotifyFrom(LocalDateTime from) {
+    public List<Appointment> findAllAppointmentsInIntervalToNotify(LocalDateTime from, LocalDateTime to) {
         if (from == null)
             throw new IllegalArgumentException();
 
@@ -240,8 +240,11 @@ public class AppointmentDaoImpl extends GenericDaoImpl<Appointment, Integer> imp
 
         query.select(root);
         query.where(builder.and(
-                builder.equal(root.get(Appointment_.wasNotificationEmailSent),true),
-                builder.greaterThanOrEqualTo(root.get(Appointment_.fromDate), from)
+                builder.equal(root.get(Appointment_.wasNotificationEmailSent),false),
+                builder.and(
+                        builder.greaterThanOrEqualTo(root.get(Appointment_.fromDate), from),
+                        builder.lessThanOrEqualTo(root.get(Appointment_.fromDate), to)
+                )
         ));
         query.where(builder.greaterThanOrEqualTo(root.get(Appointment_.fromDate), from));
 

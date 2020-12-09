@@ -6,6 +6,7 @@ import ar.edu.itba.paw.models.Appointment;
 import ar.edu.itba.paw.models.User;
 import org.apache.commons.text.StringSubstitutor;
 import org.joda.time.DateTime;
+import org.joda.time.LocalDateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -338,7 +339,7 @@ public class EmailServiceImpl implements EmailService {
             default:
                 month = null;
         }
-        String doctorHtml = null;
+        String doctorHtml;
         try {
             doctorHtml = getNotifyingDoctorHtml(
                     baseUrl, appointment.getDoctor().getUser(), appointment.getPatient().getUser(), appointment,
@@ -350,7 +351,7 @@ public class EmailServiceImpl implements EmailService {
                     appointment.getDoctor(), appointment, e.getMessage());
             return;
         }
-        String patientHtml = null;
+        String patientHtml;
         try {
             patientHtml = getNotifyingPatientHtml(
                     baseUrl, appointment.getDoctor().getUser(), appointment.getPatient().getUser(), appointment,
@@ -389,10 +390,26 @@ public class EmailServiceImpl implements EmailService {
     @PostConstruct
     @Override
     public void initScheduleEmails() {
-        List<Appointment> appointments = appointmentService.findAllAppointmentsToNotify();
+        // For the first time the server runs
+        LocalDateTime now = LocalDateTime.now();
+        List<Appointment> appointments = appointmentService.findAllAppointmentsInIntervalToNotify(now, now.plusDays(2));
         for (Appointment appointment: appointments){
             scheduleNotifyAppointmentEmail(appointment, appointment.getLocale());
         }
+        // For the following days
+        timer.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                timer.cancel();
+                timer.purge();
+                timer = new Timer();
+                LocalDateTime now = LocalDateTime.now();
+                List<Appointment> appointments = appointmentService.findAllAppointmentsInIntervalToNotify(now.plusDays(1).minusMinutes(30), now.plusDays(1));
+                for (Appointment appointment: appointments){
+                    scheduleNotifyAppointmentEmail(appointment, appointment.getLocale());
+                }
+            }
+        }, now.plusDays(1).toDate());
     }
 
     private String getCancellingHTML(String baseUrl, User userCancelling, String userTitle, Appointment appointment, String dow, String month, String link, boolean isCancellingDoctor, Locale locale) throws IOException {

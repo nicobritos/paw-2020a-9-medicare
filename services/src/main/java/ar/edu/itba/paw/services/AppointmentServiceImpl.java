@@ -128,8 +128,6 @@ public class AppointmentServiceImpl extends GenericServiceImpl<AppointmentDao, A
         try {
             emailService.sendNewAppointmentNotificationEmail(
                     appointment, locale);
-            emailService.scheduleNotifyAppointmentEmail(
-                    appointment, locale);
         } catch (MessagingException e) {
             LOGGER.error("Couldn't send new appointment email to: {}, to notify appointment: {}", appointment.getDoctor().getEmail(), appointment);
         }
@@ -247,8 +245,8 @@ public class AppointmentServiceImpl extends GenericServiceImpl<AppointmentDao, A
     }
 
     @Override
-    public List<Appointment> findAllAppointmentsToNotify() {
-        return this.appointmentRepository.findAllAppointmentsToNotifyFrom(LocalDateTime.now());
+    public List<Appointment> findAllAppointmentsInIntervalToNotify(LocalDateTime from, LocalDateTime to) {
+        return this.appointmentRepository.findAllAppointmentsInIntervalToNotify(LocalDateTime.now(), to);
     }
 
     @Override

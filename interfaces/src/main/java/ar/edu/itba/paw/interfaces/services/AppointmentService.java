@@ -49,7 +49,7 @@ public interface AppointmentService extends GenericService<Appointment, Integer>
 
     Map<Workday, Integer> appointmentQtyByWorkdayOfUser(User user);
 
-    List<Appointment> findAllAppointmentsToNotify();
+    List<Appointment> findAllAppointmentsInIntervalToNotify(LocalDateTime from, LocalDateTime to);
 
     @Override
     @Deprecated
