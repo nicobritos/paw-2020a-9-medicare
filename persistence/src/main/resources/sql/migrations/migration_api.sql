@@ -1,11 +1,3 @@
-alter table users rename column token to verification_token;
-
-alter table users rename column token_created_date to verification_token_created_date;
-
-alter table users
-    add refresh_token text;
-
-
 create table verification_token
 (
     verification_token_id serial not null,
@@ -34,19 +26,13 @@ alter table refresh_token
     add constraint refresh_token_pk
         primary key (refresh_token_id);
 
-alter table users drop column verification_token_created_date;
-
 alter table users
     add verification_token_id int;
 
 alter table users
     add refresh_token_id int;
 
-alter table users drop column refresh_token;
-
 drop index users_token_uindex;
-
-alter table users drop column verification_token;
 
 create index users_verification_token_id_index
     on users (verification_token_id);
