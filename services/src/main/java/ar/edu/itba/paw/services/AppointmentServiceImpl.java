@@ -109,7 +109,7 @@ public class AppointmentServiceImpl extends GenericServiceImpl<AppointmentDao, A
     }
 
     @Override
-    public Appointment create(Appointment model, Locale locale) throws InvalidAppointmentDateException {
+    public Appointment create(Appointment model) throws InvalidAppointmentDateException {
         if (model.getFromDate().getMinuteOfHour() % 15 != 0)
             throw new InvalidMinutesException();
         if (!this.isValidDate(model.getDoctor(), model.getFromDate()))
@@ -127,7 +127,7 @@ public class AppointmentServiceImpl extends GenericServiceImpl<AppointmentDao, A
         Appointment appointment = this.appointmentRepository.create(model);
         try {
             emailService.sendNewAppointmentNotificationEmail(
-                    appointment, locale);
+                    appointment);
         } catch (MessagingException e) {
             LOGGER.error("Couldn't send new appointment email to: {}, to notify appointment: {}", appointment.getDoctor().getEmail(), appointment);
         }

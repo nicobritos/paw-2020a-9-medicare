@@ -13,11 +13,11 @@ public interface EmailService {
                                                   User userCancelled, Appointment appointment,
                                                   Locale locale) throws MessagingException;
 
-    void sendNewAppointmentNotificationEmail(Appointment appointment, Locale locale) throws MessagingException;
+    void sendNewAppointmentNotificationEmail(Appointment appointment) throws MessagingException;
 
     void sendEmailConfirmationEmail(User user, String token, String confirmationPageRelativeUrl, Locale locale) throws MessagingException;
 
-    void scheduleNotifyAppointmentEmail(Appointment appointment, Locale locale);
+    void scheduleNotifyAppointmentEmail(Appointment appointment);
 
     @PostConstruct
     void initScheduleEmails();

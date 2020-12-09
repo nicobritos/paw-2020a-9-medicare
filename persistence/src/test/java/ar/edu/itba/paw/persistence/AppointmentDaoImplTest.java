@@ -72,6 +72,8 @@ public class AppointmentDaoImplTest {
     private static final int MINUTE = 0;
     private static final int HOUR_2 = 15;
     private static final int MINUTE_2 = 0;
+    private static final boolean WAS_NOTIFICATION_EMAIL_SENT = true;
+    private static final Locale LOCALE = new Locale("es");
 
     private static final int USER_ID_1 = STARTING_ID;
     private static final int USER_ID_2 = STARTING_ID + 1;
@@ -196,8 +198,8 @@ public class AppointmentDaoImplTest {
         u.setSurname(SURNAME);
         u.setPhone(PHONE);
         u.setProfilePicture(pictureModel());
-//        u.setVerificationToken(TOKEN);
-//        u.setVerificationTokenCreatedDate(null);
+        u.setVerificationToken(null);
+        u.setRefreshToken(null);
         u.setVerified(true);
         u.setId(USER_ID_1);
         return u;
@@ -374,8 +376,8 @@ public class AppointmentDaoImplTest {
         map.put("email", EMAIL);
         map.put("phone", PHONE);
         map.put("profile_id", PROFILE_ID_1);
-        map.put("token", TOKEN);
-        map.put("token_created_date", null);
+        map.put("verification_token_id", null);
+        map.put("refresh_token_id", null);
         userJdbcInsert.execute(map);
     }
 
@@ -399,8 +401,8 @@ public class AppointmentDaoImplTest {
         map.put("email", EMAIL_2);
         map.put("phone", PHONE_2);
         map.put("profile_id", PROFILE_ID_2);
-        map.put("token", TOKEN);
-        map.put("token_created_date", null);
+        map.put("verification_token_id", null);
+        map.put("refresh_token_id", null);
         userJdbcInsert.execute(map);
     }
 
@@ -541,6 +543,8 @@ public class AppointmentDaoImplTest {
         appointmentMap.put("from_date", FROM_DATE);
         appointmentMap.put("motive", MOTIVE);
         appointmentMap.put("message", MESSAGE);
+        appointmentMap.put("locale", LOCALE.getDisplayName());
+        appointmentMap.put("was_notification_email_sent", WAS_NOTIFICATION_EMAIL_SENT);
         appointmentJdbcInsert.execute(appointmentMap);
     }
 
@@ -554,6 +558,8 @@ public class AppointmentDaoImplTest {
         appointmentMap.put("from_date", FROM_DATE_2);
         appointmentMap.put("motive", MOTIVE);
         appointmentMap.put("message", MESSAGE);
+        appointmentMap.put("locale", LOCALE.getDisplayName());
+        appointmentMap.put("was_notification_email_sent", WAS_NOTIFICATION_EMAIL_SENT);
         appointmentJdbcInsert.execute(appointmentMap);
     }
 
@@ -566,6 +572,8 @@ public class AppointmentDaoImplTest {
         appointment.setMessage(MESSAGE);
         appointment.setMotive(MOTIVE);
         appointment.setId(APPOINTMENT_ID_1);
+        appointment.setWasNotificationEmailSent(WAS_NOTIFICATION_EMAIL_SENT);
+        appointment.setLocale(LOCALE);
         return appointment;
     }
 

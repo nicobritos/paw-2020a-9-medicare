@@ -162,8 +162,8 @@ public class EmailServiceImpl implements EmailService {
     }
 
     @Override
-    public void sendNewAppointmentNotificationEmail(Appointment appointment, Locale locale) throws MessagingException {
-        String subject = this.messageSource.getMessage("appointment.new.email.subject", null, locale);
+    public void sendNewAppointmentNotificationEmail(Appointment appointment) throws MessagingException {
+        String subject = this.messageSource.getMessage("appointment.new.email.subject", null, appointment.getLocale());
         String dowMessage;
         switch (appointment.getFromDate().getDayOfWeek()) {
             case MONDAY:
@@ -231,13 +231,13 @@ public class EmailServiceImpl implements EmailService {
             default:
                 month = null;
         }
-        String html = null;
+        String html;
         try {
             html = getNewAppointmentHTML(
                     baseUrl, appointment.getDoctor().getUser(), appointment.getPatient().getUser(), appointment,
-                    this.messageSource.getMessage(dowMessage, null, locale),
-                    this.messageSource.getMessage(month, null, locale),
-                    locale, appointment.getMotive(), appointment.getMessage());
+                    this.messageSource.getMessage(dowMessage, null, appointment.getLocale()),
+                    this.messageSource.getMessage(month, null, appointment.getLocale()),
+                    appointment.getLocale(), appointment.getMotive(), appointment.getMessage());
         } catch (IOException e) {
             LOGGER.error("Couldn't send new appointment email to doctor: {}, to notify appointment: {} caused by: {}",
                     appointment.getDoctor(), appointment, e.getMessage());
@@ -257,7 +257,7 @@ public class EmailServiceImpl implements EmailService {
         } catch (UnsupportedEncodingException e) {
             throw new RuntimeException("Error converting token to UTF-8");
         }
-        String html = null;
+        String html;
         try {
             html = getConfirmationHTML(baseUrl, confirmationUrl, user, locale);
         } catch (IOException e) {
@@ -269,9 +269,9 @@ public class EmailServiceImpl implements EmailService {
     }
 
     @Override
-    public void scheduleNotifyAppointmentEmail(Appointment appointment, Locale locale) {
-        String doctorSubject = this.messageSource.getMessage("appointment.notification.email.doctor.subject", null, locale);
-        String patientSubject = this.messageSource.getMessage("appointment.notification.email.patient.subject", null, locale);
+    public void scheduleNotifyAppointmentEmail(Appointment appointment) {
+        String doctorSubject = this.messageSource.getMessage("appointment.notification.email.doctor.subject", null, appointment.getLocale());
+        String patientSubject = this.messageSource.getMessage("appointment.notification.email.patient.subject", null, appointment.getLocale());
         String dowMessage;
         switch (appointment.getFromDate().getDayOfWeek()) {
             case MONDAY:
@@ -343,9 +343,9 @@ public class EmailServiceImpl implements EmailService {
         try {
             doctorHtml = getNotifyingDoctorHtml(
                     baseUrl, appointment.getDoctor().getUser(), appointment.getPatient().getUser(), appointment,
-                    this.messageSource.getMessage(dowMessage, null, locale),
-                    this.messageSource.getMessage(month, null, locale),
-                    locale, appointment.getMotive(), appointment.getMessage());
+                    this.messageSource.getMessage(dowMessage, null, appointment.getLocale()),
+                    this.messageSource.getMessage(month, null, appointment.getLocale()),
+                    appointment.getLocale(), appointment.getMotive(), appointment.getMessage());
         } catch (IOException e) {
             LOGGER.error("Couldn't send notifying appointment email to doctor: {}, to notify appointment: {} caused by: {}",
                     appointment.getDoctor(), appointment, e.getMessage());
@@ -355,9 +355,9 @@ public class EmailServiceImpl implements EmailService {
         try {
             patientHtml = getNotifyingPatientHtml(
                     baseUrl, appointment.getDoctor().getUser(), appointment.getPatient().getUser(), appointment,
-                    this.messageSource.getMessage(dowMessage, null, locale),
-                    this.messageSource.getMessage(month, null, locale),
-                    locale, appointment.getMotive(), appointment.getMessage());
+                    this.messageSource.getMessage(dowMessage, null, appointment.getLocale()),
+                    this.messageSource.getMessage(month, null, appointment.getLocale()),
+                    appointment.getLocale(), appointment.getMotive(), appointment.getMessage());
         } catch (IOException e) {
             LOGGER.error("Couldn't send notifying appointment email to patient: {}, to notify appointment: {} caused by: {}",
                     appointment.getPatient(), appointment, e.getMessage());
@@ -394,7 +394,7 @@ public class EmailServiceImpl implements EmailService {
         LocalDateTime now = LocalDateTime.now();
         List<Appointment> appointments = appointmentService.findAllAppointmentsInIntervalToNotify(now, now.plusDays(2));
         for (Appointment appointment: appointments){
-            scheduleNotifyAppointmentEmail(appointment, appointment.getLocale());
+            scheduleNotifyAppointmentEmail(appointment);
         }
         // For the following days
         timer.schedule(new TimerTask() {
@@ -406,7 +406,7 @@ public class EmailServiceImpl implements EmailService {
                 LocalDateTime now = LocalDateTime.now();
                 List<Appointment> appointments = appointmentService.findAllAppointmentsInIntervalToNotify(now.plusDays(1).minusMinutes(30), now.plusDays(1));
                 for (Appointment appointment: appointments){
-                    scheduleNotifyAppointmentEmail(appointment, appointment.getLocale());
+                    scheduleNotifyAppointmentEmail(appointment);
                 }
             }
         }, now.plusDays(1).toDate());

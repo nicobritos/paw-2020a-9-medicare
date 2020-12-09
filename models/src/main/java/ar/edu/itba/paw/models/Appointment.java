@@ -41,9 +41,7 @@ public class Appointment extends GenericModel<Integer> {
     private Doctor doctor;
     @Column(name = "locale", nullable = false)
     private String locale;
-    @Column(name = "base_url", nullable = false)
-    private String baseUrl;
-    @Column(name = "email_sent", nullable = false)
+    @Column(name = "was_notification_email_sent", nullable = false)
     private boolean wasNotificationEmailSent;
 
     @Override
@@ -114,14 +112,6 @@ public class Appointment extends GenericModel<Integer> {
 
     public void setLocale(Locale locale) {
         this.locale = locale.toString();
-    }
-
-    public String getBaseUrl() {
-        return baseUrl;
-    }
-
-    public void setBaseUrl(String baseUrl) {
-        this.baseUrl = baseUrl;
     }
 
     public boolean wasNotificationEmailSent() {

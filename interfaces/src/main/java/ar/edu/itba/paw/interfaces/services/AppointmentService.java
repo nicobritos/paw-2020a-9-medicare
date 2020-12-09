@@ -59,13 +59,7 @@ public interface AppointmentService extends GenericService<Appointment, Integer>
 
     void remove(Integer id, User user, Locale locale);
 
-    @Override
-    @Deprecated
-    default Appointment create(Appointment model){
-        throw new UnsupportedOperationException();
-    }
-
-    Appointment create(Appointment model, Locale locale) throws InvalidAppointmentDateException;
+    Appointment create(Appointment model) throws InvalidAppointmentDateException;
 
     List<List<AppointmentTimeSlot>> findTimeslotsSortedByWeekday(Doctor doctor, LocalDateTime from, LocalDateTime to);
 }
