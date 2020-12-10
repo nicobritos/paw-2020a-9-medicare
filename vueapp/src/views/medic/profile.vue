@@ -244,6 +244,11 @@ export default class MedicProfile extends Vue {
 </script>
 
 <style scoped>
+.toggle-visibility{
+    position: absolute;
+    bottom: 1em;
+    right: 5em;
+}
 .header {
     background-color: #00C4BA;
 }
