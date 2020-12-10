@@ -34,7 +34,7 @@ public interface AppointmentService extends GenericService<Appointment, Integer>
 
     List<Appointment> findAppointmentsOfPatientsInDateInterval(Collection<Patient> patients, LocalDateTime from, LocalDateTime to);
 
-    List<Appointment> findByWorkday(Workday workday);
+    List<Appointment> findPendingByWorkday(Workday workday);
 
     void setStatus(Appointment appointment, AppointmentStatus status) throws
             AppointmentAlreadyCancelledException,

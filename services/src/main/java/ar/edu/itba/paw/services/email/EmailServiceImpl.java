@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
@@ -50,6 +51,7 @@ public class EmailServiceImpl implements EmailService {
     private static final String MESSAGE_CONFIRMATION_SOURCE_BODY_PREFIX = "signup.confirmation.email.body";
     private static final String MESSAGE_SOURCE_DISCLAIMER = "email.disclaimer";
 
+    @Async
     private void sendEmail(String to, String subject, String html) throws MessagingException{
         InternetAddress[] parsed;
         try {
@@ -69,12 +71,12 @@ public class EmailServiceImpl implements EmailService {
         javaMailSender.send(mailMessage);
     }
 
+    @Async
     @Override
-    public void sendCanceledAppointmentNotificationEmail(User userCancelling, boolean isDoctorCancelling,
-                                                         User userCancelled, Appointment appointment,
-                                                         Locale locale) throws MessagingException {
-        String subject = this.messageSource.getMessage("appointment.cancel.email.subject", null, locale);
-        String userTitle = isDoctorCancelling ? this.messageSource.getMessage("doctor", null, locale) : this.messageSource.getMessage("patient", null, locale);
+    public void sendCancelledAppointmentNotificationEmail(Appointment appointment, boolean isDoctorCancelling) {
+        String subject = this.messageSource.getMessage("appointment.cancel.email.subject", null, appointment.getLocale());
+        String userTitle = isDoctorCancelling ? this.messageSource.getMessage("doctor", null, appointment.getLocale())
+                : this.messageSource.getMessage("patient", null, appointment.getLocale());
         String dowMessage;
         switch (appointment.getFromDate().getDayOfWeek()) {
             case MONDAY:
@@ -143,26 +145,42 @@ public class EmailServiceImpl implements EmailService {
                 month = null;
         }
 
-        String html = null;
+        String html;
+        User userCancelling = isDoctorCancelling? appointment.getDoctor().getUser() : appointment.getPatient().getUser();
+        User userCancelled = isDoctorCancelling? appointment.getPatient().getUser() : appointment.getPatient().getUser();
         try {
             html = getCancellingHTML(baseUrl,
-                    userCancelling, userTitle, appointment,
-                    this.messageSource.getMessage(dowMessage, null, locale),
-                    this.messageSource.getMessage(month, null, locale),
+                    userCancelling,
+                    userTitle, appointment, this.messageSource.getMessage(dowMessage, null, appointment.getLocale()),
+                    this.messageSource.getMessage(month, null, appointment.getLocale()),
                     baseUrl + (isDoctorCancelling?"/mediclist/1":""),
-                    isDoctorCancelling,
-                    locale);
+                    isDoctorCancelling, appointment.getLocale());
         } catch (IOException e) {
             LOGGER.error("Couldn't send cancelling appointment email to user: {}, to notify appointment: {} caused by: {}",
                     userCancelled, appointment, e.getMessage());
             return;
         }
 
-        sendEmail(userCancelled.getEmail(), subject, html);
+        try {
+            sendEmail(isDoctorCancelling? appointment.getPatient().getUser().getEmail() : appointment.getDoctor().getUser().getEmail(),
+                    subject, html);
+        } catch (MessagingException e) {
+            LOGGER.error("Couldn't send cancelled appointment email to: {}, to notify appointment: {}",
+                    userCancelled, appointment);
+        }
     }
 
+    @Async
     @Override
-    public void sendNewAppointmentNotificationEmail(Appointment appointment) throws MessagingException {
+    public void sendCancelledAppointmentNotificationEmails(List<Appointment> appointments, boolean isDoctorCancelling) {
+        for (Appointment appointment : appointments){
+            sendCancelledAppointmentNotificationEmail(appointment, isDoctorCancelling);
+        }
+    }
+
+    @Async
+    @Override
+    public void sendNewAppointmentNotificationEmail(Appointment appointment) {
         String subject = this.messageSource.getMessage("appointment.new.email.subject", null, appointment.getLocale());
         String dowMessage;
         switch (appointment.getFromDate().getDayOfWeek()) {
@@ -244,11 +262,17 @@ public class EmailServiceImpl implements EmailService {
             return;
         }
 
-        sendEmail(appointment.getDoctor().getEmail(), subject, html);
+        try {
+            sendEmail(appointment.getDoctor().getEmail(), subject, html);
+        } catch (MessagingException e) {
+            LOGGER.error("Couldn't send new appointment email to: {}, to notify appointment: {}",
+                    appointment.getDoctor().getEmail(), appointment);
+        }
     }
 
+    @Async
     @Override
-    public void sendEmailConfirmationEmail(User user, String token, String confirmationPageRelativeUrl, Locale locale) throws MessagingException {
+    public void sendEmailConfirmationEmail(User user, String token, String confirmationPageRelativeUrl, Locale locale){
 
         String subject = this.messageSource.getMessage("signup.confirmation.email.subject", null, locale);
         String confirmationUrl;
@@ -265,9 +289,14 @@ public class EmailServiceImpl implements EmailService {
                     user, token, e.getMessage());
             return;
         }
-        sendEmail(user.getEmail(), subject, html);
+        try {
+            sendEmail(user.getEmail(), subject, html);
+        } catch (MessagingException e) {
+            LOGGER.error("Couldn't send email confirmation mail to: {}", user.getEmail());
+        }
     }
 
+    @Async
     @Override
     public void scheduleNotifyAppointmentEmail(Appointment appointment) {
         String doctorSubject = this.messageSource.getMessage("appointment.notification.email.doctor.subject", null, appointment.getLocale());
@@ -388,6 +417,7 @@ public class EmailServiceImpl implements EmailService {
     }
 
     @PostConstruct
+    @Async
     @Override
     public void initScheduleEmails() {
         // For the first time the server runs

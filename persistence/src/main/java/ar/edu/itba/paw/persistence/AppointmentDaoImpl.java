@@ -172,7 +172,7 @@ public class AppointmentDaoImpl extends GenericDaoImpl<Appointment, Integer> imp
     }
 
     @Override
-    public List<Appointment> findByWorkday(Workday workday) {
+    public List<Appointment> findPendingByWorkday(Workday workday) {
         if (workday == null || workday.getDoctor() == null || workday.getDay() == null)
             throw new IllegalArgumentException();
 

@@ -35,7 +35,7 @@ public interface AppointmentDao extends GenericDao<Appointment, Integer> {
 
     List<Appointment> findByPatientsFromDate(Collection<Patient> patients, LocalDateTime from);
 
-    List<Appointment> findByWorkday(Workday workday);
+    List<Appointment> findPendingByWorkday(Workday workday);
 
     List<Appointment> findAllAppointmentsInIntervalToNotify(LocalDateTime from, LocalDateTime to);
 
