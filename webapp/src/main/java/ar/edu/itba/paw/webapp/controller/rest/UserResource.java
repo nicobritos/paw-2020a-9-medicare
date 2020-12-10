@@ -50,7 +50,7 @@ public class UserResource extends GenericAuthenticationResource {
             @Context HttpServletRequest request,
             @Context HttpServletResponse response,
             @Context HttpHeaders httpheaders) {
-        MIMEHelper.assertServerType(httpheaders, UserMIME.GET);
+        MIMEHelper.assertServerType(httpheaders, UserMIME.ME);
         if (this.getUser().isPresent())
             return this.error(Status.FORBIDDEN.getStatusCode(), Status.FORBIDDEN.toString());
         if (this.userService.findByUsername(doctorSignUp.getUser().getEmail()).isPresent())
@@ -116,7 +116,7 @@ public class UserResource extends GenericAuthenticationResource {
             @Context HttpServletRequest request,
             @Context HttpServletResponse response,
             @Context HttpHeaders httpheaders) {
-        MIMEHelper.assertServerType(httpheaders, UserMIME.GET);
+        MIMEHelper.assertServerType(httpheaders, UserMIME.ME);
         if (this.getUser().isPresent())
             return this.error(Status.FORBIDDEN.getStatusCode(), Status.FORBIDDEN.toString());
         if (this.userService.findByUsername(patientSignUp.getUser().getEmail()).isPresent())
