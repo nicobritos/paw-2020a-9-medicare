@@ -1,7 +1,7 @@
 <template>
     <div
         class="container-fluid w-100 h-100 d-flex flex-column justify-content-center align-items-center login-container">
-        <div class="register-form border p-5 rounded">
+        <form class="register-form border p-5 rounded" @submit="submitForm">
             <div class="row">
                 <h6>Medicare <img :src='logo' id="logo"/></h6>
             </div>
@@ -46,7 +46,7 @@
             <div class="form-row justify-content-between align-items-end mt-2">
                 <RouterLink class="form-link" :to="getUrl('/signup')">{{ $t('CreateAccount') }}</RouterLink>
                 <b-button
-                    @click="login"
+                    type="submit"
                     :disabled="disabledButton||loggingIn"
                     variant="primary"
                 >
@@ -59,7 +59,7 @@
             <p v-if="invalidCredentials" class="mt-4 mb-0 text-danger">
                 {{ $t('InvalidCredentials.loginForm') }}
             </p>
-        </div>
+        </form>
     </div>
 </template>
 
@@ -113,6 +113,7 @@ export default class Login extends Vue {
 
     public login(e: Event) {
         e.preventDefault();
+        console.log("hola2")
         if (this.valid){
             this.$store.dispatch('auth/login', authActionTypes.login({
                 password: this.password,
@@ -120,6 +121,12 @@ export default class Login extends Vue {
             }));
         }
 
+    }
+
+    public submitForm(e:Event){
+        //TODO:nico
+        e.preventDefault();
+        return this.login(e);
     }
 
     get valid(): boolean {
