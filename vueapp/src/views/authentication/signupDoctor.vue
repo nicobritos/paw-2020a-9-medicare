@@ -220,24 +220,27 @@ export default class SignupDoctor extends Vue {
     }
 
     // TODO: Guido
-    public validate(): boolean {
-        return true;
+    get valid(): boolean {
+        return  this.validFirstname && this.validSurname && this.validEmail &&
+                this.validPassword && this.validRepeatPassword &&
+                this.validCountry && this.validProvince &&
+                this.validLocality && this.validAddress;
     }
 
     public submitForm(e: Event): void {
         e.preventDefault();
         e.stopPropagation();
-        this.validate();
-
-        this.$store.dispatch('users/createAsDoctor', userActionTypes.createAsDoctor({
-            doctor: {
-                email: this.email,
-                firstName: this.firstname,
-                password: this.password,
-                surname: this.surname,
-                specialtyIds: []
-            }
-        }));
+        if(this.valid){
+            this.$store.dispatch('users/createAsDoctor', userActionTypes.createAsDoctor({
+                doctor: {
+                    email: this.email,
+                    firstName: this.firstname,
+                    password: this.password,
+                    surname: this.surname,
+                    specialtyIds: []
+                }
+            }));
+        }
     }
 }
 </script>

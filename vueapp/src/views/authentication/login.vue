@@ -1,7 +1,7 @@
 <template>
     <div
         class="container-fluid w-100 h-100 d-flex flex-column justify-content-center align-items-center login-container">
-        <div class="register-form border p-5 rounded">
+        <form class="register-form border p-5 rounded" @submit="submitForm">
             <div class="row">
                 <h6>Medicare <img :src='logo' id="logo"/></h6>
             </div>
@@ -14,9 +14,10 @@
                 </div>
                 <div class="col-8">           
                     <!-- TODO: maybe add state to input -->
-                    <b-input v-model="email" class="form-control" type="email" name="medicare_email" id="medicare_email"/>
+                    <b-input    v-model="email" class="form-control" type="email" name="medicare_email" 
+                                id="medicare_email" @focus="setShowInvalid"/>
                     <!-- TODO:maybe expand email feedback-->
-                    <b-form-invalid-feedback :state="validEmail">{{$t("Email.signupForm.email")}}</b-form-invalid-feedback>
+                    <b-form-invalid-feedback v-if="showInvalid" :state="validEmail">{{$t("Email.signupForm.email")}}</b-form-invalid-feedback>
                 </div>
             </div>
             <div class="form-group row">
@@ -26,13 +27,13 @@
                 <div class="col-8">
                     <!-- TODO: maybe add state to input -->
                     <b-input v-model="password" class="form-control pr-5" :type='showPassword?"text":"password"' name="medicare_password"
-                           id="medicare_password"/>
+                           id="medicare_password" @focus="setShowInvalid"/>
                     <label for="medicare_password" class="toggle-visibility" @click="toggleShowPassword()">
                         <img v-if="!showPassword" :src='eye'>
                         <img v-else :src='noeye'>
                     </label>
                     <!-- TODO:maybe expand feedback -->
-                    <b-form-invalid-feedback :state="validPassword">{{$t("NotEmpty.signupForm.password")}}</b-form-invalid-feedback>
+                    <b-form-invalid-feedback v-if="showInvalid" :state="validPassword">{{$t("NotEmpty.signupForm.password")}}</b-form-invalid-feedback>
                 </div>
             </div>
             <div class="form-group row align-items-center">
@@ -45,16 +46,21 @@
             </div>
             <div class="form-row justify-content-between align-items-end mt-2">
                 <RouterLink class="form-link" :to="getUrl('/signup')">{{ $t('CreateAccount') }}</RouterLink>
-                <button
-                    @click="login"
-                    :disabled="disabledButton"
-                    class="btn btn-primary"
-                >{{ $t('Confirm') }}</button>
+                <b-button
+                    type="submit"
+                    :disabled="disabledButton||loggingIn"
+                    variant="primary"
+                >
+                    <span v-if="!loggingIn">{{ $t('Confirm') }}</span>
+                    <span v-else>
+                        <b-spinner small></b-spinner>
+                    </span>
+                </b-button>
             </div>
             <p v-if="invalidCredentials" class="mt-4 mb-0 text-danger">
                 {{ $t('InvalidCredentials.loginForm') }}
             </p>
-        </div>
+        </form>
     </div>
 </template>
 
@@ -75,16 +81,18 @@ export default class Login extends Vue {
     private eye = eye;
     private noeye = noeye;
     private showPassword = false;
+    private showInvalid = false;
     private invalidCredentials = false;
     private email = '';
     private password = '';
     @State(state => state.auth.user)
     private readonly user: Nullable<User>;
+    @State(state => state.auth.loggingIn)
+    private readonly loggingIn:boolean;
+
 
     get disabledButton(): boolean {
-        let trimmedEmail = this.email.trim();
-
-        return !(trimmedEmail.length > 2 && isValidEmail(trimmedEmail) && this.password.length > 0);
+        return !this.valid;
     }
 
     @Watch('user')
@@ -105,23 +113,34 @@ export default class Login extends Vue {
         this.showPassword = !this.showPassword;
     }
 
-    public login(e: Event) {
-        e.preventDefault();
-        if (this.disabledButton) return;
-        this.validate(); // TODO: Guido
-
-        this.$store.dispatch('auth/login', authActionTypes.login({
-            password: this.password,
-            email: this.email
-        }));
+    public setShowInvalid():void{
+        this.showInvalid = true;
     }
 
-    public validate(): boolean {
-        return true; // TODO: Guido
+    public login(e: Event) {
+        e.preventDefault();
+        console.log("hola2")
+        if (this.valid){
+            this.$store.dispatch('auth/login', authActionTypes.login({
+                password: this.password,
+                email: this.email
+            }));
+        }
+
+    }
+
+    public submitForm(e:Event){
+        //TODO:nico
+        e.preventDefault();
+        return this.login(e);
+    }
+
+    get valid(): boolean {
+        return this.validEmail && this.validPassword;
     }
 
     get validEmail():boolean{
-        return isValidEmail(this.email);
+        return isValidEmail(this.email.trim());
     }
 
     get validPassword():boolean{

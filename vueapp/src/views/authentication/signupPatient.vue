@@ -156,25 +156,25 @@ export default class SignupPatient extends Vue {
         return createPath(url);
     }
 
-    // TODO: Guido
-    public validate(): boolean {
-        return true;
+    get valid(): boolean {
+        return  this.validFirstname && this.validSurname && this.validEmail &&
+                this.validPassword && this.validRepeatPassword;
     }
 
     public submitForm(e: Event): void {
         e.preventDefault();
         e.stopPropagation();
 
-        this.validate();
-
-        this.$store.dispatch('users/createAsPatient', userActionTypes.createAsPatient({
-            patient: {
-                email: this.email,
-                firstName: this.firstname,
-                password: this.password,
-                surname: this.surname
-            }
-        }));
+        if(this.valid){
+            this.$store.dispatch('users/createAsPatient', userActionTypes.createAsPatient({
+                patient: {
+                    email: this.email,
+                    firstName: this.firstname,
+                    password: this.password,
+                    surname: this.surname
+                }
+            }));
+        }
     }
 }
 </script>

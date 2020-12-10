@@ -20,3 +20,9 @@ export default class NavbarLogo extends Vue {
     }
 }
 </script>
+
+<style scoped>
+#navbar-logo{
+    height: 2em;
+}
+</style>
