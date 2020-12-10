@@ -18,7 +18,6 @@ import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Paths;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Optional;
@@ -130,7 +129,21 @@ public abstract class GenericResource {
     }
 
     protected URI joinPaths(String start, String... paths) {
-        return Paths.get(start, paths).toUri();
+        StringBuilder end = new StringBuilder(start);
+
+        for (String path : paths) {
+            String endString = end.toString();
+
+            if (endString.endsWith("/") && path.startsWith("/")) {
+                end.append(path, 1, path.length());
+            } else if (endString.endsWith("/") || path.startsWith("/")) {
+                end.append(path);
+            } else {
+                end.append("/").append(path);
+            }
+        }
+
+        return URI.create(end.toString());
     }
 
     private String formatPaginatorUrl(int page, int perPage, UriInfo uriInfo) {
