@@ -90,9 +90,7 @@ export default class Login extends Vue {
     private readonly loggingIn:boolean;
 
     get disabledButton(): boolean {
-        let trimmedEmail = this.email.trim();
-
-        return !(trimmedEmail.length > 2 && isValidEmail(trimmedEmail) && this.password.length > 0);
+        return !this.valid;
     }
 
     @Watch('user')
@@ -115,21 +113,21 @@ export default class Login extends Vue {
 
     public login(e: Event) {
         e.preventDefault();
-        if (this.disabledButton) return;
-        this.validate(); // TODO: Guido
+        if (this.valid){
+            this.$store.dispatch('auth/login', authActionTypes.login({
+                password: this.password,
+                email: this.email
+            }));
+        }
 
-        this.$store.dispatch('auth/login', authActionTypes.login({
-            password: this.password,
-            email: this.email
-        }));
     }
 
-    public validate(): boolean {
-        return true; // TODO: Guido
+    get valid(): boolean {
+        return this.validEmail && this.validPassword;
     }
 
     get validEmail():boolean{
-        return isValidEmail(this.email);
+        return isValidEmail(this.email.trim());
     }
 
     get validPassword():boolean{
