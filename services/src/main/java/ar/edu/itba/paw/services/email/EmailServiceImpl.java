@@ -1,5 +1,6 @@
 package ar.edu.itba.paw.services.email;
 
+import ar.edu.itba.paw.interfaces.daos.AppointmentDao;
 import ar.edu.itba.paw.interfaces.services.AppointmentService;
 import ar.edu.itba.paw.interfaces.services.EmailService;
 import ar.edu.itba.paw.models.Appointment;
@@ -35,8 +36,12 @@ public class EmailServiceImpl implements EmailService {
     private JavaMailSender javaMailSender;
     @Autowired
     private MessageSource messageSource;
+
+    /* Cant include AppointmentService because of circular injections. Only needing findAllAppointmentsInIntervalToNotify
+     * method, so we can use the DAO without worrying.
+     */
     @Autowired
-    private AppointmentService appointmentService;
+    private AppointmentDao appointmentDao;
     @Autowired
     private String baseUrl;
 
@@ -421,7 +426,7 @@ public class EmailServiceImpl implements EmailService {
     public void initScheduleEmails() {
         // For the first time the server runs
         LocalDateTime now = LocalDateTime.now();
-        List<Appointment> appointments = appointmentService.findAllAppointmentsInIntervalToNotify(now, now.plusDays(2));
+        List<Appointment> appointments = appointmentDao.findAllAppointmentsInIntervalToNotify(now, now.plusDays(2));
         for (Appointment appointment: appointments){
             scheduleNotifyAppointmentEmail(appointment);
         }
@@ -433,7 +438,7 @@ public class EmailServiceImpl implements EmailService {
                 timer.purge();
                 timer = new Timer();
                 LocalDateTime now = LocalDateTime.now();
-                List<Appointment> appointments = appointmentService.findAllAppointmentsInIntervalToNotify(now.plusDays(1).minusMinutes(30), now.plusDays(1));
+                List<Appointment> appointments = appointmentDao.findAllAppointmentsInIntervalToNotify(now.plusDays(1).minusMinutes(30), now.plusDays(1));
                 for (Appointment appointment: appointments){
                     scheduleNotifyAppointmentEmail(appointment);
                 }
