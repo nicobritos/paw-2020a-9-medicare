@@ -14,9 +14,10 @@
                 </div>
                 <div class="col-8">           
                     <!-- TODO: maybe add state to input -->
-                    <b-input v-model="email" class="form-control" type="email" name="medicare_email" id="medicare_email"/>
+                    <b-input    v-model="email" class="form-control" type="email" name="medicare_email" 
+                                id="medicare_email" @focus="setShowInvalid"/>
                     <!-- TODO:maybe expand email feedback-->
-                    <b-form-invalid-feedback :state="validEmail">{{$t("Email.signupForm.email")}}</b-form-invalid-feedback>
+                    <b-form-invalid-feedback v-if="showInvalid" :state="validEmail">{{$t("Email.signupForm.email")}}</b-form-invalid-feedback>
                 </div>
             </div>
             <div class="form-group row">
@@ -26,13 +27,13 @@
                 <div class="col-8">
                     <!-- TODO: maybe add state to input -->
                     <b-input v-model="password" class="form-control pr-5" :type='showPassword?"text":"password"' name="medicare_password"
-                           id="medicare_password"/>
+                           id="medicare_password" @focus="setShowInvalid"/>
                     <label for="medicare_password" class="toggle-visibility" @click="toggleShowPassword()">
                         <img v-if="!showPassword" :src='eye'>
                         <img v-else :src='noeye'>
                     </label>
                     <!-- TODO:maybe expand feedback -->
-                    <b-form-invalid-feedback :state="validPassword">{{$t("NotEmpty.signupForm.password")}}</b-form-invalid-feedback>
+                    <b-form-invalid-feedback v-if="showInvalid" :state="validPassword">{{$t("NotEmpty.signupForm.password")}}</b-form-invalid-feedback>
                 </div>
             </div>
             <div class="form-group row align-items-center">
@@ -80,14 +81,15 @@ export default class Login extends Vue {
     private eye = eye;
     private noeye = noeye;
     private showPassword = false;
+    private showInvalid = false;
     private invalidCredentials = false;
     private email = '';
     private password = '';
     @State(state => state.auth.user)
     private readonly user: Nullable<User>;
-
     @State(state => state.auth.loggingIn)
     private readonly loggingIn:boolean;
+
 
     get disabledButton(): boolean {
         return !this.valid;
@@ -109,6 +111,10 @@ export default class Login extends Vue {
 
     public toggleShowPassword(): void {
         this.showPassword = !this.showPassword;
+    }
+
+    public setShowInvalid():void{
+        this.showInvalid = true;
     }
 
     public login(e: Event) {
