@@ -13,7 +13,7 @@ export function isValidEmail(email: string): boolean {
 
 function _joinPath(start: string, end: string): string {
     if (start.endsWith('/') && end.startsWith('/')) {
-        return start + end.substring(-1);
+        return start + end.substring(1);
     }
     if (!start.endsWith('/') && !end.startsWith('/')) {
         return start + '/' + end;
