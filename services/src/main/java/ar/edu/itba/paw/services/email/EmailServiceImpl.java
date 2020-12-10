@@ -51,7 +51,6 @@ public class EmailServiceImpl implements EmailService {
     private static final String MESSAGE_CONFIRMATION_SOURCE_BODY_PREFIX = "signup.confirmation.email.body";
     private static final String MESSAGE_SOURCE_DISCLAIMER = "email.disclaimer";
 
-    @Async
     private void sendEmail(String to, String subject, String html) throws MessagingException{
         InternetAddress[] parsed;
         try {
