@@ -19,7 +19,12 @@ module.exports = {
       example:
       LOCAL_PROXY_SERVER = 'http://localhost:8080/medicare'
       */
-      proxy: process.env.LOCAL_PROXY_SERVER
+      proxy: {
+          "^/api/": {
+              target: process.env.LOCAL_PROXY_SERVER,
+              logLevel: "debug"
+          }
+      }
     },
     configureWebpack: {
         resolve: {
