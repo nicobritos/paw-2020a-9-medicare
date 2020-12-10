@@ -45,11 +45,16 @@
             </div>
             <div class="form-row justify-content-between align-items-end mt-2">
                 <RouterLink class="form-link" :to="getUrl('/signup')">{{ $t('CreateAccount') }}</RouterLink>
-                <button
+                <b-button
                     @click="login"
-                    :disabled="disabledButton"
-                    class="btn btn-primary"
-                >{{ $t('Confirm') }}</button>
+                    :disabled="disabledButton||loggingIn"
+                    variant="primary"
+                >
+                    <span v-if="!loggingIn">{{ $t('Confirm') }}</span>
+                    <span v-else>
+                        <b-spinner small></b-spinner>
+                    </span>
+                </b-button>
             </div>
             <p v-if="invalidCredentials" class="mt-4 mb-0 text-danger">
                 {{ $t('InvalidCredentials.loginForm') }}
@@ -80,6 +85,9 @@ export default class Login extends Vue {
     private password = '';
     @State(state => state.auth.user)
     private readonly user: Nullable<User>;
+
+    @State(state => state.auth.loggingIn)
+    private readonly loggingIn:boolean;
 
     get disabledButton(): boolean {
         let trimmedEmail = this.email.trim();
