@@ -25,11 +25,11 @@ public class DoctorDeserializer extends JsonDeserializer<Doctor> {
         Doctor doctor = new Doctor();
 
         JsonNode node = jsonObject.get("phone");
-        if (!node.isNull()) {
+        if (node != null && !node.isNull()) {
             doctor.setPhone(jsonObject.get("phone").asText());
         }
         node = jsonObject.get("email");
-        if (!node.isNull()) {
+        if (node != null && !node.isNull()) {
             doctor.setEmail(jsonObject.get("email").asText());
         }
 

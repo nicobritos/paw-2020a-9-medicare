@@ -14,7 +14,7 @@ public abstract class UserCreateDeserializer<T> extends JsonDeserializer<T> {
         user.setPassword(this.getStringNonNull(jsonObject, "password", s -> s.length() >= 8 && s.length() <= 100));
 
         JsonNode node = jsonObject.get("phone");
-        if (!node.isNull()) {
+        if (node != null && !node.isNull()) {
             user.setPhone(node.asText());
         } else {
             user.setPhone(null);

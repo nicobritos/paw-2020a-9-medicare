@@ -29,7 +29,7 @@ public abstract class JsonDeserializer<T> {
 
     protected int getIntegerNonNull(ObjectNode objectNode, String key) {
         JsonNode node = objectNode.get(key);
-        if (node.isNull())
+        if (node == null || node.isNull())
             throw new IllegalArgumentException();
         return node.asInt();
     }
@@ -51,7 +51,7 @@ public abstract class JsonDeserializer<T> {
 
     private String getString(ObjectNode objectNode, String key, Predicate<String> predicate) {
         JsonNode node = objectNode.get(key);
-        if (node.isNull() || !predicate.test(node.asText()))
+        if (node == null || node.isNull() || !predicate.test(node.asText()))
             return null;
         return node.asText();
     }

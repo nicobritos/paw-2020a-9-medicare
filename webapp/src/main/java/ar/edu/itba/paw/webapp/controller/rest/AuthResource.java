@@ -53,7 +53,7 @@ public class AuthResource extends GenericAuthenticationResource {
             @Context HttpServletRequest request,
             @Context HttpServletResponse response)
     {
-        String token = this.getRefreshtToken(request);
+        String token = this.getRefreshToken(request);
 
         if (token == null)
             return this.error(Status.BAD_REQUEST.getStatusCode(), Status.BAD_REQUEST.toString());
@@ -97,7 +97,7 @@ public class AuthResource extends GenericAuthenticationResource {
             @Context HttpServletRequest request,
             @Context HttpServletResponse response)
     {
-        String token = this.getRefreshtToken(request);
+        String token = this.getRefreshToken(request);
         if (token != null) this.refreshTokenService.removeByToken(token);
 
         this.authenticator.invalidateJWTCookies(response);
@@ -107,7 +107,7 @@ public class AuthResource extends GenericAuthenticationResource {
                 .build();
     }
 
-    private String getRefreshtToken(HttpServletRequest request) {
+    private String getRefreshToken(HttpServletRequest request) {
         return Arrays.stream(request.getCookies())
                 .filter(cookie -> cookie.getName().equals(Constants.REFRESH_TOKEN_COOKIEN_NAME))
                 .map(Cookie::getValue)
