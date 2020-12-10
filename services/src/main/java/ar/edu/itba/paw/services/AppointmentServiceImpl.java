@@ -226,15 +226,14 @@ public class AppointmentServiceImpl extends GenericServiceImpl<AppointmentDao, A
     }
 
     @Override
-    public List<Appointment> cancelAppointments(Workday workday, Locale locale) {
+    public List<Appointment> cancelAppointments(Workday workday) {
         List<Appointment> cancelled = new LinkedList<>();
         List<Appointment> appointments = findByWorkday(workday);
         //check if user is allowed to cancel
+        this.appointmentRepository.cancelAppointments(appointments);
         for (Appointment a : appointments) {
-            if (workday.getDoctor().equals(a.getDoctor())) {
-                remove(a.getId(), a.getDoctor().getUser(), locale);
-                cancelled.add(a);
-            }
+            remove(a.getId(), a.getDoctor().getUser(), a.getLocale());
+            cancelled.add(a);
         }
         return cancelled;
     }
@@ -293,7 +292,7 @@ public class AppointmentServiceImpl extends GenericServiceImpl<AppointmentDao, A
                 }
             }
             if (isAllowed) {
-                super.remove(id);
+                appointmentRepository.remove(id);
                 try {
                     emailService.sendCanceledAppointmentNotificationEmail(user, isDoctor,
                             isDoctor? appointment.get().getPatient().getUser():appointment.get().getDoctor().getUser(),

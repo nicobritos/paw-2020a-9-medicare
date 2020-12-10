@@ -45,7 +45,7 @@ public interface AppointmentService extends GenericService<Appointment, Integer>
 
     List<AppointmentTimeSlot> findAvailableTimeslotsfromDate(Doctor doctor, LocalDateTime date);
 
-    List<Appointment> cancelAppointments(Workday workday, Locale locale);
+    List<Appointment> cancelAppointments(Workday workday);
 
     Map<Workday, Integer> appointmentQtyByWorkdayOfUser(User user);
 
