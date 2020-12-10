@@ -533,6 +533,17 @@ public class AppointmentDaoImplTest {
         return s;
     }
 
+    private Doctor doctorModel2(){
+        Doctor s = new Doctor();
+        s.setRegistrationNumber(REGISTRATION_NUMBER);
+        s.setEmail(EMAIL);
+        s.setPhone(PHONE);
+        s.setId(DOCTOR_ID_2);
+        s.setUser(userModel2());
+        s.setOffice(officeModel2());
+        return s;
+    }
+
     private void insertAppointment() {
         insertPatient();
         insertDoctor();
@@ -543,7 +554,7 @@ public class AppointmentDaoImplTest {
         appointmentMap.put("from_date", FROM_DATE);
         appointmentMap.put("motive", MOTIVE);
         appointmentMap.put("message", MESSAGE);
-        appointmentMap.put("locale", LOCALE.getDisplayName());
+        appointmentMap.put("locale", LOCALE.toString());
         appointmentMap.put("was_notification_email_sent", WAS_NOTIFICATION_EMAIL_SENT);
         appointmentJdbcInsert.execute(appointmentMap);
     }
@@ -558,8 +569,38 @@ public class AppointmentDaoImplTest {
         appointmentMap.put("from_date", FROM_DATE_2);
         appointmentMap.put("motive", MOTIVE);
         appointmentMap.put("message", MESSAGE);
-        appointmentMap.put("locale", LOCALE.getDisplayName());
+        appointmentMap.put("locale", LOCALE.toString());
         appointmentMap.put("was_notification_email_sent", WAS_NOTIFICATION_EMAIL_SENT);
+        appointmentJdbcInsert.execute(appointmentMap);
+    }
+
+    private void insertAppointmentToNotify(){
+        insertAnotherPatient();
+        insertAnotherDoctor();
+        Map<String, Object> appointmentMap = new HashMap<>();
+        appointmentMap.put("status", STATUS.name());
+        appointmentMap.put("patient_id", PATIENT_ID_2);
+        appointmentMap.put("doctor_id", DOCTOR_ID_2);
+        appointmentMap.put("from_date", FROM_DATE);
+        appointmentMap.put("motive", MOTIVE);
+        appointmentMap.put("message", MESSAGE);
+        appointmentMap.put("locale", LOCALE.toString());
+        appointmentMap.put("was_notification_email_sent", false);
+        appointmentJdbcInsert.execute(appointmentMap);
+    }
+
+    private void insertAnotherAppointmentToNotify(){
+        insertAnotherPatient();
+        insertAnotherDoctor();
+        Map<String, Object> appointmentMap = new HashMap<>();
+        appointmentMap.put("status", STATUS.name());
+        appointmentMap.put("patient_id", PATIENT_ID_2);
+        appointmentMap.put("doctor_id", DOCTOR_ID_2);
+        appointmentMap.put("from_date", FROM_DATE_2);
+        appointmentMap.put("motive", MOTIVE);
+        appointmentMap.put("message", MESSAGE);
+        appointmentMap.put("locale", LOCALE.toString());
+        appointmentMap.put("was_notification_email_sent", false);
         appointmentJdbcInsert.execute(appointmentMap);
     }
 
@@ -572,6 +613,20 @@ public class AppointmentDaoImplTest {
         appointment.setMessage(MESSAGE);
         appointment.setMotive(MOTIVE);
         appointment.setId(APPOINTMENT_ID_1);
+        appointment.setWasNotificationEmailSent(WAS_NOTIFICATION_EMAIL_SENT);
+        appointment.setLocale(LOCALE);
+        return appointment;
+    }
+
+    private Appointment appointmentModel2(){
+        Appointment appointment = new Appointment();
+        appointment.setAppointmentStatus(STATUS);
+        appointment.setDoctor(doctorModel2());
+        appointment.setPatient(patientModel2());
+        appointment.setFromDate(new LocalDateTime(YEAR,MONTH,DAY,HOUR_2,MINUTE_2));
+        appointment.setMessage(MESSAGE);
+        appointment.setMotive(MOTIVE);
+        appointment.setId(APPOINTMENT_ID_2);
         appointment.setWasNotificationEmailSent(WAS_NOTIFICATION_EMAIL_SENT);
         appointment.setLocale(LOCALE);
         return appointment;
@@ -628,14 +683,13 @@ public class AppointmentDaoImplTest {
     public void testCreateAppointmentNullFail()
     {
         // 1. Precondiciones
-
         expectedException.expect(IllegalArgumentException.class);
 
         // 2. Ejercitar
         Appointment appointment = this.appointmentDao.create(null);
 
         // 3. Postcondiciones
-        // Que el metodo tire NullPointerException
+        // Que el metodo tire IllegalArgumentException
     }
 
     @Test
@@ -650,7 +704,7 @@ public class AppointmentDaoImplTest {
         Appointment appointment = this.appointmentDao.create(a);
 
         // 3. Postcondiciones
-        // Que el metodo tire IllegalStateException (no data) o DataIntegrityViolationException (no id), se hace esto porque depende de cual chequea primero.
+        // Que el metodo tire PersistenceException.
     }
 
     @Test
@@ -666,7 +720,7 @@ public class AppointmentDaoImplTest {
         Appointment appointment = this.appointmentDao.create(a);
 
         // 3. Postcondiciones
-        // Que el metodo tire IllegalStateException
+        // Que el metodo tire PersistenceException
     }
 
     @Test
@@ -681,7 +735,7 @@ public class AppointmentDaoImplTest {
         Appointment appointment = this.appointmentDao.create(a);
 
         // 3. Postcondiciones
-        // Que el metodo tire IllegalStateException
+        // Que el metodo tire PersistenceException
     }
 
     @Test
@@ -697,7 +751,7 @@ public class AppointmentDaoImplTest {
         Appointment appointment = this.appointmentDao.create(a);
 
         // 3. Postcondiciones
-        // Que el metodo tire IllegalStateException
+        // Que el metodo tire PersistenceException
     }
 
     @Test
@@ -713,7 +767,7 @@ public class AppointmentDaoImplTest {
         Appointment appointment = this.appointmentDao.create(a);
 
         // 3. Postcondiciones
-        // Que el metodo tire IllegalStateException
+        // Que el metodo tire PersistenceException
     }
 
     @Test
@@ -729,7 +783,7 @@ public class AppointmentDaoImplTest {
         Appointment appointment = this.appointmentDao.create(a);
 
         // 3. Postcondiciones
-        // Que el metodo tire IllegalStateException
+        // Que el metodo tire PersistenceException
     }
 
     /* --------------------- MÉTODO: appointmentDao.findById(String) -------------------------------------------- */
@@ -1041,22 +1095,24 @@ public class AppointmentDaoImplTest {
         this.appointmentDao.remove(APPOINTMENT_ID_1);
 
         // 3. Postcondiciones
-        assertEquals(0,JdbcTestUtils.countRowsInTable(jdbcTemplate, APPOINTMENTS_TABLE));
+        assertEquals(1,JdbcTestUtils.countRowsInTable(jdbcTemplate, APPOINTMENTS_TABLE));
+        assertEquals(1,JdbcTestUtils.countRowsInTableWhere(jdbcTemplate, APPOINTMENTS_TABLE, "status = 'CANCELLED'"));
+        assertEquals(0,JdbcTestUtils.countRowsInTableWhere(jdbcTemplate, APPOINTMENTS_TABLE, "status = 'PENDING'"));
     }
 
     @Test
     public void testAppointmentRemoveByIdNotExistent()
     {
         // 1. Precondiciones
-
         insertAppointment();
-        expectedException.expect(IllegalArgumentException.class);
 
         // 2. Ejercitar
         this.appointmentDao.remove(APPOINTMENT_ID_2);
 
         // 3. Postcondiciones
         assertEquals(1,JdbcTestUtils.countRowsInTable(jdbcTemplate, APPOINTMENTS_TABLE));
+        assertEquals(0,JdbcTestUtils.countRowsInTableWhere(jdbcTemplate, APPOINTMENTS_TABLE, "status = 'CANCELLED'"));
+        assertEquals(1,JdbcTestUtils.countRowsInTableWhere(jdbcTemplate, APPOINTMENTS_TABLE, "status = 'PENDING'"));
     }
 
     @Test
@@ -1090,7 +1146,9 @@ public class AppointmentDaoImplTest {
         this.appointmentDao.remove(a);
 
         // 3. Postcondiciones
-        assertEquals(0,JdbcTestUtils.countRowsInTable(jdbcTemplate, APPOINTMENTS_TABLE));
+        assertEquals(1,JdbcTestUtils.countRowsInTable(jdbcTemplate, APPOINTMENTS_TABLE));
+        assertEquals(1,JdbcTestUtils.countRowsInTableWhere(jdbcTemplate, APPOINTMENTS_TABLE, "status = 'CANCELLED'"));
+        assertEquals(0,JdbcTestUtils.countRowsInTableWhere(jdbcTemplate, APPOINTMENTS_TABLE, "status = 'PENDING'"));
     }
 
     @Test
@@ -1103,13 +1161,14 @@ public class AppointmentDaoImplTest {
         insertAnotherAppointment();
         Appointment a = appointmentModel();
         a.setId(APPOINTMENT_ID_2);
-        expectedException.expect(IllegalArgumentException.class);
 
         // 2. Ejercitar
         this.appointmentDao.remove(a);
 
         // 3. Postcondiciones
         assertEquals(1,JdbcTestUtils.countRowsInTable(jdbcTemplate, APPOINTMENTS_TABLE));
+        assertEquals(0,JdbcTestUtils.countRowsInTableWhere(jdbcTemplate, APPOINTMENTS_TABLE, "status = 'CANCELLED'"));
+        assertEquals(1,JdbcTestUtils.countRowsInTableWhere(jdbcTemplate, APPOINTMENTS_TABLE, "status = 'PENDING'"));
     }
 
     @Test
@@ -2130,5 +2189,159 @@ public class AppointmentDaoImplTest {
         // 3. Postcondiciones
         assertNotNull(appointments);
         assertTrue(appointments.isEmpty());
+    }
+
+    @Test
+    public void testAppointmentFindAllAppointmentsInIntervalToNotify(){
+        // 1. Precondiciones
+        insertAppointment();
+        insertAnotherAppointment();
+        insertAppointmentToNotify();
+        insertAnotherAppointmentToNotify();
+
+        // 2. Ejercitar
+        List<Appointment> appointments = this.appointmentDao.findAllAppointmentsInIntervalToNotify(
+                new LocalDateTime(YEAR, MONTH, DAY, HOUR, MINUTE).plusMinutes(1),
+                new LocalDateTime(YEAR, MONTH, DAY, HOUR_2, MINUTE_2));
+
+        // 3. Postcondiciones
+        assertNotNull(appointments);
+        assertEquals(1, appointments.size());
+        assertEquals(4, (int) appointments.get(0).getId());
+    }
+
+    @Test
+    public void testAppointmentFindAllAppointmentsInIntervalToNotifyEmpty(){
+        // 1. Precondiciones
+        insertAppointment();
+        insertAnotherAppointment();
+        insertAppointmentToNotify();
+
+        // 2. Ejercitar
+        List<Appointment> appointments = this.appointmentDao.findAllAppointmentsInIntervalToNotify(
+                new LocalDateTime(YEAR, MONTH, DAY, HOUR, MINUTE).plusMinutes(1),
+                new LocalDateTime(YEAR, MONTH, DAY, HOUR_2, MINUTE_2));
+
+        // 3. Postcondiciones
+        assertNotNull(appointments);
+        assertTrue(appointments.isEmpty());
+    }
+
+    @Test
+    public void testAppointmentFindAllAppointmentsInIntervalToNotifyNullFrom(){
+        // 1. Precondiciones
+        insertAppointment();
+        insertAnotherAppointment();
+        insertAppointmentToNotify();
+        insertAnotherAppointmentToNotify();
+        expectedException.expect(IllegalArgumentException.class);
+
+        // 2. Ejercitar
+        List<Appointment> appointments = this.appointmentDao.findAllAppointmentsInIntervalToNotify(
+                null,
+                new LocalDateTime(YEAR, MONTH, DAY, HOUR_2, MINUTE_2));
+
+        // 3. Postcondiciones
+        // IllegalArgumentException
+    }
+
+    @Test
+    public void testAppointmentFindAllAppointmentsInIntervalToNotifyNullTo(){
+        // 1. Precondiciones
+        insertAppointment();
+        insertAnotherAppointment();
+        insertAppointmentToNotify();
+        insertAnotherAppointmentToNotify();
+        expectedException.expect(IllegalArgumentException.class);
+
+        // 2. Ejercitar
+        List<Appointment> appointments = this.appointmentDao.findAllAppointmentsInIntervalToNotify(
+                new LocalDateTime(YEAR, MONTH, DAY, HOUR, MINUTE).plusMinutes(1),
+                null);
+
+        // 3. Postcondiciones
+        // IllegalArgumentException
+    }
+
+    /* --------------------- MÉTODO: appointmentDao.cancelAppointments(List<Appointments>) -------------------------------------------- */
+
+    @Test
+    public void testAppointmentCancelAppointments()
+    {
+        // 1. Precondiciones
+        insertAppointment();
+        insertAnotherAppointment();
+        insertAppointmentToNotify();
+        insertAnotherAppointmentToNotify();
+        List<Appointment> appointments = new LinkedList<>();
+        appointments.add(appointmentModel());
+        appointments.add(appointmentModel2());
+
+        // 2. Ejercitar
+        this.appointmentDao.cancelAppointments(appointments);
+
+        // 3. Postcondiciones
+        assertEquals(4,JdbcTestUtils.countRowsInTable(jdbcTemplate, APPOINTMENTS_TABLE));
+        assertEquals(2,JdbcTestUtils.countRowsInTableWhere(jdbcTemplate, APPOINTMENTS_TABLE, "status = 'CANCELLED'"));
+        assertEquals(2,JdbcTestUtils.countRowsInTableWhere(jdbcTemplate, APPOINTMENTS_TABLE, "status = 'PENDING'"));
+    }
+
+    @Test
+    public void testAppointmentCancelAppointmentsNotExistent()
+    {
+        // 1. Precondiciones
+        insertAppointment();
+        insertAnotherAppointment();
+        List<Appointment> appointments = new LinkedList<>();
+        Appointment appointment = appointmentModel();
+        appointment.setId(3);
+        Appointment appointment2 = appointmentModel2();
+        appointment2.setId(4);
+        appointments.add(appointment);
+        appointments.add(appointment2);
+
+        // 2. Ejercitar
+        this.appointmentDao.cancelAppointments(appointments);
+
+        // 3. Postcondiciones
+        assertEquals(2,JdbcTestUtils.countRowsInTable(jdbcTemplate, APPOINTMENTS_TABLE));
+        assertEquals(0,JdbcTestUtils.countRowsInTableWhere(jdbcTemplate, APPOINTMENTS_TABLE, "status = 'CANCELLED'"));
+        assertEquals(2,JdbcTestUtils.countRowsInTableWhere(jdbcTemplate, APPOINTMENTS_TABLE, "status = 'PENDING'"));
+    }
+
+    @Test
+    public void testAppointmentCancelAppointmentsNull()
+    {
+        // 1. Precondiciones
+        insertAppointment();
+        insertAnotherAppointment();
+        insertAppointmentToNotify();
+        insertAnotherAppointmentToNotify();
+        expectedException.expect(IllegalArgumentException.class);
+
+        // 2. Ejercitar
+        this.appointmentDao.cancelAppointments(null);
+
+        // 3. Postcondiciones
+        // IllegalArgumentException
+    }
+
+    @Test
+    public void testAppointmentCancelAppointmentsEmptyList()
+    {
+        // 1. Precondiciones
+        insertAppointment();
+        insertAnotherAppointment();
+        insertAppointmentToNotify();
+        insertAnotherAppointmentToNotify();
+        List<Appointment> appointments = new LinkedList<>();
+
+        // 2. Ejercitar
+        this.appointmentDao.cancelAppointments(appointments);
+
+        // 3. Postcondiciones
+        assertEquals(4,JdbcTestUtils.countRowsInTable(jdbcTemplate, APPOINTMENTS_TABLE));
+        assertEquals(0,JdbcTestUtils.countRowsInTableWhere(jdbcTemplate, APPOINTMENTS_TABLE, "status = 'CANCELLED'"));
+        assertEquals(4,JdbcTestUtils.countRowsInTableWhere(jdbcTemplate, APPOINTMENTS_TABLE, "status = 'PENDING'"));
     }
 }

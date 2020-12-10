@@ -5,17 +5,18 @@ import ar.edu.itba.paw.models.User;
 
 import javax.annotation.PostConstruct;
 import javax.mail.MessagingException;
+import java.util.List;
 import java.util.Locale;
 
 public interface EmailService {
 
-    void sendCanceledAppointmentNotificationEmail(User userCancelling, boolean isDoctorCancelling,
-                                                  User userCancelled, Appointment appointment,
-                                                  Locale locale) throws MessagingException;
+    void sendCancelledAppointmentNotificationEmail(Appointment appointment, boolean isDoctorCancelling);
 
-    void sendNewAppointmentNotificationEmail(Appointment appointment) throws MessagingException;
+    void sendCancelledAppointmentNotificationEmails(List<Appointment> appointments, boolean isDoctorCancelling);
 
-    void sendEmailConfirmationEmail(User user, String token, String confirmationPageRelativeUrl, Locale locale) throws MessagingException;
+    void sendNewAppointmentNotificationEmail(Appointment appointment);
+
+    void sendEmailConfirmationEmail(User user, String token, String confirmationPageRelativeUrl, Locale locale);
 
     void scheduleNotifyAppointmentEmail(Appointment appointment);
 

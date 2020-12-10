@@ -12,7 +12,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import javax.mail.MessagingException;
 import java.util.*;
 
 @Service
@@ -125,12 +124,7 @@ public class AppointmentServiceImpl extends GenericServiceImpl<AppointmentDao, A
             }
         }
         Appointment appointment = this.appointmentRepository.create(model);
-        try {
-            emailService.sendNewAppointmentNotificationEmail(
-                    appointment);
-        } catch (MessagingException e) {
-            LOGGER.error("Couldn't send new appointment email to: {}, to notify appointment: {}", appointment.getDoctor().getEmail(), appointment);
-        }
+        emailService.sendNewAppointmentNotificationEmail(appointment);
         return appointment;
     }
 
@@ -226,22 +220,18 @@ public class AppointmentServiceImpl extends GenericServiceImpl<AppointmentDao, A
     }
 
     @Override
-    public List<Appointment> cancelAppointments(Workday workday, Locale locale) {
-        List<Appointment> cancelled = new LinkedList<>();
-        List<Appointment> appointments = findByWorkday(workday);
-        //check if user is allowed to cancel
+    public List<Appointment> cancelAppointments(Workday workday) {
+        List<Appointment> appointments = findPendingByWorkday(workday);
+        this.appointmentRepository.cancelAppointments(appointments);
         for (Appointment a : appointments) {
-            if (workday.getDoctor().equals(a.getDoctor())) {
-                remove(a.getId(), a.getDoctor().getUser(), locale);
-                cancelled.add(a);
-            }
+            emailService.sendCancelledAppointmentNotificationEmail(a, true);
         }
-        return cancelled;
+        return appointments;
     }
 
     @Override
-    public List<Appointment> findByWorkday(Workday workday) {
-        return this.appointmentRepository.findByWorkday(workday);
+    public List<Appointment> findPendingByWorkday(Workday workday) {
+        return this.appointmentRepository.findPendingByWorkday(workday);
     }
 
     @Override
@@ -254,7 +244,7 @@ public class AppointmentServiceImpl extends GenericServiceImpl<AppointmentDao, A
         Map<Workday, Integer> appointmentMap = new HashMap<>();
         List<Workday> workdays = this.workdayService.findByUser(user);
         for (Workday workday : workdays) {
-            List<Appointment> appointments = findByWorkday(workday);
+            List<Appointment> appointments = findPendingByWorkday(workday);
             List<Appointment> myAppts = new LinkedList<>();
             for (Appointment appointment : appointments) {
                 if (appointment.getDoctor().getUser().equals(user)) {
@@ -293,14 +283,8 @@ public class AppointmentServiceImpl extends GenericServiceImpl<AppointmentDao, A
                 }
             }
             if (isAllowed) {
-                super.remove(id);
-                try {
-                    emailService.sendCanceledAppointmentNotificationEmail(user, isDoctor,
-                            isDoctor? appointment.get().getPatient().getUser():appointment.get().getDoctor().getUser(),
-                            appointment.get(), locale);
-                } catch (MessagingException e) {
-                    LOGGER.error("Couldn't send cancelled appointment email to: {}, to notify appointment: {}", user.getEmail(), appointment);
-                }
+                appointmentRepository.remove(id);
+                emailService.sendCancelledAppointmentNotificationEmail(appointment.get(), isDoctor);
             }
         }
     }

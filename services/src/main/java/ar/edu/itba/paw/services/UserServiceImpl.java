@@ -191,11 +191,7 @@ public class UserServiceImpl extends GenericSearchableServiceImpl<UserDao, User,
             token = verificationToken.getToken();
         }
 
-        try {
-            emailService.sendEmailConfirmationEmail(user, token, confirmationRelativeUrl, locale);
-        } catch (MessagingException e) {
-            LOGGER.error("Couldn't send email confirmation mail to: {}", user.getEmail());
-        }
+        emailService.sendEmailConfirmationEmail(user, token, confirmationRelativeUrl, locale);
 
         return token;
     }

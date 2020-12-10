@@ -172,7 +172,7 @@ public class AppointmentDaoImpl extends GenericDaoImpl<Appointment, Integer> imp
     }
 
     @Override
-    public List<Appointment> findByWorkday(Workday workday) {
+    public List<Appointment> findPendingByWorkday(Workday workday) {
         if (workday == null || workday.getDoctor() == null || workday.getDay() == null)
             throw new IllegalArgumentException();
 
@@ -231,7 +231,7 @@ public class AppointmentDaoImpl extends GenericDaoImpl<Appointment, Integer> imp
 
     @Override
     public List<Appointment> findAllAppointmentsInIntervalToNotify(LocalDateTime from, LocalDateTime to) {
-        if (from == null)
+        if (from == null || to == null)
             throw new IllegalArgumentException();
 
         CriteriaBuilder builder = this.getEntityManager().getCriteriaBuilder();
@@ -239,16 +239,50 @@ public class AppointmentDaoImpl extends GenericDaoImpl<Appointment, Integer> imp
         Root<Appointment> root = query.from(Appointment.class);
 
         query.select(root);
-        query.where(builder.and(
-                builder.equal(root.get(Appointment_.wasNotificationEmailSent),false),
+        query.where(
                 builder.and(
-                        builder.greaterThanOrEqualTo(root.get(Appointment_.fromDate), from),
-                        builder.lessThanOrEqualTo(root.get(Appointment_.fromDate), to)
+                    builder.and(
+                        builder.equal(root.get(Appointment_.wasNotificationEmailSent),false),
+                        builder.and(
+                                builder.greaterThanOrEqualTo(root.get(Appointment_.fromDate), from),
+                                builder.lessThanOrEqualTo(root.get(Appointment_.fromDate), to)
+                        )
+                    ),
+                        builder.equal(root.get(Appointment_.appointmentStatus), AppointmentStatus.PENDING)
                 )
-        ));
-        query.where(builder.greaterThanOrEqualTo(root.get(Appointment_.fromDate), from));
+        );
 
         return this.selectQuery(builder, query, root);
+    }
+
+    @Transactional
+    @Override
+    public void remove(Appointment appointment) {
+        if (appointment == null)
+            throw new IllegalArgumentException();
+
+        CriteriaBuilder builder = this.getEntityManager().getCriteriaBuilder();
+        CriteriaUpdate<Appointment> query = builder.createCriteriaUpdate(Appointment.class);
+        Root<Appointment> root = query.from(Appointment.class);
+
+        query.set(root.get(Appointment_.appointmentStatus), AppointmentStatus.CANCELLED);
+        query.where(builder.equal(root.get(Appointment_.id), appointment.getId()));
+        this.executeUpdate(query);
+    }
+
+    @Transactional
+    @Override
+    public void remove(Integer id) {
+        if (id == null)
+            throw new IllegalArgumentException();
+
+        CriteriaBuilder builder = this.getEntityManager().getCriteriaBuilder();
+        CriteriaUpdate<Appointment> query = builder.createCriteriaUpdate(Appointment.class);
+        Root<Appointment> root = query.from(Appointment.class);
+
+        query.set(root.get(Appointment_.appointmentStatus), AppointmentStatus.CANCELLED);
+        query.where(builder.equal(root.get(Appointment_.id), id));
+        this.executeUpdate(query);
     }
 
     @Transactional
