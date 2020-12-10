@@ -40,7 +40,14 @@ export class RestRepositoryImpl implements RestRepository {
             headers: {
                 Accept: RestRepositoryImpl.getAccept(config.accepts)
             },
-            transformResponse: (data, headers) => {
+            transformResponse: (data: any, headers) => {
+                if (typeof headers['content-type'] === 'string') {
+                    let ct = headers['content-type'];
+                    if (ct.includes(';')) {
+                        headers['content-type'] = ct.substring(0, ct.indexOf(';'));
+                    }
+                }
+
                 if (typeof data === 'string' && typeof headers['content-type'] === 'string' && headers['content-type'].endsWith('+json')) {
                     data = JSON.parse(data);
                 }
