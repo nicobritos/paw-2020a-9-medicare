@@ -25,7 +25,7 @@ public class WorkdayDeserializer extends JsonDeserializer<Workday> {
         JsonNode node = jsonObject.get("day");
 
         Workday workday = new Workday();
-        if (!node.isNull()) {
+        if (node != null && !node.isNull()) {
             workday.setDay(WorkdayDay.valueOf(node.asText()));
         }
 

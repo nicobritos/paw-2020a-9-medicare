@@ -21,24 +21,24 @@ public class UserDeserializer extends JsonDeserializer<User> {
         User user = new User();
 
         JsonNode node = jsonObject.get("email");
-        if (!node.isNull()) {
+        if (node != null && !node.isNull()) {
             user.setEmail(node.asText());
         }
         node = jsonObject.get("firstName");
-        if (!node.isNull()) {
+        if (node != null && !node.isNull()) {
             user.setFirstName(node.asText());
         }
         node = jsonObject.get("surname");
-        if (!node.isNull()) {
+        if (node != null && !node.isNull()) {
             user.setSurname(node.asText());
         }
         node = jsonObject.get("phone");
-        if (!node.isNull()) {
+        if (node != null && !node.isNull()) {
             user.setPhone(node.asText());
         }
 
         node = jsonObject.get("profilePictureId");
-        if (!node.isNull()) {
+        if (node != null && !node.isNull()) {
             Picture picture = new Picture();
             picture.setId(node.asInt());
             user.setProfilePicture(picture);

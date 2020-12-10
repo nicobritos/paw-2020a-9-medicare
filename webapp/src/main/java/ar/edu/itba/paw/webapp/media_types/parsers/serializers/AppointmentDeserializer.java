@@ -23,23 +23,23 @@ public class AppointmentDeserializer extends JsonDeserializer<Appointment> {
         Appointment appointment = new Appointment();
 
         node = jsonObject.get("date_from");
-        if (node.isNull())
+        if (node == null || node.isNull())
             throw new IllegalArgumentException();
         appointment.setFromDate(new LocalDateTime(node.asLong())); // epoch millis
 
         node = jsonObject.get("motive");
-        if (!node.isNull()) {
+        if (node != null && !node.isNull()) {
             appointment.setMotive(node.asText());
         }
         node = jsonObject.get("message");
-        if (!node.isNull()) {
+        if (node != null && !node.isNull()) {
             appointment.setMotive(node.asText());
         }
 
         Doctor doctor = new Doctor();
 
         node = jsonObject.get("doctorId");
-        if (node.isNull())
+        if (node == null || node.isNull())
             throw new IllegalArgumentException();
         doctor.setId(node.asInt());
         appointment.setDoctor(doctor);
