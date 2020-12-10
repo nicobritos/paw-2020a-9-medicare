@@ -1,6 +1,7 @@
 package ar.edu.itba.paw.webapp.auth;
 
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -56,10 +57,15 @@ public class JWTAuthorizationFilter extends BasicAuthenticationFilter {
             return null;
 
         // Procesamos los claims guardados. En este caso, el username y el rol
-        Claims claims = Jwts.parser()
-                .setSigningKey(this.secret)
-                .parseClaimsJws(jwtCookie.getValue())
-                .getBody();
+        Claims claims;
+        try {
+            claims = Jwts.parser()
+                    .setSigningKey(this.secret)
+                    .parseClaimsJws(jwtCookie.getValue())
+                    .getBody();
+        } catch (ExpiredJwtException e) {
+            return null;
+        }
 
         if (claims.getExpiration().before(new Date()))
             return null;
