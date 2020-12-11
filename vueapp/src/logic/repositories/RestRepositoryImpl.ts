@@ -109,6 +109,8 @@ export class RestRepositoryImpl implements RestRepository {
                     return data;
             },
             validateStatus: () => {
+                // Returns true because we want to manage API errors using the APIError class.
+                // Without this function axios throws an error if status code is between 200 and 300
                 return true;
             }
         };
