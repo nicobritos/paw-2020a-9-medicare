@@ -219,6 +219,10 @@ export default class MedicHome extends Vue {
     private todayAppointments = [];
     private weekAppointments = [[], [], [], [], [], [], []];
 
+    async mounted(): Promise<void> {
+
+    }
+
     timeWithZero(time: number): string {
         if (time < 10) {
             return '0' + time;
@@ -263,66 +267,6 @@ export default class MedicHome extends Vue {
 </script>
 
 <style scoped>
-.header {
-    background-color: #00C4BA;
-}
-
-.header-brand {
-    font-weight: bold;
-}
-
-.header-brand:hover {
-    font-weight: bold;
-    color: white !important;
-}
-
-.header-a-element {
-    color: white;
-}
-
-.header-a-element:hover {
-    color: #e0e0e0;
-}
-
-.header-btn-element {
-    color: #00C4BA;
-    font-weight: bold;
-}
-
-.header-btn-element:hover {
-    color: rgb(0, 160, 152);
-    font-weight: bold;
-}
-
-.green-text {
-    color: #00C4BA;
-}
-
-#navbar-logo {
-    width: 2em;
-}
-
-.filter-form {
-    background-color: #00C4BA;
-    border-radius: 1em;
-}
-
-.form-title {
-    color: white;
-}
-
-.form-control {
-    background-color: rgb(214, 214, 214);
-}
-
-.white-text {
-    color: white !important;
-}
-
-#navbarUserImage {
-    width: 3em;
-}
-
 .turno-item {
     border-radius: 2em !important;
     background-color: rgb(214, 214, 214);

@@ -38,7 +38,7 @@ const routes = [
         redirect: '/mediclist/1'
     },
     {
-        path: '/unverified',
+        path: '/verify/:token',
         name: 'Unverified',
         component: Unverified
     },

@@ -129,6 +129,7 @@ Date.prototype.plusDays = function (i) {
     return date;
 };
 
+// TODO: Nico, Guido
 @Component
 export default class SelectAppointment extends Vue {
     private readonly user = new User();

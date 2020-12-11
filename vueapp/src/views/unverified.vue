@@ -23,9 +23,9 @@ export default class Unverified extends Vue {
 
     async mounted(): Promise<void> {
         let token: string = '';
-        if (typeof this.$route.query !== 'object'
-            || typeof this.$route.query.token !== 'string'
-            || (token = this.$route.query.token).length < 0)
+        if (typeof this.$route.params !== 'object'
+            || typeof this.$route.params.token !== 'string'
+            || (token = this.$route.params.token).length < 0)
         {
             this.tokenError = true;
             return;
