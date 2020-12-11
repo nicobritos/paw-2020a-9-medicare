@@ -1,7 +1,6 @@
 package ar.edu.itba.paw.services.email;
 
 import ar.edu.itba.paw.interfaces.daos.AppointmentDao;
-import ar.edu.itba.paw.interfaces.services.AppointmentService;
 import ar.edu.itba.paw.interfaces.services.EmailService;
 import ar.edu.itba.paw.models.Appointment;
 import ar.edu.itba.paw.models.User;
@@ -281,7 +280,7 @@ public class EmailServiceImpl implements EmailService {
         String subject = this.messageSource.getMessage("signup.confirmation.email.subject", null, locale);
         String confirmationUrl;
         try {
-            confirmationUrl = confirmationPageRelativeUrl + "?token=" + URLEncoder.encode(token, StandardCharsets.UTF_8.name());
+            confirmationUrl = confirmationPageRelativeUrl + "/" + URLEncoder.encode(token, StandardCharsets.UTF_8.name());
         } catch (UnsupportedEncodingException e) {
             throw new RuntimeException("Error converting token to UTF-8");
         }
