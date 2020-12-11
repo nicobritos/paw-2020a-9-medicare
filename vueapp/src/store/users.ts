@@ -41,8 +41,12 @@ const actions: DefineActionTree<UserActions, UserState, RootState, UserActionRet
                 return;
             }
 
-            commit('auth/setUser', authMutationTypes.setUser(userDoctor.user));
-            commit('auth/setDoctors', authMutationTypes.setDoctors(userDoctor.doctors));
+            commit('auth/setUser', authMutationTypes.setUser(userDoctor.user), {
+                root: true
+            });
+            commit('auth/setDoctors', authMutationTypes.setDoctors(userDoctor.doctors), {
+                root: true
+            });
         } catch (e) {
             console.error(e);
         }
@@ -56,8 +60,12 @@ const actions: DefineActionTree<UserActions, UserState, RootState, UserActionRet
                 return;
             }
 
-            commit('auth/setUser', authMutationTypes.setUser(userPatient.user));
-            commit('auth/setPatients', authMutationTypes.setPatients(userPatient.patients));
+            commit('auth/setUser', authMutationTypes.setUser(userPatient.user), {
+                root: true
+            });
+            commit('auth/setPatients', authMutationTypes.setPatients(userPatient.patients), {
+                root: true
+            });
         } catch (e) {
             console.error(e);
             return null;
