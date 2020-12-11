@@ -8,6 +8,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
+import java.util.Objects;
 
 @Component
 public class EmailFormatter implements ApplicationContextAware {
@@ -36,7 +37,8 @@ public class EmailFormatter implements ApplicationContextAware {
     }
 
     public String getHTMLFromFilename(String filename) throws IOException {
-        InputStreamReader streamReader = new InputStreamReader(applicationContext.getResource("WEB-INF/email/" + filename + ".html").getInputStream(), StandardCharsets.UTF_8);
+        ClassLoader classLoader = getClass().getClassLoader();
+        InputStreamReader streamReader = new InputStreamReader(Objects.requireNonNull(classLoader.getResourceAsStream(filename)), StandardCharsets.UTF_8);
         BufferedReader reader = new BufferedReader(streamReader);
 
         StringBuilder stringBuilder = new StringBuilder();
