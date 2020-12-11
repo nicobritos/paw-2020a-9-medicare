@@ -119,7 +119,6 @@ export default class Login extends Vue {
 
     public login(e: Event) {
         e.preventDefault();
-        console.log("hola2")
         if (this.valid){
             this.$store.dispatch('auth/login', authActionTypes.login({
                 password: this.password,

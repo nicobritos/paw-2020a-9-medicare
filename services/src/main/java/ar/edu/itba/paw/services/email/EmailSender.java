@@ -27,7 +27,6 @@ public class EmailSender {
         properties.put("mail.smtp.auth", "true");
         properties.put("mail.smtp.starttls.enable", "true");
         properties.put("mail.debug", "false");
-
         return mailSender;
     }
 

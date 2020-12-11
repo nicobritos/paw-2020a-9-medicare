@@ -72,6 +72,7 @@ public class EmailServiceImpl implements EmailService {
         helper.setText(html, true);
 
         javaMailSender.send(mailMessage);
+        LOGGER.info("Email sent to {} with subject: {}", to, subject);
     }
 
     @Async
@@ -474,7 +475,7 @@ public class EmailServiceImpl implements EmailService {
         EmailFormatter emailFormatter = new EmailFormatter();
         String html;
         try {
-            html = emailFormatter.format(emailFormatter.getHTMLFromFilename("cancel"));
+            html = emailFormatter.format(emailFormatter.getHTMLFromFilename("email/cancel.html"));
         } catch (IOException e){
             throw new IOException("Can't find HTML file cancel.html");
         }
@@ -511,13 +512,13 @@ public class EmailServiceImpl implements EmailService {
         String html;
         if (comment != null && !comment.isEmpty()) {
             try {
-                html = emailFormatter.format(emailFormatter.getHTMLFromFilename("newAppointmentWithComment"));
+                html = emailFormatter.format(emailFormatter.getHTMLFromFilename("email/newAppointmentWithComment.html"));
             } catch (IOException e){
                 throw new IOException("Can't find HTML file newAppointmentWithComment.html");
             }
         } else {
             try {
-                html = emailFormatter.format(emailFormatter.getHTMLFromFilename("newAppointment"));
+                html = emailFormatter.format(emailFormatter.getHTMLFromFilename("email/newAppointment.html"));
             } catch (IOException e){
                 throw new IOException("Can't find HTML file newAppointment.html");
             }
@@ -555,13 +556,13 @@ public class EmailServiceImpl implements EmailService {
         String html;
         if (comment != null && !comment.isEmpty()) {
             try {
-                html = emailFormatter.format(emailFormatter.getHTMLFromFilename("newAppointmentWithComment"));
+                html = emailFormatter.format(emailFormatter.getHTMLFromFilename("email/newAppointmentWithComment.html"));
             } catch (IOException e){
                 throw new IOException("Can't find HTML file newAppointmentWithComment.html");
             }
         } else {
             try {
-                html = emailFormatter.format(emailFormatter.getHTMLFromFilename("newAppointment"));
+                html = emailFormatter.format(emailFormatter.getHTMLFromFilename("email/newAppointment.html"));
             } catch (IOException e){
                 throw new IOException("Can't find HTML file newAppointment.html");
             }
@@ -599,13 +600,13 @@ public class EmailServiceImpl implements EmailService {
         String html;
         if (comment != null && !comment.isEmpty()) {
             try {
-                html = emailFormatter.format(emailFormatter.getHTMLFromFilename("newAppointmentWithComment"));
+                html = emailFormatter.format(emailFormatter.getHTMLFromFilename("email/newAppointmentWithComment.html"));
             } catch (IOException e){
                 throw new IOException("Can't find HTML file newAppointmentWithComment.html");
             }
         } else {
             try {
-                html = emailFormatter.format(emailFormatter.getHTMLFromFilename("newAppointment"));
+                html = emailFormatter.format(emailFormatter.getHTMLFromFilename("email/newAppointment.html"));
             } catch (IOException e){
                 throw new IOException("Can't find HTML file newAppointment.html");
             }
@@ -629,7 +630,7 @@ public class EmailServiceImpl implements EmailService {
         EmailFormatter emailFormatter = new EmailFormatter();
         String html;
         try {
-            html = emailFormatter.format(emailFormatter.getHTMLFromFilename("signup"));
+            html = emailFormatter.format(emailFormatter.getHTMLFromFilename("email/signup.html"));
         } catch (IOException e){
             throw new IOException("Can't find HTML file signup.html");
         }
