@@ -1,5 +1,6 @@
 import Vue from 'vue';
 import VueRouter from 'vue-router';
+import store from "./vuex";
 import MedicList from '@/views/medicList';
 import Landing from '@/views/landing';
 import Unverified from '@/views/unverified';
@@ -18,6 +19,63 @@ import Error404 from "@/views/error/404";
 import Error500 from "@/views/error/500";
 
 Vue.use(VueRouter);
+
+// TODO:check
+function authGuard(to,from,next) {
+    if(store.state.auth.loggedIn){
+        next();
+    }else{
+        next({name:"Login"});
+    }
+}
+
+function notAuthGuard(to,from,next) {
+    if(store.state.auth.loggedIn){
+        if(store.state.auth.isDoctor){   
+            next({name:"MedicHome"});
+        }
+        else{
+            next({name:"PatientHome"});
+        }
+    }else{
+        next();
+    }
+}
+
+function patientGuard(to,from,next) {
+    if(store.state.auth.loggedIn){
+        if(store.state.auth.isDoctor){   
+            next({name:"MedicHome"});
+        }
+        else{
+            next();
+        }
+    }else{
+        next({name:"Login"});
+    }
+}
+
+function doctorGuard(to,from,next) {
+    if(store.state.auth.loggedIn){
+        if(store.state.auth.isDoctor){   
+            next({name:"MedicHome"});
+        }
+        else{
+            next();
+        }
+    }else{
+        next({name:"Login"});
+    }
+}
+
+function redirectHomeTopord(to) {
+    if(store.state.auth.isDoctor){
+        return "doctor/home";
+    }else{
+        return "patient/home";
+    }
+}
+
 const routes = [
     // example
     // TODO: CHECK best behavior for component
@@ -33,9 +91,14 @@ const routes = [
         path: '/mediclist/:page',
         name: 'MedicList',
         component: MedicList
-    }, {
+    }, 
+    {
         path: '/mediclist',
         redirect: '/mediclist/1'
+    },
+    {
+        path: '/home',
+        redirect:redirectHomeTopord
     },
     {
         path: '/verify/:token',
@@ -52,14 +115,16 @@ const routes = [
         component: Login,
         meta:{
             hideNav:true
-        }
+        },
+        beforeEnter:notAuthGuard
     }, {
         path: '/signup',
         name: 'Signup',
         component: Signup,
         meta:{
             hideNav:true
-        }
+        },
+        beforeEnter:notAuthGuard
     },
     {
         path: '/signup/doctor',
@@ -67,7 +132,8 @@ const routes = [
         component: SignupDoctor,
         meta:{
             hideNav:true
-        }
+        },
+        beforeEnter:notAuthGuard
     },
     {
         path: '/signup/patient',
@@ -75,37 +141,44 @@ const routes = [
         component: SignupPatient,
         meta:{
             hideNav:true
-        }
+        },
+        beforeEnter:notAuthGuard
     },
     {
         path: '/doctor/home',
         name: 'MedicHome',
-        component: MedicHome
+        component: MedicHome,
+        beforeEnter:doctorGuard
     },
     {
         path: '/doctor/profile',
         name: 'MedicProfile',
-        component: MedicProfile
+        component: MedicProfile,
+        beforeEnter:doctorGuard
     },
     {
         path: '/patient/profile',
         name: 'PatientProfile',
-        component: PatientProfile
+        component: PatientProfile,
+        beforeEnter:patientGuard
     },
     {
         path: '/patient/home',
         name: 'PatientHome',
-        component: PatientHome
+        component: PatientHome,
+        beforeEnter:patientGuard
     },
     {
         path: '/selectAppointment',
         name: 'SelectAppointment',
-        component: SelectAppointment
+        component: SelectAppointment,
+        beforeEnter:patientGuard
     },
     {
         path: '/requestAppointment',
         name: 'RequestAppointment',
-        component: RequestAppointment
+        component: RequestAppointment,
+        beforeEnter:patientGuard
     },
     {
         path:"/404",
@@ -124,7 +197,7 @@ const routes = [
     },
     {
         path:"*",
-        name:"Error404",
+        name:"Error404Fallback",
         component:Error404
     },
 ];
