@@ -23,6 +23,8 @@ import {UserServiceImpl} from '~/logic/services/UserServiceImpl';
 import {DoctorSpecialtyServiceImpl} from '~/logic/services/DoctorSpecialtyServiceImpl';
 import {AuthService} from '~/logic/interfaces/services/AuthService';
 import {AuthServiceImpl} from '~/logic/services/AuthServiceImpl';
+import {VerifyService} from '~/logic/interfaces/services/VerifyService';
+import {VerifyServiceImpl} from '~/logic/services/VerifyServiceImpl';
 
 const container = new Container();
 
@@ -37,6 +39,7 @@ container.bind<ProvinceService>(TYPES.Services.ProvinceService).to(ProvinceServi
 container.bind<DoctorService>(TYPES.Services.DoctorService).to(DoctorServiceImpl).inSingletonScope();
 container.bind<DoctorSpecialtyService>(TYPES.Services.DoctorSpecialtyService).to(DoctorSpecialtyServiceImpl).inSingletonScope();
 container.bind<UserService>(TYPES.Services.UserService).to(UserServiceImpl).inSingletonScope();
+container.bind<VerifyService>(TYPES.Services.VerifyService).to(VerifyServiceImpl).inSingletonScope();
 container.bind<WorkdayService>(TYPES.Services.WorkdayService).to(WorkdayServiceImpl).inSingletonScope();
 
 export default container;

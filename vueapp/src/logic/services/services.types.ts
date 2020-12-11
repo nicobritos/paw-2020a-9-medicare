@@ -8,5 +8,6 @@ export default {
     DoctorService: Symbol('DoctorService'),
     DoctorSpecialtyService: Symbol('DoctorSpecialtyService'),
     UserService: Symbol('UserService'),
+    VerifyService: Symbol('VerifyService'),
     WorkdayService: Symbol('WorkdayService'),
 };

@@ -14,21 +14,31 @@
 
 <script lang="ts">
 import {Component, Vue} from 'vue-property-decorator';
-import {User} from '@/logic/models/User';
+import TYPES from '~/logic/types';
+import {VerifyService} from '~/logic/interfaces/services/VerifyService';
 
 @Component
 export default class Unverified extends Vue {
-    private readonly user: User = new User();
-    private readonly tokenError: boolean = false;
+    private tokenError: boolean = false;
 
-    created(): void {
-        this.user.id = 1;
-        this.user.email = 'email';
-        this.user.firstName = 'firstName';
-        this.user.surname = 'surname';
-        this.user.verified = false;
-        this.user.profilePictureId = 1;
-        this.user.phone = '00000000';
+    async mounted(): Promise<void> {
+        let token: string = '';
+        if (typeof this.$route.query !== 'object'
+            || typeof this.$route.query.token !== 'string'
+            || (token = this.$route.query.token).length < 0)
+        {
+            this.tokenError = true;
+            return;
+        }
+
+        let service: VerifyService = this.$container.get(TYPES.Services.VerifyService);
+        let response = await service.verify(token);
+
+        if (typeof response === 'boolean') {
+            this.tokenError = !response;
+        } else {
+            this.tokenError = true;
+        }
     }
 }
 </script>
