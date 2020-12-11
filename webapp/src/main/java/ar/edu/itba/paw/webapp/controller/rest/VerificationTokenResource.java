@@ -9,7 +9,7 @@ import ar.edu.itba.paw.webapp.media_types.ErrorMIME;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import javax.ws.rs.GET;
+import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
@@ -28,7 +28,7 @@ public class VerificationTokenResource extends GenericResource {
     @Autowired
     private UserService userService;
 
-    @GET
+    @POST
     @Path("{token}")
     @Produces({MediaType.WILDCARD, ErrorMIME.ERROR})
     public Response getEntity(
@@ -48,6 +48,6 @@ public class VerificationTokenResource extends GenericResource {
 
         this.userService.verify(userOptional.get(), token);
 
-        return Response.ok().build();
+        return Response.noContent().build();
     }
 }

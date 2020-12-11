@@ -711,7 +711,7 @@
                 }
             }
         },
-        "/verify": {
+        "/verify/{token}": {
             "post": {
                 "summary": "Verifies the email",
                 "responses": {
