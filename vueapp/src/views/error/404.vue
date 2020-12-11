@@ -9,9 +9,9 @@
             <h6>
                 {{$t("NoPageFound")}}
             </h6>
-            <a :href='getUrl("")' class="btn btn-secondary" id="homeBtn">
+            <RouterLink :to='getUrl("")' class="btn btn-secondary" id="homeBtn">
             {{$t("BackToHome")}}
-            </a>
+            </RouterLink>
         </div>
     </div>
 </template>
@@ -23,10 +23,10 @@ import Logo from "@/assets/logo.svg";
 @Component
 export default class Error404 extends Vue {
     private logo = Logo;
-    getUrl(url:string):string{
+
+    getUrl(url:string): string {
         return createPath(url);
     }
-
 }
 </script>
 

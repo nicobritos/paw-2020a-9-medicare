@@ -13,9 +13,9 @@
             <h6>
                 {{$t("TryRefreshOrBackToHome")}}
             </h6>
-            <a :href='getUrl("")' class="btn btn-secondary" id="homeBtn">
-            {{$t("BackToHome")}}
-            </a>
+            <RouterLink :to='getUrl("")' class="btn btn-secondary" id="homeBtn">
+                {{$t("BackToHome")}}
+            </RouterLink>
         </div>
     </div>
 </template>

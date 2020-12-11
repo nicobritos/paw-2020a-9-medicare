@@ -107,22 +107,26 @@ const routes = [
         name: 'RequestAppointment',
         component: RequestAppointment
     },
-    //TODO: names
     {
-        path:"/error404",
+        path:"/404",
         name:"Error404",
         component:Error404
-    },//TODO: names
+    },
     {
-        path:"/error403",
+        path:"/403",
         name:"Error403",
         component:Error403
-    },//TODO: names
+    },
     {
-        path:"/error500",
+        path:"/500",
         name:"Error500",
         component:Error500
-    }
+    },
+    {
+        path:"*",
+        name:"Error404",
+        component:Error404
+    },
 ];
 
 const router = new VueRouter({

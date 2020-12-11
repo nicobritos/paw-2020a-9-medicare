@@ -9,9 +9,9 @@
             <h6>
                  {{$t("NoPermissionForThisPage")}}
             </h6>
-            <a :href='getUrl("")' class="btn btn-secondary" id="homeBtn">
-             {{$t("BackToHome")}}
-            </a>
+            <RouterLink :to='getUrl("")' class="btn btn-secondary" id="homeBtn">
+                {{$t("BackToHome")}}
+            </RouterLink>
         </div>
     </div>
 </template>
