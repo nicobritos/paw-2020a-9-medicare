@@ -100,7 +100,6 @@ const mutations: DefineMutationTree<AuthMutations, AuthState> = {
         state.user = payload;
         state._userLoading.promise = null;
         state._userLoading.loaded = true;
-        console.log('userset');
     },
     setPatients(state, {payload}): void {
         state.patients = payload;
