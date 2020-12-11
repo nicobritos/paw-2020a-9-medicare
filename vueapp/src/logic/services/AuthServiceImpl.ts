@@ -31,16 +31,6 @@ export class AuthServiceImpl implements AuthService {
         return response.isOk() ? response.data! : null;
     }
 
-    public async refresh(): Promise<Nullable<UserPatients | UserDoctors>> {
-        let response = await this.rest.post<UserPatients | UserDoctors, void>(AuthServiceImpl.REFRESH_PATH, {
-            accepts: UserMIME.ME,
-            data: undefined,
-            contentType: JSON_MIME
-        });
-
-        return response.isOk() ? response.data! : null;
-    }
-
     public async logout(): Promise<void> {
         await this.rest.post<User, void>(AuthServiceImpl.LOGOUT_PATH, {
             accepts: ErrorMIME,

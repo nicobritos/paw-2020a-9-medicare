@@ -65,12 +65,6 @@ const actions: DefineActionTree<AuthActions, AuthState, RootState> = {
         commit(authMutationTypes.setUser(null));
         commit(authMutationTypes.setPatients([]));
         commit(authMutationTypes.setDoctors([]));
-    },
-    async refresh({state, commit}) {
-        if (state.user) return;
-
-        let promise = getService().refresh();
-        await finishLogin(commit, promise);
     }
 };
 

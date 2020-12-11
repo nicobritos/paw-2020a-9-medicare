@@ -21,15 +21,13 @@ export interface AuthActions {
         password: string,
     },
     invalidate: void,
-    logout: void,
-    refresh: void
+    logout: void
 }
 
 export const authActionTypes: DefineTypes<AuthActions> = {
     invalidate: payload => ({payload, type: 'invalidate'}),
     login: payload => ({payload, type: 'login'}),
-    logout: payload => ({payload, type: 'logout'}),
-    refresh: payload => ({payload, type: 'refresh'})
+    logout: payload => ({payload, type: 'logout'})
 };
 
 export interface AuthMutations {

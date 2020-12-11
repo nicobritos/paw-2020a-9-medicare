@@ -22,6 +22,4 @@ export interface AuthService {
     login(loginUser: LoginUser): Promise<Nullable<UserPatients | UserDoctors>>;
 
     logout(): Promise<void>;
-
-    refresh(): Promise<Nullable<UserPatients | UserDoctors>>;
 }

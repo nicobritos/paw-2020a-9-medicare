@@ -12,27 +12,78 @@ import {Pagination, PaginationLinks} from '~/logic/models/utils/Pagination';
 import parseLinkHeader from 'parse-link-header';
 import {injectable} from 'inversify';
 import { createApiPath } from '../Utils';
+import {UserDoctors, UserPatients} from '~/logic/interfaces/services/AuthService';
+import {UserMIME} from '~/logic/services/UserServiceImpl';
+import {JSON_MIME} from '~/logic/services/Utils';
+import store from '~/plugins/vuex';
+import {authMutationTypes} from '~/store/types/auth.types';
+
+const STATUS_CODES = {
+    UNAUTHORIZED: 401
+};
 
 @injectable()
 export class RestRepositoryImpl implements RestRepository {
+    private static readonly REFRESH_PATH = 'auth/refresh';
+
     public async get<R, T = any>(path: string, config: GetConfig<T>): Promise<APIResponse<R>> {
         let axiosConfig = RestRepositoryImpl.getAxiosConfig(config);
-        return RestRepositoryImpl.formatResponse(await axios.get(createApiPath(path), axiosConfig));
+        return RestRepositoryImpl.createResponse(() => axios.get(createApiPath(path), axiosConfig));
     }
 
     public async post<R, T>(path: string, config: PostConfig<T>): Promise<APIResponse<R>> {
         let axiosConfig = RestRepositoryImpl.getAxiosConfig(config);
-        return RestRepositoryImpl.formatResponse(await axios.post(createApiPath(path), axiosConfig.data, axiosConfig));
+        return RestRepositoryImpl.createResponse(() => axios.post(createApiPath(path), axiosConfig.data, axiosConfig));
     }
 
     public async put<R, T>(path: string, config: PutConfig<T>): Promise<APIResponse<R>> {
         let axiosConfig = RestRepositoryImpl.getAxiosConfig(config);
-        return RestRepositoryImpl.formatResponse(await axios.put(createApiPath(path), axiosConfig.data, axiosConfig));
+        return RestRepositoryImpl.createResponse(() => axios.put(createApiPath(path), axiosConfig.data, axiosConfig));
     }
 
     public async delete<R = any, T = any>(path: string, config?: DeleteConfig<T>): Promise<APIResponse<R>> {
         let axiosConfig = RestRepositoryImpl.getAxiosConfig(config || {});
-        return RestRepositoryImpl.formatResponse(await axios.delete(createApiPath(path), axiosConfig));
+        return RestRepositoryImpl.createResponse(() => axios.delete(createApiPath(path), axiosConfig));
+    }
+
+    private static async createResponse<R>(runAction: () => Promise<AxiosResponse<R>>): Promise<APIResponse<R>> {
+        let apiResponse = RestRepositoryImpl.formatResponse<R>(await runAction());
+        if (!apiResponse.isOk() && apiResponse.error!.code === STATUS_CODES.UNAUTHORIZED) {
+            if (!await RestRepositoryImpl.refreshToken())
+                return apiResponse;
+
+            // Redo with freshly generated JWT
+            return RestRepositoryImpl.formatResponse<R>(await runAction());
+        } else {
+            return apiResponse;
+        }
+    }
+
+    private static async refreshToken(): Promise<boolean> {
+        let axiosConfig = RestRepositoryImpl.getAxiosConfig({
+            accepts: UserMIME.ME,
+            data: undefined,
+            contentType: JSON_MIME
+        });
+
+        let response = RestRepositoryImpl.formatResponse(
+            await axios.post(
+                createApiPath(RestRepositoryImpl.REFRESH_PATH),
+                undefined,
+                axiosConfig
+            )
+        );
+        if (response.isOk()) {
+            store.commit('auth/setUser', authMutationTypes.setUser((response.data as UserDoctors | UserPatients).user));
+
+            if ((response.data as UserDoctors).doctors != null) {
+                store.commit('auth/setDoctors', authMutationTypes.setDoctors((response.data as UserDoctors).doctors));
+            } else {
+                store.commit('auth/setPatients', authMutationTypes.setPatients((response.data as UserPatients).patients));
+            }
+        }
+
+        return response.isOk();
     }
 
     private static getAxiosConfig<R>(config: GetConfig<R> | PostConfig<R> | PutConfig<R> | DeleteConfig<R>): AxiosRequestConfig {
@@ -41,14 +92,14 @@ export class RestRepositoryImpl implements RestRepository {
                 Accept: RestRepositoryImpl.getAccept(config.accepts)
             },
             transformResponse: (data: any, headers) => {
-                if (typeof headers['content-type'] === 'string') {
-                    let ct = headers['content-type'];
-                    if (ct.includes(';')) {
-                        headers['content-type'] = ct.substring(0, ct.indexOf(';'));
+                let contentType = headers['content-type'];
+                if (typeof contentType === 'string') {
+                    if (contentType.includes(';')) {
+                        contentType = contentType.substring(0, contentType.indexOf(';'));
                     }
                 }
 
-                if (typeof data === 'string' && typeof headers['content-type'] === 'string' && headers['content-type'].endsWith('+json')) {
+                if (typeof data === 'string' && typeof contentType === 'string' && contentType.endsWith('+json')) {
                     data = JSON.parse(data);
                 }
 
@@ -56,6 +107,9 @@ export class RestRepositoryImpl implements RestRepository {
                     return new Pagination(data, headers['total-items'] || 0, RestRepositoryImpl.parseLinkHeader(headers));
                 else
                     return data;
+            },
+            validateStatus: () => {
+                return true;
             }
         };
 
@@ -87,7 +141,7 @@ export class RestRepositoryImpl implements RestRepository {
     }
 
     private static formatResponse<R>(response: AxiosResponse): APIResponse<R> {
-        if (typeof response.headers['content-type'] === 'string' && response.headers['content-type'] === ErrorMIME) {
+        if (typeof response.headers['content-type'] === 'string' && response.headers['content-type'].startsWith(ErrorMIME)) {
             return APIResponseFactory.error(response.data as APIError);
         }
 
