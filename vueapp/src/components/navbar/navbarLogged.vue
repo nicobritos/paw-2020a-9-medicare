@@ -7,7 +7,7 @@
                      class="header-a-element nav-link mx-3">{{ $t('SearchMedics') }}
         </RouterLink>
 
-        <div class="d-inline-flex flex-column align-items-end">
+        <div class="d-inline-flex flex-column align-items-end mr-3">
             <RouterLink v-if="!isDoctor" :to="getUrl('patient/profile')">
                 <!-- TODO:remove style -->
                 <p style="font-weight: 400;" class="m-0 p-0 text-muted white-text">
