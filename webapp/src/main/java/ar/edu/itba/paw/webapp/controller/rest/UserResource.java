@@ -148,6 +148,19 @@ public class UserResource extends GenericAuthenticationResource {
         return Response.ok(userOptional.get()).build();
     }
 
+    @GET
+    @Produces({UserMIME.ME, ErrorMIME.ERROR})
+    public Response getLoggedUser(
+            @Context HttpHeaders httpheaders) {
+        MIMEHelper.assertServerType(httpheaders, UserMIME.ME);
+
+        Optional<User> user = this.getUser();
+        if (!user.isPresent())
+            return this.error(Status.UNAUTHORIZED.getStatusCode(), Status.UNAUTHORIZED.toString());
+
+        return Response.ok(user.get()).build();
+    }
+
     @PUT
     @Path("{id}")
     @Produces({UserMIME.GET, ErrorMIME.ERROR})
