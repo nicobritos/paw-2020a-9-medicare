@@ -49,16 +49,27 @@ public class EmailServiceImpl implements EmailService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(EmailServiceImpl.class);
 
-    private boolean firstTime = true;
-
     private Timer timer = new Timer();
-    private ScheduledExecutorService scheduler = new ScheduledThreadPoolExecutor(1);
+    private final ScheduledExecutorService scheduler = new ScheduledThreadPoolExecutor(1);
 
-    private static final String MESSAGE_CANCEL_SOURCE_BODY_PREFIX = "appointment.cancel.email.body";
-    private static final String MESSAGE_NEW_APPOINTMENT_SOURCE_BODY_PREFIX = "appointment.new.email.body";
-    private static final String MESSAGE_APPOINTMENT_NOTIFICATION_DOCTOR_SOURCE_BODY_PREFIX = "appointment.notification.email.doctor.body";
-    private static final String MESSAGE_APPOINTMENT_NOTIFICATION_PATIENT_SOURCE_BODY_PREFIX = "appointment.notification.email.patient.body";
-    private static final String MESSAGE_CONFIRMATION_SOURCE_BODY_PREFIX = "signup.confirmation.email.body";
+    private static final String MESSAGE_CANCEL_SOURCE_PREFIX = "appointment.cancel.email";
+    private static final String MESSAGE_CANCEL_SOURCE_SUBJECT_PREFIX = MESSAGE_CANCEL_SOURCE_PREFIX + ".subject";
+    private static final String MESSAGE_CANCEL_SOURCE_BODY_PREFIX = MESSAGE_CANCEL_SOURCE_PREFIX + ".body";
+
+    private static final String MESSAGE_NEW_APPOINTMENT_SOURCE_PREFIX = "appointment.new.email";
+    private static final String MESSAGE_NEW_APPOINTMENT_SOURCE_SUBJECT_PREFIX = MESSAGE_NEW_APPOINTMENT_SOURCE_PREFIX + ".subject";
+    private static final String MESSAGE_NEW_APPOINTMENT_SOURCE_BODY_PREFIX = MESSAGE_NEW_APPOINTMENT_SOURCE_PREFIX + ".body";
+
+    private static final String MESSAGE_APPOINTMENT_NOTIFICATION_SOURCE_PREFIX = "appointment.notification.email";
+    private static final String MESSAGE_APPOINTMENT_NOTIFICATION_SOURCE_DOCTOR_SUBJECT_PREFIX = MESSAGE_APPOINTMENT_NOTIFICATION_SOURCE_PREFIX + ".doctor.subject";
+    private static final String MESSAGE_APPOINTMENT_NOTIFICATION_SOURCE_PATIENT_SUBJECT_PREFIX = MESSAGE_APPOINTMENT_NOTIFICATION_SOURCE_PREFIX + ".patient.subject";
+    private static final String MESSAGE_APPOINTMENT_NOTIFICATION_DOCTOR_SOURCE_BODY_PREFIX = MESSAGE_APPOINTMENT_NOTIFICATION_SOURCE_PREFIX + ".doctor.body";
+    private static final String MESSAGE_APPOINTMENT_NOTIFICATION_PATIENT_SOURCE_BODY_PREFIX = MESSAGE_APPOINTMENT_NOTIFICATION_SOURCE_PREFIX + ".patient.body";
+
+    private static final String MESSAGE_CONFIRMATION_SOURCE_PREFIX = "signup.confirmation.email";
+    private static final String MESSAGE_CONFIRMATION_SOURCE_SUBJECT_PREFIX = MESSAGE_CONFIRMATION_SOURCE_PREFIX + ".subject";
+    private static final String MESSAGE_CONFIRMATION_SOURCE_BODY_PREFIX = MESSAGE_CONFIRMATION_SOURCE_PREFIX + ".body";
+
     private static final String MESSAGE_SOURCE_DISCLAIMER = "email.disclaimer";
 
     private void sendEmail(String to, String subject, String html) throws MessagingException{
@@ -84,7 +95,7 @@ public class EmailServiceImpl implements EmailService {
     @Async
     @Override
     public void sendCancelledAppointmentNotificationEmail(Appointment appointment, boolean isDoctorCancelling) {
-        String subject = this.messageSource.getMessage("appointment.cancel.email.subject", null, appointment.getLocale());
+        String subject = this.messageSource.getMessage(MESSAGE_CANCEL_SOURCE_SUBJECT_PREFIX, null, appointment.getLocale());
         String userTitle = isDoctorCancelling ? this.messageSource.getMessage("doctor", null, appointment.getLocale())
                 : this.messageSource.getMessage("patient", null, appointment.getLocale());
         String dowMessage;
@@ -191,7 +202,7 @@ public class EmailServiceImpl implements EmailService {
     @Async
     @Override
     public void sendNewAppointmentNotificationEmail(Appointment appointment) {
-        String subject = this.messageSource.getMessage("appointment.new.email.subject", null, appointment.getLocale());
+        String subject = this.messageSource.getMessage(MESSAGE_NEW_APPOINTMENT_SOURCE_SUBJECT_PREFIX, null, appointment.getLocale());
         String dowMessage;
         switch (appointment.getFromDate().getDayOfWeek()) {
             case MONDAY:
@@ -284,7 +295,7 @@ public class EmailServiceImpl implements EmailService {
     @Override
     public void sendEmailConfirmationEmail(User user, String token, String confirmationPageRelativeUrl, Locale locale){
 
-        String subject = this.messageSource.getMessage("signup.confirmation.email.subject", null, locale);
+        String subject = this.messageSource.getMessage(MESSAGE_CONFIRMATION_SOURCE_SUBJECT_PREFIX, null, locale);
         String confirmationUrl;
         try {
             confirmationUrl = confirmationPageRelativeUrl + "/" + URLEncoder.encode(token, StandardCharsets.UTF_8.name());
@@ -309,8 +320,8 @@ public class EmailServiceImpl implements EmailService {
     @Async
     @Override
     public void scheduleNotifyAppointmentEmail(Appointment appointment) {
-        String doctorSubject = this.messageSource.getMessage("appointment.notification.email.doctor.subject", null, appointment.getLocale());
-        String patientSubject = this.messageSource.getMessage("appointment.notification.email.patient.subject", null, appointment.getLocale());
+        String doctorSubject = this.messageSource.getMessage(MESSAGE_APPOINTMENT_NOTIFICATION_SOURCE_DOCTOR_SUBJECT_PREFIX, null, appointment.getLocale());
+        String patientSubject = this.messageSource.getMessage(MESSAGE_APPOINTMENT_NOTIFICATION_SOURCE_PATIENT_SUBJECT_PREFIX, null, appointment.getLocale());
         String dowMessage;
         switch (appointment.getFromDate().getDayOfWeek()) {
             case MONDAY:
