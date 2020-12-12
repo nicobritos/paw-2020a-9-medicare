@@ -30,7 +30,7 @@ public class RefreshTokenServiceImpl extends GenericServiceImpl<RefreshTokenDao,
     @Autowired
     private RefreshTokenDao repository;
 
-    private final ScheduledExecutorService timer = new ScheduledThreadPoolExecutor(5);
+    private final ScheduledExecutorService scheduler = new ScheduledThreadPoolExecutor(1);
 
     public RefreshTokenServiceImpl() {
     }
@@ -98,9 +98,13 @@ public class RefreshTokenServiceImpl extends GenericServiceImpl<RefreshTokenDao,
     @PostConstruct
     @Async
     @Override
+    public void scheduleDeleteRefreshTokens(){
+        scheduler.scheduleAtFixedRate(this::deleteOldRefreshTokens, 0, 1, TimeUnit.DAYS);
+    }
+
+    @Override
     public void deleteOldRefreshTokens() {
         int tokensDeleted = repository.removeTokensOlderThan(DAYS_VALID);
         LOGGER.info("Deleted {} refresh tokens from the database that were at least {} days old", tokensDeleted, DAYS_VALID);
-        timer.scheduleAtFixedRate(this::deleteOldRefreshTokens, 0, 1, TimeUnit.DAYS);
     }
 }
