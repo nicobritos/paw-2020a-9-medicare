@@ -1,15 +1,14 @@
 package ar.edu.itba.paw.persistence;
 
 import ar.edu.itba.paw.interfaces.daos.RefreshTokenDao;
-import ar.edu.itba.paw.models.RefreshToken;
-import ar.edu.itba.paw.models.RefreshToken_;
+import ar.edu.itba.paw.models.*;
 import ar.edu.itba.paw.persistence.generics.GenericDaoImpl;
+import org.joda.time.LocalDateTime;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.persistence.criteria.CriteriaBuilder;
-import javax.persistence.criteria.CriteriaQuery;
-import javax.persistence.criteria.Root;
+import javax.persistence.criteria.*;
+import java.util.List;
 import java.util.Optional;
 
 @Repository
@@ -35,6 +34,19 @@ public class RefreshTokenDaoImpl extends GenericDaoImpl<RefreshToken, Integer> i
 
         Optional<RefreshToken> refreshToken = this.findByToken(token);
         refreshToken.ifPresent(value -> this.getEntityManager().remove(value));
+    }
+
+    @Override
+    @Transactional
+    public int removeTokensOlderThan(int days) {
+        LocalDateTime expiryDate = LocalDateTime.now().plusDays(days);
+
+        CriteriaBuilder builder = this.getEntityManager().getCriteriaBuilder();
+        CriteriaDelete<RefreshToken> delete = builder.createCriteriaDelete(RefreshToken.class);
+        Root<RefreshToken> root = delete.from(RefreshToken.class);
+
+        delete.where(builder.greaterThanOrEqualTo(root.get(RefreshToken_.createdDate), expiryDate));
+        return getEntityManager().createQuery(delete).executeUpdate();
     }
 
     @Override

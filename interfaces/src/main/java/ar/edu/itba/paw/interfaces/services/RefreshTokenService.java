@@ -13,4 +13,6 @@ public interface RefreshTokenService extends GenericService<RefreshToken, Intege
     String refresh(RefreshToken refreshToken);
 
     void removeByToken(String token);
+
+    void deleteOldRefreshTokens();
 }
