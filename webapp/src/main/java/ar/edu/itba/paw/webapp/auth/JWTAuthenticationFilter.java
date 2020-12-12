@@ -8,6 +8,7 @@ import ar.edu.itba.paw.webapp.exceptions.ExceptionResponseWriter;
 import ar.edu.itba.paw.webapp.exceptions.MissingAcceptsException;
 import ar.edu.itba.paw.webapp.media_types.LoginMIME;
 import ar.edu.itba.paw.webapp.media_types.MIMEHelper;
+import ar.edu.itba.paw.webapp.media_types.UserMIME;
 import ar.edu.itba.paw.webapp.media_types.parsers.serializers.UserMeSerializer;
 import ar.edu.itba.paw.webapp.models.UserCredentials;
 import ar.edu.itba.paw.webapp.models.UserMe;
@@ -107,6 +108,7 @@ public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilte
         }
 
         response.setStatus(Status.OK.getStatusCode());
+        response.setHeader(Constants.CONTENT_TYPE, UserMIME.ME);
         response.getWriter().append(UserMeSerializer.instance.toJson(userMe).toString());
     }
 }
