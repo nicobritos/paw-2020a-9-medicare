@@ -1,8 +1,6 @@
 package ar.edu.itba.paw.webapp.controller.rest;
 
-import ar.edu.itba.paw.interfaces.services.DoctorSpecialtyService;
-import ar.edu.itba.paw.interfaces.services.LocalityService;
-import ar.edu.itba.paw.interfaces.services.UserService;
+import ar.edu.itba.paw.interfaces.services.*;
 import ar.edu.itba.paw.models.*;
 import ar.edu.itba.paw.webapp.controller.rest.utils.GenericAuthenticationResource;
 import ar.edu.itba.paw.webapp.media_types.ErrorMIME;
@@ -33,6 +31,10 @@ public class UserResource extends GenericAuthenticationResource {
 
     @Autowired
     private DoctorSpecialtyService doctorSpecialtyService;
+    @Autowired
+    private DoctorService doctorService;
+    @Autowired
+    private PatientService patientService;
     @Autowired
     private LocalityService localityService;
     @Autowired
@@ -158,7 +160,17 @@ public class UserResource extends GenericAuthenticationResource {
         if (!user.isPresent())
             return this.error(Status.UNAUTHORIZED.getStatusCode(), Status.UNAUTHORIZED.toString());
 
-        return Response.ok(user.get()).build();
+        UserMe userMe;
+        if (this.isDoctor()) {
+            userMe = UserMeFactory.withDoctors(user.get(), this.doctorService.findByUser(user.get()));
+        } else {
+            userMe = UserMeFactory.withPatients(user.get(), this.patientService.findByUser(user.get()));
+        }
+
+        return Response
+                .ok()
+                .entity(userMe)
+                .build();
     }
 
     @PUT

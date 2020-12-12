@@ -11,6 +11,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 import org.springframework.stereotype.Component;
 
@@ -71,7 +72,7 @@ public class JWTAuthorizationFilter extends BasicAuthenticationFilter {
             return null;
 
         Object o = claims.get(Constants.JWT_CLAIMS_USERNAME);
-        String user = o != null ? o.toString() : null;
+        String email = o != null ? o.toString() : null;
 
         Collection<? extends GrantedAuthority> authorities;
         o = claims.get(Constants.JWT_CLAIMS_ROLE);
@@ -81,7 +82,7 @@ public class JWTAuthorizationFilter extends BasicAuthenticationFilter {
         else
             authorities = Collections.emptyList();
 
-        return user != null ? new UsernamePasswordAuthenticationToken(user, null, authorities) : null;
+        return email != null ? new UsernamePasswordAuthenticationToken(new User(email, "", authorities), "", authorities) : null;
     }
 
     private String getSecretKey() throws IOException {
