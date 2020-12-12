@@ -48,7 +48,23 @@ const actions: DefineActionTree<AuthActions, AuthState, RootState> = {
             username: payload.email,
             password: payload.password
         });
-        await finishLogin(commit, promise);
+        commit(authMutationTypes.setPromise(promise));
+
+        let data = null;
+        try {
+            data = await promise;
+        } catch (e) {
+            console.error(e);
+        }
+
+        commit(authMutationTypes.setUser(data == null ? data : data.user));
+        if (data != null) {
+            if ((data as UserPatients).patients != null) {
+                commit(authMutationTypes.setPatients((data as UserPatients).patients));
+            } else {
+                commit(authMutationTypes.setDoctors((data as UserDoctors).doctors));
+            }
+        }
     },
     async logout({state, commit}) {
         if (!state._userLoading.promise && !state.user) return;
@@ -67,26 +83,6 @@ const actions: DefineActionTree<AuthActions, AuthState, RootState> = {
         commit(authMutationTypes.setDoctors([]));
     }
 };
-
-async function finishLogin(commit: Commit, promise: Promise<Nullable<UserDoctors | UserPatients>>): Promise<void> {
-    commit(authMutationTypes.setPromise(promise));
-
-    let data = null;
-    try {
-        data = await promise;
-    } catch (e) {
-        console.error(e);
-    }
-
-    commit(authMutationTypes.setUser(data == null ? data : data.user));
-    if (data != null) {
-        if ((data as UserPatients).patients != null) {
-            commit(authMutationTypes.setPatients((data as UserPatients).patients));
-        } else {
-            commit(authMutationTypes.setDoctors((data as UserDoctors).doctors));
-        }
-    }
-}
 
 const mutations: DefineMutationTree<AuthMutations, AuthState> = {
     setPromise(state, {payload}): void {
