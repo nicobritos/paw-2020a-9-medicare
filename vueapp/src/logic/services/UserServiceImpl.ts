@@ -23,6 +23,14 @@ export class UserServiceImpl implements UserService {
     @inject(TYPES.Repositories.RestRepository)
     private rest: RestRepository;
 
+    public async me(): Promise<Nullable<UserDoctors | UserPatients>> {
+        let response = await this.rest.get<UserDoctors | UserPatients>(UserServiceImpl.PATH, {
+            accepts: UserMIME.ME,
+            retry: false
+        });
+        return response.isOk() ? response.data! : null;
+    }
+
     public async get(id: number): Promise<Nullable<User>> {
         let response = await this.rest.get<User>(getPathWithId(UserServiceImpl.PATH, id), {
             accepts: UserMIME.GET

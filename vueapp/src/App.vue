@@ -14,6 +14,7 @@ import "bootstrap/dist/css/bootstrap.css";
 import "bootstrap-vue/dist/bootstrap-vue.css";
 import Navbar from "./components/navbar/navbar.vue";
 import {Component, Vue} from 'vue-property-decorator';
+import {userActionTypes} from '~/store/types/user.types';
 
 @Component({
     components: {
@@ -23,6 +24,10 @@ import {Component, Vue} from 'vue-property-decorator';
 export default class App extends Vue {
     get hideNav(): boolean {
         return this.$route.meta.hideNav;
+    }
+
+    created(): void {
+        this.$store.dispatch('users/me', userActionTypes.me());
     }
 }
 </script>

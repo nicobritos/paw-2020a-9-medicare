@@ -37,5 +37,7 @@ export interface UserService {
 
     get(id: number): Promise<Nullable<User>>;
 
+    me(): Promise<Nullable<UserDoctors | UserPatients>>;
+
     update(id: number, user: UpdateUser): Promise<User | APIError>
 }

@@ -638,6 +638,16 @@
                     }
                 }
             },
+            "error-401": {
+                "description": "Unauthorized",
+                "content": {
+                    "application/vnd.error.v1+json": {
+                        "schema": {
+                            "$ref": "#/components/schemas/error"
+                        }
+                    }
+                }
+            },
             "error-403": {
                 "description": "Forbidden",
                 "content": {
@@ -807,6 +817,17 @@
             }
         },
         "/users": {
+            "get": {
+                "summary": "Returns the logged user",
+                "responses": {
+                    "200": {
+                        "$ref": "#/components/responses/get-user-me"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/error-401"
+                    }
+                }
+            },
             "post": {
                 "summary": "Creates a user",
                 "requestBody": {

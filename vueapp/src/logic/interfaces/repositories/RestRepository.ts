@@ -6,6 +6,7 @@ export type PostConfig<T> = {
     contentType: string;
     accepts: string | string[];
     paginate?: boolean;
+    retry?: boolean
 }
 
 export type PutConfig<T> = PostConfig<T>;

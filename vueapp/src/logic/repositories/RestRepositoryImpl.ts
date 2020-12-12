@@ -28,27 +28,28 @@ export class RestRepositoryImpl implements RestRepository {
 
     public async get<R, T = any>(path: string, config: GetConfig<T>): Promise<APIResponse<R>> {
         let axiosConfig = RestRepositoryImpl.getAxiosConfig(config);
-        return RestRepositoryImpl.createResponse(() => axios.get(createApiPath(path), axiosConfig));
+        return RestRepositoryImpl.createResponse(config.retry, () => axios.get(createApiPath(path), axiosConfig));
     }
 
     public async post<R, T>(path: string, config: PostConfig<T>): Promise<APIResponse<R>> {
         let axiosConfig = RestRepositoryImpl.getAxiosConfig(config);
-        return RestRepositoryImpl.createResponse(() => axios.post(createApiPath(path), axiosConfig.data, axiosConfig));
+        return RestRepositoryImpl.createResponse(config.retry, () => axios.post(createApiPath(path), axiosConfig.data, axiosConfig));
     }
 
     public async put<R, T>(path: string, config: PutConfig<T>): Promise<APIResponse<R>> {
         let axiosConfig = RestRepositoryImpl.getAxiosConfig(config);
-        return RestRepositoryImpl.createResponse(() => axios.put(createApiPath(path), axiosConfig.data, axiosConfig));
+        return RestRepositoryImpl.createResponse(config.retry, () => axios.put(createApiPath(path), axiosConfig.data, axiosConfig));
     }
 
     public async delete<R = any, T = any>(path: string, config?: DeleteConfig<T>): Promise<APIResponse<R>> {
         let axiosConfig = RestRepositoryImpl.getAxiosConfig(config || {});
-        return RestRepositoryImpl.createResponse(() => axios.delete(createApiPath(path), axiosConfig));
+        return RestRepositoryImpl.createResponse(config?.retry, () => axios.delete(createApiPath(path), axiosConfig));
     }
 
-    private static async createResponse<R>(runAction: () => Promise<AxiosResponse<R>>): Promise<APIResponse<R>> {
+    private static async createResponse<R>(retry: boolean | undefined, runAction: () => Promise<AxiosResponse<R>>): Promise<APIResponse<R>> {
         let apiResponse = RestRepositoryImpl.formatResponse<R>(await runAction());
-        if (!apiResponse.isOk() && apiResponse.error!.code === STATUS_CODES.UNAUTHORIZED) {
+        // We want to retry on undefined (default behaviour)
+        if (!apiResponse.isOk() && apiResponse.error!.code === STATUS_CODES.UNAUTHORIZED && retry !== false) {
             if (!await RestRepositoryImpl.refreshToken())
                 return apiResponse;
 

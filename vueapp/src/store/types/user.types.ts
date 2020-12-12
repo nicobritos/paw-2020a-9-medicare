@@ -8,6 +8,7 @@ export interface UserState {
 }
 
 export interface UserActions {
+    me: void,
     getUser: {
         id: number
     }
@@ -29,6 +30,7 @@ export interface UserActionReturnTypes {
 }
 
 export const userActionTypes: DefineTypes<UserActions> = {
+    me: payload => ({payload, type: 'me'}),
     getUser: payload => ({payload, type: 'getUser'}),
     updateUser: payload => ({payload, type: 'updateUser'}),
     createAsDoctor: payload => ({payload, type: 'createAsDoctor'}),

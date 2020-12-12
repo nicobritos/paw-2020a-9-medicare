@@ -9,12 +9,41 @@ import {UserActionReturnTypes, UserActions, UserState} from '~/store/types/user.
 import {User} from '~/logic/models/User';
 import {authMutationTypes} from '~/store/types/auth.types';
 import {APIError} from '~/logic/models/APIError';
+import {UserDoctors, UserPatients} from '~/logic/interfaces/services/AuthService';
 
 function getService(): UserService {
     return container.get(TYPES.Services.UserService);
 }
 
 const actions: DefineActionTree<UserActions, UserState, RootState, UserActionReturnTypes> = {
+    async me({rootState, rootGetters, commit}): Promise<void> {
+        if (rootGetters['auth/loggedIn'] || rootState.auth._userLoading.promise || rootState.auth._userLoading.loaded)
+            return;
+
+        let data: Nullable<UserDoctors | UserPatients>;
+        try {
+            data = await getService().me();
+        } catch (e) {
+            console.error(e);
+            return;
+        }
+
+        commit('auth/setUser', authMutationTypes.setUser(data == null ? data : data.user), {
+            root: true
+        });
+        if (data != null) {
+            if ((data as UserDoctors).doctors) {
+                commit('auth/setDoctors', authMutationTypes.setDoctors((data as UserDoctors).doctors), {
+                    root: true,
+                });
+            } else {
+                commit('auth/setPatients', authMutationTypes.setPatients((data as UserPatients).patients), {
+                    root: true,
+                });
+            }
+        }
+    },
+
     async getUser({state, commit}, {payload}): Promise<Nullable<User>> {
         try {
             return await getService().get(payload.id);
