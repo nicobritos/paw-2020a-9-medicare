@@ -107,6 +107,12 @@ export default class Login extends Vue {
                 });
             }
         }
+        //TODO: future check of this
+        else if( this.user ){
+                this.$router.push({
+                    name: 'Landing',
+                });
+            }
     }
 
     public toggleShowPassword(): void {

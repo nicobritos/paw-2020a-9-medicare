@@ -22,7 +22,7 @@ Vue.use(VueRouter);
 
 // TODO:check
 function authGuard(to,from,next) {
-    if(store.state.auth.loggedIn){
+    if(store.getters["auth/loggedIn"]){
         next();
     }else{
         next({name:"Login"});
@@ -30,8 +30,8 @@ function authGuard(to,from,next) {
 }
 
 function notAuthGuard(to,from,next) {
-    if(store.state.auth.loggedIn){
-        if(store.state.auth.isDoctor){   
+    if(store.getters["auth/loggedIn"]){
+        if(store.getters["auth/isDoctor"]){   
             next({name:"MedicHome"});
         }
         else{
@@ -43,8 +43,8 @@ function notAuthGuard(to,from,next) {
 }
 
 function patientGuard(to,from,next) {
-    if(store.state.auth.loggedIn){
-        if(store.state.auth.isDoctor){   
+    if(store.getters["auth/loggedIn"]){
+        if(store.getters["auth/isDoctor"]){   
             next({name:"MedicHome"});
         }
         else{
@@ -56,8 +56,8 @@ function patientGuard(to,from,next) {
 }
 
 function doctorGuard(to,from,next) {
-    if(store.state.auth.loggedIn){
-        if(store.state.auth.isDoctor){   
+    if(store.getters["auth/loggedIn"]){
+        if(store.getters["auth/isDoctor"]){   
             next({name:"MedicHome"});
         }
         else{
@@ -69,7 +69,7 @@ function doctorGuard(to,from,next) {
 }
 
 function redirectHomeTopord(to) {
-    if(store.state.auth.isDoctor){
+    if(store.getters["auth/isDoctor"]){
         return "doctor/home";
     }else{
         return "patient/home";
