@@ -61,17 +61,17 @@ public class AppointmentDaoImplTest {
     private static final String URL = "www.hnacional.com";
     private static final int REGISTRATION_NUMBER = 123;
     private static final AppointmentStatus STATUS = AppointmentStatus.PENDING;
-    private static final String FROM_DATE = "2020-05-25 11:00:00.000000";
-    private static final String FROM_DATE_2 = "2020-05-25 15:00:00.000000";
-    private static final String MOTIVE = "motive";
-    private static final String MESSAGE = "message";
-    private static final int YEAR = 2020;
+    private static final int YEAR = 2021;
     private static final int MONTH = 5;
     private static final int DAY = 25;
     private static final int HOUR = 11;
     private static final int MINUTE = 0;
     private static final int HOUR_2 = 15;
     private static final int MINUTE_2 = 0;
+    private static final String FROM_DATE = YEAR + "-05-25 11:00:00.000000";
+    private static final String FROM_DATE_2 = YEAR + "-05-25 15:00:00.000000";
+    private static final String MOTIVE = "motive";
+    private static final String MESSAGE = "message";
     private static final boolean WAS_NOTIFICATION_EMAIL_SENT = true;
     private static final Locale LOCALE = new Locale("es");
 
@@ -2200,14 +2200,14 @@ public class AppointmentDaoImplTest {
         insertAnotherAppointmentToNotify();
 
         // 2. Ejercitar
-        List<Appointment> appointments = this.appointmentDao.findAllAppointmentsInIntervalToNotify(
-                new LocalDateTime(YEAR, MONTH, DAY, HOUR, MINUTE).plusMinutes(1),
+        List<Appointment> appointments = this.appointmentDao.findAllAppointmentsToNotifyUpTo(
                 new LocalDateTime(YEAR, MONTH, DAY, HOUR_2, MINUTE_2));
 
         // 3. Postcondiciones
         assertNotNull(appointments);
-        assertEquals(1, appointments.size());
-        assertEquals(4, (int) appointments.get(0).getId());
+        assertEquals(2, appointments.size());
+        assertTrue((appointments.get(0).getId() == 3 && appointments.get(1).getId() == 4) ||
+                (appointments.get(0).getId() == 4 && appointments.get(1).getId() == 3));
     }
 
     @Test
@@ -2218,31 +2218,12 @@ public class AppointmentDaoImplTest {
         insertAppointmentToNotify();
 
         // 2. Ejercitar
-        List<Appointment> appointments = this.appointmentDao.findAllAppointmentsInIntervalToNotify(
-                new LocalDateTime(YEAR, MONTH, DAY, HOUR, MINUTE).plusMinutes(1),
+        List<Appointment> appointments = this.appointmentDao.findAllAppointmentsToNotifyUpTo(
                 new LocalDateTime(YEAR, MONTH, DAY, HOUR_2, MINUTE_2));
 
         // 3. Postcondiciones
         assertNotNull(appointments);
         assertTrue(appointments.isEmpty());
-    }
-
-    @Test
-    public void testAppointmentFindAllAppointmentsInIntervalToNotifyNullFrom(){
-        // 1. Precondiciones
-        insertAppointment();
-        insertAnotherAppointment();
-        insertAppointmentToNotify();
-        insertAnotherAppointmentToNotify();
-        expectedException.expect(IllegalArgumentException.class);
-
-        // 2. Ejercitar
-        List<Appointment> appointments = this.appointmentDao.findAllAppointmentsInIntervalToNotify(
-                null,
-                new LocalDateTime(YEAR, MONTH, DAY, HOUR_2, MINUTE_2));
-
-        // 3. Postcondiciones
-        // IllegalArgumentException
     }
 
     @Test
@@ -2255,8 +2236,7 @@ public class AppointmentDaoImplTest {
         expectedException.expect(IllegalArgumentException.class);
 
         // 2. Ejercitar
-        List<Appointment> appointments = this.appointmentDao.findAllAppointmentsInIntervalToNotify(
-                new LocalDateTime(YEAR, MONTH, DAY, HOUR, MINUTE).plusMinutes(1),
+        List<Appointment> appointments = this.appointmentDao.findAllAppointmentsToNotifyUpTo(
                 null);
 
         // 3. Postcondiciones

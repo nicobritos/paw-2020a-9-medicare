@@ -236,7 +236,7 @@ public class AppointmentServiceImpl extends GenericServiceImpl<AppointmentDao, A
 
     @Override
     public List<Appointment> findAllAppointmentsInIntervalToNotify(LocalDateTime from, LocalDateTime to) {
-        return this.appointmentRepository.findAllAppointmentsInIntervalToNotify(LocalDateTime.now(), to);
+        return this.appointmentRepository.findAllAppointmentsToNotifyUpTo(to);
     }
 
     @Override

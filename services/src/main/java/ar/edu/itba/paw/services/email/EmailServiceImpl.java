@@ -36,7 +36,7 @@ public class EmailServiceImpl implements EmailService {
     @Autowired
     private MessageSource messageSource;
 
-    /* Cant include AppointmentService because of circular injections. Only needing findAllAppointmentsInIntervalToNotify
+    /* Cant include AppointmentService because of circular injections. Only needing findAllAppointmentsToNotifyUpTo
      * method, so we can use the DAO without worrying.
      */
     @Autowired
@@ -46,7 +46,9 @@ public class EmailServiceImpl implements EmailService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(EmailServiceImpl.class);
 
-    Timer timer = new Timer();
+    private boolean firstTime = true;
+
+    private Timer timer = new Timer();
 
     private static final String MESSAGE_CANCEL_SOURCE_BODY_PREFIX = "appointment.cancel.email.body";
     private static final String MESSAGE_NEW_APPOINTMENT_SOURCE_BODY_PREFIX = "appointment.new.email.body";
@@ -426,7 +428,8 @@ public class EmailServiceImpl implements EmailService {
     public void initScheduleEmails() {
         // For the first time the server runs
         LocalDateTime now = LocalDateTime.now();
-        List<Appointment> appointments = appointmentDao.findAllAppointmentsInIntervalToNotify(now, now.plusDays(2));
+        // Notify 24hs earlier than the appointment
+        List<Appointment> appointments = appointmentDao.findAllAppointmentsToNotifyUpTo(now.plusDays(2));
         for (Appointment appointment: appointments){
             scheduleNotifyAppointmentEmail(appointment);
         }
@@ -434,14 +437,11 @@ public class EmailServiceImpl implements EmailService {
         timer.schedule(new TimerTask() {
             @Override
             public void run() {
+                // Cleanup timer
                 timer.cancel();
                 timer.purge();
                 timer = new Timer();
-                LocalDateTime now = LocalDateTime.now();
-                List<Appointment> appointments = appointmentDao.findAllAppointmentsInIntervalToNotify(now.plusDays(1).minusMinutes(30), now.plusDays(1));
-                for (Appointment appointment: appointments){
-                    scheduleNotifyAppointmentEmail(appointment);
-                }
+                initScheduleEmails();
             }
         }, now.plusDays(1).toDate());
     }

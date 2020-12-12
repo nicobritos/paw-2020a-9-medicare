@@ -36,7 +36,7 @@ public class AppointmentServiceImplTest {
     private static final String OFFICE_NAME = "Oficina";
     private static final String URL = "www.oficinahospital.com";
     private static final int PATIENT_ID = 1;
-    private static final int YEAR = 2020;
+    private static final int YEAR = 2021;
     private static final int MONTH = 1;
     private static final int DAY_OF_MONTH = 29;
     private static final int HOUR = 12;

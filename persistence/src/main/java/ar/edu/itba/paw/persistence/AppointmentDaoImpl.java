@@ -230,8 +230,8 @@ public class AppointmentDaoImpl extends GenericDaoImpl<Appointment, Integer> imp
     }
 
     @Override
-    public List<Appointment> findAllAppointmentsInIntervalToNotify(LocalDateTime from, LocalDateTime to) {
-        if (from == null || to == null)
+    public List<Appointment> findAllAppointmentsToNotifyUpTo(LocalDateTime to) {
+        if (to == null)
             throw new IllegalArgumentException();
 
         CriteriaBuilder builder = this.getEntityManager().getCriteriaBuilder();
@@ -244,7 +244,7 @@ public class AppointmentDaoImpl extends GenericDaoImpl<Appointment, Integer> imp
                     builder.and(
                         builder.equal(root.get(Appointment_.wasNotificationEmailSent),false),
                         builder.and(
-                                builder.greaterThanOrEqualTo(root.get(Appointment_.fromDate), from),
+                                builder.greaterThanOrEqualTo(root.get(Appointment_.fromDate), LocalDateTime.now()),
                                 builder.lessThanOrEqualTo(root.get(Appointment_.fromDate), to)
                         )
                     ),
