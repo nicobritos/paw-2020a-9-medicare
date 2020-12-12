@@ -14,6 +14,8 @@ import PatientProfile from '@/views/patient/profile';
 import PatientHome from '@/views/patient/home';
 import SelectAppointment from '@/views/selectAppointment';
 import RequestAppointment from '@/views/patient/requestAppointment';
+import AddSpecialty from "@/views/medic/addSpecialty";
+import AddWorkday from "@/views/medic/addWorkday";
 import Error403 from "@/views/error/403";
 import Error404 from "@/views/error/404";
 import Error500 from "@/views/error/500";
@@ -179,6 +181,16 @@ const routes = [
         name: 'RequestAppointment',
         component: RequestAppointment,
         beforeEnter:patientGuard
+    },
+    {
+        path: '/addSpecialty',
+        name: 'AddSpecialty',
+        component: AddSpecialty
+    },
+    {
+        path: '/addWorkday',
+        name: 'AddWorkday',
+        component: AddWorkday
     },
     {
         path:"/404",
