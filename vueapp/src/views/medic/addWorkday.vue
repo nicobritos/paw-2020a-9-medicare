@@ -10,6 +10,7 @@
                 </h1>
             </div>
 
+
             <div class="form-group row">
                 <div class="col">
                     <label>
@@ -17,69 +18,15 @@
                     </label>
                 </div>
                 <div class="col-8">
-                    <div class="pretty p-icon p-round p-smooth">
-                        <checkbox path="dow[0]"/>
-                        <div class="state p-success">
-                            <i class="icon mdi mdi-check"></i>
-                            <label>
-                                {{$t("Monday")}}
-                            </label>
-                        </div>
-                    </div>
-                    <div class="pretty p-icon p-round p-smooth">
-                        <checkbox path="dow[1]"/>
-                        <div class="state p-success">
-                            <i class="icon mdi mdi-check"></i>
-                            <label>
-                                {{$t("Tuesday")}}
-                            </label>
-                        </div>
-                    </div>
-                    <div class="pretty p-icon p-round p-smooth">
-                        <checkbox path="dow[2]"/>
-                        <div class="state p-success">
-                            <i class="icon mdi mdi-check"></i>
-                            <label>
-                                {{$t("Wednesday")}}
-                            </label>
-                        </div>
-                    </div>
-                    <div class="pretty p-icon p-round p-smooth">
-                        <checkbox path="dow[3]"/>
-                        <div class="state p-success">
-                            <i class="icon mdi mdi-check"></i>
-                            <label>
-                                {{$t("Thursday")}}
-                            </label>
-                        </div>
-                    </div>
-                    <div class="pretty p-icon p-round p-smooth">
-                        <checkbox path="dow[4]"/>
-                        <div class="state p-success">
-                            <i class="icon mdi mdi-check"></i>
-                            <label>
-                                {{$t("Friday")}}
-                            </label>
-                        </div>
-                    </div>
-                    <div class="pretty p-icon p-round p-smooth">
-                        <checkbox path="dow[5]"/>
-                        <div class="state p-success">
-                            <i class="icon mdi mdi-check"></i>
-                            <label>
-                                {{$t("Saturday")}}
-                            </label>
-                        </div>
-                    </div>
-                    <div class="pretty p-icon p-round p-smooth">
-                        <checkbox path="dow[6]"/>
-                        <div class="state p-success">
-                            <i class="icon mdi mdi-check"></i>
-                            <label>
-                                {{$t("Sunday")}}
-                            </label>
-                        </div>
-                    </div>
+                    <b-form-group>
+                        <b-form-radio v-model="dowSelected" name="some-radios" value="0">{{$t("Monday")}}</b-form-radio>
+                        <b-form-radio v-model="dowSelected" name="some-radios" value="1">{{$t("Tuesday")}}</b-form-radio>
+                        <b-form-radio v-model="dowSelected" name="some-radios" value="2">{{$t("Wednesday")}}</b-form-radio>
+                        <b-form-radio v-model="dowSelected" name="some-radios" value="3">{{$t("Thursday")}}</b-form-radio>
+                        <b-form-radio v-model="dowSelected" name="some-radios" value="4">{{$t("Friday")}}</b-form-radio>
+                        <b-form-radio v-model="dowSelected" name="some-radios" value="5">{{$t("Saturday")}}</b-form-radio>
+                        <b-form-radio v-model="dowSelected" name="some-radios" value="6">{{$t("Sunday")}}</b-form-radio>
+                    </b-form-group>
                 </div>
             </div>
 
@@ -90,7 +37,7 @@
                     </label>
                 </div>
                 <div class="col-8">
-                    <input class="form-control" type="time" name="startHour" id="startHour" path="startHour"/>
+                    <input v-model="startHour" class="form-control" type="time" name="startHour" id="startHour" />
                 </div>
             </div>
 
@@ -101,7 +48,7 @@
                     </label>
                 </div>
                 <div class="col-8">
-                    <input class="form-control" type="time" name="endHour" id="endHour" path="endHour"/>
+                    <input v-model="endHour" class="form-control" type="time" name="endHour" id="endHour" />
                 </div>
             </div>
 
@@ -112,12 +59,10 @@
                     </label>
                 </div>
                 <div class="col-8">
-                    <select class="form-control" name="officeId" id="officeId" path="officeId">
-                        <c:forEach items="${doctors}" var="doctor">
-                            <option value="${doctor.office.id}">
-                                <c:out value="${doctor.office.name}"/>
-                            </option>
-                        </c:forEach>
+                    <select v-model="officeSelected" class="form-control" name="officeId" id="officeId" >
+                        <option v-for="doctor in doctors" :key="doctor.office.id" :value="doctor.office.id">
+                            {{doctor.office.name}}
+                        </option>
                     </select>
                 </div>
             </div>
@@ -132,7 +77,6 @@
                     {{$t("Add")}}
                 </button>
             </div>
-            <errors path="*" cssClass="mt-4 mb-0 text-danger" element="p"/>
         </form>
     </div>    
 </template>
@@ -144,6 +88,14 @@ import { createPath } from "@/logic/Utils";
 @Component
 export default class AddSpecialty extends Vue {
     private readonly logo = logo;
+
+    private dowSelected = "0";
+    private startHour = "";
+    private endHour = "";
+    private officeSelected = "0";
+
+    //TODO: NICO
+    private doctors = [];
 
     public getUrl(url:string):string{
         return createPath(url);
