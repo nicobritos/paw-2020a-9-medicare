@@ -27,11 +27,33 @@ public abstract class JsonDeserializer<T> {
         return collection;
     }
 
+    public Collection<Integer> getArrayAsInt(ObjectNode jsonObject, String key) {
+        Collection<Integer> ids = new LinkedList<>();
+
+        JsonNode node = jsonObject.get(key);
+        if (node != null && !node.isNull()) {
+            if (!node.isArray()) throw new IllegalArgumentException();
+            for (JsonNode arrayNode : node) {
+                if (!arrayNode.isInt()) throw new IllegalArgumentException();
+                ids.add(arrayNode.asInt());
+            }
+        }
+
+        return ids;
+    }
+
     protected int getIntegerNonNull(ObjectNode objectNode, String key) {
         JsonNode node = objectNode.get(key);
-        if (node == null || node.isNull())
+        if (node == null || node.isNull() || !node.isInt())
             throw new IllegalArgumentException();
         return node.asInt();
+    }
+
+    protected int getIntegerNonNull(ObjectNode objectNode, String key, Predicate<Integer> predicate) {
+        int n = this.getIntegerNonNull(objectNode, key);
+        if (!predicate.test(n))
+            throw new IllegalArgumentException();
+        return n;
     }
 
     protected String getStringNull(ObjectNode objectNode, String key) {
@@ -51,7 +73,7 @@ public abstract class JsonDeserializer<T> {
 
     private String getString(ObjectNode objectNode, String key, Predicate<String> predicate) {
         JsonNode node = objectNode.get(key);
-        if (node == null || node.isNull() || !predicate.test(node.asText()))
+        if (node == null || node.isNull() || !node.isTextual() || !predicate.test(node.asText()))
             return null;
         return node.asText();
     }

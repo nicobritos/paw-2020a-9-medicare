@@ -144,7 +144,7 @@
 </template>
 
 <script lang="ts">
-import {Component, Prop, Vue} from 'vue-property-decorator';
+import {Component, Prop, Vue, Watch} from 'vue-property-decorator';
 import {DoctorSpecialty} from '~/logic/models/DoctorSpecialty';
 import {Locality} from '~/logic/models/Locality';
 import {State} from 'vuex-class';
@@ -152,15 +152,15 @@ import {localityActionTypes} from '~/store/types/localities.types';
 import {doctorSpecialtyActionTypes} from '~/store/types/doctorSpecialties.types';
 
 import {createPath} from "~/logic/Utils";
+import {DoctorService} from '~/logic/interfaces/services/DoctorService';
+import TYPES from '~/logic/types';
 
 @Component
 export default class MedicList extends Vue {
-    @Prop({type: Number})
-    private readonly page: number;
     @State(state => state.localities.localities)
-    private readonly localities: [];
+    private readonly localities: Locality[];
     @State(state => state.doctorSpecialties.doctorSpecialties)
-    private readonly specialties: [];
+    private readonly specialties: DoctorSpecialty[];
     private prevPage = '<';
     private firstPage = '<<';
     private nextPage = '>';
@@ -176,7 +176,11 @@ export default class MedicList extends Vue {
     };
     private doctor = [];
 
-    get searchedSpecialties() {
+    get page(): number {
+        return this.$route.params.page;
+    }
+
+    get searchedSpecialties(): DoctorSpecialty[] {
         let aux = this.$route.query.specialties;
         let specialties: DoctorSpecialty[];
 
@@ -184,12 +188,9 @@ export default class MedicList extends Vue {
             specialties = [];
         } else {
             specialties = aux.split(',').map(v => {
-                let specialty = new DoctorSpecialty();
-                specialty.id = parseInt(v);
-                specialty.name = 'Name';
-                // TODO:get specialty name instead of placeholder
-                return specialty;
-            });
+                let filtered = this.specialties.filter(value => parseInt(v) === value.id);
+                return filtered.length > 0 ? filtered[0] : null;
+            }).filter(value => value != null);
         }
 
         return specialties;
@@ -197,73 +198,74 @@ export default class MedicList extends Vue {
 
     get searchedLocalities() {
         let aux = this.$route.query.localities;
-        let localities: Locality[] = [];
+        let localities: Locality[];
 
         if (typeof aux !== 'string') {
             localities = [];
         } else {
             localities = aux.split(',').map(v => {
-                let locality = new Locality();
-                locality.id = parseInt(v);
-                locality.name = 'Name';
-
-                // TODO:get locality name instead of placeholder
-                return locality;
-            });
+                let filtered = this.localities.filter(value => parseInt(v) === value.id);
+                return filtered.length > 0 ? filtered[0] : null;
+            }).filter(value => value != null);
         }
 
         return localities;
     }
 
     get name(): string {
-        return 'name';
-        // return this.$route.query.name!;
+        return this.$route.query.name || "";
     }
 
-    getSpecialtyName(id: number) {
-        // for (const s of this.specialties) {
-        //     if (s.id == id) {
-        //         return s.name;
-        //     }
-        // }
-        return id;
+    getSpecialtyName(id: number): string {
+        for (let specialty of this.specialties) {
+            if (specialty.id === id) return specialty.name;
+        }
+
+        return id.toString();
     }
 
-    getLocalityName(id: number) {
-        // for (const l of this.localities) {
-        //     if (l.id == id) {
-        //         return l.name;
-        //     }
-        // }
-        return id;
+    getLocalityName(id: number): string {
+        for (let locality of this.localities) {
+            if (locality.id === id) return locality.name;
+        }
+
+        return id.toString();
     }
 
-    //TODO:check typescript
     getUrl(url:string):string{
         return createPath(url);
     }
 
+    async search() {
+        this.doctor = await this.getDoctorService().list({
+            page: this.page,
+            name: this.name,
+            localities: this.searchedLocalities,
+            specialties: this.searchedSpecialties
+        });
+    }
+
     // TODO: handle error
-    async mounted() {
-        // this.specialties = await Api.getSpecialties();
-        //
-        // this.localities = await Api.getLocalities();
-        //
-        // this.staff = await Api.getStaff();
-        //
-        // //TODO: this is not the way
-        // if (this.staff.length >= 2) {
-        //     this.resultsMessage = 'SearchResults2More';
-        //     this.resultsMessageParam = [this.staff.length];
-        // } else if (this.staff.length == 1) {
-        //     this.resultsMessage = 'SearchResults1';
-        // } else {
-        //     this.resultsMessage = 'NoResultsFound';
-        // }
-
-
+    mounted() {
         this.$store.dispatch('localities/loadLocalities', localityActionTypes.loadLocalities());
         this.$store.dispatch('doctorSpecialties/loadDoctorSpecialties', doctorSpecialtyActionTypes.loadDoctorSpecialties());
+    }
+
+    @Watch('staff')
+    private updateResultsMessage() {
+        //TODO: this is not the way
+        if (this.doctor.length >= 2) {
+            this.resultsMessage = 'SearchResults2More';
+            this.resultsMessageParam = [this.doctor.length];
+        } else if (this.doctor.length == 1) {
+            this.resultsMessage = 'SearchResults1';
+        } else {
+            this.resultsMessage = 'NoResultsFound';
+        }
+    }
+
+    private getDoctorService(): DoctorService {
+        return this.$container.get(TYPES.Services.DoctorService);
     }
 }
 </script>

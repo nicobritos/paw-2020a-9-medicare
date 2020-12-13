@@ -1,16 +1,17 @@
 package ar.edu.itba.paw.webapp.controller.rest;
 
-import ar.edu.itba.paw.interfaces.services.LocalityService;
 import ar.edu.itba.paw.interfaces.services.DoctorService;
 import ar.edu.itba.paw.interfaces.services.DoctorSpecialtyService;
-import ar.edu.itba.paw.models.Locality;
-import ar.edu.itba.paw.models.Paginator;
+import ar.edu.itba.paw.interfaces.services.LocalityService;
 import ar.edu.itba.paw.models.Doctor;
 import ar.edu.itba.paw.models.DoctorSpecialty;
+import ar.edu.itba.paw.models.Locality;
+import ar.edu.itba.paw.models.Paginator;
 import ar.edu.itba.paw.webapp.controller.rest.utils.GenericResource;
+import ar.edu.itba.paw.webapp.media_types.DoctorMIME;
 import ar.edu.itba.paw.webapp.media_types.ErrorMIME;
 import ar.edu.itba.paw.webapp.media_types.MIMEHelper;
-import ar.edu.itba.paw.webapp.media_types.DoctorMIME;
+import ar.edu.itba.paw.webapp.models.DoctorPagination;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -36,42 +37,50 @@ public class DoctorResource extends GenericResource {
     // TODO: i18n
     @GET
     @Produces({DoctorMIME.GET_LIST, ErrorMIME.ERROR})
+    @Consumes({DoctorMIME.PAGINATION})
     public Response getCollection(
             @Context HttpHeaders httpheaders,
             @Context UriInfo uriInfo,
-            @QueryParam("name") String name,
-            @QueryParam("specialties") String specialties,
-            @QueryParam("localities") String localities,
-            @QueryParam(PAGINATOR_PAGE_QUERY) Integer page,
-            @QueryParam(PAGINATOR_PER_PAGE_QUERY) Integer perPage) {
+            DoctorPagination pagination) {
         MIMEHelper.assertServerType(httpheaders, DoctorMIME.GET_LIST);
 
-        // TODO: <= o < ??
-        if (page != null) {
-            if (page <= 0)
-                return this.error(Status.BAD_REQUEST.getStatusCode(), Status.BAD_REQUEST.toString());
+        Collection<DoctorSpecialty> searchedSpecialties;
+        if (pagination.getSpecialtyIds() != null && pagination.getSpecialtyIds().size() > 0)
+            searchedSpecialties = this.doctorSpecialtyService.findByIds(pagination.getSpecialtyIds());
+        else
+            searchedSpecialties = Collections.emptyList();
+
+        Collection<Locality> searchedLocalities;
+        if (pagination.getLocalityIds() != null && pagination.getLocalityIds().size() > 0)
+            searchedLocalities = this.localityService.findByIds(pagination.getLocalityIds());
+        else
+            searchedLocalities = Collections.emptyList();
+
+        Paginator<Doctor> paginationResponse;
+        if (pagination.getName() != null && pagination.getName().isEmpty()) {
+            Set<String> words = new HashSet<>(Arrays.asList(pagination.getName().split(" ")));
+            paginationResponse = this.doctorService.findBy(
+                    words,
+                    words,
+                    null,
+                    searchedSpecialties,
+                    searchedLocalities,
+                    pagination.getPage(),
+                    pagination.getPerPage()
+            );
         } else {
-            page = 1;
-        }
-        if (perPage != null) {
-            if (perPage <= 0)
-                return this.error(Status.BAD_REQUEST.getStatusCode(), Status.BAD_REQUEST.toString());
-        } else {
-            perPage = PAGINATOR_PER_PAGE_DEFAULT;
+            paginationResponse = this.doctorService.findBy(
+                    (String) null,
+                    null,
+                    null,
+                    searchedSpecialties,
+                    searchedLocalities,
+                    pagination.getPage(),
+                    pagination.getPerPage()
+            );
         }
 
-        Collection<DoctorSpecialty> searchedSpecialties = this.doctorSpecialtyService.findByIds(this.stringToIntegerList(specialties));
-        Collection<Locality> searchedLocalities = this.localityService.findByIds(this.stringToIntegerList(localities));
-
-        Paginator<Doctor> doctorPaginator;
-        if (name != null && !(name = name.trim()).equals("")) {
-            Set<String> words = new HashSet<>(Arrays.asList(name.split(" ")));
-            doctorPaginator = this.doctorService.findBy(words, words, null, searchedSpecialties, searchedLocalities, page, perPage);
-        } else {
-            doctorPaginator = this.doctorService.findBy((String) null, null, null, searchedSpecialties, searchedLocalities, page, perPage);
-        }
-
-        return this.createPaginatorResponse(doctorPaginator, uriInfo).build();
+        return this.createPaginatorResponse(paginationResponse, uriInfo).build();
     }
 
     @GET

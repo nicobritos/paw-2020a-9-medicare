@@ -96,7 +96,7 @@
                     "doctors": {
                         "type": "array",
                         "items": {
-                            "$ref": "#/components/schemas/staff"
+                            "$ref": "#/components/schemas/doctor"
                         }
                     },
                     "patients": {
@@ -107,7 +107,7 @@
                     }
                 }
             },
-            "createUserStaff": {
+            "createUserDoctor": {
                 "properties": {
                     "email": {
                         "type": "string",
@@ -275,7 +275,7 @@
                 }
             },
 
-            "staff": {
+            "doctor": {
                 "properties": {
                     "id": {
                         "type": "integer"
@@ -304,7 +304,7 @@
                     }
                 }
             },
-            "staffSpecialty": {
+            "doctorSpecialty": {
                 "properties": {
                     "id": {
                         "type": "integer"
@@ -314,7 +314,7 @@
                     }
                 }
             },
-            "updateStaff": {
+            "updateDoctor": {
                 "properties": {
                     "phone": {
                         "type": "string"
@@ -326,7 +326,7 @@
                     "specialtyIds": {
                         "type": "array",
                         "items": {
-                            "$ref": "#/components/schemas/staffSpecialty"
+                            "$ref": "#/components/schemas/doctorSpecialty"
                         },
                         "nullable": false,
                         "minLength": 1
@@ -337,6 +337,43 @@
                     "email",
                     "specialtyIds"
                 ]
+            },
+            "paginateDoctor": {
+                "properties": {
+                    "name": {
+                        "type": "string",
+                        "nullable": false
+                    },
+                    "page": {
+                        "type": "number",
+                        "minimum": 1,
+                        "required": true
+                    },
+                    "perPage": {
+                        "type": "number",
+                        "minimum": 10,
+                        "maximum": 100,
+                        "required": false
+                    },
+                    "specialties": {
+                        "type": "array",
+                        "items": {
+                            "type": "number"
+                        },
+                        "nullable": false,
+                        "minLength": 1,
+                        "required": false
+                    },
+                    "localities": {
+                        "type": "array",
+                        "items": {
+                            "type": "number"
+                        },
+                        "nullable": false,
+                        "minLength": 1,
+                        "required": false
+                    }
+                }
             },
 
             "patient": {
@@ -401,7 +438,7 @@
                             "SUNDAY"
                         ]
                     },
-                    "staffId": {
+                    "doctorId": {
                         "type": "integer"
                     }
                 }
@@ -564,12 +601,12 @@
             }
         },
         "responses": {
-            "get-staff": {
+            "get-doctor": {
                 "description": "Successful",
                 "content": {
-                    "application/vnd.staff.get.v1+json": {
+                    "application/vnd.doctor.get.v1+json": {
                         "schema": {
-                            "$ref": "#/components/schemas/staff"
+                            "$ref": "#/components/schemas/doctor"
                         }
                     }
                 },
@@ -700,7 +737,7 @@
                 "summary": "Refreshes the JWT tokens",
                 "responses": {
                     "200": {
-                        "$ref": "#/components/responses/get-staff"
+                        "$ref": "#/components/responses/get-doctor"
                     },
                     "404": {
                         "$ref": "#/components/responses/error-404"
@@ -734,36 +771,29 @@
                 }
             }
         },
-        "/staffs": {
+        "/doctors": {
             "get": {
-                "summary": "List all staffs",
-                "parameters": [
-                    {
-                        "in": "query",
-                        "name": "page",
-                        "schema": {
-                            "type": "integer"
+                "summary": "List all doctors",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/vnd.doctor.pagination.v1+json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/paginateDoctor"
+                            }
                         }
-                    },
-                    {
-                        "in": "query",
-                        "name": "per_page",
-                        "schema": {
-                            "type": "integer"
-                        },
-                        "description": "items per page"
                     }
-                ],
+                },
                 "responses": {
                     "200": {
                         "description": "Successful",
 
                         "content": {
-                            "application/vnd.staff.list.get.v1+json": {
+                            "application/vnd.doctor.list.get.v1+json": {
                                 "schema": {
                                     "type": "array",
                                     "items": {
-                                        "$ref": "#/components/schemas/staff"
+                                        "$ref": "#/components/schemas/doctor"
                                     }
                                 }
                             }
@@ -772,9 +802,9 @@
                 }
             }
         },
-        "/staffs/{id}": {
+        "/doctors/{id}": {
             "get": {
-                "summary": "Gets a specific staff",
+                "summary": "Gets a specific doctor",
                 "parameters": [
                     {
                         "in": "path",
@@ -787,7 +817,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "$ref": "#/components/responses/get-staff"
+                        "$ref": "#/components/responses/get-doctor"
                     },
                     "404": {
                         "$ref": "#/components/responses/error-404"
@@ -795,20 +825,20 @@
                 }
             },
             "put": {
-                "summary": "Updates a staff",
+                "summary": "Updates a doctor",
                 "requestBody": {
                     "required": true,
                     "content": {
-                        "application/vnd.staff.update.v1+json": {
+                        "application/vnd.doctor.update.v1+json": {
                             "schema": {
-                                "$ref": "#/components/schemas/updateStaff"
+                                "$ref": "#/components/schemas/updateDoctor"
                             }
                         }
                     }
                 },
                 "responses": {
                     "200": {
-                        "$ref": "#/components/responses/get-staff"
+                        "$ref": "#/components/responses/get-doctor"
                     },
                     "404": {
                         "$ref": "#/components/responses/error-404"
@@ -833,9 +863,9 @@
                 "requestBody": {
                     "required": true,
                     "content": {
-                        "application/vnd.user.staff.create.v1+json": {
+                        "application/vnd.user.doctor.create.v1+json": {
                             "schema": {
-                                "$ref": "#/components/schemas/createUserStaff"
+                                "$ref": "#/components/schemas/createUserDoctor"
                             }
                         },
                         "application/vnd.user.patient.create.v1+json": {
@@ -1039,7 +1069,7 @@
         },
         "/specialties": {
             "get": {
-                "summary": "List all staff specialties",
+                "summary": "List all doctor specialties",
                 "responses": {
                     "200": {
                         "description": "Successful",
@@ -1049,7 +1079,7 @@
                                 "schema": {
                                     "type": "array",
                                     "items": {
-                                        "$ref": "#/components/schemas/staffSpecialty"
+                                        "$ref": "#/components/schemas/doctorSpecialty"
                                     }
                                 }
                             }
@@ -1213,7 +1243,7 @@
         },
         "/workdays": {
             "get": {
-                "summary": "If it is a staff, then it lists all its workdays, if it is not, then it returns 403",
+                "summary": "If it is a doctor, then it lists all its workdays, if it is not, then it returns 403",
                 "responses": {
                     "200": {
                         "description": "Successful",
@@ -1300,7 +1330,7 @@
         },
         "/appointmentTimeSlots": {
             "get": {
-                "summary": "List all appointment time slots for a given staff",
+                "summary": "List all appointment time slots for a given doctor",
                 "parameters": [
                     {
                         "in": "query",

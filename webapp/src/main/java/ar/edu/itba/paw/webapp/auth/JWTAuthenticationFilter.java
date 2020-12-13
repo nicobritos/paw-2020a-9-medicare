@@ -18,6 +18,7 @@ import com.fasterxml.jackson.databind.exc.UnrecognizedPropertyException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
+import org.springframework.http.HttpHeaders;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
@@ -108,7 +109,7 @@ public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilte
         }
 
         response.setStatus(Status.OK.getStatusCode());
-        response.setHeader(Constants.CONTENT_TYPE, UserMIME.ME);
+        response.setHeader(HttpHeaders.CONTENT_TYPE, UserMIME.ME);
         response.getWriter().append(UserMeSerializer.instance.toJson(userMe).toString());
     }
 }
