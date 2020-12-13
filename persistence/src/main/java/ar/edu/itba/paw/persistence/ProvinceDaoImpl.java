@@ -35,6 +35,8 @@ public class ProvinceDaoImpl extends GenericSearchableDaoImpl<Province, Integer>
         Root<Province> root = query.from(Province.class);
 
         query.select(root);
+        name = name.replace("%", "\\%");
+        name = name.replace("_", "\\%");
         query.where(
                 builder.and(
                         builder.like(

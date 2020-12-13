@@ -253,6 +253,8 @@ public abstract class GenericDaoImpl<M extends GenericModel<I>, I> implements Ge
         Root<M> root = query.from(this.mClass);
 
         query.select(root);
+        value = value.replace("%", "\\%");
+        value = value.replace("_", "\\%");
         query.where(
                 builder.like(
                         builder.lower(root.get(attribute).as(String.class)),

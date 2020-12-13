@@ -34,6 +34,9 @@ public class LocalityDaoImpl extends GenericSearchableDaoImpl<Locality, Integer>
         CriteriaQuery<Locality> query = builder.createQuery(Locality.class);
         Root<Locality> root = query.from(Locality.class);
 
+        name = name.replace("%", "\\%");
+        name = name.replace("_", "\\%");
+
         query.select(root);
         query.where(
                 builder.and(
