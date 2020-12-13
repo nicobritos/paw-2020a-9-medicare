@@ -248,6 +248,8 @@ public class DoctorDaoImpl extends GenericDaoImpl<Doctor, Integer> implements Do
         Expression<String> expression = userJoin.get(User_.firstName).as(String.class);
         for (String name : firstNames) {
             if (name.isEmpty()) continue;
+            name = name.replace("%", "\\%");
+            name = name.replace("_", "\\_");
             predicates.add(
                     builder.like(
                             builder.lower(expression),
@@ -259,6 +261,8 @@ public class DoctorDaoImpl extends GenericDaoImpl<Doctor, Integer> implements Do
         expression = userJoin.get(User_.surname).as(String.class);
         for (String name : surnames) {
             if (name.isEmpty()) continue;
+            name = name.replace("%", "\\%");
+            name = name.replace("_", "\\_");
             predicates.add(
                     builder.like(
                             builder.lower(expression),
