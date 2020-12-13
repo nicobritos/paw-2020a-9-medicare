@@ -250,12 +250,13 @@ export default class MedicList extends Vue {
     }
 
     next(): void {
-        this.gotoPage(this.$route.params.page + 1);
+        this.gotoPage(parseInt(this.$route.params.page) + 1);
     }
 
     previous(): void {
-        if (this.$route.params.page > 1)
-            this.gotoPage(this.$route.params.page - 1);
+        let page = parseInt(this.$route.params.page);
+        if (page > 1)
+            this.gotoPage(page - 1);
     }
 
     last(): void {
@@ -287,9 +288,9 @@ export default class MedicList extends Vue {
 
     private gotoPage(page: number) {
         this.$router.push({
-            name: this.$route.name,
+            name: this.$route.name as string,
             params: {
-                page: page
+                page: page.toString()
             }
         });
     }
