@@ -124,17 +124,17 @@
                     <div v-if="paginator.totalPages != 0" id="paging"
                          class="p-3 d-flex container w-100 justify-content-center ">
                         <div v-if="page > 2">
-                            <button type="button" class="btn btn-info btn-sm mr-1 firstButton">{{ firstPage }}</button>
+                            <button type="button" class="btn btn-info btn-sm mr-1 firstButton" @click="first">{{ firstPage }}</button>
                         </div>
                         <div v-if="page > 1">
-                            <button type="button" class="btn btn-info btn-sm prevButton">{{ prevPage }}</button>
+                            <button type="button" class="btn btn-info btn-sm prevButton" @click="previous">{{ prevPage }}</button>
                         </div>
                         <p class="d-inline mx-2">{{ $t('Page_of_totalPages', [page, paginator.totalPages]) }}</p>
                         <div v-if="paginator.remainingPages != 0">
-                            <button type="button" class="btn btn-info btn-sm nextButton">{{ nextPage }}</button>
+                            <button type="button" class="btn btn-info btn-sm nextButton" @click="next">{{ nextPage }}</button>
                         </div>
                         <div v-if="paginator.remainingPages > 1">
-                            <button type="button" class="btn btn-info btn-sm ml-1 lastButton">{{ lastPage }}</button>
+                            <button type="button" class="btn btn-info btn-sm ml-1 lastButton" @click="last">{{ lastPage }}</button>
                         </div>
                     </div>
                 </div>
@@ -245,6 +245,23 @@ export default class MedicList extends Vue {
         });
     }
 
+    first(): void {
+        this.gotoPage(1);
+    }
+
+    next(): void {
+        this.gotoPage(this.$route.params.page + 1);
+    }
+
+    previous(): void {
+        if (this.$route.params.page > 1)
+            this.gotoPage(this.$route.params.page - 1);
+    }
+
+    last(): void {
+        this.gotoPage(this.paginator.totalPages);
+    }
+
     // TODO: handle error
     mounted() {
         this.$store.dispatch('localities/loadLocalities', localityActionTypes.loadLocalities());
@@ -266,6 +283,15 @@ export default class MedicList extends Vue {
 
     private getDoctorService(): DoctorService {
         return this.$container.get(TYPES.Services.DoctorService);
+    }
+
+    private gotoPage(page: number) {
+        this.$router.push({
+            name: this.$route.name,
+            params: {
+                page: page
+            }
+        });
     }
 }
 </script>
