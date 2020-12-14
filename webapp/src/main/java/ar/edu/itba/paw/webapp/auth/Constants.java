@@ -13,5 +13,5 @@ public abstract class Constants {
     public static final String REFRESH_TOKEN_ENDPOINT = "refresh";
     public static final String LOGOUT_ENDPOINT = "logout";
     public static final String AUTH_ENDPOINT = "auth";
-    public static final String CONTENT_TYPE = "Content-Type";
+    public static final String PAGINATOR_COUNT_HEADER = "Total-Items";
 }

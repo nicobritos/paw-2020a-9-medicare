@@ -4,14 +4,15 @@ import TYPES from '~/logic/types';
 import {RestRepository} from '~/logic/interfaces/repositories/RestRepository';
 import {getPathWithId} from '~/logic/services/Utils';
 import {APIError} from '~/logic/models/APIError';
-import {DoctorService, UpdateDoctor} from '~/logic/interfaces/services/DoctorService';
+import {DoctorSearchParams, DoctorService, UpdateDoctor} from '~/logic/interfaces/services/DoctorService';
 import {Doctor} from '~/logic/models/Doctor';
 import {Pagination} from '~/logic/models/utils/Pagination';
 
 const DoctorMIME = {
     LIST: 'application/vnd.doctor.list.get.v1+json',
     GET: 'application/vnd.doctor.get.v1+json',
-    UPDATE: 'application/vnd.doctor.update.v1+json'
+    UPDATE: 'application/vnd.doctor.update.v1+json',
+    PAGINATION: 'application/vnd.doctor.pagination.v1+json',
 };
 
 @injectable()
@@ -28,10 +29,12 @@ export class DoctorServiceImpl implements DoctorService {
         return response.isOk() ? response.data! : null;
     }
 
-    public async list(): Promise<Pagination<Doctor>> {
+    public async list(params: DoctorSearchParams): Promise<Pagination<Doctor>> {
         let response = await this.rest.get<Pagination<Doctor>>(DoctorServiceImpl.PATH, {
             accepts: DoctorMIME.LIST,
-            paginate: true
+            paginate: true,
+            data: params,
+            contentType: DoctorMIME.PAGINATION
         });
         return response.isOk() ? response.data! : new Pagination([], 0);
     }

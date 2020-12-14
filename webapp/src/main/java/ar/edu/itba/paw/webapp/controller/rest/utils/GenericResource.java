@@ -3,6 +3,7 @@ package ar.edu.itba.paw.webapp.controller.rest.utils;
 import ar.edu.itba.paw.interfaces.services.UserService;
 import ar.edu.itba.paw.models.Paginator;
 import ar.edu.itba.paw.models.User;
+import ar.edu.itba.paw.webapp.auth.Constants;
 import ar.edu.itba.paw.webapp.auth.UserRole;
 import ar.edu.itba.paw.webapp.models.APIError;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,10 +25,9 @@ import java.util.Optional;
 import java.util.Set;
 
 public abstract class GenericResource {
-    protected static final String PAGINATOR_COUNT_HEADER = "Total-Items";
-    protected static final String PAGINATOR_PAGE_QUERY = "page";
-    protected static final String PAGINATOR_PER_PAGE_QUERY = "per_page";
     protected static final int PAGINATOR_PER_PAGE_DEFAULT = 10;
+    private static final String PAGINATOR_PAGE_QUERY = "page";
+    private static final String PAGINATOR_PER_PAGE_QUERY = "per_page";
 
     @Autowired
     private UserService userService;
@@ -84,7 +84,7 @@ public abstract class GenericResource {
         ResponseBuilder responseBuilder = Response
                 .ok()
                 .entity(paginator.getModels())
-                .header(PAGINATOR_COUNT_HEADER, String.valueOf(paginator.getTotalCount()));
+                .header(Constants.PAGINATOR_COUNT_HEADER, String.valueOf(paginator.getTotalCount()));
 
         if (paginator.getTotalCount() > 0) {
             int nextPage = 0, previousPage = 0;

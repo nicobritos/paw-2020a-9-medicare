@@ -4,4 +4,5 @@ public abstract class DoctorMIME {
     public static final String GET_LIST = "application/vnd.doctor.list.get.v1+json";
     public static final String GET = "application/vnd.doctor.get.v1+json";
     public static final String UPDATE = "application/vnd.doctor.update.v1+json";
+    public static final String PAGINATION = "application/vnd.doctor.pagination.v1+json";
 }
