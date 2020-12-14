@@ -8,7 +8,7 @@
                 <ul class="list-group turno-list mr-2 w-100 h-100 overflow-auto">
                     <div v-if="!appointments.length" class="container-fluid justify-content-center">
                         <p class="text-left mt-4" style="color:grey;">
-                            <spring:message code="NoAppointments"/>
+                            {{$t("NoAppointments")}}
                         </p>
                     </div>
                     <li v-for="appointment in appointments" :key="appointment.id"
