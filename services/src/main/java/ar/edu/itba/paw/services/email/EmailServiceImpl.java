@@ -421,20 +421,23 @@ public class EmailServiceImpl implements EmailService {
             public void run() {
                 try {
                     sendEmail(appointment.getDoctor().getEmail(), doctorSubject, finalDoctorHtml);
+                    LOGGER.info("Notification email sent to: {} for appointment {}", appointment.getDoctor(), appointment);
                 } catch (MessagingException e) {
                     LOGGER.error("Couldn't send notifying appointment email to doctor: {}, to notify appointment: {}",
                             appointment.getDoctor().getEmail(), appointment);
                 }
                 try {
                     sendEmail(appointment.getPatient().getUser().getEmail(), patientSubject, finalPatientHtml);
+                    LOGGER.info("Notification email sent to: {} for appointment {}", appointment.getPatient(), appointment);
                 } catch (MessagingException e) {
                     LOGGER.error("Couldn't send notifying appointment email to patient: {}, to notify appointment: {}",
                             appointment.getDoctor().getEmail(), appointment);
                 }
-
+                appointment.setWasNotificationEmailSent(true);
+                appointmentDao.update(appointment);
             }
         }, appointment.getFromDate().minusDays(1).toDate());
-
+        LOGGER.info("Notification email scheduled to: {} at {}", appointment.getPatient(), appointment.getFromDate().minusDays(1).toDate());
     }
 
     @PostConstruct
@@ -452,6 +455,7 @@ public class EmailServiceImpl implements EmailService {
         LocalDateTime now = LocalDateTime.now();
         // Notify 24hs earlier than the appointment, so we need appointments from now to 2 days from now
         List<Appointment> appointments = appointmentDao.findAllAppointmentsToNotifyUpTo(now.plusDays(2));
+        LOGGER.info("Found {} emails to notify in the next 24hs", appointments.size());
         for (Appointment appointment: appointments){
             scheduleNotifyAppointmentEmail(appointment);
         }
@@ -589,8 +593,8 @@ public class EmailServiceImpl implements EmailService {
         values.put("year", String.valueOf(DateTime.now().getYear()));
         values.put("body", this.messageSource.getMessage(MESSAGE_APPOINTMENT_NOTIFICATION_PATIENT_SOURCE_BODY_PREFIX + ".body",
                 new Object[]{
-                        doctor.getFirstName(),
                         patient.getDisplayName(),
+                        doctor.getFirstName(),
                         dow,
                         appointment.getFromDate().getDayOfMonth(),
                         month,
