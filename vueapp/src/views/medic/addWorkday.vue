@@ -1,6 +1,12 @@
 <template>
-    <div class="container w-100 h-100 d-flex flex-column justify-content-center align-items-center">
-        <form class="addturn-form border p-5 rounded">
+    <b-modal    v-model="showModal" 
+                :hide-footer="true"
+                :hide-header="true"
+                :no-fade="true"
+                body-class="p-0"
+                content-class="p-0"
+                #default="{ok,cancel}">
+        <form class="addturn-form border p-5 rounded" @submit="submitForm">
             <div class="row">
                 <h6>Medicare <img :src='logo' id="logo" alt="logo"/></h6>
             </div>
@@ -68,26 +74,27 @@
             </div>
 
             <div class="form-row justify-content-between">
-                <a :href="getUrl('/doctor/profile')">
-                <button class="form-atras-btn btn" type="button">
+                <button class="form-atras-btn btn" type="button" @click="cancel()">
                     {{$t("Back")}}
                 </button>
-                </a>
-                <button type="submit" class="btn btn-primary">
+                <button type="submit" class="btn btn-primary" @click="ok()">
                     {{$t("Add")}}
                 </button>
             </div>
         </form>
-    </div>    
+    </b-modal>    
 </template>
 <script lang="ts">
-import {Component, Vue} from 'vue-property-decorator';
+import {Component, Emit, VModel, Vue} from 'vue-property-decorator';
 import logo from "@/assets/logo.svg";
 import { createPath } from "@/logic/Utils";
 
 @Component
 export default class AddSpecialty extends Vue {
     private readonly logo = logo;
+
+    @VModel({type:Boolean,default:true})
+    private showModal:boolean;
 
     private dowSelected = "0";
     private startHour = "";
@@ -99,6 +106,11 @@ export default class AddSpecialty extends Vue {
 
     public getUrl(url:string):string{
         return createPath(url);
+    }
+
+    @Emit("submit")
+    submitForm(e:Event){
+        return e;
     }
 }
 </script>
