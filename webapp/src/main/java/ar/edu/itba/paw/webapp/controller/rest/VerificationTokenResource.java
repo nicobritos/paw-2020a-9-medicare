@@ -36,15 +36,15 @@ public class VerificationTokenResource extends GenericResource {
             @PathParam("token") String token)
     {
         if (token == null)
-            return this.error(Status.BAD_REQUEST.getStatusCode(), Status.BAD_REQUEST.toString());
+            return this.error(Status.BAD_REQUEST);
 
         Optional<VerificationToken> verificationTokenOptional = this.verificationTokenService.findByToken(token);
         if (!verificationTokenOptional.isPresent())
-            return this.error(Status.NOT_FOUND.getStatusCode(), Status.NOT_FOUND.toString());
+            return this.error(Status.NOT_FOUND);
 
         Optional<User> userOptional = this.userService.findByVerificationTokenId(verificationTokenOptional.get().getId());
         if (!userOptional.isPresent())
-            return this.error(Status.NOT_FOUND.getStatusCode(), Status.NOT_FOUND.toString());
+            return this.error(Status.NOT_FOUND);
 
         this.userService.verify(userOptional.get(), token);
 

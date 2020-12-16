@@ -46,11 +46,11 @@ public class ProvinceResource extends GenericResource {
         MIMEHelper.assertServerType(httpheaders, ProvinceMIME.GET_LIST);
 
         if (id == null)
-            return this.error(Status.BAD_REQUEST.getStatusCode(), Status.BAD_REQUEST.toString());
+            return this.error(Status.BAD_REQUEST);
 
         Optional<Province> provinceOptional = this.provinceService.findById(id);
         if (!provinceOptional.isPresent())
-            return this.error(Status.NOT_FOUND.getStatusCode(), Status.NOT_FOUND.toString());
+            return this.error(Status.NOT_FOUND);
 
         return Response.ok(provinceOptional.get()).build();
     }

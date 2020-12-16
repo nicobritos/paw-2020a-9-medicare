@@ -14,6 +14,7 @@ import javax.ws.rs.InternalServerErrorException;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.ResponseBuilder;
+import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriInfo;
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
@@ -50,6 +51,10 @@ public abstract class GenericResource {
             return this.userService.findByUsername(((org.springframework.security.core.userdetails.User) principal).getUsername());
         }
         return Optional.empty();
+    }
+
+    protected Response error(Status status) {
+        return this.error(status.getStatusCode(), status.toString());
     }
 
     protected Response error(int code, String message) {

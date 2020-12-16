@@ -54,13 +54,13 @@ public class UserResource extends GenericAuthenticationResource {
             @Context HttpHeaders httpheaders) {
         MIMEHelper.assertServerType(httpheaders, UserMIME.ME);
         if (this.getUser().isPresent())
-            return this.error(Status.FORBIDDEN.getStatusCode(), Status.FORBIDDEN.toString());
+            return this.error(Status.FORBIDDEN);
         if (this.userService.findByUsername(doctorSignUp.getUser().getEmail()).isPresent())
-            return this.error(Status.BAD_REQUEST.getStatusCode(), Status.BAD_REQUEST.toString());
+            return this.error(Status.BAD_REQUEST);
 
         Optional<Locality> locality = this.localityService.findById(doctorSignUp.getOffice().getLocality().getId());
         if (!locality.isPresent())
-            return this.error(Status.BAD_REQUEST.getStatusCode(), Status.BAD_REQUEST.toString());
+            return this.error(Status.BAD_REQUEST);
 
         Collection<DoctorSpecialty> doctorSpecialties = this.doctorSpecialtyService.findByIds(
                 doctorSignUp
@@ -70,7 +70,7 @@ public class UserResource extends GenericAuthenticationResource {
                         .collect(Collectors.toList())
         );
         if (doctorSpecialties.size() != doctorSignUp.getDoctorSpecialties().size())
-            return this.error(Status.BAD_REQUEST.getStatusCode(), Status.BAD_REQUEST.toString());
+            return this.error(Status.BAD_REQUEST);
 
         User user = this.copyUser(doctorSignUp);
 
@@ -120,9 +120,9 @@ public class UserResource extends GenericAuthenticationResource {
             @Context HttpHeaders httpheaders) {
         MIMEHelper.assertServerType(httpheaders, UserMIME.ME);
         if (this.getUser().isPresent())
-            return this.error(Status.FORBIDDEN.getStatusCode(), Status.FORBIDDEN.toString());
+            return this.error(Status.FORBIDDEN);
         if (this.userService.findByUsername(patientSignUp.getUser().getEmail()).isPresent())
-            return this.error(Status.BAD_REQUEST.getStatusCode(), Status.BAD_REQUEST.toString());
+            return this.error(Status.BAD_REQUEST);
 
         User newUser = this.userService.create(this.copyUser(patientSignUp));
         this.finishSignUp(request, response, patientSignUp, newUser);
@@ -141,11 +141,11 @@ public class UserResource extends GenericAuthenticationResource {
         MIMEHelper.assertServerType(httpheaders, UserMIME.GET);
 
         if (id == null)
-            return this.error(Status.BAD_REQUEST.getStatusCode(), Status.BAD_REQUEST.toString());
+            return this.error(Status.BAD_REQUEST);
 
         Optional<User> userOptional = this.userService.findById(id);
         if (!userOptional.isPresent())
-            return this.error(Status.NOT_FOUND.getStatusCode(), Status.NOT_FOUND.toString());
+            return this.error(Status.NOT_FOUND);
 
         return Response.ok(userOptional.get()).build();
     }
@@ -158,7 +158,7 @@ public class UserResource extends GenericAuthenticationResource {
 
         Optional<User> user = this.getUser();
         if (!user.isPresent())
-            return this.error(Status.UNAUTHORIZED.getStatusCode(), Status.UNAUTHORIZED.toString());
+            return this.error(Status.UNAUTHORIZED);
 
         UserMe userMe;
         if (this.isDoctor()) {
@@ -184,11 +184,11 @@ public class UserResource extends GenericAuthenticationResource {
         MIMEHelper.assertServerType(httpheaders, UserMIME.GET);
 
         if (id == null || user == null || user.getFirstName() == null || user.getSurname() == null || user.getEmail() == null)
-            return this.error(Status.BAD_REQUEST.getStatusCode(), Status.BAD_REQUEST.toString());
+            return this.error(Status.BAD_REQUEST);
 
         Optional<User> userOptional = this.userService.findById(id);
         if (!userOptional.isPresent())
-            return this.error(Status.NOT_FOUND.getStatusCode(), Status.NOT_FOUND.toString());
+            return this.error(Status.NOT_FOUND);
 
         User savedUser = userOptional.get();
         savedUser.setEmail(user.getEmail());

@@ -1,11 +1,11 @@
 package ar.edu.itba.paw.webapp.controller.rest;
 
 import ar.edu.itba.paw.interfaces.services.AppointmentService;
-import ar.edu.itba.paw.interfaces.services.PatientService;
 import ar.edu.itba.paw.interfaces.services.DoctorService;
+import ar.edu.itba.paw.interfaces.services.PatientService;
 import ar.edu.itba.paw.models.Appointment;
-import ar.edu.itba.paw.models.Patient;
 import ar.edu.itba.paw.models.Doctor;
+import ar.edu.itba.paw.models.Patient;
 import ar.edu.itba.paw.models.User;
 import ar.edu.itba.paw.webapp.controller.rest.utils.GenericResource;
 import ar.edu.itba.paw.webapp.media_types.AppointmentMIME;
@@ -53,7 +53,7 @@ public class AppointmentResource extends GenericResource {
 
         Optional<User> optionalUser = this.getUser();
         if(!optionalUser.isPresent()){
-            return this.error(Status.FORBIDDEN.getStatusCode(), Status.FORBIDDEN.toString());
+            return this.error(Status.FORBIDDEN);
         }
         User user = optionalUser.get();
         Collection<Doctor> doctors;
@@ -62,23 +62,23 @@ public class AppointmentResource extends GenericResource {
             patients = Collections.emptyList();
             doctors = this.doctorService.findByUser(user);
             if (doctors.isEmpty())
-                return this.error(Status.FORBIDDEN.getStatusCode(), Status.FORBIDDEN.toString());
+                return this.error(Status.FORBIDDEN);
         } else {
             doctors = Collections.emptyList();
             patients = this.patientService.findByUser(user);
             if (patients.isEmpty())
-                return this.error(Status.FORBIDDEN.getStatusCode(), Status.FORBIDDEN.toString());
+                return this.error(Status.FORBIDDEN);
         }
 
         if (fromYear == null || fromMonth == null || fromDay == null || toYear == null || toMonth == null || toDay == null)
-            return this.error(Status.BAD_REQUEST.getStatusCode(), Status.BAD_REQUEST.toString());
+            return this.error(Status.BAD_REQUEST);
 
         LocalDateTime dateFrom = new LocalDateTime(fromYear, fromMonth, fromDay, 0, 0);
         LocalDateTime dateTo = new LocalDateTime(toYear, toMonth, toDay, 23, 59, 59, 999);
 
         long daysBetween = Days.daysBetween(dateFrom.toLocalDate(), dateTo.toLocalDate()).getDays();
         if (daysBetween > MAX_DAYS_APPOINTMENTS || dateTo.isBefore(dateFrom))
-            return this.error(Status.BAD_REQUEST.getStatusCode(), Status.BAD_REQUEST.toString());
+            return this.error(Status.BAD_REQUEST);
 
         if (this.isDoctor()) {
             return Response.ok(this.appointmentService.findAppointmentsOfDoctorsInDateInterval(doctors, dateFrom, dateTo)).build();
@@ -96,18 +96,18 @@ public class AppointmentResource extends GenericResource {
         MIMEHelper.assertServerType(httpheaders, AppointmentMIME.GET);
 
         if (appointment == null || appointment.getFromDate() == null || appointment.getFromDate().isBefore(LocalDateTime.now()))
-            return this.error(Status.BAD_REQUEST.getStatusCode(), Status.BAD_REQUEST.toString());
+            return this.error(Status.BAD_REQUEST);
         if (this.isDoctor())
-            return this.error(Status.FORBIDDEN.getStatusCode(), Status.FORBIDDEN.toString());
+            return this.error(Status.FORBIDDEN);
 
         Optional<Doctor> doctorOptional = this.doctorService.findById(appointment.getDoctor().getId());
         if (!doctorOptional.isPresent())
-            return this.error(Status.BAD_REQUEST.getStatusCode(), Status.BAD_REQUEST.toString());
+            return this.error(Status.BAD_REQUEST);
 
         User user = this.getUser().get();
         Optional<Patient> patientOptional = this.patientService.findByUserAndOffice(user, doctorOptional.get().getOffice());
         if (!patientOptional.isPresent())
-            return this.error(Status.FORBIDDEN.getStatusCode(), Status.FORBIDDEN.toString());
+            return this.error(Status.FORBIDDEN);
 
         Appointment newAppointment = new Appointment();
         newAppointment.setDoctor(doctorOptional.get());
@@ -131,7 +131,7 @@ public class AppointmentResource extends GenericResource {
         MIMEHelper.assertServerType(httpheaders, AppointmentMIME.GET);
 
         if (id == null)
-            return this.error(Status.BAD_REQUEST.getStatusCode(), Status.BAD_REQUEST.toString());
+            return this.error(Status.BAD_REQUEST);
 
         User user = this.getUser().get();
         Collection<Doctor> doctors;
@@ -140,24 +140,24 @@ public class AppointmentResource extends GenericResource {
             patients = Collections.emptyList();
             doctors = this.doctorService.findByUser(user);
             if (doctors.isEmpty())
-                return this.error(Status.FORBIDDEN.getStatusCode(), Status.FORBIDDEN.toString());
+                return this.error(Status.FORBIDDEN);
         } else {
             doctors = Collections.emptyList();
             patients = this.patientService.findByUser(user);
             if (patients.isEmpty())
-                return this.error(Status.FORBIDDEN.getStatusCode(), Status.FORBIDDEN.toString());
+                return this.error(Status.FORBIDDEN);
         }
 
         Optional<Appointment> appointmentOptional = this.appointmentService.findById(id);
         if (!appointmentOptional.isPresent())
-            return this.error(Status.NOT_FOUND.getStatusCode(), Status.NOT_FOUND.toString());
+            return this.error(Status.NOT_FOUND);
 
         if (this.isDoctor()) {
             if (!doctors.contains(appointmentOptional.get().getDoctor()))
-                return this.error(Status.FORBIDDEN.getStatusCode(), Status.FORBIDDEN.toString());
+                return this.error(Status.FORBIDDEN);
         } else {
             if (!patients.contains(appointmentOptional.get().getPatient()))
-                return this.error(Status.FORBIDDEN.getStatusCode(), Status.FORBIDDEN.toString());
+                return this.error(Status.FORBIDDEN);
         }
 
         return Response.ok(appointmentOptional.get()).build();
@@ -170,21 +170,21 @@ public class AppointmentResource extends GenericResource {
             @Context HttpHeaders httpheaders,
             @PathParam("id") Integer id) {
         if (id == null)
-            return this.error(Status.BAD_REQUEST.getStatusCode(), Status.BAD_REQUEST.toString());
+            return this.error(Status.BAD_REQUEST);
 
         if (this.isDoctor())
-            return this.error(Status.FORBIDDEN.getStatusCode(), Status.FORBIDDEN.toString());
+            return this.error(Status.FORBIDDEN);
 
         Optional<Appointment> appointmentOptional = this.appointmentService.findById(id);
         if (!appointmentOptional.isPresent())
-            return this.error(Status.NOT_FOUND.getStatusCode(), Status.NOT_FOUND.toString());
+            return this.error(Status.NOT_FOUND);
 
         User user = this.getUser().get();
         Collection<Patient> patients = this.patientService.findByUser(user);
         if (patients.isEmpty())
-            return this.error(Status.FORBIDDEN.getStatusCode(), Status.FORBIDDEN.toString());
+            return this.error(Status.FORBIDDEN);
         if (!patients.contains(appointmentOptional.get().getPatient()))
-            return this.error(Status.FORBIDDEN.getStatusCode(), Status.FORBIDDEN.toString());
+            return this.error(Status.FORBIDDEN);
 
         this.appointmentService.remove(appointmentOptional.get().getId());
 

@@ -46,18 +46,18 @@ public class AppointmentTimeSlotResource extends GenericResource {
         MIMEHelper.assertServerType(httpheaders, AppointmentTimeSlotMIME.GET_LIST);
 
         if (doctorId == null || fromYear == null || fromMonth == null || fromDay == null || toYear == null || toMonth == null || toDay == null)
-            return this.error(Status.BAD_REQUEST.getStatusCode(), Status.BAD_REQUEST.toString());
+            return this.error(Status.BAD_REQUEST);
 
         Optional<Doctor> doctorOptional = this.doctorService.findById(doctorId);
         if (!doctorOptional.isPresent())
-            return this.error(Status.BAD_REQUEST.getStatusCode(), Status.BAD_REQUEST.toString());
+            return this.error(Status.BAD_REQUEST);
 
         LocalDateTime dateFrom = new LocalDateTime(fromYear, fromMonth, fromDay, 0, 0);
         LocalDateTime dateTo = new LocalDateTime(toYear, toMonth, toDay, 23, 59, 59, 999);
 
         long daysBetween = Days.daysBetween(dateFrom.toLocalDate(), dateTo.toLocalDate()).getDays();
         if (daysBetween > MAX_DAYS_APPOINTMENTS || dateTo.isBefore(dateFrom))
-            return this.error(Status.BAD_REQUEST.getStatusCode(), Status.BAD_REQUEST.toString());
+            return this.error(Status.BAD_REQUEST);
 
         return Response
                 .ok(this.appointmentService.findAvailableTimeslotsInDateInterval(doctorOptional.get(), dateFrom, dateTo))

@@ -46,11 +46,11 @@ public class CountryResource extends GenericResource {
         MIMEHelper.assertServerType(httpheaders, CountryMIME.GET_LIST);
 
         if (id == null || id.isEmpty())
-            return this.error(Status.BAD_REQUEST.getStatusCode(), Status.BAD_REQUEST.toString());
+            return this.error(Status.BAD_REQUEST);
 
         Optional<Country> countryOptional = this.countryService.findById(id);
         if (!countryOptional.isPresent())
-            return this.error(Status.NOT_FOUND.getStatusCode(), Status.NOT_FOUND.toString());
+            return this.error(Status.NOT_FOUND);
 
         return Response.ok(countryOptional.get()).build();
     }

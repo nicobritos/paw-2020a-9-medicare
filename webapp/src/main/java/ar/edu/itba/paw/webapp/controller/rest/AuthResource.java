@@ -56,17 +56,17 @@ public class AuthResource extends GenericAuthenticationResource {
         String token = this.getRefreshToken(request);
 
         if (token == null)
-            return this.error(Status.BAD_REQUEST.getStatusCode(), Status.BAD_REQUEST.toString());
+            return this.error(Status.BAD_REQUEST);
 
         Optional<RefreshToken> refreshTokenOptional = this.refreshTokenService.findByToken(token);
         if (!refreshTokenOptional.isPresent())
-            return this.error(Status.NOT_FOUND.getStatusCode(), Status.NOT_FOUND.toString());
+            return this.error(Status.NOT_FOUND);
 
         Optional<User> userOptional = this.userService.findByRefreshTokenId(refreshTokenOptional.get().getId());
         if (!userOptional.isPresent())
-            return this.error(Status.NOT_FOUND.getStatusCode(), Status.NOT_FOUND.toString());
+            return this.error(Status.NOT_FOUND);
         if (userOptional.get().getRefreshToken().getCreatedDate().plusMillis((int) Constants.JWT_REFRESH_EXPIRATION_MILLIS).toDateTime().isBeforeNow())
-            return this.error(Status.UNAUTHORIZED.getStatusCode(), Status.UNAUTHORIZED.toString());
+            return this.error(Status.UNAUTHORIZED);
 
         UserCredentials userCredentials = new UserCredentials();
         userCredentials.setUsername(userOptional.get().getEmail());

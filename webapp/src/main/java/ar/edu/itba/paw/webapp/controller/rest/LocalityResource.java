@@ -46,11 +46,11 @@ public class LocalityResource extends GenericResource {
         MIMEHelper.assertServerType(httpheaders, LocalityMIME.GET);
 
         if (id == null)
-            return this.error(Status.BAD_REQUEST.getStatusCode(), Status.BAD_REQUEST.toString());
+            return this.error(Status.BAD_REQUEST);
 
         Optional<Locality> localityOptional = this.localityService.findById(id);
         if (!localityOptional.isPresent())
-            return this.error(Status.NOT_FOUND.getStatusCode(), Status.NOT_FOUND.toString());
+            return this.error(Status.NOT_FOUND);
 
         return Response.ok(localityOptional.get()).build();
     }

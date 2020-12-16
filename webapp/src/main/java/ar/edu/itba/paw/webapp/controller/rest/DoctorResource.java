@@ -92,11 +92,11 @@ public class DoctorResource extends GenericResource {
         MIMEHelper.assertServerType(httpheaders, DoctorMIME.GET);
 
         if (id == null)
-            return this.error(Status.BAD_REQUEST.getStatusCode(), Status.BAD_REQUEST.toString());
+            return this.error(Status.BAD_REQUEST);
 
         Optional<Doctor> doctorOptional = this.doctorService.findById(id);
         if (!doctorOptional.isPresent())
-            return this.error(Status.NOT_FOUND.getStatusCode(), Status.NOT_FOUND.toString());
+            return this.error(Status.NOT_FOUND);
 
         return Response.ok(doctorOptional.get()).build();
     }
@@ -112,11 +112,11 @@ public class DoctorResource extends GenericResource {
         MIMEHelper.assertServerType(httpheaders, DoctorMIME.GET);
 
         if (id == null || doctor == null || doctor.getDoctorSpecialties().isEmpty())
-            return this.error(Status.BAD_REQUEST.getStatusCode(), Status.BAD_REQUEST.toString());
+            return this.error(Status.BAD_REQUEST);
 
         Optional<Doctor> doctorOptional = this.doctorService.findById(id);
         if (!doctorOptional.isPresent())
-            return this.error(Status.NOT_FOUND.getStatusCode(), Status.NOT_FOUND.toString());
+            return this.error(Status.NOT_FOUND);
 
         Collection<DoctorSpecialty> doctorSpecialties = this.doctorSpecialtyService.findByIds(
                 doctor.getDoctorSpecialties()
@@ -125,7 +125,7 @@ public class DoctorResource extends GenericResource {
                         .collect(Collectors.toList())
         ); // TODO: Is this necessary?
         if (doctorSpecialties.size() != doctor.getDoctorSpecialties().size())
-            return this.error(Status.BAD_REQUEST.getStatusCode(), Status.BAD_REQUEST.toString());
+            return this.error(Status.BAD_REQUEST);
 
         Doctor savedDoctor = doctorOptional.get();
         savedDoctor.setEmail(doctor.getEmail());
