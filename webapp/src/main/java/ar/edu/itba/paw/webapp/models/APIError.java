@@ -1,19 +1,21 @@
 package ar.edu.itba.paw.webapp.models;
 
-public class APIError {
-    private int code;
-    private String message;
+import java.util.Collection;
+import java.util.Collections;
+
+public class APIError extends APIBaseError {
+    private final Collection<APISubError> subErrors;
 
     public APIError(int code, String message) {
-        this.code = code;
-        this.message = message;
+        this(code, message, Collections.emptyList());
     }
 
-    public int getCode() {
-        return this.code;
+    public APIError(int code, String message, Collection<APISubError> subErrors) {
+        super(code, message);
+        this.subErrors = subErrors;
     }
 
-    public String getMessage() {
-        return this.message;
+    public Collection<APISubError> getSubErrors() {
+        return this.subErrors;
     }
 }

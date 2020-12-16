@@ -20,7 +20,7 @@ import java.lang.reflect.Type;
 
 @Provider
 @Produces(ErrorMIME.ERROR)
-public class ErrorParser extends GenericParser<APIError> {
+public class APIErrorParser extends GenericParser<APIError> {
     @Override
     public boolean isWriteable(Class<?> aClass, Type type, Annotation[] annotations, MediaType mediaType) {
         return true;
