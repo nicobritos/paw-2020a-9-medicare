@@ -1,8 +1,8 @@
 package ar.edu.itba.paw.webapp.exceptions;
 
 import ar.edu.itba.paw.webapp.media_types.ErrorMIME;
-import ar.edu.itba.paw.webapp.models.APIError;
-import ar.edu.itba.paw.webapp.models.APISubError;
+import ar.edu.itba.paw.webapp.models.error.APIError;
+import ar.edu.itba.paw.webapp.models.error.APISubError;
 
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response;
@@ -42,7 +42,11 @@ public abstract class APIErrorFactory {
         }
 
         public APIErrorBuilder withReason(int code, String message) {
-            this.apiError.addSubError(new APISubError(code, message));
+            return this.withReason(new APISubError(code, message));
+        }
+
+        public APIErrorBuilder withReason(APISubError subError) {
+            this.apiError.addSubError(subError);
             return this;
         }
 
@@ -54,8 +58,8 @@ public abstract class APIErrorFactory {
             return this.apiError;
         }
 
-        public void throwError() throws WebApplicationException {
-            throw new WebApplicationException(
+        public WebApplicationException getError() throws WebApplicationException {
+            return new WebApplicationException(
                     Response
                             .status(this.apiError.getCode())
                             .entity(this.apiError)

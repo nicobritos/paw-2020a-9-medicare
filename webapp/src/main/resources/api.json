@@ -311,8 +311,7 @@
             "paginateDoctor": {
                 "properties": {
                     "name": {
-                        "type": "string",
-                        "nullable": false
+                        "type": "string"
                     },
                     "page": {
                         "type": "number",
@@ -330,7 +329,6 @@
                         "items": {
                             "type": "number"
                         },
-                        "nullable": false,
                         "minLength": 1,
                         "required": false
                     },
@@ -339,7 +337,6 @@
                         "items": {
                             "type": "number"
                         },
-                        "nullable": false,
                         "minLength": 1,
                         "required": false
                     }
@@ -508,10 +505,12 @@
                         "required": true
                     },
                     "message": {
-                        "type": "string"
+                        "type": "string",
+                        "nullable": false
                     },
                     "motive": {
-                        "type": "string"
+                        "type": "string",
+                        "nullable": false
                     },
                     "doctorId": {
                         "type": "integer",
@@ -1039,6 +1038,9 @@
                     },
                     "401": {
                         "$ref": "#/components/responses/error-401"
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/error-422"
                     }
                 }
             },
@@ -1246,14 +1248,6 @@
             "get": {
                 "summary": "List all localities",
                 "parameters": [
-                    {
-                        "in": "query",
-                        "name": "countryId",
-                        "schema": {
-                            "type": "string"
-                        },
-                        "required": false
-                    },
                     {
                         "in": "query",
                         "name": "provinceId",

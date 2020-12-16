@@ -1,9 +1,11 @@
 package ar.edu.itba.paw.webapp.media_types.parsers.deserializers;
 
-import ar.edu.itba.paw.models.Picture;
 import ar.edu.itba.paw.models.User;
+import ar.edu.itba.paw.webapp.models.error.ErrorConstants;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+
+import javax.ws.rs.BadRequestException;
 
 public class UserUpdateDeserializer extends JsonDeserializer<User> {
     public static final UserUpdateDeserializer instance = new UserUpdateDeserializer();
@@ -13,7 +15,7 @@ public class UserUpdateDeserializer extends JsonDeserializer<User> {
     @Override
     public User fromJson(JsonNode o) {
         if (!(o instanceof ObjectNode)) {
-            throw new IllegalArgumentException();
+            throw new BadRequestException();
         }
 
         ObjectNode jsonObject = (ObjectNode) o;
@@ -21,27 +23,48 @@ public class UserUpdateDeserializer extends JsonDeserializer<User> {
         User user = new User();
 
         JsonNode node = jsonObject.get("email");
-        if (node != null && !node.isNull()) {
-            user.setEmail(node.asText());
-        }
-        node = jsonObject.get("firstName");
-        if (node != null && !node.isNull()) {
-            user.setFirstName(node.asText());
-        }
-        node = jsonObject.get("surname");
-        if (node != null && !node.isNull()) {
-            user.setSurname(node.asText());
-        }
-        node = jsonObject.get("phone");
-        if (node != null && !node.isNull()) {
-            user.setPhone(node.asText());
+        if (node != null) {
+            user.setEmail(this.getStringNonNull(
+                    jsonObject,
+                    "email",
+                    null,
+                    ErrorConstants.USER_UPDATE_INVALID_EMAIL
+            ));
         }
 
-        node = jsonObject.get("profilePictureId");
+        node = jsonObject.get("firstName");
         if (node != null && !node.isNull()) {
-            Picture picture = new Picture();
-            picture.setId(node.asInt());
-            user.setProfilePicture(picture);
+            user.setFirstName(this.getStringNonNull(
+                    jsonObject,
+                    "firstName",
+                    null,
+                    ErrorConstants.USER_UPDATE_INVALID_FIRST_NAME
+            ));
+        }
+
+        node = jsonObject.get("surname");
+        if (node != null && !node.isNull()) {
+            user.setSurname(this.getStringNonNull(
+                    jsonObject,
+                    "surname",
+                    null,
+                    ErrorConstants.USER_UPDATE_INVALID_SURNAME
+            ));
+        }
+
+        node = jsonObject.get("phone");
+        if (node != null && !node.isNull()) {
+            user.setPhone(this.getStringNonNull(
+                    jsonObject,
+                    "phone",
+                    null,
+                    ErrorConstants.USER_UPDATE_INVALID_PHONE
+            ));
+        }
+
+        node = jsonObject.get("profilePicture");
+        if (node != null && !node.isNull()) {
+            // TODO: Nico, ver size, MIME
         }
 
         return user;

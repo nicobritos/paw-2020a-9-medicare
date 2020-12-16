@@ -1,8 +1,8 @@
 package ar.edu.itba.paw.webapp.media_types.parsers.serializers;
 
-import ar.edu.itba.paw.webapp.models.APIBaseError;
-import ar.edu.itba.paw.webapp.models.APIError;
-import ar.edu.itba.paw.webapp.models.APISubError;
+import ar.edu.itba.paw.webapp.models.error.APIBaseError;
+import ar.edu.itba.paw.webapp.models.error.APIError;
+import ar.edu.itba.paw.webapp.models.error.APISubError;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;

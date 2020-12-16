@@ -1,5 +1,7 @@
 package ar.edu.itba.paw.webapp.media_types.parsers.deserializers;
 
+import ar.edu.itba.paw.webapp.exceptions.UnprocessableEntityException;
+import ar.edu.itba.paw.webapp.models.error.APISubError;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -27,14 +29,43 @@ public abstract class JsonDeserializer<T> {
         return collection;
     }
 
-    public Collection<Integer> getArrayAsInt(ObjectNode jsonObject, String key) {
+    protected ObjectNode getObjectNonNull(ObjectNode objectNode, String key, APISubError missingError, APISubError invalidError) {
+        JsonNode node = objectNode.get(key);
+        if (node == null) {
+            throw UnprocessableEntityException
+                    .build()
+                    .withReason(missingError)
+                    .getError();
+        } else if (!node.isObject()) {
+            throw UnprocessableEntityException
+                    .build()
+                    .withReason(invalidError)
+                    .getError();
+        }
+
+        return (ObjectNode) node;
+    }
+
+    protected Collection<Integer> getArrayAsInt(ObjectNode jsonObject, String key, APISubError invalidError) {
         Collection<Integer> ids = new LinkedList<>();
 
         JsonNode node = jsonObject.get(key);
-        if (node != null && !node.isNull()) {
-            if (!node.isArray()) throw new IllegalArgumentException();
+        if (node != null) {
+            if (!node.isArray()) {
+                throw UnprocessableEntityException
+                        .build()
+                        .withReason(invalidError)
+                        .getError();
+            }
+
             for (JsonNode arrayNode : node) {
-                if (!arrayNode.isInt()) throw new IllegalArgumentException();
+                if (!arrayNode.isInt()) {
+                    throw UnprocessableEntityException
+                            .build()
+                            .withReason(invalidError)
+                            .getError();
+                }
+
                 ids.add(arrayNode.asInt());
             }
         }
@@ -42,39 +73,62 @@ public abstract class JsonDeserializer<T> {
         return ids;
     }
 
-    protected int getIntegerNonNull(ObjectNode objectNode, String key) {
+    protected int getIntegerNonNull(ObjectNode objectNode, String key, APISubError missingError, APISubError invalidError) {
         JsonNode node = objectNode.get(key);
-        if (node == null || node.isNull() || !node.isInt())
-            throw new IllegalArgumentException();
+        if (node == null) {
+            throw UnprocessableEntityException
+                    .build()
+                    .withReason(missingError)
+                    .getError();
+        } else if (!node.isInt()) {
+            throw UnprocessableEntityException
+                    .build()
+                    .withReason(invalidError)
+                    .getError();
+        }
+
         return node.asInt();
     }
 
-    protected int getIntegerNonNull(ObjectNode objectNode, String key, Predicate<Integer> predicate) {
-        int n = this.getIntegerNonNull(objectNode, key);
-        if (!predicate.test(n))
-            throw new IllegalArgumentException();
+    protected int getIntegerNonNull(ObjectNode objectNode, String key, Predicate<Integer> predicate, APISubError missingError, APISubError invalidError) {
+        int n = this.getIntegerNonNull(objectNode, key, missingError, invalidError);
+        if (!predicate.test(n)) {
+            throw UnprocessableEntityException
+                    .build()
+                    .withReason(invalidError)
+                    .getError();
+        }
         return n;
     }
 
-    protected String getStringNull(ObjectNode objectNode, String key) {
-        return this.getString(objectNode, key, s -> true);
+    protected String getStringNull(ObjectNode objectNode, String key, APISubError invalidError) {
+        return this.getString(objectNode, key, s -> true, invalidError);
     }
 
-    protected String getStringNonNull(ObjectNode objectNode, String key) {
-        return this.getStringNonNull(objectNode, key, s -> true);
+    protected String getStringNonNull(ObjectNode objectNode, String key, APISubError missingError, APISubError invalidError) {
+        return this.getStringNonNull(objectNode, key, s -> true, missingError, invalidError);
     }
 
-    protected String getStringNonNull(ObjectNode objectNode, String key, Predicate<String> predicate) {
-        String s = this.getString(objectNode, key, predicate);
-        if (s == null)
-            throw new IllegalArgumentException();
+    protected String getStringNonNull(ObjectNode objectNode, String key, Predicate<String> predicate, APISubError missingError, APISubError invalidError) {
+        String s = this.getString(objectNode, key, predicate, invalidError);
+        if (s == null) {
+            throw UnprocessableEntityException
+                    .build()
+                    .withReason(missingError)
+                    .getError();
+        }
         return s;
     }
 
-    private String getString(ObjectNode objectNode, String key, Predicate<String> predicate) {
+    private String getString(ObjectNode objectNode, String key, Predicate<String> predicate, APISubError invalidError) {
         JsonNode node = objectNode.get(key);
-        if (node == null || node.isNull() || !node.isTextual() || !predicate.test(node.asText()))
-            return null;
+        if (node == null || node.isNull()) return null;
+        if (!node.isTextual() || !predicate.test(node.asText())) {
+            throw UnprocessableEntityException
+                    .build()
+                    .withReason(invalidError)
+                    .getError();
+        }
         return node.asText();
     }
 }

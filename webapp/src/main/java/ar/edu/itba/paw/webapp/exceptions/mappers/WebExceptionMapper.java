@@ -2,7 +2,7 @@ package ar.edu.itba.paw.webapp.exceptions.mappers;
 
 import ar.edu.itba.paw.webapp.exceptions.APIErrorFactory;
 import ar.edu.itba.paw.webapp.media_types.ErrorMIME;
-import ar.edu.itba.paw.webapp.models.APIError;
+import ar.edu.itba.paw.webapp.models.error.APIError;
 
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response;

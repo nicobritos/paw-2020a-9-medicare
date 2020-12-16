@@ -5,6 +5,8 @@ import ar.edu.itba.paw.webapp.models.PatientSignUp;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
+import javax.ws.rs.BadRequestException;
+
 public class UserCreatePatientDeserializer extends UserCreateDeserializer<PatientSignUp> {
     public static final UserCreatePatientDeserializer instance = new UserCreatePatientDeserializer();
 
@@ -13,7 +15,7 @@ public class UserCreatePatientDeserializer extends UserCreateDeserializer<Patien
     @Override
     public PatientSignUp fromJson(JsonNode o) {
         if (!(o instanceof ObjectNode)) {
-            throw new IllegalArgumentException();
+            throw new BadRequestException();
         }
 
         User user = this.getUser((ObjectNode) o);

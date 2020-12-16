@@ -2,8 +2,12 @@ package ar.edu.itba.paw.webapp.media_types.parsers.deserializers;
 
 import ar.edu.itba.paw.models.Workday;
 import ar.edu.itba.paw.models.WorkdayDay;
+import ar.edu.itba.paw.webapp.exceptions.UnprocessableEntityException;
+import ar.edu.itba.paw.webapp.models.error.ErrorConstants;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+
+import javax.ws.rs.BadRequestException;
 
 public class WorkdayCreateDeserializer extends JsonDeserializer<Workday> {
     public static final WorkdayCreateDeserializer instance = new WorkdayCreateDeserializer();
@@ -18,58 +22,71 @@ public class WorkdayCreateDeserializer extends JsonDeserializer<Workday> {
     @Override
     public Workday fromJson(JsonNode o) {
         if (!(o instanceof ObjectNode)) {
-            throw new IllegalArgumentException();
+            throw new BadRequestException();
         }
 
         ObjectNode jsonObject = (ObjectNode) o;
 
         Workday workday = new Workday();
         JsonNode node = jsonObject.get("day");
-        if (node != null && !node.isNull()) {
+        if (node != null) {
             try {
                 workday.setDay(WorkdayDay.valueOf(node.asText()));
-            } catch (IllegalArgumentException e) {
-                throw new IllegalArgumentException();
+            } catch (Exception e) {
+                throw UnprocessableEntityException
+                        .build()
+                        .withReason(ErrorConstants.WORKDAY_CREATE_INVALID_DAY)
+                        .getError();
             }
         } else {
-            throw new IllegalArgumentException();
+            throw UnprocessableEntityException
+                    .build()
+                    .withReason(ErrorConstants.WORKDAY_CREATE_MISSING_DAY)
+                    .getError();
         }
 
-        int value;
-        ObjectNode startTime = (ObjectNode) jsonObject.get("start");
-        ObjectNode endTime = (ObjectNode) jsonObject.get("end");
+        ObjectNode startTime = this.getObjectNonNull(
+                jsonObject,
+                "start",
+                ErrorConstants.WORKDAY_CREATE_MISSING_START,
+                ErrorConstants.WORKDAY_CREATE_INVALID_START
+        );
+        ObjectNode endTime = this.getObjectNonNull(
+                jsonObject,
+                "end",
+                ErrorConstants.WORKDAY_CREATE_MISSING_END,
+                ErrorConstants.WORKDAY_CREATE_INVALID_END
+        );
 
-        node = startTime.get("hour");
-        if (node == null)
-            throw new IllegalArgumentException();
-        value = node.asInt();
-        if (value < MIN_HOUR || value > MAX_HOUR)
-            throw new IllegalArgumentException();
-        workday.setStartHour(value);
+        workday.setStartHour(this.getIntegerNonNull(
+                startTime,
+                "hour",
+                integer -> integer >= MIN_HOUR && integer <= MAX_HOUR,
+                ErrorConstants.WORKDAY_CREATE_MISSING_START_HOUR,
+                ErrorConstants.WORKDAY_CREATE_INVALID_START_HOUR
+        ));
+        workday.setStartMinute(this.getIntegerNonNull(
+                startTime,
+                "minute",
+                integer -> integer >= MIN_MINUTE && integer <= MAX_MINUTE,
+                ErrorConstants.WORKDAY_CREATE_MISSING_START_MINUTE,
+                ErrorConstants.WORKDAY_CREATE_INVALID_START_MINUTE
+        ));
 
-        node = startTime.get("minute");
-        if (node == null)
-            throw new IllegalArgumentException();
-        value = node.asInt();
-        if (value < MIN_MINUTE || value > MAX_MINUTE)
-            throw new IllegalArgumentException();
-        workday.setStartMinute(value);
-
-        node = endTime.get("hour");
-        if (node == null)
-            throw new IllegalArgumentException();
-        value = node.asInt();
-        if (value < MIN_HOUR || value > MAX_HOUR)
-            throw new IllegalArgumentException();
-        workday.setEndHour(value);
-
-        node = endTime.get("minute");
-        if (node == null)
-            throw new IllegalArgumentException();
-        value = node.asInt();
-        if (value < MIN_MINUTE || value > MAX_MINUTE)
-            throw new IllegalArgumentException();
-        workday.setEndMinute(value);
+        workday.setEndHour(this.getIntegerNonNull(
+                endTime,
+                "hour",
+                integer -> integer >= MIN_HOUR && integer <= MAX_HOUR,
+                ErrorConstants.WORKDAY_CREATE_MISSING_END_HOUR,
+                ErrorConstants.WORKDAY_CREATE_INVALID_END_HOUR
+        ));
+        workday.setEndMinute(this.getIntegerNonNull(
+                endTime,
+                "minute",
+                integer -> integer >= MIN_MINUTE && integer <= MAX_MINUTE,
+                ErrorConstants.WORKDAY_CREATE_MISSING_END_MINUTE,
+                ErrorConstants.WORKDAY_CREATE_INVALID_END_MINUTE
+        ));
 
         return workday;
     }
