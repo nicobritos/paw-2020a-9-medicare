@@ -4,12 +4,13 @@ import {Nullable} from '~/logic/Utils';
 import {Doctor} from '~/logic/models/Doctor';
 import {Patient} from '~/logic/models/Patient';
 import {UserDoctors, UserPatients} from '~/logic/interfaces/services/AuthService';
+import {APIError} from '~/logic/models/APIError';
 
 export interface AuthState {
     loggingIn: boolean,
     loggingOut: boolean,
     user: Nullable<User>,
-    _userLoading: CacheableAsyncProperty<Nullable<UserPatients | UserDoctors>>,
+    _userLoading: CacheableAsyncProperty<UserPatients | UserDoctors | APIError>,
     doctors: Doctor[],
     patients: Patient[],
     isDoctor: boolean

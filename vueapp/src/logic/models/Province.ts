@@ -1,11 +1,9 @@
 import {GenericEntity} from '~/logic/models/utils/GenericEntity';
-import {JSONSerializableKeys} from '~/logic/models/utils/JSONSerializable';
-import {Country} from '~/logic/models/Country';
 
 export class Province extends GenericEntity<Province> {
     private _id: number;
     private _name: string;
-    private _country: Country;
+    private _countryId: number;
 
     public get id(): number {
         return this._id;
@@ -23,19 +21,11 @@ export class Province extends GenericEntity<Province> {
         this._name = value;
     }
 
-    public get country(): Country {
-        return this._country;
+    public get countryId(): number {
+        return this._countryId;
     }
 
-    public set country(value: Country) {
-        this._country = value;
-    }
-
-    public toJSON(): JSONSerializableKeys<Province> {
-        return {
-            id: this.id,
-            name: this.name,
-            country: this.country
-        };
+    public set country(value: number) {
+        this._countryId = value;
     }
 }

@@ -1,9 +1,14 @@
 import {Nullable} from '~/logic/Utils';
 import {Locality} from '~/logic/models/Locality';
+import {APIError} from '~/logic/models/APIError';
+
+export interface LocalityListParams {
+    countryId?: string,
+    provinceId?: string
+}
 
 export interface LocalityService {
-    // TODO: Sin provincia?
-    list(): Promise<Locality[]>;
+    list(params?: LocalityListParams): Promise<Nullable<Locality[]> | APIError>;
 
     get(id: number): Promise<Nullable<Locality>>;
 }

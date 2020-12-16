@@ -23,19 +23,19 @@ export class UserServiceImpl implements UserService {
     @inject(TYPES.Repositories.RestRepository)
     private rest: RestRepository;
 
-    public async me(): Promise<Nullable<UserDoctors | UserPatients>> {
+    public async me(): Promise<UserDoctors | UserPatients | APIError> {
         let response = await this.rest.get<UserDoctors | UserPatients>(UserServiceImpl.PATH, {
             accepts: UserMIME.ME,
             retry: false
         });
-        return response.isOk() ? response.data! : null;
+        return response.response;
     }
 
     public async get(id: number): Promise<Nullable<User>> {
         let response = await this.rest.get<User>(getPathWithId(UserServiceImpl.PATH, id), {
             accepts: UserMIME.GET
         });
-        return response.isOk() ? response.data! : null;
+        return response.orElse(null);
     }
 
     public async createAsDoctor(doctor: CreateUserDoctor): Promise<UserDoctors | APIError> {
@@ -44,7 +44,7 @@ export class UserServiceImpl implements UserService {
             data: doctor,
             contentType: UserMIME.CREATE_DOCTOR
         });
-        return response.isOk() ? response.data! : response.error!;
+        return response.response;
     }
 
     public async createAsPatient(patient: CreateUserPatient): Promise<UserPatients | APIError> {
@@ -53,7 +53,7 @@ export class UserServiceImpl implements UserService {
             data: patient,
             contentType: UserMIME.CREATE_PATIENT
         });
-        return response.isOk() ? response.data! : response.error!;
+        return response.response;
     }
 
     public async update(id: number, user: UpdateUser): Promise<User | APIError> {
@@ -62,6 +62,6 @@ export class UserServiceImpl implements UserService {
             data: user,
             contentType: UserMIME.UPDATE
         });
-        return response.isOk() ? response.data! : response.error!;
+        return response.response;
     }
 }

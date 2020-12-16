@@ -1,7 +1,7 @@
 import {User} from '~/logic/models/User';
-import {Nullable} from '~/logic/Utils';
 import {Patient} from '~/logic/models/Patient';
 import {Doctor} from '~/logic/models/Doctor';
+import {APIError} from '~/logic/models/APIError';
 
 export interface LoginUser {
     username: string;
@@ -19,7 +19,7 @@ export interface UserDoctors {
 }
 
 export interface AuthService {
-    login(loginUser: LoginUser): Promise<Nullable<UserPatients | UserDoctors>>;
+    login(loginUser: LoginUser): Promise<UserPatients | UserDoctors | APIError>;
 
-    logout(): Promise<void>;
+    logout(): Promise<true | APIError>;
 }

@@ -1,4 +1,3 @@
-import {JSONSerializable, JSONSerializableKeys} from '~/logic/models/utils/JSONSerializable';
 import {AppointmentTimeslot} from '~/logic/models/AppointmentTimeslot';
 
 export interface TimeslotDate {
@@ -7,7 +6,7 @@ export interface TimeslotDate {
     year: number;
 }
 
-export class AppointmentTimeslotDate implements JSONSerializable<AppointmentTimeslotDate> {
+export class AppointmentTimeslotDate {
     private _date: TimeslotDate;
     private _timeslots: AppointmentTimeslot[];
 
@@ -25,12 +24,5 @@ export class AppointmentTimeslotDate implements JSONSerializable<AppointmentTime
 
     public set timeslots(value: AppointmentTimeslot[]) {
         this._timeslots = value;
-    }
-
-    public toJSON(): JSONSerializableKeys<AppointmentTimeslotDate> {
-        return {
-            date: this.date,
-            timeslots: this.timeslots
-        };
     }
 }

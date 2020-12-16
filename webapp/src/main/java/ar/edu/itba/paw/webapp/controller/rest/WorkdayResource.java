@@ -104,35 +104,6 @@ public class WorkdayResource extends GenericResource {
                 .build();
     }
 
-    @POST
-    @Produces({WorkdayMIME.GET, ErrorMIME.ERROR})
-    @Consumes(WorkdayMIME.CREATE)
-    public Response createEntity(
-            Workday workday,
-            @Context HttpHeaders httpheaders) {
-        MIMEHelper.assertServerType(httpheaders, WorkdayMIME.GET);
-
-        if (workday == null || workday.getDay() == null)
-            return this.error(Status.BAD_REQUEST.getStatusCode(), Status.BAD_REQUEST.toString());
-
-        if (!this.isDoctor())
-            return this.error(Status.FORBIDDEN.getStatusCode(), Status.FORBIDDEN.toString());
-
-        Optional<Doctor> doctorOptional = this.doctorService.findByUser(this.getUser().get()).stream().findFirst();
-        if (!doctorOptional.isPresent())
-            return this.error(Status.FORBIDDEN.getStatusCode(), Status.FORBIDDEN.toString()); // TODO: Log, esto es inconsistencia, no deberia de pasar
-
-        if (workday.getStartHour() > workday.getEndHour()
-            || ((workday.getStartHour().equals(workday.getEndHour())) && (workday.getStartHour() > workday.getEndHour()))) {
-            return this.error(Status.BAD_REQUEST.getStatusCode(), Status.BAD_REQUEST.toString());
-        }
-
-        return Response
-                .status(Status.CREATED)
-                .entity(this.workdayService.create(this.createWorkday(workday, doctorOptional.get())))
-                .build();
-    }
-
     @GET
     @Path("{id}")
     @Produces({WorkdayMIME.GET, ErrorMIME.ERROR})

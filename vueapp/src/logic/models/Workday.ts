@@ -1,5 +1,4 @@
 import {GenericEntity} from '~/logic/models/utils/GenericEntity';
-import {JSONSerializableKeys} from '~/logic/models/utils/JSONSerializable';
 
 export interface WorkdayHour {
     hour: number;
@@ -61,15 +60,5 @@ export class Workday extends GenericEntity<Workday> {
 
     public set doctorId(value: number) {
         this._doctorId = value;
-    }
-
-    public toJSON(): JSONSerializableKeys<Workday> {
-        return {
-            id: this.id,
-            day: this.day,
-            end: this.end,
-            start: this.start,
-            doctorId: this.doctorId
-        };
     }
 }

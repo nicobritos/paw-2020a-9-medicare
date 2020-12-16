@@ -1,14 +1,19 @@
-import {JSONSerializable, JSONSerializableKeys} from '~/logic/models/utils/JSONSerializable';
-
 export const ErrorMIME = 'application/vnd.error.v1+json';
 
-export class APIError implements JSONSerializable<APIError> {
+export interface APISubError {
+    code: number;
+    message: number;
+}
+
+export class APIError {
     private readonly _code: number;
     private readonly _message: number;
+    private readonly _errors: readonly APISubError[];
 
-    constructor(code: number, message: number) {
+    constructor(code: number, message: number, errors: readonly APISubError[] = []) {
         this._code = code;
         this._message = message;
+        this._errors = errors;
     }
 
     public get code(): number {
@@ -19,10 +24,7 @@ export class APIError implements JSONSerializable<APIError> {
         return this._message;
     }
 
-    public toJSON(): JSONSerializableKeys<APIError> {
-        return {
-            code: this.code,
-            message: this.message
-        };
+    public get errors(): readonly APISubError[] {
+        return this._errors;
     }
 }

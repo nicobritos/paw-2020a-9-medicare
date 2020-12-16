@@ -6,6 +6,8 @@ import {Module} from 'vuex';
 import {LocalityService} from '~/logic/interfaces/services/LocalityService';
 import {LocalityActions, LocalityMutations, localityMutationTypes, LocalityState} from '~/store/types/localities.types';
 import {Locality} from '~/logic/models/Locality';
+import {Nullable} from '~/logic/Utils';
+import {APIError} from '~/logic/models/APIError';
 
 function getService(): LocalityService {
     return container.get(TYPES.Services.LocalityService);
@@ -27,14 +29,14 @@ const actions: DefineActionTree<LocalityActions, LocalityState, RootState> = {
         let promise = getService().list();
         commit(localityMutationTypes.setPromise(promise));
 
-        let data: Locality[] = [];
+        let data: Nullable<Locality[]> | APIError = null;
         try {
             data = await promise;
         } catch (e) {
             console.error(e);
         }
 
-        commit(localityMutationTypes.setLocalities(data));
+        commit(localityMutationTypes.setLocalities(data === null || data instanceof APIError ? [] : data));
     }
 };
 

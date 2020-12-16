@@ -1,5 +1,4 @@
 import {GenericEntity} from '~/logic/models/utils/GenericEntity';
-import {JSONSerializableKeys} from '~/logic/models/utils/JSONSerializable';
 
 export enum AppointmentStatus {
     PENDING= 'PENDING',
@@ -72,17 +71,5 @@ export class Appointment extends GenericEntity<Appointment> {
 
     public set doctorId(value: number) {
         this._doctorId = value;
-    }
-
-    public toJSON(): JSONSerializableKeys<Appointment> {
-        return {
-            id: this.id,
-            dateFrom: this.dateFrom,
-            message: this.message,
-            motive: this.motive,
-            patientId: this.patientId,
-            doctorId: this.doctorId,
-            status: this.status
-        };
     }
 }

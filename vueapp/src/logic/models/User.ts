@@ -1,5 +1,4 @@
 import {GenericEntity} from '~/logic/models/utils/GenericEntity';
-import {JSONSerializableKeys} from '~/logic/models/utils/JSONSerializable';
 import {Nullable} from '~/logic/Utils';
 
 export class User extends GenericEntity<User> {
@@ -8,7 +7,7 @@ export class User extends GenericEntity<User> {
     private _firstName: string;
     private _surname: string;
     private _verified: boolean;
-    private _phone: Nullable<string>; // TODO: CHeck si peude ser null. --> Update api.json
+    private _phone: Nullable<string>;
     private _profilePictureId: Nullable<number>;
 
     public get id(): number {
@@ -65,17 +64,5 @@ export class User extends GenericEntity<User> {
 
     public set profilePictureId(value: Nullable<number>) {
         this._profilePictureId = value;
-    }
-
-    public toJSON(): JSONSerializableKeys<User> {
-        return {
-            id: this.id,
-            verified: this.verified,
-            email: this.email,
-            firstName: this.firstName,
-            surname: this.surname,
-            phone: this.phone,
-            profilePictureId: this.profilePictureId
-        };
     }
 }

@@ -1,4 +1,5 @@
 import {APIError} from '~/logic/models/APIError';
+import {StatusCodes} from '~/logic/interfaces/repositories/RestRepository';
 
 export abstract class APIResponseFactory {
     public static error<T>(error: APIError): APIResponse<T> {
@@ -27,7 +28,21 @@ export class APIResponse<T> {
         return this._error;
     }
 
-    public isOk(): boolean {
+    public get response(): T | APIError {
+        return this.isOk ? this._data! : this._error!;
+    }
+
+    public get nullableResponse(): T | APIError | null {
+        if (this.isOk) return this._data!;
+        if (this._error!.code === StatusCodes.NOT_FOUND) return null;
+        return this._error!;
+    }
+
+    public get isOk(): boolean {
         return this._error === undefined;
+    }
+
+    public orElse<R>(other: R): T | R {
+        return this.isOk ? this._data! : other;
     }
 }

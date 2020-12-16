@@ -1,9 +1,11 @@
 import {CacheableAsyncProperty, DefineTypes} from '~/store/utils/helper.types';
 import {Locality} from '~/logic/models/Locality';
+import {Nullable} from '~/logic/Utils';
+import {APIError} from '~/logic/models/APIError';
 
 export interface LocalityState {
     localities: Locality[],
-    _listLoading: CacheableAsyncProperty<Locality[]>
+    _listLoading: CacheableAsyncProperty<Nullable<Locality[]> | APIError>
 }
 
 export interface LocalityActions {
@@ -15,7 +17,7 @@ export const localityActionTypes: DefineTypes<LocalityActions> = {
 };
 
 export interface LocalityMutations {
-    setPromise: Promise<Locality[]>,
+    setPromise: Promise<Nullable<Locality[]> | APIError>,
     setLocalities: Locality[]
 }
 

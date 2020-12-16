@@ -9,6 +9,7 @@ import {Nullable} from '~/logic/Utils';
 import {Commit, Module} from 'vuex';
 import {Doctor} from '~/logic/models/Doctor';
 import {Patient} from '~/logic/models/Patient';
+import {APIError} from '~/logic/models/APIError';
 
 function getService(): AuthService {
     return container.get(TYPES.Services.AuthService);
@@ -50,15 +51,15 @@ const actions: DefineActionTree<AuthActions, AuthState, RootState> = {
         });
         commit(authMutationTypes.setPromise(promise));
 
-        let data = null;
+        let data: UserPatients | UserDoctors | APIError | null = null;
         try {
             data = await promise;
         } catch (e) {
             console.error(e);
         }
 
-        commit(authMutationTypes.setUser(data == null ? data : data.user));
-        if (data != null) {
+        commit(authMutationTypes.setUser(data === null || data instanceof APIError ? null : data.user));
+        if (data != null && !(data instanceof APIError)) {
             if ((data as UserPatients).patients != null) {
                 commit(authMutationTypes.setPatients((data as UserPatients).patients));
             } else {

@@ -1,10 +1,9 @@
 import {inject, injectable} from 'inversify';
 import TYPES from '~/logic/types';
 import {RestRepository} from '~/logic/interfaces/repositories/RestRepository';
-import {Nullable} from '~/logic/Utils';
 import {AuthService, LoginUser, UserDoctors, UserPatients} from '~/logic/interfaces/services/AuthService';
 import {User} from '~/logic/models/User';
-import {ErrorMIME} from '~/logic/models/APIError';
+import {APIError, ErrorMIME} from '~/logic/models/APIError';
 import {JSON_MIME} from '~/logic/services/Utils';
 import {UserMIME} from '~/logic/services/UserServiceImpl';
 
@@ -15,27 +14,28 @@ const AuthMIME = {
 @injectable()
 export class AuthServiceImpl implements AuthService {
     private static LOGIN_PATH = 'login';
-    private static REFRESH_PATH = 'auth/refresh';
     private static LOGOUT_PATH = 'auth/logout';
 
     @inject(TYPES.Repositories.RestRepository)
     private rest: RestRepository;
 
-    public async login(loginUser: LoginUser): Promise<Nullable<UserPatients | UserDoctors>> {
+    public async login(loginUser: LoginUser): Promise<UserPatients | UserDoctors | APIError> {
         let response = await this.rest.post<UserPatients | UserDoctors, LoginUser>(AuthServiceImpl.LOGIN_PATH, {
             accepts: UserMIME.ME,
             data: loginUser,
             contentType: AuthMIME.LOGIN
         });
 
-        return response.isOk() ? response.data! : null;
+        return response.response;
     }
 
-    public async logout(): Promise<void> {
-        await this.rest.post<User, void>(AuthServiceImpl.LOGOUT_PATH, {
+    public async logout(): Promise<true | APIError> {
+        let response = await this.rest.post<User, void>(AuthServiceImpl.LOGOUT_PATH, {
             accepts: ErrorMIME,
             data: undefined,
             contentType: JSON_MIME
         });
+
+        return response.isOk ? true : response.error!;
     }
 }

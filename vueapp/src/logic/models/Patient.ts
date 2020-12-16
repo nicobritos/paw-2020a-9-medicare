@@ -1,10 +1,8 @@
 import {GenericEntity} from '~/logic/models/utils/GenericEntity';
-import {JSONSerializableKeys} from '~/logic/models/utils/JSONSerializable';
-import {User} from '~/logic/models/User';
 
 export class Patient extends GenericEntity<Patient> {
     private _id: number;
-    private _user: User;
+    private _userId: number;
     private _officeId: number;
 
     public get id(): number {
@@ -15,12 +13,12 @@ export class Patient extends GenericEntity<Patient> {
         this._id = value;
     }
 
-    public get user(): User {
-        return this._user;
+    public get userId(): number {
+        return this._userId;
     }
 
-    public set user(value: User) {
-        this._user = value;
+    public set userId(value: number) {
+        this._userId = value;
     }
 
     public get officeId(): number {
@@ -29,13 +27,5 @@ export class Patient extends GenericEntity<Patient> {
 
     public set officeId(value: number) {
         this._officeId = value;
-    }
-
-    public toJSON(): JSONSerializableKeys<Patient> {
-        return {
-            id: this.id,
-            user: this.user,
-            officeId: this.officeId
-        };
     }
 }
