@@ -3,6 +3,7 @@ package ar.edu.itba.paw.interfaces.services;
 import ar.edu.itba.paw.interfaces.services.generic.GenericService;
 import ar.edu.itba.paw.models.*;
 
+import java.util.Collection;
 import java.util.List;
 
 public interface WorkdayService extends GenericService<Workday, Integer> {
@@ -14,5 +15,5 @@ public interface WorkdayService extends GenericService<Workday, Integer> {
 
     boolean doctorWorks(Doctor doctor, AppointmentTimeSlot timeSlot);
 
-    List<Workday> create(List<Workday> workdays);
+    Collection<Workday> create(Collection<Workday> workdays);
 }

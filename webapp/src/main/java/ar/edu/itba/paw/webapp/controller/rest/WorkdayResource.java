@@ -18,7 +18,6 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 import java.util.Collection;
-import java.util.LinkedList;
 import java.util.Optional;
 
 @Path("/workdays")
@@ -36,11 +35,11 @@ public class WorkdayResource extends GenericResource {
         MIMEHelper.assertServerType(httpheaders, WorkdayMIME.GET_LIST);
 
         if (!this.isDoctor())
-            return this.error(Status.FORBIDDEN.getStatusCode(), Status.FORBIDDEN.toString());
+            return this.error(Status.FORBIDDEN);
 
         Optional<Doctor> doctorOptional = this.doctorService.findByUser(this.getUser().get()).stream().findFirst();
         if (!doctorOptional.isPresent())
-            return this.error(Status.FORBIDDEN.getStatusCode(), Status.FORBIDDEN.toString()); // TODO: Log, esto es inconsistencia, no deberia de pasar
+            return this.error(Status.FORBIDDEN); // TODO: Log, esto es inconsistencia, no deberia de pasar
 
         return Response
                 .ok()
@@ -57,50 +56,34 @@ public class WorkdayResource extends GenericResource {
         MIMEHelper.assertServerType(httpheaders, WorkdayMIME.GET_LIST);
 
         if (workdays == null || workdays.isEmpty())
-            return this.error(Status.BAD_REQUEST.getStatusCode(), Status.BAD_REQUEST.toString());
+            return this.error(Status.BAD_REQUEST);
 
         if (!this.isDoctor())
-            return this.error(Status.FORBIDDEN.getStatusCode(), Status.FORBIDDEN.toString());
+            return this.error(Status.FORBIDDEN);
 
         Optional<Doctor> doctorOptional = this.doctorService.findByUser(this.getUser().get()).stream().findFirst();
         if (!doctorOptional.isPresent())
-            return this.error(Status.FORBIDDEN.getStatusCode(), Status.FORBIDDEN.toString()); // TODO: Log, esto es inconsistencia, no deberia de pasar
+            return this.error(Status.FORBIDDEN); // TODO: Log, esto es inconsistencia, no deberia de pasar
 
-        Collection<Workday> newWorkdays = new LinkedList<>();
-
-        Status error = null;
         for (Workday workday : workdays) {
             if (workday.getStartHour() > workday.getEndHour()
                     || ((workday.getStartHour().equals(workday.getEndHour())) && (workday.getStartHour() > workday.getEndHour()))) {
-                // We need to rollback
-                error = Status.BAD_REQUEST;
-                break;
-            }
-
-            try {
-                newWorkdays.add(this.workdayService.create(this.createWorkday(workday, doctorOptional.get())));
-            } catch (Exception e) {
-                // We need to rollback
-                error = Status.INTERNAL_SERVER_ERROR;
-                break;
+                return this.error(Status.BAD_REQUEST);
             }
         }
 
-        // We need to rollback
-        if (error != null) {
-            for (Workday newWorkday : newWorkdays) {
-                try {
-                    this.workdayService.remove(newWorkday.getId());
-                } catch (Exception ignored) {
-                    // TODO: LOG
-                }
-            }
-            return this.error(error.getStatusCode(), error.toString());
+        Collection<Workday> newWorkdays;
+        try {
+            newWorkdays = this.workdayService.create(workdays);
+        } catch (Exception ignored) {
+            // TODO: LOG
+            return this.error(Status.INTERNAL_SERVER_ERROR);
         }
 
         return Response
                 .status(Status.CREATED)
                 .entity(newWorkdays)
+                //.location() // TODO
                 .build();
     }
 
@@ -113,21 +96,21 @@ public class WorkdayResource extends GenericResource {
         MIMEHelper.assertServerType(httpheaders, WorkdayMIME.GET);
 
         if (id == null)
-            return this.error(Status.BAD_REQUEST.getStatusCode(), Status.BAD_REQUEST.toString());
+            return this.error(Status.BAD_REQUEST);
 
         if (!this.isDoctor())
-            return this.error(Status.FORBIDDEN.getStatusCode(), Status.FORBIDDEN.toString());
+            return this.error(Status.FORBIDDEN);
 
         Optional<Doctor> doctorOptional = this.doctorService.findByUser(this.getUser().get()).stream().findFirst();
         if (!doctorOptional.isPresent())
-            return this.error(Status.FORBIDDEN.getStatusCode(), Status.FORBIDDEN.toString()); // TODO: Log, esto es inconsistencia, no deberia de pasar
+            return this.error(Status.FORBIDDEN); // TODO: Log, esto es inconsistencia, no deberia de pasar
 
         Optional<Workday> workdayOptional = this.workdayService.findById(id);
         if (!workdayOptional.isPresent())
-            return this.error(Status.NOT_FOUND.getStatusCode(), Status.NOT_FOUND.toString());
+            return this.error(Status.NOT_FOUND);
 
         if (!doctorOptional.get().equals(workdayOptional.get().getDoctor()))
-            return this.error(Status.FORBIDDEN.getStatusCode(), Status.FORBIDDEN.toString());
+            return this.error(Status.FORBIDDEN);
 
         return Response
                 .ok()
@@ -142,21 +125,21 @@ public class WorkdayResource extends GenericResource {
             @Context HttpHeaders httpheaders,
             @PathParam("id") Integer id) {
         if (id == null)
-            return this.error(Status.BAD_REQUEST.getStatusCode(), Status.BAD_REQUEST.toString());
+            return this.error(Status.BAD_REQUEST);
 
         if (!this.isDoctor())
-            return this.error(Status.FORBIDDEN.getStatusCode(), Status.FORBIDDEN.toString());
+            return this.error(Status.FORBIDDEN);
 
         Optional<Doctor> doctorOptional = this.doctorService.findByUser(this.getUser().get()).stream().findFirst();
         if (!doctorOptional.isPresent())
-            return this.error(Status.FORBIDDEN.getStatusCode(), Status.FORBIDDEN.toString()); // TODO: Log, esto es inconsistencia, no deberia de pasar
+            return this.error(Status.FORBIDDEN); // TODO: Log, esto es inconsistencia, no deberia de pasar
 
         Optional<Workday> workdayOptional = this.workdayService.findById(id);
         if (!workdayOptional.isPresent())
-            return this.error(Status.NOT_FOUND.getStatusCode(), Status.NOT_FOUND.toString());
+            return this.error(Status.NOT_FOUND);
 
         if (!workdayOptional.get().getDoctor().equals(doctorOptional.get()))
-            return this.error(Status.FORBIDDEN.getStatusCode(), Status.FORBIDDEN.toString());
+            return this.error(Status.FORBIDDEN);
 
         this.workdayService.remove(id);
 

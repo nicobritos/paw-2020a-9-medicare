@@ -7,6 +7,7 @@ import ar.edu.itba.paw.services.generics.GenericServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Collection;
 import java.util.List;
 
 @Service
@@ -35,7 +36,7 @@ public class WorkdayServiceImpl extends GenericServiceImpl<WorkdayDao, Workday, 
     }
 
     @Override
-    public List<Workday> create(List<Workday> workdays) {
+    public Collection<Workday> create(Collection<Workday> workdays) {
         return this.repository.create(workdays);
     }
 
