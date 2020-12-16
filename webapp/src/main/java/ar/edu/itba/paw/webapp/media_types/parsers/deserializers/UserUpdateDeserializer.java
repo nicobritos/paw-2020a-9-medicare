@@ -1,14 +1,14 @@
-package ar.edu.itba.paw.webapp.media_types.parsers.serializers;
+package ar.edu.itba.paw.webapp.media_types.parsers.deserializers;
 
 import ar.edu.itba.paw.models.Picture;
 import ar.edu.itba.paw.models.User;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
-public class UserDeserializer extends JsonDeserializer<User> {
-    public static final UserDeserializer instance = new UserDeserializer();
+public class UserUpdateDeserializer extends JsonDeserializer<User> {
+    public static final UserUpdateDeserializer instance = new UserUpdateDeserializer();
 
-    private UserDeserializer() {}
+    private UserUpdateDeserializer() {}
 
     @Override
     public User fromJson(JsonNode o) {

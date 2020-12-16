@@ -1,4 +1,4 @@
-package ar.edu.itba.paw.webapp.media_types.parsers.serializers;
+package ar.edu.itba.paw.webapp.media_types.parsers.deserializers;
 
 import ar.edu.itba.paw.models.User;
 import com.fasterxml.jackson.databind.JsonNode;

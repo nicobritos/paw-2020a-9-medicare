@@ -2,7 +2,7 @@ package ar.edu.itba.paw.webapp.media_types.parsers;
 
 import ar.edu.itba.paw.models.Appointment;
 import ar.edu.itba.paw.webapp.media_types.AppointmentMIME;
-import ar.edu.itba.paw.webapp.media_types.parsers.serializers.AppointmentDeserializer;
+import ar.edu.itba.paw.webapp.media_types.parsers.deserializers.AppointmentCreateDeserializer;
 import ar.edu.itba.paw.webapp.media_types.parsers.utils.GenericParser;
 import ar.edu.itba.paw.webapp.media_types.parsers.utils.ParserUtils;
 
@@ -28,7 +28,7 @@ public class AppointmentCreateParser extends GenericParser<Appointment> {
     @Override
     public Appointment readFrom(Class<Appointment> aClass, Type type, Annotation[] annotations, MediaType mediaType, MultivaluedMap<String, String> multivaluedMap, InputStream inputStream) throws IOException, WebApplicationException {
         try {
-            return AppointmentDeserializer.instance.fromJson(ParserUtils.inputToJSON(inputStream));
+            return AppointmentCreateDeserializer.instance.fromJson(ParserUtils.inputToJSON(inputStream));
         } catch (Exception e) {
             throw new BadRequestException();
         }

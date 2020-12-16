@@ -15,7 +15,7 @@ public class PatientSerializer extends JsonSerializer<Patient> {
         ObjectNode jsonObject = JsonNodeFactory.instance.objectNode();
 
         jsonObject.put("id", patient.getId());
-        jsonObject.replace("user", UserSerializer.instance.toJson(patient.getUser()));
+        jsonObject.put("userId", patient.getUser().getId());
         jsonObject.put("officeId", patient.getOffice().getId());
 
         return jsonObject;

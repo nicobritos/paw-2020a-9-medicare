@@ -16,7 +16,7 @@ public class LocalitySerializer extends JsonSerializer<Locality> {
 
         jsonObject.put("id", locality.getId());
         jsonObject.put("name", locality.getName());
-        jsonObject.replace("province", ProvinceSerializer.instance.toJson(locality.getProvince()));
+        jsonObject.put("province", locality.getProvince().getId());
 
         return jsonObject;
     }

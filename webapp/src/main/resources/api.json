@@ -85,7 +85,8 @@
                         "nullable": true
                     },
                     "profilePictureId": {
-                        "type": "integer"
+                        "type": "integer",
+                        "nullable": true
                     }
                 }
             },
@@ -140,20 +141,22 @@
                         "type": "integer",
                         "nullable": false
                     },
-                    "specialtyIds": {
-                        "type": "array",
-                        "items": [
-                            {
-                                "type": "integer"
-                            }
-                        ]
+                    "street": {
+                        "type": "string",
+                        "nullable": false
+                    },
+                    "localityId": {
+                        "type": "number",
+                        "nullable": false
                     }
                 },
                 "required": [
                     "email",
                     "password",
                     "firstName",
-                    "surname"
+                    "surname",
+                    "street",
+                    "localityId"
                 ]
             },
             "createUserPatient": {
@@ -250,7 +253,7 @@
                         "type": "integer"
                     },
                     "phone": {
-                        "type": "string"
+                        "type": "string",
                         "nullable": true
                     },
                     "email": {
@@ -492,7 +495,7 @@
                     "patientId": {
                         "type": "integer"
                     },
-                    "staffId": {
+                    "doctorId": {
                         "type": "integer"
                     }
                 }
@@ -510,7 +513,7 @@
                     "motive": {
                         "type": "string"
                     },
-                    "staffId": {
+                    "doctorId": {
                         "type": "integer",
                         "required": true
                     }
@@ -1419,7 +1422,7 @@
                 "parameters": [
                     {
                         "in": "query",
-                        "name": "staff_id",
+                        "name": "doctor_id",
                         "schema": {
                             "type": "integer"
                         },

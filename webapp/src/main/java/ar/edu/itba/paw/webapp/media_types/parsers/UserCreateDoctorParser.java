@@ -1,7 +1,7 @@
 package ar.edu.itba.paw.webapp.media_types.parsers;
 
 import ar.edu.itba.paw.webapp.media_types.UserMIME;
-import ar.edu.itba.paw.webapp.media_types.parsers.serializers.UserDoctorDeserializer;
+import ar.edu.itba.paw.webapp.media_types.parsers.deserializers.UserCreateDoctorDeserializer;
 import ar.edu.itba.paw.webapp.media_types.parsers.utils.GenericParser;
 import ar.edu.itba.paw.webapp.media_types.parsers.utils.ParserUtils;
 import ar.edu.itba.paw.webapp.models.DoctorSignUp;
@@ -28,7 +28,7 @@ public class UserCreateDoctorParser extends GenericParser<DoctorSignUp> {
     @Override
     public DoctorSignUp readFrom(Class<DoctorSignUp> aClass, Type type, Annotation[] annotations, MediaType mediaType, MultivaluedMap<String, String> multivaluedMap, InputStream inputStream) throws IOException, WebApplicationException {
         try {
-            return UserDoctorDeserializer.instance.fromJson(ParserUtils.inputToJSON(inputStream));
+            return UserCreateDoctorDeserializer.instance.fromJson(ParserUtils.inputToJSON(inputStream));
         } catch (Exception e) {
             throw new BadRequestException();
         }

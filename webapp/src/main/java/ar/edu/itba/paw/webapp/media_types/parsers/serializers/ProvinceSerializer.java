@@ -16,7 +16,7 @@ public class ProvinceSerializer extends JsonSerializer<Province> {
 
         jsonObject.put("id", province.getId());
         jsonObject.put("name", province.getName());
-        jsonObject.replace("country", CountrySerializer.instance.toJson(province.getCountry()));
+        jsonObject.put("countryId", province.getCountry().getId());
 
         return jsonObject;
     }

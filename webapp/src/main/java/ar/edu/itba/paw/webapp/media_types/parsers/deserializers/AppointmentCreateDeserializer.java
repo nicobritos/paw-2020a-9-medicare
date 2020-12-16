@@ -1,4 +1,4 @@
-package ar.edu.itba.paw.webapp.media_types.parsers.serializers;
+package ar.edu.itba.paw.webapp.media_types.parsers.deserializers;
 
 import ar.edu.itba.paw.models.Appointment;
 import ar.edu.itba.paw.models.Doctor;
@@ -6,10 +6,10 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.joda.time.LocalDateTime;
 
-public class AppointmentDeserializer extends JsonDeserializer<Appointment> {
-    public static final AppointmentDeserializer instance = new AppointmentDeserializer();
+public class AppointmentCreateDeserializer extends JsonDeserializer<Appointment> {
+    public static final AppointmentCreateDeserializer instance = new AppointmentCreateDeserializer();
 
-    private AppointmentDeserializer() {}
+    private AppointmentCreateDeserializer() {}
 
     @Override
     public Appointment fromJson(JsonNode o) {

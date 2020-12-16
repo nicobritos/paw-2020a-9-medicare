@@ -1,7 +1,7 @@
 package ar.edu.itba.paw.webapp.media_types.parsers;
 
 import ar.edu.itba.paw.webapp.media_types.DoctorMIME;
-import ar.edu.itba.paw.webapp.media_types.parsers.serializers.DoctorPaginationDeserializer;
+import ar.edu.itba.paw.webapp.media_types.parsers.deserializers.DoctorPaginationDeserializer;
 import ar.edu.itba.paw.webapp.media_types.parsers.utils.GenericParser;
 import ar.edu.itba.paw.webapp.media_types.parsers.utils.ParserUtils;
 import ar.edu.itba.paw.webapp.models.DoctorPagination;

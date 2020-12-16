@@ -1,14 +1,14 @@
-package ar.edu.itba.paw.webapp.media_types.parsers.serializers;
+package ar.edu.itba.paw.webapp.media_types.parsers.deserializers;
 
 import ar.edu.itba.paw.models.User;
 import ar.edu.itba.paw.webapp.models.PatientSignUp;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
-public class UserPatientDeserializer extends UserCreateDeserializer<PatientSignUp> {
-    public static final UserPatientDeserializer instance = new UserPatientDeserializer();
+public class UserCreatePatientDeserializer extends UserCreateDeserializer<PatientSignUp> {
+    public static final UserCreatePatientDeserializer instance = new UserCreatePatientDeserializer();
 
-    private UserPatientDeserializer() {}
+    private UserCreatePatientDeserializer() {}
 
     @Override
     public PatientSignUp fromJson(JsonNode o) {
