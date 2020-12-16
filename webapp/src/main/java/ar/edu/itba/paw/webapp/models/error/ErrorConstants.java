@@ -13,129 +13,129 @@ public abstract class ErrorConstants {
     public static final APISubError APPOINTMENT_CREATE_MISSING_DOCTOR_ID
             = missingField(5, "doctorId");
     public static final APISubError APPOINTMENT_CREATE_INVALID_DOCTOR_ID
-            = invalidField(5, "doctorId");
+            = invalidField(6, "doctorId");
     public static final APISubError APPOINTMENT_CREATE_NONEXISTENT_DOCTOR
-            = nonExistentEntity(5, "doctor", "doctorId");
+            = nonExistentEntity(7, "Doctor", "doctorId");
 
     public static final APISubError APPOINTMENT_TIME_SLOT_GET_NONEXISTENT_DOCTOR
-            = nonExistentEntity(5, "doctor", "doctor_id");
+            = nonExistentEntity(8, "Doctor", "doctor_id");
 
     public static final APISubError LOCALITY_GET_NONEXISTENT_PROVINCE
-            = nonExistentEntity(5, "province", "provinceId");
+            = nonExistentEntity(9, "Province", "provinceId");
 
     public static final APISubError PROVINCE_GET_NONEXISTENT_COUNTRY
-            = nonExistentEntity(5, "country", "countryId");
+            = nonExistentEntity(10, "Country", "countryId");
 
     public static final APISubError DOCTOR_PAGINATION_INVALID_NAME
-            = invalidField(5, "name");
+            = invalidField(11, "name");
     public static final APISubError DOCTOR_PAGINATION_MISSING_PAGE
-            = missingField(5, "page");
+            = missingField(12, "page");
     public static final APISubError DOCTOR_PAGINATION_INVALID_PAGE
-            = invalidField(5, "page");
+            = invalidField(13, "page");
     public static final APISubError DOCTOR_PAGINATION_INVALID_PER_PAGE
-            = invalidField(5, "per_page");
+            = invalidField(14, "per_page");
     public static final APISubError DOCTOR_PAGINATION_INVALID_SPECIALTIES
-            = invalidField(5, "specialties");
+            = invalidField(15, "specialties");
    public static final APISubError DOCTOR_PAGINATION_INVALID_LOCALITIES
-            = invalidField(5, "localities");
+            = invalidField(16, "localities");
 
     public static final APISubError DOCTOR_UPDATE_INVALID_PHONE
-            = invalidField(5, "phone");
+            = invalidField(17, "phone");
     public static final APISubError DOCTOR_UPDATE_INVALID_EMAIL
-            = invalidField(5, "email");
+            = invalidField(18, "email");
     public static final APISubError DOCTOR_UPDATE_INVALID_SPECIALTIES
-            = invalidField(5, "specialtyIds");
+            = invalidField(19, "specialtyIds");
     public static final APISubError DOCTOR_UPDATE_SOME_INVALID_SPECIALTIES
-            = new APISubError(5, "Some of the specialties provided could not be found");
+            = new APISubError(20, "Some of the specialties provided could not be found");
     public static final APISubError DOCTOR_UPDATE_EMPTY_SPECIALTIES
-            = new APISubError(5, "You need to provide at least one specialty");
+            = new APISubError(21, "You need to provide at least one specialty");
 
     public static final APISubError USER_CREATE_MISSING_EMAIL
-            = missingField(5, "email");
+            = missingField(22, "email");
     public static final APISubError USER_CREATE_INVALID_EMAIL
-            = invalidField(5, "email");
+            = invalidField(23, "email");
     public static final APISubError USER_CREATE_MISSING_FIRST_NAME
-            = missingField(5, "firstName");
+            = missingField(24, "firstName");
     public static final APISubError USER_CREATE_INVALID_FIRST_NAME
-            = invalidField(5, "firstName");
+            = invalidField(25, "firstName");
     public static final APISubError USER_CREATE_MISSING_SURNAME
-            = missingField(5, "surname");
+            = missingField(26, "surname");
     public static final APISubError USER_CREATE_INVALID_SURNAME
-            = invalidField(5, "surname");
+            = invalidField(27, "surname");
     public static final APISubError USER_CREATE_MISSING_PASSWORD
-            = missingField(5, "password");
+            = missingField(28, "password");
     public static final APISubError USER_CREATE_INVALID_PASSWORD
-            = invalidField(5, "password");
+            = invalidField(29, "password");
     public static final APISubError USER_CREATE_INVALID_PHONE
-            = invalidField(5, "phone");
+            = invalidField(30, "phone");
 
     public static final APISubError USER_CREATE_DOCTOR_INVALID_REGISTRATION_NUMBER
-            = invalidField(5, "registrationNumber");
+            = invalidField(31, "registrationNumber");
     public static final APISubError USER_CREATE_DOCTOR_MISSING_LOCALITY_ID
-            = invalidField(5, "localityId");
+            = missingField(32, "localityId");
     public static final APISubError USER_CREATE_DOCTOR_INVALID_LOCALITY_ID
-            = invalidField(5, "localityId");
+            = invalidField(33, "localityId");
     public static final APISubError USER_CREATE_NONEXISTENT_LOCALITY
-            = nonExistentEntity(5, "Locality", "localityId");
+            = nonExistentEntity(34, "Locality", "localityId");
     public static final APISubError USER_CREATE_DOCTOR_MISSING_STREET
-            = invalidField(5, "street");
+            = missingField(35, "street");
     public static final APISubError USER_CREATE_DOCTOR_INVALID_STREET
-            = invalidField(5, "street");
+            = invalidField(36, "street");
 
     public static final APISubError USER_UPDATE_INVALID_EMAIL
-            = invalidField(5, "email");
+            = invalidField(37, "email");
     public static final APISubError USER_UPDATE_INVALID_FIRST_NAME
-            = invalidField(5, "firstName");
+            = invalidField(38, "firstName");
     public static final APISubError USER_UPDATE_INVALID_SURNAME
-            = invalidField(5, "surname");
+            = invalidField(39, "surname");
     public static final APISubError USER_UPDATE_INVALID_PHONE
-            = invalidField(5, "phone");
+            = invalidField(40, "phone");
 
     public static final APISubError WORKDAY_CREATE_INVALID_DAY
-            = invalidField(5, "day");
+            = invalidField(41, "day");
     public static final APISubError WORKDAY_CREATE_MISSING_DAY
-            = invalidField(5, "day");
+            = missingField(42, "day");
     public static final APISubError WORKDAY_CREATE_MISSING_START
-            = invalidField(5, "start");
+            = missingField(43, "start");
     public static final APISubError WORKDAY_CREATE_INVALID_START
-            = invalidField(5, "start");
+            = invalidField(44, "start");
     public static final APISubError WORKDAY_CREATE_MISSING_END
-            = invalidField(5, "end");
+            = missingField(45, "end");
     public static final APISubError WORKDAY_CREATE_INVALID_END
-            = invalidField(5, "end");
+            = invalidField(46, "end");
     public static final APISubError WORKDAY_CREATE_MISSING_START_HOUR
-            = invalidField(5, "start.hour");
+            = missingField(47, "start.hour");
     public static final APISubError WORKDAY_CREATE_INVALID_START_HOUR
-            = invalidField(5, "start.hour");
+            = invalidField(48, "start.hour");
     public static final APISubError WORKDAY_CREATE_MISSING_START_MINUTE
-            = invalidField(5, "start.minute");
+            = missingField(49, "start.minute");
     public static final APISubError WORKDAY_CREATE_INVALID_START_MINUTE
-            = invalidField(5, "start.minute");
+            = invalidField(50, "start.minute");
     public static final APISubError WORKDAY_CREATE_MISSING_END_HOUR
-            = invalidField(5, "end.hour");
+            = missingField(51, "end.hour");
     public static final APISubError WORKDAY_CREATE_INVALID_END_HOUR
-            = invalidField(5, "end.hour");
+            = invalidField(52, "end.hour");
     public static final APISubError WORKDAY_CREATE_MISSING_END_MINUTE
-            = invalidField(5, "end.minute");
+            = missingField(53, "end.minute");
     public static final APISubError WORKDAY_CREATE_INVALID_END_MINUTE
-            = invalidField(5, "end.minute");
+            = invalidField(54, "end.minute");
 
     public static final APISubError DATE_RANGE_TOO_BROAD
-            = new APISubError(5, "The selected range date is too broad");
+            = new APISubError(55, "The selected range date is too broad");
     public static final APISubError DATE_FROM_IS_AFTER_TO
-            = new APISubError(5, "The start date is after the end one");
+            = new APISubError(56, "The start date is after the end one");
 
     public static final APISubError MISSING_BODY_PARAMS
-            = new APISubError(5, "Some of the required body parameters are missing");
+            = new APISubError(57, "Some of the required body parameters are missing");
     public static final APISubError MISSING_PATH_PARAMS
-            = new APISubError(5, "Some of the required path parameters are missing or are invalid");
+            = new APISubError(58, "Some of the required path parameters are missing or are invalid");
     public static final APISubError MISSING_QUERY_PARAMS
-            = new APISubError(5, "Some of the required query parameters are missing");
+            = new APISubError(59, "Some of the required query parameters are missing");
     public static final APISubError INVALID_QUERY_PARAMS
-            = new APISubError(5, "Some of the passed query parameters are invalid");
+            = new APISubError(60, "Some of the passed query parameters are invalid");
 
     public static final APISubError USER_EMAIL_USED
-            = new APISubError(5, "The email specified is already being used");
+            = new APISubError(61, "The email specified is already being used");
 
 
     private static APISubError invalidField(int code, String field) {
