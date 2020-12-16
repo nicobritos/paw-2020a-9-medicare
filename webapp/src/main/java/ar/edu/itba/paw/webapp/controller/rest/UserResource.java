@@ -1,7 +1,10 @@
 package ar.edu.itba.paw.webapp.controller.rest;
 
 import ar.edu.itba.paw.interfaces.services.*;
-import ar.edu.itba.paw.models.*;
+import ar.edu.itba.paw.models.Doctor;
+import ar.edu.itba.paw.models.Locality;
+import ar.edu.itba.paw.models.Office;
+import ar.edu.itba.paw.models.User;
 import ar.edu.itba.paw.webapp.controller.rest.utils.GenericAuthenticationResource;
 import ar.edu.itba.paw.webapp.media_types.ErrorMIME;
 import ar.edu.itba.paw.webapp.media_types.MIMEHelper;
@@ -19,10 +22,8 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Path("/users")
 @Component
@@ -58,46 +59,23 @@ public class UserResource extends GenericAuthenticationResource {
         if (this.userService.findByUsername(doctorSignUp.getUser().getEmail()).isPresent())
             return this.error(Status.BAD_REQUEST);
 
-        Optional<Locality> locality = this.localityService.findById(doctorSignUp.getOffice().getLocality().getId());
+        Optional<Locality> locality = this.localityService.findById(doctorSignUp.getLocalityId());
         if (!locality.isPresent())
-            return this.error(Status.BAD_REQUEST);
-
-        Collection<DoctorSpecialty> doctorSpecialties = this.doctorSpecialtyService.findByIds(
-                doctorSignUp
-                        .getDoctorSpecialties()
-                        .stream()
-                        .map(DoctorSpecialty::getId)
-                        .collect(Collectors.toList())
-        );
-        if (doctorSpecialties.size() != doctorSignUp.getDoctorSpecialties().size())
             return this.error(Status.BAD_REQUEST);
 
         User user = this.copyUser(doctorSignUp);
 
         Office office = new Office();
         office.setLocality(locality.get());
-        office.setStreet(doctorSignUp.getOffice().getStreet());
-
-        if (doctorSignUp.getOffice().getName() != null) {
-            office.setName(doctorSignUp.getOffice().getName());
-        } else {
-            // TODO: i18n
-            office.setName("Consultorio de " + user.getFirstName() + " " + user.getSurname());
-        }
-        if (doctorSignUp.getOffice().getPhone() != null) {
-            office.setName(doctorSignUp.getOffice().getPhone());
-        } else {
-            office.setPhone(doctorSignUp.getUser().getPhone());
-        }
-        if (doctorSignUp.getOffice().getEmail() != null) {
-            office.setName(doctorSignUp.getOffice().getEmail());
-        } else {
-            office.setPhone(doctorSignUp.getUser().getEmail());
-        }
+        office.setStreet(doctorSignUp.getStreet());
+        // TODO: i18n
+        office.setName("Consultorio de " + user.getFirstName() + " " + user.getSurname());
+        office.setPhone(doctorSignUp.getUser().getPhone());
+        office.setPhone(doctorSignUp.getUser().getEmail());
 
         Doctor doctor = new Doctor();
         doctor.setOffice(office);
-        doctor.setDoctorSpecialties(doctorSpecialties);
+        doctor.setDoctorSpecialties(Collections.emptyList());
         doctor.setRegistrationNumber(doctorSignUp.getRegistrationNumber());
         doctor.setPhone(office.getPhone());
         doctor.setEmail(office.getEmail());

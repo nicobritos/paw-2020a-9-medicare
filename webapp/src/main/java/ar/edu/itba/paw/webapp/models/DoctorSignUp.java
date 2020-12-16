@@ -1,10 +1,17 @@
 package ar.edu.itba.paw.webapp.models;
 
-import ar.edu.itba.paw.models.Locality;
-
 public class DoctorSignUp extends UserSignUp {
-    private Locality locality;
+    private int localityId;
     private Integer registrationNumber;
+    private String street;
+
+    public String getStreet() {
+        return this.street;
+    }
+
+    public void setStreet(String street) {
+        this.street = street;
+    }
 
     public Integer getRegistrationNumber() {
         return this.registrationNumber;
@@ -14,11 +21,11 @@ public class DoctorSignUp extends UserSignUp {
         this.registrationNumber = registrationNumber;
     }
 
-    public Locality getLocality() {
-        return this.locality;
+    public int getLocalityId() {
+        return this.localityId;
     }
 
-    public void setLocality(Locality locality) {
-        this.locality = locality;
+    public void setLocalityId(int localityId) {
+        this.localityId = localityId;
     }
 }

@@ -1,6 +1,5 @@
 package ar.edu.itba.paw.webapp.media_types.parsers.deserializers;
 
-import ar.edu.itba.paw.models.Locality;
 import ar.edu.itba.paw.models.User;
 import ar.edu.itba.paw.webapp.models.DoctorSignUp;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -27,8 +26,8 @@ public class UserCreateDoctorDeserializer extends UserCreateDeserializer<DoctorS
         if (jsonObject.has("registrationNumber"))
             doctorSignUp.setRegistrationNumber(this.getIntegerNonNull(jsonObject, "registrationNumber"));
 
-        Locality locality = new Locality();
-        locality.setId(this.getIntegerNonNull(jsonObject, "localityId"));
+        doctorSignUp.setLocalityId(this.getIntegerNonNull(jsonObject, "localityId"));
+        doctorSignUp.setStreet(this.getStringNonNull(jsonObject, "street"));
 
         return doctorSignUp;
     }
