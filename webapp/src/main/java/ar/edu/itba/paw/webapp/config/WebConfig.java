@@ -163,6 +163,8 @@ public class WebConfig {
         final Properties properties = new Properties();
         properties.setProperty("hibernate.hbm2ddl.auto", "update");
         properties.setProperty("hibernate.dialect", "org.hibernate.dialect.PostgreSQL92Dialect");
+        properties.setProperty("hibernate.order_inserts", "true");
+        properties.put("hibernate.jdbc.batch_size", "5");
         properties.setProperty("jadira.usertype.autoRegisterUserTypes", "true");
 //        properties.setProperty("hibernate.show_sql", "true");
 //        properties.setProperty("format_sql", "true");

@@ -35,6 +35,11 @@ public class WorkdayServiceImpl extends GenericServiceImpl<WorkdayDao, Workday, 
     }
 
     @Override
+    public List<Workday> create(List<Workday> workdays) {
+        return this.repository.create(workdays);
+    }
+
+    @Override
     protected WorkdayDao getRepository() {
         return this.repository;
     }

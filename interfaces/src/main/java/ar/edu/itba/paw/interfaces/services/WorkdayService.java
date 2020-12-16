@@ -13,4 +13,6 @@ public interface WorkdayService extends GenericService<Workday, Integer> {
     List<Workday> findByDoctor(Doctor doctor, WorkdayDay day);
 
     boolean doctorWorks(Doctor doctor, AppointmentTimeSlot timeSlot);
+
+    List<Workday> create(List<Workday> workdays);
 }
