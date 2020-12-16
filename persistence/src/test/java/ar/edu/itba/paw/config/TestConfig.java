@@ -67,6 +67,8 @@ public class TestConfig {
         properties.setProperty("hibernate.dialect", "ar.edu.itba.paw.dialect.MyHSQLDialect");
         properties.setProperty("hibernate.show_sql", "true");
         properties.setProperty("format_sql", "true");
+        properties.setProperty("hibernate.order_inserts", "true");
+        properties.setProperty("hibernate.jdbc.batch_size", "5");
 
         factoryBean.setJpaProperties(properties);
         return factoryBean;

@@ -9,9 +9,7 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.persistence.Tuple;
 import javax.persistence.criteria.*;
 import javax.persistence.metamodel.SingularAttribute;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Repository
 public class WorkdayDaoImpl extends GenericDaoImpl<Workday, Integer> implements WorkdayDao {
@@ -74,19 +72,18 @@ public class WorkdayDaoImpl extends GenericDaoImpl<Workday, Integer> implements 
 
     @Transactional
     @Override
-    public List<Workday> create(List<Workday> workdays) {
+    public Collection<Workday> create(Collection<Workday> workdays) {
+        if(workdays == null || workdays.isEmpty()){
+            throw new IllegalArgumentException();
+        }
         int i=0;
         for (Workday workday : workdays){
-            if (workday == null) {
-                throw new IllegalArgumentException("An element of the list contained was null");
-            }
             // Memory Optimization
             if (i > 0 && i % BATCH_SIZE == 0) {
                 getEntityManager().flush();
                 getEntityManager().clear();
             }
-
-            getEntityManager().persist(workday);
+            super.create(workday);
             i++;
         }
         return workdays;
