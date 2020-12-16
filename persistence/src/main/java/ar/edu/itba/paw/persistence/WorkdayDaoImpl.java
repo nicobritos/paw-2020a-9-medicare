@@ -4,6 +4,7 @@ import ar.edu.itba.paw.interfaces.daos.WorkdayDao;
 import ar.edu.itba.paw.models.*;
 import ar.edu.itba.paw.persistence.generics.GenericDaoImpl;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.Tuple;
 import javax.persistence.criteria.*;
@@ -14,6 +15,8 @@ import java.util.Map;
 
 @Repository
 public class WorkdayDaoImpl extends GenericDaoImpl<Workday, Integer> implements WorkdayDao {
+    private static final int BATCH_SIZE = 5;
+
     public WorkdayDaoImpl() {
         super(Workday.class, Workday_.id);
     }
@@ -69,6 +72,25 @@ public class WorkdayDaoImpl extends GenericDaoImpl<Workday, Integer> implements 
         return false;
     }
 
+    @Transactional
+    @Override
+    public List<Workday> create(List<Workday> workdays) {
+        int i=0;
+        for (Workday workday : workdays){
+            if (workday == null) {
+                throw new IllegalArgumentException("An element of the list contained was null");
+            }
+            // Memory Optimization
+            if (i > 0 && i % BATCH_SIZE == 0) {
+                getEntityManager().flush();
+                getEntityManager().clear();
+            }
+
+            getEntityManager().persist(workday);
+            i++;
+        }
+        return workdays;
+    }
 
     @Override
     protected void insertOrderBy(CriteriaBuilder builder, CriteriaQuery<Workday> query, Root<Workday> root) {
