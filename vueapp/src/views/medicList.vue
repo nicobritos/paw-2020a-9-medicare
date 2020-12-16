@@ -286,7 +286,7 @@ export default class MedicList extends Vue {
         this.$store.dispatch('doctorSpecialties/loadDoctorSpecialties', doctorSpecialtyActionTypes.loadDoctorSpecialties());
     }
 
-    @Watch('staff')
+    @Watch('doctor')
     private updateResultsMessage() {
         //TODO: this is not the way
         if (this.doctorPagination.items.length >= 2) {
