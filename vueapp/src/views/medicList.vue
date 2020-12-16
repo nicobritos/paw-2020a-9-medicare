@@ -156,6 +156,7 @@ import {DoctorService} from '~/logic/interfaces/services/DoctorService';
 import TYPES from '~/logic/types';
 import {Pagination} from '~/logic/models/utils/Pagination';
 import {Doctor} from '~/logic/models/Doctor';
+import {APIError} from '~/logic/models/APIError';
 
 type I18NMessages = 'NoResultsFound' | 'SearchResults1' | 'SearchResults2More';
 
@@ -246,13 +247,19 @@ export default class MedicList extends Vue {
         return createPath(url);
     }
 
+    // TODO: Guido manejar errores
     async search() {
-        this.doctorPagination = await this.getDoctorService().list({
+        let response = await this.getDoctorService().list({
             page: this.page,
             name: this.name,
             localities: this.searchedLocalities,
             specialties: this.searchedSpecialties
         });
+        if (response instanceof APIError) {
+            // TODO: Guido
+        } else {
+            this.doctorPagination = response;
+        }
     }
 
     first(): void {

@@ -1,6 +1,6 @@
 import container from '~/plugins/inversify.config';
 import TYPES from '~/logic/types';
-import {DefineActionTree, DefineMutationTree} from '~/store/utils/helper.types';
+import {DefineActionTree} from '~/store/utils/helper.types';
 import {RootState} from '~/store/types/root.types';
 import {Nullable} from '~/logic/Utils';
 import {Module} from 'vuex';
@@ -20,7 +20,7 @@ const actions: DefineActionTree<UserActions, UserState, RootState, UserActionRet
         if (rootGetters['auth/loggedIn'] || rootState.auth._userLoading.promise || rootState.auth._userLoading.loaded)
             return;
 
-        let data: Nullable<UserDoctors | UserPatients>;
+        let data: UserDoctors | UserPatients | APIError;
         try {
             data = await getService().me();
         } catch (e) {
@@ -28,10 +28,10 @@ const actions: DefineActionTree<UserActions, UserState, RootState, UserActionRet
             return;
         }
 
-        commit('auth/setUser', authMutationTypes.setUser(data == null ? data : data.user), {
+        commit('auth/setUser', authMutationTypes.setUser(data instanceof APIError ? null : data.user), {
             root: true
         });
-        if (data != null) {
+        if (!(data instanceof APIError)) {
             if ((data as UserDoctors).doctors) {
                 commit('auth/setDoctors', authMutationTypes.setDoctors((data as UserDoctors).doctors), {
                     root: true,
