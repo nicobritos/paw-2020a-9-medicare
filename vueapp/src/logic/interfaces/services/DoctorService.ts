@@ -5,11 +5,10 @@ import {Pagination} from '~/logic/models/utils/Pagination';
 import {Nullable} from '~/logic/Utils';
 import {Locality} from '~/logic/models/Locality';
 
-// TODO: Ver los required en api doc
 export interface UpdateDoctor {
-    phone?: string;
+    phone?: Nullable<string>;
     email?: string;
-    specialtyIds?: DoctorSpecialty[]; // TODO: No tendrian q ser ids?
+    specialtyIds?: number[];
 }
 
 export interface DoctorSearchParams {
@@ -21,7 +20,7 @@ export interface DoctorSearchParams {
 }
 
 export interface DoctorService {
-    list(params: DoctorSearchParams): Promise<Pagination<Doctor>>;
+    list(params: DoctorSearchParams): Promise<Pagination<Doctor> | APIError>;
 
     get(id: number): Promise<Nullable<Doctor>>;
 

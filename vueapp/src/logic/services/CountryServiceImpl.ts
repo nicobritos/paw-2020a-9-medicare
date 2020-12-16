@@ -18,18 +18,17 @@ export class CountryServiceImpl implements CountryService {
     @inject(TYPES.Repositories.RestRepository)
     private rest: RestRepository;
 
-    // TODO: Manage errors
     public async list(): Promise<Country[]> {
         let response = await this.rest.get<Country[]>(CountryServiceImpl.PATH, {
             accepts: CountryServiceMIME.LIST
         });
-        return response.isOk() ? response.data! : [];
+        return response.orElse([]);
     }
 
     public async get(id: string): Promise<Nullable<Country>> {
         let response = await this.rest.get<Country>(getPathWithId(CountryServiceImpl.PATH, id), {
             accepts: CountryServiceMIME.GET
         });
-        return response.isOk() ? response.data! : null;
+        return response.orElse(null);
     }
 }

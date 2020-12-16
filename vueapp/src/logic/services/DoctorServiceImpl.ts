@@ -26,17 +26,17 @@ export class DoctorServiceImpl implements DoctorService {
         let response = await this.rest.get<Doctor>(getPathWithId(DoctorServiceImpl.PATH, id), {
             accepts: DoctorMIME.GET
         });
-        return response.isOk() ? response.data! : null;
+        return response.orElse(null);
     }
 
-    public async list(params: DoctorSearchParams): Promise<Pagination<Doctor>> {
+    public async list(params: DoctorSearchParams): Promise<Pagination<Doctor> | APIError> {
         let response = await this.rest.get<Pagination<Doctor>>(DoctorServiceImpl.PATH, {
             accepts: DoctorMIME.LIST,
             paginate: true,
             data: params,
             contentType: DoctorMIME.PAGINATION
         });
-        return response.isOk() ? response.data! : new Pagination([], 0);
+        return response.response;
     }
 
     public async update(id: number, doctor: UpdateDoctor): Promise<Doctor | APIError> {
@@ -45,6 +45,6 @@ export class DoctorServiceImpl implements DoctorService {
             data: doctor,
             contentType: DoctorMIME.UPDATE
         });
-        return response.isOk() ? response.data! : response.error!;
+        return response.response;
     }
 }

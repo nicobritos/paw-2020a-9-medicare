@@ -3,8 +3,9 @@ import {inject, injectable} from 'inversify';
 import TYPES from '~/logic/types';
 import {RestRepository} from '~/logic/interfaces/repositories/RestRepository';
 import {getPathWithId} from '~/logic/services/Utils';
-import {LocalityService} from '~/logic/interfaces/services/LocalityService';
+import {LocalityListParams, LocalityService} from '~/logic/interfaces/services/LocalityService';
 import {Locality} from '~/logic/models/Locality';
+import {APIError} from '~/logic/models/APIError';
 
 const LocalityMIME = {
     LIST: 'application/vnd.locality.list.get.v1+json',
@@ -18,18 +19,18 @@ export class LocalityServiceImpl implements LocalityService {
     @inject(TYPES.Repositories.RestRepository)
     private rest: RestRepository;
 
-    // TODO: Manage errors
-    public async list(): Promise<Locality[]> {
+    public async list(params?: LocalityListParams): Promise<Nullable<Locality[]> | APIError> {
         let response = await this.rest.get<Locality[]>(LocalityServiceImpl.PATH, {
-            accepts: LocalityMIME.LIST
+            accepts: LocalityMIME.LIST,
+            params
         });
-        return response.isOk() ? response.data! : [];
+        return response.nullableResponse;
     }
 
     public async get(id: number): Promise<Nullable<Locality>> {
         let response = await this.rest.get<Locality>(getPathWithId(LocalityServiceImpl.PATH, id), {
             accepts: LocalityMIME.GET
         });
-        return response.isOk() ? response.data! : null;
+        return response.orElse(null);
     }
 }

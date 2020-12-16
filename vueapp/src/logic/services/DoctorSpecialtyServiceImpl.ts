@@ -20,6 +20,6 @@ export class DoctorSpecialtyServiceImpl implements DoctorSpecialtyService {
         let response = await this.rest.get<DoctorSpecialty[]>(DoctorSpecialtyServiceImpl.PATH, {
             accepts: DoctorSpecialtyMIME.LIST
         });
-        return response.isOk() ? response.data! : [];
+        return response.orElse([]);
     }
 }

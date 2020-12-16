@@ -4,12 +4,14 @@ import TYPES from '~/logic/types';
 import {RestRepository} from '~/logic/interfaces/repositories/RestRepository';
 import {getPathWithId} from '~/logic/services/Utils';
 import {APIError} from '~/logic/models/APIError';
-import {WorkdayService} from '~/logic/interfaces/services/WorkdayService';
+import {CreateWorkday, WorkdayService} from '~/logic/interfaces/services/WorkdayService';
 import {Workday} from '~/logic/models/Workday';
 
 const WorkdayMIME = {
     LIST: 'application/vnd.workday.list.get.v1+json',
     GET: 'application/vnd.workday.get.v1+json',
+    CREATE: 'application/vnd.workday.create.v1+json',
+    CREATE_LIST: 'application/vnd.workday.list.create.v1+json'
 };
 
 @injectable()
@@ -23,18 +25,28 @@ export class WorkdayServiceImpl implements WorkdayService {
         let response = await this.rest.get<Workday>(getPathWithId(WorkdayServiceImpl.PATH, id), {
             accepts: WorkdayMIME.GET
         });
-        return response.isOk() ? response.data! : null;
+        return response.orElse(null);
     }
 
-    public async list(): Promise<Workday[]> {
+    public async list(): Promise<Workday[] | APIError> {
         let response = await this.rest.get<Workday[]>(WorkdayServiceImpl.PATH, {
             accepts: WorkdayMIME.LIST
         });
-        return response.isOk() ? response.data! : [];
+        return response.response;
     }
 
-    public async delete(id: number): Promise<true | APIError> {
+    public async createList(createWorkdays: CreateWorkday[]): Promise<Workday[] | APIError> {
+        let response = await this.rest.post<Workday[], CreateWorkday[]>(WorkdayServiceImpl.PATH, {
+            accepts: WorkdayMIME.LIST,
+            contentType: WorkdayMIME.CREATE_LIST,
+            data: createWorkdays
+        });
+
+        return response.response;
+    }
+
+    public async delete(id: number): Promise<boolean> {
         let response = await this.rest.delete(getPathWithId(WorkdayServiceImpl.PATH, id));
-        return response.isOk() ? true : response.error!;
+        return response.isOk;
     }
 }

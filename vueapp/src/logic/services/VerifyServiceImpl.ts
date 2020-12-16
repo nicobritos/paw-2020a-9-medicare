@@ -19,6 +19,6 @@ export class VerifyServiceImpl implements VerifyService {
             contentType: JSON_MIME
         });
 
-        return response.isOk() ? true : response.error!;
+        return response.isOk ? true : response.error!;
     }
 }

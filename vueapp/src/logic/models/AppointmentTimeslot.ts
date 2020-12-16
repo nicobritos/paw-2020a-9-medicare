@@ -1,6 +1,4 @@
-import {JSONSerializable, JSONSerializableKeys} from '~/logic/models/utils/JSONSerializable';
-
-export class AppointmentTimeslot implements JSONSerializable<AppointmentTimeslot> {
+export class AppointmentTimeslot {
     private _hour: number;
     private _minute: number;
     private _duration: number;
@@ -27,13 +25,5 @@ export class AppointmentTimeslot implements JSONSerializable<AppointmentTimeslot
 
     public set duration(value: number) {
         this._duration = value;
-    }
-
-    public toJSON(): JSONSerializableKeys<AppointmentTimeslot> {
-        return {
-            duration: this.duration,
-            hour: this.hour,
-            minute: this.minute
-        };
     }
 }

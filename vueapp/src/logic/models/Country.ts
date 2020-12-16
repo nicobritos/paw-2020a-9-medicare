@@ -1,5 +1,4 @@
 import {GenericEntity} from '~/logic/models/utils/GenericEntity';
-import {JSONSerializableKeys} from '~/logic/models/utils/JSONSerializable';
 
 export class Country extends GenericEntity<Country> {
     private _id: string;
@@ -19,12 +18,5 @@ export class Country extends GenericEntity<Country> {
 
     public set name(value: string) {
         this._name = value;
-    }
-
-    public toJSON(): JSONSerializableKeys<Country> {
-        return {
-            id: this.id,
-            name: this.name
-        };
     }
 }

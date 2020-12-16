@@ -4,7 +4,7 @@ import {
     GetConfig,
     PostConfig,
     PutConfig,
-    RestRepository,
+    RestRepository, StatusCodes,
 } from '~/logic/interfaces/repositories/RestRepository';
 import {APIError, ErrorMIME} from '~/logic/models/APIError';
 import {APIResponse, APIResponseFactory} from '~/logic/models/APIResponse';
@@ -17,10 +17,6 @@ import {UserMIME} from '~/logic/services/UserServiceImpl';
 import {JSON_MIME} from '~/logic/services/Utils';
 import store from '~/plugins/vuex';
 import {authMutationTypes} from '~/store/types/auth.types';
-
-const STATUS_CODES = {
-    UNAUTHORIZED: 401
-};
 
 @injectable()
 export class RestRepositoryImpl implements RestRepository {
@@ -49,7 +45,7 @@ export class RestRepositoryImpl implements RestRepository {
     private static async createResponse<R>(retry: boolean | undefined, runAction: () => Promise<AxiosResponse<R>>): Promise<APIResponse<R>> {
         let apiResponse = RestRepositoryImpl.formatResponse<R>(await runAction());
         // We want to retry on undefined (default behaviour)
-        if (!apiResponse.isOk() && apiResponse.error!.code === STATUS_CODES.UNAUTHORIZED && retry !== false) {
+        if (!apiResponse.isOk && apiResponse.error!.code === StatusCodes.UNAUTHORIZED && retry !== false) {
             if (!await RestRepositoryImpl.refreshToken())
                 return apiResponse;
 
@@ -74,7 +70,7 @@ export class RestRepositoryImpl implements RestRepository {
                 axiosConfig
             )
         );
-        if (response.isOk()) {
+        if (response.isOk) {
             store.commit('auth/setUser', authMutationTypes.setUser((response.data as UserDoctors | UserPatients).user));
 
             if ((response.data as UserDoctors).doctors != null) {
@@ -84,7 +80,7 @@ export class RestRepositoryImpl implements RestRepository {
             }
         }
 
-        return response.isOk();
+        return response.isOk;
     }
 
     private static getAxiosConfig<R>(config: GetConfig<R> | PostConfig<R> | PutConfig<R> | DeleteConfig<R>): AxiosRequestConfig {

@@ -21,6 +21,6 @@ export class AppointmentTimeSlotServiceImpl implements AppointmentTimeSlotServic
         let response = await this.rest.get<AppointmentTimeslotDate[]>(AppointmentTimeSlotServiceImpl.PATH, {
             accepts: AppointmentTimeSlotMIME.LIST
         });
-        return response.isOk() ? response.data! : response.error!;
+        return response.response;
     }
 }

@@ -43,8 +43,8 @@
                     "name": {
                         "type": "string"
                     },
-                    "country": {
-                        "$ref": "#/components/schemas/country"
+                    "countryId": {
+                        "type": "string"
                     }
                 }
             },
@@ -56,8 +56,8 @@
                     "name": {
                         "type": "string"
                     },
-                    "province": {
-                        "$ref": "#/components/schemas/province"
+                    "provinceId": {
+                        "type": "string"
                     }
                 }
             },
@@ -81,7 +81,8 @@
                         "type": "boolean"
                     },
                     "phone": {
-                        "type": "string"
+                        "type": "string",
+                        "nullable": true
                     },
                     "profilePictureId": {
                         "type": "integer"
@@ -146,39 +147,13 @@
                                 "type": "integer"
                             }
                         ]
-                    },
-                    "office": {
-                        "type": "object",
-                        "properties": {
-                            "name": {
-                                "type": "string"
-                            },
-                            "phone": {
-                                "type": "string"
-                            },
-                            "email": {
-                                "type": "string"
-                            },
-                            "street": {
-                                "type": "string",
-                                "minLength": 2
-                            },
-                            "localityId": {
-                                "type": "integer"
-                            }
-                        },
-                        "required": [
-                            "localityId",
-                            "street"
-                        ]
                     }
                 },
                 "required": [
                     "email",
                     "password",
                     "firstName",
-                    "surname",
-                    "office"
+                    "surname"
                 ]
             },
             "createUserPatient": {
@@ -235,17 +210,11 @@
                     "phone": {
                         "type": "string"
                     },
-                    "profilePictureId": {
-                        "type": "integer"
+                    "profilePicture": {
+                        "type": "string",
+                        "format": "base64"
                     }
-                },
-                "required": [
-                    "email",
-                    "firstName",
-                    "surname",
-                    "phone",
-                    "profilePictureId"
-                ]
+                }
             },
 
             "office": {
@@ -282,16 +251,18 @@
                     },
                     "phone": {
                         "type": "string"
+                        "nullable": true
                     },
                     "email": {
                         "type": "email",
                         "format": "email"
                     },
                     "registrationNumber": {
-                        "type": "integer"
+                        "type": "integer",
+                        "nullable": true
                     },
-                    "user": {
-                        "$ref": "#/components/schemas/user"
+                    "userId": {
+                        "type": "integer"
                     },
                     "office": {
                         "$ref": "#/components/schemas/office"
@@ -321,22 +292,18 @@
                     },
                     "email": {
                         "type": "email",
-                        "format": "email"
+                        "format": "email",
+                        "nullable": false
                     },
                     "specialtyIds": {
                         "type": "array",
                         "items": {
-                            "$ref": "#/components/schemas/doctorSpecialty"
+                            "type": "integer"
                         },
                         "nullable": false,
                         "minLength": 1
                     }
-                },
-                "required": [
-                    "phone",
-                    "email",
-                    "specialtyIds"
-                ]
+                }
             },
             "paginateDoctor": {
                 "properties": {
@@ -381,8 +348,8 @@
                     "id": {
                         "type": "integer"
                     },
-                    "user": {
-                        "$ref": "#/components/schemas/user"
+                    "userId": {
+                        "type": "integer"
                     },
                     "officeId": {
                         "type": "integer"
@@ -596,6 +563,20 @@
                     },
                     "message": {
                         "type": "string"
+                    },
+                    "errors": {
+                        "type": "array",
+                        "items": {
+                            "type": "object",
+                            "properties": {
+                                "code": {
+                                    "type": "integer"
+                                },
+                                "message": {
+                                    "type": "string"
+                                }
+                            }
+                        }
                     }
                 }
             }
@@ -704,6 +685,16 @@
                         }
                     }
                 }
+            },
+            "error-422": {
+                "description": "Unprocessable entity",
+                "content": {
+                    "application/vnd.error.v1+json": {
+                        "schema": {
+                            "$ref": "#/components/schemas/error"
+                        }
+                    }
+                }
             }
         }
     },
@@ -726,8 +717,14 @@
                     "200": {
                         "$ref": "#/components/responses/get-user-me"
                     },
+                    "401": {
+                        "$ref": "#/components/responses/error-401"
+                    },
                     "403": {
                         "$ref": "#/components/responses/error-403"
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/error-422"
                     }
                 }
             }
@@ -739,8 +736,8 @@
                     "200": {
                         "$ref": "#/components/responses/get-doctor"
                     },
-                    "404": {
-                        "$ref": "#/components/responses/error-404"
+                    "403": {
+                        "$ref": "#/components/responses/error-403"
                     }
                 }
             }
@@ -752,8 +749,8 @@
                     "204": {
                         "description": "Successful."
                     },
-                    "404": {
-                        "$ref": "#/components/responses/error-404"
+                    "403": {
+                        "$ref": "#/components/responses/error-403"
                     }
                 }
             }
@@ -798,6 +795,12 @@
                                 }
                             }
                         }
+                    },
+                    "400": {
+                        "$ref": "#/components/responses/error-400"
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/error-422"
                     }
                 }
             }
@@ -840,8 +843,17 @@
                     "200": {
                         "$ref": "#/components/responses/get-doctor"
                     },
-                    "404": {
-                        "$ref": "#/components/responses/error-404"
+                    "400": {
+                        "$ref": "#/components/responses/error-400"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/error-401"
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/error-403"
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/error-422"
                     }
                 }
             }
@@ -849,12 +861,13 @@
         "/users": {
             "get": {
                 "summary": "Returns the logged user",
+
                 "responses": {
                     "200": {
                         "$ref": "#/components/responses/get-user-me"
                     },
-                    "401": {
-                        "$ref": "#/components/responses/error-401"
+                    "403": {
+                        "$ref": "#/components/responses/error-403"
                     }
                 }
             },
@@ -879,8 +892,17 @@
                     "201": {
                         "$ref": "#/components/responses/get-user-me"
                     },
-                    "404": {
-                        "$ref": "#/components/responses/error-404"
+                    "400": {
+                        "$ref": "#/components/responses/error-400"
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/error-403"
+                    },
+                    "409": {
+                        "$ref": "#/components/responses/error-409"
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/error-422"
                     }
                 }
             }
@@ -923,8 +945,11 @@
                     "200": {
                         "$ref": "#/components/responses/get-user"
                     },
-                    "404": {
+                    "400": {
                         "$ref": "#/components/responses/error-404"
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/error-403"
                     }
                 }
             }
@@ -1008,6 +1033,9 @@
                                 }
                             }
                         }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/error-401"
                     }
                 }
             },
@@ -1029,6 +1057,12 @@
                     },
                     "400": {
                         "$ref": "#/components/responses/error-400"
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/error-403"
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/error-422"
                     }
                 }
             }
@@ -1142,10 +1176,19 @@
         "/provinces": {
             "get": {
                 "summary": "List all provinces",
+                "parameters": [
+                    {
+                        "in": "query",
+                        "name": "countryId",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "required": false
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "Successful",
-
                         "content": {
                             "application/vnd.province.list.get.v1+json": {
                                 "schema": {
@@ -1156,6 +1199,12 @@
                                 }
                             }
                         }
+                    },
+                    "400": {
+                        "$ref": "#/components/responses/error-400"
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/error-404"
                     }
                 }
             }
@@ -1193,6 +1242,24 @@
         "/localities": {
             "get": {
                 "summary": "List all localities",
+                "parameters": [
+                    {
+                        "in": "query",
+                        "name": "countryId",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "required": false
+                    },
+                    {
+                        "in": "query",
+                        "name": "provinceId",
+                        "schema": {
+                            "type": "number"
+                        },
+                        "required": false
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "Successful",
@@ -1207,6 +1274,12 @@
                                 }
                             }
                         }
+                    },
+                    "400": {
+                        "$ref": "#/components/responses/error-400"
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/error-404"
                     }
                 }
             }
@@ -1269,11 +1342,6 @@
                 "requestBody": {
                     "required": true,
                     "content": {
-                        "application/vnd.workday.create.v1+json": {
-                            "schema": {
-                                "$ref": "#/components/schemas/createWorkday"
-                            }
-                        },
                         "application/vnd.workday.list.create.v1+json": {
                             "schema": {
                                 "type": "array",
@@ -1286,10 +1354,27 @@
                 },
                 "responses": {
                     "201": {
-                        "$ref": "#/components/responses/get-workday"
+                        "description": "Successful",
+
+                        "content": {
+                            "application/vnd.workday.list.get.v1+json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/workday"
+                                    }
+                                }
+                            }
+                        }
                     },
                     "400": {
                         "$ref": "#/components/responses/error-400"
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/error-403"
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/error-422"
                     }
                 }
             }
@@ -1416,8 +1501,11 @@
                             }
                         }
                     },
-                    "404": {
-                        "$ref": "#/components/responses/error-404"
+                    "400": {
+                        "$ref": "#/components/responses/error-400"
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/error-422"
                     }
                 }
             }

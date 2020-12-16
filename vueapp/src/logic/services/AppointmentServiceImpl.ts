@@ -25,14 +25,14 @@ export class AppointmentServiceImpl implements AppointmentService {
         let response = await this.rest.get<Appointment>(getPathWithId(AppointmentServiceImpl.PATH, id), {
             accepts: AppointmentMIME.GET
         });
-        return response.isOk() ? response.data! : null;
+        return response.orElse(null);
     }
 
-    public async list(dateRange: DateRange): Promise<Appointment[]> {
+    public async list(dateRange: DateRange): Promise<Appointment[] | APIError> {
         let response = await this.rest.get<Appointment[]>(AppointmentServiceImpl.PATH, {
             accepts: AppointmentMIME.LIST
         });
-        return response.isOk() ? response.data! : [];
+        return response.response;
     }
 
     public async create(appointment: CreateAppointment): Promise<Appointment | APIError> {
@@ -41,11 +41,11 @@ export class AppointmentServiceImpl implements AppointmentService {
             data: appointment,
             contentType: AppointmentMIME.CREATE
         });
-        return response.isOk() ? response.data! : response.error!;
+        return response.response;
     }
 
     public async delete(id: number): Promise<true | APIError> {
         let response = await this.rest.delete(getPathWithId(AppointmentServiceImpl.PATH, id));
-        return response.isOk() ? true : response.error!;
+        return response.isOk ? true : response.error!;
     }
 }

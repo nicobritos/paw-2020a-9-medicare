@@ -1,5 +1,4 @@
 import {GenericEntity} from '~/logic/models/utils/GenericEntity';
-import {JSONSerializableKeys} from '~/logic/models/utils/JSONSerializable';
 import {Locality} from '~/logic/models/Locality';
 
 export class Office extends GenericEntity<Office> {
@@ -9,7 +8,7 @@ export class Office extends GenericEntity<Office> {
     private _email: string;
     private _street: string;
     private _url: string;
-    private _locality: Locality;
+    private _localityId: number;
 
     public get id(): number {
         return this._id;
@@ -59,23 +58,11 @@ export class Office extends GenericEntity<Office> {
         this._url = value;
     }
 
-    public get locality(): Locality {
-        return this._locality;
+    public get localityId(): number {
+        return this._localityId;
     }
 
-    public set locality(value: Locality) {
-        this._locality = value;
-    }
-
-    public toJSON(): JSONSerializableKeys<Office> {
-        return {
-            id: this.id,
-            email: this.email,
-            locality: this.locality,
-            name: this.name,
-            phone: this.phone,
-            street: this.street,
-            url: this.url
-        };
+    public set localityId(value: number) {
+        this._localityId = value;
     }
 }

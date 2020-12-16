@@ -11,7 +11,7 @@ export interface CreateAppointment {
 }
 
 export interface AppointmentService {
-    list(dateRange: DateRange): Promise<Appointment[]>;
+    list(dateRange: DateRange): Promise<Appointment[] | APIError>;
 
     get(id: number): Promise<Nullable<Appointment>>;
 

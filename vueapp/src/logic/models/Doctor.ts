@@ -1,15 +1,14 @@
 import {GenericEntity} from '~/logic/models/utils/GenericEntity';
-import {JSONSerializableKeys} from '~/logic/models/utils/JSONSerializable';
 import {Nullable} from '~/logic/Utils';
 import {User} from '~/logic/models/User';
 import {Office} from '~/logic/models/Office';
 
 export class Doctor extends GenericEntity<Doctor> {
     private _id: number;
-    private _phone: Nullable<string>; // TODO: CHeck si peude ser null. --> Update api.json
+    private _phone: Nullable<string>;
     private _email: string;
     private _registrationNumber: Nullable<number>;
-    private _user: User;
+    private _userId: number;
     private _office: Office;
     private _specialtyIds: Array<number>;
 
@@ -45,12 +44,12 @@ export class Doctor extends GenericEntity<Doctor> {
         this._registrationNumber = value;
     }
 
-    public get user(): User {
-        return this._user;
+    public get userId(): number {
+        return this._userId;
     }
 
-    public set user(value: User) {
-        this._user = value;
+    public set userId(value: number) {
+        this._userId = value;
     }
 
     public get office(): Office {
@@ -67,17 +66,5 @@ export class Doctor extends GenericEntity<Doctor> {
 
     public set specialtyIds(value: Array<number>) {
         this._specialtyIds = value;
-    }
-
-    public toJSON(): JSONSerializableKeys<Doctor> {
-        return {
-            id: this.id,
-            email: this.email,
-            phone: this.phone,
-            office: this.office,
-            registrationNumber: this.registrationNumber,
-            specialtyIds: this.specialtyIds,
-            user: this.user
-        };
     }
 }

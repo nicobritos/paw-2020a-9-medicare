@@ -2,6 +2,11 @@ export type ID = number | string;
 
 export type Nullable<T> = null | T;
 
+/**
+ * We use this and not string directly to make it more readable
+ */
+export type Base64 = string;
+
 export interface Hash<T> {
     [k: string]: T
 }
