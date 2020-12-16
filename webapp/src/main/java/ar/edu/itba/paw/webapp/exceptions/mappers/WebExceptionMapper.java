@@ -1,10 +1,10 @@
-package ar.edu.itba.paw.webapp.exceptions;
+package ar.edu.itba.paw.webapp.exceptions.mappers;
 
+import ar.edu.itba.paw.webapp.exceptions.APIErrorBuilder;
 import ar.edu.itba.paw.webapp.media_types.ErrorMIME;
 import ar.edu.itba.paw.webapp.models.APIError;
 
 import javax.ws.rs.WebApplicationException;
-import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.ext.ExceptionMapper;
@@ -17,13 +17,13 @@ public class WebExceptionMapper implements ExceptionMapper<WebApplicationExcepti
         if (exception.getResponse() != null) {
             Object entity;
             String mediaType;
-            if (!(exception.getResponse().getEntity() instanceof APIError)) {
+
+            if (!(exception.getResponse().getEntity() instanceof APIError))
                 entity = APIErrorBuilder.buildError(exception.getResponse().getStatus());
-                mediaType = ErrorMIME.ERROR;
-            } else {
-                entity = "";
-                mediaType = MediaType.TEXT_PLAIN;
-            }
+            else
+                entity = exception.getResponse().getEntity();
+
+            mediaType = ErrorMIME.ERROR;
 
             return Response
                     .status(exception.getResponse().getStatus())

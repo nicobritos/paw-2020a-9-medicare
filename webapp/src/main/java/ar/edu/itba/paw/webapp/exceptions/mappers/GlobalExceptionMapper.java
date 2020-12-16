@@ -1,5 +1,6 @@
-package ar.edu.itba.paw.webapp.exceptions;
+package ar.edu.itba.paw.webapp.exceptions.mappers;
 
+import ar.edu.itba.paw.webapp.exceptions.APIErrorBuilder;
 import ar.edu.itba.paw.webapp.media_types.ErrorMIME;
 
 import javax.ws.rs.core.Response;

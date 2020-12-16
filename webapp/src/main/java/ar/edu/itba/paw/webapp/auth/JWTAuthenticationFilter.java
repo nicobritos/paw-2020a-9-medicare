@@ -5,7 +5,6 @@ import ar.edu.itba.paw.interfaces.services.PatientService;
 import ar.edu.itba.paw.interfaces.services.UserService;
 import ar.edu.itba.paw.models.Doctor;
 import ar.edu.itba.paw.webapp.exceptions.ExceptionResponseWriter;
-import ar.edu.itba.paw.webapp.exceptions.MissingAcceptsException;
 import ar.edu.itba.paw.webapp.media_types.LoginMIME;
 import ar.edu.itba.paw.webapp.media_types.MIMEHelper;
 import ar.edu.itba.paw.webapp.media_types.UserMIME;
@@ -31,6 +30,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.HttpMethod;
+import javax.ws.rs.NotAcceptableException;
 import javax.ws.rs.core.Response.Status;
 import java.io.IOException;
 import java.util.Collection;
@@ -68,7 +68,7 @@ public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilte
         try {
             MIMEHelper.assertServerType(request);
             MIMEHelper.assertClientType(request, LoginMIME.POST);
-        } catch (MissingAcceptsException e) {
+        } catch (NotAcceptableException e) {
             ExceptionResponseWriter.setError(response, Status.NOT_ACCEPTABLE);
             return null;
         }
