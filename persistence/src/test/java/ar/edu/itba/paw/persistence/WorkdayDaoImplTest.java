@@ -25,6 +25,7 @@ import javax.sql.DataSource;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static org.junit.Assert.*;
 
@@ -1621,7 +1622,7 @@ public class WorkdayDaoImplTest
         }
 
         // 2. Ejercitar
-        List<Workday> workdays = this.workdayDao.create(ws);
+        List<Workday> workdays = new ArrayList<>(this.workdayDao.create(ws));
 
         // 3. Postcondiciones
         assertEquals(7, JdbcTestUtils.countRowsInTable(this.jdbcTemplate, WORKDAYS_TABLE));
@@ -1640,7 +1641,7 @@ public class WorkdayDaoImplTest
         expectedException.expect(IllegalArgumentException.class);
 
         // 2. Ejercitar
-        List<Workday> workdays = this.workdayDao.create((List<Workday>) null);
+        List<Workday> workdays = new ArrayList<>(this.workdayDao.create((List<Workday>) null));
 
         // 3. Postcondiciones
         // Que el metodo tire NullPointerException
@@ -1654,7 +1655,7 @@ public class WorkdayDaoImplTest
         expectedException.expect(IllegalArgumentException.class);
 
         // 2. Ejercitar
-        workdays = this.workdayDao.create(workdays);
+        workdays = new ArrayList<>(this.workdayDao.create(workdays));
 
         // 3. Postcondiciones
         // Que el metodo tire PersistenceException
