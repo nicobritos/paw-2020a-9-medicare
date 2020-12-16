@@ -18,4 +18,8 @@ public class APIError extends APIBaseError {
     public Collection<APISubError> getSubErrors() {
         return this.subErrors;
     }
+
+    public void addSubError(APISubError subError) {
+        this.subErrors.add(subError);
+    }
 }

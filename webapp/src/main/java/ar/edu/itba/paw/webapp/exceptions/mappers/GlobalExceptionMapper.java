@@ -1,6 +1,6 @@
 package ar.edu.itba.paw.webapp.exceptions.mappers;
 
-import ar.edu.itba.paw.webapp.exceptions.APIErrorBuilder;
+import ar.edu.itba.paw.webapp.exceptions.APIErrorFactory;
 import ar.edu.itba.paw.webapp.media_types.ErrorMIME;
 
 import javax.ws.rs.core.Response;
@@ -15,7 +15,7 @@ public class GlobalExceptionMapper implements ExceptionMapper<Throwable> {
         // TODO: Log
         return Response
                 .status(Status.INTERNAL_SERVER_ERROR)
-                .entity(APIErrorBuilder.buildError(Status.INTERNAL_SERVER_ERROR))
+                .entity(APIErrorFactory.buildError(Status.INTERNAL_SERVER_ERROR).build())
                 .type(ErrorMIME.ERROR)
                 .build();
     }

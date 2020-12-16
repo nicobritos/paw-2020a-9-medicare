@@ -5,7 +5,8 @@ import ar.edu.itba.paw.models.Paginator;
 import ar.edu.itba.paw.models.User;
 import ar.edu.itba.paw.webapp.auth.Constants;
 import ar.edu.itba.paw.webapp.auth.UserRole;
-import ar.edu.itba.paw.webapp.models.APIError;
+import ar.edu.itba.paw.webapp.exceptions.APIErrorFactory;
+import ar.edu.itba.paw.webapp.exceptions.APIErrorFactory.APIErrorBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -53,15 +54,12 @@ public abstract class GenericResource {
         return Optional.empty();
     }
 
-    protected Response error(Status status) {
+    protected APIErrorBuilder error(Status status) {
         return this.error(status.getStatusCode(), status.toString());
     }
 
-    protected Response error(int code, String message) {
-        return Response
-                .status(code)
-                .entity(new APIError(code, message))
-                .build();
+    protected APIErrorBuilder error(int code, String message) {
+        return APIErrorFactory.buildError(code, message);
     }
 
     protected Set<Integer> stringToIntegerList(String list) {

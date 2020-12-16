@@ -1,6 +1,6 @@
 package ar.edu.itba.paw.webapp.exceptions.mappers;
 
-import ar.edu.itba.paw.webapp.exceptions.APIErrorBuilder;
+import ar.edu.itba.paw.webapp.exceptions.APIErrorFactory;
 import ar.edu.itba.paw.webapp.media_types.ErrorMIME;
 import ar.edu.itba.paw.webapp.models.APIError;
 
@@ -19,7 +19,7 @@ public class WebExceptionMapper implements ExceptionMapper<WebApplicationExcepti
             String mediaType;
 
             if (!(exception.getResponse().getEntity() instanceof APIError))
-                entity = APIErrorBuilder.buildError(exception.getResponse().getStatus());
+                entity = APIErrorFactory.buildError(exception.getResponse().getStatus()).build();
             else
                 entity = exception.getResponse().getEntity();
 
@@ -33,7 +33,7 @@ public class WebExceptionMapper implements ExceptionMapper<WebApplicationExcepti
         } else {
             return Response
                     .status(Status.INTERNAL_SERVER_ERROR)
-                    .entity(APIErrorBuilder.buildError(Status.INTERNAL_SERVER_ERROR))
+                    .entity(APIErrorFactory.buildError(Status.INTERNAL_SERVER_ERROR).build())
                     .type(ErrorMIME.ERROR)
                     .build();
         }

@@ -13,7 +13,7 @@ public abstract class ExceptionResponseWriter {
         response.setStatus(status.getStatusCode());
         response.setContentType(ErrorMIME.ERROR);
 
-        APIError apiError = APIErrorBuilder.buildError(status);
+        APIError apiError = APIErrorFactory.buildError(status).build();
         try {
             response.getWriter().write(APIErrorSerializer.instance.toJson(apiError).toString());
         } catch (IOException e) {
