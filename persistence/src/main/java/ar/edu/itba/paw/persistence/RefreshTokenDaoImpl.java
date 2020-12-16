@@ -39,13 +39,13 @@ public class RefreshTokenDaoImpl extends GenericDaoImpl<RefreshToken, Integer> i
     @Override
     @Transactional
     public int removeTokensOlderThan(int days) {
-        LocalDateTime expiryDate = LocalDateTime.now().plusDays(days);
+        LocalDateTime maximumCreatedDate = LocalDateTime.now().minusDays(days);
 
         CriteriaBuilder builder = this.getEntityManager().getCriteriaBuilder();
         CriteriaDelete<RefreshToken> delete = builder.createCriteriaDelete(RefreshToken.class);
         Root<RefreshToken> root = delete.from(RefreshToken.class);
 
-        delete.where(builder.greaterThanOrEqualTo(root.get(RefreshToken_.createdDate), expiryDate));
+        delete.where(builder.lessThanOrEqualTo(root.get(RefreshToken_.createdDate), maximumCreatedDate));
         return getEntityManager().createQuery(delete).executeUpdate();
     }
 

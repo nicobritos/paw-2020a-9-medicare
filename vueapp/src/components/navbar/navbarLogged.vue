@@ -1,6 +1,6 @@
 <template>
     <div class="container w-100 justify-content-end">
-        <RouterLink v-if="user.verified" :to="getUrl('/')" class="header-a-element nav-link mx-3">
+        <RouterLink v-if="user.verified" :to="getUrl('/patient/home')" class="header-a-element nav-link mx-3">
             {{ $t('MyAppointments') }}
         </RouterLink>
         <RouterLink v-if="user.verified && !isDoctor" :to='getUrl("mediclist/1")'
@@ -41,11 +41,13 @@
         <RouterLink v-else :to='getUrl("doctor/profile")'>
             <div style="width: 2em;" class="d-flex flex-column justify-content-center">
                 <div class="profile-picture-container">
-                    <div style="margin-top: 100%;"></div>
+                    <!-- TODO: check wtf this -->
+                    <!-- <div style="margin-top: 100%;"></div> -->
                     <img
                         id="navbarDoctorUserImage"
                         class="profile-picture rounded-circle"
                         :src='getUrl("profilePics/"+user.profilePictureId)'
+                        :srcset="defaultProfilePic"
                         alt="profile pic"
                     />
                 </div>
@@ -60,6 +62,7 @@ import {State} from 'vuex-class';
 import {User} from '~/logic/models/User';
 import {Doctor} from '~/logic/models/Doctor';
 import {Patient} from '~/logic/models/Patient';
+import defaultProfilePic from "@/assets/defaultProfilePic.svg";
 
 import {createPath} from "~/logic/Utils";
 
@@ -73,6 +76,7 @@ export default class NavbarLogged extends Vue {
     private readonly patients: Patient[];
     @State(state => state.auth.isDoctor)
     private readonly isDoctor: boolean;
+    private readonly defaultProfilePic = defaultProfilePic;
 
     logout(e: Event): void {
         e.preventDefault();

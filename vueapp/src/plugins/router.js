@@ -90,7 +90,7 @@ const routes = [
     //   component: () => import(/* webpackChunkName: "about" */ '../views/About.vue')
     // }
     {
-        path: '/mediclist/:page',
+        path: '/mediclist/:page([1-9][0-9]*)',
         name: 'MedicList',
         component: MedicList
     }, 

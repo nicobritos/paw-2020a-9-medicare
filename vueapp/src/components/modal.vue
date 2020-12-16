@@ -1,35 +1,57 @@
-<template type="text/template" id="modal-generic-modal">
-    <div class="modal fade" tabindex="-1" role="dialog">
-        <div class="modal-dialog" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">{0}</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label=""
-                            style="outline: none !important;">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <div class="modal-body">
-                    {{ body }}
-                </div>
-                <div class="modal-footer">
-                    {{ footer }}
-                    <button type="button" id="modal-generic-modal-footer-cancel" class="btn btn-secondary">
-                        {{ cancel }}
-                    </button>
-                    <button type="button" id="modal-generic-modal-footer-confirm" class="btn btn-primary">
-                        {{ confirm }}
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
+<template>
+    <b-modal 
+        v-model="showModal" 
+        :title="title" 
+        @ok="onConfirm"
+        @hide="onCancel"
+        no-close-on-backdrop="true">
+        <template slot="modal-header">
+            <h5 class="modal-title">{{title}}</h5>
+        </template>
+        {{ body }}
+        <template #modal-footer="{ok,cancel}">
+            {{ footer }}
+            <button @click="cancel()" type="button" class="btn btn-secondary">
+                {{ cancelText }}
+            </button>
+            <button @click="ok()" type="button" class="btn btn-primary">
+                {{ confirmText }}
+            </button>
+        </template>
+    </b-modal>
 </template>
 
 <script lang="ts">
-import {Component, Vue} from 'vue-property-decorator';
+import {Component, Emit, Prop, VModel, Vue} from 'vue-property-decorator';
+import i18n from "@/plugins/i18n";
+import { BvModalEvent } from 'bootstrap-vue';
 
 @Component
 export default class Modal extends Vue {
+    @Prop({type:String,default:""})
+    private readonly title:string;
+    @Prop({type:String,default:""})
+    private readonly body:string;
+    @Prop({type:String,default:""})
+    private readonly footer:string;
+    @Prop({type:String,default:i18n.t("Cancel")})
+    private readonly cancelText:string;
+    @Prop({type:String,default:i18n.t("Accept")})
+    private readonly confirmText:string;
+
+    @VModel({type:Boolean})
+    private showModal:boolean;
+
+    @Emit("cancel")
+    onCancel():boolean{
+        console.log("cancel")
+        return false;
+    }
+
+    @Emit("confirm")
+    onConfirm():boolean{
+        console.log("confirm");
+        return true;
+    }
 }
 </script>
