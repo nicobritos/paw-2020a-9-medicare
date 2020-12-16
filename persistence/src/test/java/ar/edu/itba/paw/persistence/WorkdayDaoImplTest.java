@@ -65,7 +65,7 @@ public class WorkdayDaoImplTest
     private static final int START_MINUTE_2 = 30;
     private static final int END_HOUR_2 = 18;
     private static final int END_MINUTE_2 = 0;
-    private static final String DAY_2 = WorkdayDay.TUESDAY.name();
+    private static final WorkdayDay DAY_2 = WorkdayDay.TUESDAY;
 
     private static final String OFFICES_TABLE = "office";
     private static final String LOCALITIES_TABLE = "system_locality";
@@ -405,13 +405,33 @@ public class WorkdayDaoImplTest
      **/
     private Workday workdayModel(){
         Workday w = new Workday();
+        w.setId(STARTING_ID);
         w.setDoctor(doctorModel());
         w.setEndMinute(END_MINUTE);
         w.setEndHour(END_HOUR);
         w.setStartMinute(START_MINUTE);
         w.setStartHour(START_HOUR);
         w.setDay(DAY);
-        w.setId(STARTING_ID);
+        return w;
+    }
+
+    /** Devuelve un workday con
+     * doctor_id=STARTING_ID
+     * start_hour=START_HOUR
+     * start_minute=START_MINUTE
+     * end_hour=END_HOUR
+     * end_minute=END_MINUTE
+     * day=DAY
+     **/
+    private Workday workdayModel2(){
+        Workday w = new Workday();
+        w.setId(STARTING_ID + 1);
+        w.setDoctor(doctorModel());
+        w.setEndMinute(END_MINUTE_2);
+        w.setEndHour(END_HOUR_2);
+        w.setStartMinute(START_MINUTE_2);
+        w.setStartHour(START_HOUR_2);
+        w.setDay(DAY_2);
         return w;
     }
     
@@ -467,7 +487,7 @@ public class WorkdayDaoImplTest
         expectedException.expect(IllegalArgumentException.class);
 
         // 2. Ejercitar
-        Workday workday = this.workdayDao.create(null);
+        Workday workday = this.workdayDao.create((Workday) null);
 
         // 3. Postcondiciones
         // Que el metodo tire NullPointerException
@@ -1585,5 +1605,58 @@ public class WorkdayDaoImplTest
 
         // 3. Postcondiciones
         // Que tire NullPointerException
+    }
+
+    /* --------------------- MÉTODO: workdayDao.create(List<Workday>) -------------------------------------------- */
+
+    @Test
+    public void testCreateWorkdaysSuccessfully() {
+        // 1. Precondiciones
+        insertDoctor();
+        List<Workday> ws = new ArrayList<>();
+        for (int i=0; i<7; i++){
+            Workday workday = workdayModel();
+            workday.setId(null);
+            ws.add(workday);
+        }
+
+        // 2. Ejercitar
+        List<Workday> workdays = this.workdayDao.create(ws);
+
+        // 3. Postcondiciones
+        assertEquals(7, JdbcTestUtils.countRowsInTable(this.jdbcTemplate, WORKDAYS_TABLE));
+        assertEquals(7, workdays.size());
+        workdays.sort(Comparator.comparingInt(Workday::getId));
+        assertEquals((int) workdays.get(0).getId(), STARTING_ID);
+        assertEquals((int) workdays.get(6).getId(), STARTING_ID + 6);
+
+    }
+
+    @Test
+    public void testCreateWorkdaysNullFail()
+    {
+        // 1. Precondiciones
+
+        expectedException.expect(IllegalArgumentException.class);
+
+        // 2. Ejercitar
+        List<Workday> workdays = this.workdayDao.create((List<Workday>) null);
+
+        // 3. Postcondiciones
+        // Que el metodo tire NullPointerException
+    }
+
+    @Test
+    public void testCreateWorkdaysEmptyWorkdayFail()
+    {
+        // 1. Precondiciones
+        List<Workday> workdays = new ArrayList<>();
+        expectedException.expect(IllegalArgumentException.class);
+
+        // 2. Ejercitar
+        workdays = this.workdayDao.create(workdays);
+
+        // 3. Postcondiciones
+        // Que el metodo tire PersistenceException
     }
 }

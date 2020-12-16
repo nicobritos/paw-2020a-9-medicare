@@ -75,18 +75,17 @@ public class WorkdayDaoImpl extends GenericDaoImpl<Workday, Integer> implements 
     @Transactional
     @Override
     public List<Workday> create(List<Workday> workdays) {
+        if(workdays == null || workdays.isEmpty()){
+            throw new IllegalArgumentException();
+        }
         int i=0;
         for (Workday workday : workdays){
-            if (workday == null) {
-                throw new IllegalArgumentException("An element of the list contained was null");
-            }
             // Memory Optimization
             if (i > 0 && i % BATCH_SIZE == 0) {
                 getEntityManager().flush();
                 getEntityManager().clear();
             }
-
-            getEntityManager().persist(workday);
+            super.create(workday);
             i++;
         }
         return workdays;
