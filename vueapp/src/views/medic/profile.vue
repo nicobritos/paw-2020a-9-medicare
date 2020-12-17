@@ -132,7 +132,7 @@
                                     }}
                                 </p>
                                 <!-- TODO: connect button -->
-                                <button class="btn cancel-workday-btn" type="button">X</button>
+                                <button class="btn cancel-workday-btn" type="button" @click="removeWorkday(workday.id)">X</button>
                             </div>
                             <div class="row d-flex align-items-center justify-content-center my-3">
                                 <button @click="openAddWorkday" class="btn btn-info">{{ $t('AddSchedule') }}</button>
@@ -148,7 +148,7 @@
                             <div class="row d-flex align-items-center justify-content-between">
                                 <p class="m-0">{{ specialty.name }}</p>
                                 <!-- TODO:connect button -->
-                                <button class="btn cancel-specialty-btn" type="button">X</button>
+                                <button class="btn cancel-specialty-btn" type="button" @click="removeSpecialty(specialty.id)">X</button>
                             </div>
                         </div>
                     </div>
@@ -162,6 +162,11 @@
         </div>
         <AddWorkday v-model="showAddWorkday"/>
         <AddSpecialty v-model="showAddSpecialties"/>
+        <!-- TODO: maybe change this to a b-modal called via function -->
+        <Modal  v-model="showModal" 
+                @confirm="modOnConfirm" 
+                :title="modtitle" 
+                :body="modbody"/>
     </div>
 
 </template>
@@ -175,6 +180,7 @@ import {Component, Vue} from 'vue-property-decorator';
 import {User} from '~/logic/models/User';
 import AddSpecialty from "./addSpecialty.vue";
 import AddWorkday from "./addWorkday.vue";
+import Modal from "@/components/modal.vue";
 
 import {createPath} from "~/logic/Utils";
 import defaultProfilePic from "@/assets/defaultProfilePic.svg";
@@ -186,7 +192,8 @@ user.id = user.profilePictureId = 1;
 @Component({
     components:{
         AddSpecialty,
-        AddWorkday
+        AddWorkday,
+        Modal
     }
 })
 export default class MedicProfile extends Vue {
@@ -217,6 +224,11 @@ export default class MedicProfile extends Vue {
 
     private showAddSpecialties = false;
     private showAddWorkday = false;
+    
+    private showModal = false;
+    private modtitle:string = "";
+    private modbody:string = "";
+    private modOnConfirm:Function = ()=>{};
 
     getDow(day: Date): string {
         switch (day.getDay()) {
@@ -252,13 +264,43 @@ export default class MedicProfile extends Vue {
         return createPath(url);
     }
 
-    openAddSpecialties(){
+    openAddSpecialties():void{
         this.showAddSpecialties = true;
         return;
     }
 
-    openAddWorkday(){
+    openAddWorkday():void{
         this.showAddWorkday = true;
+        return;
+    }
+
+    openModForRemoveSpecialty(id:number){
+        this.modtitle = this.$t("YouAreAboutToDeleteASpecialty").toString();
+        this.modbody = this.$t("DoYouWantToContinue").toString();
+        this.modOnConfirm = () => {
+            this.removeSpecialty(id);
+        }
+        this.showModal = true;
+    }
+    
+    openModForRemoveWorkday(id:number){
+        this.modtitle = this.$t("YouAreAboutToCancelAWorkday").toString();
+        this.modbody = this.$t("DoYouWantToContinue").toString();
+        this.modOnConfirm = () => {
+            this.removeWorkday(id);
+        }
+        this.showModal = true;
+    }
+
+    //TODO: NICO remove specialty with id
+    removeSpecialty(id:number):void{
+        console.log(id);
+        return;
+    }
+
+    //TODO: NICO remove workday with id
+    removeWorkday(id:number):void{
+        console.log(id);
         return;
     }
 }
