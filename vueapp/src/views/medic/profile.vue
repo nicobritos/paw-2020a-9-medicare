@@ -11,6 +11,7 @@
                                 id="profilePic"
                                 class="profile-picture rounded-circle"
                                 :src="getUrl('profilePics/'+user.profilePictureId)"
+                                :srcset="defaultProfilePic"
                                 alt="profile pics"
                             />
                         </div>
@@ -174,6 +175,7 @@ import {Component, Vue} from 'vue-property-decorator';
 import {User} from '~/logic/models/User';
 
 import {createPath} from "~/logic/Utils";
+import defaultProfilePic from "@/assets/defaultProfilePic.svg";
 
 let user = new User();
 user.email = user.firstName = user.phone = user.surname = 'asd';
@@ -185,6 +187,7 @@ export default class MedicProfile extends Vue {
     private editPencil = editPencil;
     private eye = eye;
     private noeye = noeye;
+    private readonly defaultProfilePic = defaultProfilePic;
     private user: User = user;
     private doctors = [];
     private workdays = [];
