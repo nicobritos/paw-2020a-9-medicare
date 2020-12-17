@@ -5,6 +5,7 @@
                 :no-fade="true"
                 body-class="p-0"
                 content-class="p-0"
+                @show="cleanValues"
                 #default="{ok,cancel}">
         <form class="addturn-form border p-5 rounded" @submit="submitForm">
             <div class="row">
@@ -68,6 +69,11 @@ export default class AddSpecialty extends Vue {
         return createPath(url);
     }
 
+    private cleanValues(){
+        //TODO: clean selected specialty
+    }
+
+    //TODO: NICO submit form for adding a specialty
     @Emit("submit")
     submitForm(e:Event){
         return e;

@@ -135,8 +135,7 @@
                                 <button class="btn cancel-workday-btn" type="button">X</button>
                             </div>
                             <div class="row d-flex align-items-center justify-content-center my-3">
-                                <a :href="getUrl('doctor/profile/workday')" type="button" class="btn btn-info">
-                                    {{ $t('AddSchedule') }}</a>
+                                <button @click="openAddWorkday" class="btn btn-info">{{ $t('AddSchedule') }}</button>
                             </div>
                         </div>
                     </div>
@@ -154,14 +153,15 @@
                         </div>
                     </div>
                     <div class="row d-flex align-items-center justify-content-center my-3">
-                        <a :href="getUrl('/doctor/profile/specialty')" type="button"
-                           class="btn btn-info">{{ $t('AddSpecialty') }}</a>
+                        <button @click="openAddSpecialties" class="btn btn-info">{{ $t('AddSpecialty') }}</button>
                     </div>
                 </div>
             </div>
             <div class="col-2">
             </div>
         </div>
+        <AddWorkday v-model="showAddWorkday"/>
+        <AddSpecialty v-model="showAddSpecialties"/>
     </div>
 
 </template>
@@ -173,6 +173,8 @@ import eye from '@/assets/eye.svg';
 import noeye from '@/assets/noeye.svg';
 import {Component, Vue} from 'vue-property-decorator';
 import {User} from '~/logic/models/User';
+import AddSpecialty from "./addSpecialty.vue";
+import AddWorkday from "./addWorkday.vue";
 
 import {createPath} from "~/logic/Utils";
 import defaultProfilePic from "@/assets/defaultProfilePic.svg";
@@ -181,7 +183,12 @@ let user = new User();
 user.email = user.firstName = user.phone = user.surname = 'asd';
 user.id = user.profilePictureId = 1;
 
-@Component
+@Component({
+    components:{
+        AddSpecialty,
+        AddWorkday
+    }
+})
 export default class MedicProfile extends Vue {
     private moreOptions = moreOptions;
     private editPencil = editPencil;
@@ -208,6 +215,8 @@ export default class MedicProfile extends Vue {
     private passwordModEnabled = false;
     enablePasswordMod():void{this.passwordModEnabled=true};
 
+    private showAddSpecialties = false;
+    private showAddWorkday = false;
 
     getDow(day: Date): string {
         switch (day.getDay()) {
@@ -243,6 +252,15 @@ export default class MedicProfile extends Vue {
         return createPath(url);
     }
 
+    openAddSpecialties(){
+        this.showAddSpecialties = true;
+        return;
+    }
+
+    openAddWorkday(){
+        this.showAddWorkday = true;
+        return;
+    }
 }
 </script>
 
