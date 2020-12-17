@@ -3,7 +3,7 @@ import {inject, injectable} from 'inversify';
 import TYPES from '~/logic/types';
 import {RestRepository} from '~/logic/interfaces/repositories/RestRepository';
 import {getPathWithId} from '~/logic/services/Utils';
-import {LocalityListParams, LocalityService} from '~/logic/interfaces/services/LocalityService';
+import {LocalityService} from '~/logic/interfaces/services/LocalityService';
 import {Locality} from '~/logic/models/Locality';
 import {APIError} from '~/logic/models/APIError';
 
@@ -19,7 +19,10 @@ export class LocalityServiceImpl implements LocalityService {
     @inject(TYPES.Repositories.RestRepository)
     private rest: RestRepository;
 
-    public async list(params?: LocalityListParams): Promise<Nullable<Locality[]> | APIError> {
+    public async list(provinceId?: number): Promise<Nullable<Locality[]> | APIError> {
+        let params: any = {};
+
+        if (typeof provinceId === 'number') params.provinceId = provinceId;
         let response = await this.rest.get<Locality[]>(LocalityServiceImpl.PATH, {
             accepts: LocalityMIME.LIST,
             params

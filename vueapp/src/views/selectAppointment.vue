@@ -158,7 +158,7 @@ export default class SelectAppointment extends Vue {
         office.url = 'example.com';
 
         this.doctor.id = 1;
-        this.doctor.user = this.user;
+        this.doctor.userId = this.user.id;
         this.doctor.phone = this.user.phone;
         this.doctor.email = this.user.email;
         this.doctor.registrationNumber = 12345;
