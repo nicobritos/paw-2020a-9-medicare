@@ -30,7 +30,6 @@ import java.util.Optional;
 import java.util.Set;
 
 public abstract class GenericResource {
-    protected static final int PAGINATOR_PER_PAGE_DEFAULT = 10;
     private static final String PAGINATOR_PAGE_QUERY = "page";
     private static final String PAGINATOR_PER_PAGE_QUERY = "per_page";
 
