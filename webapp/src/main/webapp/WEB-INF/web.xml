@@ -39,15 +39,15 @@
         <init-param>
             <param-name>jersey.config.server.provider.packages</param-name>
             <param-value>
-                ar.edu.itba.paw.webapp.controller.rest,
+                ar.edu.itba.paw.webapp.rest,
                 ar.edu.itba.paw.webapp.exceptions,
-                ar.edu.itba.paw.webapp.media_types.parsers
+                ar.edu.itba.paw.webapp.media_types,
             </param-value>
         </init-param>
-<!--        <init-param>-->
-<!--            <param-name>jersey.config.server.provider.scanning.recursive</param-name>-->
-<!--            <param-value>true</param-value>-->
-<!--        </init-param>-->
+        <init-param>
+            <param-name>jersey.config.server.provider.scanning.recursive</param-name>
+            <param-value>true</param-value>
+        </init-param>
         <load-on-startup>1</load-on-startup>
     </servlet>
     <servlet-mapping>
@@ -71,19 +71,6 @@
         <servlet-name>default</servlet-name>
         <url-pattern>*.png</url-pattern>
     </servlet-mapping>
-
-    <error-page>
-        <error-code>404</error-code>
-        <location>/WEB-INF/jsp/error/404.jsp</location>
-    </error-page>
-    <error-page>
-        <error-code>500</error-code>
-        <location>/WEB-INF/jsp/error/500.jsp</location>
-    </error-page>
-    <error-page>
-        <error-code>403</error-code>
-        <location>/WEB-INF/jsp/error/403.jsp</location>
-    </error-page>
 
     <jsp-config>
         <jsp-property-group>
