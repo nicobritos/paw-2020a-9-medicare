@@ -16,9 +16,10 @@
                             />
                         </div>
                     </div>
-                    <div class="picture-overlay d-flex flex-column align-items-center justify-content-end pb-3">
-                        <input id="profile-picture-input" style="display: none;" type="file" accept="image/*">
-                        <i class="fas fa-pencil-alt"></i>
+                    <div @click="triggerChangePPInput" class="picture-overlay d-flex flex-column align-items-center justify-content-center pb-3">
+                        <input ref="PPInput" @change="changeProfilePic" id="profile-picture-input" style="display: none;" type="file" accept="image/*">
+                        <!-- TODO: check this icon and previous implementation -->
+                        <b-icon icon="pencil" style="color:ccc;" scale="4.0"/>
                     </div>
                 </div>
             </div>
@@ -303,6 +304,39 @@ export default class MedicProfile extends Vue {
         console.log(id);
         return;
     }
+
+    changeProfilePic(e:InputEvent){
+        //get profile pic file and check type
+        //TODO: typescript
+        //@ts-ignore
+        let file = e.target.files[0];
+        if (!file.type.includes("image")) {
+            //TODO: toast error
+            return;
+        }
+        //append it to form
+        let formData = new FormData();
+        formData.append("pic", file);
+        //post to someurl
+        //TODO: fill url
+        fetch(this.getUrl("someurl"), {
+            method: "POST",
+            body: formData
+        }).then((r) => {
+            if (r.ok) {
+                //TODO:show ok toast and update profile pic
+            } else {
+                //TODO:show error toast
+            }
+        }).catch((e) => {
+            //TODO:show error message
+        });
+    }
+
+    triggerChangePPInput(){
+        //@ts-ignore
+        this.$refs.PPInput.click();
+    }
 }
 </script>
 
@@ -396,6 +430,7 @@ export default class MedicProfile extends Vue {
     height: 10em;
     width: 10em;
     border-radius: 10em;
+    cursor: pointer;
 }
 
 .picture-container > * {

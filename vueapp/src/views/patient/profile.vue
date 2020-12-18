@@ -17,9 +17,10 @@
                             />
                         </div>
                     </div>
-                    <div class="picture-overlay d-flex flex-column align-items-center justify-content-end pb-3">
-                        <input id="profile-picture-input" style="display: none;" type="file" accept="image/*">
-                        <i class="fas fa-pencil-alt"></i>
+                    <div class="picture-overlay d-flex flex-column align-items-center justify-content-center pb-3">
+                        <input ref="PPInput" @change="changeProfilePic" id="profile-picture-input" style="display: none;" type="file" accept="image/*">
+                        <!-- TODO: check this icon and previous implementation -->
+                        <b-icon icon="pencil" style="color:ccc;" scale="4.0"/>
                     </div>
                 </div>
             </div>
@@ -156,6 +157,38 @@ export default class PatientProfile extends Vue {
         return createPath(url);
     }
 
+        changeProfilePic(e:InputEvent){
+        //get profile pic file and check type
+        //TODO: typescript
+        //@ts-ignore
+        let file = e.target.files[0];
+        if (!file.type.includes("image")) {
+            //TODO: toast error
+            return;
+        }
+        //append it to form
+        let formData = new FormData();
+        formData.append("pic", file);
+        //post to someurl
+        //TODO: fill url
+        fetch(this.getUrl("someurl"), {
+            method: "POST",
+            body: formData
+        }).then((r) => {
+            if (r.ok) {
+                //TODO:show ok toast and update profile pic
+            } else {
+                //TODO:show error toast
+            }
+        }).catch((e) => {
+            //TODO:show error message
+        });
+    }
+
+    triggerChangePPInput(){
+        //@ts-ignore
+        this.$refs.PPInput.click();
+    }
 }
 </script>
 
@@ -165,4 +198,147 @@ export default class PatientProfile extends Vue {
     bottom: 1em;
     right: 5em;
 }
+/*TODO: fusionar con medicprofile*/
+html, body {
+    height: 100%;
+}
+
+.header {
+    background-color: #00C4BA;
+}
+
+.header-brand {
+    font-weight: bold;
+}
+
+.header-brand:hover {
+    font-weight: bold;
+    color: white !important;
+}
+
+.header-a-element {
+    color: white;
+}
+
+.header-a-element:hover {
+    color: #e0e0e0;
+}
+
+.header-btn-element {
+    color: #00C4BA;
+    font-weight: bold;
+}
+
+.header-btn-element:hover {
+    color: rgb(0, 160, 152);
+    font-weight: bold;
+}
+
+.green-text {
+    color: #00C4BA;
+}
+
+#navbar-logo {
+    width: 2em;
+}
+
+.filter-form {
+    background-color: #00C4BA;
+    border-radius: 1em;
+}
+
+.form-title {
+    color: white;
+}
+
+.form-control {
+    background-color: rgba(214, 214, 214);
+}
+
+.white-text {
+    color: white !important;
+}
+
+#navbarUserImage {
+    width: 3em;
+}
+
+.turno-item {
+    border-radius: 2em !important;
+    background-color: rgba(214, 214, 214);
+}
+
+.turno-list {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
+
+.turno-list::-webkit-scrollbar {
+    display: none;
+}
+
+.moreOptionsButton {
+    height: 1.5em;
+    cursor: pointer;
+}
+
+.picture-container {
+    position: relative;
+    height: 10em;
+    width: 10em;
+    border-radius: 10em;
+    cursor: pointer;
+}
+
+.picture-container > * {
+    position: absolute;
+    top: 0;
+    left: 0;
+}
+
+.picture-container .picture-overlay {
+    z-index: 1;
+    width: 100%;
+    height: 100%;
+    border-radius: 10em;
+    opacity: 0;
+    transition: opacity 0.1s ease-in-out 0s;
+}
+
+.picture-container:hover .picture-overlay,
+.picture-container:active .picture-overlay {
+    opacity: 100%;
+}
+
+.picture-container .picture-overlay > i {
+    padding: 10px;
+    background: #333333bb;
+    border-radius: 50px;
+    font-size: 20px;
+    color: #ffffff;
+    cursor: pointer;
+}
+
+#profilePic {
+    height: 100%;
+    border-radius: 10em;
+}
+
+.profile-picture-container {
+    display: inline-block;
+    position: relative;
+    width: 100%;
+}
+
+.profile-picture {
+    object-fit: cover;
+    height: 100%;
+    width: 100%;
+    top: 0;
+    bottom: 0;
+    right: 0;
+    left: 0;
+    position: absolute;
+}
+
 </style>
