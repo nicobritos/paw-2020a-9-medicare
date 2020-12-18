@@ -1,5 +1,7 @@
 package ar.edu.itba.paw.webapp.models.error;
 
+import ar.edu.itba.paw.webapp.models.Constants;
+
 // TODO: Guido i18n
 public abstract class ErrorConstants {
     public static final APISubError APPOINTMENT_CREATE_MISSING_DATE_FROM
@@ -136,6 +138,9 @@ public abstract class ErrorConstants {
 
     public static final APISubError USER_EMAIL_USED
             = new APISubError(61, "The email specified is already being used");
+
+    public static final APISubError MISSING_INVALID_REFRESH_TOKEN
+            = new APISubError(62, "A valid Refresh Token cookie was expected with the name: \"" + Constants.REFRESH_TOKEN_COOKIEN_NAME + "\"");
 
 
     private static APISubError invalidField(int code, String field) {

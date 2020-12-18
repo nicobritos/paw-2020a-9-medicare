@@ -14,6 +14,7 @@ public abstract class Constants {
     public static final String LOGOUT_ENDPOINT = "logout";
     public static final String AUTH_ENDPOINT = "auth";
     public static final String PAGINATOR_COUNT_HEADER = "Total-Items";
+    public static final String VALID_JWT_REQUEST_ATTRIBUTE = "valid_jwt_request_attribute";
 
     public static final int UNPROCESSABLE_ENTITY_CODE = 422;
     public static final String UNPROCESSABLE_ENTITY_DESCRIPTION = "Validation failed";

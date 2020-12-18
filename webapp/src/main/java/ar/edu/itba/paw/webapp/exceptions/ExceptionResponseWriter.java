@@ -10,23 +10,19 @@ import java.io.IOException;
 
 public abstract class ExceptionResponseWriter {
     public static void setError(HttpServletResponse response, Status status) {
-        response.setStatus(status.getStatusCode());
-        response.setContentType(ErrorMIME.ERROR);
-
-        APIError apiError = APIErrorFactory.buildError(status).build();
-        try {
-            response.getWriter().write(APIErrorSerializer.instance.toJson(apiError).toString());
-        } catch (IOException e) {
-            // TODO: Log
-        }
+        ExceptionResponseWriter.setError(response, APIErrorFactory.buildError(status).build());
     }
 
     public static void setError(HttpServletResponse response, Status status, String message) {
-        response.setStatus(status.getStatusCode());
+        ExceptionResponseWriter.setError(response, new APIError(status.getStatusCode(), message));
+    }
+
+    public static void setError(HttpServletResponse response, APIError error) {
+        response.setStatus(error.getCode());
         response.setContentType(ErrorMIME.ERROR);
 
         try {
-            response.getWriter().write(APIErrorSerializer.instance.toJson(new APIError(status.getStatusCode(), message)).toString());
+            response.getWriter().write(APIErrorSerializer.instance.toJson(error).toString());
         } catch (IOException e) {
             // TODO: Log
         }

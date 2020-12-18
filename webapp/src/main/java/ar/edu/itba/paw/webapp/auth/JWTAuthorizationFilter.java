@@ -2,7 +2,6 @@ package ar.edu.itba.paw.webapp.auth;
 
 import ar.edu.itba.paw.webapp.models.Constants;
 import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -50,9 +49,16 @@ public class JWTAuthorizationFilter extends BasicAuthenticationFilter {
     }
 
     private UsernamePasswordAuthenticationToken getAuthentication(HttpServletRequest request) {
+        UsernamePasswordAuthenticationToken token = this.parseAuthentication(request);
+        request.setAttribute(Constants.VALID_JWT_REQUEST_ATTRIBUTE, token != null);
+        return token;
+    }
+
+    protected UsernamePasswordAuthenticationToken parseAuthentication(HttpServletRequest request) {
         Cookie[] cookies = request.getCookies();
-        if (cookies == null || cookies.length == 0)
+        if (cookies == null || cookies.length == 0) {
             return null;
+        }
 
         Cookie jwtCookie = Arrays.stream(cookies).filter(cookie -> cookie.getName().equals(Constants.JWT_COOKIE_NAME)).findFirst().orElse(null);
         if (jwtCookie == null)
@@ -65,7 +71,7 @@ public class JWTAuthorizationFilter extends BasicAuthenticationFilter {
                     .setSigningKey(this.secret)
                     .parseClaimsJws(jwtCookie.getValue())
                     .getBody();
-        } catch (ExpiredJwtException e) {
+        } catch (Exception e) {
             return null;
         }
 
