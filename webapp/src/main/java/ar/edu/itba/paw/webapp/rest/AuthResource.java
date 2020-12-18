@@ -55,7 +55,7 @@ public class AuthResource extends GenericAuthenticationResource {
         String token = this.getRefreshToken(request);
 
         if (token == null)
-            throw this.missingPathParams();
+            throw this.forbidden();
 
         Optional<RefreshToken> refreshTokenOptional = this.refreshTokenService.findByToken(token);
         if (!refreshTokenOptional.isPresent())
