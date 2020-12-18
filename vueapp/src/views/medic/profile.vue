@@ -132,11 +132,10 @@
                                     }}
                                 </p>
                                 <!-- TODO: connect button -->
-                                <button class="btn cancel-workday-btn" type="button">X</button>
+                                <button class="btn cancel-workday-btn" type="button" @click="removeWorkday(workday.id)">X</button>
                             </div>
                             <div class="row d-flex align-items-center justify-content-center my-3">
-                                <a :href="getUrl('doctor/profile/workday')" type="button" class="btn btn-info">
-                                    {{ $t('AddSchedule') }}</a>
+                                <button @click="openAddWorkday" class="btn btn-info">{{ $t('AddSchedule') }}</button>
                             </div>
                         </div>
                     </div>
@@ -149,19 +148,25 @@
                             <div class="row d-flex align-items-center justify-content-between">
                                 <p class="m-0">{{ specialty.name }}</p>
                                 <!-- TODO:connect button -->
-                                <button class="btn cancel-specialty-btn" type="button">X</button>
+                                <button class="btn cancel-specialty-btn" type="button" @click="removeSpecialty(specialty.id)">X</button>
                             </div>
                         </div>
                     </div>
                     <div class="row d-flex align-items-center justify-content-center my-3">
-                        <a :href="getUrl('/doctor/profile/specialty')" type="button"
-                           class="btn btn-info">{{ $t('AddSpecialty') }}</a>
+                        <button @click="openAddSpecialties" class="btn btn-info">{{ $t('AddSpecialty') }}</button>
                     </div>
                 </div>
             </div>
             <div class="col-2">
             </div>
         </div>
+        <AddWorkday v-model="showAddWorkday"/>
+        <AddSpecialty v-model="showAddSpecialties"/>
+        <!-- TODO: maybe change this to a b-modal called via function -->
+        <Modal  v-model="showModal" 
+                @confirm="modOnConfirm" 
+                :title="modtitle" 
+                :body="modbody"/>
     </div>
 
 </template>
@@ -173,6 +178,9 @@ import eye from '@/assets/eye.svg';
 import noeye from '@/assets/noeye.svg';
 import {Component, Vue} from 'vue-property-decorator';
 import {User} from '~/logic/models/User';
+import AddSpecialty from "./addSpecialty.vue";
+import AddWorkday from "./addWorkday.vue";
+import Modal from "@/components/modal.vue";
 
 import {createPath} from "~/logic/Utils";
 import defaultProfilePic from "@/assets/defaultProfilePic.svg";
@@ -181,7 +189,13 @@ let user = new User();
 user.email = user.firstName = user.phone = user.surname = 'asd';
 user.id = user.profilePictureId = 1;
 
-@Component
+@Component({
+    components:{
+        AddSpecialty,
+        AddWorkday,
+        Modal
+    }
+})
 export default class MedicProfile extends Vue {
     private moreOptions = moreOptions;
     private editPencil = editPencil;
@@ -208,6 +222,13 @@ export default class MedicProfile extends Vue {
     private passwordModEnabled = false;
     enablePasswordMod():void{this.passwordModEnabled=true};
 
+    private showAddSpecialties = false;
+    private showAddWorkday = false;
+    
+    private showModal = false;
+    private modtitle:string = "";
+    private modbody:string = "";
+    private modOnConfirm:Function = ()=>{};
 
     getDow(day: Date): string {
         switch (day.getDay()) {
@@ -243,6 +264,45 @@ export default class MedicProfile extends Vue {
         return createPath(url);
     }
 
+    openAddSpecialties():void{
+        this.showAddSpecialties = true;
+        return;
+    }
+
+    openAddWorkday():void{
+        this.showAddWorkday = true;
+        return;
+    }
+
+    openModForRemoveSpecialty(id:number){
+        this.modtitle = this.$t("YouAreAboutToDeleteASpecialty").toString();
+        this.modbody = this.$t("DoYouWantToContinue").toString();
+        this.modOnConfirm = () => {
+            this.removeSpecialty(id);
+        }
+        this.showModal = true;
+    }
+    
+    openModForRemoveWorkday(id:number){
+        this.modtitle = this.$t("YouAreAboutToCancelAWorkday").toString();
+        this.modbody = this.$t("DoYouWantToContinue").toString();
+        this.modOnConfirm = () => {
+            this.removeWorkday(id);
+        }
+        this.showModal = true;
+    }
+
+    //TODO: NICO remove specialty with id
+    removeSpecialty(id:number):void{
+        console.log(id);
+        return;
+    }
+
+    //TODO: NICO remove workday with id
+    removeWorkday(id:number):void{
+        console.log(id);
+        return;
+    }
 }
 </script>
 

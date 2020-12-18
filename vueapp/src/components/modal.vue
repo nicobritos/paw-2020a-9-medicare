@@ -3,8 +3,8 @@
         v-model="showModal" 
         :title="title" 
         @ok="onConfirm"
-        @hide="onCancel"
-        no-close-on-backdrop="true">
+        @cancel="onCancel"
+        :no-close-on-backdrop="true">
         <template slot="modal-header">
             <h5 class="modal-title">{{title}}</h5>
         </template>
@@ -44,13 +44,11 @@ export default class Modal extends Vue {
 
     @Emit("cancel")
     onCancel():boolean{
-        console.log("cancel")
         return false;
     }
 
     @Emit("confirm")
     onConfirm():boolean{
-        console.log("confirm");
         return true;
     }
 }

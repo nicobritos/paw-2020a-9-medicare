@@ -5,6 +5,7 @@
                 :no-fade="true"
                 body-class="p-0"
                 content-class="p-0"
+                @show="cleanValues"
                 #default="{ok,cancel}">
         <form class="addturn-form border p-5 rounded" @submit="submitForm">
             <div class="row">
@@ -108,8 +109,24 @@ export default class AddSpecialty extends Vue {
         return createPath(url);
     }
 
+    private cleanValues(){
+            this.dowSelected = "0";
+            this.startHour = "";
+            this.endHour = "";
+            this.officeSelected = "0";
+    }
+
+    //TODO: NICO submit form for adding workday
     @Emit("submit")
     submitForm(e:Event){
+        e.preventDefault()
+        let formData = {
+            dowSelected:this.dowSelected,
+            startHour:this.startHour,
+            endHour:this.endHour,
+            officeSelected:this.officeSelected
+        }
+        console.log(formData)
         return e;
     }
 }
