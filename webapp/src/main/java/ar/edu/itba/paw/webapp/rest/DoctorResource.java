@@ -15,6 +15,7 @@ import ar.edu.itba.paw.webapp.models.DoctorPagination;
 import ar.edu.itba.paw.webapp.models.error.ErrorConstants;
 import ar.edu.itba.paw.webapp.rest.utils.GenericResource;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
 
 import javax.ws.rs.*;
@@ -107,6 +108,7 @@ public class DoctorResource extends GenericResource {
     @Path("{id}")
     @Produces({DoctorMIME.GET, ErrorMIME.ERROR})
     @Consumes(DoctorMIME.UPDATE)
+    @PreAuthorize("hasRole('DOCTOR')")
     public Response updateEntity(
             Doctor doctor,
             @Context HttpHeaders httpheaders,

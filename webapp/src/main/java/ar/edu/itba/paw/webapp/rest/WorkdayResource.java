@@ -12,6 +12,7 @@ import ar.edu.itba.paw.webapp.media_types.WorkdayMIME;
 import ar.edu.itba.paw.webapp.models.error.ErrorConstants;
 import ar.edu.itba.paw.webapp.rest.utils.GenericResource;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
 
 import javax.ws.rs.*;
@@ -33,6 +34,7 @@ public class WorkdayResource extends GenericResource {
 
     @GET
     @Produces({WorkdayMIME.GET_LIST, ErrorMIME.ERROR})
+    @PreAuthorize("hasRole('DOCTOR')")
     public Response getCollection(
             @Context HttpHeaders httpheaders) {
         MIMEHelper.assertServerType(httpheaders, WorkdayMIME.GET_LIST);
@@ -54,6 +56,7 @@ public class WorkdayResource extends GenericResource {
     @POST
     @Produces({WorkdayMIME.GET_LIST, ErrorMIME.ERROR})
     @Consumes(WorkdayMIME.CREATE_LIST)
+    @PreAuthorize("hasRole('DOCTOR')")
     public Response createEntities(
             Collection<Workday> workdays,
             @Context HttpHeaders httpheaders) {
@@ -84,7 +87,6 @@ public class WorkdayResource extends GenericResource {
             newWorkdays = this.workdayService.create(workdays);
         } catch (Exception ignored) {
             // TODO: LOG
-//            return this.error(Status.INTERNAL_SERVER_ERROR);
             throw ignored;
         }
 
@@ -98,6 +100,7 @@ public class WorkdayResource extends GenericResource {
     @GET
     @Path("{id}")
     @Produces({WorkdayMIME.GET, ErrorMIME.ERROR})
+    @PreAuthorize("hasRole('DOCTOR')")
     public Response getEntity(
             @Context HttpHeaders httpheaders,
             @PathParam("id") Integer id) {
@@ -128,6 +131,7 @@ public class WorkdayResource extends GenericResource {
     @DELETE
     @Path("{id}")
     @Produces({MediaType.WILDCARD, ErrorMIME.ERROR})
+    @PreAuthorize("hasRole('DOCTOR')")
     public Response deleteEntity(
             @Context HttpHeaders httpheaders,
             @PathParam("id") Integer id) {
@@ -151,18 +155,5 @@ public class WorkdayResource extends GenericResource {
         return Response
                 .status(Status.NO_CONTENT)
                 .build();
-    }
-
-    private Workday createWorkday(Workday workday, Doctor doctor) {
-        Workday copy = new Workday();
-
-        copy.setDoctor(doctor);
-        copy.setDay(workday.getDay());
-        copy.setStartHour(workday.getStartHour());
-        copy.setStartMinute(workday.getStartMinute());
-        copy.setEndHour(workday.getEndHour());
-        copy.setEndMinute(workday.getEndMinute());
-
-        return copy;
     }
 }

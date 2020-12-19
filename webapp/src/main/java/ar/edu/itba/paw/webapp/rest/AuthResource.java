@@ -54,8 +54,7 @@ public class AuthResource extends GenericAuthenticationResource {
             @Context HttpServletResponse response) {
         String token = this.getRefreshToken(request);
 
-        if (token == null)
-            throw this.forbidden();
+        if (token == null) throw this.forbidden();
 
         Optional<RefreshToken> refreshTokenOptional = this.refreshTokenService.findByToken(token);
         if (!refreshTokenOptional.isPresent())

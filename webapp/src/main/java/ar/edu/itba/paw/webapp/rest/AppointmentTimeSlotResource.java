@@ -12,6 +12,7 @@ import ar.edu.itba.paw.webapp.rest.utils.GenericResource;
 import org.joda.time.Days;
 import org.joda.time.LocalDateTime;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
 
 import javax.ws.rs.GET;
@@ -35,6 +36,7 @@ public class AppointmentTimeSlotResource extends GenericResource {
 
     @GET
     @Produces({AppointmentTimeSlotMIME.GET_LIST, ErrorMIME.ERROR})
+    @PreAuthorize("!hasRole('UNVERIFIED')")
     public Response getCollection(
             @Context HttpHeaders httpheaders,
             @QueryParam("doctor_id") Integer doctorId,

@@ -16,6 +16,7 @@ import ar.edu.itba.paw.webapp.rest.utils.GenericResource;
 import org.joda.time.Days;
 import org.joda.time.LocalDateTime;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
 
 import javax.ws.rs.*;
@@ -44,6 +45,7 @@ public class AppointmentResource extends GenericResource {
 
     @GET
     @Produces({AppointmentMIME.GET_LIST, ErrorMIME.ERROR})
+    @PreAuthorize("!hasRole('UNVERIFIED')")
     public Response getEntity(
             @Context HttpHeaders httpheaders,
             @QueryParam("from_year") Integer fromYear,
@@ -55,11 +57,7 @@ public class AppointmentResource extends GenericResource {
 
         MIMEHelper.assertServerType(httpheaders, AppointmentMIME.GET_LIST);
 
-        Optional<User> optionalUser = this.getUser();
-        if (!optionalUser.isPresent())
-            throw this.error(Status.UNAUTHORIZED).getError();
-
-        User user = optionalUser.get();
+        User user = this.assertUserUnauthorized();
         Collection<Doctor> doctors;
         Collection<Patient> patients;
         if (this.isDoctor()) {
@@ -116,6 +114,7 @@ public class AppointmentResource extends GenericResource {
     @POST
     @Produces({AppointmentMIME.GET, ErrorMIME.ERROR})
     @Consumes(AppointmentMIME.CREATE)
+    @PreAuthorize("hasRole('PATIENT')")
     public Response createEntity(
             Appointment appointment,
             @Context HttpHeaders httpheaders) {
@@ -170,6 +169,7 @@ public class AppointmentResource extends GenericResource {
     @GET
     @Path("{id}")
     @Produces({AppointmentMIME.GET, ErrorMIME.ERROR})
+    @PreAuthorize("!hasRole('UNVERIFIED')")
     public Response getEntity(
             @Context HttpHeaders httpheaders,
             @PathParam("id") Integer id) {
@@ -211,6 +211,7 @@ public class AppointmentResource extends GenericResource {
     @DELETE
     @Path("{id}")
     @Produces({MediaType.WILDCARD, ErrorMIME.ERROR})
+    @PreAuthorize("!hasRole('UNVERIFIED')")
     public Response deleteEntity(
             @Context HttpHeaders httpheaders,
             @PathParam("id") Integer id) {
