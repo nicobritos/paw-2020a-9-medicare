@@ -946,6 +946,28 @@
                 }
             }
         },
+        "/users/{id}/picture": {
+            "get": {
+                "summary": "Gets a user's profile picture",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "schema": {
+                            "type": "integer"
+                        },
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "The image"
+                    },
+                    "404": {
+                    }
+                }
+            }
+        },
         "/appointments": {
             "get": {
                 "summary": "List all the appointments of the logged user",

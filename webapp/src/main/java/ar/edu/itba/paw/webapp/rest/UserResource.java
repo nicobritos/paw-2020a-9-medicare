@@ -1,16 +1,11 @@
 package ar.edu.itba.paw.webapp.rest;
 
-import ar.edu.itba.paw.interfaces.services.DoctorService;
-import ar.edu.itba.paw.interfaces.services.LocalityService;
-import ar.edu.itba.paw.interfaces.services.PatientService;
-import ar.edu.itba.paw.interfaces.services.UserService;
-import ar.edu.itba.paw.models.Doctor;
-import ar.edu.itba.paw.models.Locality;
-import ar.edu.itba.paw.models.Office;
-import ar.edu.itba.paw.models.User;
+import ar.edu.itba.paw.interfaces.services.*;
+import ar.edu.itba.paw.models.*;
 import ar.edu.itba.paw.webapp.exceptions.ConflictException;
 import ar.edu.itba.paw.webapp.media_types.ErrorMIME;
 import ar.edu.itba.paw.webapp.media_types.MIMEHelper;
+import ar.edu.itba.paw.webapp.media_types.PictureMIME;
 import ar.edu.itba.paw.webapp.media_types.UserMIME;
 import ar.edu.itba.paw.webapp.models.*;
 import ar.edu.itba.paw.webapp.models.error.ErrorConstants;
@@ -41,6 +36,8 @@ public class UserResource extends GenericAuthenticationResource {
     private PatientService patientService;
     @Autowired
     private LocalityService localityService;
+    @Autowired
+    private PictureService pictureService;
     @Autowired
     private UserService userService;
     @Autowired
@@ -130,6 +127,31 @@ public class UserResource extends GenericAuthenticationResource {
         if (!userOptional.isPresent()) throw this.notFound();
 
         return Response.ok(userOptional.get()).type(UserMIME.GET).build();
+    }
+
+    @GET
+    @Path("{id}/picture")
+    @Produces({PictureMIME.IMAGES})
+    public Response getProfilePicture(
+            @Context HttpHeaders httpheaders,
+            @PathParam("id") Integer id) {
+        // We don't want to return an APIError
+        if (id == null)
+            return Response.status(Status.NOT_FOUND).build(); // TODO map 404 to vue
+
+        Optional<User> userOptional = this.userService.findById(id);
+        // We don't want to return an APIError
+        if (!userOptional.isPresent() || userOptional.get().getProfilePictureId() == null)
+            return Response.status(Status.NOT_FOUND).build();
+
+        Optional<Picture> picture = this.pictureService.findById(userOptional.get().getProfilePictureId());
+        if (!picture.isPresent())
+            return Response.status(Status.NOT_FOUND).build();
+
+        return Response
+                .ok(picture.get().getData())
+                .type(picture.get().getMimeType())
+                .build();
     }
 
     @GET

@@ -36,8 +36,10 @@ public class User extends GenericModel<Integer> {
     @ManyToOne(fetch = FetchType.EAGER)
     private RefreshToken refreshToken;
     @JoinColumn(name = "profile_id")
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne(fetch = FetchType.LAZY)
     private Picture profilePicture;
+    @Column(name = "profile_id", insertable = false, updatable = false)
+    private Integer profilePictureId;
     @Column(name = "phone")
     private String phone;
 
@@ -125,6 +127,10 @@ public class User extends GenericModel<Integer> {
 
     public void setPhone(String phone) {
         this.phone = phone;
+    }
+
+    public Integer getProfilePictureId() {
+        return this.profilePictureId;
     }
 
     @Override

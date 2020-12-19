@@ -71,6 +71,7 @@ public class WebAuthConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers(HttpMethod.GET, API_PATH + "/verify/**").permitAll() // Verifies a user
                 .antMatchers(HttpMethod.POST, API_PATH + "/auth/refresh").permitAll() // Refreshes the access token
                 .antMatchers(HttpMethod.POST, API_PATH + "/users").anonymous() // Creates a user
+                .antMatchers(HttpMethod.GET, API_PATH + "/users/**").anonymous() // Creates a user
                 .antMatchers(HttpMethod.GET, API_PATH + "/specialties").permitAll()
                 .antMatchers(HttpMethod.GET, API_PATH + "/countries").permitAll()
                 .antMatchers(HttpMethod.GET, API_PATH + "/provinces").permitAll()
