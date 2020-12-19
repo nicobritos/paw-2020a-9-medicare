@@ -14,26 +14,15 @@ import PatientProfile from '@/views/patient/profile';
 import PatientHome from '@/views/patient/home';
 import SelectAppointment from '@/views/selectAppointment';
 import RequestAppointment from '@/views/patient/requestAppointment';
-import AddSpecialty from "@/views/medic/addSpecialty";
-import AddWorkday from "@/views/medic/addWorkday";
 import Error403 from "@/views/error/403";
 import Error404 from "@/views/error/404";
 import Error500 from "@/views/error/500";
 
 Vue.use(VueRouter);
 
-// TODO:check
-function authGuard(to,from,next) {
-    if(store.getters["auth/loggedIn"]){
-        next();
-    }else{
-        next({name:"Login"});
-    }
-}
-
 function notAuthGuard(to,from,next) {
     if(store.getters["auth/loggedIn"]){
-        if(store.getters["auth/isDoctor"]){   
+        if(store.getters["auth/isDoctor"]){
             next({name:"MedicHome"});
         }
         else{
@@ -53,7 +42,9 @@ function patientGuard(to,from,next) {
             next();
         }
     }else{
-        next({name:"Login"});
+        next({name:"Login",params:{
+            prevto:to
+        }});
     }
 }
 
@@ -66,7 +57,9 @@ function doctorGuard(to,from,next) {
             next();
         }
     }else{
-        next({name:"Login"});
+        next({name:"Login",params:{
+            prevto:to
+        }});
     }
 }
 
@@ -181,16 +174,6 @@ const routes = [
         name: 'RequestAppointment',
         component: RequestAppointment,
         beforeEnter:patientGuard
-    },
-    {
-        path: '/addSpecialty',
-        name: 'AddSpecialty',
-        component: AddSpecialty
-    },
-    {
-        path: '/addWorkday',
-        name: 'AddWorkday',
-        component: AddWorkday
     },
     {
         path:"/404",
