@@ -157,9 +157,8 @@ export default class PatientProfile extends Vue {
         return createPath(url);
     }
 
-        changeProfilePic(e:InputEvent){
+    changeProfilePic(e:InputEvent){
         //get profile pic file and check type
-        //TODO: typescript
         //@ts-ignore
         let file = e.target.files[0];
         if (!file.type.includes("image")) {
