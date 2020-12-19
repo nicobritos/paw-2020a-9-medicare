@@ -140,28 +140,15 @@ public class AppointmentResource extends GenericResource {
                     .getError();
         }
 
-        Optional<Patient> patientOptional = this.patientService.findByUserAndOffice(user, doctorOptional.get().getOffice());
-        Patient patient;
-        if (!patientOptional.isPresent()) {
-            patient = new Patient();
-            patient.setUser(user);
-            patient.setOffice(doctorOptional.get().getOffice());
-
-            patient = this.patientService.create(patient);
-        } else {
-            patient = patientOptional.get();
-        }
-
         Appointment newAppointment = new Appointment();
         newAppointment.setDoctor(doctorOptional.get());
         newAppointment.setMotive(appointment.getMotive());
         newAppointment.setMessage(appointment.getMessage());
-        newAppointment.setPatient(patient);
         newAppointment.setFromDate(appointment.getFromDate());
 
         return Response
                 .status(Status.CREATED)
-                .entity(this.appointmentService.create(newAppointment))
+                .entity(this.appointmentService.create(newAppointment, user))
                 .type(AppointmentMIME.GET)
                 .build();
     }
