@@ -7,7 +7,4 @@ import ar.edu.itba.paw.models.Province;
 import java.util.Set;
 
 public interface CountryService extends GenericSearchableService<Country, String> {
-    void addProvince(Country country, Province province);
-
-    void addProvinces(Country country, Set<Province> provinces);
 }

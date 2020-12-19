@@ -28,20 +28,6 @@ public class ProvinceServiceImpl extends GenericServiceImpl<ProvinceDao, Provinc
     }
 
     @Override
-    public void addLocality(Province province, Locality locality) {
-        // TODO
-//        province.getLocalities().add(locality);
-//        this.repository.update(province);
-    }
-
-    @Override
-    public void addLocalities(Province province, Set<Locality> localities) {
-        // TODO
-//        province.getLocalities().addAll(localities);
-//        this.repository.update(province);
-    }
-
-    @Override
     protected ProvinceDao getRepository() {
         return this.repository;
     }

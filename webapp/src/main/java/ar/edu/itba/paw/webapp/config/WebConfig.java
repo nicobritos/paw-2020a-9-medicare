@@ -129,12 +129,9 @@ public class WebConfig {
         return new JpaTransactionManager(entityManagerFactory);
     }
 
-    //TODO:set max size upload maybe?
     @Bean(name = "multipartResolver")
     public MultipartResolver multipartResolver() {
-        //final long maxSize = 100000;
         CommonsMultipartResolver cmr = new CommonsMultipartResolver();
-        //cmr.setMaxUploadSize(maxSize);
         return cmr;
     }
 

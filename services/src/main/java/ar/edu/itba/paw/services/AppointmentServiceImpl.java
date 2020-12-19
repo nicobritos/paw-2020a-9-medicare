@@ -271,7 +271,7 @@ public class AppointmentServiceImpl extends GenericServiceImpl<AppointmentDao, A
         Optional<Appointment> appointment = findById(id);
         if (appointment.isPresent()) {
             //get doctor for current user
-            List<Doctor> doctors = this.doctorService.findByUser(user); // TODO: add doctor list inside User model
+            List<Doctor> doctors = this.doctorService.findByUser(user);
             //get patient for current user
             List<Patient> patient = this.patientService.findByUser(user);
             //check if user is allowed to cancel

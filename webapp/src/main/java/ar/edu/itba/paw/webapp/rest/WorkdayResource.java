@@ -1,5 +1,6 @@
 package ar.edu.itba.paw.webapp.rest;
 
+import ar.edu.itba.paw.interfaces.MediCareException;
 import ar.edu.itba.paw.interfaces.services.DoctorService;
 import ar.edu.itba.paw.interfaces.services.WorkdayService;
 import ar.edu.itba.paw.models.Doctor;
@@ -10,6 +11,8 @@ import ar.edu.itba.paw.webapp.media_types.MIMEHelper;
 import ar.edu.itba.paw.webapp.media_types.WorkdayMIME;
 import ar.edu.itba.paw.webapp.models.error.ErrorConstants;
 import ar.edu.itba.paw.webapp.rest.utils.GenericResource;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
@@ -21,6 +24,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 import java.util.Collection;
+import java.util.List;
 import java.util.Optional;
 
 @Path("/workdays")
@@ -31,6 +35,8 @@ public class WorkdayResource extends GenericResource {
     @Autowired
     private DoctorService doctorService;
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(WorkdayResource.class);
+
     @GET
     @Produces({WorkdayMIME.GET_LIST, ErrorMIME.ERROR})
     @PreAuthorize("hasRole('DOCTOR')")
@@ -40,14 +46,9 @@ public class WorkdayResource extends GenericResource {
 
         User user = this.assertUserUnauthorized();
         if (!this.isDoctor()) throw this.forbidden();
-
-        Optional<Doctor> doctorOptional = this.doctorService.findByUser(user).stream().findFirst();
-        // TODO: Log, esto es inconsistencia, no deberia de pasar
-        if (!doctorOptional.isPresent()) throw this.forbidden();
-
         return Response
                 .ok()
-                .entity(this.workdayService.findByDoctor(doctorOptional.get()))
+                .entity(this.workdayService.findByUser(user))
                 .type(WorkdayMIME.GET_LIST)
                 .build();
     }
@@ -66,10 +67,6 @@ public class WorkdayResource extends GenericResource {
         User user = this.assertUserUnauthorized();
         if (!this.isDoctor()) throw this.forbidden();
 
-        Optional<Doctor> doctorOptional = this.doctorService.findByUser(user).stream().findFirst();
-        // TODO: Log, esto es inconsistencia, no deberia de pasar
-        if (!doctorOptional.isPresent()) throw this.forbidden();
-
         for (Workday workday : workdays) {
             if (workday.getStartHour() > workday.getEndHour()
                     || ((workday.getStartHour().equals(workday.getEndHour())) && (workday.getStartHour() > workday.getEndHour()))) {
@@ -79,12 +76,7 @@ public class WorkdayResource extends GenericResource {
         }
 
         Collection<Workday> newWorkdays;
-        try {
-            newWorkdays = this.workdayService.create(workdays);
-        } catch (Exception ignored) {
-            // TODO: LOG
-            throw ignored;
-        }
+        newWorkdays = this.workdayService.create(workdays);
 
         return Response
                 .status(Status.CREATED)
@@ -107,14 +99,16 @@ public class WorkdayResource extends GenericResource {
         User user = this.assertUserUnauthorized();
         if (!this.isDoctor()) throw this.forbidden();
 
-        Optional<Doctor> doctorOptional = this.doctorService.findByUser(user).stream().findFirst();
-        // TODO: Log, esto es inconsistencia, no deberia de pasar
-        if (!doctorOptional.isPresent()) throw this.forbidden();
+        List<Doctor> doctors = this.doctorService.findByUser(user);
+        if (doctors.isEmpty()) {
+            LOGGER.error("Couldnt find a doctor for this user. This situation should be impossible");
+            throw this.forbidden();
+        }
 
         Optional<Workday> workdayOptional = this.workdayService.findById(id);
         if (!workdayOptional.isPresent()) throw this.notFound();
 
-        if (!doctorOptional.get().equals(workdayOptional.get().getDoctor()))
+        if (!doctors.contains(workdayOptional.get().getDoctor()))
             throw this.notFound();
 
         return Response
@@ -136,17 +130,11 @@ public class WorkdayResource extends GenericResource {
         User user = this.assertUserUnauthorized();
         if (!this.isDoctor()) throw this.forbidden();
 
-        Optional<Doctor> doctorOptional = this.doctorService.findByUser(user).stream().findFirst();
-        // TODO: Log, esto es inconsistencia, no deberia de pasar
-        if (!doctorOptional.isPresent()) throw this.forbidden();
-
-        Optional<Workday> workdayOptional = this.workdayService.findById(id);
-        if (!workdayOptional.isPresent()) throw this.notFound();
-
-        if (!workdayOptional.get().getDoctor().equals(doctorOptional.get()))
+        try {
+            this.workdayService.remove(id, user);
+        } catch (MediCareException | IllegalArgumentException e){
             throw this.notFound();
-
-        this.workdayService.remove(id);
+        }
 
         return Response
                 .status(Status.NO_CONTENT)

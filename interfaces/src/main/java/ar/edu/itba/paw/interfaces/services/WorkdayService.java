@@ -16,4 +16,6 @@ public interface WorkdayService extends GenericService<Workday, Integer> {
     boolean doctorWorks(Doctor doctor, AppointmentTimeSlot timeSlot);
 
     Collection<Workday> create(Collection<Workday> workdays);
+
+    void remove(Integer id, User user);
 }

@@ -12,8 +12,4 @@ public interface OfficeService extends GenericSearchableService<Office, Integer>
     List<Office> findByProvince(Province province);
 
     List<Office> findByLocality(Locality locality);
-
-    void addDoctor(Office office, Doctor doctor);
-
-    void addDoctors(Office office, Collection<Doctor> doctors);
 }

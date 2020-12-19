@@ -10,6 +10,9 @@ import io.jsonwebtoken.SignatureAlgorithm;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.PropertySource;
+import org.springframework.core.io.DefaultResourceLoader;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.ResourceLoader;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -17,11 +20,17 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Component;
+import org.springframework.util.FileCopyUtils;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.Reader;
+import java.io.UncheckedIOException;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 
 @Component
@@ -142,14 +151,9 @@ public class JWTAuthenticator {
     }
 
     private String getSecretKey() throws IOException {
-        return "SECRET"; // TODO
-//        InputStreamReader streamReader = new InputStreamReader(this.secretResource.getInputStream(), StandardCharsets.UTF_8);
-//        BufferedReader reader = new BufferedReader(streamReader);
-//
-//        StringBuilder stringBuilder = new StringBuilder();
-//        for (String line; (line = reader.readLine()) != null; ) {
-//            stringBuilder.append(line);
-//        }
-//        return stringBuilder.toString();
+        ResourceLoader resourceLoader = new DefaultResourceLoader();
+        Resource resource = resourceLoader.getResource("token.key");
+        Reader reader = new InputStreamReader(resource.getInputStream(), StandardCharsets.UTF_8);
+        return FileCopyUtils.copyToString(reader);
     }
 }
