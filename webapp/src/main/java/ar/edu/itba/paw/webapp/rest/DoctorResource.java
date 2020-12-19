@@ -35,7 +35,6 @@ public class DoctorResource extends GenericResource {
     @Autowired
     private LocalityService localityService;
 
-    // TODO: i18n
     @GET
     @Produces({DoctorMIME.GET_LIST, ErrorMIME.ERROR})
     public Response getCollection(
