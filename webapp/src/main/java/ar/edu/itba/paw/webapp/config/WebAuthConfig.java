@@ -67,7 +67,7 @@ public class WebAuthConfig extends WebSecurityConfigurerAdapter {
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and().csrf().disable()
                 .authorizeRequests()
-                .antMatchers("/").permitAll()
+                .antMatchers("/**").fullyAuthenticated()
                 .antMatchers(HttpMethod.POST, "/login").anonymous()
                 .antMatchers(HttpMethod.POST, "/auth/logout").authenticated()
                 .antMatchers(HttpMethod.GET, "/verify/**").permitAll() // Verifies a user
@@ -78,7 +78,7 @@ public class WebAuthConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers(HttpMethod.GET, "/provinces").permitAll()
                 .antMatchers(HttpMethod.GET, "/localities").permitAll()
                 .antMatchers(HttpMethod.GET, "/doctors/**").permitAll()
-                .anyRequest().fullyAuthenticated().and()
+                .and()
                 .addFilter(this.jwtAuthorizationFilter())  // Verifies JWT if provided
                 .addFilterAfter(this.jwtAuthenticationFilter(), JWTAuthorizationFilter.class) // Authenticates a user and sends JWT and Refresh token
                 .exceptionHandling()

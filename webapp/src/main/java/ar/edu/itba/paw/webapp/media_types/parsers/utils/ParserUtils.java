@@ -16,7 +16,7 @@ public abstract class ParserUtils {
         try {
             return objectMapper.readTree(inputStream);
         } catch (JsonProcessingException e) {
-            throw new BadRequestException();
+            throw new BadRequestException("Error parsing JSON body");
         }
     }
 }
