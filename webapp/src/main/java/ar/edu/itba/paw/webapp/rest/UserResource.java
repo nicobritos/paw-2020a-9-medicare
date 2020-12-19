@@ -73,7 +73,6 @@ public class UserResource extends GenericAuthenticationResource {
         Office office = new Office();
         office.setLocality(locality.get());
         office.setStreet(doctorSignUp.getStreet());
-        // TODO: Guido i18n
         office.setName("Consultorio de " + user.getFirstName() + " " + user.getSurname());
         office.setPhone(doctorSignUp.getUser().getPhone());
         office.setPhone(doctorSignUp.getUser().getEmail());

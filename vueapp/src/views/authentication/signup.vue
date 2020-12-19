@@ -38,7 +38,6 @@ import {createPath} from "~/logic/Utils";
 export default class Signup extends Vue {
     private logo = logo;
 
-    //TODO: check typescript
     getUrl(url:string):string{
         return createPath(url);
     }

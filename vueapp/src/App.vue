@@ -1,8 +1,4 @@
 <template>
-  <!-- 
-    TODO:CHECK
-    lo dejo asi checkear si el resto funciona bien con esto
-  -->
   <span id="app">
     <Navbar v-if="!hideNav"/>
     <RouterView/>

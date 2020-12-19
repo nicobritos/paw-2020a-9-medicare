@@ -2,7 +2,6 @@ package ar.edu.itba.paw.webapp.models.error;
 
 import ar.edu.itba.paw.webapp.models.Constants;
 
-// TODO: Guido i18n
 public abstract class ErrorConstants {
     public static final APISubError APPOINTMENT_CREATE_MISSING_DATE_FROM
             = missingField(1, "date_from");

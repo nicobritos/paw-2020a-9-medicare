@@ -183,7 +183,6 @@ export default class RequestAppointment extends Vue {
         return 'Locality' + id;
     }
 
-    //TODO: check typescript
     getUrl(url:string):string{
         return createPath(url);
     }

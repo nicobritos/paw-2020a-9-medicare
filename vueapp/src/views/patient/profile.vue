@@ -1,7 +1,6 @@
 <template>
     <div class="container flex-fill mx-5 pl-5 mt-3 w-100">
         <div class="row">
-            <!-- TODO:make component for reusability -->
             <div class="col-4 align-items-start d-flex flex-column">
                 <!-- TODO check imagen -->
                 <div class="picture-container no-select">
@@ -27,7 +26,6 @@
             <div class="col-6">
                 <div class="container p-0 pt-4 m-0">
                     <!-- TODO:connect form -->
-                    <!-- TODO:make component for reusability -->
                     <form>
                         <div class="row">
                             <div class="col p-0 m-0">
@@ -152,7 +150,6 @@ export default class PatientProfile extends Vue {
     enablePasswordMod():void{this.passwordModEnabled=true};
 
 
-    //TODO: check typescript
     getUrl(url:string):string{
         return createPath(url);
     }
@@ -197,7 +194,6 @@ export default class PatientProfile extends Vue {
     bottom: 1em;
     right: 5em;
 }
-/*TODO: fusionar con medicprofile*/
 html, body {
     height: 100%;
 }

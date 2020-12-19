@@ -66,7 +66,6 @@
 
 <script lang="ts">
 import logo from '@/assets/logo.svg';
-//TODO:change to bootstrap icons
 import eye from '@/assets/eye.svg';
 import noeye from '@/assets/noeye.svg';
 import {Component, Vue, Watch} from 'vue-property-decorator';

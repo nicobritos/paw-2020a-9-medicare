@@ -1,5 +1,4 @@
 <template>
-    <!--TODO:check -->
     <nav class="navbar navbar-expand header">
         <NavbarLogo/>
         <NavbarLogged v-if="loggedIn" @logout="logout"/>
@@ -33,7 +32,6 @@ export default class Navbar extends Vue {
 </script>
 
 <style scoped>
-/* TODO:Check probably should use scoped with deep selector */
 html,
 body {
     height: 100%;

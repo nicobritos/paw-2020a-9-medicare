@@ -15,7 +15,6 @@ import {createPath} from "~/logic/Utils";
 
 @Component
 export default class NavbarNotLogged extends Vue {
-    //TODO:check typescript
     getUrl(url:string):string{
         return createPath(url);
     }
