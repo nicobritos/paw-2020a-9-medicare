@@ -286,8 +286,8 @@ export default class MedicList extends Vue {
         this.$store.dispatch('doctorSpecialties/loadDoctorSpecialties', doctorSpecialtyActionTypes.loadDoctorSpecialties());
         this.search();
 
-        this.s = this.searchedSpecialties.length > 0 ? this.searchedSpecialties[0] : null;
-        this.selectedLocality = this.searchedSpecialties.length > 0 ? this.searchedSpecialties[0] : null;
+        this.selectedSpecialty = this.searchedSpecialties.length > 0 ? this.searchedSpecialties[0] : null;
+        this.selectedLocality = this.searchedLocalities.length > 0 ? this.searchedLocalities[0] : null;
     }
 
     @Watch('doctorPagination')
