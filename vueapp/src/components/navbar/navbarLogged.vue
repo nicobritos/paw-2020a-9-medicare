@@ -24,15 +24,17 @@
         </div>
         <img v-if="!user.verified" id="navbarUnverifiedUserImage" class="ml-2"
              src="https://fonts.gstatic.com/s/i/materialicons/account_circle/v4/24px.svg" alt="unverified user image">
-        <RouterLink v-else-if="!doctors" :to='getUrl("patient/profile")'>
+        <RouterLink v-else-if="!isDoctor" :to='getUrl("patient/profile")'>
             <!-- TODO:move style to css -->
             <div style="width: 2em;" class="d-flex flex-column justify-content-center">
                 <div class="profile-picture-container">
-                    <div style="margin-top: 100%;"></div>
+                    <!-- TODO: check wtf this -->
+                    <!-- <div style="margin-top: 100%;"></div> -->
                     <img
                         id="navbarPatientUserImage"
                         class="profile-picture rounded-circle"
                         :src='getUrl("profilePics/"+user.profilePictureId)'
+                        :srcset="defaultProfilePic"
                         alt="profile pic"
                     />
                 </div>
