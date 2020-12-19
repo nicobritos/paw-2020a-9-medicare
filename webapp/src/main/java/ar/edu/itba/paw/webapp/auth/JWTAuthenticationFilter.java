@@ -9,6 +9,7 @@ import ar.edu.itba.paw.webapp.media_types.LoginMIME;
 import ar.edu.itba.paw.webapp.media_types.MIMEHelper;
 import ar.edu.itba.paw.webapp.media_types.UserMIME;
 import ar.edu.itba.paw.webapp.media_types.parsers.serializers.UserMeSerializer;
+import ar.edu.itba.paw.webapp.models.Constants;
 import ar.edu.itba.paw.webapp.models.UserCredentials;
 import ar.edu.itba.paw.webapp.models.UserMe;
 import ar.edu.itba.paw.webapp.models.UserMeFactory;
@@ -73,6 +74,12 @@ public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilte
             return null;
         }
 
+        if (((boolean) request.getAttribute(Constants.VALID_JWT_REQUEST_ATTRIBUTE))) {
+            // The user has already logged in
+            ExceptionResponseWriter.setError(response, Status.FORBIDDEN);
+            return null;
+        }
+
         UserCredentials credentials;
         try {
             credentials = new ObjectMapper().readValue(request.getInputStream(), UserCredentials.class);
@@ -87,7 +94,7 @@ public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilte
         try {
             return this.authenticator.attemptAuthentication(credentials);
         } catch (AuthenticationException e) {
-            ExceptionResponseWriter.setError(response, Status.FORBIDDEN, "Invalid username or password");
+            ExceptionResponseWriter.setError(response, Status.UNAUTHORIZED, "Invalid username or password");
             return null;
         } catch (Exception e) {
             ExceptionResponseWriter.setError(response, Status.INTERNAL_SERVER_ERROR);

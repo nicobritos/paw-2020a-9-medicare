@@ -1,5 +1,6 @@
 package ar.edu.itba.paw.webapp.config;
 
+import ar.edu.itba.paw.webapp.auth.AccessDeniedHandlerImpl;
 import ar.edu.itba.paw.webapp.auth.JWTAuthenticationEntryPoint;
 import ar.edu.itba.paw.webapp.auth.JWTAuthenticationFilter;
 import ar.edu.itba.paw.webapp.auth.JWTAuthorizationFilter;
@@ -11,6 +12,7 @@ import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.BeanIds;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
+import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -23,6 +25,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 @EnableWebSecurity
 @Configuration
 @ComponentScan(basePackages = {"ar.edu.itba.paw.webapp.auth"})
+@EnableGlobalMethodSecurity(prePostEnabled = true, proxyTargetClass = true)
 public class WebAuthConfig extends WebSecurityConfigurerAdapter {
     @Autowired
     private UserDetailsService userDetailsService;
@@ -65,19 +68,21 @@ public class WebAuthConfig extends WebSecurityConfigurerAdapter {
                 .and().csrf().disable()
                 .authorizeRequests()
                 .antMatchers("/").permitAll()
-                .antMatchers(HttpMethod.POST, "/login").permitAll()
+                .antMatchers(HttpMethod.POST, "/login").anonymous()
+                .antMatchers(HttpMethod.POST, "/auth/logout").authenticated()
                 .antMatchers(HttpMethod.GET, "/verify/**").permitAll() // Verifies a user
-                .antMatchers(HttpMethod.POST, "/refresh/**").permitAll() // Refreshes the access token
+                .antMatchers(HttpMethod.POST, "/auth/refresh").permitAll() // Refreshes the access token
                 .antMatchers(HttpMethod.POST, "/users").anonymous() // Creates a user
-                .anyRequest().permitAll().and()
-//                .anyRequest().authenticated().and()
-                .httpBasic().authenticationEntryPoint(new JWTAuthenticationEntryPoint()).and() // Handles exceptions
-                .addFilter(this.jwtAuthenticationFilter()) // Authenticates a user and sends JWT and Refresh token
-                .addFilter(this.jwtAuthorizationFilter()); // Verifies JWT if provided
+                .anyRequest().fullyAuthenticated().and()
+                .addFilter(this.jwtAuthorizationFilter())  // Verifies JWT if provided
+                .addFilterAfter(this.jwtAuthenticationFilter(), JWTAuthorizationFilter.class) // Authenticates a user and sends JWT and Refresh token
+                .exceptionHandling()
+                .authenticationEntryPoint(new JWTAuthenticationEntryPoint()) // Handles forbidden/unauthorized page access exceptions
+                .accessDeniedHandler(new AccessDeniedHandlerImpl()); // Handles role exceptions
     }
 
     @Override
     public void configure(WebSecurity web) {
-        web.ignoring().antMatchers("/js/**", "/css/**", "/img/**", "/403", "/500", "/404");
+        web.ignoring().antMatchers("/js/**", "/css/**", "/img/**");
     }
 }
