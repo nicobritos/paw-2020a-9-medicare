@@ -4,7 +4,6 @@ import ar.edu.itba.paw.interfaces.services.LocalityService;
 import ar.edu.itba.paw.interfaces.services.ProvinceService;
 import ar.edu.itba.paw.models.Locality;
 import ar.edu.itba.paw.models.Province;
-import ar.edu.itba.paw.webapp.exceptions.UnprocessableEntityException;
 import ar.edu.itba.paw.webapp.media_types.ErrorMIME;
 import ar.edu.itba.paw.webapp.media_types.LocalityMIME;
 import ar.edu.itba.paw.webapp.media_types.MIMEHelper;
@@ -39,10 +38,7 @@ public class LocalityResource extends GenericResource {
         if (provinceId != null) {
             Optional<Province> province = this.provinceService.findById(provinceId);
             if (!province.isPresent()) {
-                throw UnprocessableEntityException
-                        .build()
-                        .withReason(ErrorConstants.LOCALITY_GET_NONEXISTENT_PROVINCE)
-                        .getError();
+                throw this.unprocessableEntity(ErrorConstants.LOCALITY_GET_NONEXISTENT_PROVINCE);
             }
             localities = this.localityService.findByProvince(province.get());
         } else {

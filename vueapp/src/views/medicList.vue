@@ -85,7 +85,6 @@
                                         </div>
                                         <div class="row">
                                             <p class="m-0">
-                                                <!-- TODO:super check this -->
                                                 {{
                                                     member.specialtyIds.map((v) => {
                                                         return getSpecialtyName(v);
@@ -184,7 +183,7 @@ export default class MedicList extends Vue {
     }
     
     get totalPages(): number {
-        return this.doctorPagination.totalItems / MedicList.PER_PAGE;
+        return Math.ceil(this.doctorPagination.totalItems / MedicList.PER_PAGE);
     }
 
     get remainingPages(): number {
@@ -252,11 +251,11 @@ export default class MedicList extends Vue {
         let response = await this.getDoctorService().list({
             page: this.page,
             name: this.name,
-            localities: this.searchedLocalities,
-            specialties: this.searchedSpecialties
+            localities: this.searchedLocalities.map(value => value.id),
+            specialties: this.searchedSpecialties.map(value => value.id)
         });
         if (response instanceof APIError) {
-            // TODO: Guido
+            // TODO: Guidos
         } else {
             this.doctorPagination = response;
         }
@@ -284,6 +283,7 @@ export default class MedicList extends Vue {
     mounted() {
         this.$store.dispatch('localities/loadLocalities', localityActionTypes.loadLocalities());
         this.$store.dispatch('doctorSpecialties/loadDoctorSpecialties', doctorSpecialtyActionTypes.loadDoctorSpecialties());
+        this.search();
     }
 
     @Watch('doctor')
@@ -305,7 +305,7 @@ export default class MedicList extends Vue {
 
     private gotoPage(page: number) {
         this.$router.push({
-            name: this.$route.name as string,
+            path: this.$route.name as string,
             params: {
                 page: page.toString()
             }

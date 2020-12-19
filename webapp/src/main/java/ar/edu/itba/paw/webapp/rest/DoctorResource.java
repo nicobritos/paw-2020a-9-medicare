@@ -7,11 +7,9 @@ import ar.edu.itba.paw.models.Doctor;
 import ar.edu.itba.paw.models.DoctorSpecialty;
 import ar.edu.itba.paw.models.Locality;
 import ar.edu.itba.paw.models.Paginator;
-import ar.edu.itba.paw.webapp.exceptions.UnprocessableEntityException;
 import ar.edu.itba.paw.webapp.media_types.DoctorMIME;
 import ar.edu.itba.paw.webapp.media_types.ErrorMIME;
 import ar.edu.itba.paw.webapp.media_types.MIMEHelper;
-import ar.edu.itba.paw.webapp.models.DoctorPagination;
 import ar.edu.itba.paw.webapp.models.error.ErrorConstants;
 import ar.edu.itba.paw.webapp.rest.utils.GenericResource;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,36 +38,59 @@ public class DoctorResource extends GenericResource {
     // TODO: i18n
     @GET
     @Produces({DoctorMIME.GET_LIST, ErrorMIME.ERROR})
-    @Consumes({DoctorMIME.PAGINATION})
     public Response getCollection(
             @Context HttpHeaders httpheaders,
             @Context UriInfo uriInfo,
-            DoctorPagination pagination) {
+            @QueryParam("page") Integer page,
+            @QueryParam("per_page") Integer perPage,
+            @QueryParam("localities") List<Integer> localities,
+            @QueryParam("specialties") List<Integer> specialties,
+            @QueryParam("name") String name) {
         MIMEHelper.assertServerType(httpheaders, DoctorMIME.GET_LIST);
 
-        Collection<DoctorSpecialty> searchedSpecialties;
-        if (pagination.getSpecialtyIds() != null && pagination.getSpecialtyIds().size() > 0)
-            searchedSpecialties = this.doctorSpecialtyService.findByIds(pagination.getSpecialtyIds());
-        else
-            searchedSpecialties = Collections.emptyList();
+        if (page == null) {
+            throw this.unprocessableEntity(ErrorConstants.DOCTOR_PAGINATION_MISSING_PAGE);
+        } else if (page < 1) {
+            throw this.unprocessableEntity(ErrorConstants.DOCTOR_PAGINATION_INVALID_PAGE);
+        }
+
+        if (perPage == null) {
+            perPage = DoctorResource.DEFAULT_PER_PAGE;
+        } else if (perPage < DoctorResource.MIN_PER_PAGE || perPage > DoctorResource.MAX_PER_PAGE) {
+            throw this.unprocessableEntity(ErrorConstants.DOCTOR_PAGINATION_INVALID_PER_PAGE);
+        }
 
         Collection<Locality> searchedLocalities;
-        if (pagination.getLocalityIds() != null && pagination.getLocalityIds().size() > 0)
-            searchedLocalities = this.localityService.findByIds(pagination.getLocalityIds());
-        else
+        if (localities == null || localities.isEmpty()) {
             searchedLocalities = Collections.emptyList();
+        } else if (localities.stream().anyMatch(Objects::isNull)) {
+            throw this.unprocessableEntity(ErrorConstants.DOCTOR_PAGINATION_INVALID_LOCALITIES);
+        } else {
+            searchedLocalities = this.localityService.findByIds(localities);
+        }
+
+        Collection<DoctorSpecialty> searchedSpecialties;
+        if (specialties == null || specialties.isEmpty()) {
+            searchedSpecialties = Collections.emptyList();
+        } else if (specialties.stream().anyMatch(Objects::isNull)) {
+            throw this.unprocessableEntity(ErrorConstants.DOCTOR_PAGINATION_INVALID_SPECIALTIES);
+        } else {
+            searchedSpecialties = this.doctorSpecialtyService.findByIds(specialties);
+        }
+
+        if (name != null) name = name.trim();
 
         Paginator<Doctor> paginationResponse;
-        if (pagination.getName() != null && pagination.getName().isEmpty()) {
-            Set<String> words = new HashSet<>(Arrays.asList(pagination.getName().split(" ")));
+        if (name != null && !name.isEmpty()) {
+            Set<String> words = new HashSet<>(Arrays.asList(name.split(" ")));
             paginationResponse = this.doctorService.findBy(
                     words,
                     words,
                     null,
                     searchedSpecialties,
                     searchedLocalities,
-                    pagination.getPage(),
-                    pagination.getPerPage()
+                    page,
+                    perPage
             );
         } else {
             paginationResponse = this.doctorService.findBy(
@@ -78,13 +99,13 @@ public class DoctorResource extends GenericResource {
                     null,
                     searchedSpecialties,
                     searchedLocalities,
-                    pagination.getPage(),
-                    pagination.getPerPage()
+                    page,
+                    perPage
             );
         }
 
         return this.createPaginatorResponse(paginationResponse, uriInfo)
-                .type(DoctorMIME.PAGINATION)
+                .type(DoctorMIME.GET_LIST)
                 .build();
     }
 
@@ -118,10 +139,7 @@ public class DoctorResource extends GenericResource {
         if (id == null) throw this.missingPathParams();
         if (doctor == null) throw this.missingBodyParams();
         if (doctor.getDoctorSpecialties().isEmpty()) {
-            throw UnprocessableEntityException
-                    .build()
-                    .withReason(ErrorConstants.DOCTOR_UPDATE_EMPTY_SPECIALTIES)
-                    .getError();
+            throw this.unprocessableEntity(ErrorConstants.DOCTOR_UPDATE_EMPTY_SPECIALTIES);
         }
 
         Optional<Doctor> doctorOptional = this.doctorService.findById(id);
@@ -134,10 +152,7 @@ public class DoctorResource extends GenericResource {
                         .collect(Collectors.toList())
         );
         if (doctorSpecialties.size() != doctor.getDoctorSpecialties().size()) {
-            throw UnprocessableEntityException
-                    .build()
-                    .withReason(ErrorConstants.DOCTOR_UPDATE_SOME_INVALID_SPECIALTIES)
-                    .getError();
+            throw this.unprocessableEntity(ErrorConstants.DOCTOR_UPDATE_SOME_INVALID_SPECIALTIES);
         }
 
         Doctor savedDoctor = doctorOptional.get();

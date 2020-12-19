@@ -5,7 +5,6 @@ import ar.edu.itba.paw.interfaces.services.WorkdayService;
 import ar.edu.itba.paw.models.Doctor;
 import ar.edu.itba.paw.models.User;
 import ar.edu.itba.paw.models.Workday;
-import ar.edu.itba.paw.webapp.exceptions.UnprocessableEntityException;
 import ar.edu.itba.paw.webapp.media_types.ErrorMIME;
 import ar.edu.itba.paw.webapp.media_types.MIMEHelper;
 import ar.edu.itba.paw.webapp.media_types.WorkdayMIME;
@@ -75,10 +74,7 @@ public class WorkdayResource extends GenericResource {
             if (workday.getStartHour() > workday.getEndHour()
                     || ((workday.getStartHour().equals(workday.getEndHour())) && (workday.getStartHour() > workday.getEndHour()))) {
 
-                throw UnprocessableEntityException
-                        .build()
-                        .withReason(ErrorConstants.DATE_FROM_IS_AFTER_TO)
-                        .getError();
+                throw this.unprocessableEntity(ErrorConstants.DATE_FROM_IS_AFTER_TO);
             }
         }
 

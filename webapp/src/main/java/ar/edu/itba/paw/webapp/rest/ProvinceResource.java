@@ -4,7 +4,6 @@ import ar.edu.itba.paw.interfaces.services.CountryService;
 import ar.edu.itba.paw.interfaces.services.ProvinceService;
 import ar.edu.itba.paw.models.Country;
 import ar.edu.itba.paw.models.Province;
-import ar.edu.itba.paw.webapp.exceptions.UnprocessableEntityException;
 import ar.edu.itba.paw.webapp.media_types.ErrorMIME;
 import ar.edu.itba.paw.webapp.media_types.MIMEHelper;
 import ar.edu.itba.paw.webapp.media_types.ProvinceMIME;
@@ -39,10 +38,7 @@ public class ProvinceResource extends GenericResource {
         if (countryId != null) {
             Optional<Country> country = this.countryService.findById(countryId);
             if (!country.isPresent()) {
-                throw UnprocessableEntityException
-                        .build()
-                        .withReason(ErrorConstants.PROVINCE_GET_NONEXISTENT_COUNTRY)
-                        .getError();
+                throw this.unprocessableEntity(ErrorConstants.PROVINCE_GET_NONEXISTENT_COUNTRY);
             }
             provinces = this.provinceService.findByCountry(country.get());
         } else {

@@ -20,8 +20,8 @@ public class DoctorSerializer extends JsonSerializer<Doctor> {
         jsonObject.put("phone", doctor.getPhone());
         jsonObject.put("email", doctor.getEmail());
         jsonObject.put("registrationNumber", doctor.getRegistrationNumber());
-        jsonObject.put("userId", doctor.getUser().getId());
 
+        jsonObject.replace("user", UserSerializer.instance.toJson(doctor.getUser()));
         jsonObject.replace("office", OfficeSerializer.instance.toJson(doctor.getOffice()));
 
         ArrayNode specialtiesArray = jsonObject.putArray("specialtyIds");
