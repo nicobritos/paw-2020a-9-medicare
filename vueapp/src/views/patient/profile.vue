@@ -17,7 +17,7 @@
                             />
                         </div>
                     </div>
-                    <div class="picture-overlay d-flex flex-column align-items-center justify-content-center pb-3">
+                    <div @click="triggerChangePPInput" class="picture-overlay d-flex flex-column align-items-center justify-content-center pb-3">
                         <input ref="PPInput" @change="changeProfilePic" id="profile-picture-input" style="display: none;" type="file" accept="image/*">
                         <!-- TODO: check this icon and previous implementation -->
                         <b-icon icon="pencil" style="color:ccc;" scale="4.0"/>
