@@ -1,3 +1,5 @@
+import i18n from "@/plugins/i18n";
+
 export type ID = number | string;
 
 export type Nullable<T> = null | T;
@@ -34,4 +36,8 @@ export function createPath(path: string): string {
 export function createApiPath(path: string): string {
     // @ts-ignore
     return _joinPath(createPath(process.env.VUE_APP_API_PATH), path);
+}
+
+export function getErrorMessage(code:number) {
+    return i18n.t("Error"+code).toString();
 }
