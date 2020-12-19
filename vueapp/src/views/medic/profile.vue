@@ -1,7 +1,6 @@
 <template>
     <div class="container flex-fill mx-5 pl-5 mt-3 w-100">
         <div class="row">
-            <!-- TODO:make component for reusability -->
             <div class="col-4 align-items-start d-flex flex-column">
                 <div class="picture-container no-select">
                     <div class="w-100 d-flex flex-column justify-content-center">
@@ -18,7 +17,6 @@
                     </div>
                     <div @click="triggerChangePPInput" class="picture-overlay d-flex flex-column align-items-center justify-content-center pb-3">
                         <input ref="PPInput" @change="changeProfilePic" id="profile-picture-input" style="display: none;" type="file" accept="image/*">
-                        <!-- TODO: check this icon and previous implementation -->
                         <b-icon class="edit-pencil-icon" icon="pencil"/>
                     </div>
                 </div>
@@ -26,7 +24,6 @@
             <div class="col-6">
                 <div class="container p-0 pt-4 m-0">
                     <!-- TODO:connect form -->
-                    <!-- TODO:make component for reusability -->
                     <form>
                         <div class="row">
                             <div class="col p-0 m-0">
@@ -260,7 +257,6 @@ export default class MedicProfile extends Vue {
         }
     }
     
-    //TODO: check typescript
     getUrl(url:string):string{
         return createPath(url);
     }
@@ -307,7 +303,6 @@ export default class MedicProfile extends Vue {
 
     changeProfilePic(e:InputEvent){
         //get profile pic file and check type
-        //TODO: typescript
         //@ts-ignore
         let file = e.target.files[0];
         if (!file.type.includes("image")) {

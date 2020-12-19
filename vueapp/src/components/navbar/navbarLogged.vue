@@ -28,8 +28,6 @@
             <!-- TODO:move style to css -->
             <div style="width: 2em;" class="d-flex flex-column justify-content-center">
                 <div class="profile-picture-container">
-                    <!-- TODO: check wtf this -->
-                    <!-- <div style="margin-top: 100%;"></div> -->
                     <img
                         id="navbarPatientUserImage"
                         class="profile-picture rounded-circle"
@@ -43,8 +41,6 @@
         <RouterLink v-else :to='getUrl("doctor/profile")'>
             <div style="width: 2em;" class="d-flex flex-column justify-content-center">
                 <div class="profile-picture-container">
-                    <!-- TODO: check wtf this -->
-                    <!-- <div style="margin-top: 100%;"></div> -->
                     <img
                         id="navbarDoctorUserImage"
                         class="profile-picture rounded-circle"
@@ -87,7 +83,6 @@ export default class NavbarLogged extends Vue {
         this.$router.push('Landing');
         this.$emit('logout');
     };
-    //TODO:check typescript
     getUrl(url:string):string{
         return createPath(url);
     }

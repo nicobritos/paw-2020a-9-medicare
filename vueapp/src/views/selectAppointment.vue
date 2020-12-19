@@ -121,7 +121,6 @@ import {Office} from '~/logic/models/Office';
 
 import {createPath} from "~/logic/Utils";
 
-// TODO:check
 // @ts-ignore
 Date.prototype.plusDays = function (i) {
     let date = new Date(this.valueOf());
@@ -217,7 +216,6 @@ export default class SelectAppointment extends Vue {
         }
     }
 
-    //TODO:check typescript
     getUrl(url:string):string{
         return createPath(url);
     }

@@ -219,7 +219,6 @@ export default class SignupDoctor extends Vue {
         return createPath(url);
     }
 
-    // TODO: Guido
     get valid(): boolean {
         return  this.validFirstname && this.validSurname && this.validEmail &&
                 this.validPassword && this.validRepeatPassword &&

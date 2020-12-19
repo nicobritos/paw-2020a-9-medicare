@@ -185,7 +185,6 @@ export default class PatientHome extends Vue {
         }
     }
 
-    //TODO: check typescript
     getUrl(url:string):string{
         return createPath(url);
     }

@@ -66,7 +66,6 @@
 
 <script lang="ts">
 import logo from '@/assets/logo.svg';
-//TODO:change to bootstrap icons
 import eye from '@/assets/eye.svg';
 import noeye from '@/assets/noeye.svg';
 import {Component, Vue, Watch} from 'vue-property-decorator';
@@ -101,7 +100,12 @@ export default class Login extends Vue {
             let previous = typeof this.$route.query.previous === 'string' ? this.$route.query.previous : this.$route.query.previous[0];
             if (previous !== null && !this.$route.matched[0].regex.test(previous)) {
                 this.$router.push(previous);
-            } else {
+            }
+            // TODO:check this
+            // if(this.$route.params.prevto){
+            //     this.$router.push(this.$route.params.prevto)
+            // }
+            else {
                 this.$router.push({
                     name: 'Landing',
                 });
