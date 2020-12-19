@@ -264,8 +264,8 @@
                         "type": "integer",
                         "nullable": true
                     },
-                    "userId": {
-                        "type": "integer"
+                    "user": {
+                        "$ref": "#/components/schemas/user"
                     },
                     "office": {
                         "$ref": "#/components/schemas/office"
@@ -305,40 +305,6 @@
                         },
                         "nullable": false,
                         "minLength": 1
-                    }
-                }
-            },
-            "paginateDoctor": {
-                "properties": {
-                    "name": {
-                        "type": "string"
-                    },
-                    "page": {
-                        "type": "number",
-                        "minimum": 1,
-                        "required": true
-                    },
-                    "perPage": {
-                        "type": "number",
-                        "minimum": 10,
-                        "maximum": 100,
-                        "required": false
-                    },
-                    "specialties": {
-                        "type": "array",
-                        "items": {
-                            "type": "number"
-                        },
-                        "minLength": 1,
-                        "required": false
-                    },
-                    "localities": {
-                        "type": "array",
-                        "items": {
-                            "type": "number"
-                        },
-                        "minLength": 1,
-                        "required": false
                     }
                 }
             },
@@ -773,16 +739,40 @@
         "/doctors": {
             "get": {
                 "summary": "List all doctors",
-                "requestBody": {
-                    "required": true,
-                    "content": {
-                        "application/vnd.doctor.pagination.v1+json": {
-                            "schema": {
-                                "$ref": "#/components/schemas/paginateDoctor"
-                            }
+                "parameters": [
+                    {
+                        "name": {
+                            "type": "string"
+                        },
+                        "page": {
+                            "type": "number",
+                            "minimum": 1,
+                            "required": true
+                        },
+                        "perPage": {
+                            "type": "number",
+                            "minimum": 10,
+                            "maximum": 100,
+                            "required": false
+                        },
+                        "specialties": {
+                            "type": "array",
+                            "items": {
+                                "type": "number"
+                            },
+                            "minLength": 1,
+                            "required": false
+                        },
+                        "localities": {
+                            "type": "array",
+                            "items": {
+                                "type": "number"
+                            },
+                            "minLength": 1,
+                            "required": false
                         }
                     }
-                },
+                ],
                 "responses": {
                     "200": {
                         "description": "Successful",

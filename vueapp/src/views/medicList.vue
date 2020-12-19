@@ -74,18 +74,17 @@
                                             <!-- TODO:check src url -->
                                             <img
                                                 class="profile-picture rounded-circle"
-                                                :src='getUrl("profilePics/"+member.userId)'
+                                                :src='getUrl("profilePics/"+member.user.profilePictureId)'
                                                 alt="profile pic"
                                             />
                                         </div>
                                     </div>
                                     <div class="col-6">
                                         <div class="row justify-content-start">
-                                            <h5>{{ member.userId+ member.userId }}</h5>
+                                            <h5>{{ member.user.firstName + member.user.surname }}</h5>
                                         </div>
                                         <div class="row">
                                             <p class="m-0">
-                                                <!-- TODO:super check this -->
                                                 {{
                                                     member.specialtyIds.map((v) => {
                                                         return getSpecialtyName(v);
@@ -184,7 +183,7 @@ export default class MedicList extends Vue {
     }
     
     get totalPages(): number {
-        return this.doctorPagination.totalItems / MedicList.PER_PAGE;
+        return Math.ceil(this.doctorPagination.totalItems / MedicList.PER_PAGE);
     }
 
     get remainingPages(): number {
@@ -262,11 +261,6 @@ export default class MedicList extends Vue {
         }
     }
 
-    @Watch('doctorPagination')
-    private print(): void {
-        console.log(this.doctorPagination);
-    }
-
     first(): void {
         this.gotoPage(1);
     }
@@ -311,7 +305,7 @@ export default class MedicList extends Vue {
 
     private gotoPage(page: number) {
         this.$router.push({
-            name: this.$route.name as string,
+            path: this.$route.name as string,
             params: {
                 page: page.toString()
             }
