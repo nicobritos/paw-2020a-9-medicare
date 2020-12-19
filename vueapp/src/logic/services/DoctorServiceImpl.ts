@@ -12,7 +12,6 @@ const DoctorMIME = {
     LIST: 'application/vnd.doctor.list.get.v1+json',
     GET: 'application/vnd.doctor.get.v1+json',
     UPDATE: 'application/vnd.doctor.update.v1+json',
-    PAGINATION: 'application/vnd.doctor.pagination.v1+json',
 };
 
 @injectable()

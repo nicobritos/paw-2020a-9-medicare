@@ -1,24 +1,23 @@
 <template>
-    <form>
+    <form @submit="searchForm">
         <div class="container h-75">
             <div class="row mt-4">
                 <h4>
-                    <!-- TODO:CHECK -->
-                    {{ !!resultsMessageParam ? $t(resultsMessage, resultsMessageParam) : $t(resultsMessage) }}
+                    {{ doctorPagination.totalItems > 1 ? $t(resultsMessage, resultsMessageParam) : $t(resultsMessage) }}
                 </h4>
             </div>
             <div class="row mt-4 justify-content-center">
-                <input class="form-control w-100" type="text" name="name" :value="name" :placeholder='$t("Name")'/>
+                <input class="form-control w-100" type="text" name="name" v-model="inputName" :placeholder='$t("Name")'/>
             </div>
             <div class="row mt-4">
                 <div class="col-4 px-3">
                     <div class="row mt-4">
                         <select class="select-css form-control w-100" type="text" name="specialties"
-                                id="selEspecialidad">
+                                id="selEspecialidad" v-model="selectedSpecialty">
                             <option value="-1" disabled :selected="searchedSpecialties.length == 0">
                                 {{ $t('Specialty') }}
                             </option>
-                            <option value="-1">{{ $t('Any') }}</option>
+                            <option :value="null">{{ $t('Any') }}</option>
                             <option v-for="specialty in specialties" :key="specialty.id"
                                     :value="specialty.id"
                                     :selected="searchedSpecialties.some(v => specialty.id == v.id)">
@@ -28,10 +27,10 @@
                     </div>
                     <div class="row mt-4">
                         <select class="select-css form-control w-100" type="text" name="localities" id="localidad">
-                            <option value="-1" disabled :selected="searchedLocalities.length == 0">
+                            <option value="-1" disabled :selected="searchedLocalities.length == 0" v-model="selectedLocality">
                                 {{ $t('Locality') }}
                             </option>
-                            <option value="-1">{{ $t('Any') }}</option>
+                            <option :value="null">{{ $t('Any') }}</option>
                             <option v-for="locality in localities" :key="locality.id" :value="locality.id"
                                     :selected="searchedLocalities.some(v => locality.id == v.id)">
                                 {{ locality.name }}
@@ -47,22 +46,21 @@
                     <div v-if="totalPages != 0" id="paging"
                          class="p-3 d-flex container w-100 justify-content-center ">
                         <div v-if="page>2">
-                            <button type="button" class="btn btn-info btn-sm mr-1 firstButton">{{ firstPage }}</button>
+                            <button type="button" class="btn btn-info btn-sm mr-1 firstButton" @click="first">{{ firstPage }}</button>
                         </div>
                         <div v-if="page > 1">
-                            <button type="button" class="btn btn-info btn-sm prevButton">{{ prevPage }}</button>
+                            <button type="button" class="btn btn-info btn-sm prevButton" @click="previous">{{ prevPage }}</button>
                         </div>
                         <p class="d-inline mx-2">{{ $t('Page_of_totalPages', [page, totalPages]) }}</p>
                         <div v-if="remainingPages != 0">
-                            <button type="button" class="btn btn-info btn-sm nextButton">{{ nextPage }}</button>
+                            <button type="button" class="btn btn-info btn-sm nextButton" @click="next">{{ nextPage }}</button>
                         </div>
                         <div v-if="remainingPages > 1">
-                            <button type="button" class="btn btn-info btn-sm ml-1 lastButton">{{ lastPage }}</button>
+                            <button type="button" class="btn btn-info btn-sm ml-1 lastButton" @click="last">{{ lastPage }}</button>
                         </div>
                     </div>
                     <ul class="list-group turno-list mr-2 w-100">
-                        <!-- TODO:CHECK THIS IF -->
-                        <div v-if="doctorPagination.items.length == 0" class="container-fluid justify-content-center">
+                        <div v-if="doctorPagination.items.length === 0" class="container-fluid justify-content-center">
                             <p class="text-center" style="color:grey;">{{ $t('NoMedicsFound') }}</p>
                         </div>
                         <li v-for="member in doctorPagination.items" :key="member.id" class="list-group-item turno-item mb-3">
@@ -81,7 +79,7 @@
                                     </div>
                                     <div class="col-6">
                                         <div class="row justify-content-start">
-                                            <h5>{{ member.user.firstName + member.user.surname }}</h5>
+                                            <h5>{{ member.user.firstName + " " + member.user.surname }}</h5>
                                         </div>
                                         <div class="row">
                                             <p class="m-0">
@@ -150,7 +148,7 @@ import {State} from 'vuex-class';
 import {localityActionTypes} from '~/store/types/localities.types';
 import {doctorSpecialtyActionTypes} from '~/store/types/doctorSpecialties.types';
 
-import {createPath} from '~/logic/Utils';
+import {createPath, Nullable} from '~/logic/Utils';
 import {DoctorService} from '~/logic/interfaces/services/DoctorService';
 import TYPES from '~/logic/types';
 import {Pagination} from '~/logic/models/utils/Pagination';
@@ -171,9 +169,9 @@ export default class MedicList extends Vue {
     private firstPage = '<<';
     private nextPage = '>';
     private lastPage = '>>';
-    /**
-     * possible values = "NoResultsFound","SearchResults1","SearchResults2More"
-     */
+    private inputName: string = this.name;
+    private selectedSpecialty: Nullable<DoctorSpecialty> = null;
+    private selectedLocality: Nullable<Locality> = null;
     private resultsMessage: I18NMessages = 'NoResultsFound';
     private resultsMessageParam: number[] = [];
     private doctorPagination: Pagination<Doctor> = new Pagination<Doctor>([], 0);
@@ -187,21 +185,20 @@ export default class MedicList extends Vue {
     }
 
     get remainingPages(): number {
-        return this.page - this.totalPages;
+        return this.totalPages - this.page;
     }
 
     get searchedSpecialties(): DoctorSpecialty[] {
         let aux = this.$route.query.specialties;
         let searchedSpecialties: DoctorSpecialty[];
 
-        if (typeof aux !== 'string') {
-            searchedSpecialties = [];
-        } else {
-            searchedSpecialties = aux.split(',').map(v => {
-                let filtered = this.specialties.filter(value => parseInt(v) === value.id);
-                return filtered.length > 0 ? filtered[0] : null;
-            }).filter(value => value != null) as DoctorSpecialty[];
-        }
+        if (typeof aux !== 'string' && typeof aux !== 'object') return [];
+        if (typeof aux === 'string') aux = aux.split(',');
+
+        searchedSpecialties = aux.map(v => {
+            let filtered = this.specialties.filter(value => parseInt(v!) === value.id);
+            return filtered.length > 0 ? filtered[0] : null;
+        }).filter(value => value != null) as DoctorSpecialty[];
 
         return searchedSpecialties;
     }
@@ -210,14 +207,13 @@ export default class MedicList extends Vue {
         let aux = this.$route.query.localities;
         let searchedLocalities: Locality[];
 
-        if (typeof aux !== 'string') {
-            searchedLocalities = [];
-        } else {
-            searchedLocalities = aux.split(',').map(v => {
-                let filtered = this.localities.filter(value => parseInt(v) === value.id);
-                return filtered.length > 0 ? filtered[0] : null;
-            }).filter(value => value != null) as Locality[];
-        }
+        if (typeof aux !== 'string' && typeof aux !== 'object') return [];
+        if (typeof aux === 'string') aux = aux.split(',');
+
+        searchedLocalities = aux.map(v => {
+            let filtered = this.localities.filter(value => parseInt(v!) === value.id);
+            return filtered.length > 0 ? filtered[0] : null;
+        }).filter(value => value != null) as Locality[];
 
         return searchedLocalities;
     }
@@ -246,7 +242,13 @@ export default class MedicList extends Vue {
         return createPath(url);
     }
 
-    // TODO: Guido manejar errores
+    searchForm(e: Event): void {
+        e.stopPropagation();
+        e.preventDefault();
+
+        this.search();
+    }
+
     async search() {
         let response = await this.getDoctorService().list({
             page: this.page,
@@ -255,7 +257,7 @@ export default class MedicList extends Vue {
             specialties: this.searchedSpecialties.map(value => value.id)
         });
         if (response instanceof APIError) {
-            // TODO: Guidos
+            // TODO: Guido
         } else {
             this.doctorPagination = response;
         }
@@ -279,20 +281,21 @@ export default class MedicList extends Vue {
         this.gotoPage(this.totalPages);
     }
 
-    // TODO: handle error
     mounted() {
         this.$store.dispatch('localities/loadLocalities', localityActionTypes.loadLocalities());
         this.$store.dispatch('doctorSpecialties/loadDoctorSpecialties', doctorSpecialtyActionTypes.loadDoctorSpecialties());
         this.search();
+
+        this.s = this.searchedSpecialties.length > 0 ? this.searchedSpecialties[0] : null;
+        this.selectedLocality = this.searchedSpecialties.length > 0 ? this.searchedSpecialties[0] : null;
     }
 
-    @Watch('doctor')
+    @Watch('doctorPagination')
     private updateResultsMessage() {
-        //TODO: this is not the way
         if (this.doctorPagination.items.length >= 2) {
             this.resultsMessage = 'SearchResults2More';
-            this.resultsMessageParam = [this.doctorPagination.items.length];
-        } else if (this.doctorPagination.items.length == 1) {
+            this.resultsMessageParam = [this.doctorPagination.totalItems];
+        } else if (this.doctorPagination.items.length === 1) {
             this.resultsMessage = 'SearchResults1';
         } else {
             this.resultsMessage = 'NoResultsFound';
@@ -305,11 +308,10 @@ export default class MedicList extends Vue {
 
     private gotoPage(page: number) {
         this.$router.push({
-            path: this.$route.name as string,
-            params: {
-                page: page.toString()
-            }
+            path: createPath("/mediclist/" + page.toString()),
+            query: this.$route.query
         });
+        this.search();
     }
 }
 </script>
