@@ -27,6 +27,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 @ComponentScan(basePackages = {"ar.edu.itba.paw.webapp.auth"})
 @EnableGlobalMethodSecurity(prePostEnabled = true, proxyTargetClass = true)
 public class WebAuthConfig extends WebSecurityConfigurerAdapter {
+    private static final String API_PATH = "/api";
+
     @Autowired
     private UserDetailsService userDetailsService;
 
@@ -62,28 +64,26 @@ public class WebAuthConfig extends WebSecurityConfigurerAdapter {
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
-        http
-                .antMatcher("/api/**")
-                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-                .and().csrf().disable()
-                .authorizeRequests()
-//                .antMatchers("/**").fullyAuthenticated()
-                .antMatchers(HttpMethod.POST, "/login").anonymous()
-                .antMatchers(HttpMethod.POST, "/auth/logout").authenticated()
-                .antMatchers(HttpMethod.GET, "/verify/**").permitAll() // Verifies a user
-                .antMatchers(HttpMethod.POST, "/auth/refresh").permitAll() // Refreshes the access token
-                .antMatchers(HttpMethod.POST, "/users").anonymous() // Creates a user
-                .antMatchers(HttpMethod.GET, "/specialties").permitAll()
-                .antMatchers(HttpMethod.GET, "/countries").permitAll()
-                .antMatchers(HttpMethod.GET, "/provinces").permitAll()
-                .antMatchers(HttpMethod.GET, "/localities").permitAll()
-                .antMatchers(HttpMethod.GET, "/doctors/**").permitAll()
-                .and()
+        http.antMatcher(API_PATH + "/**").sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+            .and().authorizeRequests()
+                .antMatchers(HttpMethod.POST, API_PATH + "/login").anonymous()
+                .antMatchers(HttpMethod.POST, API_PATH + "/auth/logout").authenticated()
+                .antMatchers(HttpMethod.GET, API_PATH + "/verify/**").permitAll() // Verifies a user
+                .antMatchers(HttpMethod.POST, API_PATH + "/auth/refresh").permitAll() // Refreshes the access token
+                .antMatchers(HttpMethod.POST, API_PATH + "/users").anonymous() // Creates a user
+                .antMatchers(HttpMethod.GET, API_PATH + "/specialties").permitAll()
+                .antMatchers(HttpMethod.GET, API_PATH + "/countries").permitAll()
+                .antMatchers(HttpMethod.GET, API_PATH + "/provinces").permitAll()
+                .antMatchers(HttpMethod.GET, API_PATH + "/localities").permitAll()
+                .antMatchers(HttpMethod.GET, API_PATH + "/doctors/**").permitAll()
+                .antMatchers(API_PATH + "/**").authenticated()
+            .and()
                 .addFilter(this.jwtAuthorizationFilter())  // Verifies JWT if provided
                 .addFilterAfter(this.jwtAuthenticationFilter(), JWTAuthorizationFilter.class) // Authenticates a user and sends JWT and Refresh token
                 .exceptionHandling()
                 .authenticationEntryPoint(new JWTAuthenticationEntryPoint()) // Handles forbidden/unauthorized page access exceptions
-                .accessDeniedHandler(new AccessDeniedHandlerImpl()); // Handles role exceptions
+                .accessDeniedHandler(new AccessDeniedHandlerImpl()) // Handles role exceptions
+            .and().csrf().disable();
     }
 
     @Override
