@@ -142,6 +142,8 @@ public abstract class ErrorConstants {
     public static final APISubError MISSING_INVALID_REFRESH_TOKEN
             = new APISubError(62, "A valid Refresh Token cookie was expected with the name: \"" + Constants.REFRESH_TOKEN_COOKIEN_NAME + "\"");
 
+    public static final APISubError MISSING_INVALID_JSON_BODY
+            = new APISubError(63, "Missing or invalid JSON body");
 
     private static APISubError invalidField(int code, String field) {
         return new APISubError(code, "Invalid \"" + field + "\" field");
