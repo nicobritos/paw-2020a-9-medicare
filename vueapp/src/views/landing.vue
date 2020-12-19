@@ -1,11 +1,10 @@
 <template>
-    <!-- TODO: check this tag -->
     <div>
         <div class="container w-100 ml-4 mb-5">
             <h2 class="display-5 mt-5 green-text">{{ $t('FindingMedicQuickAndEasy') }}</h2>
         </div>
         <div class="container h-50 justify-content-center">
-            <form class="filter-form p-3">
+            <form class="filter-form p-3" @submit="submitForm">
                 <div class="form-row">
                     <div class="col">
                         <h2 class="ml-5 mt-3 form-title">{{ $t('SearchMedics') }}</h2>
@@ -41,7 +40,7 @@
                 <div class="form-row px-5 mt-4 mb-3">
                     <button
                         class="w-100 btn rounded-pill btn-light header-btn-element"
-                        @click="search"
+                        type="submit"
                     >
                         {{ $t('SearchMedics') }}
                     </button>
@@ -68,7 +67,7 @@ import {Component, Vue} from 'vue-property-decorator';
 import {State} from 'vuex-class';
 import {localityActionTypes} from '~/store/types/localities.types';
 import {doctorSpecialtyActionTypes} from '~/store/types/doctorSpecialties.types';
-import {Hash, Nullable} from '~/logic/Utils';
+import {createPath, Hash, Nullable} from '~/logic/Utils';
 
 @Component
 export default class Landing extends Vue {
@@ -81,10 +80,16 @@ export default class Landing extends Vue {
     private localityId: Nullable<number> = null;
     private specialtyId: Nullable<number> = null;
 
-    // TODO: handle error
     mounted(): void {
         this.$store.dispatch('localities/loadLocalities', localityActionTypes.loadLocalities());
         this.$store.dispatch('doctorSpecialties/loadDoctorSpecialties', doctorSpecialtyActionTypes.loadDoctorSpecialties());
+    }
+
+    submitForm(event: Event): void {
+        event.preventDefault();
+        event.stopPropagation();
+
+        this.search();
     }
 
     search(): void {
@@ -97,7 +102,7 @@ export default class Landing extends Vue {
             query.specialty = this.specialtyId.toString();
 
         this.$router.push({
-            name: 'MedicList',
+            path: createPath("/mediclist"),
             query
         });
     }

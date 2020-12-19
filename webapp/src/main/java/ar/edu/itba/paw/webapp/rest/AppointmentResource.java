@@ -7,7 +7,6 @@ import ar.edu.itba.paw.models.Appointment;
 import ar.edu.itba.paw.models.Doctor;
 import ar.edu.itba.paw.models.Patient;
 import ar.edu.itba.paw.models.User;
-import ar.edu.itba.paw.webapp.exceptions.UnprocessableEntityException;
 import ar.edu.itba.paw.webapp.media_types.AppointmentMIME;
 import ar.edu.itba.paw.webapp.media_types.ErrorMIME;
 import ar.edu.itba.paw.webapp.media_types.MIMEHelper;
@@ -87,15 +86,9 @@ public class AppointmentResource extends GenericResource {
 
         long daysBetween = Days.daysBetween(dateFrom.toLocalDate(), dateTo.toLocalDate()).getDays();
         if (daysBetween > MAX_DAYS_APPOINTMENTS) {
-            throw UnprocessableEntityException
-                    .build()
-                    .withReason(ErrorConstants.DATE_RANGE_TOO_BROAD)
-                    .getError();
+            throw this.unprocessableEntity(ErrorConstants.DATE_RANGE_TOO_BROAD);
         } else if (dateTo.isBefore(dateFrom)) {
-            throw UnprocessableEntityException
-                    .build()
-                    .withReason(ErrorConstants.DATE_FROM_IS_AFTER_TO)
-                    .getError();
+            throw this.unprocessableEntity(ErrorConstants.DATE_FROM_IS_AFTER_TO);
         }
 
         if (this.isDoctor()) {
@@ -124,20 +117,14 @@ public class AppointmentResource extends GenericResource {
         if (appointment == null || appointment.getFromDate() == null)
             throw this.missingBodyParams();
         if (appointment.getFromDate().isBefore(LocalDateTime.now())) {
-            throw UnprocessableEntityException
-                    .build()
-                    .withReason(ErrorConstants.DATE_FROM_IS_AFTER_TO)
-                    .getError();
+            throw this.unprocessableEntity(ErrorConstants.DATE_FROM_IS_AFTER_TO);
         }
         if (this.isDoctor())
             throw this.error(Status.FORBIDDEN).getError();
 
         Optional<Doctor> doctorOptional = this.doctorService.findById(appointment.getDoctor().getId());
         if (!doctorOptional.isPresent()) {
-            throw UnprocessableEntityException
-                    .build()
-                    .withReason(ErrorConstants.APPOINTMENT_CREATE_NONEXISTENT_DOCTOR)
-                    .getError();
+            throw this.unprocessableEntity(ErrorConstants.APPOINTMENT_CREATE_NONEXISTENT_DOCTOR);
         }
 
         Appointment newAppointment = new Appointment();

@@ -15,8 +15,8 @@ export interface DoctorSearchParams {
     page: number,
     perPage?: number,
     name?: string
-    specialties?: DoctorSpecialty[],
-    localities?: Locality[],
+    specialties?: number[],
+    localities?: number[],
 }
 
 export interface DoctorService {

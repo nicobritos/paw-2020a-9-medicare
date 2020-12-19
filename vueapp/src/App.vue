@@ -16,6 +16,8 @@ import Navbar from "./components/navbar/navbar.vue";
 import {Component, Vue} from 'vue-property-decorator';
 import {userActionTypes} from '~/store/types/user.types';
 
+import { getErrorMessage } from "@/logic/Utils";
+
 @Component({
     components: {
         Navbar
@@ -28,6 +30,20 @@ export default class App extends Vue {
 
     created(): void {
         this.$store.dispatch('users/me', userActionTypes.me());
+        /**
+         * TODO: NICO
+         * N  N I   CCCC  OOOOOO
+         * NN N I CC      O    O
+         * N NN I CC      O    O
+         * N  N I   CCCC  OOOOOO
+         */
+    }
+
+    showErrorToast(code:number){
+      this.$bvToast.toast(getErrorMessage(code),{
+        title:this.$t("ThereWasAnError").toString(),
+        variant:"danger"
+      })
     }
 }
 </script>
