@@ -20,7 +20,7 @@
                     <div @click="triggerChangePPInput" class="picture-overlay d-flex flex-column align-items-center justify-content-center pb-3">
                         <input ref="PPInput" @change="changeProfilePic" id="profile-picture-input" style="display: none;" type="file" accept="image/*">
                         <!-- TODO: check this icon and previous implementation -->
-                        <b-icon icon="pencil" style="color:ccc;" scale="4.0"/>
+                        <b-icon class="edit-pencil-icon" icon="pencil"/>
                     </div>
                 </div>
             </div>
@@ -309,11 +309,11 @@ html, body {
     opacity: 100%;
 }
 
-.picture-container .picture-overlay > i {
+.picture-container .picture-overlay > .edit-pencil-icon {
     padding: 10px;
     background: #333333bb;
     border-radius: 50px;
-    font-size: 20px;
+    font-size: 3rem;
     color: #ffffff;
     cursor: pointer;
 }
