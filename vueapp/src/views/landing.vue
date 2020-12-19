@@ -93,13 +93,13 @@ export default class Landing extends Vue {
     }
 
     search(): void {
-        let query: Hash<string> = {};
+        let query: Hash<string | string[]> = {};
         if (this.name)
             query.name = this.name.trim();
         if (this.localityId)
-            query.locality = this.localityId.toString();
+            query.localities = [this.localityId.toString()];
         if (this.specialtyId)
-            query.specialty = this.specialtyId.toString();
+            query.specialties = [this.specialtyId.toString()];
 
         this.$router.push({
             path: createPath("/mediclist"),
@@ -111,27 +111,6 @@ export default class Landing extends Vue {
 
 
 <style scoped>
-.header {
-    background-color: #00C4BA;
-}
-
-.header-brand {
-    font-weight: bold;
-}
-
-.header-brand:hover {
-    font-weight: bold;
-    color: white !important;
-}
-
-.header-a-element {
-    color: white;
-}
-
-.header-a-element:hover {
-    color: #e0e0e0;
-}
-
 .header-btn-element {
     color: #00C4BA;
     font-weight: bold;
@@ -144,10 +123,6 @@ export default class Landing extends Vue {
 
 .green-text {
     color: #00C4BA;
-}
-
-#navbar-logo {
-    height: 1.5em;
 }
 
 .filter-form {
@@ -163,31 +138,6 @@ export default class Landing extends Vue {
     background-color: rgb(214, 214, 214);
 }
 
-.white-text {
-    color: white !important;
-}
-
-#navbarUserImage {
-    width: 3em;
-}
-
-.profile-picture-container {
-    display: inline-block;
-    position: relative;
-    width: 100%;
-}
-
-.profile-picture {
-    object-fit: cover;
-    height: 100%;
-    width: 100%;
-    top: 0;
-    bottom: 0;
-    right: 0;
-    left: 0;
-    position: absolute;
-}
-
 .shareDiv {
     display: flex;
     padding: 0% 10%;
@@ -201,10 +151,5 @@ export default class Landing extends Vue {
 
 .shareSocial {
     margin-left: 30px;
-}
-
-.jssocials-share-link {
-    box-shadow: none;
-    border: none !important;
 }
 </style>

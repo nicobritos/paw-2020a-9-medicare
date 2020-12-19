@@ -17,6 +17,7 @@ import {UserMIME} from '~/logic/services/UserServiceImpl';
 import {JSON_MIME} from '~/logic/services/Utils';
 import store from '~/plugins/vuex';
 import {authMutationTypes} from '~/store/types/auth.types';
+import qs from 'qs';
 
 @injectable()
 export class RestRepositoryImpl implements RestRepository {

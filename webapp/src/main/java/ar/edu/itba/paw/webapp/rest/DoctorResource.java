@@ -43,8 +43,8 @@ public class DoctorResource extends GenericResource {
             @Context UriInfo uriInfo,
             @QueryParam("page") Integer page,
             @QueryParam("per_page") Integer perPage,
-            @QueryParam("localities") List<Integer> localities,
-            @QueryParam("specialties") List<Integer> specialties,
+            @QueryParam("localities[]") List<Integer> localities,
+            @QueryParam("specialties[]") List<Integer> specialties,
             @QueryParam("name") String name) {
         MIMEHelper.assertServerType(httpheaders, DoctorMIME.GET_LIST);
 
