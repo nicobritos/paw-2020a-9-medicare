@@ -41,11 +41,10 @@ public abstract class GenericResource {
             return false;
 
         Collection<? extends GrantedAuthority> authorities = SecurityContextHolder.getContext().getAuthentication().getAuthorities();
-        if (authorities.isEmpty())
-            return false;
 
-        GrantedAuthority authority = authorities.stream().findFirst().orElse(null);
-        return authority.getAuthority().equals(UserRole.DOCTOR.getAsRole());
+        return authorities
+                .stream()
+                .anyMatch(grantedAuthority -> grantedAuthority.getAuthority().equals(UserRole.DOCTOR.getAsRole()));
     }
 
     protected Optional<User> getUser() {
@@ -59,7 +58,7 @@ public abstract class GenericResource {
     protected User assertUserUnauthorized() {
         Optional<User> user = this.getUser();
         if (!user.isPresent())
-            throw this.error(Status.UNAUTHORIZED).getError();
+            throw this.unauthorized();
         return user.get();
     }
 
