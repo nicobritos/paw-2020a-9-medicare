@@ -108,24 +108,34 @@ public class AppointmentServiceImpl extends GenericServiceImpl<AppointmentDao, A
     }
 
     @Override
-    public Appointment create(Appointment model) throws InvalidAppointmentDateException {
-        if (model.getFromDate().getMinuteOfHour() % 15 != 0)
+    public Appointment create(Appointment appointment, User patientUser) throws InvalidAppointmentDateException {
+        if (appointment.getFromDate().getMinuteOfHour() % 15 != 0)
             throw new InvalidMinutesException();
-        if (!this.isValidDate(model.getDoctor(), model.getFromDate()))
+        if (!this.isValidDate(appointment.getDoctor(), appointment.getFromDate()))
             throw new InvalidAppointmentDateException();
+        Optional<Patient> optionalPatient = patientService.findByUserAndOffice(patientUser, appointment.getDoctor().getOffice());
+        Patient patient;
+        if(!optionalPatient.isPresent()){
+            Patient toCreate = new Patient();
+            toCreate.setOffice(appointment.getDoctor().getOffice());
+            toCreate.setUser(patientUser);
+            patient = patientService.create(toCreate);
+        } else {
+            patient = optionalPatient.get();
+        }
+        appointment.setPatient(patient);
+        appointment.setAppointmentStatus(AppointmentStatus.PENDING);
 
-        model.setAppointmentStatus(AppointmentStatus.PENDING);
-
-        List<Appointment> appointments = this.findByDate(model.getDoctor(), model.getFromDate());
-        for (Appointment appointment : appointments) {
-            if (model.getFromDate().isAfter(appointment.getFromDate()) && model.getFromDate().isBefore(appointment.getToDate())
-                    || (model.getToDate().isAfter(appointment.getFromDate()) && model.getToDate().isBefore(appointment.getToDate()))) {
+        List<Appointment> appointments = this.findByDate(appointment.getDoctor(), appointment.getFromDate());
+        for (Appointment appt : appointments) {
+            if (appt.getFromDate().isAfter(appt.getFromDate()) && appt.getFromDate().isBefore(appt.getToDate())
+                    || (appt.getToDate().isAfter(appt.getFromDate()) && appt.getToDate().isBefore(appt.getToDate()))) {
                 throw new MediCareException("Workday date overlaps with an existing one");
             }
         }
-        Appointment appointment = this.appointmentRepository.create(model);
-        emailService.sendNewAppointmentNotificationEmail(appointment);
-        return appointment;
+        Appointment appt = this.appointmentRepository.create(appointment);
+        emailService.sendNewAppointmentNotificationEmail(appt);
+        return appt;
     }
 
     @Override

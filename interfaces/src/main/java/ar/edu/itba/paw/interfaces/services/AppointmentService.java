@@ -59,7 +59,7 @@ public interface AppointmentService extends GenericService<Appointment, Integer>
 
     void remove(Integer id, User user, Locale locale);
 
-    Appointment create(Appointment model) throws InvalidAppointmentDateException;
+    Appointment create(Appointment model, User patient) throws InvalidAppointmentDateException;
 
     List<List<AppointmentTimeSlot>> findTimeslotsSortedByWeekday(Doctor doctor, LocalDateTime from, LocalDateTime to);
 }
