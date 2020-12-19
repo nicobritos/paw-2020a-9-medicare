@@ -3,7 +3,6 @@ package ar.edu.itba.paw.webapp.rest;
 import ar.edu.itba.paw.interfaces.services.AppointmentService;
 import ar.edu.itba.paw.interfaces.services.DoctorService;
 import ar.edu.itba.paw.models.Doctor;
-import ar.edu.itba.paw.webapp.exceptions.UnprocessableEntityException;
 import ar.edu.itba.paw.webapp.media_types.AppointmentTimeSlotMIME;
 import ar.edu.itba.paw.webapp.media_types.ErrorMIME;
 import ar.edu.itba.paw.webapp.media_types.MIMEHelper;
@@ -53,10 +52,7 @@ public class AppointmentTimeSlotResource extends GenericResource {
 
         Optional<Doctor> doctorOptional = this.doctorService.findById(doctorId);
         if (!doctorOptional.isPresent()) {
-            throw UnprocessableEntityException
-                    .build()
-                    .withReason(ErrorConstants.APPOINTMENT_TIME_SLOT_GET_NONEXISTENT_DOCTOR)
-                    .getError();
+            throw this.unprocessableEntity(ErrorConstants.APPOINTMENT_TIME_SLOT_GET_NONEXISTENT_DOCTOR);
         }
 
         LocalDateTime dateFrom, dateTo;
@@ -69,15 +65,9 @@ public class AppointmentTimeSlotResource extends GenericResource {
 
         long daysBetween = Days.daysBetween(dateFrom.toLocalDate(), dateTo.toLocalDate()).getDays();
         if (daysBetween > MAX_DAYS_APPOINTMENTS) {
-            throw UnprocessableEntityException
-                    .build()
-                    .withReason(ErrorConstants.DATE_RANGE_TOO_BROAD)
-                    .getError();
+            throw this.unprocessableEntity(ErrorConstants.DATE_RANGE_TOO_BROAD);
         } else if (dateTo.isBefore(dateFrom)) {
-            throw UnprocessableEntityException
-                    .build()
-                    .withReason(ErrorConstants.DATE_FROM_IS_AFTER_TO)
-                    .getError();
+            throw this.unprocessableEntity(ErrorConstants.DATE_FROM_IS_AFTER_TO);
         }
 
         return Response

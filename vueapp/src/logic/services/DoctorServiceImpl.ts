@@ -33,8 +33,7 @@ export class DoctorServiceImpl implements DoctorService {
         let response = await this.rest.get<Pagination<Doctor>>(DoctorServiceImpl.PATH, {
             accepts: DoctorMIME.LIST,
             paginate: true,
-            data: params,
-            contentType: DoctorMIME.PAGINATION
+            params
         });
         return response.response;
     }

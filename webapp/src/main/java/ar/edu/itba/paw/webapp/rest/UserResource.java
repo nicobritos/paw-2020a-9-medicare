@@ -9,7 +9,6 @@ import ar.edu.itba.paw.models.Locality;
 import ar.edu.itba.paw.models.Office;
 import ar.edu.itba.paw.models.User;
 import ar.edu.itba.paw.webapp.exceptions.ConflictException;
-import ar.edu.itba.paw.webapp.exceptions.UnprocessableEntityException;
 import ar.edu.itba.paw.webapp.media_types.ErrorMIME;
 import ar.edu.itba.paw.webapp.media_types.MIMEHelper;
 import ar.edu.itba.paw.webapp.media_types.UserMIME;
@@ -66,10 +65,7 @@ public class UserResource extends GenericAuthenticationResource {
 
         Optional<Locality> locality = this.localityService.findById(doctorSignUp.getLocalityId());
         if (!locality.isPresent()) {
-            throw UnprocessableEntityException
-                    .build()
-                    .withReason(ErrorConstants.USER_CREATE_NONEXISTENT_LOCALITY)
-                    .getError();
+            throw this.unprocessableEntity(ErrorConstants.USER_CREATE_NONEXISTENT_LOCALITY);
         }
 
         User user = this.copyUser(doctorSignUp);

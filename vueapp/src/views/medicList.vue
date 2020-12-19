@@ -74,14 +74,14 @@
                                             <!-- TODO:check src url -->
                                             <img
                                                 class="profile-picture rounded-circle"
-                                                :src='getUrl("profilePics/"+member.user.profilePictureId)'
+                                                :src='getUrl("profilePics/"+member.userId)'
                                                 alt="profile pic"
                                             />
                                         </div>
                                     </div>
                                     <div class="col-6">
                                         <div class="row justify-content-start">
-                                            <h5>{{ member.user.firstName + member.user.surname }}</h5>
+                                            <h5>{{ member.userId+ member.userId }}</h5>
                                         </div>
                                         <div class="row">
                                             <p class="m-0">
@@ -252,14 +252,19 @@ export default class MedicList extends Vue {
         let response = await this.getDoctorService().list({
             page: this.page,
             name: this.name,
-            localities: this.searchedLocalities,
-            specialties: this.searchedSpecialties
+            localities: this.searchedLocalities.map(value => value.id),
+            specialties: this.searchedSpecialties.map(value => value.id)
         });
         if (response instanceof APIError) {
-            // TODO: Guido
+            // TODO: Guidos
         } else {
             this.doctorPagination = response;
         }
+    }
+
+    @Watch('doctorPagination')
+    private print(): void {
+        console.log(this.doctorPagination);
     }
 
     first(): void {
@@ -284,6 +289,7 @@ export default class MedicList extends Vue {
     mounted() {
         this.$store.dispatch('localities/loadLocalities', localityActionTypes.loadLocalities());
         this.$store.dispatch('doctorSpecialties/loadDoctorSpecialties', doctorSpecialtyActionTypes.loadDoctorSpecialties());
+        this.search();
     }
 
     @Watch('doctor')

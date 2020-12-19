@@ -8,6 +8,7 @@ import ar.edu.itba.paw.webapp.exceptions.APIErrorFactory;
 import ar.edu.itba.paw.webapp.exceptions.APIErrorFactory.APIErrorBuilder;
 import ar.edu.itba.paw.webapp.exceptions.UnprocessableEntityException;
 import ar.edu.itba.paw.webapp.models.Constants;
+import ar.edu.itba.paw.webapp.models.error.APISubError;
 import ar.edu.itba.paw.webapp.models.error.ErrorConstants;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.GrantedAuthority;
@@ -30,8 +31,11 @@ import java.util.Optional;
 import java.util.Set;
 
 public abstract class GenericResource {
-    private static final String PAGINATOR_PAGE_QUERY = "page";
-    private static final String PAGINATOR_PER_PAGE_QUERY = "per_page";
+    protected static final int DEFAULT_PER_PAGE = 10;
+    protected static final int MIN_PER_PAGE = 10;
+    protected static final int MAX_PER_PAGE = 100;
+    protected static final String PAGINATOR_PAGE_QUERY = "page";
+    protected static final String PAGINATOR_PER_PAGE_QUERY = "per_page";
 
     @Autowired
     private UserService userService;
@@ -70,16 +74,23 @@ public abstract class GenericResource {
         return this.error(Status.BAD_REQUEST).withReason(ErrorConstants.MISSING_BODY_PARAMS).getError();
     }
 
+    protected WebApplicationException unprocessableEntity(APISubError apiSubError) {
+        return UnprocessableEntityException
+                .build()
+                .withReason(apiSubError)
+                .getError();
+    }
+
     protected WebApplicationException missingPathParams() {
         return this.error(Status.BAD_REQUEST).withReason(ErrorConstants.MISSING_PATH_PARAMS).getError();
     }
 
     protected WebApplicationException missingQueryParams() {
-        return UnprocessableEntityException.build().withReason(ErrorConstants.MISSING_QUERY_PARAMS).getError();
+        return this.unprocessableEntity(ErrorConstants.MISSING_QUERY_PARAMS);
     }
 
     protected WebApplicationException invalidQueryParams() {
-        return UnprocessableEntityException.build().withReason(ErrorConstants.INVALID_QUERY_PARAMS).getError();
+        return this.unprocessableEntity(ErrorConstants.INVALID_QUERY_PARAMS);
     }
 
     protected WebApplicationException notFound() {

@@ -116,6 +116,8 @@ export class RestRepositoryImpl implements RestRepository {
             RestRepositoryImpl.setContentType(axiosConfig, config.contentType);
         if (config.data)
             axiosConfig.data = config.data;
+        if (config.params)
+            axiosConfig.params = config.params;
 
         return axiosConfig;
     }

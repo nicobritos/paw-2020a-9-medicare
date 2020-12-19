@@ -67,7 +67,7 @@ public class WebAuthConfig extends WebSecurityConfigurerAdapter {
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and().csrf().disable()
                 .authorizeRequests()
-                .antMatchers("/**").fullyAuthenticated()
+//                .antMatchers("/**").fullyAuthenticated()
                 .antMatchers(HttpMethod.POST, "/login").anonymous()
                 .antMatchers(HttpMethod.POST, "/auth/logout").authenticated()
                 .antMatchers(HttpMethod.GET, "/verify/**").permitAll() // Verifies a user
