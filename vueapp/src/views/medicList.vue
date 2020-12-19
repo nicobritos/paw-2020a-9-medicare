@@ -72,7 +72,7 @@
                                             <!-- TODO:check src url -->
                                             <img
                                                 class="profile-picture rounded-circle"
-                                                :src='getUrl("profilePics/"+member.user.profilePictureId)'
+                                                :src='getApiUrl("users/" + member.user.id + "/picture")'
                                                 alt="profile pic"
                                             />
                                         </div>
@@ -148,7 +148,7 @@ import {State} from 'vuex-class';
 import {localityActionTypes} from '~/store/types/localities.types';
 import {doctorSpecialtyActionTypes} from '~/store/types/doctorSpecialties.types';
 
-import {createPath, Nullable} from '~/logic/Utils';
+import {createApiPath, createPath, Nullable} from '~/logic/Utils';
 import {DoctorService} from '~/logic/interfaces/services/DoctorService';
 import TYPES from '~/logic/types';
 import {Pagination} from '~/logic/models/utils/Pagination';
@@ -240,6 +240,10 @@ export default class MedicList extends Vue {
 
     getUrl(url:string):string{
         return createPath(url);
+    }
+
+    getApiUrl(url:string):string{
+        return createApiPath(url);
     }
 
     searchForm(e: Event): void {

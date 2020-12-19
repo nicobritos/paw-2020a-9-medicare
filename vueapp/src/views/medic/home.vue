@@ -17,7 +17,7 @@
                                         <!-- TODO: profile pic -->
                                         <img
                                             class="profile-picture rounded-circle"
-                                            :src='"/profilePics/"+appointment.patient.user.profilePicture.id'
+                                            :src='"/users/" +appointment.patient.user.profilePicture.id'
                                             alt="profile pic"
                                         />
                                     </div>
@@ -201,6 +201,7 @@
 <script lang="ts">
 import moreOptions from '@/assets/moreOptions.svg';
 import {Component, Vue} from 'vue-property-decorator';
+import {Appointment} from '~/logic/models/Appointment';
 
 // @ts-ignore
 Date.prototype.plusDays = function (i) {
@@ -216,8 +217,8 @@ export default class MedicHome extends Vue {
     private moreOptions = moreOptions;
     private monday = new Date(2020, 7, 6);
     private today = new Date(2020, 7, 9);
-    private todayAppointments = [];
-    private weekAppointments = [[], [], [], [], [], [], []];
+    private todayAppointments: Appointment[] = [];
+    private weekAppointments: Appointment[] = [[], [], [], [], [], [], []];
 
     async mounted(): Promise<void> {
 

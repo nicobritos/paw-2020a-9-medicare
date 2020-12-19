@@ -10,9 +10,12 @@ import ar.edu.itba.paw.webapp.media_types.UserMIME;
 import ar.edu.itba.paw.webapp.models.*;
 import ar.edu.itba.paw.webapp.models.error.ErrorConstants;
 import ar.edu.itba.paw.webapp.rest.utils.GenericAuthenticationResource;
+import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.DefaultResourceLoader;
+import org.springframework.core.io.ResourceLoader;
 import org.springframework.stereotype.Component;
 
 import javax.servlet.http.HttpServletRequest;
@@ -22,6 +25,7 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
+import java.io.FileInputStream;
 import java.util.Collections;
 import java.util.Optional;
 
@@ -134,22 +138,32 @@ public class UserResource extends GenericAuthenticationResource {
     public Response getProfilePicture(
             @Context HttpHeaders httpheaders,
             @PathParam("id") Integer id) {
-        // We don't want to return an APIError
-        if (id == null)
-            return Response.status(Status.NOT_FOUND).build(); // TODO map 404 to vue
 
-        Optional<User> userOptional = this.userService.findById(id);
-        // We don't want to return an APIError
-        if (!userOptional.isPresent() || userOptional.get().getProfilePictureId() == null)
-            return Response.status(Status.NOT_FOUND).build();
-
-        Optional<Picture> picture = this.pictureService.findById(userOptional.get().getProfilePictureId());
-        if (!picture.isPresent())
-            return Response.status(Status.NOT_FOUND).build();
+        byte[] picture;
+        String mime;
+        if (id == null) {
+            picture = this.getDefaultProfilePicture();
+            mime = PictureMIME.SVG;
+        } else {
+            Optional<User> userOptional = this.userService.findById(id);
+            if (!userOptional.isPresent() || userOptional.get().getProfilePictureId() == null) {
+                picture = this.getDefaultProfilePicture();
+                mime = PictureMIME.SVG;
+            } else {
+                Optional<Picture> pictureObject = this.pictureService.findById(userOptional.get().getProfilePictureId());
+                if (!pictureObject.isPresent()) {
+                    picture = this.getDefaultProfilePicture();
+                    mime = PictureMIME.SVG;
+                } else {
+                    picture = pictureObject.get().getData();
+                    mime = pictureObject.get().getMimeType();
+                }
+            }
+        }
 
         return Response
-                .ok(picture.get().getData())
-                .type(picture.get().getMimeType())
+                .ok(picture)
+                .type(mime)
                 .build();
     }
 
@@ -203,7 +217,7 @@ public class UserResource extends GenericAuthenticationResource {
 
         this.userService.update(savedUser);
 
-        return Response.status(Status.CREATED).entity(savedUser).type(UserMIME.GET).build();
+        return Response.status(Status.CREATED).entity(savedUser ).type(UserMIME.GET).build();
     }
 
     private User copyUser(UserSignUp userSignUp) {
@@ -226,5 +240,16 @@ public class UserResource extends GenericAuthenticationResource {
         credentials.setPassword(userSignUp.getUser().getPassword());
 
         this.createJWTCookies(credentials, newUser, response, LOGGER);
+    }
+
+    private byte[] getDefaultProfilePicture() {
+        try {
+            // TODO: Null
+            ResourceLoader resourceLoader = new DefaultResourceLoader();
+            return IOUtils.toByteArray(new FileInputStream(resourceLoader.getResource("classpath:defaultProfilePic.svg").getFile()));
+        } catch (Exception e) {
+            // TODO: Log
+            return null;
+        }
     }
 }
