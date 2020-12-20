@@ -966,6 +966,38 @@
                     "404": {
                     }
                 }
+            },
+            "post": {
+                "summary": "Sets the user's profile picture",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "schema": {
+                            "type": "integer"
+                        },
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "201": {
+                    },
+                    "400": {
+                        "$ref": "#/components/responses/error-400"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/error-401"
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/error-403"
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/error-404"
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/error-422"
+                    }
+                }
             }
         },
         "/appointments": {
