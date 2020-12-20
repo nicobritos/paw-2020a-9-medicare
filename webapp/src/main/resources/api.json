@@ -83,10 +83,6 @@
                     "phone": {
                         "type": "string",
                         "nullable": true
-                    },
-                    "profilePictureId": {
-                        "type": "integer",
-                        "nullable": true
                     }
                 }
             },

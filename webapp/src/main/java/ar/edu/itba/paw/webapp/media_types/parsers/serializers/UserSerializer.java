@@ -20,7 +20,6 @@ public class UserSerializer extends JsonSerializer<User> {
         jsonObject.put("surname", user.getSurname());
         jsonObject.put("verified", user.getVerified());
         jsonObject.put("phone", user.getPhone());
-        jsonObject.put("profilePictureId", user.getProfilePictureId());
 
         return jsonObject;
     }

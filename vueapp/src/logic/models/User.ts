@@ -8,7 +8,6 @@ export class User extends GenericEntity<User> {
     private _surname: string;
     private _verified: boolean;
     private _phone: Nullable<string>;
-    private _profilePictureId: Nullable<number>;
 
     public get id(): number {
         return this._id;
@@ -56,13 +55,5 @@ export class User extends GenericEntity<User> {
 
     public set phone(value: Nullable<string>) {
         this._phone = value;
-    }
-
-    public get profilePictureId(): Nullable<number> {
-        return this._profilePictureId;
-    }
-
-    public set profilePictureId(value: Nullable<number>) {
-        this._profilePictureId = value;
     }
 }
