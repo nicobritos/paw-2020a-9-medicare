@@ -14,8 +14,7 @@ import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.DefaultResourceLoader;
-import org.springframework.core.io.ResourceLoader;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Component;
 
 import javax.servlet.http.HttpServletRequest;
@@ -244,9 +243,7 @@ public class UserResource extends GenericAuthenticationResource {
 
     private byte[] getDefaultProfilePicture() {
         try {
-            // TODO: Null
-            ResourceLoader resourceLoader = new DefaultResourceLoader();
-            return IOUtils.toByteArray(new FileInputStream(resourceLoader.getResource("classpath:defaultProfilePic.svg").getFile()));
+            return IOUtils.toByteArray(new FileInputStream(new ClassPathResource("/defaultProfilePic.svg").getFile()));
         } catch (Exception e) {
             // TODO: Log
             return null;
