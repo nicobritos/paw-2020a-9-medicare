@@ -144,6 +144,12 @@ public abstract class ErrorConstants {
     public static final APISubError MISSING_INVALID_JSON_BODY
             = new APISubError(63, "Missing or invalid JSON body");
 
+    // TODO: Guido
+    public static final APISubError INVALID_IMAGE_TYPE
+            = new APISubError(64, "Invalid image type");
+    public static final APISubError IMAGE_TOO_BIG
+            = new APISubError(65, "The supplied image is too big");
+
     private static APISubError invalidField(int code, String field) {
         return new APISubError(code, "Invalid \"" + field + "\" field");
     }

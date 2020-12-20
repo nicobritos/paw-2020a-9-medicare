@@ -60,26 +60,24 @@ public class AuthResource extends GenericAuthenticationResource {
         if (!refreshTokenOptional.isPresent())
             throw this.notFound();
 
-        Optional<User> userOptional = this.userService.findByRefreshTokenId(refreshTokenOptional.get().getId());
-        if (!userOptional.isPresent())
-            throw this.notFound();
-        if (userOptional.get().getRefreshToken().getCreatedDate().plusMillis((int) Constants.JWT_REFRESH_EXPIRATION_MILLIS).toDateTime().isBeforeNow())
+        User user = this.assertUserNotFound();
+        if (user.getRefreshToken().getCreatedDate().plusMillis((int) Constants.JWT_REFRESH_EXPIRATION_MILLIS).toDateTime().isBeforeNow())
             throw this.unauthorized();
 
         UserCredentials userCredentials = new UserCredentials();
-        userCredentials.setUsername(userOptional.get().getEmail());
+        userCredentials.setUsername(user.getEmail());
         userCredentials.setPassword(token);
 
-        if (!this.createJWTCookies(userCredentials, userOptional.get(), response, LOGGER)) {
+        if (!this.createJWTCookies(userCredentials, user, response, LOGGER)) {
             throw this.error(Status.INTERNAL_SERVER_ERROR).getError();
         }
 
         UserMe userMe;
-        Collection<Doctor> doctors = this.doctorService.findByUser(userOptional.get());
+        Collection<Doctor> doctors = this.doctorService.findByUser(user);
         if (doctors.size() == 0) {
-            userMe = UserMeFactory.withPatients(userOptional.get(), this.patientService.findByUser(userOptional.get()));
+            userMe = UserMeFactory.withPatients(user, this.patientService.findByUser(user));
         } else {
-            userMe = UserMeFactory.withDoctors(userOptional.get(), doctors);
+            userMe = UserMeFactory.withDoctors(user, doctors);
         }
 
         return Response

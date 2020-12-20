@@ -85,7 +85,7 @@ public class JWTAuthorizationFilter extends BasicAuthenticationFilter {
             return null;
 
         Object o = claims.get(Constants.JWT_CLAIMS_USERNAME);
-        String email = o != null ? o.toString() : null;
+        Integer id = o != null ? (int) o : null;
 
         Collection<? extends GrantedAuthority> authorities;
         o = claims.get(Constants.JWT_CLAIMS_ROLE);
@@ -95,7 +95,7 @@ public class JWTAuthorizationFilter extends BasicAuthenticationFilter {
         else
             authorities = Collections.emptyList();
 
-        return email != null ? new UsernamePasswordAuthenticationToken(new User(email, "", authorities), "", authorities) : null;
+        return id != null ? new UsernamePasswordAuthenticationToken(new User(id.toString(), "", authorities), "", authorities) : null;
     }
 
     private String getSecretKey() throws IOException {

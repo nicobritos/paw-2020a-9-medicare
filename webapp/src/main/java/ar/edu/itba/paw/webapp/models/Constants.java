@@ -4,7 +4,7 @@ import java.util.concurrent.TimeUnit;
 
 public abstract class Constants {
     public static final String JWT_CLAIMS_ROLE = "role";
-    public static final String JWT_CLAIMS_USERNAME = "username";
+    public static final String JWT_CLAIMS_USERNAME = "id";
     public static final long JWT_EXPIRATION_MILLIS = TimeUnit.HOURS.toMillis(1);
     public static final long JWT_REFRESH_EXPIRATION_MILLIS = TimeUnit.DAYS.toMillis(7);
     public static final String JWT_COOKIE_NAME = "X-Jwt";
@@ -18,4 +18,6 @@ public abstract class Constants {
 
     public static final int UNPROCESSABLE_ENTITY_CODE = 422;
     public static final String UNPROCESSABLE_ENTITY_DESCRIPTION = "Validation failed";
+
+    public static final long MAX_PROFILE_PICTURE_SIZE = 1024 * 1024; // 1 MB
 }

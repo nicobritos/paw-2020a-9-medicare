@@ -54,7 +54,11 @@ public abstract class GenericResource {
     protected Optional<User> getUser() {
         Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         if (principal instanceof org.springframework.security.core.userdetails.User) {
-            return this.userService.findByUsername(((org.springframework.security.core.userdetails.User) principal).getUsername());
+            try {
+                return this.userService.findById(Integer.parseInt(((org.springframework.security.core.userdetails.User) principal).getUsername()));
+            } catch (NumberFormatException e) {
+                return Optional.empty();
+            }
         }
         return Optional.empty();
     }
@@ -63,6 +67,13 @@ public abstract class GenericResource {
         Optional<User> user = this.getUser();
         if (!user.isPresent())
             throw this.unauthorized();
+        return user.get();
+    }
+
+    protected User assertUserNotFound() {
+        Optional<User> user = this.getUser();
+        if (!user.isPresent())
+            throw this.notFound();
         return user.get();
     }
 

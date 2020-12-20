@@ -3,14 +3,14 @@ package ar.edu.itba.paw.webapp.rest;
 import ar.edu.itba.paw.interfaces.services.*;
 import ar.edu.itba.paw.models.*;
 import ar.edu.itba.paw.webapp.exceptions.ConflictException;
-import ar.edu.itba.paw.webapp.media_types.ErrorMIME;
-import ar.edu.itba.paw.webapp.media_types.MIMEHelper;
-import ar.edu.itba.paw.webapp.media_types.PictureMIME;
-import ar.edu.itba.paw.webapp.media_types.UserMIME;
+import ar.edu.itba.paw.webapp.exceptions.UnprocessableEntityException;
+import ar.edu.itba.paw.webapp.media_types.*;
 import ar.edu.itba.paw.webapp.models.*;
 import ar.edu.itba.paw.webapp.models.error.ErrorConstants;
 import ar.edu.itba.paw.webapp.rest.utils.GenericAuthenticationResource;
 import org.apache.commons.io.IOUtils;
+import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
+import org.glassfish.jersey.media.multipart.FormDataParam;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,9 +22,12 @@ import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.HttpHeaders;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.Collections;
 import java.util.Optional;
 
@@ -125,10 +128,7 @@ public class UserResource extends GenericAuthenticationResource {
 
         if (id == null) throw this.missingPathParams();
 
-        Optional<User> userOptional = this.userService.findById(id);
-        if (!userOptional.isPresent()) throw this.notFound();
-
-        return Response.ok(userOptional.get()).type(UserMIME.GET).build();
+        return Response.ok(this.assertUserNotFound()).type(UserMIME.GET).build();
     }
 
     @GET
@@ -166,6 +166,58 @@ public class UserResource extends GenericAuthenticationResource {
                 .build();
     }
 
+    @POST
+    @Path("{id}/picture")
+    @Produces({ApplicationMIME.WILDCARD, ErrorMIME.ERROR})
+    @Consumes(MediaType.MULTIPART_FORM_DATA)
+    public Response setProfilePicture(
+            @Context HttpHeaders httpheaders,
+            @FormDataParam("picture") InputStream pictureFile,
+            @FormDataParam("picture") FormDataContentDisposition pictureDetails,
+            @PathParam("id") Integer id) {
+
+        if (id == null) throw this.missingPathParams();
+
+        User user = this.assertUserUnauthorized();
+
+        Optional<User> userPath = this.userService.findById(id);
+        if (!userPath.isPresent())
+            throw this.notFound();
+        if (!userPath.get().getId().equals(user.getId()))
+            throw this.forbidden();
+
+        if (!pictureDetails.getType().toLowerCase().startsWith("image"))
+            throw this.error(Status.BAD_REQUEST).withReason(ErrorConstants.INVALID_IMAGE_TYPE).getError();
+
+        if (pictureDetails.getSize() > Constants.MAX_PROFILE_PICTURE_SIZE) {
+            throw UnprocessableEntityException
+                    .build()
+                    .withReason(ErrorConstants.IMAGE_TOO_BIG)
+                    .getError();
+        }
+
+        Picture picture = new Picture();
+        try {
+            picture.setData(IOUtils.toByteArray(pictureFile));
+        } catch (IOException e) {
+            throw this.error(Status.BAD_REQUEST).withReason(ErrorConstants.INVALID_IMAGE_TYPE).getError();
+        }
+        picture.setSize(pictureDetails.getSize());
+        picture.setName(pictureDetails.getName());
+        picture.setMimeType(pictureDetails.getType());
+
+        // TODO: Agus transaccion
+        if (user.getProfilePictureId() != null)
+            this.pictureService.remove(user.getProfilePictureId());
+        picture = this.pictureService.create(picture);
+        user.setProfilePicture(picture);
+        this.userService.update(user);
+
+        return Response
+                .created(this.joinPaths(this.baseUrl, this.apiPath, "/users/" + user.getId().toString() + "/picture"))
+                .build();
+    }
+
     @GET
     @Produces({UserMIME.ME, ErrorMIME.ERROR})
     public Response getLoggedUser(
@@ -199,10 +251,8 @@ public class UserResource extends GenericAuthenticationResource {
         MIMEHelper.assertServerType(httpheaders, UserMIME.GET);
 
         if (id == null || user == null) throw this.missingBodyParams();
-        Optional<User> userOptional = this.userService.findById(id);
-        if (!userOptional.isPresent()) throw this.notFound();
 
-        User savedUser = userOptional.get();
+        User savedUser = this.assertUserNotFound();
         if (user.getEmail() != null)
             savedUser.setEmail(user.getEmail());
         if (user.getPhone() != null)

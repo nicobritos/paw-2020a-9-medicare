@@ -104,7 +104,14 @@ public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilte
 
     @Override
     protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response, FilterChain chain, Authentication authentication) throws IOException, ServletException {
-        ar.edu.itba.paw.models.User user = this.userService.findByUsername(((User) authentication.getPrincipal()).getUsername()).get();
+        ar.edu.itba.paw.models.User user;
+        try {
+            user = this.userService.findById(Integer.parseInt(((User) authentication.getPrincipal()).getUsername())).get();
+        } catch (NumberFormatException e) {
+            // TODO: Log, no deberia de pasar
+            return;
+        }
+
         this.authenticator.createAndRefreshJWT(authentication, user, response);
 
         UserMe userMe;

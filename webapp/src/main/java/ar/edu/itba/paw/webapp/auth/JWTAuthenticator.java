@@ -28,8 +28,6 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
-import java.io.UncheckedIOException;
-import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 
@@ -87,16 +85,26 @@ public class JWTAuthenticator {
         Map<String, Object> claims = new HashMap<>();
 
         Object principal = authentication.getPrincipal();
-        String username;
+        int id;
         if (principal instanceof User) {
-            username = ((User) principal).getUsername();
+            try {
+                id = Integer.parseInt(((User) principal).getUsername());
+            } catch (NumberFormatException e) {
+                throw new IllegalArgumentException();
+            }
+        } else if (principal instanceof Integer) {
+            id = (Integer) principal;
         } else if (principal instanceof String) {
-            username = (String) principal;
+            try {
+                id = Integer.parseInt((String) principal);
+            } catch (NumberFormatException e) {
+                throw new IllegalArgumentException();
+            }
         } else {
             throw new IllegalArgumentException();
         }
 
-        claims.put(Constants.JWT_CLAIMS_USERNAME, username);
+        claims.put(Constants.JWT_CLAIMS_USERNAME, id);
         Optional<? extends GrantedAuthority> authority = authentication.getAuthorities().stream().findFirst();
         authority.ifPresent(grantedAuthority -> claims.put(Constants.JWT_CLAIMS_ROLE, grantedAuthority.getAuthority()));
 
