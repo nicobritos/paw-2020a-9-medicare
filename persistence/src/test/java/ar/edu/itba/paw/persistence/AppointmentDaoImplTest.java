@@ -61,7 +61,7 @@ public class AppointmentDaoImplTest {
     private static final String URL = "www.hnacional.com";
     private static final int REGISTRATION_NUMBER = 123;
     private static final AppointmentStatus STATUS = AppointmentStatus.PENDING;
-    private static final int YEAR = 2021;
+    private static final int YEAR = 2020;
     private static final int MONTH = 5;
     private static final int DAY = 25;
     private static final int HOUR = 11;
@@ -70,6 +70,8 @@ public class AppointmentDaoImplTest {
     private static final int MINUTE_2 = 0;
     private static final String FROM_DATE = YEAR + "-05-25 11:00:00.000000";
     private static final String FROM_DATE_2 = YEAR + "-05-25 15:00:00.000000";
+    private static final String FROM_DATE_TO_NOTIFY = (LocalDateTime.now().getYear() + 1) + "-05-25 11:00:00.000000";
+    private static final String FROM_DATE_2_TO_NOTIFY = (LocalDateTime.now().getYear() + 1) + "-05-25 15:00:00.000000";
     private static final String MOTIVE = "motive";
     private static final String MESSAGE = "message";
     private static final boolean WAS_NOTIFICATION_EMAIL_SENT = true;
@@ -581,7 +583,7 @@ public class AppointmentDaoImplTest {
         appointmentMap.put("status", STATUS.name());
         appointmentMap.put("patient_id", PATIENT_ID_2);
         appointmentMap.put("doctor_id", DOCTOR_ID_2);
-        appointmentMap.put("from_date", FROM_DATE);
+        appointmentMap.put("from_date", FROM_DATE_TO_NOTIFY);
         appointmentMap.put("motive", MOTIVE);
         appointmentMap.put("message", MESSAGE);
         appointmentMap.put("locale", LOCALE.toString());
@@ -596,7 +598,7 @@ public class AppointmentDaoImplTest {
         appointmentMap.put("status", STATUS.name());
         appointmentMap.put("patient_id", PATIENT_ID_2);
         appointmentMap.put("doctor_id", DOCTOR_ID_2);
-        appointmentMap.put("from_date", FROM_DATE_2);
+        appointmentMap.put("from_date", FROM_DATE_2_TO_NOTIFY);
         appointmentMap.put("motive", MOTIVE);
         appointmentMap.put("message", MESSAGE);
         appointmentMap.put("locale", LOCALE.toString());
@@ -2201,7 +2203,7 @@ public class AppointmentDaoImplTest {
 
         // 2. Ejercitar
         List<Appointment> appointments = this.appointmentDao.findAllAppointmentsToNotifyUpTo(
-                new LocalDateTime(YEAR, MONTH, DAY, HOUR_2, MINUTE_2));
+                new LocalDateTime(LocalDateTime.now().getYear() + 1, MONTH, DAY, HOUR_2, MINUTE_2));
 
         // 3. Postcondiciones
         assertNotNull(appointments);
