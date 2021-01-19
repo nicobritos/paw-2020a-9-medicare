@@ -55,7 +55,7 @@
 </template>
 
 <script lang="ts">
-import {Component, Vue} from 'vue-property-decorator';
+import {Component, Emit, Vue} from 'vue-property-decorator';
 import {State} from 'vuex-class';
 import {User} from '~/logic/models/User';
 import {Doctor} from '~/logic/models/Doctor';
@@ -76,12 +76,9 @@ export default class NavbarLogged extends Vue {
     private readonly isDoctor: boolean;
     private readonly defaultProfilePic = defaultProfilePic;
 
+    @Emit("logout")
     logout(e: Event): void {
         e.preventDefault();
-
-        // TODO:check because it throws an error if redundant navigation to same url
-        this.$router.push('Landing');
-        this.$emit('logout');
     };
     getUrl(url:string):string{
         return createPath(url);
