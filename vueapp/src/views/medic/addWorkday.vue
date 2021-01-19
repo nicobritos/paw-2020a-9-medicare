@@ -88,7 +88,8 @@
 <script lang="ts">
 import {Component, Emit, VModel, Vue} from 'vue-property-decorator';
 import logo from "@/assets/logo.svg";
-import { createPath } from "@/logic/Utils";
+import {createPath} from "@/logic/Utils";
+import {Doctor} from '~/logic/models/Doctor';
 
 @Component
 export default class AddSpecialty extends Vue {
@@ -102,8 +103,7 @@ export default class AddSpecialty extends Vue {
     private endHour = "";
     private officeSelected = "0";
 
-    //TODO: NICO
-    private doctors = [];
+    private doctors: Doctor[] = [];
 
     public getUrl(url:string):string{
         return createPath(url);
