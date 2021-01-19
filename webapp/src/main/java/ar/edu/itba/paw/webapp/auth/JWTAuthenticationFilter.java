@@ -112,7 +112,7 @@ public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilte
             return;
         }
 
-        this.authenticator.createAndRefreshJWT(authentication, user, response);
+        this.authenticator.createAndRefreshJWT(authentication, user, response, null);
 
         UserMe userMe;
         Collection<Doctor> doctors = this.doctorService.findByUser(user);

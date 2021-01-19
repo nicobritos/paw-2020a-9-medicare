@@ -61,14 +61,14 @@ public class AuthResource extends GenericAuthenticationResource {
             throw this.notFound();
 
         User user = this.assertUserNotFound();
-        if (user.getRefreshToken().getCreatedDate().plusMillis((int) Constants.JWT_REFRESH_EXPIRATION_MILLIS).toDateTime().isBeforeNow())
+        if (refreshTokenOptional.get().getCreatedDate().plusMillis((int) Constants.JWT_REFRESH_EXPIRATION_MILLIS).toDateTime().isBeforeNow())
             throw this.unauthorized();
 
         UserCredentials userCredentials = new UserCredentials();
         userCredentials.setUsername(user.getEmail());
         userCredentials.setPassword(token);
 
-        if (!this.createJWTCookies(userCredentials, user, response, LOGGER)) {
+        if (!this.createJWTCookies(userCredentials, user, response, token, LOGGER)) {
             throw this.error(Status.INTERNAL_SERVER_ERROR).getError();
         }
 
@@ -104,6 +104,8 @@ public class AuthResource extends GenericAuthenticationResource {
     }
 
     private String getRefreshToken(HttpServletRequest request) {
+        if (request.getCookies() == null) return null;
+
         return Arrays.stream(request.getCookies())
                 .filter(cookie -> cookie.getName().equals(Constants.REFRESH_TOKEN_COOKIEN_NAME))
                 .map(Cookie::getValue)

@@ -44,14 +44,6 @@ public class UserDaoImpl extends GenericSearchableDaoImpl<User, Integer> impleme
     }
 
     @Override
-    public Optional<User> findByRefreshTokenId(Integer id) {
-        if (id == null) {
-            throw new IllegalArgumentException();
-        }
-        return this.findBy(User_.refreshToken, id).stream().findFirst();
-    }
-
-    @Override
     protected SingularAttribute<? super User, ?> getNameAttribute() {
         return User_.firstName;
     }

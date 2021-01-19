@@ -1,14 +1,17 @@
 package ar.edu.itba.paw.persistence;
 
 import ar.edu.itba.paw.interfaces.daos.RefreshTokenDao;
-import ar.edu.itba.paw.models.*;
+import ar.edu.itba.paw.models.RefreshToken;
+import ar.edu.itba.paw.models.RefreshToken_;
 import ar.edu.itba.paw.persistence.generics.GenericDaoImpl;
 import org.joda.time.LocalDateTime;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.persistence.criteria.*;
-import java.util.List;
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaDelete;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Root;
 import java.util.Optional;
 
 @Repository
@@ -38,6 +41,21 @@ public class RefreshTokenDaoImpl extends GenericDaoImpl<RefreshToken, Integer> i
 
     @Override
     @Transactional
+    public void removeByUserId(Integer userId) {
+        if (userId == null) {
+            throw new IllegalArgumentException();
+        }
+
+        CriteriaBuilder builder = this.getEntityManager().getCriteriaBuilder();
+        CriteriaDelete<RefreshToken> delete = builder.createCriteriaDelete(RefreshToken.class);
+
+        Root<RefreshToken> root = delete.from(RefreshToken.class);
+        delete.where(builder.equal(root.get(RefreshToken_.userId), userId));
+        this.getEntityManager().createQuery(delete).executeUpdate();
+    }
+
+    @Override
+    @Transactional
     public int removeTokensOlderThan(int days) {
         LocalDateTime maximumCreatedDate = LocalDateTime.now().minusDays(days);
 
@@ -46,7 +64,7 @@ public class RefreshTokenDaoImpl extends GenericDaoImpl<RefreshToken, Integer> i
         Root<RefreshToken> root = delete.from(RefreshToken.class);
 
         delete.where(builder.lessThanOrEqualTo(root.get(RefreshToken_.createdDate), maximumCreatedDate));
-        return getEntityManager().createQuery(delete).executeUpdate();
+        return this.getEntityManager().createQuery(delete).executeUpdate();
     }
 
     @Override

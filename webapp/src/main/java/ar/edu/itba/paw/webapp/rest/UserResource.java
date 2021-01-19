@@ -288,7 +288,7 @@ public class UserResource extends GenericAuthenticationResource {
         credentials.setUsername(userSignUp.getUser().getEmail());
         credentials.setPassword(userSignUp.getUser().getPassword());
 
-        this.createJWTCookies(credentials, newUser, response, LOGGER);
+        this.createJWTCookies(credentials, newUser, response, null, LOGGER);
     }
 
     private byte[] getDefaultProfilePicture() {

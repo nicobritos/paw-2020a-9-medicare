@@ -1,5 +1,7 @@
 package ar.edu.itba.paw.webapp.auth;
 
+import ar.edu.itba.paw.webapp.media_types.parsers.deserializers.UserJWTDeserializer;
+import ar.edu.itba.paw.webapp.media_types.parsers.utils.ParserUtils;
 import ar.edu.itba.paw.webapp.models.Constants;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
@@ -84,8 +86,13 @@ public class JWTAuthorizationFilter extends BasicAuthenticationFilter {
         if (claims.getExpiration().before(new Date()))
             return null;
 
-        Object o = claims.get(Constants.JWT_CLAIMS_USERNAME);
-        Integer id = o != null ? (int) o : null;
+        Object o = claims.get(Constants.JWT_CLAIMS_DATA);
+        ar.edu.itba.paw.models.User jwtUser;
+        try {
+            jwtUser = UserJWTDeserializer.instance.fromJson(ParserUtils.stringToJson((String) o));
+        } catch (Exception e) {
+            return null;
+        }
 
         Collection<? extends GrantedAuthority> authorities;
         o = claims.get(Constants.JWT_CLAIMS_ROLE);
@@ -95,7 +102,7 @@ public class JWTAuthorizationFilter extends BasicAuthenticationFilter {
         else
             authorities = Collections.emptyList();
 
-        return id != null ? new UsernamePasswordAuthenticationToken(new User(id.toString(), "", authorities), "", authorities) : null;
+        return jwtUser != null ? new UsernamePasswordAuthenticationToken(new User(jwtUser.getId().toString(), "", authorities), "", authorities) : null;
     }
 
     private String getSecretKey() throws IOException {

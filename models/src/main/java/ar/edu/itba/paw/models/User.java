@@ -9,7 +9,6 @@ import javax.persistence.*;
                 @Index(columnList = "users_id", name = "user_users_id_uindex", unique = true),
                 @Index(columnList = "email", name = "user_email_uindex", unique = true),
                 @Index(columnList = "verification_token_id", name = "users_verification_token_id_index", unique = true),
-                @Index(columnList = "refresh_token_id", name = "users_refresh_token_id_index", unique = true),
                 @Index(columnList = "email", name = "user_email_uindex", unique = true),
         }
 )
@@ -32,9 +31,6 @@ public class User extends GenericModel<Integer> {
     @JoinColumn(name = "verification_token_id")
     @ManyToOne(fetch = FetchType.EAGER)
     private VerificationToken verificationToken;
-    @JoinColumn(name = "refresh_token_id")
-    @ManyToOne(fetch = FetchType.EAGER)
-    private RefreshToken refreshToken;
     @JoinColumn(name = "profile_id")
     @ManyToOne(fetch = FetchType.LAZY)
     private Picture profilePicture;
@@ -59,6 +55,11 @@ public class User extends GenericModel<Integer> {
 
     public void setProfilePicture(Picture profilePicture) {
         this.profilePicture = profilePicture;
+        if (profilePicture == null) {
+            this.profilePictureId = null;
+        } else {
+            this.profilePictureId = profilePicture.getId();
+        }
     }
 
     public String getEmail() {
@@ -107,14 +108,6 @@ public class User extends GenericModel<Integer> {
 
     public void setVerificationToken(VerificationToken verificationToken) {
         this.verificationToken = verificationToken;
-    }
-
-    public RefreshToken getRefreshToken() {
-        return this.refreshToken;
-    }
-
-    public void setRefreshToken(RefreshToken refreshToken) {
-        this.refreshToken = refreshToken;
     }
 
     public String getDisplayName() {

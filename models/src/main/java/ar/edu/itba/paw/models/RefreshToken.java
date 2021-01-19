@@ -1,7 +1,6 @@
 package ar.edu.itba.paw.models;
 
 import org.hibernate.annotations.Type;
-import org.joda.time.DateTime;
 import org.joda.time.LocalDateTime;
 
 import javax.persistence.*;
@@ -11,6 +10,7 @@ import javax.persistence.*;
         name = "refresh_token",
         indexes = {
                 @Index(columnList = "refresh_token_id", name = "refresh_token_id_uindex", unique = true),
+                @Index(columnList = "user_id", name = "refresh_token_id_user_id_index"),
         }
 )
 public class RefreshToken extends GenericModel<Integer> {
@@ -24,6 +24,11 @@ public class RefreshToken extends GenericModel<Integer> {
     @Column(name = "created_date")
     @Type(type="org.jadira.usertype.dateandtime.joda.PersistentLocalDateTime")
     private LocalDateTime createdDate;
+    @JoinColumn(name = "user_id")
+    @ManyToOne(fetch = FetchType.LAZY)
+    private User user;
+    @Column(name = "user_id", insertable = false, updatable = false)
+    private Integer userId;
 
     @Override
     public Integer getId() {
@@ -49,6 +54,23 @@ public class RefreshToken extends GenericModel<Integer> {
 
     public void setCreatedDate(LocalDateTime createdDate) {
         this.createdDate = createdDate;
+    }
+
+    public User getUser() {
+        return this.user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
+        if (user == null) {
+            this.userId = null;
+        } else {
+            this.userId = user.getId();
+        }
+    }
+
+    public Integer getUserId() {
+        return this.userId;
     }
 
     @Override

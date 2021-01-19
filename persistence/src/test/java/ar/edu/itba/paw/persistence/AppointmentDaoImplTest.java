@@ -201,7 +201,8 @@ public class AppointmentDaoImplTest {
         u.setPhone(PHONE);
         u.setProfilePicture(pictureModel());
         u.setVerificationToken(null);
-        u.setRefreshToken(null);
+        // TODO: Agus
+//        u.setRefreshToken(null);
         u.setVerified(true);
         u.setId(USER_ID_1);
         return u;

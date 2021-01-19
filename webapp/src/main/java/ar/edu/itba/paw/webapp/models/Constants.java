@@ -4,7 +4,7 @@ import java.util.concurrent.TimeUnit;
 
 public abstract class Constants {
     public static final String JWT_CLAIMS_ROLE = "role";
-    public static final String JWT_CLAIMS_USERNAME = "id";
+    public static final String JWT_CLAIMS_DATA = "data";
     public static final long JWT_EXPIRATION_MILLIS = TimeUnit.HOURS.toMillis(1);
     public static final long JWT_REFRESH_EXPIRATION_MILLIS = TimeUnit.DAYS.toMillis(7);
     public static final String JWT_COOKIE_NAME = "X-Jwt";

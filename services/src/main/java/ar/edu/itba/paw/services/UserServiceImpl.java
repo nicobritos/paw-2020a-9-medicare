@@ -17,7 +17,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.mail.MessagingException;
 import java.io.IOException;
 import java.util.*;
 
@@ -113,8 +112,7 @@ public class UserServiceImpl extends GenericSearchableServiceImpl<UserDao, User,
     @Override
     public void updatePassword(User user, String newPassword) {
         user.setPassword(this.passwordEncoder.encode(newPassword));
-        if (user.getRefreshToken() != null)
-            this.refreshTokenService.remove(user.getRefreshToken().getId());
+        this.refreshTokenService.removeByUserId(user.getId());
 
         super.update(user);
     }
@@ -148,13 +146,6 @@ public class UserServiceImpl extends GenericSearchableServiceImpl<UserDao, User,
             }
         }
 
-        if (user.getRefreshToken() != null) {
-            Optional<User> userToken = this.repository.findByRefreshTokenId(user.getRefreshToken().getId());
-            if (userToken.isPresent() && !userToken.get().equals(user)) {
-                throw new MediCareException("Verification token already exists");
-            }
-        }
-
         super.update(user);
     }
 
@@ -166,11 +157,6 @@ public class UserServiceImpl extends GenericSearchableServiceImpl<UserDao, User,
     @Override
     public Optional<User> findByVerificationTokenId(Integer id) {
         return this.repository.findByVerificationTokenId(id);
-    }
-
-    @Override
-    public Optional<User> findByRefreshTokenId(Integer id) {
-        return this.repository.findByRefreshTokenId(id);
     }
 
     @Override
@@ -194,20 +180,6 @@ public class UserServiceImpl extends GenericSearchableServiceImpl<UserDao, User,
         emailService.sendEmailConfirmationEmail(user, token, confirmationRelativeUrl, locale);
 
         return token;
-    }
-
-    @Override
-    public String generateRefreshToken(User user) {
-        user = this.findById(user.getId()).get();
-
-        if (user.getRefreshToken() != null) {
-            return this.refreshTokenService.refresh(user.getRefreshToken());
-        } else {
-            RefreshToken refreshToken = this.refreshTokenService.generate();
-            user.setRefreshToken(refreshToken);
-            this.update(user);
-            return refreshToken.getToken();
-        }
     }
 
     @Override

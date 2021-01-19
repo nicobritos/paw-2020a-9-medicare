@@ -33,4 +33,25 @@ public abstract class ParserUtils {
             );
         }
     }
+
+    // Devuelve un ObjectNode o ArrayNode
+    public static JsonNode stringToJson(String input) throws IOException, BadRequestException {
+        // Tratamos de parsearlo
+        ObjectMapper objectMapper = new ObjectMapper();
+        try {
+            return objectMapper.readTree(input);
+        } catch (JsonProcessingException e) {
+            throw new BadRequestException(
+                    Response
+                            .status(Status.BAD_REQUEST)
+                            .entity(
+                                    APIErrorFactory
+                                            .buildError(Status.BAD_REQUEST)
+                                            .withReason(ErrorConstants.MISSING_INVALID_JSON_BODY)
+                                            .build()
+                            )
+                            .build()
+            );
+        }
+    }
 }

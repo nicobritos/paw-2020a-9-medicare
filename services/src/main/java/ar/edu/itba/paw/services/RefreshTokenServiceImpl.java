@@ -4,6 +4,7 @@ import ar.edu.itba.paw.interfaces.MediCareException;
 import ar.edu.itba.paw.interfaces.daos.RefreshTokenDao;
 import ar.edu.itba.paw.interfaces.services.RefreshTokenService;
 import ar.edu.itba.paw.models.RefreshToken;
+import ar.edu.itba.paw.models.User;
 import ar.edu.itba.paw.services.generics.GenericServiceImpl;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.joda.time.LocalDateTime;
@@ -47,24 +48,33 @@ public class RefreshTokenServiceImpl extends GenericServiceImpl<RefreshTokenDao,
     }
 
     @Override
-    public RefreshToken generate() {
+    public String generate(User user) {
         RefreshToken refreshToken = new RefreshToken();
+        refreshToken.setUser(user);
         this.generateAndSaveToken(refreshToken, rt -> {
             rt = this.create(rt);
             refreshToken.setId(rt.getId());
         });
-        return refreshToken;
+        return refreshToken.getToken();
     }
 
     @Override
-    public String refresh(RefreshToken refreshToken) {
-        this.generateAndSaveToken(refreshToken, this::secureUpdate);
-        return refreshToken.getToken();
+    public String refresh(String refreshToken) {
+        RefreshToken refreshTokenModel = new RefreshToken();
+        refreshTokenModel.setToken(refreshToken);
+
+        this.generateAndSaveToken(refreshTokenModel, this::secureUpdate);
+        return refreshTokenModel.getToken();
     }
 
     @Override
     public void removeByToken(String token) {
         this.repository.removeByToken(token);
+    }
+
+    @Override
+    public void removeByUserId(Integer userId) {
+        this.repository.removeByUserId(userId);
     }
 
     @Override

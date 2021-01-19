@@ -21,7 +21,7 @@ public abstract class GenericAuthenticationResource extends GenericResource {
     @Autowired
     private UserService userService;
 
-    protected boolean createJWTCookies(UserCredentials credentials, User user, HttpServletResponse response, Logger logger) {
+    protected boolean createJWTCookies(UserCredentials credentials, User user, HttpServletResponse response, String refreshToken, Logger logger) {
         Collection<? extends GrantedAuthority> authorities;
         if (!user.getVerified()) {
             authorities = Collections.singletonList(new SimpleGrantedAuthority(UserRole.UNVERIFIED.getAsRole()));
@@ -35,7 +35,7 @@ public abstract class GenericAuthenticationResource extends GenericResource {
 
         try {
             Authentication authentication = this.authenticator.createAuthentication(credentials, authorities);
-            this.authenticator.createAndRefreshJWT(authentication, user, response);
+            this.authenticator.createAndRefreshJWT(authentication, user, response, refreshToken);
         } catch (Exception e) {
             logger.error("Error creating JWT token for user id: {} with mail: {}", user.getId(), user.getEmail());
             return false;

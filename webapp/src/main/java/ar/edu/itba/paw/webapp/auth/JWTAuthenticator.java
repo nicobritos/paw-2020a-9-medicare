@@ -2,6 +2,7 @@ package ar.edu.itba.paw.webapp.auth;
 
 import ar.edu.itba.paw.interfaces.services.RefreshTokenService;
 import ar.edu.itba.paw.interfaces.services.UserService;
+import ar.edu.itba.paw.webapp.media_types.parsers.serializers.UserJWTSerializer;
 import ar.edu.itba.paw.webapp.models.Constants;
 import ar.edu.itba.paw.webapp.models.UserCredentials;
 import ar.edu.itba.paw.webapp.utils.CookieUtils;
@@ -18,11 +19,9 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Component;
 import org.springframework.util.FileCopyUtils;
 
-import javax.servlet.ServletException;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -78,33 +77,11 @@ public class JWTAuthenticator {
      * @param authentication
      * @param user
      * @return headers
-     * @throws IOException
-     * @throws ServletException
      */
-    public void createAndRefreshJWT(Authentication authentication, ar.edu.itba.paw.models.User user, HttpServletResponse response) throws IOException, ServletException {
+    public void createAndRefreshJWT(Authentication authentication, ar.edu.itba.paw.models.User user, HttpServletResponse response, String refreshToken) {
         Map<String, Object> claims = new HashMap<>();
 
-        Object principal = authentication.getPrincipal();
-        int id;
-        if (principal instanceof User) {
-            try {
-                id = Integer.parseInt(((User) principal).getUsername());
-            } catch (NumberFormatException e) {
-                throw new IllegalArgumentException();
-            }
-        } else if (principal instanceof Integer) {
-            id = (Integer) principal;
-        } else if (principal instanceof String) {
-            try {
-                id = Integer.parseInt((String) principal);
-            } catch (NumberFormatException e) {
-                throw new IllegalArgumentException();
-            }
-        } else {
-            throw new IllegalArgumentException();
-        }
-
-        claims.put(Constants.JWT_CLAIMS_USERNAME, id);
+        claims.put(Constants.JWT_CLAIMS_DATA, UserJWTSerializer.instance.toJson(user).toString());
         Optional<? extends GrantedAuthority> authority = authentication.getAuthorities().stream().findFirst();
         authority.ifPresent(grantedAuthority -> claims.put(Constants.JWT_CLAIMS_ROLE, grantedAuthority.getAuthority()));
 
@@ -116,11 +93,10 @@ public class JWTAuthenticator {
                 .signWith(SignatureAlgorithm.HS512, this.secret)
                 .compact();
 
-        String refreshToken;
-        if (user.getRefreshToken() != null) {
-            refreshToken = this.refreshTokenService.refresh(user.getRefreshToken());
+        if (refreshToken != null) {
+            refreshToken = this.refreshTokenService.refresh(refreshToken);
         } else {
-            refreshToken = this.userService.generateRefreshToken(user);
+            refreshToken = this.refreshTokenService.generate(user);
         }
 
         CookieUtils.setHttpOnlyCookie(response, this.createJWTCookie(token));
