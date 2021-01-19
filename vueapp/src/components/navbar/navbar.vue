@@ -14,6 +14,8 @@ import NavbarLogged from '~/components/navbar/navbarLogged.vue';
 import NavbarLogo from '~/components/navbar/navbarLogo.vue';
 import NavbarNotLogged from '~/components/navbar/navbarNotLogged.vue';
 
+import {createPath} from "~/logic/Utils";
+
 @Component({
     components: {
         NavbarLogged,
@@ -27,6 +29,16 @@ export default class Navbar extends Vue {
 
     logout(): void {
         this.$store.dispatch('auth/logout', authActionTypes.logout());
+        /*TODO: this should work but check it just in case*/ 
+        if(this.$route.name != 'Landing'){
+            this.$router.push({
+                name:"Landing"
+            })
+        }
+    }
+
+    getUrl(url:string):string{
+        return createPath(url);
     }
 }
 </script>

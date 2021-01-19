@@ -78,9 +78,6 @@ export default class NavbarLogged extends Vue {
 
     logout(e: Event): void {
         e.preventDefault();
-
-        // TODO:check because it throws an error if redundant navigation to same url
-        this.$router.push('Landing');
         this.$emit('logout');
     };
     getUrl(url:string):string{
