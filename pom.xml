@@ -36,7 +36,6 @@
         <org.apache.commons.text.version>1.8</org.apache.commons.text.version>
         <jersey.version>3.0-SNAPSHOT</jersey.version>
         <jjwt.version>0.7.0</jjwt.version>
-        <jersey-media-multipart.version>2.17</jersey-media-multipart.version>
     </properties>
 
     <dependencyManagement>
@@ -313,7 +312,7 @@
             <dependency>
                 <groupId>org.glassfish.jersey.media</groupId>
                 <artifactId>jersey-media-multipart</artifactId>
-                <version>${jersey-media-multipart.version}</version>
+                <version>${jersey.version}</version>
             </dependency>
 
             <!-- JERSEY JSON -->
