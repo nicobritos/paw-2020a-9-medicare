@@ -17,7 +17,7 @@
                                         <!-- TODO: profile pic -->
                                         <img
                                             class="profile-picture rounded-circle"
-                                            :src='"/users/" +appointment.patient.user.profilePicture.id'
+                                            :src='getApiUrl("/users/" + appointment.patient.user.id)'
                                             alt="profile pic"
                                         />
                                     </div>
