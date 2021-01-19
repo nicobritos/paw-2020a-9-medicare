@@ -1,7 +1,9 @@
 <template>
     <div class="container w-100 justify-content-start">
-        <img class="navbar-brand" :src='logo' alt="logo" id="navbar-logo">
-        <RouterLink :to='getUrl("")' class="navbar-brand header-brand header-a-element">MediCare</RouterLink>
+        <RouterLink :to='getUrl("")' class="navbar-brand header-brand header-a-element">
+            <img class="navbar-brand" :src='logo' alt="logo" id="navbar-logo">
+            MediCare
+        </RouterLink>
     </div>
 </template>
 
