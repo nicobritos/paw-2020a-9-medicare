@@ -2,22 +2,23 @@ import axios, {AxiosRequestConfig, AxiosResponse} from 'axios';
 import {
     DeleteConfig,
     GetConfig,
+    LOGGED_IN_TTL_HEADER_NAME,
     PostConfig,
     PutConfig,
-    RestRepository, StatusCodes,
+    RestRepository,
+    StatusCodes,
 } from '~/logic/interfaces/repositories/RestRepository';
 import {APIError, ErrorMIME} from '~/logic/models/APIError';
 import {APIResponse, APIResponseFactory} from '~/logic/models/APIResponse';
 import {Pagination, PaginationLinks} from '~/logic/models/utils/Pagination';
 import parseLinkHeader from 'parse-link-header';
 import {injectable} from 'inversify';
-import { createApiPath } from '../Utils';
+import {createApiPath} from '../Utils';
 import {UserDoctors, UserPatients} from '~/logic/interfaces/services/AuthService';
 import {UserMIME} from '~/logic/services/UserServiceImpl';
 import {JSON_MIME} from '~/logic/services/Utils';
 import store from '~/plugins/vuex';
-import {authMutationTypes} from '~/store/types/auth.types';
-import qs from 'qs';
+import {authMutationTypes, LOGGED_IN_EXPIRATION_DATE_KEY} from '~/store/types/auth.types';
 
 @injectable()
 export class RestRepositoryImpl implements RestRepository {
@@ -90,6 +91,12 @@ export class RestRepositoryImpl implements RestRepository {
                 Accept: RestRepositoryImpl.getAccept(config.accepts)
             },
             transformResponse: (data: any, headers) => {
+                let ttl = headers[LOGGED_IN_TTL_HEADER_NAME];
+                if (ttl) {
+                    let expDate = (new Date(0)).getTime() + Number.parseInt(ttl);
+                    localStorage.setItem(LOGGED_IN_EXPIRATION_DATE_KEY, expDate.toString());
+                }
+
                 let contentType = headers['content-type'];
                 if (typeof contentType === 'string') {
                     if (contentType.includes(';')) {

@@ -102,24 +102,17 @@ public class JWTAuthenticator {
 
         CookieUtils.setHttpOnlyCookie(response, this.createJWTCookie(token));
         CookieUtils.setHttpOnlyCookie(response, this.createRefreshTokenCookie(refreshToken));
-        CookieUtils.setCookie(response, this.createJWTExpirationCookie());
+        this.createJWTExpirationHeader(response);
     }
 
     public void invalidateJWTCookies(HttpServletResponse response) {
         CookieUtils.setHttpOnlyCookie(response, this.createJWTCookie(Constants.EMPTY_COOKIE));
         CookieUtils.setHttpOnlyCookie(response, this.createRefreshTokenCookie(Constants.EMPTY_COOKIE));
-        CookieUtils.setCookie(response, this.createJWTExpirationCookie());
+        this.createJWTExpirationHeader(response);
     }
 
-    private Cookie createJWTExpirationCookie() {
-        Cookie cookie = new Cookie(Constants.LOGGED_IN_COOKIE_NAME, "true");
-
-        int maxAge = (int) TimeUnit.MILLISECONDS.toSeconds(Constants.JWT_EXPIRATION_MILLIS);
-        cookie.setMaxAge(maxAge); // Seconds
-        cookie.setDomain(this.APP_HOST);
-        cookie.setPath(this.APP_SUBPATH);
-
-        return cookie;
+    private void createJWTExpirationHeader(HttpServletResponse response) {
+        response.setHeader(Constants.LOGGED_IN_TTL_HEADER_NAME, Long.toString(Constants.JWT_EXPIRATION_MILLIS));
     }
 
     private Cookie createJWTCookie(String token) {

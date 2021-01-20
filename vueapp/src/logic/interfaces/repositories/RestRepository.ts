@@ -24,6 +24,8 @@ export const StatusCodes = {
     UNPROCESSABLE_ENTITY: 422
 };
 
+export const LOGGED_IN_TTL_HEADER_NAME = 'x-logged-in-ttl';
+
 export interface RestRepository {
     get<R, T = any>(path: string, config: GetConfig<T>): Promise<APIResponse<R>>;
 

@@ -2,11 +2,19 @@ import {AuthService, UserDoctors, UserPatients} from '~/logic/interfaces/service
 import {User} from '~/logic/models/User';
 import TYPES from '~/logic/types';
 import container from '~/plugins/inversify.config';
-import {AuthActions, AuthGetters, AuthMutations, authMutationTypes, AuthState} from '~/store/types/auth.types';
+import {
+    AuthActions,
+    AuthGetters,
+    AuthMutations,
+    authMutationTypes,
+    AuthState,
+    LOGGED_IN_EXPIRATION_DATE_KEY,
+    USER_KEY,
+} from '~/store/types/auth.types';
 import {RootState} from '~/store/types/root.types';
 import {DefineActionTree, DefineGetterTree, DefineMutationTree} from '~/store/utils/helper.types';
 import {Nullable} from '~/logic/Utils';
-import {Commit, Module} from 'vuex';
+import {Module} from 'vuex';
 import {Doctor} from '~/logic/models/Doctor';
 import {Patient} from '~/logic/models/Patient';
 import {APIError} from '~/logic/models/APIError';
@@ -22,7 +30,6 @@ const state = (): AuthState => ({
     },
     loggingIn: false,
     loggingOut: false,
-    user: null as Nullable<User>,
     doctors: [] as Doctor[],
     patients: [] as Patient[],
     isDoctor: false
@@ -30,7 +37,14 @@ const state = (): AuthState => ({
 
 const getters: DefineGetterTree<AuthGetters, AuthState, RootState> = {
     loggedIn(state): boolean {
-        return !!state.user;
+        return hasLoggedIn();
+    },
+    user(state): Nullable<User> {
+        if (!hasLoggedIn()) return null;
+
+        let userString: Nullable<string> = localStorage.getItem(USER_KEY);
+        if (!userString) return null;
+        return JSON.parse(userString);
     }
 };
 
@@ -68,7 +82,7 @@ const actions: DefineActionTree<AuthActions, AuthState, RootState> = {
         }
     },
     async logout({state, commit}) {
-        if (!state._userLoading.promise && !state.user) return;
+        if (!state._userLoading.promise && !hasLoggedIn()) return;
 
         if (state._userLoading.promise)
             await state._userLoading.promise;
@@ -94,7 +108,13 @@ const mutations: DefineMutationTree<AuthMutations, AuthState> = {
     setUser(state, {payload}): void {
         state.loggingOut = state.loggingIn = false;
 
-        state.user = payload;
+        if (payload) {
+            localStorage.setItem(USER_KEY, JSON.stringify(payload));
+        } else {
+            localStorage.removeItem(USER_KEY);
+            localStorage.removeItem(LOGGED_IN_EXPIRATION_DATE_KEY);
+        }
+
         state._userLoading.promise = null;
         state._userLoading.loaded = true;
     },
@@ -109,6 +129,25 @@ const mutations: DefineMutationTree<AuthMutations, AuthState> = {
             state.isDoctor = true;
     },
 };
+
+function hasLoggedIn(): boolean {
+    let userString: Nullable<string> = localStorage.getItem(USER_KEY);
+    if (!userString) return false;
+
+    let expirationDateString = localStorage.getItem(LOGGED_IN_EXPIRATION_DATE_KEY);
+    if (!expirationDateString) {
+        localStorage.removeItem(USER_KEY);
+        return false;
+    }
+
+    // Chech epochs
+    if ((new Date(0)).getTime() <= Number.parseInt(expirationDateString)) {
+        localStorage.removeItem(LOGGED_IN_EXPIRATION_DATE_KEY);
+        localStorage.removeItem(USER_KEY);
+        return false;
+    }
+    return true;
+}
 
 const store: Module<any, any> = {
     namespaced: true,

@@ -1,15 +1,17 @@
-import {User} from '~/logic/models/User';
 import {CacheableAsyncProperty, DefineTypes} from '~/store/utils/helper.types';
-import {Nullable} from '~/logic/Utils';
 import {Doctor} from '~/logic/models/Doctor';
 import {Patient} from '~/logic/models/Patient';
 import {UserDoctors, UserPatients} from '~/logic/interfaces/services/AuthService';
 import {APIError} from '~/logic/models/APIError';
+import {Nullable} from '~/logic/Utils';
+import {User} from '~/logic/models/User';
+
+export const LOGGED_IN_EXPIRATION_DATE_KEY = 'loggedInExpDate';
+export const USER_KEY = 'userKey';
 
 export interface AuthState {
     loggingIn: boolean,
     loggingOut: boolean,
-    user: Nullable<User>,
     _userLoading: CacheableAsyncProperty<UserPatients | UserDoctors | APIError>,
     doctors: Doctor[],
     patients: Patient[],
@@ -32,7 +34,7 @@ export const authActionTypes: DefineTypes<AuthActions> = {
 };
 
 export interface AuthMutations {
-    setUser: AuthState['user'],
+    setUser: Nullable<User>,
     setDoctors: AuthState['doctors'],
     setPatients: AuthState['patients'],
     setPromise: AuthState['_userLoading']['promise']
@@ -47,4 +49,5 @@ export const authMutationTypes: DefineTypes<AuthMutations> = {
 
 export interface AuthGetters {
     loggedIn: boolean
+    user: Nullable<User>
 }
