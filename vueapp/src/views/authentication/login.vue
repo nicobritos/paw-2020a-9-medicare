@@ -129,6 +129,7 @@ export default class Login extends Vue {
 
     public login(e: Event) {
         e.preventDefault();
+        e.stopPropagation();
         if (this.valid){
             this.$store.dispatch('auth/login', authActionTypes.login({
                 password: this.password,
@@ -139,8 +140,8 @@ export default class Login extends Vue {
     }
 
     public submitForm(e:Event){
-        //TODO:nico
         e.preventDefault();
+        e.stopPropagation();
         return this.login(e);
     }
 
