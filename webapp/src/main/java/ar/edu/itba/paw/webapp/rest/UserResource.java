@@ -207,9 +207,7 @@ public class UserResource extends GenericAuthenticationResource {
         picture.setMimeType(pictureDetails.getType());
 
         // TODO: Agus transaccion
-        if (user.getProfilePictureId() != null)
-            this.pictureService.remove(user.getProfilePictureId());
-        picture = this.pictureService.create(picture);
+        picture = pictureService.changeProfilePic(user, picture);
         user.setProfilePicture(picture);
         this.userService.update(user);
 
