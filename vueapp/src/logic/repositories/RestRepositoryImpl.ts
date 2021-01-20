@@ -19,6 +19,8 @@ import {UserMIME} from '~/logic/services/UserServiceImpl';
 import {JSON_MIME} from '~/logic/services/Utils';
 import store from '~/plugins/vuex';
 import {authMutationTypes, LOGGED_IN_EXPIRATION_DATE_KEY} from '~/store/types/auth.types';
+import EventBus from '~/logic/EventBus';
+import {APIErrorEventName} from '~/logic/interfaces/APIErrorEvent';
 
 @injectable()
 export class RestRepositoryImpl implements RestRepository {
@@ -97,18 +99,13 @@ export class RestRepositoryImpl implements RestRepository {
                     localStorage.setItem(LOGGED_IN_EXPIRATION_DATE_KEY, expDate.toString());
                 }
 
-                let contentType = headers['content-type'];
-                if (typeof contentType === 'string') {
-                    if (contentType.includes(';')) {
-                        contentType = contentType.substring(0, contentType.indexOf(';'));
-                    }
-                }
+                let contentType = RestRepositoryImpl.parseContentType(headers);
 
-                if (typeof data === 'string' && typeof contentType === 'string' && contentType.endsWith('+json')) {
+                if (typeof data === 'string' && contentType.endsWith('+json')) {
                     data = JSON.parse(data);
                 }
 
-                if (config.paginate)
+                if (config.paginate && data && !contentType.startsWith(ErrorMIME))
                     return new Pagination(data, headers['total-items'] || 0, RestRepositoryImpl.parseLinkHeader(headers));
                 else
                     return data;
@@ -151,6 +148,8 @@ export class RestRepositoryImpl implements RestRepository {
 
     private static formatResponse<R>(response: AxiosResponse): APIResponse<R> {
         if (typeof response.headers['content-type'] === 'string' && response.headers['content-type'].startsWith(ErrorMIME)) {
+            // TODO: CHECK
+            EventBus.$emit(APIErrorEventName, response.data);
             return APIResponseFactory.error(response.data as APIError);
         }
 
@@ -173,5 +172,15 @@ export class RestRepositoryImpl implements RestRepository {
         if (parsed['previous']) paginationLinks.previous = parsed['previous'].url;
 
         return paginationLinks;
+    }
+
+    private static parseContentType(headers: any): string {
+        let contentType = headers['content-type'];
+        if (typeof contentType === 'string') {
+            if (contentType.includes(';')) {
+                contentType = contentType.substring(0, contentType.indexOf(';'));
+            }
+        }
+        return contentType || '';
     }
 }

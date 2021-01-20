@@ -90,9 +90,10 @@ import {Component, Emit, VModel, Vue} from 'vue-property-decorator';
 import logo from "@/assets/logo.svg";
 import {createPath} from "@/logic/Utils";
 import {Doctor} from '~/logic/models/Doctor';
+import {Getter} from 'vuex-class';
 
 @Component
-export default class AddSpecialty extends Vue {
+export default class AddWorkday extends Vue {
     private readonly logo = logo;
 
     @VModel({type:Boolean,default:true})
@@ -103,30 +104,35 @@ export default class AddSpecialty extends Vue {
     private endHour = "";
     private officeSelected = "0";
 
-    private doctors: Doctor[] = [];
+    @Getter('auth/doctors')
+    private readonly doctors: Doctor[];
 
     public getUrl(url:string):string{
         return createPath(url);
     }
 
     private cleanValues(){
-            this.dowSelected = "0";
-            this.startHour = "";
-            this.endHour = "";
-            this.officeSelected = "0";
+        this.dowSelected = "0";
+        this.startHour = "";
+        this.endHour = "";
+        this.officeSelected = "0";
     }
 
     //TODO: NICO submit form for adding workday
     @Emit("submit")
     submitForm(e:Event){
-        e.preventDefault()
+        e.preventDefault();
+        e.stopPropagation();
+
         let formData = {
             dowSelected:this.dowSelected,
             startHour:this.startHour,
             endHour:this.endHour,
             officeSelected:this.officeSelected
-        }
-        console.log(formData)
+        };
+
+
+
         return e;
     }
 }
