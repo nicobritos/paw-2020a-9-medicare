@@ -18,9 +18,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.web.bind.annotation.ModelAttribute;
 
-import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
@@ -28,7 +27,6 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Optional;
 
@@ -50,17 +48,16 @@ public class AuthResource extends GenericAuthenticationResource {
     @Produces({UserMIME.ME, ErrorMIME.ERROR})
     @Path("/" + Constants.REFRESH_TOKEN_ENDPOINT)
     public Response refreshToken(
-            @Context HttpServletRequest request,
+            @ModelAttribute("refreshTokenString") String token,
+            @ModelAttribute("userOptional") Optional<User> userOptional,
             @Context HttpServletResponse response) {
-        String token = this.getRefreshToken(request);
-
         if (token == null) throw this.forbidden();
 
         Optional<RefreshToken> refreshTokenOptional = this.refreshTokenService.findByToken(token);
         if (!refreshTokenOptional.isPresent())
             throw this.notFound();
 
-        User user = this.assertUserNotFound();
+        User user = this.assertUserNotFound(userOptional);
         if (refreshTokenOptional.get().getCreatedDate().plusMillis((int) Constants.JWT_REFRESH_EXPIRATION_MILLIS).toDateTime().isBeforeNow())
             throw this.unauthorized();
 
@@ -91,9 +88,8 @@ public class AuthResource extends GenericAuthenticationResource {
     @Produces({ErrorMIME.ERROR})
     @Path("/" + Constants.LOGOUT_ENDPOINT)
     public Response invalidateToken(
-            @Context HttpServletRequest request,
+            @ModelAttribute("refreshTokenString") String token,
             @Context HttpServletResponse response) {
-        String token = this.getRefreshToken(request);
         if (token != null) this.refreshTokenService.removeByToken(token);
 
         this.authenticator.invalidateJWTCookies(response);
@@ -101,15 +97,5 @@ public class AuthResource extends GenericAuthenticationResource {
         return Response
                 .status(Status.NO_CONTENT)
                 .build();
-    }
-
-    private String getRefreshToken(HttpServletRequest request) {
-        if (request.getCookies() == null) return null;
-
-        return Arrays.stream(request.getCookies())
-                .filter(cookie -> cookie.getName().equals(Constants.REFRESH_TOKEN_COOKIEN_NAME))
-                .map(Cookie::getValue)
-                .findFirst()
-                .orElse(null);
     }
 }

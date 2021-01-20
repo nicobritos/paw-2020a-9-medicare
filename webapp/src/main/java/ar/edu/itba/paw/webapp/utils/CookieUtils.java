@@ -24,4 +24,8 @@ public abstract class CookieUtils {
 
         response.addHeader(SET_COOKIE, newCookie.toString());
     }
+
+    public static void setCookie(HttpServletResponse response, Cookie cookie) {
+        response.addCookie(cookie);
+    }
 }

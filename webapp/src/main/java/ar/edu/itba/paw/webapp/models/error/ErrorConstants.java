@@ -139,7 +139,7 @@ public abstract class ErrorConstants {
             = new APISubError(61, "The email specified is already being used");
 
     public static final APISubError MISSING_INVALID_REFRESH_TOKEN
-            = new APISubError(62, "A valid Refresh Token cookie was expected with the name: \"" + Constants.REFRESH_TOKEN_COOKIEN_NAME + "\"");
+            = new APISubError(62, "A valid Refresh Token cookie was expected with the name: \"" + Constants.REFRESH_TOKEN_COOKIE_NAME + "\"");
 
     public static final APISubError MISSING_INVALID_JSON_BODY
             = new APISubError(63, "Missing or invalid JSON body");

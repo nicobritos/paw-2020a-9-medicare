@@ -16,6 +16,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Component;
+import org.springframework.web.bind.annotation.ModelAttribute;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -47,6 +48,8 @@ public class UserResource extends GenericAuthenticationResource {
     @Autowired
     private UserService userService;
     @Autowired
+    private RefreshTokenService refreshTokenService;
+    @Autowired
     private String baseUrl;
     @Autowired
     private String apiPath;
@@ -56,12 +59,13 @@ public class UserResource extends GenericAuthenticationResource {
     @Consumes(UserMIME.CREATE_DOCTOR)
     public Response createDoctor(
             DoctorSignUp doctorSignUp,
+            @ModelAttribute("userOptional") Optional<User> userOptional,
             @Context HttpServletRequest request,
             @Context HttpServletResponse response,
             @Context HttpHeaders httpheaders) {
         MIMEHelper.assertServerType(httpheaders, UserMIME.ME);
 
-        if (this.getUser().isPresent()) throw this.forbidden();
+        if (userOptional.isPresent()) throw this.forbidden();
 
         if (this.userService.findByUsername(doctorSignUp.getUser().getEmail()).isPresent())
             throw ConflictException.build().withReason(ErrorConstants.USER_EMAIL_USED).getError();
@@ -101,11 +105,12 @@ public class UserResource extends GenericAuthenticationResource {
     @Consumes(UserMIME.CREATE_PATIENT)
     public Response createPatient(
             PatientSignUp patientSignUp,
+            @ModelAttribute("userOptional") Optional<User> userOptional,
             @Context HttpServletRequest request,
             @Context HttpServletResponse response,
             @Context HttpHeaders httpheaders) {
         MIMEHelper.assertServerType(httpheaders, UserMIME.ME);
-        if (this.getUser().isPresent()) throw this.forbidden();
+        if (userOptional.isPresent()) throw this.forbidden();
         if (this.userService.findByUsername(patientSignUp.getUser().getEmail()).isPresent())
             throw ConflictException.build().withReason(ErrorConstants.USER_EMAIL_USED).getError();
 
@@ -123,12 +128,13 @@ public class UserResource extends GenericAuthenticationResource {
     @Produces({UserMIME.GET, ErrorMIME.ERROR})
     public Response getEntity(
             @Context HttpHeaders httpheaders,
+            @ModelAttribute("userOptional") Optional<User> userOptional,
             @PathParam("id") Integer id) {
         MIMEHelper.assertServerType(httpheaders, UserMIME.GET);
 
         if (id == null) throw this.missingPathParams();
 
-        return Response.ok(this.assertUserNotFound()).type(UserMIME.GET).build();
+        return Response.ok(this.assertUserNotFound(userOptional)).type(UserMIME.GET).build();
     }
 
     @GET
@@ -172,13 +178,22 @@ public class UserResource extends GenericAuthenticationResource {
     @Consumes(MediaType.MULTIPART_FORM_DATA)
     public Response setProfilePicture(
             @Context HttpHeaders httpheaders,
+            @Context HttpServletResponse response,
+            @ModelAttribute("refreshTokenString") String token,
+            @ModelAttribute("userOptional") Optional<User> userOptional,
             @FormDataParam("picture") InputStream pictureFile,
             @FormDataParam("picture") FormDataContentDisposition pictureDetails,
             @PathParam("id") Integer id) {
 
         if (id == null) throw this.missingPathParams();
 
-        User user = this.assertUserUnauthorized();
+        User user = this.assertUserUnauthorized(userOptional);
+
+        if (token == null) throw this.forbidden();
+
+        Optional<RefreshToken> refreshTokenOptional = this.refreshTokenService.findByToken(token);
+        if (!refreshTokenOptional.isPresent())
+            throw this.forbidden();
 
         Optional<User> userPath = this.userService.findById(id);
         if (!userPath.isPresent())
@@ -211,6 +226,12 @@ public class UserResource extends GenericAuthenticationResource {
         user.setProfilePicture(picture);
         this.userService.update(user);
 
+        UserCredentials userCredentials = new UserCredentials();
+        userCredentials.setUsername(user.getEmail());
+        userCredentials.setPassword(token);
+
+        this.createJWTCookies(userCredentials, user, response, token, LOGGER);
+
         return Response
                 .created(this.joinPaths(this.baseUrl, this.apiPath, "/users/" + user.getId().toString() + "/picture"))
                 .build();
@@ -219,10 +240,11 @@ public class UserResource extends GenericAuthenticationResource {
     @GET
     @Produces({UserMIME.ME, ErrorMIME.ERROR})
     public Response getLoggedUser(
+            @ModelAttribute("userOptional") Optional<User> userOptional,
             @Context HttpHeaders httpheaders) {
         MIMEHelper.assertServerType(httpheaders, UserMIME.ME);
 
-        User user = this.assertUserUnauthorized();
+        User user = this.assertUserUnauthorized(userOptional);
 
         UserMe userMe;
         if (this.isDoctor()) {
@@ -244,13 +266,14 @@ public class UserResource extends GenericAuthenticationResource {
     @Consumes(UserMIME.UPDATE)
     public Response updateEntity(
             User user,
+            @ModelAttribute("userOptional") Optional<User> userOptional,
             @Context HttpHeaders httpheaders,
             @PathParam("id") Integer id) {
         MIMEHelper.assertServerType(httpheaders, UserMIME.GET);
 
         if (id == null || user == null) throw this.missingBodyParams();
 
-        User savedUser = this.assertUserNotFound();
+        User savedUser = this.assertUserNotFound(userOptional);
         if (user.getEmail() != null)
             savedUser.setEmail(user.getEmail());
         if (user.getPhone() != null)
