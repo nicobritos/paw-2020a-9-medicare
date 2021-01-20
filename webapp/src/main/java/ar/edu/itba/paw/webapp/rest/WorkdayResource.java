@@ -16,6 +16,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
+import org.springframework.web.bind.annotation.ModelAttribute;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
@@ -41,10 +42,11 @@ public class WorkdayResource extends GenericResource {
     @Produces({WorkdayMIME.GET_LIST, ErrorMIME.ERROR})
     @PreAuthorize("hasRole('DOCTOR')")
     public Response getCollection(
+            @ModelAttribute("userOptional") Optional<User> userOptional,
             @Context HttpHeaders httpheaders) {
         MIMEHelper.assertServerType(httpheaders, WorkdayMIME.GET_LIST);
 
-        User user = this.assertUserUnauthorized();
+        User user = this.assertUserUnauthorized(userOptional);
         if (!this.isDoctor()) throw this.forbidden();
         return Response
                 .ok()
@@ -64,7 +66,6 @@ public class WorkdayResource extends GenericResource {
 
         if (workdays == null || workdays.isEmpty()) throw this.missingBodyParams();
 
-        User user = this.assertUserUnauthorized();
         if (!this.isDoctor()) throw this.forbidden();
 
         for (Workday workday : workdays) {
@@ -91,12 +92,13 @@ public class WorkdayResource extends GenericResource {
     @PreAuthorize("hasRole('DOCTOR')")
     public Response getEntity(
             @Context HttpHeaders httpheaders,
+            @ModelAttribute("userOptional") Optional<User> userOptional,
             @PathParam("id") Integer id) {
         MIMEHelper.assertServerType(httpheaders, WorkdayMIME.GET);
 
         if (id == null) throw this.missingPathParams();
 
-        User user = this.assertUserUnauthorized();
+        User user = this.assertUserUnauthorized(userOptional);
         if (!this.isDoctor()) throw this.forbidden();
 
         List<Doctor> doctors = this.doctorService.findByUser(user);
@@ -124,10 +126,11 @@ public class WorkdayResource extends GenericResource {
     @PreAuthorize("hasRole('DOCTOR')")
     public Response deleteEntity(
             @Context HttpHeaders httpheaders,
+            @ModelAttribute("userOptional") Optional<User> userOptional,
             @PathParam("id") Integer id) {
         if (id == null) throw this.missingPathParams();
 
-        User user = this.assertUserUnauthorized();
+        User user = this.assertUserUnauthorized(userOptional);
         if (!this.isDoctor()) throw this.forbidden();
 
         try {

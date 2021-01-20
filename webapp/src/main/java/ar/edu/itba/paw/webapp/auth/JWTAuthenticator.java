@@ -29,6 +29,7 @@ import java.io.InputStreamReader;
 import java.io.Reader;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 
 @Component
 @PropertySource("classpath:application-prod.properties")
@@ -101,11 +102,24 @@ public class JWTAuthenticator {
 
         CookieUtils.setHttpOnlyCookie(response, this.createJWTCookie(token));
         CookieUtils.setHttpOnlyCookie(response, this.createRefreshTokenCookie(refreshToken));
+        CookieUtils.setCookie(response, this.createJWTExpirationCookie());
     }
 
     public void invalidateJWTCookies(HttpServletResponse response) {
         CookieUtils.setHttpOnlyCookie(response, this.createJWTCookie(Constants.EMPTY_COOKIE));
         CookieUtils.setHttpOnlyCookie(response, this.createRefreshTokenCookie(Constants.EMPTY_COOKIE));
+        CookieUtils.setCookie(response, this.createJWTExpirationCookie());
+    }
+
+    private Cookie createJWTExpirationCookie() {
+        Cookie cookie = new Cookie(Constants.LOGGED_IN_COOKIE_NAME, "true");
+
+        int maxAge = (int) TimeUnit.MILLISECONDS.toSeconds(Constants.JWT_EXPIRATION_MILLIS);
+        cookie.setMaxAge(maxAge); // Seconds
+        cookie.setDomain(this.APP_HOST);
+        cookie.setPath(this.APP_SUBPATH);
+
+        return cookie;
     }
 
     private Cookie createJWTCookie(String token) {
@@ -113,7 +127,7 @@ public class JWTAuthenticator {
         // No usamos secure porque paw no tiene ssl
         // jwtCookie.setSecure(true);
 
-        int maxAge = token.isEmpty() ? 0 : (int) (Constants.JWT_EXPIRATION_MILLIS / 1000);
+        int maxAge = token.isEmpty() ? 0 : (int) TimeUnit.MILLISECONDS.toSeconds(Constants.JWT_EXPIRATION_MILLIS);
         cookie.setMaxAge(maxAge); // Seconds
         cookie.setDomain(this.APP_HOST);
         cookie.setPath(this.APP_SUBPATH);
@@ -122,11 +136,11 @@ public class JWTAuthenticator {
     }
 
     private Cookie createRefreshTokenCookie(String token) {
-        Cookie cookie = new Cookie(Constants.REFRESH_TOKEN_COOKIEN_NAME, token);
+        Cookie cookie = new Cookie(Constants.REFRESH_TOKEN_COOKIE_NAME, token);
         // No usamos secure porque paw no tiene ssl
         // jwtCookie.setSecure(true);
 
-        int maxAge = token.isEmpty() ? 0 : (int) (Constants.JWT_REFRESH_EXPIRATION_MILLIS / 1000);
+        int maxAge = token.isEmpty() ? 0 : (int) TimeUnit.MILLISECONDS.toSeconds(Constants.JWT_REFRESH_EXPIRATION_MILLIS);
         cookie.setMaxAge(maxAge); // Seconds
         cookie.setDomain(this.APP_HOST);
         cookie.setPath(this.APP_SUBPATH + '/' + Constants.AUTH_ENDPOINT);

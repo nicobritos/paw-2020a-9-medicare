@@ -18,6 +18,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.web.bind.annotation.ModelAttribute;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
@@ -51,6 +52,7 @@ public class AuthResource extends GenericAuthenticationResource {
     @Path("/" + Constants.REFRESH_TOKEN_ENDPOINT)
     public Response refreshToken(
             @Context HttpServletRequest request,
+            @ModelAttribute("userOptional") Optional<User> userOptional,
             @Context HttpServletResponse response) {
         String token = this.getRefreshToken(request);
 
@@ -60,7 +62,7 @@ public class AuthResource extends GenericAuthenticationResource {
         if (!refreshTokenOptional.isPresent())
             throw this.notFound();
 
-        User user = this.assertUserNotFound();
+        User user = this.assertUserNotFound(userOptional);
         if (refreshTokenOptional.get().getCreatedDate().plusMillis((int) Constants.JWT_REFRESH_EXPIRATION_MILLIS).toDateTime().isBeforeNow())
             throw this.unauthorized();
 
@@ -107,7 +109,7 @@ public class AuthResource extends GenericAuthenticationResource {
         if (request.getCookies() == null) return null;
 
         return Arrays.stream(request.getCookies())
-                .filter(cookie -> cookie.getName().equals(Constants.REFRESH_TOKEN_COOKIEN_NAME))
+                .filter(cookie -> cookie.getName().equals(Constants.REFRESH_TOKEN_COOKIE_NAME))
                 .map(Cookie::getValue)
                 .findFirst()
                 .orElse(null);

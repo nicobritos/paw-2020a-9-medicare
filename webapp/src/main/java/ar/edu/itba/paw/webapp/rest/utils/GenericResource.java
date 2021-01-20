@@ -3,6 +3,7 @@ package ar.edu.itba.paw.webapp.rest.utils;
 import ar.edu.itba.paw.interfaces.services.UserService;
 import ar.edu.itba.paw.models.Paginator;
 import ar.edu.itba.paw.models.User;
+import ar.edu.itba.paw.webapp.auth.JWTParser;
 import ar.edu.itba.paw.webapp.auth.UserRole;
 import ar.edu.itba.paw.webapp.exceptions.APIErrorFactory;
 import ar.edu.itba.paw.webapp.exceptions.APIErrorFactory.APIErrorBuilder;
@@ -13,7 +14,9 @@ import ar.edu.itba.paw.webapp.models.error.ErrorConstants;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.web.bind.annotation.ModelAttribute;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.InternalServerErrorException;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.HttpHeaders;
@@ -41,21 +44,53 @@ public abstract class GenericResource {
     private UserService userService;
 
     protected boolean isDoctor() {
-        if (!SecurityContextHolder.getContext().getAuthentication().isAuthenticated())
+        if (!this.isAuthenticated())
             return false;
 
-        Collection<? extends GrantedAuthority> authorities = SecurityContextHolder.getContext().getAuthentication().getAuthorities();
-
-        return authorities
-                .stream()
-                .anyMatch(grantedAuthority -> grantedAuthority.getAuthority().equals(UserRole.DOCTOR.getAsRole()));
-    }
-
-    protected Optional<User> getUser() {
         Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         if (principal instanceof org.springframework.security.core.userdetails.User) {
             try {
-                return this.userService.findById(Integer.parseInt(((org.springframework.security.core.userdetails.User) principal).getUsername()));
+                org.springframework.security.core.userdetails.User user = ((org.springframework.security.core.userdetails.User) principal);
+                if (user.getAuthorities().isEmpty() || user.getAuthorities().stream().findFirst().get().getAuthority().equals(UserRole.UNVERIFIED.getAsRole())) {
+                    // If the user is unverified we must return it from the db as it may now be verified
+                    Optional<User> userOptional = this.userService.findById(Integer.parseInt(((org.springframework.security.core.userdetails.User) principal).getUsername()));
+                    return userOptional.filter(value -> this.userService.isDoctor(value)).isPresent();
+                } else {
+                    Collection<? extends GrantedAuthority> authorities = SecurityContextHolder.getContext().getAuthentication().getAuthorities();
+
+                    return authorities
+                            .stream()
+                            .anyMatch(grantedAuthority -> grantedAuthority.getAuthority().equals(UserRole.DOCTOR.getAsRole()));
+                }
+            } catch (NumberFormatException e) {
+                return false;
+            }
+        }
+        return false;
+    }
+
+    protected boolean isAuthenticated() {
+        if (!SecurityContextHolder.getContext().getAuthentication().isAuthenticated()) return false;
+
+        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        return principal instanceof org.springframework.security.core.userdetails.User;
+    }
+
+    @ModelAttribute("userOptional")
+    protected Optional<User> getUser(HttpServletRequest request) {
+        if (!this.isAuthenticated()) return Optional.empty();
+
+        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        if (principal instanceof org.springframework.security.core.userdetails.User) {
+            try {
+                org.springframework.security.core.userdetails.User user = ((org.springframework.security.core.userdetails.User) principal);
+                if (user.getAuthorities().isEmpty() || user.getAuthorities().stream().findFirst().get().getAuthority().equals(UserRole.UNVERIFIED.getAsRole())) {
+                    // If the user is unverified we must return it from the db as it may now be verified
+                    return this.userService.findById(Integer.parseInt(((org.springframework.security.core.userdetails.User) principal).getUsername()));
+                } else {
+                    // We can just return the user stored in the jwt payload
+                    return Optional.ofNullable(JWTParser.getInstance().decodeJWT(request));
+                }
             } catch (NumberFormatException e) {
                 return Optional.empty();
             }
@@ -63,15 +98,13 @@ public abstract class GenericResource {
         return Optional.empty();
     }
 
-    protected User assertUserUnauthorized() {
-        Optional<User> user = this.getUser();
+    protected User assertUserUnauthorized(Optional<User> user) {
         if (!user.isPresent())
             throw this.unauthorized();
         return user.get();
     }
 
-    protected User assertUserNotFound() {
-        Optional<User> user = this.getUser();
+    protected User assertUserNotFound(Optional<User> user) {
         if (!user.isPresent())
             throw this.notFound();
         return user.get();
