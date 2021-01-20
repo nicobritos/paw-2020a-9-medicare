@@ -2,6 +2,7 @@ package ar.edu.itba.paw.services;
 
 import ar.edu.itba.paw.interfaces.daos.PictureDao;
 import ar.edu.itba.paw.interfaces.services.PictureService;
+import ar.edu.itba.paw.interfaces.services.UserService;
 import ar.edu.itba.paw.models.Picture;
 import ar.edu.itba.paw.models.User;
 import ar.edu.itba.paw.services.generics.GenericServiceImpl;
@@ -13,6 +14,8 @@ import org.springframework.transaction.annotation.Transactional;
 public class PictureServiceImpl extends GenericServiceImpl<PictureDao, Picture, Integer> implements PictureService {
     @Autowired
     private PictureDao repository;
+    @Autowired
+    private UserService userService;
 
     @Override
     protected PictureDao getRepository() {
@@ -21,11 +24,13 @@ public class PictureServiceImpl extends GenericServiceImpl<PictureDao, Picture, 
 
     @Override
     @Transactional
-    public Picture changeProfilePic(User user, Picture picture) {
+    public User changeProfilePic(User user, Picture picture) {
         if(user == null)
             throw new IllegalArgumentException();
         if (user.getProfilePictureId() != null)
             remove(user.getProfilePictureId());
-        return create(picture);
+        user.setProfilePicture(create(picture));
+        userService.update(user);
+        return user;
     }
 }

@@ -15,6 +15,8 @@ import ar.edu.itba.paw.webapp.models.UserMe;
 import ar.edu.itba.paw.webapp.models.UserMeFactory;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.exc.UnrecognizedPropertyException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
@@ -35,6 +37,7 @@ import javax.ws.rs.NotAcceptableException;
 import javax.ws.rs.core.Response.Status;
 import java.io.IOException;
 import java.util.Collection;
+import java.util.Optional;
 
 @Component
 public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilter {
@@ -46,6 +49,8 @@ public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilte
     private PatientService patientService;
     @Autowired
     private JWTAuthenticator authenticator;
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(JWTAuthenticationFilter.class);
 
     @Value("classpath:token.key")
     private Resource secretResource;
@@ -105,11 +110,17 @@ public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilte
     @Override
     protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response, FilterChain chain, Authentication authentication) throws IOException, ServletException {
         ar.edu.itba.paw.models.User user;
+        Optional<ar.edu.itba.paw.models.User> maybeUser;
         try {
-            user = this.userService.findById(Integer.parseInt(((User) authentication.getPrincipal()).getUsername())).get();
+            maybeUser = this.userService.findById(Integer.parseInt(((User) authentication.getPrincipal()).getUsername()));
         } catch (NumberFormatException e) {
-            // TODO: Log, no deberia de pasar
-            return;
+            LOGGER.error("Bad username, should be a number. Username: {}", ((User) authentication.getPrincipal()).getUsername());
+            throw new IllegalStateException("Could not authenticate because of Id");
+        }
+        if(!maybeUser.isPresent()){
+            throw new IllegalStateException("Could not authenticate because user not found");
+        } else {
+            user = maybeUser.get();
         }
 
         this.authenticator.createAndRefreshJWT(authentication, user, response, null);

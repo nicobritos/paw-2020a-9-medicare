@@ -221,10 +221,7 @@ public class UserResource extends GenericAuthenticationResource {
         picture.setName(pictureDetails.getName());
         picture.setMimeType(pictureDetails.getType());
 
-        // TODO: Agus transaccion
-        picture = pictureService.changeProfilePic(user, picture);
-        user.setProfilePicture(picture);
-        this.userService.update(user);
+        user = pictureService.changeProfilePic(user, picture);
 
         UserCredentials userCredentials = new UserCredentials();
         userCredentials.setUsername(user.getEmail());
@@ -315,8 +312,8 @@ public class UserResource extends GenericAuthenticationResource {
     private byte[] getDefaultProfilePicture() {
         try {
             return IOUtils.toByteArray(new FileInputStream(new ClassPathResource("/defaultProfilePic.svg").getFile()));
-        } catch (Exception e) {
-            // TODO: Log
+        } catch (IOException e) {
+            LOGGER.error("Could not found defaultProfilePic.svg");
             return null;
         }
     }

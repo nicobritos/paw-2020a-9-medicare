@@ -5,5 +5,5 @@ import ar.edu.itba.paw.models.Picture;
 import ar.edu.itba.paw.models.User;
 
 public interface PictureService extends GenericService<Picture, Integer> {
-    Picture changeProfilePic(User user, Picture picture);
+    User changeProfilePic(User user, Picture picture);
 }
