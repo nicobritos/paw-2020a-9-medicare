@@ -294,7 +294,7 @@ export default class MedicProfile extends Vue {
     }
 
     // TODO: Guido: Hace un await y mientras mostra un loading spinner
-    removeSpecialty(id: number):void{
+    async removeSpecialty(id: number): Promise<void> {
         let doctors: Doctor[] = this.$store.getters['auth/doctors'];
 
         for (let doctor of doctors) {
