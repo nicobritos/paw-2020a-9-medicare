@@ -1,6 +1,9 @@
-package ar.edu.itba.paw;
+package ar.edu.itba.paw.services;
 
 import ar.edu.itba.paw.interfaces.daos.AppointmentDao;
+import ar.edu.itba.paw.interfaces.services.EmailService;
+import ar.edu.itba.paw.interfaces.services.PatientService;
+import ar.edu.itba.paw.interfaces.services.WorkdayService;
 import ar.edu.itba.paw.interfaces.services.exceptions.InvalidAppointmentStatusChangeException;
 import ar.edu.itba.paw.models.*;
 import ar.edu.itba.paw.services.AppointmentServiceImpl;
@@ -15,6 +18,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
@@ -49,10 +53,17 @@ public class AppointmentServiceImplTest {
     private static final int DOCTOR_ID = 1;
     private static final int APPOINTMENT_ID = 1;
     @InjectMocks
-    private AppointmentServiceImpl appointmentService = new AppointmentServiceImpl();
+    private final AppointmentServiceImpl appointmentService = new AppointmentServiceImpl();
 
     @Mock
-    private AppointmentDao mockDao;
+    private AppointmentDao appointmentDaoMock;
+    @Mock
+    private WorkdayService workdayServiceMock;
+    @Mock
+    private PatientService patientServiceMock;
+    @Mock
+    private EmailService emailServiceMock;
+
 
     private User userModel() {
         User user = new User();
@@ -146,5 +157,37 @@ public class AppointmentServiceImplTest {
         AppointmentStatus changeToStatus = AppointmentStatus.SEEN;
         appointment.setAppointmentStatus(status);
         appointmentService.setStatus(appointment, changeToStatus);
+    }
+
+    @Test
+    public void createAppointmentTest(){
+        Workday workday = new Workday();
+        workday.setDoctor(doctorModel());
+        workday.setDay(WorkdayDay.from(dateModel()));
+        workday.setStartHour(HOUR);
+        workday.setStartMinute(MINUTE);
+        workday.setEndHour(HOUR+1);
+        workday.setEndMinute(MINUTE);
+        workday.setId(APPOINTMENT_ID);
+
+        AppointmentTimeSlot appointmentTimeSlot = new AppointmentTimeSlot();
+        appointmentTimeSlot.setDate(dateModel());
+        Mockito.when(workdayServiceMock.doctorWorks(Mockito.eq(doctorModel()), Mockito.eq(appointmentTimeSlot)))
+                .thenReturn(true);
+        Mockito.when(workdayServiceMock.findByDoctor(doctorModel(), WorkdayDay.from(dateModel())))
+                .thenReturn(Collections.singletonList(workday));
+        Mockito.when(patientServiceMock.findByUserAndOffice(Mockito.eq(userModel()), Mockito.eq(officeModel())))
+                .thenReturn(Optional.empty());
+        Mockito.when(patientServiceMock.create(Mockito.eq(patientModel())))
+                .thenReturn(patientModel());
+        Mockito.when(appointmentDaoMock.findByDoctorsAndDate(Mockito.eq(Collections.singletonList(doctorModel())), Mockito.eq(dateModel())))
+                .thenReturn(Collections.emptyList());
+        Mockito.when(appointmentDaoMock.create(Mockito.eq(appointmentModel())))
+                .thenReturn(appointmentModel());
+        Mockito.doNothing().when(emailServiceMock).sendNewAppointmentNotificationEmail(appointmentModel());
+
+        Appointment appointment = appointmentService.create(appointmentModel(), userModel());
+
+        assertEquals(appointmentModel(), appointment);
     }
 }
