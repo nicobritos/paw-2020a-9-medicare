@@ -91,6 +91,8 @@ import logo from "@/assets/logo.svg";
 import {createPath} from "@/logic/Utils";
 import {Doctor} from '~/logic/models/Doctor';
 import {Getter} from 'vuex-class';
+import TYPES from '~/logic/types';
+import {WorkdayService} from '~/logic/interfaces/services/WorkdayService';
 
 @Component
 export default class AddWorkday extends Vue {
@@ -102,6 +104,7 @@ export default class AddWorkday extends Vue {
     private dowSelected = "0";
     private startHour = "";
     private endHour = "";
+    // TODO: Guido, x ahora no tenemos muchos offices, podriamos sacarlo. Hya un office por staff
     private officeSelected = "0";
 
     @Getter('auth/doctors')
@@ -118,22 +121,26 @@ export default class AddWorkday extends Vue {
         this.officeSelected = "0";
     }
 
-    //TODO: NICO submit form for adding workday
-    @Emit("submit")
     submitForm(e:Event){
         e.preventDefault();
         e.stopPropagation();
 
-        let formData = {
-            dowSelected:this.dowSelected,
-            startHour:this.startHour,
-            endHour:this.endHour,
-            officeSelected:this.officeSelected
-        };
+        // TODO: Guido: Hace un await y mientras mostra un loading spinner
+        this.getWorkdayService().createList([{
+            day: this.dowSelected,
+            end: {
+                hour: this.endHour,
+                minute: 0
+            },
+            start: {
+                hour: this.startHour,
+                minute: 0
+            }
+        }]);
+    }
 
-
-
-        return e;
+    private getWorkdayService(): WorkdayService {
+        return this.$container.get(TYPES.Services.WorkdayService);
     }
 }
 </script>

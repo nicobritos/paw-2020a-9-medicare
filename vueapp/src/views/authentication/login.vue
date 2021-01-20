@@ -71,7 +71,7 @@ import noeye from '@/assets/noeye.svg';
 import {Component, Vue, Watch} from 'vue-property-decorator';
 import {isValidEmail, Nullable, createPath} from '~/logic/Utils';
 import {authActionTypes} from '~/store/types/auth.types';
-import {State} from 'vuex-class';
+import {Getter, State} from 'vuex-class';
 import {User} from '~/logic/models/User';
 
 @Component
@@ -84,7 +84,7 @@ export default class Login extends Vue {
     private invalidCredentials = false;
     private email = '';
     private password = '';
-    @State(state => state.auth.user)
+    @Getter('auth/user')
     private readonly user: Nullable<User>;
     @State(state => state.auth.loggingIn)
     private readonly loggingIn:boolean;

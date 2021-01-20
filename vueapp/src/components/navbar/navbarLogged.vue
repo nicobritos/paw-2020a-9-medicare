@@ -56,7 +56,7 @@
 
 <script lang="ts">
 import {Component, Emit, Vue} from 'vue-property-decorator';
-import {State} from 'vuex-class';
+import {Getter, State} from 'vuex-class';
 import {User} from '~/logic/models/User';
 import {Doctor} from '~/logic/models/Doctor';
 import {Patient} from '~/logic/models/Patient';
@@ -66,13 +66,13 @@ import {createPath} from "~/logic/Utils";
 
 @Component
 export default class NavbarLogged extends Vue {
-    @State(state => state.auth.user)
+    @Getter('auth/user')
     private readonly user: User;
-    @State(state => state.auth.doctors)
+    @Getter('auth/doctors')
     private readonly doctors: Doctor[];
-    @State(state => state.auth.patients)
+    @Getter('auth/patients')
     private readonly patients: Patient[];
-    @State(state => state.auth.isDoctor)
+    @Getter('auth/isDoctor')
     private readonly isDoctor: boolean;
     private readonly defaultProfilePic = defaultProfilePic;
 

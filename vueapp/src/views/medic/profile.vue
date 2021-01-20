@@ -182,6 +182,10 @@ import Modal from "@/components/modal.vue";
 
 import {createPath} from "~/logic/Utils";
 import defaultProfilePic from "@/assets/defaultProfilePic.svg";
+import {WorkdayService} from '~/logic/interfaces/services/WorkdayService';
+import TYPES from '~/logic/types';
+import {Doctor} from '~/logic/models/Doctor';
+import {doctorActionTypes} from '~/store/types/doctor.types';
 
 let user = new User();
 user.email = user.firstName = user.phone = user.surname = 'asd';
@@ -289,16 +293,32 @@ export default class MedicProfile extends Vue {
         this.showModal = true;
     }
 
-    //TODO: NICO remove specialty with id
-    removeSpecialty(id:number):void{
-        console.log(id);
+    // TODO: Guido: Hace un await y mientras mostra un loading spinner
+    removeSpecialty(id: number):void{
+        let doctors: Doctor[] = this.$store.getters['auth/doctors'];
+
+        for (let doctor of doctors) {
+            let specialties = doctor.specialtyIds.map(value => value);
+            let index = specialties.findIndex(value => value === id);
+            if (index < 0) continue;
+            specialties.splice(index, 1);
+
+            await this.$store.dispatch('doctors/updateDoctor', doctorActionTypes.updateDoctor({
+                id: doctor.id,
+                doctor: {
+                    email: doctor.email,
+                    phone: doctor.phone,
+                    specialtyIds: specialties
+                }
+            }));
+        }
+        this.$store.dispatch('doctors/updateDoctor')
         return;
     }
 
-    //TODO: NICO remove workday with id
-    removeWorkday(id:number):void{
-        console.log(id);
-        return;
+    // TODO: Guido: Hace un await y mientras mostra un loading spinner
+    removeWorkday(id: number):void{
+        this.getWorkdayService().delete(id);
     }
 
     changeProfilePic(e:InputEvent){
@@ -331,6 +351,10 @@ export default class MedicProfile extends Vue {
     triggerChangePPInput(){
         //@ts-ignore
         this.$refs.PPInput.click();
+    }
+
+    private getWorkdayService(): WorkdayService {
+        return this.$container.get(TYPES.Services.WorkdayService);
     }
 }
 </script>
