@@ -1,5 +1,5 @@
 import {GenericEntity} from '~/logic/models/utils/GenericEntity';
-import {Nullable} from '~/logic/Utils';
+import {ID, Nullable} from '~/logic/Utils';
 
 export class User extends GenericEntity<User> {
     private _id: number;
@@ -8,6 +8,7 @@ export class User extends GenericEntity<User> {
     private _surname: string;
     private _verified: boolean;
     private _phone: Nullable<string>;
+    private _profilePictureId: ID;
 
     public get id(): number {
         return this._id;
@@ -55,5 +56,13 @@ export class User extends GenericEntity<User> {
 
     public set phone(value: Nullable<string>) {
         this._phone = value;
+    }
+
+    public get profilePictureId(): ID {
+        return this._profilePictureId;
+    }
+
+    public set profilePictureId(value: ID) {
+        this._profilePictureId = value;
     }
 }
