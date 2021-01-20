@@ -24,7 +24,7 @@
                     </label>
                 </div>
                 <div class="col-8">
-                    <select class="form-control" name="specialtyId" id="specialtyId" path="specialtyId">
+                    <select class="form-control" name="specialtyId" id="specialtyId" path="specialtyId" v-model="selectedSpecialtyId">
                         <option :value="null" disabled selected>{{ $t('Specialty') }}</option>
                         <option :value="null">{{ $t('Any') }}</option>
                         <option v-for="specialty in specialties" :key="specialty.id"
@@ -48,15 +48,18 @@
 <script lang="ts">
 import {Component, Emit, VModel, Vue} from 'vue-property-decorator';
 import logo from "@/assets/logo.svg";
-import { createPath } from "@/logic/Utils";
+import {createPath, ID, Nullable} from '@/logic/Utils';
 import {doctorSpecialtyActionTypes} from '~/store/types/doctorSpecialties.types';
 import { State } from 'vuex-class';
+import {doctorActionTypes} from '~/store/types/doctor.types';
+import {Doctor} from '~/logic/models/Doctor';
 
 @Component
 export default class AddSpecialty extends Vue {
     private readonly logo = logo;
     @VModel({type:Boolean,default:true})
-    private showModal:boolean;
+    private showModal: boolean;
+    private selectedSpecialtyId: Nullable<ID> = null;
 
     @State(state => state.doctorSpecialties.doctorSpecialties)
     private readonly specialties: [];
@@ -73,12 +76,28 @@ export default class AddSpecialty extends Vue {
         //TODO: clean selected specialty
     }
 
-    //TODO: NICO submit form for adding a specialty
-    @Emit("submit")
-    submitForm(e:Event){
-        return e;
-    }
+    public async submitForm(e:Event): Promise<void> {
+        e.stopPropagation();
+        e.preventDefault();
 
+        if (!this.selectedSpecialtyId) return;
+
+        let doctors: Doctor[] = this.$store.getters['auth/doctors'];
+
+        for (let doctor of doctors) {
+            let specialties = doctor.specialtyIds.map(value => value);
+            specialties.push(this.selectedSpecialtyId);
+
+            await this.$store.dispatch('doctors/updateDoctor', doctorActionTypes.updateDoctor({
+                id: doctor.id,
+                doctor: {
+                    email: doctor.email,
+                    phone: doctor.phone,
+                    specialtyIds: specialties
+                }
+            }));
+        }
+    }
 }
 </script>
 
