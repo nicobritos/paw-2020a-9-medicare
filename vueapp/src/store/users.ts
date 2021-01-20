@@ -15,6 +15,9 @@ function getService(): UserService {
     return container.get(TYPES.Services.UserService);
 }
 
+const state = (): UserState => ({
+});
+
 const actions: DefineActionTree<UserActions, UserState, RootState, UserActionReturnTypes> = {
     async me({rootState, rootGetters, commit}): Promise<void> {
         if (rootGetters['auth/loggedIn'] || rootState.auth._userLoading.promise || rootState.auth._userLoading.loaded)
@@ -55,7 +58,15 @@ const actions: DefineActionTree<UserActions, UserState, RootState, UserActionRet
 
     async updateUser({state, commit}, {payload}) {
         try {
-            return await getService().update(payload.id, payload.user);
+            let data = await getService().update(payload.id, payload.user);
+            if (data instanceof APIError) {
+                console.error(data);
+            } else {
+                commit('auth/setUser', authMutationTypes.setUser(data), {
+                    root: true
+                });
+            }
+            return data;
         } catch (e) {
             console.error(e);
             return null;
@@ -104,7 +115,8 @@ const actions: DefineActionTree<UserActions, UserState, RootState, UserActionRet
 
 const store: Module<any, any> = {
     namespaced: true,
-    actions
+    actions,
+    state
 };
 
 export default store;

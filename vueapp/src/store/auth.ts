@@ -152,6 +152,30 @@ const mutations: DefineMutationTree<AuthMutations, AuthState> = {
             localStorage.removeItem(DOCTORS_KEY);
         }
     },
+    setDoctor(state, {payload}): void {
+        let doctors: Doctor[];
+        let dataString: Nullable<string> = localStorage.getItem(DOCTORS_KEY);
+        if (!dataString || dataString.length === 0) doctors = [];
+        doctors = JSON.parse(dataString!);
+
+        if (doctors.length === 0) {
+            if (payload.doctor) {
+                doctors.push(payload.doctor);
+                localStorage.setItem(DOCTORS_KEY, JSON.stringify(doctors));
+            }
+            localStorage.setItem(DOCTORS_KEY, JSON.stringify(payload));
+        } else {
+            let index = doctors.findIndex(value => value.id.toString() == payload.id.toString());
+            if (!payload.doctor) {
+                if (index < 0) return;
+                doctors.splice(index, 1);
+            } else {
+                doctors[index] = payload.doctor;
+            }
+
+            localStorage.setItem(DOCTORS_KEY, JSON.stringify(doctors));
+        }
+    },
 };
 
 function hasLoggedIn(): boolean {
