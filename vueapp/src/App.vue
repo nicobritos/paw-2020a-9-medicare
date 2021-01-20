@@ -24,22 +24,12 @@ export default class App extends Vue {
         return this.$route.meta.hideNav;
     }
 
-    created(): void {
-        this.$store.dispatch('users/me', userActionTypes.me());
-        /**
-         * TODO: NICO
-         * N  N I   CCCC  OOOOOO
-         * NN N I CC      O    O
-         * N NN I CC      O    O
-         * N  N I   CCCC  OOOOOO
-         */
-    }
-
     showErrorToast(code:number){
-      this.$bvToast.toast(getErrorMessage(code),{
-        title:this.$t("ThereWasAnError").toString(),
-        variant:"danger"
-      })
+        // TODO: NICO
+        this.$bvToast.toast(getErrorMessage(code),{
+            title:this.$t("ThereWasAnError").toString(),
+            variant:"danger"
+        })
     }
 }
 </script>
