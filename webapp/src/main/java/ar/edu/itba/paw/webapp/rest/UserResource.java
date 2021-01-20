@@ -48,6 +48,8 @@ public class UserResource extends GenericAuthenticationResource {
     @Autowired
     private UserService userService;
     @Autowired
+    private RefreshTokenService refreshTokenService;
+    @Autowired
     private String baseUrl;
     @Autowired
     private String apiPath;
@@ -176,6 +178,8 @@ public class UserResource extends GenericAuthenticationResource {
     @Consumes(MediaType.MULTIPART_FORM_DATA)
     public Response setProfilePicture(
             @Context HttpHeaders httpheaders,
+            @Context HttpServletResponse response,
+            @ModelAttribute("refreshTokenString") String token,
             @ModelAttribute("userOptional") Optional<User> userOptional,
             @FormDataParam("picture") InputStream pictureFile,
             @FormDataParam("picture") FormDataContentDisposition pictureDetails,
@@ -184,6 +188,12 @@ public class UserResource extends GenericAuthenticationResource {
         if (id == null) throw this.missingPathParams();
 
         User user = this.assertUserUnauthorized(userOptional);
+
+        if (token == null) throw this.forbidden();
+
+        Optional<RefreshToken> refreshTokenOptional = this.refreshTokenService.findByToken(token);
+        if (!refreshTokenOptional.isPresent())
+            throw this.forbidden();
 
         Optional<User> userPath = this.userService.findById(id);
         if (!userPath.isPresent())
@@ -217,6 +227,12 @@ public class UserResource extends GenericAuthenticationResource {
         picture = this.pictureService.create(picture);
         user.setProfilePicture(picture);
         this.userService.update(user);
+
+        UserCredentials userCredentials = new UserCredentials();
+        userCredentials.setUsername(user.getEmail());
+        userCredentials.setPassword(token);
+
+        this.createJWTCookies(userCredentials, user, response, token, LOGGER);
 
         return Response
                 .created(this.joinPaths(this.baseUrl, this.apiPath, "/users/" + user.getId().toString() + "/picture"))
