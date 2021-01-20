@@ -17,8 +17,8 @@ import org.joda.time.LocalDateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
-import org.springframework.web.bind.annotation.ModelAttribute;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.HttpHeaders;
@@ -47,8 +47,8 @@ public class AppointmentResource extends GenericResource {
     @Produces({AppointmentMIME.GET_LIST, ErrorMIME.ERROR})
     @PreAuthorize("!hasRole('UNVERIFIED')")
     public Response getEntity(
-            @ModelAttribute("userOptional") Optional<User> userOptional,
             @Context HttpHeaders httpheaders,
+            @Context HttpServletRequest request,
             @QueryParam("from_year") Integer fromYear,
             @QueryParam("from_month") Integer fromMonth,
             @QueryParam("from_day") Integer fromDay,
@@ -58,7 +58,7 @@ public class AppointmentResource extends GenericResource {
 
         MIMEHelper.assertServerType(httpheaders, AppointmentMIME.GET_LIST);
 
-        User user = this.assertUserUnauthorized(userOptional);
+        User user = this.assertUserUnauthorized(request);
 
         Collection<Doctor> doctors;
         Collection<Patient> patients;
@@ -113,11 +113,11 @@ public class AppointmentResource extends GenericResource {
     @PreAuthorize("hasRole('PATIENT')")
     public Response createEntity(
             Appointment appointment,
-            @ModelAttribute("userOptional") Optional<User> userOptional,
+            @Context HttpServletRequest request,
             @Context HttpHeaders httpheaders) {
         MIMEHelper.assertServerType(httpheaders, AppointmentMIME.GET);
 
-        User user = this.assertUserUnauthorized(userOptional);
+        User user = this.assertUserUnauthorized(request);
         if (appointment == null || appointment.getFromDate() == null)
             throw this.missingBodyParams();
         if (appointment.getFromDate().isBefore(LocalDateTime.now())) {
@@ -150,13 +150,13 @@ public class AppointmentResource extends GenericResource {
     @PreAuthorize("!hasRole('UNVERIFIED')")
     public Response getEntity(
             @Context HttpHeaders httpheaders,
-            @ModelAttribute("userOptional") Optional<User> userOptional,
+            @Context HttpServletRequest request,
             @PathParam("id") Integer id) {
         MIMEHelper.assertServerType(httpheaders, AppointmentMIME.GET);
 
         if (id == null) throw this.missingPathParams();
 
-        User user = this.assertUserUnauthorized(userOptional);
+        User user = this.assertUserUnauthorized(request);
 
         Collection<Doctor> doctors;
         Collection<Patient> patients;
@@ -193,10 +193,10 @@ public class AppointmentResource extends GenericResource {
     @PreAuthorize("!hasRole('UNVERIFIED')")
     public Response deleteEntity(
             @Context HttpHeaders httpheaders,
-            @ModelAttribute("userOptional") Optional<User> userOptional,
+            @Context HttpServletRequest request,
             @PathParam("id") Integer id) {
         if (id == null) throw this.missingPathParams();
-        User user = this.assertUserUnauthorized(userOptional);
+        User user = this.assertUserUnauthorized(request);
 
         Optional<Appointment> appointmentOptional = this.appointmentService.findById(id);
         if (!appointmentOptional.isPresent())

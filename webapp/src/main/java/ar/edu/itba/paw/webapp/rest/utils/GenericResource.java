@@ -14,7 +14,6 @@ import ar.edu.itba.paw.webapp.models.error.ErrorConstants;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.web.bind.annotation.ModelAttribute;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.InternalServerErrorException;
@@ -76,7 +75,6 @@ public abstract class GenericResource {
         return principal instanceof org.springframework.security.core.userdetails.User;
     }
 
-    @ModelAttribute("userOptional")
     protected Optional<User> getUser(HttpServletRequest request) {
         if (!this.isAuthenticated()) return Optional.empty();
 
@@ -98,13 +96,15 @@ public abstract class GenericResource {
         return Optional.empty();
     }
 
-    protected User assertUserUnauthorized(Optional<User> user) {
+    protected User assertUserUnauthorized(HttpServletRequest request) {
+        Optional<User> user = this.getUser(request);
         if (!user.isPresent())
             throw this.unauthorized();
         return user.get();
     }
 
-    protected User assertUserNotFound(Optional<User> user) {
+    protected User assertUserNotFound(HttpServletRequest request) {
+        Optional<User> user = this.getUser(request);
         if (!user.isPresent())
             throw this.notFound();
         return user.get();

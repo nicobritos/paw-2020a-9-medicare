@@ -16,8 +16,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
-import org.springframework.web.bind.annotation.ModelAttribute;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.HttpHeaders;
@@ -42,11 +42,11 @@ public class WorkdayResource extends GenericResource {
     @Produces({WorkdayMIME.GET_LIST, ErrorMIME.ERROR})
     @PreAuthorize("hasRole('DOCTOR')")
     public Response getCollection(
-            @ModelAttribute("userOptional") Optional<User> userOptional,
+            @Context HttpServletRequest request,
             @Context HttpHeaders httpheaders) {
         MIMEHelper.assertServerType(httpheaders, WorkdayMIME.GET_LIST);
 
-        User user = this.assertUserUnauthorized(userOptional);
+        User user = this.assertUserUnauthorized(request);
         if (!this.isDoctor()) throw this.forbidden();
         return Response
                 .ok()
@@ -92,13 +92,13 @@ public class WorkdayResource extends GenericResource {
     @PreAuthorize("hasRole('DOCTOR')")
     public Response getEntity(
             @Context HttpHeaders httpheaders,
-            @ModelAttribute("userOptional") Optional<User> userOptional,
+            @Context HttpServletRequest request,
             @PathParam("id") Integer id) {
         MIMEHelper.assertServerType(httpheaders, WorkdayMIME.GET);
 
         if (id == null) throw this.missingPathParams();
 
-        User user = this.assertUserUnauthorized(userOptional);
+        User user = this.assertUserUnauthorized(request);
         if (!this.isDoctor()) throw this.forbidden();
 
         List<Doctor> doctors = this.doctorService.findByUser(user);
@@ -126,11 +126,11 @@ public class WorkdayResource extends GenericResource {
     @PreAuthorize("hasRole('DOCTOR')")
     public Response deleteEntity(
             @Context HttpHeaders httpheaders,
-            @ModelAttribute("userOptional") Optional<User> userOptional,
+            @Context HttpServletRequest request,
             @PathParam("id") Integer id) {
         if (id == null) throw this.missingPathParams();
 
-        User user = this.assertUserUnauthorized(userOptional);
+        User user = this.assertUserUnauthorized(request);
         if (!this.isDoctor()) throw this.forbidden();
 
         try {

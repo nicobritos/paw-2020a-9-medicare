@@ -11,7 +11,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.web.bind.annotation.ModelAttribute;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
@@ -26,7 +25,6 @@ public abstract class GenericAuthenticationResource extends GenericResource {
     @Autowired
     private UserService userService;
 
-    @ModelAttribute("refreshTokenString")
     protected String getRefreshTokenString(HttpServletRequest request) {
         if (request.getCookies() == null) return null;
 
