@@ -82,7 +82,8 @@ export default class AddSpecialty extends Vue {
 
         if (!this.selectedSpecialtyId) return;
 
-        let doctors: Doctor[] = this.$store.getters['auth/doctors'];
+        //TODO: check if this is correct
+        let doctors: Doctor[] = this.$store.getters['auth/doctors']();
 
         for (let doctor of doctors) {
             let specialties = doctor.specialtyIds.map(value => value);

@@ -25,7 +25,7 @@ import {createPath} from "~/logic/Utils";
 import Logo from "@/assets/logo.svg";
 
 @Component
-export default class Error403 extends Vue {
+export default class Error500 extends Vue {
     private logo = Logo;
     getUrl(url:string):string{
         return createPath(url);

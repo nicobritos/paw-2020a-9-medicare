@@ -67,7 +67,8 @@
                 </div>
                 <div class="col-8">
                     <select v-model="officeSelected" class="form-control" name="officeId" id="officeId" >
-                        <option v-for="doctor in doctors" :key="doctor.office.id" :value="doctor.office.id">
+                        <!-- TODO: check that this function call is okey -->
+                        <option v-for="doctor in doctors()" :key="doctor.office.id" :value="doctor.office.id">
                             {{doctor.office.name}}
                         </option>
                     </select>
@@ -108,7 +109,7 @@ export default class AddWorkday extends Vue {
     private officeSelected = "0";
 
     @Getter('auth/doctors')
-    private readonly doctors: Doctor[];
+    private readonly doctors: () => Doctor[];
 
     public getUrl(url:string):string{
         return createPath(url);

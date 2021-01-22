@@ -19,10 +19,10 @@ import Error404 from "@/views/error/404";
 import Error500 from "@/views/error/500";
 
 Vue.use(VueRouter);
-
+//TODO: change use of getters
 function notAuthGuard(to,from,next) {
-    if(store.getters["auth/loggedIn"]){
-        if(store.getters["auth/isDoctor"]){
+    if(store.getters["auth/loggedIn"]()){
+        if(store.getters["auth/isDoctor"]()){
             next({name:"MedicHome"});
         }
         else{
@@ -34,8 +34,8 @@ function notAuthGuard(to,from,next) {
 }
 
 function patientGuard(to,from,next) {
-    if(store.getters["auth/loggedIn"]){
-        if(store.getters["auth/isDoctor"]){   
+    if(store.getters["auth/loggedIn"]()){
+        if(store.getters["auth/isDoctor"]()){   
             next({name:"MedicHome"});
         }
         else{
@@ -49,8 +49,8 @@ function patientGuard(to,from,next) {
 }
 
 function doctorGuard(to,from,next) {
-    if(store.getters["auth/loggedIn"]){
-        if(store.getters["auth/isDoctor"]){   
+    if(store.getters["auth/loggedIn"]()){
+        if(store.getters["auth/isDoctor"]()){   
             next({name:"MedicHome"});
         }
         else{
@@ -64,7 +64,7 @@ function doctorGuard(to,from,next) {
 }
 
 function redirectHomeTopord(to) {
-    if(store.getters["auth/isDoctor"]){
+    if(store.getters["auth/isDoctor"]()){
         return "doctor/home";
     }else{
         return "patient/home";
