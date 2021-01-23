@@ -127,6 +127,7 @@ export default class AddWorkday extends Vue {
         e.stopPropagation();
 
         // TODO: Guido: Hace un await y mientras mostra un loading spinner
+        // TODO: Parse endhour and starthour
         this.getWorkdayService().createList([{
             day: this.dowSelected,
             end: {

@@ -26,7 +26,7 @@
             <div class="col-6">
                 <div class="container p-0 pt-4 m-0">
                     <!-- TODO:connect form -->
-                    <form>
+                    <form @submit="submitForm">
                         <div class="row">
                             <div class="col p-0 m-0">
                                 <!-- TODO Connect image function-->
@@ -184,6 +184,25 @@ export default class PatientProfile extends Vue {
     triggerChangePPInput(){
         //@ts-ignore
         this.$refs.PPInput.click();
+    }
+
+    //TODO: do validation
+    //TODO: should be formEvent or something like that
+    submitForm(e:any): void{
+        e.preventDefault();
+        let data = {
+                firstnameChanged:this.firstnameModEnabled,
+                surnameChanged:this.surnameModEnabled,
+                phoneChanged:this.phoneModEnabled,
+                emailChanged:this.emailModEnabled,
+                passwordChanged:this.passwordModEnabled,
+                
+                firstname: e.target["firstName"].value,
+                surname: e.target["surname"].value,
+                phone: e.target["phone"].value,
+                email: e.target["email"].value,
+                password: e.target["password"].value
+        }
     }
 }
 </script>

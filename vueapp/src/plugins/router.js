@@ -19,7 +19,7 @@ import Error404 from "@/views/error/404";
 import Error500 from "@/views/error/500";
 
 Vue.use(VueRouter);
-//TODO: change use of getters
+//TODO: check verified for certain actions
 function notAuthGuard(to,from,next) {
     if(store.getters["auth/loggedIn"]()){
         if(store.getters["auth/isDoctor"]()){
@@ -83,6 +83,11 @@ const routes = [
     //   component: () => import(/* webpackChunkName: "about" */ '../views/About.vue')
     // }
     {
+        name:"test",
+        component:PatientProfile,
+        path:"/test"
+    },
+    {
         path: '/mediclist/:page([1-9][0-9]*)',
         name: 'MedicList',
         component: MedicList
@@ -99,6 +104,7 @@ const routes = [
         path: '/verify/:token',
         name: 'Unverified',
         component: Unverified
+        // TODO: unverified guard
     },
     {
         path: '/',

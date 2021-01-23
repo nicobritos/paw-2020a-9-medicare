@@ -24,7 +24,7 @@
             <div class="col-6">
                 <div class="container p-0 pt-4 m-0">
                     <!-- TODO:connect form -->
-                    <form>
+                    <form @submit="submitForm">
                         <div class="row">
                             <div class="col p-0 m-0">
                                 <!-- TODO Connect image function-->
@@ -294,6 +294,11 @@ export default class MedicProfile extends Vue {
     }
 
     // TODO: Guido: Hace un await y mientras mostra un loading spinner
+    /*
+        se podria armar un objeto que sea par clave valor entre el specialty/workday
+        y usar el que undefined es falsy para mostrar el boton y si esta en proceso
+        de borrarse asociamos un true y cundo se borra lo seteamos en false
+    */
     // TODO: check this
     async removeSpecialty(id: number): Promise<void> {
         let doctors: Doctor[] = this.$store.getters['auth/doctors']();
@@ -347,6 +352,25 @@ export default class MedicProfile extends Vue {
         }).catch((e) => {
             //TODO:show error message
         });
+    }
+
+    //TODO: do validation
+    //TODO: should be formEvent or something like that
+    submitForm(e:any): void{
+        e.preventDefault();
+        let data = {
+                firstnameChanged:this.firstnameModEnabled,
+                surnameChanged:this.surnameModEnabled,
+                phoneChanged:this.phoneModEnabled,
+                emailChanged:this.emailModEnabled,
+                passwordChanged:this.passwordModEnabled,
+                
+                firstname: e.target["firstName"].value,
+                surname: e.target["surname"].value,
+                phone: e.target["phone"].value,
+                email: e.target["email"].value,
+                password: e.target["password"].value
+        }
     }
 
     triggerChangePPInput(){
