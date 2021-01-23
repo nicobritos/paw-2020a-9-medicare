@@ -84,10 +84,10 @@ export default class Login extends Vue {
     private invalidCredentials = false;
     private email = '';
     private password = '';
-    @Getter('auth/user')
-    private readonly user: () => Nullable<User>;
+    @State(state => state.auth.user)
+    private readonly user: Nullable<User>;
     @State(state => state.auth.loggingIn)
-    private readonly loggingIn:() => boolean;
+    private readonly loggingIn: boolean;
 
 
     get disabledButton(): boolean {
@@ -96,7 +96,7 @@ export default class Login extends Vue {
 
     @Watch('user')
     public goBack(): void {
-        if (this.user() && this.$route.query && this.$route.query.previous) {
+        if (this.user && this.$route.query && this.$route.query.previous) {
             let previous = typeof this.$route.query.previous === 'string' ? this.$route.query.previous : this.$route.query.previous[0];
             if (previous !== null && !this.$route.matched[0].regex.test(previous)) {
                 this.$router.push(previous);
@@ -112,7 +112,7 @@ export default class Login extends Vue {
             }
         }
         //TODO: future check of this
-        else if( this.user() ){
+        else if( this.user ){
                 this.$router.push({
                     name: 'Landing',
                 });

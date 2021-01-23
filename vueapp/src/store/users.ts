@@ -77,7 +77,6 @@ const actions: DefineActionTree<UserActions, UserState, RootState, UserActionRet
         try {
             let userDoctor = await getService().createAsDoctor(payload.doctor);
             if (userDoctor instanceof APIError) {
-                console.error(userDoctor); // TODO: Guido
                 return;
             }
 
@@ -96,7 +95,6 @@ const actions: DefineActionTree<UserActions, UserState, RootState, UserActionRet
         try {
             let userPatient = await getService().createAsPatient(payload.patient);
             if (userPatient instanceof APIError) {
-                console.error(userPatient); // TODO: Guido
                 return;
             }
 

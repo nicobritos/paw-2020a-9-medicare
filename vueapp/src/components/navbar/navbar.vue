@@ -1,7 +1,7 @@
 <template>
     <nav class="navbar navbar-expand header">
         <NavbarLogo/>
-        <NavbarLogged v-if="loggedIn()" @logout="logout"/>
+        <NavbarLogged v-if="loggedIn" @logout="logout"/>
         <NavbarNotLogged v-else/>
     </nav>
 </template>
@@ -25,7 +25,7 @@ import {createPath} from "~/logic/Utils";
 })
 export default class Navbar extends Vue {
     @Getter('auth/loggedIn')
-    private readonly loggedIn: () => boolean;
+    private readonly loggedIn: boolean;
 
     logout(): void {
         this.$store.dispatch('auth/logout', authActionTypes.logout());

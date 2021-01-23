@@ -64,8 +64,6 @@ export type StoreTS<State, Getters> = Omit<Store<State>, 'getters'> & {
     readonly getters: GetterHelper<Getters>;
 };
 
-export type NonCachedGetter<T> = () => T
-
 export interface AsyncProperty<T> {
     promise: Promise<T> | null
 }
