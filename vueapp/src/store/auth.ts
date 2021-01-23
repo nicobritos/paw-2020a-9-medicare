@@ -30,40 +30,16 @@ const state = (): AuthState => ({
     },
     loggingIn: false,
     loggingOut: false,
+    user: null as Nullable<User>,
+    doctors: [],
+    patients: [],
+    isDoctor: false
 });
 
 const getters: DefineGetterTree<AuthGetters, AuthState, RootState> = {
-    loggedIn: (): () => boolean => (): boolean => {
-        return hasLoggedIn();
-    },
-    user: (): () => Nullable<User> => (): Nullable<User> => {
-        if (!hasLoggedIn()) return null;
-
-        let userString: Nullable<string> = localStorage.getItem(USER_KEY);
-        if (!userString || userString.length === 0) return null;
-        return JSON.parse(userString);
-    },
-    patients: (): () => Patient[] => (): Patient[] => {
-        if (!hasLoggedIn()) return [];
-
-        let dataString: Nullable<string> = localStorage.getItem(PATIENTS_KEY);
-        if (!dataString || dataString.length === 0) return [];
-        return JSON.parse(dataString);
-    },
-    doctors: (): () => Doctor[] => (): Doctor[] => {
-        if (!hasLoggedIn()) return [];
-
-        let dataString: Nullable<string> = localStorage.getItem(DOCTORS_KEY);
-        if (!dataString || dataString.length === 0) return [];
-        return JSON.parse(dataString);
-    },
-    isDoctor: (): () => boolean => (): boolean => {
-        if (!hasLoggedIn()) return false;
-
-        let dataString: Nullable<string> = localStorage.getItem(IS_DOCTOR_KEY);
-        if (!dataString || dataString.length === 0) return false;
-        return JSON.parse(dataString);
-    },
+    loggedIn(state): boolean {
+        return !!state.user;
+    }
 };
 
 const actions: DefineActionTree<AuthActions, AuthState, RootState> = {
@@ -100,7 +76,7 @@ const actions: DefineActionTree<AuthActions, AuthState, RootState> = {
         }
     },
     async logout({state, commit}) {
-        if (!state._userLoading.promise && !hasLoggedIn()) return;
+        if (!state._userLoading.promise && !state.user) return;
 
         if (state._userLoading.promise)
             await state._userLoading.promise;
@@ -126,6 +102,7 @@ const mutations: DefineMutationTree<AuthMutations, AuthState> = {
     setUser(state, {payload}): void {
         state.loggingOut = state.loggingIn = false;
 
+        state.user = payload;
         if (payload) {
             localStorage.setItem(USER_KEY, JSON.stringify(payload));
         } else {
@@ -137,6 +114,10 @@ const mutations: DefineMutationTree<AuthMutations, AuthState> = {
         state._userLoading.loaded = true;
     },
     setPatients(state, {payload}): void {
+        state.patients = payload || [];
+        if (payload !== null)
+            state.isDoctor = false;
+
         if (payload) {
             localStorage.setItem(PATIENTS_KEY, JSON.stringify(payload));
             localStorage.setItem(IS_DOCTOR_KEY, JSON.stringify(false));
@@ -145,6 +126,10 @@ const mutations: DefineMutationTree<AuthMutations, AuthState> = {
         }
     },
     setDoctors(state, {payload}): void {
+        state.doctors = payload || [];
+        if (payload !== null)
+            state.isDoctor = true;
+
         if (payload) {
             localStorage.setItem(DOCTORS_KEY, JSON.stringify(payload));
             localStorage.setItem(IS_DOCTOR_KEY, JSON.stringify(true));

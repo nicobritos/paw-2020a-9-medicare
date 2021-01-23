@@ -148,8 +148,12 @@ export class RestRepositoryImpl implements RestRepository {
 
     private static formatResponse<R>(response: AxiosResponse): APIResponse<R> {
         if (typeof response.headers['content-type'] === 'string' && response.headers['content-type'].startsWith(ErrorMIME)) {
-            // TODO: CHECK
-            EventBus.$emit(APIErrorEventName, response.data);
+            let apiError: APIError = response.data;
+            if (apiError.errors && apiError.errors.length) {
+                for (let error of apiError.errors)
+                    EventBus.$emit(APIErrorEventName, error.code);
+            }
+
             return APIResponseFactory.error(response.data as APIError);
         }
 

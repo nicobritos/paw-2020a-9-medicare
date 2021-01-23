@@ -1,4 +1,4 @@
-import {CacheableAsyncProperty, DefineTypes, NonCachedGetter} from '~/store/utils/helper.types';
+import {CacheableAsyncProperty, DefineTypes} from '~/store/utils/helper.types';
 import {Doctor} from '~/logic/models/Doctor';
 import {Patient} from '~/logic/models/Patient';
 import {UserDoctors, UserPatients} from '~/logic/interfaces/services/AuthService';
@@ -16,6 +16,10 @@ export interface AuthState {
     loggingIn: boolean,
     loggingOut: boolean,
     _userLoading: CacheableAsyncProperty<UserPatients | UserDoctors | APIError>,
+    user: Nullable<User>,
+    doctors: Doctor[],
+    patients: Patient[],
+    isDoctor: boolean
 }
 
 export interface AuthActions {
@@ -50,9 +54,5 @@ export const authMutationTypes: DefineTypes<AuthMutations> = {
 };
 
 export interface AuthGetters {
-    loggedIn: NonCachedGetter<boolean>
-    user: NonCachedGetter<Nullable<User>>,
-    doctors: NonCachedGetter<Doctor[]>,
-    patients: NonCachedGetter<Patient[]>,
-    isDoctor: NonCachedGetter<boolean>
+    loggedIn: boolean
 }

@@ -22,7 +22,7 @@ Vue.use(VueRouter);
 //TODO: check verified for certain actions
 function notAuthGuard(to,from,next) {
     if(store.getters["auth/loggedIn"]()){
-        if(store.getters["auth/isDoctor"]()){
+        if(store.state.auth.isDoctor){
             next({name:"MedicHome"});
         }
         else{
@@ -35,7 +35,7 @@ function notAuthGuard(to,from,next) {
 
 function patientGuard(to,from,next) {
     if(store.getters["auth/loggedIn"]()){
-        if(store.getters["auth/isDoctor"]()){   
+        if(store.state.auth.isDoctor){   
             next({name:"MedicHome"});
         }
         else{
@@ -50,7 +50,7 @@ function patientGuard(to,from,next) {
 
 function doctorGuard(to,from,next) {
     if(store.getters["auth/loggedIn"]()){
-        if(store.getters["auth/isDoctor"]()){   
+        if(store.state.auth.isDoctor){   
             next({name:"MedicHome"});
         }
         else{
@@ -64,7 +64,7 @@ function doctorGuard(to,from,next) {
 }
 
 function redirectHomeTopord(to) {
-    if(store.getters["auth/isDoctor"]()){
+    if(store.state.auth.isDoctor){
         return "doctor/home";
     }else{
         return "patient/home";
@@ -83,11 +83,6 @@ const routes = [
     //   component: () => import(/* webpackChunkName: "about" */ '../views/About.vue')
     // }
     {
-        name:"test",
-        component:PatientProfile,
-        path:"/test"
-    },
-    {
         path: '/mediclist/:page([1-9][0-9]*)',
         name: 'MedicList',
         component: MedicList
@@ -104,7 +99,7 @@ const routes = [
         path: '/verify/:token',
         name: 'Unverified',
         component: Unverified
-        // TODO: unverified guard
+        // TODO: Guido guard y Nico levatar user del localStorage de nuevo para volver a verificar
     },
     {
         path: '/',

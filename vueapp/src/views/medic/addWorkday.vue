@@ -68,7 +68,7 @@
                 <div class="col-8">
                     <select v-model="officeSelected" class="form-control" name="officeId" id="officeId" >
                         <!-- TODO: check that this function call is okey -->
-                        <option v-for="doctor in doctors()" :key="doctor.office.id" :value="doctor.office.id">
+                        <option v-for="doctor in doctors" :key="doctor.office.id" :value="doctor.office.id">
                             {{doctor.office.name}}
                         </option>
                     </select>
@@ -87,11 +87,11 @@
     </b-modal>    
 </template>
 <script lang="ts">
-import {Component, Emit, VModel, Vue} from 'vue-property-decorator';
+import {Component, VModel, Vue} from 'vue-property-decorator';
 import logo from "@/assets/logo.svg";
 import {createPath} from "@/logic/Utils";
 import {Doctor} from '~/logic/models/Doctor';
-import {Getter} from 'vuex-class';
+import {State} from 'vuex-class';
 import TYPES from '~/logic/types';
 import {WorkdayService} from '~/logic/interfaces/services/WorkdayService';
 
@@ -108,8 +108,8 @@ export default class AddWorkday extends Vue {
     // TODO: Guido, x ahora no tenemos muchos offices, podriamos sacarlo. Hya un office por staff
     private officeSelected = "0";
 
-    @Getter('auth/doctors')
-    private readonly doctors: () => Doctor[];
+    @State(state => state.auth.doctors)
+    private readonly doctors: Doctor[];
 
     public getUrl(url:string):string{
         return createPath(url);

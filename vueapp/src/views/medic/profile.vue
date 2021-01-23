@@ -180,16 +180,13 @@ import AddSpecialty from "./addSpecialty.vue";
 import AddWorkday from "./addWorkday.vue";
 import Modal from "@/components/modal.vue";
 
-import {createPath} from "~/logic/Utils";
+import {createPath, Nullable} from '~/logic/Utils';
 import defaultProfilePic from "@/assets/defaultProfilePic.svg";
 import {WorkdayService} from '~/logic/interfaces/services/WorkdayService';
 import TYPES from '~/logic/types';
-import {Doctor} from '~/logic/models/Doctor';
 import {doctorActionTypes} from '~/store/types/doctor.types';
-
-let user = new User();
-user.email = user.firstName = user.phone = user.surname = 'asd';
-user.id = user.profilePictureId = 1;
+import {State} from 'vuex-class';
+import {Doctor} from '~/logic/models/Doctor';
 
 @Component({
     components:{
@@ -204,8 +201,11 @@ export default class MedicProfile extends Vue {
     private eye = eye;
     private noeye = noeye;
     private readonly defaultProfilePic = defaultProfilePic;
-    private user: User = user;
-    private doctors = [];
+
+    @State(state => state.auth.user)
+    private readonly user: Nullable<User>;
+    @State(state => state.auth.doctors)
+    private readonly doctors: Doctor[];
     private workdays = [];
     private specialties = [];
 
@@ -301,9 +301,7 @@ export default class MedicProfile extends Vue {
     */
     // TODO: check this
     async removeSpecialty(id: number): Promise<void> {
-        let doctors: Doctor[] = this.$store.getters['auth/doctors']();
-
-        for (let doctor of doctors) {
+        for (let doctor of this.doctors) {
             let specialties = doctor.specialtyIds.map(value => value);
             let index = specialties.findIndex(value => value === id);
             if (index < 0) continue;
@@ -318,8 +316,6 @@ export default class MedicProfile extends Vue {
                 }
             }));
         }
-        this.$store.dispatch('doctors/updateDoctor')
-        return;
     }
 
     // TODO: Guido: Hace un await y mientras mostra un loading spinner

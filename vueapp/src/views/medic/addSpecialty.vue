@@ -53,6 +53,7 @@ import {doctorSpecialtyActionTypes} from '~/store/types/doctorSpecialties.types'
 import { State } from 'vuex-class';
 import {doctorActionTypes} from '~/store/types/doctor.types';
 import {Doctor} from '~/logic/models/Doctor';
+import {DoctorSpecialty} from '~/logic/models/DoctorSpecialty';
 
 @Component
 export default class AddSpecialty extends Vue {
@@ -62,7 +63,9 @@ export default class AddSpecialty extends Vue {
     private selectedSpecialtyId: Nullable<ID> = null;
 
     @State(state => state.doctorSpecialties.doctorSpecialties)
-    private readonly specialties: [];
+    private readonly specialties: DoctorSpecialty[];
+    @State(state => state.auth.doctors)
+    private readonly doctors: Doctor[];
 
     mounted(): void {
         this.$store.dispatch('doctorSpecialties/loadDoctorSpecialties', doctorSpecialtyActionTypes.loadDoctorSpecialties());
@@ -82,10 +85,7 @@ export default class AddSpecialty extends Vue {
 
         if (!this.selectedSpecialtyId) return;
 
-        //TODO: check if this is correct
-        let doctors: Doctor[] = this.$store.getters['auth/doctors']();
-
-        for (let doctor of doctors) {
+        for (let doctor of this.doctors) {
             let specialties = doctor.specialtyIds.map(value => value);
             specialties.push(this.selectedSpecialtyId);
 
