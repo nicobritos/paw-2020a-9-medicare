@@ -21,7 +21,7 @@ import Error500 from "@/views/error/500";
 Vue.use(VueRouter);
 //TODO: check verified for certain actions
 function notAuthGuard(to,from,next) {
-    if(store.getters["auth/loggedIn"]()){
+    if(store.getters["auth/loggedIn"]){
         if(store.state.auth.isDoctor){
             next({name:"MedicHome"});
         }
@@ -34,7 +34,7 @@ function notAuthGuard(to,from,next) {
 }
 
 function patientGuard(to,from,next) {
-    if(store.getters["auth/loggedIn"]()){
+    if(store.getters["auth/loggedIn"]){
         if(store.state.auth.isDoctor){   
             next({name:"MedicHome"});
         }
@@ -49,7 +49,7 @@ function patientGuard(to,from,next) {
 }
 
 function doctorGuard(to,from,next) {
-    if(store.getters["auth/loggedIn"]()){
+    if(store.getters["auth/loggedIn"]){
         if(store.state.auth.isDoctor){   
             next({name:"MedicHome"});
         }
