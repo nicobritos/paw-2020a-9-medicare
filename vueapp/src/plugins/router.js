@@ -71,6 +71,19 @@ function redirectHomeTopord(to) {
     }
 }
 
+function unverifiedGuard(to,from,next) {
+    if(store.getters["auth/loggedIn"]){
+        if(!store.state.auth.user.verified){
+            next();
+        }
+        else{
+            next({name:"Landing"});
+        }
+    }else{
+        next({name:"Landing"});
+    }
+}
+
 const routes = [
     // example
     // TODO: CHECK best behavior for component
@@ -98,8 +111,10 @@ const routes = [
     {
         path: '/verify/:token',
         name: 'Unverified',
-        component: Unverified
+        component: Unverified,
         // TODO: Guido guard y Nico levatar user del localStorage de nuevo para volver a verificar
+        // TODO: check
+        beforeEnter:unverifiedGuard
     },
     {
         path: '/',

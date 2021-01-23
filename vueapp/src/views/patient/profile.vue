@@ -149,6 +149,10 @@ export default class PatientProfile extends Vue {
     private passwordModEnabled = false;
     enablePasswordMod():void{this.passwordModEnabled=true};
 
+    mounted(){
+        //TODO:disassociate this from the auth user
+        this.user = this.$store.state.auth.user;
+    }
 
     getUrl(url:string):string{
         return createPath(url);
