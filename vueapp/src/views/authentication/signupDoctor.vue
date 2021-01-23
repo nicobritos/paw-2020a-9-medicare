@@ -236,7 +236,8 @@ export default class SignupDoctor extends Vue {
                     firstName: this.firstname,
                     password: this.password,
                     surname: this.surname,
-                    specialtyIds: []
+                    specialtyIds: [],
+                    localityId: 0 // TODO: GUIDO
                 }
             }));
         }

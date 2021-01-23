@@ -14,6 +14,7 @@ interface CreateUser {
 export interface CreateUserDoctor extends CreateUser {
     registrationNumber?: number;
     specialtyIds: number[]; // TODO: APIDocs dice que no es mandatory
+    localityId: number;
 }
 
 export interface CreateUserPatient extends CreateUser {
