@@ -121,6 +121,7 @@ import {createPath} from "~/logic/Utils";
 
 @Component
 export default class PatientHome extends Vue {
+    // TODO: connect this
     private appointments = [];
     private specialties = [];
     private localities = [];

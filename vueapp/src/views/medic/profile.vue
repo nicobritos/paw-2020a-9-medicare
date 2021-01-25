@@ -206,6 +206,7 @@ export default class MedicProfile extends Vue {
     private readonly user: Nullable<User>;
     @State(state => state.auth.doctors)
     private readonly doctors: Doctor[];
+    //TODO: connect this
     private workdays = [];
     private specialties = [];
 

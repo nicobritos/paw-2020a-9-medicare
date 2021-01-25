@@ -215,6 +215,7 @@ export default class MedicHome extends Vue {
     private next = '>';
     private prev = '<';
     private moreOptions = moreOptions;
+    // TODO: connect this
     private monday = new Date(2020, 7, 6);
     private today = new Date(2020, 7, 9);
     private todayAppointments: Appointment[] = [];
