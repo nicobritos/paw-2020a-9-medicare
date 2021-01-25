@@ -77,34 +77,32 @@
                 </ul>
             </div>
             <div class="col">
-                <form class="container p-5 filter-form">
+                <form class="container p-5 filter-form" @submit="submitForm">
                     <div class="row justify-content-start">
                         <h3 class="form-title">{{ $t('SearchMedics') }}</h3>
                     </div>
                     <div class="row justify-content-start my-3">
-                        <input class="w-100 form-control" type="text" name="name" id="name"
+                        <input v-model="name" class="w-100 form-control" type="text" name="name" id="name"
                                :placeholder='$t("NameAndOrSurname")'>
                     </div>
                     <div class="row justify-content-start my-3">
-                        <select name="specialties" class="form-control">
-                            <option value="-1" disabled selected>{{ $t('Specialty') }}</option>
-                            <option value="-1">{{ $t('Any') }}</option>
-                            <option v-for="specialty in specialties" :key="specialty.id" :value="specialty.id">
-                                {{ specialty.name }}
-                            </option>
+                        <select v-model="specialtyId" name="specialties" class="form-control">
+                            <option :value="null" disabled selected>{{ $t('Specialty') }}</option>
+                            <option :value="null">{{ $t('Any') }}</option>
+                             <option v-for="specialty in specialties" :key="specialty.id"
+                                    :value="specialty.id">{{ specialty.name }}</option>
                         </select>
                     </div>
                     <div class="row justify-content-start my-3">
-                        <select name="localities" class="form-control">
-                            <option value="-1" disabled selected>{{ $t('Locality') }}</option>
-                            <option value="-1">{{ $t('Any') }}</option>
-                            <option v-for="locality in localities" :key="locality.id" :value="locality.id">
-                                {{ locality.name }}
-                            </option>
+                        <select v-model="localityId" name="localities" class="form-control">
+                            <option :value="null" disabled selected>{{ $t('Locality') }}</option>
+                            <option :value="null">{{ $t('Any') }}</option>
+                            <option v-for="locality in localities" :key="locality.id"
+                                    :value="locality.id">{{ locality.name }}</option>
                         </select>
                     </div>
                     <div class="row justify-content-start my-3">
-                        <button class="w-100 btn rounded-pill btn-light header-btn-element">{{ $t('SearchMedics') }}
+                        <button type="submit" class="w-100 btn rounded-pill btn-light header-btn-element">{{ $t('SearchMedics') }}
                         </button>
                     </div>
                 </form>
@@ -116,15 +114,22 @@
 <script lang="ts">
 
 import {Component, Vue} from 'vue-property-decorator';
+import { State } from 'vuex-class';
 
-import {createPath} from "~/logic/Utils";
+import {createPath, Hash, Nullable} from "~/logic/Utils";
 
 @Component
 export default class PatientHome extends Vue {
     // TODO: connect this
     private appointments = [];
-    private specialties = [];
-    private localities = [];
+    @State(state => state.localities.localities)
+    private readonly localities: [];
+    @State(state => state.doctorSpecialties.doctorSpecialties)
+    private readonly specialties: [];
+
+    private name: string = '';
+    private localityId: Nullable<number> = null;
+    private specialtyId: Nullable<number> = null;
 
     getDoW(t: number): string {
         switch (t) {
@@ -188,6 +193,28 @@ export default class PatientHome extends Vue {
 
     getUrl(url:string):string{
         return createPath(url);
+    }
+
+    submitForm(event: Event): void {
+        event.preventDefault();
+        event.stopPropagation();
+
+        this.search();
+    }
+
+    search(): void {
+        let query: Hash<string | string[]> = {};
+        if (this.name)
+            query.name = this.name.trim();
+        if (this.localityId)
+            query.localities = [this.localityId.toString()];
+        if (this.specialtyId)
+            query.specialties = [this.specialtyId.toString()];
+
+        this.$router.push({
+            path: createPath("/mediclist"),
+            query
+        });
     }
 
 }

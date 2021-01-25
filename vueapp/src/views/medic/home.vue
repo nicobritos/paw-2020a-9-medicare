@@ -215,9 +215,9 @@ export default class MedicHome extends Vue {
     private next = '>';
     private prev = '<';
     private moreOptions = moreOptions;
+    private monday = this.getMonday(new Date());
+    private today = new Date();
     // TODO: connect this
-    private monday = new Date(2020, 7, 6);
-    private today = new Date(2020, 7, 9);
     private todayAppointments: Appointment[] = [];
     private weekAppointments: Appointment[] = [[], [], [], [], [], [], []];
 
@@ -265,6 +265,19 @@ export default class MedicHome extends Vue {
                 return this.monday.plusDays(i).monthOfYear;
         }
     }
+
+    getMonday(day:Date):Date {
+        // get day of week
+        let toAdd = day.getDay();
+
+        //remove the amount of days necessary to get to monday
+        //(monday is 1, sunday is 0)
+        toAdd = toAdd == 0 ? -6 : -1 * ( toAdd - 1 );
+        
+        //@ts-ignore
+        return day.plusDays( toAdd );
+    }
+
 }
 </script>
 
