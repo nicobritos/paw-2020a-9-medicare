@@ -110,7 +110,11 @@
                 </div>
                 <div class="col-8">
                     <!-- TODO: maybe add state to input -->
-                    <select v-model="locality" class="form-control" style="width: 100%;" id="locality"/>
+                    <select v-model="locality" class="form-control" style="width: 100%;" id="locality">
+                        <option v-for="locality in localities" :key="locality.id" :value="locality.id">
+                            {{ locality.name }}
+                        </option>
+                    </select>
                     <!-- TODO: maybe expand feedback-->
                     <!-- TODO: check the i18n-->
                     <b-form-invalid-feedback :state="validLocality">{{$t("NotEmpty.signupForm.address")}}</b-form-invalid-feedback>
@@ -144,6 +148,8 @@ import {Component, Vue} from 'vue-property-decorator';
 
 import {createPath, isValidEmail} from "~/logic/Utils";
 import {userActionTypes} from '~/store/types/user.types';
+import { Locality } from '~/logic/models/Locality';
+import { State } from 'vuex-class';
 
 @Component
 export default class SignupDoctor extends Vue {
@@ -152,6 +158,11 @@ export default class SignupDoctor extends Vue {
     private logo = logo;
     private eye = eye;
     private noeye = noeye;
+
+    //TODO:add country and province
+
+    @State(state => state.localities.localities)
+    private readonly localities: Locality[];
 
     //TODO:check properties
     private readonly minFirstnameLength = 2;
@@ -209,7 +220,7 @@ export default class SignupDoctor extends Vue {
         return true;
     }
     get validLocality():boolean{
-        return true;
+        return this.locality != null;
     }
     get validAddress():boolean{
         return this.address.length!=0;
