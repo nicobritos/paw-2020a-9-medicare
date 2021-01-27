@@ -51,10 +51,10 @@ function patientGuard(to,from,next) {
 function doctorGuard(to,from,next) {
     if(store.getters["auth/loggedIn"]){
         if(store.state.auth.isDoctor){   
-            next({name:"MedicHome"});
+            next();
         }
         else{
-            next();
+            next({name:"PatientHome"});
         }
     }else{
         next({name:"Login",params:{
