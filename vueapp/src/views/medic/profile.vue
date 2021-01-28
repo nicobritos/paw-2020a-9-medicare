@@ -33,8 +33,11 @@
                                         <img type="button" :src='editPencil' alt="editar" @click="enableFirstnameMod"/>
                                     </label>
                                 </h3>
-                                <input class="form-control mb-3 w-75" id="firstName" name="firstName"
-                                       :value="user.firstName" :readonly="!firstnameModEnabled"/>
+                                <input v-model="firstname" class="form-control mb-3 w-75" id="firstName" name="firstName"
+                                        :readonly="!firstnameModEnabled"/>
+                                <!-- TODO: maybe expand feedback-->
+                                <!-- TODO: check the i18n-->
+                                <b-form-invalid-feedback :state="validFirstname||!firstnameModEnabled">{{$t("Size.signupForm.firstName",[0,maxFirstnameLength,minFirstnameLength])}}</b-form-invalid-feedback>
                             </div>
                             <div class="col p-0 m-0">
                                 <!-- TODO Connect image function-->
@@ -43,8 +46,11 @@
                                         <img type="button" :src='editPencil' alt="editar" @click="enableSurnameMod"/>
                                     </label>
                                 </h3>
-                                <input class="form-control mb-3 w-75" name="surname" id="surname" :value="user.surname"
+                                <input class="form-control mb-3 w-75" name="surname" id="surname" v-model="surname"
                                        :readonly="!surnameModEnabled"/>
+                                <!-- TODO: maybe expand feedback-->
+                                <!-- TODO: check the i18n-->
+                                <b-form-invalid-feedback :state="validSurname||!surnameModEnabled">{{$t("Size.signupForm.surname",[0,maxSurnameLength,minSurnameLength])}}</b-form-invalid-feedback>
                             </div>
                         </div>
                         <div class="row">
@@ -54,8 +60,9 @@
                                         <img type="button" :src='editPencil' alt="editar" @click="enablePhoneMod">
                                     </label>
                                 </h3>
-                                <input class="form-control mb-3 w-75" id="phone" name="phone" :value="user.phone"
+                                <input class="form-control mb-3 w-75" id="phone" name="phone" v-model="phone"
                                        :readonly="!phoneModEnabled"/>
+                                <!-- TODO: if validation in phone then feedback should be provided probably -->
                             </div>
                             <div class="col p-0 m-0">
                                 <h3>{{ $t('Email') }}
@@ -63,8 +70,11 @@
                                         <img type="button" :src='editPencil' alt="editar" @click="enableEmailMod"/>
                                     </label>
                                 </h3>
-                                <input class="form-control mb-3 w-75" id="email" name="email" :value="user.email"
+                                <input class="form-control mb-3 w-75" id="email" name="email" v-model="email"
                                        :readonly="!emailModEnabled"/>
+                                <!-- TODO: maybe expand feedback-->
+                                <!-- TODO: check the i18n-->
+                                <b-form-invalid-feedback :state="validEmail||!emailModEnabled">{{$t("Email.signupForm.email")}}</b-form-invalid-feedback>
                             </div>
                         </div>
                         <div class="row">
@@ -75,11 +85,12 @@
                                     </label>
                                 </h3>
                                 <input :type='passwordVis? "text": "password"' class="form-control mb-3 w-75" id="password" name="password"
-                                       :readonly="!passwordModEnabled"/>
+                                       v-model="password" :readonly="!passwordModEnabled"/>
                                 <label for="password" class="toggle-visibility">
                                     <img type="button" :src='eye' v-if="!passwordVis && passwordModEnabled" alt="not visible password" @click="passwordVis=true">
                                     <img type="button" :src='noeye' v-else-if="passwordModEnabled" alt="visible password" @click="passwordVis=false">
                                 </label>
+                                <!-- TODO: add feedback -->
                             </div>
                             <div v-if="passwordModEnabled" class="col p-0 m-0" id="repeat-password-container">
                                 <h3>
@@ -89,11 +100,13 @@
                                     </label>    
                                 </h3>
                                 <input :type='repeatPasswordVis? "text":"password"' class="form-control mb-3 w-75"
-                                       id="repeatPassword" name="repeatPassword"/>
+                                       v-model="repeatPassword" id="repeatPassword" name="repeatPassword"/>
                                 <label for="repeatPassword" class="toggle-visibility">
                                     <img type="button" :src='eye' v-if="!repeatPasswordVis" alt="not visible password" @click="repeatPasswordVis=true">
                                     <img type="button" :src='noeye' v-else alt="visible password" @click="repeatPasswordVis=false">
                                 </label>
+                                <!-- TODO: add feedback -->
+                                <!-- the problem lies in the fact that is you add a feedback the eyeicon gets missedplaced -->
                             </div>
                         </div>
                         <div class="row justify-content-center align-items-end mt-2">
@@ -180,7 +193,7 @@ import AddSpecialty from "./addSpecialty.vue";
 import AddWorkday from "./addWorkday.vue";
 import Modal from "@/components/modal.vue";
 
-import {createPath, Nullable} from '~/logic/Utils';
+import {createPath, isValidEmail, Nullable} from '~/logic/Utils';
 import defaultProfilePic from "@/assets/defaultProfilePic.svg";
 import {WorkdayService} from '~/logic/interfaces/services/WorkdayService';
 import TYPES from '~/logic/types';
@@ -232,6 +245,20 @@ export default class MedicProfile extends Vue {
     private modtitle:string = "";
     private modbody:string = "";
     private modOnConfirm:Function = ()=>{};
+
+    mounted(){
+        /*
+            TODO: hablar con nico de si se peude hacer esto para settear
+                    los valores iniciales del form, quizas a el se le
+                    ocurre algo mejor
+        */
+
+        let user = this.$store.state.auth.user;
+        this.firstname = user.firstName;
+        this.surname = user.surname;
+        this.email = user.email;
+        this.phone = user.phone
+    }
 
     getDow(day: Date): string {
         switch (day.getDay()) {
@@ -351,25 +378,6 @@ export default class MedicProfile extends Vue {
         });
     }
 
-    //TODO: do validation
-    //TODO: should be formEvent or something like that
-    submitForm(e:any): void{
-        e.preventDefault();
-        let data = {
-                firstnameChanged:this.firstnameModEnabled,
-                surnameChanged:this.surnameModEnabled,
-                phoneChanged:this.phoneModEnabled,
-                emailChanged:this.emailModEnabled,
-                passwordChanged:this.passwordModEnabled,
-                
-                firstname: e.target["firstName"].value,
-                surname: e.target["surname"].value,
-                phone: e.target["phone"].value,
-                email: e.target["email"].value,
-                password: e.target["password"].value
-        }
-    }
-
     triggerChangePPInput(){
         //@ts-ignore
         this.$refs.PPInput.click();
@@ -378,6 +386,70 @@ export default class MedicProfile extends Vue {
     private getWorkdayService(): WorkdayService {
         return this.$container.get(TYPES.Services.WorkdayService);
     }
+
+    //-------------------------Form------------------------------
+    // TODO: finish form submit
+
+    //TODO:check properties
+    private readonly minFirstnameLength = 2;
+    private readonly maxFirstnameLength = 20;
+    private readonly minSurnameLength = 2;
+    private readonly maxSurnameLength = 20;
+    private readonly minPasswordLength = 8;
+    private readonly maxPasswordLength = 100;
+
+    //form values
+    private firstname:string = "";
+    private surname:string = "";
+    private email:string = "";
+    private phone:string = "";
+    private password:string = "";
+    private repeatPassword:string = "";
+
+    get validFirstname():boolean {
+        return  this.firstname.length>=this.minFirstnameLength 
+                && this.firstname.length<=this.maxFirstnameLength;
+    }
+
+    get validSurname():boolean {
+        return  this.surname.length>=this.minSurnameLength 
+                && this.surname.length<=this.maxSurnameLength;
+    }
+    get validEmail():boolean {
+        return isValidEmail(this.email);
+    }
+    get validPassword():boolean {
+        return this.password.length>=this.minPasswordLength 
+                && this.password.length<=this.maxPasswordLength;;
+    }
+    get validRepeatPassword():boolean {
+        return this.password === this.repeatPassword;
+    }
+
+    //TODO: vaya uno a saber que es un telefono valido no??
+    get validPhone():boolean{
+        return true;
+    }
+
+
+    get validUserUpdate(): boolean {
+        return  this.validFirstname && this.validSurname && this.validEmail &&
+                this.validPassword && this.validRepeatPassword && this.validPhone;
+    }
+
+
+    //TODO: do validation
+    //TODO: should be formEvent or something like that
+    submitForm(e:any): void{
+        e.preventDefault();
+        if(this.validUserUpdate){
+            //TODO: update user
+            console.log("update user")
+        }else{
+            //TODO: show invalid toast
+        }
+    }
+
 }
 </script>
 
