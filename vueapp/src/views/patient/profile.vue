@@ -135,10 +135,6 @@ import {createPath, isValidEmail, Nullable} from "~/logic/Utils";
 import defaultProfilePic from "@/assets/defaultProfilePic.svg";
 import { State } from 'vuex-class';
 
-let user = new User();
-user.email = user.firstName = user.phone = user.surname = 'asd';
-user.id = user.profilePictureId = 1;
-
 @Component
 export default class PatientProfile extends Vue {
     private noeye = noeye;
