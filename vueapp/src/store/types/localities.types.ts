@@ -12,7 +12,7 @@ export interface LocalityActions {
     loadLocalities: {
         countryId: ID,
         provinceId: ID
-    }
+    } | void
 }
 
 export const localityActionTypes: DefineTypes<LocalityActions> = {

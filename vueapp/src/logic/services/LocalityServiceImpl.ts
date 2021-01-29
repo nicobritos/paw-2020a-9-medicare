@@ -21,12 +21,15 @@ export class LocalityServiceImpl implements LocalityService {
     @inject(TYPES.Repositories.RestRepository)
     private rest: RestRepository;
 
-    public async list(countryId: ID, provinceId: ID): Promise<Nullable<Locality[]> | APIError> {
-        let params: any = {};
+    public async list(params?: { countryId: ID, provinceId: ID }): Promise<Nullable<Locality[]> | APIError> {
+        let path: string;
+        if (params)
+            path = LocalityServiceImpl.formatPath(params.countryId, params.provinceId);
+        else
+            path = LocalityServiceImpl.PATH;
 
-        let response = await this.rest.get<Locality[]>(LocalityServiceImpl.formatPath(countryId, provinceId), {
+        let response = await this.rest.get<Locality[]>(path, {
             accepts: LocalityMIME.LIST,
-            params
         });
         return response.nullableResponse;
     }

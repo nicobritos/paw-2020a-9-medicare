@@ -3,7 +3,7 @@ import {Locality} from '~/logic/models/Locality';
 import {APIError} from '~/logic/models/APIError';
 
 export interface LocalityService {
-    list(countryId: ID, provinceId: ID): Promise<Nullable<Locality[]> | APIError>;
+    list(params?: { countryId: ID, provinceId: ID }): Promise<Nullable<Locality[]> | APIError>;
 
     get(countryId: ID, provinceId: ID, id: ID): Promise<Nullable<Locality>>;
 }

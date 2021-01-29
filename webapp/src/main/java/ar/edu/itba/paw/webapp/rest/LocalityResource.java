@@ -19,7 +19,6 @@ import javax.ws.rs.core.Response;
 import java.util.Collection;
 import java.util.Optional;
 
-@Path("/countries/{countryId}/provinces/{provinceId}/localities")
 @Component
 public class LocalityResource extends GenericResource {
     @Autowired
@@ -28,6 +27,7 @@ public class LocalityResource extends GenericResource {
     private LocalityService localityService;
 
     @GET
+    @Path("/countries/{countryId}/provinces/{provinceId}/localities")
     @Produces({LocalityMIME.GET_LIST, ErrorMIME.ERROR})
     public Response getCollection(
             @Context HttpHeaders httpheaders,
@@ -53,7 +53,22 @@ public class LocalityResource extends GenericResource {
     }
 
     @GET
-    @Path("{id}")
+    @Path("/localities")
+    @Produces({LocalityMIME.GET_LIST, ErrorMIME.ERROR})
+    public Response getAllCollection(@Context HttpHeaders httpheaders) {
+        MIMEHelper.assertServerType(httpheaders, LocalityMIME.GET_LIST);
+
+        Collection<Locality> localities = this.localityService.list();
+
+        return Response
+                .ok()
+                .entity(localities)
+                .type(LocalityMIME.GET_LIST)
+                .build();
+    }
+
+    @GET
+    @Path("/countries/{countryId}/provinces/{provinceId}/localities/{id}")
     @Produces({LocalityMIME.GET, ErrorMIME.ERROR})
     public Response getEntity(
             @Context HttpHeaders httpheaders,

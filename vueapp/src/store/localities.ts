@@ -26,7 +26,12 @@ const actions: DefineActionTree<LocalityActions, LocalityState, RootState> = {
         if (state._listLoading.loaded) return;
         if (state._listLoading.promise) return;
 
-        let promise = getService().list(payload.countryId, payload.provinceId);
+        let promise;
+        if (payload)
+            promise = getService().list({ provinceId: payload.provinceId, countryId: payload.countryId });
+        else
+            promise = getService().list();
+
         commit(localityMutationTypes.setPromise(promise));
 
         let data: Nullable<Locality[]> | APIError = null;

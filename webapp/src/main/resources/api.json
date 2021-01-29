@@ -1301,6 +1301,33 @@
                 }
             }
         },
+        "/localities": {
+            "get": {
+                "summary": "List all localities",
+                "responses": {
+                    "200": {
+                        "description": "Successful",
+
+                        "content": {
+                            "application/vnd.locality.list.get.v1+json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/locality"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "$ref": "#/components/responses/error-400"
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/error-404"
+                    }
+                }
+            }
+        },
         "/countries/{countryId}/provinces/{provinceId}/localities/{id}": {
             "get": {
                 "summary": "Gets a specific locality",
