@@ -42,7 +42,8 @@ export interface AuthMutations {
     setDoctors: Nullable<Doctor[]>,
     setDoctor: {id: ID, doctor: Nullable<Doctor>},
     setPatients: Nullable<Patient[]>,
-    setPromise: AuthState['_userLoading']['promise']
+    setPromise: AuthState['_userLoading']['promise'],
+    loadUserFromLocalStorage: void
 }
 
 export const authMutationTypes: DefineTypes<AuthMutations> = {
@@ -50,7 +51,8 @@ export const authMutationTypes: DefineTypes<AuthMutations> = {
     setUser: payload => ({payload, type: 'setUser'}),
     setDoctors: payload => ({payload, type: 'setDoctors'}),
     setDoctor: payload => ({payload, type: 'setDoctor'}),
-    setPatients: payload => ({payload, type: 'setPatients'})
+    setPatients: payload => ({payload, type: 'setPatients'}),
+    loadUserFromLocalStorage: payload => ({payload, type: 'loadUserFromLocalStorage'})
 };
 
 export interface AuthGetters {
