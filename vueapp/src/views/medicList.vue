@@ -256,13 +256,11 @@ export default class MedicList extends Vue {
     async search() {
         let response = await this.getDoctorService().list({
             page: this.page,
-            name: this.name,
+            name: this.inputName,
             localities: this.searchedLocalities.map(value => value.id),
             specialties: this.searchedSpecialties.map(value => value.id)
         });
-        if (response instanceof APIError) {
-            // TODO: Guido
-        } else {
+        if (!(response instanceof APIError)) {
             this.doctorPagination = response;
         }
     }
