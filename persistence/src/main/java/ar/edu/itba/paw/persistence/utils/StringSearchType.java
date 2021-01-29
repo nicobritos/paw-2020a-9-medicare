@@ -10,7 +10,7 @@ public enum StringSearchType {
     PREFIX(s -> '%' + s, String::startsWith),
     SUFFIX(s -> s + '%', String::endsWith),
     CONTAINS(s -> '%' + s + '%', String::contains),
-    CONTAINS_NO_ACC(s -> '%' + s + "%", (s, s2) -> StringUtils.stripAccents(s).contains(s2));
+    CONTAINS_NO_ACC(s -> '%' + s + "%", (s, s2) -> StringUtils.stripAccents(s).contains(StringUtils.stripAccents(s2)));
 
     private final Function<String, String> transformer;
     private final BiFunction<String, String, Boolean> operator;

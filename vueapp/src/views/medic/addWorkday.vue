@@ -26,13 +26,13 @@
                 </div>
                 <div class="col-8">
                     <b-form-group>
-                        <b-form-radio v-model="dowSelected" name="some-radios" value="0">{{$t("Monday")}}</b-form-radio>
-                        <b-form-radio v-model="dowSelected" name="some-radios" value="1">{{$t("Tuesday")}}</b-form-radio>
-                        <b-form-radio v-model="dowSelected" name="some-radios" value="2">{{$t("Wednesday")}}</b-form-radio>
-                        <b-form-radio v-model="dowSelected" name="some-radios" value="3">{{$t("Thursday")}}</b-form-radio>
-                        <b-form-radio v-model="dowSelected" name="some-radios" value="4">{{$t("Friday")}}</b-form-radio>
-                        <b-form-radio v-model="dowSelected" name="some-radios" value="5">{{$t("Saturday")}}</b-form-radio>
-                        <b-form-radio v-model="dowSelected" name="some-radios" value="6">{{$t("Sunday")}}</b-form-radio>
+                        <b-form-radio v-model="dowSelected" name="some-radios" :value="0">{{$t("Monday")}}</b-form-radio>
+                        <b-form-radio v-model="dowSelected" name="some-radios" :value="1">{{$t("Tuesday")}}</b-form-radio>
+                        <b-form-radio v-model="dowSelected" name="some-radios" :value="2">{{$t("Wednesday")}}</b-form-radio>
+                        <b-form-radio v-model="dowSelected" name="some-radios" :value="3">{{$t("Thursday")}}</b-form-radio>
+                        <b-form-radio v-model="dowSelected" name="some-radios" :value="4">{{$t("Friday")}}</b-form-radio>
+                        <b-form-radio v-model="dowSelected" name="some-radios" :value="5">{{$t("Saturday")}}</b-form-radio>
+                        <b-form-radio v-model="dowSelected" name="some-radios" :value="6">{{$t("Sunday")}}</b-form-radio>
                     </b-form-group>
                 </div>
             </div>
@@ -94,6 +94,7 @@ import {Doctor} from '~/logic/models/Doctor';
 import {State} from 'vuex-class';
 import TYPES from '~/logic/types';
 import {WorkdayService} from '~/logic/interfaces/services/WorkdayService';
+import { Day } from '~/logic/models/utils/DateRange';
 
 @Component
 export default class AddWorkday extends Vue {
@@ -102,7 +103,7 @@ export default class AddWorkday extends Vue {
     @VModel({type:Boolean,default:true})
     private showModal:boolean;
 
-    private dowSelected = "0";
+    private dowSelected = 0;
     private startHour = "";
     private endHour = "";
     // TODO: Guido, x ahora no tenemos muchos offices, podriamos sacarlo. Hya un office por staff
@@ -116,7 +117,7 @@ export default class AddWorkday extends Vue {
     }
 
     private cleanValues(){
-        this.dowSelected = "0";
+        this.dowSelected = 0;
         this.startHour = "";
         this.endHour = "";
         this.officeSelected = "0";
@@ -126,17 +127,25 @@ export default class AddWorkday extends Vue {
         e.preventDefault();
         e.stopPropagation();
 
-        // TODO: Guido: Hace un await y mientras mostra un loading spinner
-        // TODO: Parse endhour and starthour
+        /*
+            TODO: check this, supponsedly input type=time always returns 
+                    hh:mm:ss with ss being optional but always in 24-hour format
+        */
+        let start = this.startHour.split(":").map(v => parseInt(v));
+        let end = this.endHour.split(":").map(v => parseInt(v));
+        //TODO:check
+        //TODO:FIXME tira 500 por algun motivo
+        let day = [ 'MONDAY','TUESDAY','WEDNESDAY','THURSDAY','FRIDAY','SATURDAY','SUNDAY'][this.dowSelected];
         this.getWorkdayService().createList([{
-            day: this.dowSelected,
+            //TODO:check
+            day: day as Day,
             end: {
-                hour: this.endHour,
-                minute: 0
+                hour: end[0],
+                minute: end[1]
             },
             start: {
-                hour: this.startHour,
-                minute: 0
+                hour: start[0],
+                minute: start[1]
             }
         }]);
     }
