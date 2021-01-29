@@ -12,12 +12,23 @@ import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Root;
 import javax.persistence.metamodel.SingularAttribute;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 @Repository
 public class LocalityDaoImpl extends GenericSearchableDaoImpl<Locality, Integer> implements LocalityDao {
     public LocalityDaoImpl() {
         super(Locality.class, Locality_.id);
+    }
+
+    @Override
+    public Optional<Locality> findByProvinceAndId(Province province, Integer id) {
+        Map<SingularAttribute<? super Locality, ?>, Object> params = new HashMap<>();
+        params.put(Locality_.province, province);
+        params.put(Locality_.id, id);
+        return this.findBy(params).stream().findFirst();
     }
 
     @Override

@@ -12,7 +12,10 @@ import ar.edu.itba.paw.webapp.rest.utils.GenericResource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import javax.ws.rs.*;
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.Response;
@@ -35,15 +38,11 @@ public class ProvinceResource extends GenericResource {
         MIMEHelper.assertServerType(httpheaders, ProvinceMIME.GET_LIST);
 
         Collection<Province> provinces;
-        if (countryId != null) {
-            Optional<Country> country = this.countryService.findById(countryId);
-            if (!country.isPresent()) {
-                throw this.unprocessableEntity(ErrorConstants.PROVINCE_GET_NONEXISTENT_COUNTRY);
-            }
-            provinces = this.provinceService.findByCountry(country.get());
-        } else {
-            provinces = this.provinceService.list();
+        Optional<Country> country = this.countryService.findById(countryId);
+        if (!country.isPresent()) {
+            throw this.unprocessableEntity(ErrorConstants.PROVINCE_GET_NONEXISTENT_COUNTRY);
         }
+        provinces = this.provinceService.findByCountry(country.get());
 
         return Response
                 .ok()
@@ -57,12 +56,17 @@ public class ProvinceResource extends GenericResource {
     @Produces({ProvinceMIME.GET, ErrorMIME.ERROR})
     public Response getEntity(
             @Context HttpHeaders httpheaders,
+            @PathParam("countryId") String countryId,
             @PathParam("id") Integer id) {
         MIMEHelper.assertServerType(httpheaders, ProvinceMIME.GET_LIST);
 
         if (id == null) throw this.missingPathParams();
 
-        Optional<Province> provinceOptional = this.provinceService.findById(id);
+        Optional<Country> country = this.countryService.findById(countryId);
+        if (!country.isPresent()) {
+            throw this.unprocessableEntity(ErrorConstants.PROVINCE_GET_NONEXISTENT_COUNTRY);
+        }
+        Optional<Province> provinceOptional = this.provinceService.findByCountryAndId(country.get(), id);
         if (!provinceOptional.isPresent()) throw this.notFound();
 
         return Response.ok(provinceOptional.get()).type(ProvinceMIME.GET).build();

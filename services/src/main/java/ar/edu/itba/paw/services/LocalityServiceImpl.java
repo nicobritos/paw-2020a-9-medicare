@@ -9,11 +9,17 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Collection;
+import java.util.Optional;
 
 @Service
 public class LocalityServiceImpl extends GenericServiceImpl<LocalityDao, Locality, Integer> implements LocalityService {
     @Autowired
     private LocalityDao repository;
+
+    @Override
+    public Optional<Locality> findByProvinceAndId(Province province, Integer id) {
+        return this.repository.findByProvinceAndId(province, id);
+    }
 
     @Override
     public Collection<Locality> findByProvince(Province province) {

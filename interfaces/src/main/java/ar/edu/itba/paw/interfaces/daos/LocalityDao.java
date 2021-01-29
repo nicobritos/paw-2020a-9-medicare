@@ -5,8 +5,11 @@ import ar.edu.itba.paw.models.Locality;
 import ar.edu.itba.paw.models.Province;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface LocalityDao extends GenericSearchableDao<Locality, Integer> {
+    Optional<Locality> findByProvinceAndId(Province province, Integer id);
+
     List<Locality> findByProvince(Province province);
 
     /**

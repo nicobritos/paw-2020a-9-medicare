@@ -5,8 +5,11 @@ import ar.edu.itba.paw.models.Locality;
 import ar.edu.itba.paw.models.Province;
 
 import java.util.Collection;
+import java.util.Optional;
 
 public interface LocalityService extends GenericService<Locality, Integer> {
+    Optional<Locality> findByProvinceAndId(Province province, Integer id);
+
     Collection<Locality> findByProvince(Province province);
 
     /**

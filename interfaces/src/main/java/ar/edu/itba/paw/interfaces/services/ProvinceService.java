@@ -2,13 +2,14 @@ package ar.edu.itba.paw.interfaces.services;
 
 import ar.edu.itba.paw.interfaces.services.generic.GenericService;
 import ar.edu.itba.paw.models.Country;
-import ar.edu.itba.paw.models.Locality;
 import ar.edu.itba.paw.models.Province;
 
 import java.util.List;
-import java.util.Set;
+import java.util.Optional;
 
 public interface ProvinceService extends GenericService<Province, Integer> {
+    Optional<Province> findByCountryAndId(Country country, Integer id);
+
     List<Province> findByCountry(Country country);
 
     /**
