@@ -10,7 +10,7 @@
                             <img
                                 id="profilePic"
                                 class="profile-picture rounded-circle"
-                                :src="getUrl('profilePics/'+user.profilePictureId)"
+                                :src="getApiUrl('/users/' + user.id + '/picture')"
                                 :srcset="defaultProfilePic"
                                 alt="profile pic"
                             />
@@ -131,9 +131,12 @@ import editPencil from '@/assets/editPencil.svg';
 import {Component, Vue} from 'vue-property-decorator';
 import {User} from '~/logic/models/User';
 
-import {createPath, isValidEmail, Nullable} from "~/logic/Utils";
+import {createApiPath, createPath, isValidEmail, Nullable} from '~/logic/Utils';
 import defaultProfilePic from "@/assets/defaultProfilePic.svg";
 import { State } from 'vuex-class';
+import EventBus from '~/logic/EventBus';
+import {APIErrorEventName} from '~/logic/interfaces/APIErrorEvent';
+import {APIError} from '~/logic/models/APIError';
 
 @Component
 export default class PatientProfile extends Vue {
@@ -146,7 +149,7 @@ export default class PatientProfile extends Vue {
     private repeatPasswordVis = false;
 
     @State(state => state.auth.user)
-    private readonly user: Nullable<User>;
+    private readonly user: User;
 
     //enable/disable readonly property of input
     private firstnameModEnabled = false;
@@ -173,8 +176,8 @@ export default class PatientProfile extends Vue {
         this.phone = user.phone
     }
 
-    getUrl(url:string):string{
-        return createPath(url);
+    getApiUrl(url:string):string{
+        return createApiPath(url);
     }
 
     changeProfilePic(e:InputEvent){
@@ -186,18 +189,17 @@ export default class PatientProfile extends Vue {
             return;
         }
         //append it to form
-        let formData = new FormData();
-        formData.append("pic", file);
+        // let formData = new FormData();
+        // formData.append("pic", file);
         //post to someurl
-        //TODO: fill url
-        fetch(this.getUrl("someurl"), {
+        fetch(this.getApiUrl(`/users/${this.user.id}/picture`), {
             method: "POST",
-            body: formData
+            body: file  // TODO: CHECK
         }).then((r) => {
             if (r.ok) {
                 //TODO:show ok toast and update profile pic
             } else {
-                //TODO:show error toast
+                EventBus.$emit(APIErrorEventName, new APIError(r.status, r.statusText));
             }
         }).catch((e) => {
             //TODO:show error message

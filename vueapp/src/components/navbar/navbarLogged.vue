@@ -31,7 +31,7 @@
                     <img
                         id="navbarPatientUserImage"
                         class="profile-picture rounded-circle"
-                        :src='getUrl("profilePics/"+user.profilePictureId)'
+                        :src="getApiUrl('/users/' + user.id + '/picture')"
                         :srcset="defaultProfilePic"
                         alt="profile pic"
                     />
@@ -44,7 +44,7 @@
                     <img
                         id="navbarDoctorUserImage"
                         class="profile-picture rounded-circle"
-                        :src='getUrl("profilePics/"+user.profilePictureId)'
+                        :src="getApiUrl('/users/' + user.id + '/picture')"
                         :srcset="defaultProfilePic"
                         alt="profile pic"
                     />
@@ -60,7 +60,7 @@ import {State} from 'vuex-class';
 import {User} from '~/logic/models/User';
 import defaultProfilePic from "@/assets/defaultProfilePic.svg";
 
-import {createPath} from "~/logic/Utils";
+import {createApiPath, createPath} from '~/logic/Utils';
 
 @Component
 export default class NavbarLogged extends Vue {
@@ -69,6 +69,10 @@ export default class NavbarLogged extends Vue {
     @State(state => state.auth.isDoctor)
     private readonly isDoctor: boolean;
     private readonly defaultProfilePic = defaultProfilePic;
+
+    getApiUrl(url: string):string{
+        return createApiPath(url);
+    }
 
     @Emit("logout")
     logout(e: Event): void {

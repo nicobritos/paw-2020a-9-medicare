@@ -9,7 +9,7 @@
                             <img
                                 id="profilePic"
                                 class="profile-picture rounded-circle"
-                                :src="getUrl('profilePics/'+user.profilePictureId)"
+                                :src="getApiUrl('/users/' + user.id + '/picture')"
                                 :srcset="defaultProfilePic"
                                 alt="profile pics"
                             />
@@ -193,13 +193,16 @@ import AddSpecialty from "./addSpecialty.vue";
 import AddWorkday from "./addWorkday.vue";
 import Modal from "@/components/modal.vue";
 
-import {createPath, isValidEmail, Nullable} from '~/logic/Utils';
+import {createApiPath, createPath, isValidEmail, Nullable} from '~/logic/Utils';
 import defaultProfilePic from "@/assets/defaultProfilePic.svg";
 import {WorkdayService} from '~/logic/interfaces/services/WorkdayService';
 import TYPES from '~/logic/types';
 import {doctorActionTypes} from '~/store/types/doctor.types';
 import {State} from 'vuex-class';
 import {Doctor} from '~/logic/models/Doctor';
+import EventBus from '~/logic/EventBus';
+import {APIErrorEventName} from '~/logic/interfaces/APIErrorEvent';
+import {APIError} from '~/logic/models/APIError';
 
 @Component({
     components:{
@@ -216,7 +219,7 @@ export default class MedicProfile extends Vue {
     private readonly defaultProfilePic = defaultProfilePic;
 
     @State(state => state.auth.user)
-    private readonly user: Nullable<User>;
+    private readonly user: User;
     @State(state => state.auth.doctors)
     private readonly doctors: Doctor[];
     //TODO: connect this
@@ -289,8 +292,8 @@ export default class MedicProfile extends Vue {
         }
     }
     
-    getUrl(url:string):string{
-        return createPath(url);
+    getApiUrl(url:string):string{
+        return createApiPath(url);
     }
 
     openAddSpecialties():void{
@@ -360,18 +363,17 @@ export default class MedicProfile extends Vue {
             return;
         }
         //append it to form
-        let formData = new FormData();
-        formData.append("pic", file);
+        // let formData = new FormData();
+        // formData.append("pic", file);
         //post to someurl
-        //TODO: fill url
-        fetch(this.getUrl("someurl"), {
+        fetch(this.getApiUrl(`/users/${this.user.id}/picture`), {
             method: "POST",
-            body: formData
+            body: file  // TODO: CHECK
         }).then((r) => {
             if (r.ok) {
                 //TODO:show ok toast and update profile pic
             } else {
-                //TODO:show error toast
+                EventBus.$emit(APIErrorEventName, new APIError(r.status, r.statusText));
             }
         }).catch((e) => {
             //TODO:show error message

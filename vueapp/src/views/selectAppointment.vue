@@ -8,7 +8,7 @@
                             <div style="margin-top: 100%;"></div>
                             <img
                                 class="profile-picture rounded-circle"
-                                :src='getUrl("profilePics/"+doctor.user.profilePictureId)'
+                                :src="getApiUrl('/users/' + doctor.user.id + '/picture')"
                                 alt="profile pic"
                             />
                         </div>
@@ -119,7 +119,7 @@ import {User} from '~/logic/models/User';
 import {Doctor} from '~/logic/models/Doctor';
 import {Office} from '~/logic/models/Office';
 
-import {createPath} from "~/logic/Utils";
+import {createApiPath, createPath} from '~/logic/Utils';
 
 // @ts-ignore
 Date.prototype.plusDays = function (i) {
@@ -214,6 +214,10 @@ export default class SelectAppointment extends Vue {
             default:
                 return t.toString();
         }
+    }
+
+    getApiUrl(url:string):string{
+        return createApiPath(url);
     }
 
     getUrl(url:string):string{

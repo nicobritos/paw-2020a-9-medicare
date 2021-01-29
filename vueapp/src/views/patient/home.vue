@@ -20,7 +20,7 @@
                                         <div style="margin-top: 100%;"></div>
                                         <img
                                             class="profile-picture rounded-circle"
-                                            :src="getUrl('profilePics/'+appointment.doctor.user.profilePictureId)"
+                                            :src="getApiUrl('/users/' + appointment.doctor.user.id + '/picture')"
                                             alt="profile pic"
                                         />
                                     </div>
@@ -116,7 +116,7 @@
 import {Component, Vue} from 'vue-property-decorator';
 import { State } from 'vuex-class';
 
-import {createPath, Hash, Nullable} from "~/logic/Utils";
+import {createApiPath, createPath, Hash, Nullable} from '~/logic/Utils';
 
 @Component
 export default class PatientHome extends Vue {
@@ -191,8 +191,8 @@ export default class PatientHome extends Vue {
         }
     }
 
-    getUrl(url:string):string{
-        return createPath(url);
+    getApiUrl(url:string):string{
+        return createApiPath(url);
     }
 
     submitForm(event: Event): void {

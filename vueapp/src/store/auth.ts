@@ -194,8 +194,8 @@ const mutations: DefineMutationTree<AuthMutations, AuthState> = {
         }
 
         state.user = user;
-        state.patients = patients;
-        state.doctors = doctors;
+        state.patients = patients || [];
+        state.doctors = doctors || [];
         state.isDoctor = isDoctor;
     },
 };

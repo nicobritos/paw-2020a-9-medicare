@@ -138,9 +138,9 @@
                                                 <div class="col-4 d-flex flex-column justify-content-center">
                                                     <div class="profile-picture-container">
                                                         <div style="margin-top: 100%;"></div>
-                                                        <imgmonth
+                                                        <img
                                                             class="profile-picture rounded-circle"
-                                                            :src='"/profilePics/"+appointment.patient.user.profilePicture.id'
+                                                            :src="getApiUrl('/users/' + appointment.patient.user.id + '/picture')"
                                                             alt="profile pic"
                                                         />
                                                     </div>
@@ -202,6 +202,7 @@
 import moreOptions from '@/assets/moreOptions.svg';
 import {Component, Vue} from 'vue-property-decorator';
 import {Appointment} from '~/logic/models/Appointment';
+import {createApiPath, createPath} from '~/logic/Utils';
 
 // @ts-ignore
 Date.prototype.plusDays = function (i) {
@@ -231,6 +232,10 @@ export default class MedicHome extends Vue {
         } else {
             return time.toString();
         }
+    }
+
+    getApiUrl(url:string):string{
+        return createApiPath(url);
     }
 
     getMpdMonthOfYear(i: number): string {

@@ -2,15 +2,15 @@ export const ErrorMIME = 'application/vnd.error.v1+json';
 
 export interface APISubError {
     code: number;
-    message: number;
+    message: string;
 }
 
 export class APIError {
     private readonly _code: number;
-    private readonly _message: number;
+    private readonly _message: string;
     private readonly _errors: readonly APISubError[];
 
-    constructor(code: number, message: number, errors: readonly APISubError[] = []) {
+    constructor(code: number, message: string, errors: readonly APISubError[] = []) {
         this._code = code;
         this._message = message;
         this._errors = errors;
@@ -20,7 +20,7 @@ export class APIError {
         return this._code;
     }
 
-    public get message(): number {
+    public get message(): string {
         return this._message;
     }
 

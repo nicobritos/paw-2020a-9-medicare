@@ -37,7 +37,7 @@
                                 <div style="margin-top: 100%;"></div>
                                 <img
                                     class="profile-picture rounded-circle"
-                                    :src="getUrl('profilePics/'+ doctor.user.profilePicturId)"
+                                    :src="getApiUrl('/users/' + doctor.user.id + '/picture')"
                                     alt="profile pic"
                                 />
                             </div>
@@ -103,7 +103,7 @@ import {Component, Vue} from 'vue-property-decorator';
 import {User} from '~/logic/models/User';
 import {Doctor} from '~/logic/models/Doctor';
 
-import {createPath} from "~/logic/Utils";
+import {createApiPath, createPath} from '~/logic/Utils';
 
 let user = new User();
 let doctor = new Doctor();
@@ -118,6 +118,10 @@ export default class RequestAppointment extends Vue {
     private date = new Date(2020, 1, 10);
     private doctor = doctor;
     private user = user;
+
+    getApiUrl(url:string):string{
+        return createApiPath(url);
+    }
 
     getDoW(t: number): string {
         switch (t) {
