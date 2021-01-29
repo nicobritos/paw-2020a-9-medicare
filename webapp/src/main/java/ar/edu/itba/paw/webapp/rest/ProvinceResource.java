@@ -19,7 +19,7 @@ import javax.ws.rs.core.Response;
 import java.util.Collection;
 import java.util.Optional;
 
-@Path("/provinces")
+@Path("/countries/{countryId}/provinces")
 @Component
 public class ProvinceResource extends GenericResource {
     @Autowired
@@ -31,7 +31,7 @@ public class ProvinceResource extends GenericResource {
     @Produces({ProvinceMIME.GET_LIST, ErrorMIME.ERROR})
     public Response getCollection(
             @Context HttpHeaders httpheaders,
-            @QueryParam("countryId") String countryId) {
+            @PathParam("countryId") String countryId) {
         MIMEHelper.assertServerType(httpheaders, ProvinceMIME.GET_LIST);
 
         Collection<Province> provinces;

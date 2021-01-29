@@ -144,12 +144,17 @@
 import eye from '@/assets/eye.svg';
 import noeye from '@/assets/noeye.svg';
 import logo from '@/assets/logo.svg';
-import {Component, Vue} from 'vue-property-decorator';
+import {Component, Vue, Watch} from 'vue-property-decorator';
 
 import {createPath, isValidEmail} from "~/logic/Utils";
 import {userActionTypes} from '~/store/types/user.types';
 import { Locality } from '~/logic/models/Locality';
 import { State } from 'vuex-class';
+import {countryActionTypes} from '~/store/types/countries.types';
+import {provinceActionTypes} from '~/store/types/provinces.types';
+import {localityActionTypes} from '~/store/types/localities.types';
+import {Country} from '~/logic/models/Country';
+import {Province} from '~/logic/models/Province';
 
 @Component
 export default class SignupDoctor extends Vue {
@@ -159,8 +164,11 @@ export default class SignupDoctor extends Vue {
     private eye = eye;
     private noeye = noeye;
 
-    //TODO:add country and province
-
+    //TODO: Guido connect country and province
+    @State(state => state.countries.countries)
+    private readonly countries: Country[];
+    @State(state => state.provinces.provinces)
+    private readonly provinces: Province[];
     @State(state => state.localities.localities)
     private readonly localities: Locality[];
 
@@ -179,10 +187,33 @@ export default class SignupDoctor extends Vue {
     private password:string = "";
     private repeatPassword:string = "";
     //TODO:do this props
-    private country=null;
-    private province=null;
+    private country: any = null;
+    private province: any =null;
     private locality=null;
     private address="";
+
+    public mounted(): void {
+        this.$store.dispatch('countries/loadCountries', countryActionTypes.loadCountries());
+    }
+
+    @Watch('country', {immediate: true})
+    loadProvinces(): void {
+        if (!this.country) return;
+
+        this.$store.dispatch('provinces/loadProvinces', provinceActionTypes.loadProvinces({
+            countryId: this.country// TODO Guido check que devuelve el select
+        }));
+    }
+
+    @Watch('province', {immediate: true})
+    loadLocalities(): void {
+        if (!this.province) return;
+
+        this.$store.dispatch('localities/loadLocalities', localityActionTypes.loadLocalities({
+            countryId: this.country,
+            provinceId: this.province// TODO Guido check que devuelve el select
+        }));
+    }
 
     toggleShowPassword(): void {
         this.showPassword = !this.showPassword;

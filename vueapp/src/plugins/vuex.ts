@@ -5,6 +5,8 @@ import localities from '~/store/localities';
 import doctorSpecialties from '~/store/doctorSpecialties';
 import auth from '~/store/auth';
 import doctors from '~/store/doctors';
+import countries from '~/store/countries';
+import provinces from '~/store/provinces';
 
 Vue.use(Vuex);
 
@@ -14,7 +16,9 @@ const store = new Vuex.Store({
         localities,
         users,
         doctorSpecialties,
-        doctors
+        doctors,
+        countries,
+        provinces
     }
 });
 

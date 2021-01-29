@@ -1,9 +1,9 @@
-import {Nullable} from '~/logic/Utils';
+import {ID, Nullable} from '~/logic/Utils';
 import {Province} from '~/logic/models/Province';
 import {APIError} from '~/logic/models/APIError';
 
 export interface ProvinceService {
-    list(countryId?: string): Promise<Nullable<Province[]> | APIError>;
+    list(countryId: ID): Promise<Nullable<Province[]> | APIError>;
 
-    get(id: number): Promise<Nullable<Province>>;
+    get(countryId: ID, id: ID): Promise<Nullable<Province>>;
 }

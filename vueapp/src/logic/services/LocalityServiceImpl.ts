@@ -1,4 +1,4 @@
-import {Nullable} from '~/logic/Utils';
+import {ID, Nullable} from '~/logic/Utils';
 import {inject, injectable} from 'inversify';
 import TYPES from '~/logic/types';
 import {RestRepository} from '~/logic/interfaces/repositories/RestRepository';
@@ -6,6 +6,8 @@ import {getPathWithId} from '~/logic/services/Utils';
 import {LocalityService} from '~/logic/interfaces/services/LocalityService';
 import {Locality} from '~/logic/models/Locality';
 import {APIError} from '~/logic/models/APIError';
+import {ProvinceServiceImpl} from '~/logic/services/ProvinceServiceImpl';
+import {CountryServiceImpl} from '~/logic/services/CountryServiceImpl';
 
 const LocalityMIME = {
     LIST: 'application/vnd.locality.list.get.v1+json',
@@ -19,21 +21,26 @@ export class LocalityServiceImpl implements LocalityService {
     @inject(TYPES.Repositories.RestRepository)
     private rest: RestRepository;
 
-    public async list(provinceId?: number): Promise<Nullable<Locality[]> | APIError> {
+    public async list(countryId: ID, provinceId: ID): Promise<Nullable<Locality[]> | APIError> {
         let params: any = {};
 
-        if (typeof provinceId === 'number') params.provinceId = provinceId;
-        let response = await this.rest.get<Locality[]>(LocalityServiceImpl.PATH, {
+        let response = await this.rest.get<Locality[]>(LocalityServiceImpl.formatPath(countryId, provinceId), {
             accepts: LocalityMIME.LIST,
             params
         });
         return response.nullableResponse;
     }
 
-    public async get(id: number): Promise<Nullable<Locality>> {
-        let response = await this.rest.get<Locality>(getPathWithId(LocalityServiceImpl.PATH, id), {
+    public async get(countryId: ID, provinceId: ID, id: ID): Promise<Nullable<Locality>> {
+        let response = await this.rest.get<Locality>(LocalityServiceImpl.formatPath(countryId, provinceId, id), {
             accepts: LocalityMIME.GET
         });
         return response.orElse(null);
+    }
+
+    private static formatPath(countryId: ID, provinceId: ID, localityId?: ID): string {
+        let s = `/${CountryServiceImpl.PATH}/${countryId}/${ProvinceServiceImpl.PATH}/${provinceId}/${LocalityServiceImpl.PATH}`;
+        if (localityId != null) return getPathWithId(s, localityId);
+        return s;
     }
 }

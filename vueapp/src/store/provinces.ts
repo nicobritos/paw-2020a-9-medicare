@@ -3,49 +3,51 @@ import TYPES from '~/logic/types';
 import {DefineActionTree, DefineMutationTree} from '~/store/utils/helper.types';
 import {RootState} from '~/store/types/root.types';
 import {Module} from 'vuex';
-import {LocalityService} from '~/logic/interfaces/services/LocalityService';
 import {LocalityActions, LocalityMutations, localityMutationTypes, LocalityState} from '~/store/types/localities.types';
 import {Locality} from '~/logic/models/Locality';
 import {Nullable} from '~/logic/Utils';
 import {APIError} from '~/logic/models/APIError';
+import {ProvinceService} from '~/logic/interfaces/services/ProvinceService';
+import {ProvinceActions, ProvinceMutations, provinceMutationTypes, ProvinceState} from '~/store/types/provinces.types';
+import {Province} from '~/logic/models/Province';
 
-function getService(): LocalityService {
-    return container.get(TYPES.Services.LocalityService);
+function getService(): ProvinceService {
+    return container.get(TYPES.Services.ProvinceService);
 }
 
-const state = (): LocalityState => ({
+const state = (): ProvinceState => ({
     _listLoading: {
         loaded: false,
         promise: null
-    } as LocalityState['_listLoading'],
-    localities: [] as Locality[]
+    } as ProvinceState['_listLoading'],
+    provinces: [] as Province[]
 });
 
-const actions: DefineActionTree<LocalityActions, LocalityState, RootState> = {
-    async loadLocalities({state, commit}, {payload}) {
+const actions: DefineActionTree<ProvinceActions, ProvinceState, RootState> = {
+    async loadProvinces({state, commit}, {payload}) {
         if (state._listLoading.loaded) return;
         if (state._listLoading.promise) return;
 
-        let promise = getService().list(payload.countryId, payload.provinceId);
-        commit(localityMutationTypes.setPromise(promise));
+        let promise = getService().list(payload.countryId);
+        commit(provinceMutationTypes.setPromise(promise));
 
-        let data: Nullable<Locality[]> | APIError = null;
+        let data: Nullable<Province[]> | APIError = null;
         try {
             data = await promise;
         } catch (e) {
             console.error(e);
         }
 
-        commit(localityMutationTypes.setLocalities(data === null || data instanceof APIError ? [] : data));
+        commit(provinceMutationTypes.setProvinces(data === null || data instanceof APIError ? [] : data));
     }
 };
 
-const mutations: DefineMutationTree<LocalityMutations, LocalityState> = {
+const mutations: DefineMutationTree<ProvinceMutations, ProvinceState> = {
     setPromise(state, {payload}): void {
         state._listLoading.promise = payload;
     },
-    setLocalities(state, {payload}): void {
-        state.localities = payload;
+    setProvinces(state, {payload}): void {
+        state.provinces = payload;
         state._listLoading.loaded = true;
         state._listLoading.promise = null;
     }

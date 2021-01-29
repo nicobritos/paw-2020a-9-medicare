@@ -13,7 +13,7 @@ const CountryServiceMIME = {
 
 @injectable()
 export class CountryServiceImpl implements CountryService {
-    private static PATH = 'countries';
+    public static PATH = 'countries';
 
     @inject(TYPES.Repositories.RestRepository)
     private rest: RestRepository;

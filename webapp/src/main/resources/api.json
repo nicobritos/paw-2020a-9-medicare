@@ -1218,19 +1218,9 @@
                 }
             }
         },
-        "/provinces": {
+        "/countries/{countryId}/provinces": {
             "get": {
-                "summary": "List all provinces",
-                "parameters": [
-                    {
-                        "in": "query",
-                        "name": "countryId",
-                        "schema": {
-                            "type": "string"
-                        },
-                        "required": false
-                    }
-                ],
+                "summary": "List all provinces of a given country",
                 "responses": {
                     "200": {
                         "description": "Successful",
@@ -1254,7 +1244,7 @@
                 }
             }
         },
-        "/provinces/{id}": {
+        "/countries/{countryId}/provinces/{id}": {
             "get": {
                 "summary": "Gets a specific province",
                 "parameters": [
@@ -1284,19 +1274,9 @@
                 }
             }
         },
-        "/localities": {
+        "/countries/{countryId}/provinces/{provinceId}/localities": {
             "get": {
-                "summary": "List all localities",
-                "parameters": [
-                    {
-                        "in": "query",
-                        "name": "provinceId",
-                        "schema": {
-                            "type": "number"
-                        },
-                        "required": false
-                    }
-                ],
+                "summary": "List all localities of a given province",
                 "responses": {
                     "200": {
                         "description": "Successful",
@@ -1321,7 +1301,7 @@
                 }
             }
         },
-        "/localities/{id}": {
+        "/countries/{countryId}/provinces/{provinceId}/localities/{id}": {
             "get": {
                 "summary": "Gets a specific locality",
                 "parameters": [

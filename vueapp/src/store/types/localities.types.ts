@@ -1,6 +1,6 @@
 import {CacheableAsyncProperty, DefineTypes} from '~/store/utils/helper.types';
 import {Locality} from '~/logic/models/Locality';
-import {Nullable} from '~/logic/Utils';
+import {ID, Nullable} from '~/logic/Utils';
 import {APIError} from '~/logic/models/APIError';
 
 export interface LocalityState {
@@ -9,7 +9,10 @@ export interface LocalityState {
 }
 
 export interface LocalityActions {
-    loadLocalities: void
+    loadLocalities: {
+        countryId: ID,
+        provinceId: ID
+    }
 }
 
 export const localityActionTypes: DefineTypes<LocalityActions> = {
