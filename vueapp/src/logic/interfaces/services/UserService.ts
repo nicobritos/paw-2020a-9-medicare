@@ -25,7 +25,6 @@ export interface UpdateUser {
     firstName?: string;
     surname?: string;
     phone?: string;
-    profilePicture?: Base64;
 }
 
 export interface UserService {
