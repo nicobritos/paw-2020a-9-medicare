@@ -161,32 +161,44 @@ const mutations: DefineMutationTree<AuthMutations, AuthState> = {
             localStorage.setItem(DOCTORS_KEY, JSON.stringify(doctors));
         }
     },
+    loadUserFromLocalStorage(state): void {
+        let userString: Nullable<string> = localStorage.getItem(USER_KEY);
+        if (!userString) return;
+
+        let expirationDateString = localStorage.getItem(LOGGED_IN_EXPIRATION_DATE_KEY);
+        if (!expirationDateString || expirationDateString.length === 0) {
+            localStorage.removeItem(USER_KEY);
+            localStorage.removeItem(DOCTORS_KEY);
+            localStorage.removeItem(PATIENTS_KEY);
+            localStorage.removeItem(IS_DOCTOR_KEY);
+            return;
+        }
+
+        // Chech epochs
+        if ((new Date(0)).getTime() >= Number.parseInt(expirationDateString)) {
+            localStorage.removeItem(LOGGED_IN_EXPIRATION_DATE_KEY);
+            localStorage.removeItem(USER_KEY);
+            localStorage.removeItem(DOCTORS_KEY);
+            localStorage.removeItem(PATIENTS_KEY);
+            localStorage.removeItem(IS_DOCTOR_KEY);
+        }
+
+        let user, patients, doctors, isDoctor;
+        try {
+            user = JSON.parse(userString);
+            patients = JSON.parse(localStorage.getItem(PATIENTS_KEY)!);
+            doctors = JSON.parse(localStorage.getItem(DOCTORS_KEY)!);
+            isDoctor = JSON.parse(localStorage.getItem(IS_DOCTOR_KEY)!);
+        } catch (e) {
+            return;
+        }
+
+        state.user = user;
+        state.patients = patients;
+        state.doctors = doctors;
+        state.isDoctor = isDoctor;
+    },
 };
-
-function hasLoggedIn(): boolean {
-    let userString: Nullable<string> = localStorage.getItem(USER_KEY);
-    if (!userString) return false;
-
-    let expirationDateString = localStorage.getItem(LOGGED_IN_EXPIRATION_DATE_KEY);
-    if (!expirationDateString || expirationDateString.length === 0) {
-        localStorage.removeItem(USER_KEY);
-        localStorage.removeItem(DOCTORS_KEY);
-        localStorage.removeItem(PATIENTS_KEY);
-        localStorage.removeItem(IS_DOCTOR_KEY);
-        return false;
-    }
-
-    // Chech epochs
-    if ((new Date(0)).getTime() <= Number.parseInt(expirationDateString)) {
-        localStorage.removeItem(LOGGED_IN_EXPIRATION_DATE_KEY);
-        localStorage.removeItem(USER_KEY);
-        localStorage.removeItem(DOCTORS_KEY);
-        localStorage.removeItem(PATIENTS_KEY);
-        localStorage.removeItem(IS_DOCTOR_KEY);
-        return false;
-    }
-    return true;
-}
 
 const store: Module<any, any> = {
     namespaced: true,

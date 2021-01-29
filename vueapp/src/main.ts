@@ -16,5 +16,8 @@ new Vue({
   router,
   i18n,
   store,
-  render: h => h(App)
+  render: h => h(App),
+  created() {
+    this.$store.commit('auth/loadUserFromLocalStorage');
+  }
 }).$mount('#app');
