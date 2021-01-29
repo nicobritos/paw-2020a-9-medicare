@@ -74,9 +74,12 @@ function redirectHomeTopord(to) {
 function unverifiedGuard(to,from,next) {
     if(store.getters["auth/loggedIn"]){
         if(!store.state.auth.user.verified){
-            next();
-        }
-        else{
+            store.commit('auth/loadUserFromLocalStorage');
+            if (!store.state.auth.user.verified)
+                next();
+            else
+                next({name:"Landing"});
+        } else {
             next({name:"Landing"});
         }
     }else{
