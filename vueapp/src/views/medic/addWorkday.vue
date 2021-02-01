@@ -106,8 +106,8 @@ export default class AddWorkday extends Vue {
     private dowSelected = 0;
     private startHour = "";
     private endHour = "";
-    // TODO: Guido, x ahora no tenemos muchos offices, podriamos sacarlo. Hya un office por staff
-    private officeSelected = "0";
+    //this is selected on mount and on clean values
+    private officeSelected = 0;
 
     @State(state => state.auth.doctors)
     private readonly doctors: Doctor[];
@@ -116,11 +116,19 @@ export default class AddWorkday extends Vue {
         return createPath(url);
     }
 
+    mounted(){
+        if(this.doctors&&this.doctors[0]&&this.doctors[0].office&&this.doctors[0].office.id){
+            this.officeSelected = this.doctors[0].office.id
+        }
+    }
+
     private cleanValues(){
         this.dowSelected = 0;
         this.startHour = "";
         this.endHour = "";
-        this.officeSelected = "0";
+        if(this.doctors&&this.doctors[0]&&this.doctors[0].office&&this.doctors[0].office.id){
+            this.officeSelected = this.doctors[0].office.id;
+        }
     }
 
     submitForm(e:Event){

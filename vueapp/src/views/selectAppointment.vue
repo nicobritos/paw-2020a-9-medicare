@@ -1,6 +1,6 @@
 <template>
     <div class="container ml-0 mr-0 pr-0 fill-height">
-        <div class="row h-100">
+        <div v-if="doctor&&user&&locality&&monday" class="row h-100">
             <div class="col-4 h-100 grey-background">
                 <div class="row mt-4">
                     <div class="col-3 d-flex flex-column justify-content-center">
@@ -15,7 +15,7 @@
                     </div>
                     <div class="col mr-3">
                         <div class="row mt-2">
-                            <h5>{{ doctor.user.firstName + ' ' + doctor.user.surname }}}</h5>
+                            <h5>{{ doctor.user.firstName + ' ' + doctor.user.surname }}</h5>
                         </div>
                         <div class="row mt-3 d-flex justify-content-start">
                             <p>
@@ -28,10 +28,11 @@
                     </div>
                 </div>
                 <div class="row mt-3 pl-4">
-                    <p class="m-0"><b>{{ $t('Address') }}:</b> {{ doctor.office.street }} - TODO Locality</p>
+                    <!-- TODO: yo guido apuesto que esto se rompe en la primera de cambio -->
+                    <p class="m-0"><b>{{ $t('Address') }}:</b> {{ doctor.office.street }} - {{locality.name}}</p>
                     <a
                         class="link"
-                        :href="'https://www.google.com/maps/search/?api=1&query=TODOLocality'+','+doctor.office.street"
+                        :href="'https://www.google.com/maps/search/?api=1&query='+ locality.name +','+doctor.office.street"
                         target="_blank"
                     >
                         <small class="m-1">{{ $t('SeeInGoogleMaps') }}</small>
@@ -60,14 +61,14 @@
                 </div>
                 <div class="row">
                     <div class="col-1 p-0">
-                        <button class="btn" id="day-left">{{ prev }}</button>
+                        <button @click="changeWeek(-1)" class="btn" id="day-left">{{ prev }}</button>
                     </div>
                     <div class="d-flex flex-horizontal" id="week-container">
                         <div class="d-flex flex-vertical" id="day-container">
 
                         </div>
                     </div>
-                    <div v-for="i in 7" :key="i" class="col-1 mr-4 p-0">
+                    <div v-for="(_,i) in 7" :key="i" class="col-1 mr-4 p-0">
                         <span class="d-flex flex-column align-items-center text-center">
                                 <p class="mb-0">
                                     {{ getDoW(monday.plusDays(i).getDay()) }}
@@ -102,10 +103,10 @@
                         </div>
                     </div>
                     <div class="col-1 p-0 flex-shrink-1">
-                        <button id="day-right" class="btn">{{ next }}</button>
+                        <button @click="changeWeek(1)" id="day-right" class="btn">{{ next }}</button>
                     </div>
                 </div>
-                <div v-if="!timeslots || !timeslots.length" class="row justify-content-center">
+                <div v-if="noSlotsAvailable" class="row justify-content-center">
                     <p class="text-center mt-2" style="color:grey;">{{ $t('NoAvailableAppointmentsThisWeek') }}</p>
                 </div>
             </div>
@@ -114,12 +115,21 @@
 </template>
 
 <script lang="ts">
-import {Component, Vue} from 'vue-property-decorator';
+import {Component, Vue, Watch} from 'vue-property-decorator';
 import {User} from '~/logic/models/User';
 import {Doctor} from '~/logic/models/Doctor';
 import {Office} from '~/logic/models/Office';
 
-import {createApiPath, createPath} from '~/logic/Utils';
+import {createApiPath, createPath, Nullable} from '~/logic/Utils';
+import { State } from 'vuex-class';
+import { DoctorService } from '~/logic/interfaces/services/DoctorService';
+import TYPES from '~/logic/types';
+import { Locality } from '~/logic/models/Locality';
+import { LocalityService } from '~/logic/interfaces/services/LocalityService';
+import { AppointmentTimeSlotService } from '~/logic/interfaces/services/AppointmentTimeSlotService';
+import { DateRange, FullDate } from '~/logic/models/utils/DateRange';
+import { AppointmentTimeslotDate } from '~/logic/models/AppointmentTimeslotDate';
+import { APIError } from '~/logic/models/APIError';
 
 // @ts-ignore
 Date.prototype.plusDays = function (i) {
@@ -128,40 +138,68 @@ Date.prototype.plusDays = function (i) {
     return date;
 };
 
-// TODO: Guido
 @Component
 export default class SelectAppointment extends Vue {
-    private readonly user = new User();
+    @State(state => state.auth.user)
+    private readonly user:User;
     private readonly prev = '<';
     private readonly next = '>';
-    private readonly monday = new Date(2020, 7, 13);
-    private readonly weekSlots = [[], [], [], [], [], [], []];
-    private readonly timeslots = [];
-    private readonly doctor = new Doctor();
+    private monday:Date = this.getMonday(new Date());
+    // TODO:check implications of type change
+    private weekSlots:AppointmentTimeslotDate[] = [];
+    private doctor:Nullable<Doctor> = null;
+    private locality:Nullable<Locality> = null;
 
-    created(): void {
-        this.user.id = 1;
-        this.user.email = 'example@email.com';
-        this.user.firstName = 'firstName';
-        this.user.surname = 'surname';
-        this.user.verified = true;
-        this.user.phone = '00000000';
-        this.user.profilePictureId = 1;
+    async created() {
+        if(!this.monday){
+            let today = new Date();
+            //@ts-ignore
+            today.plusDays(7*parseInt(this.$route.params.weekNo))
+            this.monday = this.getMonday(today)
+        }
+        //TODO:check nico
+        this.doctor = await this.$container
+                        .get<DoctorService>(TYPES.Services.DoctorService)
+                        .get(parseInt(this.$route.params.memberId));
+        //TODO:nico haceme un get por id de localidad y cambia esto
+        // this.locality = await this.$container.get<LocalityService>(TYPES.Services.LocalityService).get("AR",1,this.doctor!.office.localityId!);
+        this.locality = new Locality();
+        this.locality.name = "Tigre";
 
-        let office = new Office();
-        office.id = 1;
-        office.name = 'Consultorio de ' + this.user.surname;
-        office.phone = this.user.phone;
-        office.email = this.user.email;
-        office.street = 'Street 1234';
-        office.url = 'example.com';
+        this.updateSlots()
+    }
 
-        this.doctor.id = 1;
-        this.doctor.user = this.user;
-        this.doctor.phone = this.user.phone;
-        this.doctor.email = this.user.email;
-        this.doctor.registrationNumber = 12345;
-        this.doctor.specialtyIds = [1];
+    updateWeek(){
+        let today = new Date();
+        //@ts-ignore
+        today = today.plusDays( 7 * parseInt(this.$route.params.weekNo) );
+        this.monday = this.getMonday(today);
+        //TODO:refresh timeslots
+        this.updateSlots();
+    }
+
+    async updateSlots(){
+        //@ts-ignore
+        let saturday = this.monday.plusDays(6);
+        
+        //TODO: esto me tirando un error raro
+        let slots = await this.$container
+                    .get<AppointmentTimeSlotService>(TYPES.Services.AppointmentTimeSlotService)
+                    .list(this.doctor!.id,{
+                            from: {
+                                    year: this.monday.getFullYear(),
+                                    month: this.monday.getMonth(),
+                                    day: this.monday.getDate()
+                            } as FullDate,
+                            to: {
+                                    year: saturday.getFullYear(),
+                                    month: saturday.getMonth(),
+                                    day: saturday.getDate()
+                            } as FullDate
+                    } as DateRange); 
+        if(!(slots instanceof APIError)){
+            this.weekSlots = slots;
+        }       
     }
 
     public getMoY(t: number): string {
@@ -223,5 +261,64 @@ export default class SelectAppointment extends Vue {
     getUrl(url:string):string{
         return createPath(url);
     }
+    getMonday(day:Date):Date {
+        // get day of week
+        let toAdd = day.getDay();
+
+        //remove the amount of days necessary to get to monday
+        //(monday is 1, sunday is 0)
+        toAdd = toAdd == 0 ? -6 : -1 * ( toAdd - 1 );
+        
+        //@ts-ignore
+        return day.plusDays( toAdd );
+    }
+    changeWeek(num:number){
+        let prevnum = parseInt(this.$route.params.weekNo);
+        this.$router.push({name:"SelectAppointment",params:{
+            ...this.$route.params,
+            weekNo:""+(prevnum+num)
+        }})
+        this.updateWeek()
+    }
+
+    //checks if theres at least 1 timeslot this week
+    //TODO:check that its working
+    get noSlotsAvailable(){
+        if(this.weekSlots.length>1){
+            for (const daySlot of this.weekSlots) {
+                if(daySlot.timeslots.length>1){
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
 }
 </script>
+
+<style scoped>
+.grey-background {
+    background-color: rgba(214, 214, 214);
+}
+
+.fill-height {
+    flex: 1 1 auto;
+}
+
+.profile-picture-container {
+    display: inline-block;
+    position: relative;
+    width: 100%;
+}
+
+.profile-picture {
+    object-fit: cover;
+    height: 100%;
+    width: 100%;
+    top: 0;
+    bottom: 0;
+    right: 0;
+    left: 0;
+    position: absolute;
+}
+</style>

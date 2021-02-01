@@ -183,7 +183,7 @@ const routes = [
         beforeEnter:patientGuard
     },
     {
-        path: '/selectAppointment',
+        path: '/appointment/:memberId([0-9][0-9]*)/:weekNo(-?[0-9][0-9]*)',
         name: 'SelectAppointment',
         component: SelectAppointment,
         beforeEnter:patientGuard
