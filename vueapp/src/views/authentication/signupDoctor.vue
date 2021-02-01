@@ -86,25 +86,33 @@
                 </div>
                 <div class="col-8">
                     <!-- TODO: maybe add state to input -->
-                    <select v-model="country" class="form-control" style="width: 100%;" items="${countryMap}" id="country"/>
+                    <select v-model="country" class="form-control" style="width: 100%;" items="${countryMap}" id="country">
+                        <option v-for="country in countries" :key="country.id" :value="country.id">
+                            {{ country.name }}
+                        </option>
+                    </select>
                     <!-- TODO: maybe expand feedback-->
                     <!-- TODO: check the i18n-->
-                    <b-form-invalid-feedback :state="validCountry">{{$t("NotEmpty.signupForm.address")}}</b-form-invalid-feedback>
+                    <b-form-invalid-feedback :state="validCountry">{{$t("NotNull.signupForm.countryId")}}</b-form-invalid-feedback>
                 </div>
             </div>
-            <div class="form-group row" id="province-container">
+            <div v-show="validCountry" class="form-group row" id="province-container">
                 <div class="col">
                     <label for="province">{{ $t('Province') }}</label>
                 </div>
                 <div class="col-8">
                     <!-- TODO: maybe add state to input -->
-                    <select v-model="province" class="form-control" style="width: 100%;" id="province"/>
+                    <select v-model="province" class="form-control" style="width: 100%;" id="province">
+                        <option v-for="province in provinces" :key="province.id" :value="province.id">
+                            {{ province.name }}
+                        </option>
+                    </select>
                     <!-- TODO: maybe expand feedback-->
                     <!-- TODO: check the i18n-->
-                    <b-form-invalid-feedback :state="validProvince">{{$t("NotEmpty.signupForm.address")}}</b-form-invalid-feedback>
+                    <b-form-invalid-feedback :state="validProvince">{{$t("NotNull.signupForm.provinceId")}}</b-form-invalid-feedback>
                 </div>
             </div>
-            <div class="form-group row" id="locality-container">
+            <div v-show="validProvince" class="form-group row" id="locality-container">
                 <div class="col">
                     <label for="locality">{{ $t('Locality') }}</label>
                 </div>
@@ -117,10 +125,10 @@
                     </select>
                     <!-- TODO: maybe expand feedback-->
                     <!-- TODO: check the i18n-->
-                    <b-form-invalid-feedback :state="validLocality">{{$t("NotEmpty.signupForm.address")}}</b-form-invalid-feedback>
+                    <b-form-invalid-feedback :state="validLocality">{{$t("NotNull.signupForm.localityId")}}</b-form-invalid-feedback>
                 </div>
             </div>
-            <div class="form-group row">
+            <div v-show="validLocality" class="form-group row">
                 <div class="col">
                     <label for="address">{{ $t('Address') }}</label>
                 </div>
@@ -188,9 +196,9 @@ export default class SignupDoctor extends Vue {
     private repeatPassword:string = "";
     //TODO:do this props
     private country: any = null;
-    private province: any =null;
-    private locality=null;
-    private address="";
+    private province: any = null;
+    private locality = null;
+    private address = "";
 
     public mounted(): void {
         this.$store.dispatch('countries/loadCountries', countryActionTypes.loadCountries());
@@ -242,13 +250,11 @@ export default class SignupDoctor extends Vue {
     get validRepeatPassword():boolean {
         return this.password === this.repeatPassword;
     }
-
-    //TODO:do this validations
     get validCountry():boolean{
-        return true;
+        return this.country != null;
     }
     get validProvince():boolean{
-        return true;
+        return this.province != null;
     }
     get validLocality():boolean{
         return this.locality != null;
@@ -279,7 +285,7 @@ export default class SignupDoctor extends Vue {
                     password: this.password,
                     surname: this.surname,
                     specialtyIds: [],
-                    localityId: 0 // TODO: GUIDO
+                    localityId: this.locality! // TODO: GUIDO
                 }
             }));
         }

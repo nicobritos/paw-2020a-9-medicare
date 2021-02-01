@@ -30,6 +30,8 @@
   "NotEmpty.signupForm.firstName": "You must enter your first name",
   "Size.signupForm.surname": "The surname must have between {2} and {1} characters",
   "NotEmpty.signupForm.surname": "You must enter your surname",
+  "NotNull.signupForm.countryId": "You must select a country",
+  "NotNull.signupForm.provinceId": "You must select a province",
   "NotNull.signupForm.localityId": "You must select a locality",
   "NotEmpty.signupForm.address": "You must enter an address",
   "InvalidCredentials.loginForm": "Invalid email or password",

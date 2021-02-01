@@ -30,6 +30,8 @@
   "NotEmpty.signupForm.firstName": "Debe escribir su nombre",
   "Size.signupForm.surname": "El apellido debe tener entre {2} y {1} caracteres",
   "NotEmpty.signupForm.surname": "Debe escribir su apellido",
+  "NotNull.signupForm.countryId": "Debe seleccionar un país",
+  "NotNull.signupForm.provinceId": "Debe seleccionar una provincia",
   "NotNull.signupForm.localityId": "Debe seleccionar una localidad",
   "NotEmpty.signupForm.address": "Debe escribir una dirección",
   "InvalidCredentials.loginForm": "Email o contraseña incorrectos",
