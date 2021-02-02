@@ -1,6 +1,6 @@
 <template>
     <div class="container ml-0 mr-0 pr-0 fill-height">
-        <!-- TODO: show spinner while this is loading -->
+        <!-- TODO: maybe there should be a delay -->
         <div v-if="doctor&&user&&locality&&monday" class="row h-100">
             <div class="col-4 h-100 grey-background">
                 <div class="row mt-4">
@@ -112,6 +112,9 @@
                 </div>
             </div>
         </div>
+        <div v-else class="row justify-content-center">
+            <b-spinner class="loading-spinner"></b-spinner>
+        </div>
     </div>
 </template>
 
@@ -119,7 +122,6 @@
 import {Component, Vue, Watch} from 'vue-property-decorator';
 import {User} from '~/logic/models/User';
 import {Doctor} from '~/logic/models/Doctor';
-import {Office} from '~/logic/models/Office';
 
 import {createApiPath, createPath, Nullable} from '~/logic/Utils';
 import { State } from 'vuex-class';
@@ -321,5 +323,11 @@ export default class SelectAppointment extends Vue {
     right: 0;
     left: 0;
     position: absolute;
+}
+.loading-spinner{
+    margin-top: 5rem;
+    width:7rem;
+    height:7rem;
+    color: rgb(0, 160, 152)
 }
 </style>

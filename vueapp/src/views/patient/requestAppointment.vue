@@ -1,6 +1,6 @@
 <template>
     <div class="container fill-height">
-        <!-- TODO: show spinner while this is loading -->
+        <!-- TODO: maybe there should be a delay -->
         <div v-if="doctor" class="row mt-4">
             <form @submit="submitForm" class="col d-flex flex-column" id="appointment-request-form">
                 <h4 class="text-muted">{{ $t('ScheduleAppointment') }}</h4>
@@ -92,6 +92,9 @@
                     </div>
                 </div>
             </div>
+        </div>
+        <div v-else class="row justify-content-center">
+            <b-spinner class="loading-spinner"></b-spinner>
         </div>
     </div>
 </template>
@@ -329,5 +332,10 @@ export default class RequestAppointment extends Vue {
     left: 0;
     position: absolute;
 }
-
+.loading-spinner{
+    margin-top: 5rem;
+    width:7rem;
+    height:7rem;
+    color: rgb(0, 160, 152)
+}
 </style>

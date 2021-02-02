@@ -95,7 +95,7 @@ export default class Login extends Vue {
     }
 
     //TODO:check this added by guido
-    mounted(){
+    beforeMount(){
         if(this.user){
             this.goBack();
         }
