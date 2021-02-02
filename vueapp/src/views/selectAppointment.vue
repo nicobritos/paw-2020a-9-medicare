@@ -1,5 +1,6 @@
 <template>
     <div class="container ml-0 mr-0 pr-0 fill-height">
+        <!-- TODO: show spinner while this is loading -->
         <div v-if="doctor&&user&&locality&&monday" class="row h-100">
             <div class="col-4 h-100 grey-background">
                 <div class="row mt-4">

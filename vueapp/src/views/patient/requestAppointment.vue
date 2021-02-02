@@ -1,7 +1,7 @@
 <template>
     <div class="container fill-height">
+        <!-- TODO: show spinner while this is loading -->
         <div v-if="doctor" class="row mt-4">
-            <!-- TODO:connect form -->
             <form @submit="submitForm" class="col d-flex flex-column" id="appointment-request-form">
                 <h4 class="text-muted">{{ $t('ScheduleAppointment') }}</h4>
                 <p class="mt-3 text-muted">{{ $t('Motive') }}</p>
@@ -45,7 +45,7 @@
                         <div class="col p-0">
                             <p class="m-0 white-text">{{ doctor.user.firstName }} {{ doctor.user.surname }}</p>
                             <small class="white-text">
-                                <!-- TODO: check -->
+                                <!-- TODO: change this -->
                                 {{ doctor.doctorSpecialties }}
                             </small>
                         </div>
