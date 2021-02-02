@@ -189,7 +189,7 @@ const routes = [
         beforeEnter:patientGuard
     },
     {
-        path: '/requestAppointment',
+        path: '/patient/appointment/:doctorId([0-9][0-9]*)/:year([0-9][0-9]*)/:monthOfYear([0-9][0-9]*)/:dayOfMonth([0-9][0-9]*)/:hourOfDay([0-9][0-9]*)/:minuteOfHour([0-9][0-9]*)',
         name: 'RequestAppointment',
         component: RequestAppointment,
         beforeEnter:patientGuard
