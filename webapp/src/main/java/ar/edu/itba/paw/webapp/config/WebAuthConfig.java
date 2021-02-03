@@ -73,9 +73,9 @@ public class WebAuthConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers(HttpMethod.POST, API_PATH + "/users").anonymous() // Creates a user
                 .antMatchers(HttpMethod.GET, API_PATH + "/users/**").permitAll() // Creates a user
                 .antMatchers(HttpMethod.GET, API_PATH + "/specialties").permitAll()
-                .antMatchers(HttpMethod.GET, API_PATH + "/countries").permitAll()
-                .antMatchers(HttpMethod.GET, API_PATH + "/provinces").permitAll()
-                .antMatchers(HttpMethod.GET, API_PATH + "/localities").permitAll()
+                .antMatchers(HttpMethod.GET, API_PATH + "/countries/**").permitAll()
+                .antMatchers(HttpMethod.GET, API_PATH + "/provinces/**").permitAll()
+                .antMatchers(HttpMethod.GET, API_PATH + "/localities/**").permitAll()
                 .antMatchers(HttpMethod.GET, API_PATH + "/doctors/**").permitAll()
                 .antMatchers(API_PATH + "/**").authenticated()
             .and()
