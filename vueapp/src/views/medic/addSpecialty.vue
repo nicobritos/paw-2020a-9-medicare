@@ -26,7 +26,6 @@
                 <div class="col-8">
                     <select class="form-control" name="specialtyId" id="specialtyId" path="specialtyId" v-model="selectedSpecialtyId">
                         <option :value="null" disabled selected>{{ $t('Specialty') }}</option>
-                        <option :value="null">{{ $t('Any') }}</option>
                         <option v-for="specialty in specialties" :key="specialty.id"
                                 :value="specialty.id">{{ specialty.name }}</option>
                     </select>
@@ -60,7 +59,7 @@ export default class AddSpecialty extends Vue {
     private readonly logo = logo;
     @VModel({type:Boolean,default:true})
     private showModal: boolean;
-    private selectedSpecialtyId: Nullable<ID> = null;
+    private selectedSpecialtyId: Nullable<number> = null;
 
     @State(state => state.doctorSpecialties.doctorSpecialties)
     private readonly specialties: DoctorSpecialty[];
@@ -76,7 +75,7 @@ export default class AddSpecialty extends Vue {
     }
 
     private cleanValues(){
-        //TODO: clean selected specialty
+        this.selectedSpecialtyId = null;
     }
 
     public async submitForm(e:Event): Promise<void> {
@@ -88,7 +87,7 @@ export default class AddSpecialty extends Vue {
         for (let doctor of this.doctors) {
             let specialties = doctor.specialtyIds.map(value => value);
             specialties.push(this.selectedSpecialtyId);
-
+            //TODO: tira 405 method not allowed
             await this.$store.dispatch('doctors/updateDoctor', doctorActionTypes.updateDoctor({
                 id: doctor.id,
                 doctor: {
