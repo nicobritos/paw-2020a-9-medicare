@@ -130,15 +130,16 @@
                             <div v-for="workday in workdays" :key="workday.id"
                                  class="row d-flex align-items-center justify-content-between">
                                 <p class="m-0">-
+                                    <!-- TODO: check all this -->
                                     {{
                                         $t('wkd_from_wksh_wksm_to_wkeh_wkem_cons',
                                             [
-                                                getDow(workday.getDay()),
-                                                timeWithZero(workday.startHour),
-                                                timeWithZero(workday.startMinute),
-                                                timeWithZero(workday.endHour),
-                                                timeWithZero(workday.endMinute),
-                                                workday.doctor.office.name
+                                                getDowFromWorkday(workday),
+                                                timeWithZero(workday.start.hour),
+                                                timeWithZero(workday.start.minute),
+                                                timeWithZero(workday.end.hour),
+                                                timeWithZero(workday.end.minute),
+                                                doctor[0].office.name
                                             ])
                                     }}
                                 </p>
@@ -187,7 +188,7 @@ import moreOptions from '@/assets/moreOptions.svg';
 import editPencil from '@/assets/editPencil.svg';
 import eye from '@/assets/eye.svg';
 import noeye from '@/assets/noeye.svg';
-import {Component, Vue} from 'vue-property-decorator';
+import {Component, Vue, Watch} from 'vue-property-decorator';
 import {User} from '~/logic/models/User';
 import AddSpecialty from "./addSpecialty.vue";
 import AddWorkday from "./addWorkday.vue";
@@ -203,6 +204,9 @@ import {Doctor} from '~/logic/models/Doctor';
 import EventBus from '~/logic/EventBus';
 import {APIErrorEventName} from '~/logic/interfaces/APIErrorEvent';
 import {APIError} from '~/logic/models/APIError';
+import { doctorSpecialtyActionTypes } from '~/store/types/doctorSpecialties.types';
+import { DoctorSpecialty } from '~/logic/models/DoctorSpecialty';
+import { Workday } from '~/logic/models/Workday';
 
 @Component({
     components:{
@@ -222,9 +226,10 @@ export default class MedicProfile extends Vue {
     private readonly user: User;
     @State(state => state.auth.doctors)
     private readonly doctors: Doctor[];
-    //TODO: connect this
-    private workdays = [];
-    private specialties = [];
+    private workdays:Workday[] = [];
+    private specialties:DoctorSpecialty[] = [];
+    @State(state => state.doctorSpecialties.doctorSpecialties)
+    private readonly allSpecialties:DoctorSpecialty[];
 
     private passwordVis = false;
     private repeatPasswordVis = false;
@@ -250,17 +255,37 @@ export default class MedicProfile extends Vue {
     private modOnConfirm:Function = ()=>{};
 
     mounted(){
-        /*
-            TODO: hablar con nico de si se peude hacer esto para settear
-                    los valores iniciales del form, quizas a el se le
-                    ocurre algo mejor
-        */
-
         let user = this.$store.state.auth.user;
         this.firstname = user.firstName;
         this.surname = user.surname;
         this.email = user.email;
-        this.phone = user.phone
+        this.phone = user.phone;
+        this.$store.dispatch("doctorSpecialties/loadDoctorSpecialties",doctorSpecialtyActionTypes.loadDoctorSpecialties())
+        this.setSpecialties()
+    }
+
+    @Watch("allSpecialties")
+    setSpecialties(){
+        if(this.allSpecialties){
+            this.specialties = this.allSpecialties.filter((v:DoctorSpecialty)=>{
+                                    for (const doctor of this.doctors) {
+                                        for (const s of doctor.specialtyIds) {
+                                            if(s == v.id){
+                                                return true;
+                                            }
+                                        }
+                                    }
+                                    return false;
+                                })
+        }
+    }
+
+    async setWorkdays(){
+        let workdays = await this.$container.get<WorkdayService>(TYPES.Services.WorkdayService)
+                            .list();
+        if(!(workdays instanceof APIError)){
+            this.workdays = workdays;
+        }
     }
 
     getDow(day: Date): string {
@@ -282,6 +307,11 @@ export default class MedicProfile extends Vue {
             default:
                 return day.getDay().toString();
         }
+    }
+
+    getDowFromWorkday(workday:Workday){
+        let day = workday.day.toLowerCase();
+        return this.$t(day.charAt(0).toUpperCase() + day.slice(1))
     }
 
     timeWithZero(t: number): string {
