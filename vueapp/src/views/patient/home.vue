@@ -115,13 +115,17 @@
 
 import {Component, Vue} from 'vue-property-decorator';
 import { State } from 'vuex-class';
+import { AppointmentService } from '~/logic/interfaces/services/AppointmentService';
+import { APIError } from '~/logic/models/APIError';
+import { Appointment } from '~/logic/models/Appointment';
+import TYPES from '~/logic/types';
 
 import {createApiPath, createPath, Hash, Nullable} from '~/logic/Utils';
 
 @Component
 export default class PatientHome extends Vue {
     // TODO: connect this
-    private appointments = [];
+    private appointments:Appointment[] = [];
     @State(state => state.localities.localities)
     private readonly localities: [];
     @State(state => state.doctorSpecialties.doctorSpecialties)
@@ -130,6 +134,27 @@ export default class PatientHome extends Vue {
     private name: string = '';
     private localityId: Nullable<number> = null;
     private specialtyId: Nullable<number> = null;
+
+    async mounted(){
+        //TODO: appoitnments no tiene  campo doctor sino doctor id lo que es un problema
+        let today = new Date();
+        let appointments = await this.$container.get<AppointmentService>(TYPES.Services.AppointmentService)
+                                    .list({
+                                        from:{
+                                            year:today.getFullYear(),
+                                            month:today.getMonth(),
+                                            day:today.getDate()
+                                        },
+                                        to:{
+                                            year:today.getFullYear() + 1,
+                                            month:today.getMonth(),
+                                            day:today.getDate()
+                                        }
+                                    });
+        if(!(appointments instanceof APIError) ){
+            this.appointments = appointments;
+        }
+    }
 
     getDoW(t: number): string {
         switch (t) {

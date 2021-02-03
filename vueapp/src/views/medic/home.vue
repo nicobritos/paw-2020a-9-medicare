@@ -200,8 +200,11 @@
 
 <script lang="ts">
 import moreOptions from '@/assets/moreOptions.svg';
-import {Component, Vue} from 'vue-property-decorator';
+import {Component, Vue, Watch} from 'vue-property-decorator';
+import { AppointmentService } from '~/logic/interfaces/services/AppointmentService';
+import { APIError } from '~/logic/models/APIError';
 import {Appointment} from '~/logic/models/Appointment';
+import TYPES from '~/logic/types';
 import {createApiPath, createPath} from '~/logic/Utils';
 
 // @ts-ignore
@@ -220,10 +223,54 @@ export default class MedicHome extends Vue {
     private today = new Date();
     // TODO: connect this
     private todayAppointments: Appointment[] = [];
-    private weekAppointments: Appointment[] = [[], [], [], [], [], [], []];
+    private weekAppointments: Appointment[][] = [[], [], [], [], [], [], []];
 
     async mounted(): Promise<void> {
+        //TODO: appoitnments no tiene  campo doctor sino doctor id lo que es un problema
+        let appointments = await this.$container.get<AppointmentService>(TYPES.Services.AppointmentService)
+                                .list({
+                                    from:{
+                                        year:this.today.getFullYear(),
+                                        month:this.today.getMonth(),
+                                        day:this.today.getDate()
+                                    },
+                                    to:{
+                                        year:this.today.getFullYear(),
+                                        month:this.today.getMonth(),
+                                        //TODO: check if this should be the same day or the next
+                                        day:this.today.getDate() + 1
+                                    }
+                                })
+        if(!(appointments instanceof APIError)){
+            this.todayAppointments = appointments;
+        }
+        this.updateWeekAppointments();
+    }
 
+    @Watch("monday")
+    async updateWeekAppointments(){
+        //TODO: appoitnments no tiene  campo doctor sino doctor id lo que es un problema
+        for (let i = 0; i < this.weekAppointments.length; i++) {
+            let appointments = await this.$container.get<AppointmentService>(TYPES.Services.AppointmentService)
+                        .list({
+                            from:{
+                                year:this.monday.getFullYear(),
+                                month:this.monday.getMonth(),
+                                day:this.monday.getDate() + i
+                            },
+                            to:{
+                                year:this.monday.getFullYear(),
+                                month:this.monday.getMonth(),
+                                //TODO: check if this should be the same day or the next
+                                day:this.monday.getDate() + i + 1
+                            }
+                        })
+            if(!(appointments instanceof APIError)){
+                this.weekAppointments[i] = appointments;
+            }else{
+                this.weekAppointments[i] = [];
+            }
+        }
     }
 
     timeWithZero(time: number): string {
