@@ -165,7 +165,8 @@
                         </div>
                     </div>
                     <div class="row d-flex align-items-center justify-content-center my-3">
-                        <button @click="openAddSpecialties" class="btn btn-info">{{ $t('AddSpecialty') }}</button>
+<!--                        TODO: GUIDO check disabled-->
+                        <button @click="openAddSpecialties" :disabled="remainingSpecialties.length === 0" class="btn btn-info">{{ $t('AddSpecialty') }}</button>
                     </div>
                 </div>
             </div>
@@ -173,7 +174,7 @@
             </div>
         </div>
         <AddWorkday v-model="showAddWorkday"/>
-        <AddSpecialty v-model="showAddSpecialties"/>
+        <AddSpecialty :specialties="remainingSpecialties" v-model="showAddSpecialties"/>
         <!-- TODO: maybe change this to a b-modal called via function -->
         <Modal  v-model="showModal" 
                 @confirm="modOnConfirm" 
@@ -228,6 +229,7 @@ export default class MedicProfile extends Vue {
     private readonly doctors: Doctor[];
     private workdays:Workday[] = [];
     private specialties:DoctorSpecialty[] = [];
+    private remainingSpecialties:DoctorSpecialty[] = [];
     @State(state => state.doctorSpecialties.doctorSpecialties)
     private readonly allSpecialties:DoctorSpecialty[];
 
@@ -267,18 +269,33 @@ export default class MedicProfile extends Vue {
     @Watch("allSpecialties", {immediate: true, deep: true})
     @Watch("doctors", {immediate: true, deep: true})
     setSpecialties(){
-        if(this.allSpecialties){
-            this.specialties = this.allSpecialties.filter((v:DoctorSpecialty)=>{
-                for (const doctor of this.doctors) {
-                    for (const s of doctor.specialtyIds) {
-                        if(s == v.id){
-                            return true;
-                        }
+        if (!this.allSpecialties) return;
+
+        this.specialties = [];
+        this.remainingSpecialties = [];
+        for (let specialty of this.allSpecialties) {
+            let added = false;
+            for (let doctor of this.doctors) {
+                if (doctor.specialtyIds.find(value => value == specialty.id)) {
+                    added = true;
+                }
+            }
+            if (added) {
+                this.specialties.push(specialty);
+            } else {
+                this.remainingSpecialties.push(specialty);
+            }
+        }
+        this.specialties = this.allSpecialties.filter((v:DoctorSpecialty)=>{
+            for (const doctor of this.doctors) {
+                for (const s of doctor.specialtyIds) {
+                    if(s == v.id){
+                        return true;
                     }
                 }
-                return false;
-            })
-        }
+            }
+            return false;
+        })
     }
 
     async setWorkdays(){
