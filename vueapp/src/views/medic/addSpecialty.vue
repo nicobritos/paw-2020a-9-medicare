@@ -45,7 +45,7 @@
 </template>
 
 <script lang="ts">
-import {Component, Emit, VModel, Vue} from 'vue-property-decorator';
+import {Component, Emit, Prop, VModel, Vue} from 'vue-property-decorator';
 import logo from "@/assets/logo.svg";
 import {createPath, ID, Nullable} from '@/logic/Utils';
 import {doctorSpecialtyActionTypes} from '~/store/types/doctorSpecialties.types';
@@ -60,15 +60,10 @@ export default class AddSpecialty extends Vue {
     @VModel({type:Boolean,default:true})
     private showModal: boolean;
     private selectedSpecialtyId: Nullable<number> = null;
-
-    @State(state => state.doctorSpecialties.doctorSpecialties)
+    @Prop({ type: Array, required: true })
     private readonly specialties: DoctorSpecialty[];
     @State(state => state.auth.doctors)
     private readonly doctors: Doctor[];
-
-    mounted(): void {
-        this.$store.dispatch('doctorSpecialties/loadDoctorSpecialties', doctorSpecialtyActionTypes.loadDoctorSpecialties());
-    }
 
     public getUrl(url:string):string{
         return createPath(url);
