@@ -287,9 +287,9 @@ export default class SelectAppointment extends Vue {
     //checks if theres at least 1 timeslot this week
     //TODO:check that its working
     get noSlotsAvailable(){
-        if(this.weekSlots.length>1){
+        if(this.weekSlots.length > 0){
             for (const daySlot of this.weekSlots) {
-                if(daySlot.timeslots.length>1){
+                if(daySlot.timeslots.length > 0){
                     return false;
                 }
             }

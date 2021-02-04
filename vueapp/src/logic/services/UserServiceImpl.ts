@@ -57,7 +57,7 @@ export class UserServiceImpl implements UserService {
     }
 
     public async update(id: number, user: UpdateUser): Promise<User | APIError> {
-        let response = await this.rest.post<User, UpdateUser>(getPathWithId(UserServiceImpl.PATH, id), {
+        let response = await this.rest.put<User, UpdateUser>(getPathWithId(UserServiceImpl.PATH, id), {
             accepts: UserMIME.GET,
             data: user,
             contentType: UserMIME.UPDATE

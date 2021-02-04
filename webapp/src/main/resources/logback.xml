@@ -48,19 +48,19 @@
         </encoder>
     </appender>
 
-    <logger name="ar.edu.itba.paw.persistence" level="INFO" additivity="false">
+    <logger name="ar.edu.itba.paw.persistence" level="DEBUG" additivity="false">
         <appender-ref ref="persistence-appender"/>
     </logger>
 
-    <logger name="ar.edu.itba.paw.webapp" level="INFO" additivity="false">
+    <logger name="ar.edu.itba.paw.webapp" level="DEBUG" additivity="false">
         <appender-ref ref="webapp-appender"/>
     </logger>
 
-    <logger name="ar.edu.itba.paw.models" level="INFO" additivity="false">
+    <logger name="ar.edu.itba.paw.models" level="DEBUG" additivity="false">
         <appender-ref ref="models-appender"/>
     </logger>
 
-    <logger name="ar.edu.itba.paw.services" level="INFO" additivity="false">
+    <logger name="ar.edu.itba.paw.services" level="DEBUG" additivity="false">
         <appender-ref ref="services-appender"/>
     </logger>
 

@@ -25,7 +25,7 @@ const actions: DefineActionTree<DoctorActions, DoctorState, RootState, DoctorAct
             commit('auth/setDoctor', authMutationTypes.setDoctor({
                 id: payload.id,
                 doctor: data
-            }));
+            }), {root: true});
         }
 
         return data;

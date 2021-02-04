@@ -38,7 +38,7 @@ export class DoctorServiceImpl implements DoctorService {
     }
 
     public async update(id: number, doctor: UpdateDoctor): Promise<Doctor | APIError> {
-        let response = await this.rest.put<Doctor, UpdateDoctor>(DoctorServiceImpl.PATH, {
+        let response = await this.rest.put<Doctor, UpdateDoctor>(getPathWithId(DoctorServiceImpl.PATH, id), {
             accepts: DoctorMIME.GET,
             data: doctor,
             contentType: DoctorMIME.UPDATE

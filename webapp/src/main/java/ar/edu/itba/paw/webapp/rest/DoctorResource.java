@@ -135,6 +135,7 @@ public class DoctorResource extends GenericResource {
             @PathParam("id") Integer id) {
         MIMEHelper.assertServerType(httpheaders, DoctorMIME.GET);
 
+        if (!this.isDoctor()) throw this.forbidden();
         if (id == null) throw this.missingPathParams();
         if (doctor == null) throw this.missingBodyParams();
         if (doctor.getDoctorSpecialties().isEmpty()) {
@@ -161,6 +162,6 @@ public class DoctorResource extends GenericResource {
 
         this.doctorService.update(savedDoctor);
 
-        return Response.status(Status.CREATED).entity(doctorOptional.get()).type(DoctorMIME.GET).build();
+        return Response.status(Status.OK).entity(doctorOptional.get()).type(DoctorMIME.GET).build();
     }
 }
