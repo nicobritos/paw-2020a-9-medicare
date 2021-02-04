@@ -35,7 +35,7 @@ const actions: DefineActionTree<ProvinceActions, ProvinceState, RootState> = {
         try {
             data = await promise;
         } catch (e) {
-            console.error(e);
+            return;
         }
 
         commit(provinceMutationTypes.setProvinces(data === null || data instanceof APIError ? [] : data));

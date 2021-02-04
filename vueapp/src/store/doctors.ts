@@ -19,9 +19,7 @@ function getService(): DoctorService {
 const actions: DefineActionTree<DoctorActions, DoctorState, RootState, DoctorActionReturnTypes> = {
     async updateDoctor({state, commit}, {payload}): Promise<Doctor | APIError> {
         let data = await getService().update(payload.id, payload.doctor);
-        if (data instanceof APIError) {
-            console.error(data);
-        } else {
+        if (!(data instanceof APIError)) {
             commit('auth/setDoctor', authMutationTypes.setDoctor({
                 id: payload.id,
                 doctor: data

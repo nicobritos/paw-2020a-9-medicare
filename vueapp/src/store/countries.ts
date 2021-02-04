@@ -31,7 +31,6 @@ const actions: DefineActionTree<CountryActions, CountryState, RootState> = {
         try {
             data = await promise;
         } catch (e) {
-            console.error(e);
             return;
         }
 

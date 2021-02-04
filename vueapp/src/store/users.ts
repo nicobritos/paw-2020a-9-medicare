@@ -56,19 +56,18 @@ const actions: DefineActionTree<UserActions, UserState, RootState, UserActionRet
         }
     },
 
-    async updateUser({state, commit}, {payload}) {
+    async updateUser({state, commit, rootState}, {payload}) {
+        if (!rootState.auth.user) return;
+
         try {
-            let data = await getService().update(payload.id, payload.user);
-            if (data instanceof APIError) {
-                console.error(data);
-            } else {
+            let data = await getService().update(rootState.auth.user.id, payload);
+            if (!(data instanceof APIError)) {
                 commit('auth/setUser', authMutationTypes.setUser(data), {
                     root: true
                 });
             }
             return data;
         } catch (e) {
-            console.error(e);
             return null;
         }
     },
@@ -105,7 +104,6 @@ const actions: DefineActionTree<UserActions, UserState, RootState, UserActionRet
                 root: true
             });
         } catch (e) {
-            console.error(e);
             return null;
         }
     }

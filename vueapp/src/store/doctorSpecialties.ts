@@ -35,7 +35,7 @@ const actions: DefineActionTree<DoctorSpecialtyActions, DoctorSpecialtyState, Ro
         try {
             data = await promise;
         } catch (e) {
-            console.error(e);
+            return;
         }
 
         commit(doctorSpecialtyMutationTypes.setDoctorSpecialties(data));

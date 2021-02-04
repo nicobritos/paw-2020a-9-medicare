@@ -38,7 +38,7 @@ const actions: DefineActionTree<LocalityActions, LocalityState, RootState> = {
         try {
             data = await promise;
         } catch (e) {
-            console.error(e);
+            return;
         }
 
         commit(localityMutationTypes.setLocalities(data === null || data instanceof APIError ? [] : data));
