@@ -20,11 +20,7 @@ public abstract class JsonDeserializer<T> {
     public Collection<T> fromJsonArray(ArrayNode jsonArray) {
         Collection<T> collection = new LinkedList<>();
         for (Object o : jsonArray) {
-            try {
-                collection.add((T) o);
-            } catch (ClassCastException e) {
-                collection.add(this.fromJson((JsonNode) o));
-            }
+            collection.add(this.fromJson((JsonNode) o));
         }
         return collection;
     }

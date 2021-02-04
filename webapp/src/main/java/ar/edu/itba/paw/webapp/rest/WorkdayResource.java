@@ -61,12 +61,18 @@ public class WorkdayResource extends GenericResource {
     @PreAuthorize("hasRole('DOCTOR')")
     public Response createEntities(
             Collection<Workday> workdays,
+            @Context HttpServletRequest request,
             @Context HttpHeaders httpheaders) {
         MIMEHelper.assertServerType(httpheaders, WorkdayMIME.GET_LIST);
 
         if (workdays == null || workdays.isEmpty()) throw this.missingBodyParams();
 
         if (!this.isDoctor()) throw this.forbidden();
+        User user = this.assertUserUnauthorized(request);
+        Optional<Doctor> doctor = this.doctorService.findByUser(user).stream().findFirst();
+        if (!doctor.isPresent()) {
+            throw this.forbidden();
+        }
 
         for (Workday workday : workdays) {
             if (workday.getStartHour() > workday.getEndHour()
@@ -74,6 +80,8 @@ public class WorkdayResource extends GenericResource {
 
                 throw this.unprocessableEntity(ErrorConstants.DATE_FROM_IS_AFTER_TO);
             }
+
+            workday.setDoctor(doctor.get());
         }
 
         Collection<Workday> newWorkdays;
