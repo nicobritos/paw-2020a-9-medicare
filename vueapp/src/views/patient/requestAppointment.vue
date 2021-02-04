@@ -36,17 +36,21 @@
                             <div class="profile-picture-container">
                                 <div style="margin-top: 100%;"></div>
                                 <img
+                                    v-if="doctor"
                                     class="profile-picture rounded-circle"
                                     :src="getApiUrl('/users/' + doctor.user.id + '/picture')"
                                     alt="profile pic"
                                 />
                             </div>
                         </div>
-                        <div class="col p-0">
+                        <div class="col p-0" v-if="doctor">
                             <p class="m-0 white-text">{{ doctor.user.firstName }} {{ doctor.user.surname }}</p>
                             <small class="white-text">
-                                <!-- TODO: change this -->
-                                {{ doctor.doctorSpecialties }}
+                                {{
+                                    doctor.specialtyIds.map((v) => {
+                                        return getSpecialtyName(v);
+                                    }).join(', ')
+                                }}
                             </small>
                         </div>
                     </div>
@@ -55,7 +59,7 @@
                             <img :src='calendarIcon' class="w-75" alt="calendar icon">
                         </div>
                         <div class="col p-0">
-                            <p class="m-0 white-text">
+                            <p class="m-0 white-text" v-if="date">
                                 {{
                                     $t(
                                         'dow_dom_moy_hod_moh',
@@ -77,8 +81,7 @@
                         <div class="col-3 d-flex align-items-center justify-content-center">
                             <img :src='mapIcon ' class="w-75" alt="map icon">
                         </div>
-                        <div class="col p-0">
-                            <!-- TODO: check -->
+                        <div class="col p-0" v-if="doctor && locality">
                             <p class="m-0 white-text">{{ doctor.office.street }} -
                                 {{ locality.name }}</p>
                             <a
@@ -114,6 +117,8 @@ import { Locality } from '~/logic/models/Locality';
 import { LocalityService } from '~/logic/interfaces/services/LocalityService';
 import { AppointmentService } from '~/logic/interfaces/services/AppointmentService';
 import { APIError } from '~/logic/models/APIError';
+import {DoctorSpecialty} from '~/logic/models/DoctorSpecialty';
+import {doctorSpecialtyActionTypes} from '~/store/types/doctorSpecialties.types';
 
 @Component
 export default class RequestAppointment extends Vue {
@@ -123,6 +128,8 @@ export default class RequestAppointment extends Vue {
     private doctor:Nullable<Doctor> = null;
     private locality:Nullable<Locality> = null;
 
+    @State(state => state.doctorSpecialties.doctorSpecialties)
+    private readonly specialties: DoctorSpecialty[];
     @State(state => state.auth.user)
     private readonly user:Nullable<User>;
 
@@ -131,6 +138,7 @@ export default class RequestAppointment extends Vue {
     private comment:string = "";
 
     async mounted(){
+        this.$store.dispatch('doctorSpecialties/loadDoctorSpecialties', doctorSpecialtyActionTypes.loadDoctorSpecialties());
         this.date = new Date(
             parseInt(this.$route.params.year),
             parseInt(this.$route.params.monthOfYear),
@@ -146,6 +154,14 @@ export default class RequestAppointment extends Vue {
 
     getApiUrl(url:string):string{
         return createApiPath(url);
+    }
+
+    getSpecialtyName(id: number): string {
+        for (let specialty of this.specialties) {
+            if (specialty.id === id) return specialty.name;
+        }
+
+        return id.toString();
     }
 
     getDoW(t: number): string {

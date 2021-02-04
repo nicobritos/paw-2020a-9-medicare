@@ -14,10 +14,9 @@
                                 <div class="col-4 d-flex flex-column justify-content-center">
                                     <div class="profile-picture-container">
                                         <div style="margin-top: 100%;"></div>
-                                        <!-- TODO: profile pic -->
                                         <img
                                             class="profile-picture rounded-circle"
-                                            :src='getApiUrl("/users/" + appointment.patient.user.id)'
+                                            :src='getApiUrl("/users/" + appointment.patient.id + "/picture")'
                                             alt="profile pic"
                                         />
                                     </div>
@@ -26,7 +25,7 @@
                                     <div class="row justify-content-start">
                                         <h5>
                                             {{
-                                                $t('name_surname', [appointment.patient.user.firstName, appointment.patient.user.surname])
+                                                $t('name_surname', [appointment.patient.firstName, appointment.patient.surname])
                                             }}</h5>
                                     </div>
                                     <div class="row">
@@ -35,10 +34,10 @@
                                                 $t(
                                                     'fhom_fmoh_thod_tmoh',
                                                     [
-                                                        timeWithZero(appointment.fromDate.hourOfDay),
-                                                        timeWithZero(appointment.fromDate.minuteOfHour),
-                                                        timeWithZero(appointment.toDate.hourOfDay),
-                                                        timeWithZero(appointment.toDate.minuteOfHour)
+                                                        timeWithZero(appointment.dateFrom.getHours()),
+                                                        timeWithZero(appointment.dateFrom.getMinutes()),
+                                                        timeWithZero(appointment.dateTo.getHours()),
+                                                        timeWithZero(appointment.dateTo.getMinutes())
                                                     ]
                                                 )
                                             }}
@@ -140,7 +139,7 @@
                                                         <div style="margin-top: 100%;"></div>
                                                         <img
                                                             class="profile-picture rounded-circle"
-                                                            :src="getApiUrl('/users/' + appointment.patient.user.id + '/picture')"
+                                                            :src="getApiUrl('/users/' + appointment.patient.userId + '/picture')"
                                                             alt="profile pic"
                                                         />
                                                     </div>
@@ -149,7 +148,7 @@
                                                     <div class="row justify-content-start">
                                                         <h5>
                                                             {{
-                                                                appointment.patient.user.firstName + ' ' + appointment.patient.user.surname
+                                                                appointment.patient.firstName + ' ' + appointment.patient.surname
                                                             }}</h5>
                                                     </div>
                                                     <div class="row">
@@ -158,10 +157,10 @@
                                                                 $t(
                                                                     'fhom_fmoh_thod_tmoh',
                                                                     [
-                                                                        timeWithZero(appointment.fromDate.hourOfDay),
-                                                                        timeWithZero(appointment.fromDate.minuteOfHour),
-                                                                        timeWithZero(appointment.toDate.hourOfDay),
-                                                                        timeWithZero(appointment.toDate.minuteOfHour)
+                                                                        timeWithZero(appointment.dateFrom.getHours()),
+                                                                        timeWithZero(appointment.dateFrom.getMinutes()),
+                                                                        timeWithZero(appointment.dateTo.getHours()),
+                                                                        timeWithZero(appointment.dateTo.getMinutes())
                                                                     ]
                                                                 )
                                                             }}
@@ -205,7 +204,9 @@ import { AppointmentService } from '~/logic/interfaces/services/AppointmentServi
 import { APIError } from '~/logic/models/APIError';
 import {Appointment} from '~/logic/models/Appointment';
 import TYPES from '~/logic/types';
-import {createApiPath, createPath} from '~/logic/Utils';
+import {createApiPath, createPath, ID} from '~/logic/Utils';
+import {DoctorService} from '~/logic/interfaces/services/DoctorService';
+import {Doctor} from '~/logic/models/Doctor';
 
 // @ts-ignore
 Date.prototype.plusDays = function (i) {
@@ -221,12 +222,10 @@ export default class MedicHome extends Vue {
     private moreOptions = moreOptions;
     private monday = this.getMonday(new Date());
     private today = new Date();
-    // TODO: connect this
     private todayAppointments: Appointment[] = [];
     private weekAppointments: Appointment[][] = [[], [], [], [], [], [], []];
 
     async mounted(): Promise<void> {
-        //TODO: appoitnments no tiene  campo doctor sino doctor id lo que es un problema
         let appointments = await this.$container.get<AppointmentService>(TYPES.Services.AppointmentService)
                                 .list({
                                     from:{
@@ -241,7 +240,7 @@ export default class MedicHome extends Vue {
                                         day:this.today.getDate() + 1
                                     }
                                 })
-        if(!(appointments instanceof APIError)){
+        if (!(appointments instanceof APIError)) {
             this.todayAppointments = appointments;
         }
         this.updateWeekAppointments();
@@ -249,7 +248,6 @@ export default class MedicHome extends Vue {
 
     @Watch("monday")
     async updateWeekAppointments(){
-        //TODO: appoitnments no tiene  campo doctor sino doctor id lo que es un problema
         for (let i = 0; i < this.weekAppointments.length; i++) {
             let appointments = await this.$container.get<AppointmentService>(TYPES.Services.AppointmentService)
                         .list({
@@ -261,11 +259,15 @@ export default class MedicHome extends Vue {
                             to:{
                                 year:this.monday.getFullYear(),
                                 month:this.monday.getMonth(),
-                                //TODO: check if this should be the same day or the next
                                 day:this.monday.getDate() + i + 1
                             }
                         })
             if(!(appointments instanceof APIError)){
+                for (let appointment of appointments) {
+                    // Hacemos async para no perder tiempo, no hace falta que sea bloqueante
+                    this.setAppointmentDoctor(appointment.id, appointment.doctorId);
+                }
+
                 this.weekAppointments[i] = appointments;
             }else{
                 this.weekAppointments[i] = [];

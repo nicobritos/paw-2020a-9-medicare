@@ -25,14 +25,20 @@ export class AppointmentServiceImpl implements AppointmentService {
         let response = await this.rest.get<Appointment>(getPathWithId(AppointmentServiceImpl.PATH, id), {
             accepts: AppointmentMIME.GET
         });
-        return response.orElse(null);
+        if (!response.isOk)
+            return null;
+
+        return AppointmentServiceImpl.formatAppointment(response.data!);
     }
 
     public async list(dateRange: DateRange): Promise<Appointment[] | APIError> {
         let response = await this.rest.get<Appointment[]>(AppointmentServiceImpl.PATH, {
             accepts: AppointmentMIME.LIST
         });
-        return response.response;
+        if (!response.isOk)
+            return response.error!;
+
+        return AppointmentServiceImpl.formatAppointments(response.data!);
     }
 
     public async create(appointment: CreateAppointment): Promise<Appointment | APIError> {
@@ -41,11 +47,29 @@ export class AppointmentServiceImpl implements AppointmentService {
             data: appointment,
             contentType: AppointmentMIME.CREATE
         });
-        return response.response;
+        if (!response.isOk)
+            return response.error!;
+
+        return AppointmentServiceImpl.formatAppointment(response.data!);
     }
 
     public async delete(id: number): Promise<true | APIError> {
         let response = await this.rest.delete(getPathWithId(AppointmentServiceImpl.PATH, id));
         return response.isOk ? true : response.error!;
+    }
+
+    private static formatAppointments(appointments: Appointment[]): Appointment[] {
+        let ret: Appointment[] = [];
+
+        for (let appointment of appointments) {
+            ret.push(AppointmentServiceImpl.formatAppointment(appointment));
+        }
+
+        return ret;
+    }
+
+    private static formatAppointment(appointment: Appointment): Appointment {
+        appointment.dateTo = new Date(appointment.dateFrom.getTime() + Appointment.DURATION_MINUTES * 60 * 1000);
+        return appointment;
     }
 }

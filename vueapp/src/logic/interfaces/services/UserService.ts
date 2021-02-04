@@ -13,7 +13,7 @@ interface CreateUser {
 
 export interface CreateUserDoctor extends CreateUser {
     registrationNumber?: number;
-    specialtyIds: number[]; // TODO: APIDocs dice que no es mandatory
+    specialtyIds: number[];
     localityId: number;
 }
 
@@ -25,6 +25,7 @@ export interface UpdateUser {
     firstName?: string;
     surname?: string;
     phone?: string;
+    password?: string;
 }
 
 export interface UserService {

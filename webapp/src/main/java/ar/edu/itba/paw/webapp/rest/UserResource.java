@@ -259,19 +259,29 @@ public class UserResource extends GenericAuthenticationResource {
 
         if (id == null || user == null) throw this.missingBodyParams();
 
+        boolean modifyUser = false;
         User savedUser = this.assertUserNotFound(request);
-        if (user.getEmail() != null)
+        if (user.getEmail() != null) {
             savedUser.setEmail(user.getEmail());
-        if (user.getPhone() != null)
+            modifyUser = true;
+        } if (user.getPhone() != null) {
             savedUser.setPhone(user.getPhone());
-        if (user.getSurname() != null)
+            if (!modifyUser) modifyUser = true;
+        } if (user.getSurname() != null) {
             savedUser.setSurname(user.getSurname());
-        if (user.getFirstName() != null)
+            if (!modifyUser) modifyUser = true;
+        } if (user.getFirstName() != null) {
             savedUser.setFirstName(user.getFirstName());
+            if (!modifyUser) modifyUser = true;
+        }
 
-        this.userService.update(savedUser);
+        if (modifyUser)
+            this.userService.update(savedUser);
 
-        return Response.status(Status.CREATED).entity(savedUser ).type(UserMIME.GET).build();
+        if (user.getPassword() != null)
+            this.userService.updatePassword(savedUser, user.getPassword());
+
+        return Response.status(Status.OK).entity(savedUser).type(UserMIME.GET).build();
     }
 
     private User copyUser(UserSignUp userSignUp) {

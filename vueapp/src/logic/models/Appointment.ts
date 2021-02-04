@@ -1,4 +1,5 @@
 import {GenericEntity} from '~/logic/models/utils/GenericEntity';
+import {Patient} from '~/logic/models/Patient';
 
 export enum AppointmentStatus {
     PENDING= 'PENDING',
@@ -9,12 +10,15 @@ export enum AppointmentStatus {
 }
 
 export class Appointment extends GenericEntity<Appointment> {
+    public static readonly DURATION_MINUTES = 15;
+
     private _id: number;
     private _status: AppointmentStatus;
     private _dateFrom: Date;
+    private _dateTo: Date;
     private _message: string;
     private _motive: string;
-    private _patientId: number;
+    private _patient: Patient;
     private _doctorId: number;
 
     public get id(): number {
@@ -41,6 +45,14 @@ export class Appointment extends GenericEntity<Appointment> {
         this._dateFrom = value;
     }
 
+    public get dateTo(): Date {
+        return this._dateTo;
+    }
+
+    public set dateTo(value: Date) {
+        this._dateTo = value;
+    }
+
     public get message(): string {
         return this._message;
     }
@@ -57,12 +69,12 @@ export class Appointment extends GenericEntity<Appointment> {
         this._motive = value;
     }
 
-    public get patientId(): number {
-        return this._patientId;
+    public get patient(): Patient {
+        return this._patient;
     }
 
-    public set patientId(value: number) {
-        this._patientId = value;
+    public set patient(value: Patient) {
+        this._patient = value;
     }
 
     public get doctorId(): number {

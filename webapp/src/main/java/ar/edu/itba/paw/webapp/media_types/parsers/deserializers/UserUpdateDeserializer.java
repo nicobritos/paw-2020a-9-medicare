@@ -62,9 +62,14 @@ public class UserUpdateDeserializer extends JsonDeserializer<User> {
             ));
         }
 
-        node = jsonObject.get("profilePicture");
+        node = jsonObject.get("password");
         if (node != null && !node.isNull()) {
-            // TODO: Nico, ver size, MIME
+            user.setPassword(this.getStringNonNull(
+                    jsonObject,
+                    "password",
+                    null,
+                    ErrorConstants.USER_UPDATE_INVALID_PASSWORD
+            ));
         }
 
         return user;

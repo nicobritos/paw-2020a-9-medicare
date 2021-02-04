@@ -91,6 +91,9 @@ public abstract class ErrorConstants {
             = invalidField(39, "surname");
     public static final APISubError USER_UPDATE_INVALID_PHONE
             = invalidField(40, "phone");
+    // TODO: Guido front
+    public static final APISubError USER_UPDATE_INVALID_PASSWORD
+            = invalidField(401, "password");
 
     public static final APISubError WORKDAY_CREATE_INVALID_DAY
             = invalidField(41, "day");

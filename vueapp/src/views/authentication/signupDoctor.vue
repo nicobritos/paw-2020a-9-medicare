@@ -154,7 +154,7 @@ import noeye from '@/assets/noeye.svg';
 import logo from '@/assets/logo.svg';
 import {Component, Vue, Watch} from 'vue-property-decorator';
 
-import {createPath, isValidEmail} from "~/logic/Utils";
+import {createPath, ID, isValidEmail, Nullable} from '~/logic/Utils';
 import {userActionTypes} from '~/store/types/user.types';
 import { Locality } from '~/logic/models/Locality';
 import { State } from 'vuex-class';
@@ -194,10 +194,10 @@ export default class SignupDoctor extends Vue {
     private email:string = "";
     private password:string = "";
     private repeatPassword:string = "";
-    //TODO:do this props
-    private country: any = null;
-    private province: any = null;
-    private locality = null;
+
+    private country: Nullable<ID> = null;
+    private province: Nullable<ID> = null;
+    private locality: Nullable<number> = null;
     private address = "";
 
     public mounted(): void {
@@ -209,7 +209,7 @@ export default class SignupDoctor extends Vue {
         if (!this.country) return;
 
         this.$store.dispatch('provinces/loadProvinces', provinceActionTypes.loadProvinces({
-            countryId: this.country// TODO Guido check que devuelve el select
+            countryId: this.country!
         }));
     }
 
@@ -218,8 +218,8 @@ export default class SignupDoctor extends Vue {
         if (!this.province) return;
 
         this.$store.dispatch('localities/loadLocalities', localityActionTypes.loadLocalities({
-            countryId: this.country,
-            provinceId: this.province// TODO Guido check que devuelve el select
+            countryId: this.country!,
+            provinceId: this.province!
         }));
     }
 
@@ -231,6 +231,7 @@ export default class SignupDoctor extends Vue {
         this.showRepeatPassword = !this.showRepeatPassword;
     }
 
+    // TODO: Guido convendria hacer un .trim() para sacar espacios en los finales
     get validFirstname():boolean {
         return  this.firstname.length>=this.minFirstnameLength 
                 && this.firstname.length<=this.maxFirstnameLength;
@@ -245,7 +246,7 @@ export default class SignupDoctor extends Vue {
     }
     get validPassword():boolean {
         return this.password.length>=this.minPasswordLength 
-                && this.password.length<=this.maxPasswordLength;;
+                && this.password.length<=this.maxPasswordLength;
     }
     get validRepeatPassword():boolean {
         return this.password === this.repeatPassword;
@@ -285,7 +286,7 @@ export default class SignupDoctor extends Vue {
                     password: this.password,
                     surname: this.surname,
                     specialtyIds: [],
-                    localityId: this.locality! // TODO: GUIDO
+                    localityId: this.locality!
                 }
             }));
         }

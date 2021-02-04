@@ -103,26 +103,6 @@ export default class Login extends Vue {
 
     @Watch('user')
     public goBack(): void {
-        // TODO: check this
-        // this was the previous version, the other if is another way that seems to work
-        // while this doesnt. i'm leaving a check just to make sure it's the correct
-        // way of doing it
-        // if (this.user && this.$route.query && this.$route.query.previous) {
-        //     let previous = typeof this.$route.query.previous === 'string' ? this.$route.query.previous : this.$route.query.previous[0];
-        //     if (previous !== null && !this.$route.matched[0].regex.test(previous)) {
-        //         this.$router.push(previous);
-        //     }
-        //     // TODO:check this
-        //     // if(this.$route.params.prevto){
-        //     //     this.$router.push(this.$route.params.prevto)
-        //     // }
-        //     else {
-        //         this.$router.push({
-        //             name: 'Landing',
-        //         });
-        //     }
-        // }
-        //TODO: future check of this
         if(this.user && this.$route.params.prevto){
             this.$router.push(this.$route.params.prevto)
         }

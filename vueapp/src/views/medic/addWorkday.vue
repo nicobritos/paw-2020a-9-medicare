@@ -136,16 +136,13 @@ export default class AddWorkday extends Vue {
         e.stopPropagation();
 
         /*
-            TODO: check this, supponsedly input type=time always returns 
+            TODO: check this, supponsedly input type=time always returns
                     hh:mm:ss with ss being optional but always in 24-hour format
         */
         let start = this.startHour.split(":").map(v => parseInt(v));
         let end = this.endHour.split(":").map(v => parseInt(v));
-        //TODO:check
-        //TODO:FIXME tira 500 por algun motivo
         let day = [ 'MONDAY','TUESDAY','WEDNESDAY','THURSDAY','FRIDAY','SATURDAY','SUNDAY'][this.dowSelected];
         this.getWorkdayService().createList([{
-            //TODO:check
             day: day as Day,
             end: {
                 hour: end[0],

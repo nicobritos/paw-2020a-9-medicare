@@ -194,7 +194,7 @@ export default class PatientProfile extends Vue {
             body: file
         }).then((r) => {
             if (r.ok) {
-                //TODO:show ok toast and update profile pic
+                //TODO:show ok toast
             }
         }).catch((e) => {
             //TODO:show error message
@@ -269,13 +269,14 @@ export default class PatientProfile extends Vue {
         e.preventDefault();
         if(this.validUserUpdate){
             this.$store.dispatch('users/updateUser', userActionTypes.updateUser({
-                user: {
-                    email
-                },
-                id: this.user.id
+                email: this.email,
+                firstName: this.firstname,
+                phone: this.phone,
+                surname: this.surname,
+                password: this.password
             }));
-            //TODO: update user
-            console.log("update user")
+        }else{
+            //TODO: show invalid toast
         }
     }
 

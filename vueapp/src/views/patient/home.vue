@@ -20,24 +20,26 @@
                                         <div style="margin-top: 100%;"></div>
                                         <img
                                             class="profile-picture rounded-circle"
-                                            :src="getApiUrl('/users/' + appointment.doctor.user.id + '/picture')"
+                                            :src="getApiUrl('/users/' + appointmentDoctors[appointment.id].user.id + '/picture')"
                                             alt="profile pic"
                                         />
                                     </div>
                                 </div>
                                 <div class="col-7">
                                     <div class="row justify-content-start">
-                                        <h5>{{ appointment.doctor.user.firstName }}
-                                            {{ appointment.doctor.user.surname }}</h5>
+                                        <h5>{{ appointmentDoctors[appointment.id] ? appointmentDoctors[appointment.id].user.firstName : '' }}
+                                            {{ appointmentDoctors[appointment.id] ? appointmentDoctors[appointment.id].user.surname : '' }}</h5>
                                     </div>
                                     <div class="row">
                                         <p class="m-0">
-                                            <!-- TODO: check -->
-                                            {{ appointment.doctor.doctorSpecialties }}
+                                            {{ appointmentDoctors[appointment.id] ? appointmentDoctors[appointment.id].specialtyIds.map((v) => {
+                                                    return getSpecialtyName(v);
+                                                }).join(', ') : ''
+                                            }}
                                         </p>
                                     </div>
                                     <div class="row">
-                                        <p class="m-0">{{ appointment.doctor.office.street }}</p>
+                                        <p class="m-0">{{ appointmentDoctors[appointment.id] ? appointmentDoctors[appointment.id].office.street : '' }}</p>
                                     </div>
                                     <div class="row">
                                         <p class="m-0">
@@ -46,13 +48,13 @@
                                                 $t(
                                                     'dow_dom_moy_sh_sm_eh_em',
                                                     [
-                                                        getDoW(appointment.from.getDay()),
-                                                        appointment.from.getDate(),
-                                                        getMoY(appointment.from.getMonth()),
-                                                        timeWithZero(appointment.from.getHour()),
-                                                        timeWithZero(appointment.from.getMinute()),
-                                                        timeWithZero(appointment.to.getHour()),
-                                                        timeWithZero(appointment.to.getMinute())
+                                                        getDoW(appointment.dateFrom.getDay()),
+                                                        appointment.dateFrom.getDate(),
+                                                        getMoY(appointment.dateFrom.getMonth()),
+                                                        timeWithZero(appointment.dateFrom.getHours()),
+                                                        timeWithZero(appointment.dateFrom.getMinutes()),
+                                                        timeWithZero(appointment.dateTo.getHours()),
+                                                        timeWithZero(appointment.dateTo.getMinutes())
                                                     ]
                                                 )
                                             }}
@@ -120,40 +122,56 @@ import { APIError } from '~/logic/models/APIError';
 import { Appointment } from '~/logic/models/Appointment';
 import TYPES from '~/logic/types';
 
-import {createApiPath, createPath, Hash, Nullable} from '~/logic/Utils';
+import {createApiPath, createPath, Hash, ID, Nullable} from '~/logic/Utils';
+import {Doctor} from '~/logic/models/Doctor';
+import { DoctorService } from '~/logic/interfaces/services/DoctorService';
+import {doctorSpecialtyActionTypes} from '~/store/types/doctorSpecialties.types';
+import {DoctorSpecialty} from '~/logic/models/DoctorSpecialty';
+import {Locality} from '~/logic/models/Locality';
 
 @Component
 export default class PatientHome extends Vue {
-    // TODO: connect this
     private appointments:Appointment[] = [];
     @State(state => state.localities.localities)
-    private readonly localities: [];
+    private readonly localities: Locality[];
     @State(state => state.doctorSpecialties.doctorSpecialties)
-    private readonly specialties: [];
+    private readonly specialties: DoctorSpecialty[];
 
     private name: string = '';
     private localityId: Nullable<number> = null;
     private specialtyId: Nullable<number> = null;
+    private appointmentDoctors: Record<ID, Doctor> = {};
 
     async mounted(){
-        //TODO: appoitnments no tiene  campo doctor sino doctor id lo que es un problema
+        this.$store.dispatch('doctorSpecialties/loadDoctorSpecialties', doctorSpecialtyActionTypes.loadDoctorSpecialties());
         let today = new Date();
         let appointments = await this.$container.get<AppointmentService>(TYPES.Services.AppointmentService)
-                                    .list({
-                                        from:{
-                                            year:today.getFullYear(),
-                                            month:today.getMonth(),
-                                            day:today.getDate()
-                                        },
-                                        to:{
-                                            year:today.getFullYear() + 1,
-                                            month:today.getMonth(),
-                                            day:today.getDate()
-                                        }
-                                    });
-        if(!(appointments instanceof APIError) ){
+            .list({
+                from:{
+                    year:today.getFullYear(),
+                    month:today.getMonth(),
+                    day:today.getDate()
+                },
+                to:{
+                    year:today.getFullYear() + 1,
+                    month:today.getMonth(),
+                    day:today.getDate()
+                }
+            });
+        if (!(appointments instanceof APIError)) {
+            this.appointmentDoctors = {};
+            for (let appointment of appointments) {
+                // Hacemos async para no perder tiempo, no hace falta que sea bloqueante
+                this.setAppointmentDoctor(appointment.id, appointment.doctorId);
+            }
+
             this.appointments = appointments;
         }
+    }
+
+    async setAppointmentDoctor(appointmentId: ID, id: number) {
+        let doctor = await this.$container.get<DoctorService>(TYPES.Services.DoctorService).get(id);
+        this.appointmentDoctors[appointmentId] = doctor!;
     }
 
     getDoW(t: number): string {
@@ -214,6 +232,14 @@ export default class PatientHome extends Vue {
         } else {
             return t.toString();
         }
+    }
+
+    getSpecialtyName(id: number): string {
+        for (let specialty of this.specialties) {
+            if (specialty.id === id) return specialty.name;
+        }
+
+        return id.toString();
     }
 
     getApiUrl(url:string):string{

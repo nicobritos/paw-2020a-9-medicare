@@ -23,7 +23,6 @@
             </div>
             <div class="col-6">
                 <div class="container p-0 pt-4 m-0">
-                    <!-- TODO:connect form -->
                     <form @submit="submitForm">
                         <div class="row">
                             <div class="col p-0 m-0">
@@ -165,7 +164,6 @@
                         </div>
                     </div>
                     <div class="row d-flex align-items-center justify-content-center my-3">
-<!--                        TODO: GUIDO check disabled-->
                         <button @click="openAddSpecialties" :disabled="remainingSpecialties.length === 0" class="btn btn-info">{{ $t('AddSpecialty') }}</button>
                     </div>
                 </div>
@@ -208,6 +206,7 @@ import {APIError} from '~/logic/models/APIError';
 import { doctorSpecialtyActionTypes } from '~/store/types/doctorSpecialties.types';
 import { DoctorSpecialty } from '~/logic/models/DoctorSpecialty';
 import { Workday } from '~/logic/models/Workday';
+import {userActionTypes} from '~/store/types/user.types';
 
 @Component({
     components:{
@@ -378,7 +377,6 @@ export default class MedicProfile extends Vue {
         y usar el que undefined es falsy para mostrar el boton y si esta en proceso
         de borrarse asociamos un true y cundo se borra lo seteamos en false
     */
-    // TODO: check this
     async removeSpecialty(id: number): Promise<void> {
         for (let doctor of this.doctors) {
             let specialties = doctor.specialtyIds.map(value => value);
@@ -419,7 +417,7 @@ export default class MedicProfile extends Vue {
             body: file  // TODO: CHECK
         }).then((r) => {
             if (r.ok) {
-                //TODO:show ok toast and update profile pic
+                //TODO:show ok toast
             }
         }).catch((e) => {
             //TODO:show error message
@@ -436,7 +434,6 @@ export default class MedicProfile extends Vue {
     }
 
     //-------------------------Form------------------------------
-    // TODO: finish form submit
 
     //TODO:check properties
     private readonly minFirstnameLength = 2;
@@ -474,9 +471,9 @@ export default class MedicProfile extends Vue {
         return this.password === this.repeatPassword;
     }
 
-    //TODO: vaya uno a saber que es un telefono valido no??
     get validPhone():boolean{
-        return true;
+        this.phone = this.phone.trim();
+        return this.phone.length >= 7 && this.phone.length <= 14; // Algunos lugares tienen tels con 7 dig
     }
 
 
@@ -485,14 +482,16 @@ export default class MedicProfile extends Vue {
                 this.validPassword && this.validRepeatPassword && this.validPhone;
     }
 
-
-    //TODO: do validation
-    //TODO: should be formEvent or something like that
     submitForm(e:any): void{
         e.preventDefault();
         if(this.validUserUpdate){
-            //TODO: update user
-            console.log("update user")
+            this.$store.dispatch('users/updateUser', userActionTypes.updateUser({
+                email: this.email,
+                firstName: this.firstname,
+                phone: this.phone,
+                surname: this.surname,
+                password: this.password
+            }));
         }else{
             //TODO: show invalid toast
         }
