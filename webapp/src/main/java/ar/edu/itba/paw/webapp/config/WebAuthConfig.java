@@ -68,13 +68,16 @@ public class WebAuthConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers(HttpMethod.GET, API_PATH + "/verify/**").permitAll() // Verifies a user
                 .antMatchers(HttpMethod.POST, API_PATH + "/auth/refresh").permitAll() // Refreshes the access token
                 .antMatchers(HttpMethod.POST, API_PATH + "/users").anonymous() // Creates a user
+                .antMatchers(HttpMethod.PUT, API_PATH + "/users/**").authenticated()
                 .antMatchers(HttpMethod.GET, API_PATH + "/users/**").permitAll() // Creates a user
                 .antMatchers(HttpMethod.GET, API_PATH + "/specialties").permitAll()
                 .antMatchers(HttpMethod.GET, API_PATH + "/countries/**").permitAll()
                 .antMatchers(HttpMethod.GET, API_PATH + "/provinces/**").permitAll()
                 .antMatchers(HttpMethod.GET, API_PATH + "/localities/**").permitAll()
+                .antMatchers(HttpMethod.GET, API_PATH + "/workdays/**").permitAll()
+                .antMatchers(HttpMethod.POST, API_PATH + "/workdays/**").hasRole(UserRole.DOCTOR.toString())
                 .antMatchers(HttpMethod.GET, API_PATH + "/doctors/**").permitAll()
-                .antMatchers(HttpMethod.PUT, API_PATH + "/doctors/*").hasRole(UserRole.DOCTOR.toString())
+                .antMatchers(HttpMethod.PUT, API_PATH + "/doctors/**").hasRole(UserRole.DOCTOR.toString())
                 .antMatchers(API_PATH + "/**").authenticated()
             .and()
                 .addFilter(this.jwtAuthorizationFilter())  // Verifies JWT if provided
