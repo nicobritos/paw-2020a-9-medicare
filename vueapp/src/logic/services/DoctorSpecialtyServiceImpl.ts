@@ -15,7 +15,6 @@ export class DoctorSpecialtyServiceImpl implements DoctorSpecialtyService {
     @inject(TYPES.Repositories.RestRepository)
     private rest: RestRepository;
 
-    // TODO: Manage errors
     public async list(): Promise<DoctorSpecialty[]> {
         let response = await this.rest.get<DoctorSpecialty[]>(DoctorSpecialtyServiceImpl.PATH, {
             accepts: DoctorSpecialtyMIME.LIST

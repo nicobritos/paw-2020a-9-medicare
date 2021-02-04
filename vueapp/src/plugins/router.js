@@ -19,7 +19,7 @@ import Error404 from "@/views/error/404";
 import Error500 from "@/views/error/500";
 
 Vue.use(VueRouter);
-//TODO: check verified for certain actions
+
 function notAuthGuard(to,from,next) {
     if(store.getters["auth/loggedIn"]){
         if(store.state.auth.isDoctor){
@@ -89,7 +89,6 @@ function unverifiedGuard(to,from,next) {
 
 const routes = [
     // example
-    // TODO: CHECK best behavior for component
     // {
     //   path: '/about',
     //   name: 'About',
@@ -115,8 +114,6 @@ const routes = [
         path: '/verify/:token',
         name: 'Unverified',
         component: Unverified,
-        // TODO: Guido guard y Nico levatar user del localStorage de nuevo para volver a verificar
-        // TODO: check
         beforeEnter:unverifiedGuard
     },
     {
