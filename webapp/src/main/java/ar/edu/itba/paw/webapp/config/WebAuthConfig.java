@@ -1,9 +1,6 @@
 package ar.edu.itba.paw.webapp.config;
 
-import ar.edu.itba.paw.webapp.auth.AccessDeniedHandlerImpl;
-import ar.edu.itba.paw.webapp.auth.JWTAuthenticationEntryPoint;
-import ar.edu.itba.paw.webapp.auth.JWTAuthenticationFilter;
-import ar.edu.itba.paw.webapp.auth.JWTAuthorizationFilter;
+import ar.edu.itba.paw.webapp.auth.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
@@ -77,6 +74,7 @@ public class WebAuthConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers(HttpMethod.GET, API_PATH + "/provinces/**").permitAll()
                 .antMatchers(HttpMethod.GET, API_PATH + "/localities/**").permitAll()
                 .antMatchers(HttpMethod.GET, API_PATH + "/doctors/**").permitAll()
+                .antMatchers(HttpMethod.PUT, API_PATH + "/doctors/*").hasRole(UserRole.DOCTOR.toString())
                 .antMatchers(API_PATH + "/**").authenticated()
             .and()
                 .addFilter(this.jwtAuthorizationFilter())  // Verifies JWT if provided
