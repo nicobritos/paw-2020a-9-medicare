@@ -6,4 +6,6 @@ export interface LocalityService {
     list(params?: { countryId: ID, provinceId: ID }): Promise<Nullable<Locality[]> | APIError>;
 
     get(countryId: ID, provinceId: ID, id: ID): Promise<Nullable<Locality>>;
+
+    getById(id: ID): Promise<Nullable<Locality>>;
 }
