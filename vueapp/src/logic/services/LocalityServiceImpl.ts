@@ -41,9 +41,20 @@ export class LocalityServiceImpl implements LocalityService {
         return response.orElse(null);
     }
 
+    public async getById(id: ID): Promise<Nullable<Locality>> {
+        let response = await this.rest.get<Locality>(LocalityServiceImpl.formatPathId(id), {
+            accepts: LocalityMIME.GET
+        });
+        return response.orElse(null);
+    }
+
     private static formatPath(countryId: ID, provinceId: ID, localityId?: ID): string {
         let s = `/${CountryServiceImpl.PATH}/${countryId}/${ProvinceServiceImpl.PATH}/${provinceId}/${LocalityServiceImpl.PATH}`;
         if (localityId != null) return getPathWithId(s, localityId);
         return s;
+    }
+
+    private static formatPathId(localityId: ID): string {
+        return getPathWithId(`/${LocalityServiceImpl.PATH}`, localityId);
     }
 }

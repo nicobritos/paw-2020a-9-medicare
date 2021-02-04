@@ -104,4 +104,20 @@ public class LocalityResource extends GenericResource {
 
         return Response.ok(localityOptional.get()).type(LocalityMIME.GET).build();
     }
+
+    @GET
+    @Path("/localities/{id}")
+    @Produces({LocalityMIME.GET, ErrorMIME.ERROR})
+    public Response getEntityById(
+            @Context HttpHeaders httpheaders,
+            @PathParam("id") Integer id) {
+        MIMEHelper.assertServerType(httpheaders, LocalityMIME.GET);
+
+        if (id == null) throw this.missingPathParams();
+
+        Optional<Locality> localityOptional = this.localityService.findById(id);
+        if (!localityOptional.isPresent()) throw this.notFound();
+
+        return Response.ok(localityOptional.get()).type(LocalityMIME.GET).build();
+    }
 }
