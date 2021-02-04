@@ -18,6 +18,7 @@ import {Module} from 'vuex';
 import {APIError} from '~/logic/models/APIError';
 import {Patient} from '~/logic/models/Patient';
 import {Doctor} from '~/logic/models/Doctor';
+import Vue from 'vue';
 
 function getService(): AuthService {
     return container.get(TYPES.Services.AuthService);
@@ -145,6 +146,7 @@ const mutations: DefineMutationTree<AuthMutations, AuthState> = {
 
         if (doctors.length === 0) {
             if (payload.doctor) {
+                state.doctors.push(payload.doctor);
                 doctors.push(payload.doctor);
                 localStorage.setItem(DOCTORS_KEY, JSON.stringify(doctors));
             }
@@ -153,8 +155,10 @@ const mutations: DefineMutationTree<AuthMutations, AuthState> = {
             let index = doctors.findIndex(value => value.id.toString() == payload.id.toString());
             if (!payload.doctor) {
                 if (index < 0) return;
+                Vue.delete(state.doctors, index);
                 doctors.splice(index, 1);
             } else {
+                Vue.set(state.doctors, index, payload.doctor);
                 doctors[index] = payload.doctor;
             }
 
@@ -175,7 +179,7 @@ const mutations: DefineMutationTree<AuthMutations, AuthState> = {
         }
 
         // Chech epochs
-        if ((new Date(0)).getTime() >= Number.parseInt(expirationDateString)) {
+        if ((new Date()).getTime() >= Number.parseInt(expirationDateString)) {
             localStorage.removeItem(LOGGED_IN_EXPIRATION_DATE_KEY);
             localStorage.removeItem(USER_KEY);
             localStorage.removeItem(DOCTORS_KEY);

@@ -95,7 +95,7 @@ export class RestRepositoryImpl implements RestRepository {
             transformResponse: (data: any, headers) => {
                 let ttl = headers[LOGGED_IN_TTL_HEADER_NAME];
                 if (ttl) {
-                    let expDate = (new Date(0)).getTime() + Number.parseInt(ttl);
+                    let expDate = (new Date()).getTime() + Number.parseInt(ttl);
                     localStorage.setItem(LOGGED_IN_EXPIRATION_DATE_KEY, expDate.toString());
                 }
 
@@ -154,7 +154,7 @@ export class RestRepositoryImpl implements RestRepository {
                     EventBus.$emit(APIErrorEventName, error.code);
             }
 
-            return APIResponseFactory.error(response.data as APIError);
+            return APIResponseFactory.error(new APIError(apiError.code, apiError.message, apiError.errors));
         }
 
         return APIResponseFactory.ok(response.data);

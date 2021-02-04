@@ -264,19 +264,20 @@ export default class MedicProfile extends Vue {
         this.setSpecialties()
     }
 
-    @Watch("allSpecialties")
+    @Watch("allSpecialties", {immediate: true, deep: true})
+    @Watch("doctors", {immediate: true, deep: true})
     setSpecialties(){
         if(this.allSpecialties){
             this.specialties = this.allSpecialties.filter((v:DoctorSpecialty)=>{
-                                    for (const doctor of this.doctors) {
-                                        for (const s of doctor.specialtyIds) {
-                                            if(s == v.id){
-                                                return true;
-                                            }
-                                        }
-                                    }
-                                    return false;
-                                })
+                for (const doctor of this.doctors) {
+                    for (const s of doctor.specialtyIds) {
+                        if(s == v.id){
+                            return true;
+                        }
+                    }
+                }
+                return false;
+            })
         }
     }
 

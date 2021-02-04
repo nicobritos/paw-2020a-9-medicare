@@ -87,7 +87,6 @@ export default class AddSpecialty extends Vue {
         for (let doctor of this.doctors) {
             let specialties = doctor.specialtyIds.map(value => value);
             specialties.push(this.selectedSpecialtyId);
-            //TODO: tira 405 method not allowed
             await this.$store.dispatch('doctors/updateDoctor', doctorActionTypes.updateDoctor({
                 id: doctor.id,
                 doctor: {
