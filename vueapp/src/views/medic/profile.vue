@@ -420,8 +420,6 @@ export default class MedicProfile extends Vue {
         }).then((r) => {
             if (r.ok) {
                 //TODO:show ok toast and update profile pic
-            } else {
-                EventBus.$emit(APIErrorEventName, new APIError(r.status, r.statusText));
             }
         }).catch((e) => {
             //TODO:show error message

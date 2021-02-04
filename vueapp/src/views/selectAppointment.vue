@@ -148,7 +148,6 @@ export default class SelectAppointment extends Vue {
     private readonly prev = '<';
     private readonly next = '>';
     private monday:Date = this.getMonday(new Date());
-    // TODO:check implications of type change
     private weekSlots:AppointmentTimeslotDate[] = [];
     private doctor:Nullable<Doctor> = null;
     private locality:Nullable<Locality> = null;
@@ -160,14 +159,10 @@ export default class SelectAppointment extends Vue {
             today.plusDays(7*parseInt(this.$route.params.weekNo))
             this.monday = this.getMonday(today)
         }
-        //TODO:check nico
         this.doctor = await this.$container
                         .get<DoctorService>(TYPES.Services.DoctorService)
                         .get(parseInt(this.$route.params.memberId));
-        //TODO:nico haceme un get por id de localidad y cambia esto
-        // this.locality = await this.$container.get<LocalityService>(TYPES.Services.LocalityService).get("AR",1,this.doctor!.office.localityId!);
-        this.locality = new Locality();
-        this.locality.name = "Tigre";
+        this.locality = await this.$container.get<LocalityService>(TYPES.Services.LocalityService).getById(this.doctor!.office.localityId!);
 
         this.updateSlots()
     }
@@ -177,7 +172,6 @@ export default class SelectAppointment extends Vue {
         //@ts-ignore
         today = today.plusDays( 7 * parseInt(this.$route.params.weekNo) );
         this.monday = this.getMonday(today);
-        //TODO:refresh timeslots
         this.updateSlots();
     }
 
@@ -285,7 +279,6 @@ export default class SelectAppointment extends Vue {
     }
 
     //checks if theres at least 1 timeslot this week
-    //TODO:check that its working
     get noSlotsAvailable(){
         if(this.weekSlots.length > 0){
             for (const daySlot of this.weekSlots) {

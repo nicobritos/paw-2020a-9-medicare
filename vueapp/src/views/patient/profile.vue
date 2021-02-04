@@ -131,12 +131,13 @@ import editPencil from '@/assets/editPencil.svg';
 import {Component, Vue} from 'vue-property-decorator';
 import {User} from '~/logic/models/User';
 
-import {createApiPath, createPath, isValidEmail, Nullable} from '~/logic/Utils';
+import {createApiPath, createPath, getErrorMessage, isValidEmail, Nullable} from '~/logic/Utils';
 import defaultProfilePic from "@/assets/defaultProfilePic.svg";
 import { State } from 'vuex-class';
 import EventBus from '~/logic/EventBus';
 import {APIErrorEventName} from '~/logic/interfaces/APIErrorEvent';
 import {APIError} from '~/logic/models/APIError';
+import {userActionTypes} from '~/store/types/user.types';
 
 @Component
 export default class PatientProfile extends Vue {
@@ -164,11 +165,6 @@ export default class PatientProfile extends Vue {
     enablePasswordMod():void{this.passwordModEnabled=true};
 
     mounted(){
-        /*
-            TODO: hablar con nico de si se peude hacer esto para settear
-                    los valores iniciales del form, quizas a el se le
-                    ocurre algo mejor
-        */
         let user = this.$store.state.auth.user;
         this.firstname = user.firstName;
         this.surname = user.surname;
@@ -186,6 +182,7 @@ export default class PatientProfile extends Vue {
         let file = e.target.files[0];
         if (!file.type.includes("image")) {
             //TODO: toast error
+            this.showErrorToast('Error');
             return;
         }
         //append it to form
@@ -194,12 +191,10 @@ export default class PatientProfile extends Vue {
         //post to someurl
         fetch(this.getApiUrl(`/users/${this.user.id}/picture`), {
             method: "POST",
-            body: file  // TODO: CHECK
+            body: file
         }).then((r) => {
             if (r.ok) {
                 //TODO:show ok toast and update profile pic
-            } else {
-                EventBus.$emit(APIErrorEventName, new APIError(r.status, r.statusText));
             }
         }).catch((e) => {
             //TODO:show error message
@@ -211,8 +206,14 @@ export default class PatientProfile extends Vue {
         this.$refs.PPInput.click();
     }
 
+    showErrorToast(message:string){
+        this.$bvToast.toast(message,{
+            title:this.$t("ThereWasAnError").toString(),
+            variant:"danger"
+        })
+    }
+
     //-------------------------Form------------------------------
-    // TODO: finish form submit
 
     //TODO:check properties
     private readonly minFirstnameLength = 2;
@@ -231,46 +232,50 @@ export default class PatientProfile extends Vue {
     private repeatPassword:string = "";
 
     get validFirstname():boolean {
-        return  this.firstname.length>=this.minFirstnameLength 
+        this.firstname = this.firstname.trim();
+        return  this.firstname.length>=this.minFirstnameLength
                 && this.firstname.length<=this.maxFirstnameLength;
     }
 
     get validSurname():boolean {
-        return  this.surname.length>=this.minSurnameLength 
+        this.surname = this.surname.trim();
+        return  this.surname.length>=this.minSurnameLength
                 && this.surname.length<=this.maxSurnameLength;
     }
     get validEmail():boolean {
+        this.email = this.email.trim();
         return isValidEmail(this.email);
     }
     get validPassword():boolean {
+        this.password = this.password.trim();
         return this.password.length>=this.minPasswordLength 
-                && this.password.length<=this.maxPasswordLength;;
+                && this.password.length<=this.maxPasswordLength;
     }
     get validRepeatPassword():boolean {
         return this.password === this.repeatPassword;
     }
 
-    //TODO: vaya uno a saber que es un telefono valido no??
     get validPhone():boolean{
-        return true;
+        this.phone = this.phone.trim();
+        return this.phone.length >= 7 && this.phone.length <= 14; // Algunos lugares tienen tels con 7 dig
     }
-
 
     get validUserUpdate(): boolean {
         return  this.validFirstname && this.validSurname && this.validEmail &&
                 this.validPassword && this.validRepeatPassword && this.validPhone;
     }
 
-
-    //TODO: do validation
-    //TODO: should be formEvent or something like that
     submitForm(e:any): void{
         e.preventDefault();
         if(this.validUserUpdate){
+            this.$store.dispatch('users/updateUser', userActionTypes.updateUser({
+                user: {
+                    email
+                },
+                id: this.user.id
+            }));
             //TODO: update user
             console.log("update user")
-        }else{
-            //TODO: show invalid toast
         }
     }
 

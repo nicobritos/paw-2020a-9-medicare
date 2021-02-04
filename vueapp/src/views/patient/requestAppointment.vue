@@ -141,10 +141,7 @@ export default class RequestAppointment extends Vue {
         this.phone = this.user?.phone || "";
         this.doctor = await this.$container.get<DoctorService>(TYPES.Services.DoctorService)
                         .get(parseInt(this.$route.params.doctorId));
-        //TODO:nico haceme un get por id de localidad y cambia esto
-        // this.locality = await this.$container.get<LocalityService>(TYPES.Services.LocalityService).get("AR",1,this.doctor!.office.localityId!);
-        this.locality = new Locality();
-        this.locality.name = "Tigre";
+        this.locality = await this.$container.get<LocalityService>(TYPES.Services.LocalityService).getById(this.doctor!.office.localityId!);
     }
 
     getApiUrl(url:string):string{
@@ -211,36 +208,25 @@ export default class RequestAppointment extends Vue {
         }
     }
 
-    //TODO: wtf is this used for
-    getLocality(id: number): string {
-        return 'Locality' + id;
-    }
-
     getUrl(url:string):string{
         return createPath(url);
     }
 
-    //TODO: check nico porque no puedo checkearlo
-    //TODO: otra cosa es que pedimos el phone pero no lo usamos para nada
     submitForm(e:Event){
         e.preventDefault();
         this.$container.get<AppointmentService>(TYPES.Services.AppointmentService)
-                        .create({
-                            date_from:this.date!,
-                            doctorId:this.doctor!.id,
-                            motive:this.motive,
-                            message:this.comment
-                        })
-                        .then(res=>{
-                            if(res instanceof APIError){
-                                //TODO: esto hay que handlelearlo???
-                            }else{
-                                //TODO: esto hay que handlelearlo???
-                                this.$router.push({
-                                    name:"PatientHome"
-                                })
-                            }
-                        })
+            .create({
+                date_from:this.date!,
+                doctorId:this.doctor!.id,
+                motive:this.motive,
+                message:this.comment
+            }).then(res=>{
+                if(!(res instanceof APIError)){
+                    this.$router.push({
+                        name:"PatientHome"
+                    })
+                }
+            });
     }
 
 }

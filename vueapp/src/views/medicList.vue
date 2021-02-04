@@ -69,7 +69,6 @@
                                     <div class="col-3 d-flex flex-column justify-content-center">
                                         <div class="profile-picture-container">
                                             <div style="margin-top: 100%;"></div>
-                                            <!-- TODO:check src url -->
                                             <img
                                                 class="profile-picture rounded-circle"
                                                 :src='getApiUrl("users/" + member.user.id + "/picture")'
