@@ -271,7 +271,7 @@ export default class MedicHome extends Vue {
     }
 
     async updateWeekAppointments(){
-        let week = DateTime.fromJSDate(today).plus({ weeks: 1 }).toJSDate();
+        let week = DateTime.fromJSDate(this.today).plus({ weeks: 1 }).toJSDate();
 
         let appointments = await this.getService().list(
             {

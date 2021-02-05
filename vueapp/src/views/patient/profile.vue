@@ -26,14 +26,13 @@
                     <form @submit="submitForm">
                         <div class="row">
                             <div class="col p-0 m-0">
-                                <!-- TODO Connect image function-->
                                 <h3>{{ $t('Name') }}
                                     <label for="fname" class="toggle-readonly">
                                         <img type="button" :src='editPencil' alt="editar" @click="enableFirstnameMod"/>
                                     </label>
                                 </h3>
                                 <input class="form-control mb-3 w-75" id="fname" name="fname" type="text" autocomplete="fname"
-                                       v-model="firstname" :readonly="!firstnameModEnabled"/>
+                                       v-model="firstname" :readonly="!firstnameModEnabled" :disabled="!firstnameModEnabled"/>
                                 <!-- TODO: maybe expand feedback-->
                                 <!-- TODO: check the i18n-->
                                 <b-form-invalid-feedback :state="validFirstname">{{$t("Size.signupForm.firstName",[0,maxFirstnameLength,minFirstnameLength])}}</b-form-invalid-feedback>
@@ -46,7 +45,7 @@
                                     </label>
                                 </h3>
                                 <input class="form-control mb-3 w-75" name="lname" id="lname" v-model="surname" type="text" autocomplete="lname"
-                                       :readonly="!surnameModEnabled"/>
+                                       :readonly="!surnameModEnabled" :disabled="!surnameModEnabled"/>
                                 <!-- TODO: maybe expand feedback-->
                                 <!-- TODO: check the i18n-->
                                 <b-form-invalid-feedback :state="validSurname">{{$t("Size.signupForm.surname",[0,maxSurnameLength,minSurnameLength])}}</b-form-invalid-feedback>
@@ -60,7 +59,7 @@
                                     </label>
                                 </h3>
                                 <input class="form-control mb-3 w-75" id="phone" name="phone" v-model="phone" type="text" autocomplete="phone"
-                                       :readonly="!phoneModEnabled"/>
+                                       :readonly="!phoneModEnabled" :disabled="!phoneModEnabled"/>
                                 <!-- TODO: if validation in phone then feedback should be provided probably -->
                             </div>
                             <div class="col p-0 m-0">
@@ -70,7 +69,7 @@
                                     </label>
                                 </h3>
                                 <input class="form-control mb-3 w-75" id="email" name="email" v-model="email" type="text" autocomplete="username"
-                                       :readonly="!emailModEnabled"/>
+                                       :readonly="!emailModEnabled" :disabled="!emailModEnabled"/>
                                 <!-- TODO: maybe expand feedback-->
                                 <!-- TODO: check the i18n-->
                                 <b-form-invalid-feedback :state="validEmail">{{$t("Email.signupForm.email")}}</b-form-invalid-feedback>
@@ -84,7 +83,7 @@
                                     </label>
                                 </h3>
                                 <input :type='passwordVis? "text": "password"' class="form-control mb-3 w-75" id="password" name="password" autocomplete="new-password"
-                                       :readonly="!passwordModEnabled"/>
+                                       :readonly="!passwordModEnabled" :disabled="!passwordModEnabled"/>
                                 <label for="password" class="toggle-visibility">
                                     <img type="button" :src='eye' v-if="!passwordVis && passwordModEnabled" alt="not visible password" @click="passwordVis=true">
                                     <img type="button" :src='noeye' v-else-if="passwordModEnabled" alt="visible password" @click="passwordVis=false">
@@ -128,12 +127,9 @@ import editPencil from '@/assets/editPencil.svg';
 import {Component, Vue} from 'vue-property-decorator';
 import {User} from '~/logic/models/User';
 
-import {createApiPath, createPath, getErrorMessage, isValidEmail, Nullable} from '~/logic/Utils';
+import {createApiPath, isValidEmail} from '~/logic/Utils';
 import defaultProfilePic from "@/assets/defaultProfilePic.svg";
 import { State } from 'vuex-class';
-import EventBus from '~/logic/EventBus';
-import {APIErrorEventName} from '~/logic/interfaces/APIErrorEvent';
-import {APIError} from '~/logic/models/APIError';
 import {userActionTypes} from '~/store/types/user.types';
 import { UpdateUser } from '~/logic/interfaces/services/UserService';
 
@@ -345,8 +341,11 @@ html, body {
     color: white;
 }
 
+.form-control[disabled] {
+    background-color: rgb(214, 214, 214);
+}
 .form-control {
-    background-color: rgba(214, 214, 214);
+    background-color: #f0f0f0;
 }
 
 .white-text {
@@ -359,7 +358,7 @@ html, body {
 
 .turno-item {
     border-radius: 2em !important;
-    background-color: rgba(214, 214, 214);
+    background-color: rgb(214, 214, 214);
 }
 
 .turno-list {

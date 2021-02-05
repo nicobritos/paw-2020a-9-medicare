@@ -223,7 +223,7 @@ export default class SelectAppointment extends Vue {
                 let date = DateTime.local(weekSlot.date.year, weekSlot.date.month, weekSlot.date.day);
                 if (!this.weekSlots[date.year]) this.weekSlots[date.year] = {};
                 if (!this.weekSlots[date.year][date.month]) this.weekSlots[date.year][date.month] = {};
-                if (!this.weekSlots[date.year][date.month][date.day]) this.weekSlots[date.year][date.month][date.day] = {};
+                if (!this.weekSlots[date.year][date.month][date.day]) this.weekSlots[date.year][date.month][date.day] = [];
 
                 this.weekSlots[date.year][date.month][date.day] = weekSlot.timeslots;
             }

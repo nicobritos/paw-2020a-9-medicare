@@ -32,7 +32,7 @@
                                     </label>
                                 </h3>
                                 <input v-model="firstname" class="form-control mb-3 w-75" id="fname" name="fname" type="text" autocomplete="fname"
-                                        :readonly="!firstnameModEnabled"/>
+                                        :readonly="!firstnameModEnabled" :disabled="!firstnameModEnabled"/>
                                 <!-- TODO: maybe expand feedback-->
                                 <!-- TODO: check the i18n-->
                                 <b-form-invalid-feedback :state="validFirstname">{{$t("Size.signupForm.firstName",[0,maxFirstnameLength,minFirstnameLength])}}</b-form-invalid-feedback>
@@ -44,7 +44,7 @@
                                     </label>
                                 </h3>
                                 <input class="form-control mb-3 w-75" name="lname" id="lname" v-model="surname" type="text" autocomplete="lname"
-                                       :readonly="!surnameModEnabled"/>
+                                       :readonly="!surnameModEnabled" :disabled="!surnameModEnabled"/>
                                 <!-- TODO: maybe expand feedback-->
                                 <!-- TODO: check the i18n-->
                                 <b-form-invalid-feedback :state="validSurname">{{$t("Size.signupForm.surname",[0,maxSurnameLength,minSurnameLength])}}</b-form-invalid-feedback>
@@ -58,7 +58,7 @@
                                     </label>
                                 </h3>
                                 <input class="form-control mb-3 w-75" id="phone" name="phone" v-model="phone" type="text" autocomplete="phone"
-                                       :readonly="!phoneModEnabled"/>
+                                       :readonly="!phoneModEnabled" :disabled="!phoneModEnabled"/>
                                 <!-- TODO: if validation in phone then feedback should be provided probably -->
                             </div>
                             <div class="col p-0 m-0">
@@ -68,7 +68,7 @@
                                     </label>
                                 </h3>
                                 <input class="form-control mb-3 w-75" id="email" name="email" v-model="email" autocomplete="username"
-                                       :readonly="!emailModEnabled"/>
+                                       :readonly="!emailModEnabled" :disabled="!emailModEnabled"/>
                                 <!-- TODO: maybe expand feedback-->
                                 <!-- TODO: check the i18n-->
                                 <b-form-invalid-feedback :state="validEmail">{{$t("Email.signupForm.email")}}</b-form-invalid-feedback>
@@ -82,7 +82,7 @@
                                     </label>
                                 </h3>
                                 <input :type='passwordVis? "text": "password"' class="form-control mb-3 w-75" id="password" name="new-password" autocomplete="new-password"
-                                       v-model="password" :readonly="!passwordModEnabled"/>
+                                       v-model="password" :readonly="!passwordModEnabled" :disabled="!passwordModEnabled"/>
                                 <label for="password" class="toggle-visibility">
                                     <img type="button" :src='eye' v-if="!passwordVis && passwordModEnabled" alt="not visible password" @click="passwordVis=true">
                                     <img type="button" :src='noeye' v-else-if="passwordModEnabled" alt="visible password" @click="passwordVis=false">
@@ -94,7 +94,7 @@
                                     {{ $t('RepeatPassword') }}
                                     <label for="repeatPassword" class="toggle-readonly">
                                         <img :src='editPencil' alt="editar"/>
-                                    </label>    
+                                    </label>
                                 </h3>
                                 <input :type='repeatPasswordVis? "text":"password"' class="form-control mb-3 w-75"
                                        v-model="repeatPassword" id="repeatPassword" name="new-password" autocomplete="new-password"/>
@@ -135,7 +135,7 @@
                                                 timeWithZero(workday.start.minute),
                                                 timeWithZero(workday.end.hour),
                                                 timeWithZero(workday.end.minute),
-                                                doctor[0].office.name
+                                                doctors[0].office.name
                                             ])
                                     }}
                                 </p>
@@ -562,8 +562,11 @@ export default class MedicProfile extends Vue {
     color: white;
 }
 
-.form-control {
+.form-control[disabled] {
     background-color: rgb(214, 214, 214);
+}
+.form-control {
+    background-color: #f0f0f0;
 }
 
 .white-text {
