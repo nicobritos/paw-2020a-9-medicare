@@ -135,7 +135,7 @@
                                                 timeWithZero(workday.start.minute),
                                                 timeWithZero(workday.end.hour),
                                                 timeWithZero(workday.end.minute),
-                                                doctor[0].office.name
+                                                doctors[0].office.name
                                             ])
                                     }}
                                 </p>
@@ -305,6 +305,7 @@ export default class MedicProfile extends Vue {
     async setWorkdays(){
         let workdays = await this.$container.get<WorkdayService>(TYPES.Services.WorkdayService)
                             .list();
+        console.log(workdays)
         if(!(workdays instanceof APIError)){
             this.workdays = workdays;
         }
