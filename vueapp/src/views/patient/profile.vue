@@ -2,7 +2,6 @@
     <div class="container flex-fill mx-5 pl-5 mt-3 w-100">
         <div class="row">
             <div class="col-4 align-items-start d-flex flex-column">
-                <!-- TODO check imagen -->
                 <div class="picture-container no-select">
                     <div class="w-100 d-flex flex-column justify-content-center">
                         <div class="profile-picture-container">
@@ -18,14 +17,12 @@
                     </div>
                     <div @click="triggerChangePPInput" class="picture-overlay d-flex flex-column align-items-center justify-content-center pb-3">
                         <input ref="PPInput" @change="changeProfilePic" id="profile-picture-input" style="display: none;" type="file" accept="image/*">
-                        <!-- TODO: check this icon and previous implementation -->
                         <b-icon class="edit-pencil-icon" icon="pencil"/>
                     </div>
                 </div>
             </div>
             <div class="col-6">
                 <div class="container p-0 pt-4 m-0">
-                    <!-- TODO:connect form -->
                     <form @submit="submitForm">
                         <div class="row">
                             <div class="col p-0 m-0">
@@ -216,7 +213,6 @@ export default class PatientProfile extends Vue {
 
     //-------------------------Form------------------------------
 
-    //TODO:check properties
     private readonly minFirstnameLength = 2;
     private readonly maxFirstnameLength = 20;
     private readonly minSurnameLength = 2;
@@ -284,7 +280,7 @@ export default class PatientProfile extends Vue {
         if(this.validUserUpdate){
             this.$store.dispatch('users/updateUser', userActionTypes.updateUser(updateUser));
         }else{
-            //TODO: show invalid toast
+            //TODO: show invalid toast (aunque deberia de estar ya)
         }
     }
 

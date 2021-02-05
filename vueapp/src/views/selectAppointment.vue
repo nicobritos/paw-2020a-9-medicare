@@ -1,6 +1,5 @@
 <template>
     <div class="container ml-0 mr-0 pr-0 fill-height">
-        <!-- TODO: maybe there should be a delay -->
         <div v-if="doctor&&user&&locality&&monday" class="row h-100">
             <div class="col-4 h-100 grey-background">
                 <div class="row mt-4">
@@ -20,20 +19,16 @@
                         </div>
                         <div class="row mt-3 d-flex justify-content-start">
                             <p>
-                                <!-- TODO:check -->
-                                <span v-for="(specialty,index) in doctor.doctorSpecialtyIds" :key="specialty.id">
-                                    {{
-                                        doctor.specialtyIds.map((v) => {
-                                            return getSpecialtyName(v);
-                                        }).join(', ')
-                                    }}
-                                </span>
+                                {{
+                                    doctor.specialtyIds.map((v) => {
+                                        return getSpecialtyName(v);
+                                    }).join(', ')
+                                }}
                             </p>
                         </div>
                     </div>
                 </div>
                 <div class="row mt-3 pl-4">
-                    <!-- TODO: yo guido apuesto que esto se rompe en la primera de cambio -->
                     <p class="m-0"><b>{{ $t('Address') }}:</b> {{ doctor.office.street }} - {{locality.name}}</p>
                     <a
                         class="link"
@@ -188,7 +183,6 @@ export default class SelectAppointment extends Vue {
         //@ts-ignore
         let saturday = this.monday.plusDays(6);
         
-        //TODO: esto me tirando un error raro
         let slots = await this.$container
                     .get<AppointmentTimeSlotService>(TYPES.Services.AppointmentTimeSlotService)
                     .list(this.doctor!.id,{

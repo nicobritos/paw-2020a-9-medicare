@@ -129,7 +129,6 @@
                             <div v-for="workday in workdays" :key="workday.id"
                                  class="row d-flex align-items-center justify-content-between">
                                 <p class="m-0">-
-                                    <!-- TODO: check all this -->
                                     {{
                                         $t('wkd_from_wksh_wksm_to_wkeh_wkem_cons',
                                             [
@@ -142,7 +141,6 @@
                                             ])
                                     }}
                                 </p>
-                                <!-- TODO: connect button -->
                                 <button class="btn cancel-workday-btn" type="button" @click="removeWorkday(workday.id)">X</button>
                             </div>
                             <div class="row d-flex align-items-center justify-content-center my-3">
@@ -158,7 +156,6 @@
                         <div v-for="specialty in specialties" :key="specialty.id" class="container p-0 m-0 pl-3">
                             <div class="row d-flex align-items-center justify-content-between">
                                 <p class="m-0">{{ specialty.name }}</p>
-                                <!-- TODO:connect button -->
                                 <button class="btn cancel-specialty-btn" type="button" @click="removeSpecialty(specialty.id)">X</button>
                             </div>
                         </div>
@@ -173,8 +170,7 @@
         </div>
         <AddWorkday v-model="showAddWorkday"/>
         <AddSpecialty :specialties="remainingSpecialties" v-model="showAddSpecialties"/>
-        <!-- TODO: maybe change this to a b-modal called via function -->
-        <Modal  v-model="showModal" 
+        <Modal  v-model="showModal"
                 @confirm="modOnConfirm" 
                 :title="modtitle" 
                 :body="modbody"/>
@@ -436,7 +432,6 @@ export default class MedicProfile extends Vue {
 
     //-------------------------Form------------------------------
 
-    //TODO:check properties
     private readonly minFirstnameLength = 2;
     private readonly maxFirstnameLength = 20;
     private readonly minSurnameLength = 2;
@@ -501,7 +496,7 @@ export default class MedicProfile extends Vue {
         if(this.validUserUpdate){
             this.$store.dispatch('users/updateUser', userActionTypes.updateUser(updateUser));
         }else{
-            //TODO: show invalid toast
+            //TODO: show invalid toast (aunque deberia de estar ya)
         }
     }
 

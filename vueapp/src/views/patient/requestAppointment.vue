@@ -1,6 +1,5 @@
 <template>
     <div class="container fill-height">
-        <!-- TODO: maybe there should be a delay -->
         <div v-if="doctor" class="row mt-4">
             <form @submit="submitForm" class="col d-flex flex-column" id="appointment-request-form">
                 <h4 class="text-muted">{{ $t('ScheduleAppointment') }}</h4>

@@ -13,7 +13,6 @@
                     <label for="first_name">{{ $t('Name') }}</label>
                 </div>
                 <div class="col-8">
-                    <!-- TODO: maybe add state to input -->
                     <b-input v-model="firstname" class="form-control" type="text" name="firstName" id="first_name"/>
                     <!-- TODO: maybe expand feedback-->
                     <!-- TODO: check the i18n-->
@@ -25,7 +24,6 @@
                     <label for="surname">{{ $t('Surname') }}</label>
                 </div>
                 <div class="col-8">
-                    <!-- TODO: maybe add state to input -->
                     <b-input v-model="surname" class="form-control" type="text" name="surname" id="surname"/>
                     <!-- TODO: maybe expand feedback-->
                     <!-- TODO: check the i18n-->
@@ -37,7 +35,6 @@
                     <label for="medicare_email">{{ $t('Email') }}</label>
                 </div>
                 <div class="col-8">
-                    <!-- TODO: maybe add state to input -->
                     <b-input v-model="email" class="form-control" type="email" name="medicare_email" id="medicare_email"/>
                     <!-- TODO: maybe expand feedback-->
                     <!-- TODO: check the i18n-->
@@ -49,7 +46,6 @@
                     <label for="medicare_password">{{ $t('Password') }}</label>
                 </div>
                 <div class="col-8">
-                    <!-- TODO: maybe add state to input -->
                     <b-input v-model="password" class="form-control pr-5"
                            :type='showPassword?"text":"password"' name="medicare_password"
                            id="medicare_password"/>
@@ -67,7 +63,6 @@
                     <label for="medicare_repeatPassword">{{ $t('RepeatPassword') }}</label>
                 </div>
                 <div class="col-8">
-                    <!-- TODO: maybe add state to input -->
                     <b-input v-model="repeatPassword" class="form-control pr-5"
                            :type='showRepeatPassword?"text":"password"' name="medicare_repeatPassword"
                            id="medicare_repeatPassword"/>
@@ -85,7 +80,6 @@
                     <label for="country">{{ $t('Country') }}</label>
                 </div>
                 <div class="col-8">
-                    <!-- TODO: maybe add state to input -->
                     <select v-model="country" class="form-control" style="width: 100%;" items="${countryMap}" id="country">
                         <option v-for="country in countries" :key="country.id" :value="country.id">
                             {{ country.name }}
@@ -101,7 +95,6 @@
                     <label for="province">{{ $t('Province') }}</label>
                 </div>
                 <div class="col-8">
-                    <!-- TODO: maybe add state to input -->
                     <select v-model="province" class="form-control" style="width: 100%;" id="province">
                         <option v-for="province in provinces" :key="province.id" :value="province.id">
                             {{ province.name }}
@@ -117,7 +110,6 @@
                     <label for="locality">{{ $t('Locality') }}</label>
                 </div>
                 <div class="col-8">
-                    <!-- TODO: maybe add state to input -->
                     <select v-model="locality" class="form-control" style="width: 100%;" id="locality">
                         <option v-for="locality in localities" :key="locality.id" :value="locality.id">
                             {{ locality.name }}
@@ -133,7 +125,6 @@
                     <label for="address">{{ $t('Address') }}</label>
                 </div>
                 <div class="col-8">
-                    <!-- TODO: maybe add state to input -->
                     <b-input v-model="address" class="form-control" type="text" name="address" id="address"/>
                     <!-- TODO: maybe expand feedback-->
                     <!-- TODO: check the i18n-->
@@ -172,7 +163,6 @@ export default class SignupDoctor extends Vue {
     private eye = eye;
     private noeye = noeye;
 
-    //TODO: Guido connect country and province
     @State(state => state.countries.countries)
     private readonly countries: Country[];
     @State(state => state.provinces.provinces)
@@ -180,7 +170,6 @@ export default class SignupDoctor extends Vue {
     @State(state => state.localities.localities)
     private readonly localities: Locality[];
 
-    //TODO:check properties
     private readonly minFirstnameLength = 2;
     private readonly maxFirstnameLength = 20;
     private readonly minSurnameLength = 2;

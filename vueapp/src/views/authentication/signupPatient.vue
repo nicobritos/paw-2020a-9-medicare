@@ -13,7 +13,6 @@
                     <label for="first_name">{{ $t('Name') }}</label>
                 </div>
                 <div class="col-8">
-                    <!-- TODO: maybe add state to input -->
                     <b-input v-model="firstname" class="form-control" type="text" name="firstName" id="first_name"/>
                     <!-- TODO: maybe expand feedback-->
                     <!-- TODO: check the i18n-->
@@ -25,7 +24,6 @@
                     <label for="surname">{{ $t('Surname') }}</label>
                 </div>
                 <div class="col-8">
-                    <!-- TODO: maybe add state to input -->
                     <b-input v-model="surname" class="form-control" type="text" name="surname" id="surname"/>
                     <!-- TODO: maybe expand feedback-->
                     <!-- TODO: check the i18n-->
@@ -37,7 +35,6 @@
                     <label for="medicare_email">{{ $t('Email') }}</label>
                 </div>
                 <div class="col-8">
-                    <!-- TODO: maybe add state to input -->
                     <b-input v-model="email" class="form-control" type="email" name="medicare_email" id="medicare_email"/>
                     <!-- TODO: maybe expand feedback-->
                     <!-- TODO: check the i18n-->
@@ -49,7 +46,6 @@
                     <label for="medicare_password">{{ $t('Password') }}</label>
                 </div>
                 <div class="col-8">
-                    <!-- TODO: maybe add state to input -->
                     <b-input v-model="password" class="form-control pr-5"
                            :type='showPassword?"text":"password"' name="medicare_password"
                            id="medicare_password"/>
@@ -68,7 +64,6 @@
                     <label for="medicare_repeatPassword">{{ $t('RepeatPassword') }}</label>
                 </div>
                 <div class="col-8">
-                    <!-- TODO: maybe add state to input -->
                     <b-input v-model="repeatPassword" class="form-control pr-5"
                            :type='showRepeatPassword?"text":"password"' name="medicare_repeatPassword"
                            id="medicare_repeatPassword"/>
@@ -108,7 +103,6 @@ export default class SignupPatient extends Vue {
     private eye = eye;
     private noeye = noeye;
 
-    //TODO:check properties
     private readonly minFirstnameLength = 2;
     private readonly maxFirstnameLength = 20;
     private readonly minSurnameLength = 2;
