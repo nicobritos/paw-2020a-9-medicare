@@ -26,7 +26,6 @@
                     <form @submit="submitForm">
                         <div class="row">
                             <div class="col p-0 m-0">
-                                <!-- TODO Connect image function-->
                                 <h3>{{ $t('Name') }}
                                     <label for="fname" class="toggle-readonly">
                                         <img type="button" :src='editPencil' alt="editar" @click="enableFirstnameMod"/>
@@ -39,7 +38,6 @@
                                 <b-form-invalid-feedback :state="validFirstname">{{$t("Size.signupForm.firstName",[0,maxFirstnameLength,minFirstnameLength])}}</b-form-invalid-feedback>
                             </div>
                             <div class="col p-0 m-0">
-                                <!-- TODO Connect image function-->
                                 <h3>{{ $t('Surname') }}
                                     <label for="lname" class="toggle-readonly">
                                         <img type="button" :src='editPencil' alt="editar" @click="enableSurnameMod"/>
@@ -269,6 +267,7 @@ export default class MedicProfile extends Vue {
         this.phone = user.phone;
         this.$store.dispatch("doctorSpecialties/loadDoctorSpecialties",doctorSpecialtyActionTypes.loadDoctorSpecialties())
         this.setSpecialties()
+        this.setWorkdays();
     }
 
     @Watch("allSpecialties", {immediate: true, deep: true})
