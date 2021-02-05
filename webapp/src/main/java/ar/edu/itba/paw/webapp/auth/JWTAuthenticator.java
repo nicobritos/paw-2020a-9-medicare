@@ -120,8 +120,8 @@ public class JWTAuthenticator {
         // No usamos secure porque paw no tiene ssl
         // jwtCookie.setSecure(true);
 
-        int maxAge = token.isEmpty() ? 0 : (int) TimeUnit.MILLISECONDS.toSeconds(Constants.JWT_EXPIRATION_MILLIS);
-        cookie.setMaxAge(maxAge); // Seconds
+        if (!token.isEmpty())
+            cookie.setMaxAge((int) TimeUnit.MILLISECONDS.toSeconds(Constants.JWT_EXPIRATION_MILLIS));
         cookie.setDomain(this.APP_HOST);
         cookie.setPath(this.APP_SUBPATH);
 
@@ -133,8 +133,8 @@ public class JWTAuthenticator {
         // No usamos secure porque paw no tiene ssl
         // jwtCookie.setSecure(true);
 
-        int maxAge = token.isEmpty() ? 0 : (int) TimeUnit.MILLISECONDS.toSeconds(Constants.JWT_REFRESH_EXPIRATION_MILLIS);
-        cookie.setMaxAge(maxAge); // Seconds
+        if (!token.isEmpty())
+            cookie.setMaxAge((int) TimeUnit.MILLISECONDS.toSeconds(Constants.JWT_REFRESH_EXPIRATION_MILLIS));
         cookie.setDomain(this.APP_HOST);
         cookie.setPath(this.APP_SUBPATH + '/' + Constants.AUTH_ENDPOINT);
 
