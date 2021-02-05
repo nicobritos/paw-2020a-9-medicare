@@ -22,7 +22,11 @@
                             <p>
                                 <!-- TODO:check -->
                                 <span v-for="(specialty,index) in doctor.doctorSpecialtyIds" :key="specialty.id">
-                                    {{ index != doctor.doctorSpecialtyIds.length - 1 ? 'SPECIALTY' + ',' : 'SPECIALTY' }}
+                                    {{
+                                        doctor.specialtyIds.map((v) => {
+                                            return getSpecialtyName(v);
+                                        }).join(', ')
+                                    }}
                                 </span>
                             </p>
                         </div>
@@ -133,6 +137,8 @@ import { AppointmentTimeSlotService } from '~/logic/interfaces/services/Appointm
 import { DateRange, FullDate } from '~/logic/models/utils/DateRange';
 import { AppointmentTimeslotDate } from '~/logic/models/AppointmentTimeslotDate';
 import { APIError } from '~/logic/models/APIError';
+import {DoctorSpecialty} from '~/logic/models/DoctorSpecialty';
+import {doctorSpecialtyActionTypes} from '~/store/types/doctorSpecialties.types';
 
 // @ts-ignore
 Date.prototype.plusDays = function (i) {
@@ -145,6 +151,8 @@ Date.prototype.plusDays = function (i) {
 export default class SelectAppointment extends Vue {
     @State(state => state.auth.user)
     private readonly user:User;
+    @State(state => state.doctorSpecialties.doctorSpecialties)
+    private readonly specialties: DoctorSpecialty[];
     private readonly prev = '<';
     private readonly next = '>';
     private monday:Date = this.getMonday(new Date());
@@ -153,6 +161,7 @@ export default class SelectAppointment extends Vue {
     private locality:Nullable<Locality> = null;
 
     async created() {
+        this.$store.dispatch('doctorSpecialties/loadDoctorSpecialties', doctorSpecialtyActionTypes.loadDoctorSpecialties());
         if(!this.monday){
             let today = new Date();
             //@ts-ignore
@@ -258,6 +267,7 @@ export default class SelectAppointment extends Vue {
     getUrl(url:string):string{
         return createPath(url);
     }
+
     getMonday(day:Date):Date {
         // get day of week
         let toAdd = day.getDay();
@@ -269,6 +279,7 @@ export default class SelectAppointment extends Vue {
         //@ts-ignore
         return day.plusDays( toAdd );
     }
+
     changeWeek(num:number){
         let prevnum = parseInt(this.$route.params.weekNo);
         this.$router.push({name:"SelectAppointment",params:{
@@ -276,6 +287,14 @@ export default class SelectAppointment extends Vue {
             weekNo:""+(prevnum+num)
         }})
         this.updateWeek()
+    }
+
+    getSpecialtyName(id: number): string {
+        for (let specialty of this.specialties) {
+            if (specialty.id === id) return specialty.name;
+        }
+
+        return id.toString();
     }
 
     //checks if theres at least 1 timeslot this week
@@ -294,7 +313,7 @@ export default class SelectAppointment extends Vue {
 
 <style scoped>
 .grey-background {
-    background-color: rgba(214, 214, 214);
+    background-color: rgb(214, 214, 214);
 }
 
 .fill-height {
