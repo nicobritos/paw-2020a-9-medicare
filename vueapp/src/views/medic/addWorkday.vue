@@ -67,7 +67,6 @@
                 </div>
                 <div class="col-8">
                     <select v-model="officeSelected" class="form-control" name="officeId" id="officeId" >
-                        <!-- TODO: check that this function call is okey -->
                         <option v-for="doctor in doctors" :key="doctor.office.id" :value="doctor.office.id">
                             {{doctor.office.name}}
                         </option>
@@ -135,10 +134,6 @@ export default class AddWorkday extends Vue {
         e.preventDefault();
         e.stopPropagation();
 
-        /*
-            TODO: check this, supponsedly input type=time always returns
-                    hh:mm:ss with ss being optional but always in 24-hour format
-        */
         let start = this.startHour.split(":").map(v => parseInt(v));
         let end = this.endHour.split(":").map(v => parseInt(v));
         let day = [ 'MONDAY','TUESDAY','WEDNESDAY','THURSDAY','FRIDAY','SATURDAY','SUNDAY'][this.dowSelected];

@@ -9,7 +9,6 @@
 
         <div class="d-inline-flex flex-column align-items-end mr-3">
             <RouterLink v-if="!isDoctor" :to="getUrl('patient/profile')">
-                <!-- TODO:remove style -->
                 <p style="font-weight: 400;" class="m-0 p-0 text-muted white-text">
                     {{ user.firstName + ' ' + user.surname }}
                 </p>
@@ -25,7 +24,6 @@
         <img v-if="!user.verified" id="navbarUnverifiedUserImage" class="ml-2"
              src="https://fonts.gstatic.com/s/i/materialicons/account_circle/v4/24px.svg" alt="unverified user image">
         <RouterLink v-else-if="!isDoctor" :to='getUrl("patient/profile")'>
-            <!-- TODO:move style to css -->
             <div style="width: 2em;" class="d-flex flex-column justify-content-center">
                 <div class="profile-picture-container">
                     <img

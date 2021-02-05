@@ -2,7 +2,6 @@
     <div class="container flex-fill mx-5 pl-5 mt-3 w-100">
         <div class="row">
             <div class="col-4 align-items-start d-flex flex-column">
-                <!-- TODO check imagen -->
                 <div class="picture-container no-select">
                     <div class="w-100 d-flex flex-column justify-content-center">
                         <div class="profile-picture-container">
@@ -18,24 +17,22 @@
                     </div>
                     <div @click="triggerChangePPInput" class="picture-overlay d-flex flex-column align-items-center justify-content-center pb-3">
                         <input ref="PPInput" @change="changeProfilePic" id="profile-picture-input" style="display: none;" type="file" accept="image/*">
-                        <!-- TODO: check this icon and previous implementation -->
                         <b-icon class="edit-pencil-icon" icon="pencil"/>
                     </div>
                 </div>
             </div>
             <div class="col-6">
                 <div class="container p-0 pt-4 m-0">
-                    <!-- TODO:connect form -->
                     <form @submit="submitForm">
                         <div class="row">
                             <div class="col p-0 m-0">
                                 <!-- TODO Connect image function-->
                                 <h3>{{ $t('Name') }}
-                                    <label for="firstName" class="toggle-readonly">
+                                    <label for="fname" class="toggle-readonly">
                                         <img type="button" :src='editPencil' alt="editar" @click="enableFirstnameMod"/>
                                     </label>
                                 </h3>
-                                <input class="form-control mb-3 w-75" id="firstName" name="firstName"
+                                <input class="form-control mb-3 w-75" id="fname" name="fname" type="text" autocomplete="fname"
                                        v-model="firstname" :readonly="!firstnameModEnabled"/>
                                 <!-- TODO: maybe expand feedback-->
                                 <!-- TODO: check the i18n-->
@@ -44,11 +41,11 @@
                             <div class="col p-0 m-0">
                                 <!-- TODO Connect image function-->
                                 <h3>{{ $t('Surname') }}
-                                    <label for="surname" class="toggle-readonly">
+                                    <label for="lname" class="toggle-readonly">
                                         <img type="button" :src='editPencil' alt="editar" @click="enableSurnameMod"/>
                                     </label>
                                 </h3>
-                                <input class="form-control mb-3 w-75" name="surname" id="surname" v-model="surname"
+                                <input class="form-control mb-3 w-75" name="lname" id="lname" v-model="surname" type="text" autocomplete="lname"
                                        :readonly="!surnameModEnabled"/>
                                 <!-- TODO: maybe expand feedback-->
                                 <!-- TODO: check the i18n-->
@@ -62,7 +59,7 @@
                                         <img type="button" :src='editPencil' alt="editar" @click="enablePhoneMod">
                                     </label>
                                 </h3>
-                                <input class="form-control mb-3 w-75" id="phone" name="phone" v-model="phone"
+                                <input class="form-control mb-3 w-75" id="phone" name="phone" v-model="phone" type="text" autocomplete="phone"
                                        :readonly="!phoneModEnabled"/>
                                 <!-- TODO: if validation in phone then feedback should be provided probably -->
                             </div>
@@ -72,7 +69,7 @@
                                         <img type="button" :src='editPencil' alt="editar" @click="enableEmailMod"/>
                                     </label>
                                 </h3>
-                                <input class="form-control mb-3 w-75" id="email" name="email" v-model="email"
+                                <input class="form-control mb-3 w-75" id="email" name="email" v-model="email" type="text" autocomplete="username"
                                        :readonly="!emailModEnabled"/>
                                 <!-- TODO: maybe expand feedback-->
                                 <!-- TODO: check the i18n-->
@@ -86,7 +83,7 @@
                                         <img type="button" :src='editPencil' alt="editar" @click="enablePasswordMod"/>
                                     </label>
                                 </h3>
-                                <input :type='passwordVis? "text": "password"' class="form-control mb-3 w-75" id="password" name="password"
+                                <input :type='passwordVis? "text": "password"' class="form-control mb-3 w-75" id="password" name="password" autocomplete="new-password"
                                        :readonly="!passwordModEnabled"/>
                                 <label for="password" class="toggle-visibility">
                                     <img type="button" :src='eye' v-if="!passwordVis && passwordModEnabled" alt="not visible password" @click="passwordVis=true">
@@ -102,8 +99,8 @@
                                         <img :src='editPencil' alt="editar"/>
                                     </label>    
                                 </h3>
-                                <input :type='repeatPasswordVis? "text":"password"' class="form-control mb-3 w-75"
-                                       id="repeatPassword" name="repeatPassword"/>
+                                <input :type='repeatPasswordVis? "text":"password"' class="form-control mb-3 w-75" name="new-password" autocomplete="new-password"
+                                       id="repeatPassword"/>
                                 <label for="repeatPassword" class="toggle-visibility">
                                     <img type="button" :src='eye' v-if="!repeatPasswordVis" alt="not visible password" @click="repeatPasswordVis=true">
                                     <img type="button" :src='noeye' v-else alt="visible password" @click="repeatPasswordVis=false">
@@ -216,7 +213,6 @@ export default class PatientProfile extends Vue {
 
     //-------------------------Form------------------------------
 
-    //TODO:check properties
     private readonly minFirstnameLength = 2;
     private readonly maxFirstnameLength = 20;
     private readonly minSurnameLength = 2;
@@ -284,7 +280,7 @@ export default class PatientProfile extends Vue {
         if(this.validUserUpdate){
             this.$store.dispatch('users/updateUser', userActionTypes.updateUser(updateUser));
         }else{
-            //TODO: show invalid toast
+            //TODO: show invalid toast (aunque deberia de estar ya)
         }
     }
 

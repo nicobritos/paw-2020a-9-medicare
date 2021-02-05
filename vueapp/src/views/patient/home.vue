@@ -43,7 +43,6 @@
                                     </div>
                                     <div class="row">
                                         <p class="m-0">
-                                            <!-- TODO: Check whay would be to -->
                                             {{
                                                 $t(
                                                     'dow_dom_moy_sh_sm_eh_em',

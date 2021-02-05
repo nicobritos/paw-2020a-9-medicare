@@ -72,10 +72,8 @@
                             <!-- TODO:connect button -->
                             <button type="button" class="btn" id="prevWeekBtn">{{ prev }}</button>
                         </td>
-                        <!-- TODO:check, should be 0 to 6 -->
                         <td v-for="i in 7" :key="i" class="px-0">
                             <!-- day of the week -->
-                            <!-- TODO:CHECK -->
                             <span
                                 class="medicare-day-span container px-0 mx-2 d-flex flex-column align-items-center text-center"
                                 :data-day="monday.plusDays(i)"
@@ -236,7 +234,6 @@ export default class MedicHome extends Vue {
                                     to:{
                                         year:this.today.getFullYear(),
                                         month:this.today.getMonth(),
-                                        //TODO: check if this should be the same day or the next
                                         day:this.today.getDate() + 1
                                     }
                                 })

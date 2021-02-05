@@ -159,7 +159,7 @@ public class UserServiceImpl extends GenericSearchableServiceImpl<UserDao, User,
             userToSave.setSurname(user.getSurname());
         }
 
-        super.update(user);
+        super.update(userToSave);
     }
 
     @Override

@@ -13,8 +13,7 @@
                     <label for="medicare_email">{{ $t('Email') }}</label>
                 </div>
                 <div class="col-8">           
-                    <!-- TODO: maybe add state to input -->
-                    <b-input    v-model="email" class="form-control" type="email" name="medicare_email" 
+                    <b-input    v-model="email" class="form-control" type="email" name="current-email" autocomplete="username"
                                 id="medicare_email" @focus="setShowInvalid"/>
                     <!-- TODO:maybe expand email feedback-->
                     <b-form-invalid-feedback v-if="showInvalid" :state="validEmail">{{$t("Email.signupForm.email")}}</b-form-invalid-feedback>
@@ -25,8 +24,7 @@
                     <label for="medicare_password">{{ $t('Password') }}</label>
                 </div>
                 <div class="col-8">
-                    <!-- TODO: maybe add state to input -->
-                    <b-input v-model="password" class="form-control pr-5" :type='showPassword?"text":"password"' name="medicare_password"
+                    <b-input v-model="password" class="form-control pr-5" :type='showPassword?"text":"password"' name="current-password" autocomplete="current-password"
                            id="medicare_password" @focus="setShowInvalid"/>
                     <label for="medicare_password" class="toggle-visibility" @click="toggleShowPassword()">
                         <img v-if="!showPassword" :src='eye'>
@@ -94,7 +92,6 @@ export default class Login extends Vue {
         return !this.valid;
     }
 
-    //TODO:check this added by guido
     beforeMount(){
         if(this.user){
             this.goBack();
