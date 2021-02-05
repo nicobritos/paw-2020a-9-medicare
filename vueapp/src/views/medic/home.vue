@@ -314,7 +314,7 @@ export default class MedicHome extends Vue {
 
     getMpdMonthOfYear(i: number): string {
         // @ts-ignore
-        switch (this.monday.plusDays(i).monthOfYear) {
+        switch (this.monday.plusDays(i).getMonth()) {
             case 0:
                 return this.$t('JanuaryAbbreviated').toString();
             case 1:
@@ -341,7 +341,7 @@ export default class MedicHome extends Vue {
                 return this.$t('DecemberAbbreviated').toString();
             default:
                 // @ts-ignore
-                return this.monday.plusDays(i).monthOfYear;
+                return this.monday.plusDays(i).getMonth();
         }
     }
 
