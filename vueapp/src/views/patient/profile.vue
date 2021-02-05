@@ -39,7 +39,7 @@
                                        v-model="firstname" :readonly="!firstnameModEnabled"/>
                                 <!-- TODO: maybe expand feedback-->
                                 <!-- TODO: check the i18n-->
-                                <b-form-invalid-feedback :state="validFirstname||!firstnameModEnabled">{{$t("Size.signupForm.firstName",[0,maxFirstnameLength,minFirstnameLength])}}</b-form-invalid-feedback>
+                                <b-form-invalid-feedback :state="validFirstname">{{$t("Size.signupForm.firstName",[0,maxFirstnameLength,minFirstnameLength])}}</b-form-invalid-feedback>
                             </div>
                             <div class="col p-0 m-0">
                                 <!-- TODO Connect image function-->
@@ -52,7 +52,7 @@
                                        :readonly="!surnameModEnabled"/>
                                 <!-- TODO: maybe expand feedback-->
                                 <!-- TODO: check the i18n-->
-                                <b-form-invalid-feedback :state="validSurname||!surnameModEnabled">{{$t("Size.signupForm.surname",[0,maxSurnameLength,minSurnameLength])}}</b-form-invalid-feedback>
+                                <b-form-invalid-feedback :state="validSurname">{{$t("Size.signupForm.surname",[0,maxSurnameLength,minSurnameLength])}}</b-form-invalid-feedback>
                             </div>
                         </div>
                         <div class="row">
@@ -76,7 +76,7 @@
                                        :readonly="!emailModEnabled"/>
                                 <!-- TODO: maybe expand feedback-->
                                 <!-- TODO: check the i18n-->
-                                <b-form-invalid-feedback :state="validEmail||!emailModEnabled">{{$t("Email.signupForm.email")}}</b-form-invalid-feedback>
+                                <b-form-invalid-feedback :state="validEmail">{{$t("Email.signupForm.email")}}</b-form-invalid-feedback>
                             </div>
                         </div>
                         <div class="row">
@@ -138,6 +138,7 @@ import EventBus from '~/logic/EventBus';
 import {APIErrorEventName} from '~/logic/interfaces/APIErrorEvent';
 import {APIError} from '~/logic/models/APIError';
 import {userActionTypes} from '~/store/types/user.types';
+import { UpdateUser } from '~/logic/interfaces/services/UserService';
 
 @Component
 export default class PatientProfile extends Vue {
@@ -233,31 +234,37 @@ export default class PatientProfile extends Vue {
 
     get validFirstname():boolean {
         this.firstname = this.firstname.trim();
-        return  this.firstname.length>=this.minFirstnameLength
-                && this.firstname.length<=this.maxFirstnameLength;
+        return  (this.firstname.length>=this.minFirstnameLength
+                && this.firstname.length<=this.maxFirstnameLength)
+                || !this.firstnameModEnabled;
     }
 
     get validSurname():boolean {
         this.surname = this.surname.trim();
-        return  this.surname.length>=this.minSurnameLength
-                && this.surname.length<=this.maxSurnameLength;
+        return  (this.surname.length>=this.minSurnameLength
+                && this.surname.length<=this.maxSurnameLength)
+                || !this.surnameModEnabled;
     }
     get validEmail():boolean {
         this.email = this.email.trim();
-        return isValidEmail(this.email);
+        return  isValidEmail(this.email)
+                || !this.emailModEnabled;
     }
     get validPassword():boolean {
         this.password = this.password.trim();
-        return this.password.length>=this.minPasswordLength 
-                && this.password.length<=this.maxPasswordLength;
+        return (this.password.length>=this.minPasswordLength 
+                && this.password.length<=this.maxPasswordLength)
+                || !this.passwordModEnabled;
     }
     get validRepeatPassword():boolean {
-        return this.password === this.repeatPassword;
+        return  (this.password === this.repeatPassword)
+                || !this.passwordModEnabled;
     }
 
     get validPhone():boolean{
         this.phone = this.phone.trim();
-        return this.phone.length >= 7 && this.phone.length <= 14; // Algunos lugares tienen tels con 7 dig
+        return  (this.phone.length >= 7 && this.phone.length <= 14)
+                || !this.phoneModEnabled; // Algunos lugares tienen tels con 7 dig
     }
 
     get validUserUpdate(): boolean {
@@ -267,14 +274,15 @@ export default class PatientProfile extends Vue {
 
     submitForm(e:any): void{
         e.preventDefault();
+        let updateUser:UpdateUser = {};
+        if(this.firstnameModEnabled)updateUser.firstName = this.firstname;
+        if(this.surnameModEnabled)updateUser.surname = this.surname;
+        if(this.phoneModEnabled)updateUser.phone = this.phone;
+        if(this.emailModEnabled)updateUser.email = this.email;
+        if(this.passwordModEnabled)updateUser.password = this.password;
+
         if(this.validUserUpdate){
-            this.$store.dispatch('users/updateUser', userActionTypes.updateUser({
-                email: this.email,
-                firstName: this.firstname,
-                phone: this.phone,
-                surname: this.surname,
-                password: this.password
-            }));
+            this.$store.dispatch('users/updateUser', userActionTypes.updateUser(updateUser));
         }else{
             //TODO: show invalid toast
         }
