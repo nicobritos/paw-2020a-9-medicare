@@ -53,9 +53,7 @@
                                             data-toggle="dropdown"
                                         />
                                         <div class="dropdown-menu">
-                                            <!-- TODO add reprogramar -->
-                                            <!-- TODO cancel -->
-                                            <button type="submit" class="dropdown-item">{{ $t('Cancel') }}</button>
+                                            <button type="submit" class="dropdown-item" @click="cancelAppointment(appointment.id)">{{ $t('Cancel') }}</button>
                                         </div>
                                     </div>
                                 </div>
@@ -174,9 +172,9 @@
                                                             data-toggle="dropdown"
                                                         />
                                                         <div class="dropdown-menu">
-                                                            <!-- TODO add reprogramar -->
-                                                            <!-- TODO connect button -->
-                                                            <button type="button" class="dropdown-item cancel-appt-btn">
+                                                            <button type="button" class="dropdown-item cancel-appt-btn"
+                                                                    @click="cancelWeekAppointment(appointment.id, 90)"
+                                                            >
                                                                 {{ $t('Cancel') }}
                                                             </button>
                                                         </div>
@@ -205,6 +203,7 @@ import TYPES from '~/logic/types';
 import {createApiPath, createPath, ID} from '~/logic/Utils';
 import {DoctorService} from '~/logic/interfaces/services/DoctorService';
 import {Doctor} from '~/logic/models/Doctor';
+import {DateTime} from 'luxon';
 
 // @ts-ignore
 Date.prototype.plusDays = function (i) {
@@ -224,19 +223,21 @@ export default class MedicHome extends Vue {
     private weekAppointments: Appointment[][] = [[], [], [], [], [], [], []];
 
     async mounted(): Promise<void> {
-        let appointments = await this.$container.get<AppointmentService>(TYPES.Services.AppointmentService)
-                                .list({
-                                    from:{
-                                        year:this.today.getFullYear(),
-                                        month:this.today.getMonth(),
-                                        day:this.today.getDate()
-                                    },
-                                    to:{
-                                        year:this.today.getFullYear(),
-                                        month:this.today.getMonth(),
-                                        day:this.today.getDate() + 1
-                                    }
-                                })
+        let tomorrow = DateTime.fromJSDate(this.today).plus({ days: 1 }).toJSDate();
+        let appointments = await this.getService().list(
+            {
+                from: {
+                    year:this.today.getFullYear(),
+                    month:this.today.getMonth(),
+                    day:this.today.getDate()
+                },
+                to: {
+                    year: tomorrow.getFullYear(),
+                    month: tomorrow.getMonth(),
+                    day: tomorrow.getDate()
+                }
+            }
+        );
         if (!(appointments instanceof APIError)) {
             this.todayAppointments = appointments;
         }
@@ -245,25 +246,32 @@ export default class MedicHome extends Vue {
 
     @Watch("monday")
     async updateWeekAppointments(){
+        let today = this.today;
+
         for (let i = 0; i < this.weekAppointments.length; i++) {
-            let appointments = await this.$container.get<AppointmentService>(TYPES.Services.AppointmentService)
-                        .list({
-                            from:{
-                                year:this.monday.getFullYear(),
-                                month:this.monday.getMonth(),
-                                day:this.monday.getDate() + i
-                            },
-                            to:{
-                                year:this.monday.getFullYear(),
-                                month:this.monday.getMonth(),
-                                day:this.monday.getDate() + i + 1
-                            }
-                        })
+            let tomorrow = DateTime.fromJSDate(today).plus({ days: 1 }).toJSDate();
+
+            let appointments = await this.getService().list(
+                {
+                    from: {
+                        year: today.getFullYear(),
+                        month: today.getMonth(),
+                        day: today.getDate()
+                    },
+                    to: {
+                        year: tomorrow.getFullYear(),
+                        month: tomorrow.getMonth(),
+                        day: tomorrow.getDate()
+                    }
+                }
+            );
             if(!(appointments instanceof APIError)){
                 this.weekAppointments[i] = appointments;
             }else{
                 this.weekAppointments[i] = [];
             }
+
+            today = tomorrow;
         }
     }
 
@@ -324,6 +332,29 @@ export default class MedicHome extends Vue {
         return day.plusDays( toAdd );
     }
 
+    // TODO: Guido spinner
+    async cancelAppointment(id: number): Promise<void> {
+        let response = await this.getService().delete(id);
+        if (!(response instanceof APIError)) {
+            let index = this.todayAppointments.findIndex(value => value.id == id);
+            if (index < 0) return;
+            this.todayAppointments.splice(index, 1);
+        }
+    }
+
+    // TODO: Guido spinner
+    async cancelWeekAppointment(id: number, dow: number): Promise<void> {
+        let response = await this.getService().delete(id);
+        if (!(response instanceof APIError)) {
+            let index = this.weekAppointments[dow].findIndex(value => value.id == id);
+            if (index < 0) return;
+            this.weekAppointments[dow].splice(index, 1);
+        }
+    }
+
+    private getService(): AppointmentService {
+        return this.$container.get<AppointmentService>(TYPES.Services.AppointmentService);
+    }
 }
 </script>
 

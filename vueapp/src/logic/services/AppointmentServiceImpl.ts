@@ -7,6 +7,7 @@ import {AppointmentService, CreateAppointment} from '~/logic/interfaces/services
 import {Appointment} from '~/logic/models/Appointment';
 import {APIError} from '~/logic/models/APIError';
 import {DateRange} from '~/logic/models/utils/DateRange';
+import {DateTime} from 'luxon';
 
 const AppointmentMIME = {
     LIST: 'application/vnd.appointment.list.get.v1+json',
@@ -80,7 +81,7 @@ export class AppointmentServiceImpl implements AppointmentService {
     }
 
     private static formatAppointment(appointment: Appointment): Appointment {
-        appointment.dateTo = new Date(appointment.dateFrom.getTime() + Appointment.DURATION_MINUTES * 60 * 1000);
+        appointment.dateTo = DateTime.fromJSDate(appointment.dateFrom).plus({ minutes: Appointment.DURATION_MINUTES }).toJSDate();
         return appointment;
     }
 }
