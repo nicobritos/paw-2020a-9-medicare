@@ -65,8 +65,7 @@
                                         <img :src='moreOptions' class="moreOptionsButton"
                                              alt="nore options" data-toggle="dropdown">
                                         <div class="dropdown-menu">
-                                            <!-- TODO: connect button -->
-                                            <button type="button" class="dropdown-item cancel-appt-btn">
+                                            <button type="button" class="dropdown-item cancel-appt-btn" @click="cancelAppointment(appointment.id)">
                                                 {{ $t('Cancel') }}
                                             </button>
                                         </div>
@@ -113,23 +112,24 @@
 </template>
 
 <script lang="ts">
-
+import moreOptions from '@/assets/moreOptions.svg';
 import {Component, Vue} from 'vue-property-decorator';
 import { State } from 'vuex-class';
 import { AppointmentService } from '~/logic/interfaces/services/AppointmentService';
 import { APIError } from '~/logic/models/APIError';
 import { Appointment } from '~/logic/models/Appointment';
 import TYPES from '~/logic/types';
-
 import {createApiPath, createPath, Hash, ID, Nullable} from '~/logic/Utils';
 import {Doctor} from '~/logic/models/Doctor';
 import { DoctorService } from '~/logic/interfaces/services/DoctorService';
 import {doctorSpecialtyActionTypes} from '~/store/types/doctorSpecialties.types';
 import {DoctorSpecialty} from '~/logic/models/DoctorSpecialty';
 import {Locality} from '~/logic/models/Locality';
+import {DateTime} from 'luxon';
 
 @Component
 export default class PatientHome extends Vue {
+    private moreOptions = moreOptions;
     private appointments:Appointment[] = [];
     @State(state => state.localities.localities)
     private readonly localities: Locality[];
@@ -144,19 +144,21 @@ export default class PatientHome extends Vue {
     async mounted(){
         this.$store.dispatch('doctorSpecialties/loadDoctorSpecialties', doctorSpecialtyActionTypes.loadDoctorSpecialties());
         let today = new Date();
-        let appointments = await this.$container.get<AppointmentService>(TYPES.Services.AppointmentService)
-            .list({
+        let twoWeeks = DateTime.fromJSDate(today).plus({ weeks: 2 }).toJSDate();
+        let appointments = await this.getService().list(
+            {
                 from:{
-                    year:today.getFullYear(),
-                    month:today.getMonth(),
-                    day:today.getDate()
+                    year: today.getFullYear(),
+                    month: today.getMonth(),
+                    day: today.getDate()
                 },
                 to:{
-                    year:today.getFullYear() + 1,
-                    month:today.getMonth(),
-                    day:today.getDate()
+                    year: twoWeeks.getFullYear(),
+                    month: twoWeeks.getMonth(),
+                    day: twoWeeks.getDate()
                 }
-            });
+            }
+        );
         if (!(appointments instanceof APIError)) {
             this.appointmentDoctors = {};
             for (let appointment of appointments) {
@@ -252,6 +254,16 @@ export default class PatientHome extends Vue {
         this.search();
     }
 
+    // TODO: Guido spinner
+    async cancelAppointment(id: number): Promise<void> {
+        let response = await this.getService().delete(id);
+        if (!(response instanceof APIError)) {
+            let index = this.appointments.findIndex(value => value.id == id);
+            if (index < 0) return;
+            this.appointments.splice(index, 1);
+        }
+    }
+
     search(): void {
         let query: Hash<string | string[]> = {};
         if (this.name)
@@ -267,6 +279,9 @@ export default class PatientHome extends Vue {
         });
     }
 
+    private getService(): AppointmentService {
+        return this.$container.get<AppointmentService>(TYPES.Services.AppointmentService);
+    }
 }
 </script>
 
