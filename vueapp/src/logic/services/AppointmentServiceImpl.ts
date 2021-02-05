@@ -32,20 +32,20 @@ export class AppointmentServiceImpl implements AppointmentService {
     }
 
     public async list(dateRange: DateRange): Promise<Appointment[] | APIError> {
-        /* 
-            TODO: nico checkear, le agregue ese string the query despues del path
-            poruqe me estaba tirando un error de que faltaban los query params 
-        */
-        let queryString =   `?from_year=${dateRange.from.year}&&` +
-                            `from_month=${dateRange.from.month}&&` +
-                            `from_day=${dateRange.from.day}&&` +
-                            `to_year=${dateRange.to.year}&&` +
-                            `to_month=${dateRange.to.month}&&` +
-                            `to_day=${ dateRange.to.day}`
         let response = await this.rest.get<Appointment[]>(
-            AppointmentServiceImpl.PATH + queryString, {
-            accepts: AppointmentMIME.LIST
-        });
+            AppointmentServiceImpl.PATH,
+            {
+                accepts: AppointmentMIME.LIST,
+                params: {
+                    from_year: dateRange.from.year,
+                    from_month: dateRange.from.month,
+                    from_day: dateRange.from.day,
+                    to_year: dateRange.to.year,
+                    to_month: dateRange.to.month,
+                    to_day: dateRange.to.day,
+                }
+            }
+        );
         if (!response.isOk)
             return response.error!;
 
