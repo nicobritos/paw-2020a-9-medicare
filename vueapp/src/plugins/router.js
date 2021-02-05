@@ -87,6 +87,19 @@ function unverifiedGuard(to,from,next) {
     }
 }
 
+function notAuthGuardOrPatient(to,from,next) {
+    if(store.getters["auth/loggedIn"]){
+        if(store.state.auth.isDoctor){
+            next({name:"MedicHome"});
+        }
+        else{
+            next();
+        }
+    }else{
+        next();
+    }
+}
+
 const routes = [
     // example
     // {
@@ -100,7 +113,8 @@ const routes = [
     {
         path: '/mediclist/:page([1-9][0-9]*)',
         name: 'MedicList',
-        component: MedicList
+        component: MedicList,
+        beforeEnter:notAuthGuardOrPatient
     }, 
     {
         path: '/mediclist',
@@ -119,7 +133,8 @@ const routes = [
     {
         path: '/',
         name: 'Landing',
-        component: Landing
+        component: Landing,
+        beforeEnter:notAuthGuardOrPatient
     }, {
         path: '/login',
         name: 'Login',
