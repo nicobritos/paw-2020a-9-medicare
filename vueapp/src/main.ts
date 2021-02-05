@@ -12,14 +12,13 @@ Vue.use(inversifyPlugin);
 
 Vue.config.productionTip = false;
 
+store.commit('auth/loadUserFromLocalStorage');
+
 new Vue({
   router,
   i18n,
   store,
   render: h => h(App),
-  created() {
-    this.$store.commit('auth/loadUserFromLocalStorage');
-  }
 }).$mount('#app');
 
 // code for generating the communication button
