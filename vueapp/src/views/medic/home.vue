@@ -4,7 +4,7 @@
             <div class="col-4 h-100 pl-0 mr-3 w-100">
                 <h4>{{ $t('AgendaFor') }} {{ $t('today') }}</h4>
                 <ul class="list-group turno-list mr-2 w-100 h-100 overflow-auto">
-                    <div v-if="!todayAppointments" class="container-fluid justify-content-center">
+                    <div v-if="todayAppointments.length == 0" class="container-fluid justify-content-center">
                         <p class="text-left mt-4" style="color:grey;">{{ $t('NoAppointmentsToday') }}</p>
                     </div>
                     <li v-for="appointment in todayAppointments" :key="appointment.id"
@@ -121,7 +121,7 @@
                         <td colspan="9">
                             <div class="container-fluid d-flex justify-content-center">
                                 <ul class="list-group turno-list mr-2 w-50 overflow-auto">
-                                    <div v-if="!weekAppointments[selectedDay.getDay()]"
+                                    <div v-if="weekAppointments[selectedDay.getDay()].length == 0"
                                          class="container-fluid justify-content-center">
                                         <p class="text-center mt-4" style="color:grey;">
                                             {{ $t('NoAppointmentsThisDay') }}</p>
