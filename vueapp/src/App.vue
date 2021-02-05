@@ -43,11 +43,8 @@ export default class App extends Vue {
         })
     }
 
-    private apiErrorCallback(error: APIError): void {
-        this.showErrorToast(error.code);
-        for (let e of error.errors) {
-            this.showErrorToast(e.code);
-        }
+    private apiErrorCallback(code: number): void {
+        this.showErrorToast(code);
     }
 }
 </script>
