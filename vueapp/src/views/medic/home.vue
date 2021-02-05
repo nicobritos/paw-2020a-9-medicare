@@ -263,11 +263,6 @@ export default class MedicHome extends Vue {
                             }
                         })
             if(!(appointments instanceof APIError)){
-                for (let appointment of appointments) {
-                    // Hacemos async para no perder tiempo, no hace falta que sea bloqueante
-                    this.setAppointmentDoctor(appointment.id, appointment.doctorId);
-                }
-
                 this.weekAppointments[i] = appointments;
             }else{
                 this.weekAppointments[i] = [];
