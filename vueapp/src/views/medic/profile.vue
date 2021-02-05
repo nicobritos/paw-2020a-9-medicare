@@ -261,10 +261,10 @@ export default class MedicProfile extends Vue {
 
     mounted(){
         let user = this.$store.state.auth.user;
-        this.firstname = user.firstName;
-        this.surname = user.surname;
-        this.email = user.email;
-        this.phone = user.phone;
+        this.firstname = user.firstName||"";
+        this.surname = user.surname||"";
+        this.email = user.email||"";
+        this.phone = user.phone||"";
         this.$store.dispatch("doctorSpecialties/loadDoctorSpecialties",doctorSpecialtyActionTypes.loadDoctorSpecialties())
         this.setSpecialties()
         this.setWorkdays();
