@@ -175,6 +175,10 @@ export default class PatientProfile extends Vue {
     }
 
     changeProfilePic(e:InputEvent){
+        //@ts-ignore
+        if(!e.target.files||e.target.files.length<1){
+            return;
+        }
         //get profile pic file and check type
         //@ts-ignore
         let file = e.target.files[0];
@@ -183,10 +187,6 @@ export default class PatientProfile extends Vue {
             this.showErrorToast('Error');
             return;
         }
-        //append it to form
-        // let formData = new FormData();
-        // formData.append("pic", file);
-        //post to someurl
         fetch(this.getApiUrl(`/users/${this.user.id}/picture`), {
             method: "POST",
             body: file
