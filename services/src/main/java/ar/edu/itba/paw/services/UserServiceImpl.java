@@ -97,19 +97,6 @@ public class UserServiceImpl extends GenericSearchableServiceImpl<UserDao, User,
     }
 
     @Override
-    @Transactional
-    public void setProfile(User user, Picture picture) {
-        if (user.getProfilePicture() == null) {
-            picture = this.pictureService.create(picture);
-            user.setProfilePicture(picture);
-            this.update(user);
-        } else {
-            picture.setId(user.getProfilePicture().getId());
-            this.pictureService.update(picture);
-        }
-    }
-
-    @Override
     public void updatePassword(User user, String newPassword) {
         user.setPassword(this.passwordEncoder.encode(newPassword));
         this.refreshTokenService.removeByUserId(user.getId());
@@ -127,7 +114,7 @@ public class UserServiceImpl extends GenericSearchableServiceImpl<UserDao, User,
                 throw new EmailAlreadyExistsException();
             }
         } else {
-            if (user.getId() != null && this.findById(user.getId()).isPresent()) {
+            if ((userOptional = this.findById(user.getId())).isPresent()) {
                 // Already exists in DB, the email has changed
                 if (!this.isValidEmailDomain(user.getEmail()))
                     throw new InvalidEmailDomain();
@@ -136,6 +123,8 @@ public class UserServiceImpl extends GenericSearchableServiceImpl<UserDao, User,
                     this.verificationTokenService.remove(user.getVerificationToken().getId());
                     user.setVerificationToken(null);
                 }
+            } else {
+                throw new NoSuchElementException();
             }
         }
 
@@ -144,6 +133,30 @@ public class UserServiceImpl extends GenericSearchableServiceImpl<UserDao, User,
             if (userToken.isPresent() && !userToken.get().equals(user)) {
                 throw new MediCareException("Verification token already exists");
             }
+        }
+
+        User userToSave = userOptional.get();
+        if (user.getPhone() != null) {
+            userToSave.setPhone(user.getPhone());
+        }
+        // TODO: Check
+        if (user.getVerificationToken() != null) {
+            userToSave.setPhone(user.getPhone());
+        }
+        if (user.getEmail() != null) {
+            userToSave.setEmail(user.getEmail());
+        }
+        if (user.getVerified() != null) {
+            userToSave.setVerified(user.getVerified());
+        }
+        if (user.getProfilePicture() != null) {
+            userToSave.setProfilePicture(user.getProfilePicture());
+        }
+        if (user.getFirstName() != null) {
+            userToSave.setFirstName(user.getFirstName());
+        }
+        if (user.getSurname() != null) {
+            userToSave.setSurname(user.getSurname());
         }
 
         super.update(user);

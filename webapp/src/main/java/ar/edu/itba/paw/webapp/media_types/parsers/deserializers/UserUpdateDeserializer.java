@@ -23,7 +23,7 @@ public class UserUpdateDeserializer extends JsonDeserializer<User> {
         User user = new User();
 
         JsonNode node = jsonObject.get("email");
-        if (node != null) {
+        if (node != null && !node.isNull()) {
             user.setEmail(this.getStringNonNull(
                     jsonObject,
                     "email",

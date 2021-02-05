@@ -4,7 +4,6 @@ import ar.edu.itba.paw.interfaces.services.exceptions.EmailAlreadyExistsExceptio
 import ar.edu.itba.paw.interfaces.services.generic.GenericSearchableService;
 import ar.edu.itba.paw.models.Doctor;
 import ar.edu.itba.paw.models.Patient;
-import ar.edu.itba.paw.models.Picture;
 import ar.edu.itba.paw.models.User;
 
 import java.util.Locale;
@@ -28,6 +27,4 @@ public interface UserService extends GenericSearchableService<User, Integer> {
     String generateVerificationToken(User user, Locale locale, String confirmationRelativeUrl);
 
     boolean verify(User user, String token);
-
-    void setProfile(User user, Picture picture);
 }
