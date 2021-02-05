@@ -8,7 +8,8 @@
                         <p class="text-left mt-4" style="color:grey;">{{ $t('NoAppointmentsToday') }}</p>
                     </div>
                     <li v-for="appointment in todayAppointments" :key="appointment.id"
-                        class="list-group-item turno-item mb-3" id="lit">
+                        class="list-group-item turno-item mb-3" id="lit"
+                    >
                         <div class="container">
                             <div class="row">
                                 <div class="col-4 d-flex flex-column justify-content-center">
@@ -16,7 +17,7 @@
                                         <div style="margin-top: 100%;"></div>
                                         <img
                                             class="profile-picture rounded-circle"
-                                            :src='getApiUrl("/users/" + appointment.patient.id + "/picture")'
+                                            :src='getApiUrl("/users/" + appointment.patient.userId + "/picture")'
                                             alt="profile pic"
                                         />
                                     </div>
@@ -53,7 +54,7 @@
                                             data-toggle="dropdown"
                                         />
                                         <div class="dropdown-menu">
-                                            <button type="submit" class="dropdown-item" @click="cancelAppointment(appointment.id)">{{ $t('Cancel') }}</button>
+                                            <button type="submit" class="dropdown-item" @click="cancelAppointment(appointment.id, this.today.getDay())">{{ $t('Cancel') }}</button>
                                         </div>
                                     </div>
                                 </div>
@@ -67,15 +68,15 @@
                 <table class="table table-borderless">
                     <tr>
                         <td class="px-0">
-                            <!-- TODO:connect button -->
-                            <button type="button" class="btn" id="prevWeekBtn">{{ prev }}</button>
+                            <button type="button" class="btn" id="prevWeekBtn" @click="setDisplayWeek(-1)">{{ prev }}</button>
                         </td>
                         <td v-for="i in 7" :key="i" class="px-0">
                             <!-- day of the week -->
                             <span
                                 class="medicare-day-span container px-0 mx-2 d-flex flex-column align-items-center text-center"
+                                @click="selectDay(i)"
                                 :data-day="monday.plusDays(i)"
-                                :style='(monday.plusDays(i-1) == today)?"font-weight:bold":""'>
+                                :style='(monday.plusDays(i-1).getTime() == selectedDay.getTime())?"font-weight:bold":""'>
                                 <p class="mb-0"
                                    v-if="monday.plusDays(i-1).getDay() == 1">{{ $t('MondayAbbreviated') }}</p>
                                 <p class="mb-0"
@@ -113,20 +114,19 @@
                             </span>
                         </td>
                         <td class="px-0">
-                            <!-- TODO: connect button -->
-                            <button type="button" class="btn" id="nextWeekBtn">{{ next }}</button>
+                            <button type="button" class="btn" id="nextWeekBtn" @click="setDisplayWeek(1)">{{ next }}</button>
                         </td>
                     </tr>
                     <tr>
                         <td colspan="9">
                             <div class="container-fluid d-flex justify-content-center">
                                 <ul class="list-group turno-list mr-2 w-50 overflow-auto">
-                                    <div v-if="!weekAppointments[today.getDay()]"
+                                    <div v-if="!weekAppointments[selectedDay.getDay()]"
                                          class="container-fluid justify-content-center">
                                         <p class="text-center mt-4" style="color:grey;">
                                             {{ $t('NoAppointmentsThisDay') }}</p>
                                     </div>
-                                    <li v-for="appointment in weekAppointments[today.getDay()]" :key="appointment.id"
+                                    <li v-for="appointment in weekAppointments[selectedDay.getDay()]" :key="appointment.id"
                                         class="list-group-item turno-item mb-3">
                                         <div class="container">
                                             <div class="row">
@@ -173,7 +173,7 @@
                                                         />
                                                         <div class="dropdown-menu">
                                                             <button type="button" class="dropdown-item cancel-appt-btn"
-                                                                    @click="cancelWeekAppointment(appointment.id, 90)"
+                                                                    @click="cancelAppointment(appointment.id, this.selectedDay.getDay())"
                                                             >
                                                                 {{ $t('Cancel') }}
                                                             </button>
@@ -218,18 +218,45 @@ export default class MedicHome extends Vue {
     private prev = '<';
     private moreOptions = moreOptions;
     private monday = this.getMonday(new Date());
+    private selectedDay = new Date();
     private today = new Date();
     private todayAppointments: Appointment[] = [];
     private weekAppointments: Appointment[][] = [[], [], [], [], [], [], []];
 
-    async mounted(): Promise<void> {
+    mounted(): Promise<void> {
+        let promises = [];
+        promises.push(this.updateTodayAppointments());
+        promises.push(this.updateWeekAppointments());
+        return Promise.all(promises);
+    }
+
+    setDisplayWeek(weeks: number): Promise<void> {
+        this.monday = DateTime.fromJSDate(this.monday).plus({ weeks: weeks }).toJSDate();
+        this.selectedDay = this.monday;
+        return this.updateWeekAppointments();
+    }
+
+    selectDay(dow: number): void {
+        if (this.selectedDay.getDay() === dow) return;
+
+        let selectedDay = DateTime.fromJSDate(this.selectedDay);
+        if (this.selectedDay.getDay() < dow) {
+            selectedDay = selectedDay.plus({ days: dow - this.selectedDay.getDay() });
+        } else {
+            selectedDay = selectedDay.plus({ days: this.selectedDay.getDay() + dow });
+        }
+
+        this.selectedDay = selectedDay.toJSDate();
+    }
+
+    async updateTodayAppointments(): Promise<void> {
         let tomorrow = DateTime.fromJSDate(this.today).plus({ days: 1 }).toJSDate();
         let appointments = await this.getService().list(
             {
                 from: {
-                    year:this.today.getFullYear(),
-                    month:this.today.getMonth(),
-                    day:this.today.getDate()
+                    year: this.today.getFullYear(),
+                    month: this.today.getMonth(),
+                    day: this.today.getDate()
                 },
                 to: {
                     year: tomorrow.getFullYear(),
@@ -241,12 +268,10 @@ export default class MedicHome extends Vue {
         if (!(appointments instanceof APIError)) {
             this.todayAppointments = appointments;
         }
-        this.updateWeekAppointments();
     }
 
-    @Watch("monday")
     async updateWeekAppointments(){
-        let today = this.today;
+        let today = this.monday;
 
         for (let i = 0; i < this.weekAppointments.length; i++) {
             let tomorrow = DateTime.fromJSDate(today).plus({ days: 1 }).toJSDate();
@@ -333,23 +358,21 @@ export default class MedicHome extends Vue {
     }
 
     // TODO: Guido spinner
-    async cancelAppointment(id: number): Promise<void> {
+    async cancelAppointment(id: number, dow: number): Promise<void> {
         let response = await this.getService().delete(id);
         if (!(response instanceof APIError)) {
-            let index = this.todayAppointments.findIndex(value => value.id == id);
-            if (index < 0) return;
-            this.todayAppointments.splice(index, 1);
+            this.deleteAppointment(id, dow);
         }
     }
 
-    // TODO: Guido spinner
-    async cancelWeekAppointment(id: number, dow: number): Promise<void> {
-        let response = await this.getService().delete(id);
-        if (!(response instanceof APIError)) {
-            let index = this.weekAppointments[dow].findIndex(value => value.id == id);
-            if (index < 0) return;
+    private deleteAppointment(id: number, dow: number): void {
+        let index = this.weekAppointments[dow].findIndex(value => value.id == id);
+        if (index > -1)
             this.weekAppointments[dow].splice(index, 1);
-        }
+
+        index = this.todayAppointments.findIndex(value => value.id == id);
+        if (index >= 0)
+            this.todayAppointments.splice(index, 1);
     }
 
     private getService(): AppointmentService {
