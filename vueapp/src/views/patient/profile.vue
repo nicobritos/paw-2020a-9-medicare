@@ -28,11 +28,11 @@
                             <div class="col p-0 m-0">
                                 <!-- TODO Connect image function-->
                                 <h3>{{ $t('Name') }}
-                                    <label for="firstName" class="toggle-readonly">
+                                    <label for="fname" class="toggle-readonly">
                                         <img type="button" :src='editPencil' alt="editar" @click="enableFirstnameMod"/>
                                     </label>
                                 </h3>
-                                <input class="form-control mb-3 w-75" id="firstName" name="firstName"
+                                <input class="form-control mb-3 w-75" id="fname" name="fname" type="text" autocomplete="fname"
                                        v-model="firstname" :readonly="!firstnameModEnabled"/>
                                 <!-- TODO: maybe expand feedback-->
                                 <!-- TODO: check the i18n-->
@@ -41,11 +41,11 @@
                             <div class="col p-0 m-0">
                                 <!-- TODO Connect image function-->
                                 <h3>{{ $t('Surname') }}
-                                    <label for="surname" class="toggle-readonly">
+                                    <label for="lname" class="toggle-readonly">
                                         <img type="button" :src='editPencil' alt="editar" @click="enableSurnameMod"/>
                                     </label>
                                 </h3>
-                                <input class="form-control mb-3 w-75" name="surname" id="surname" v-model="surname"
+                                <input class="form-control mb-3 w-75" name="lname" id="lname" v-model="surname" type="text" autocomplete="lname"
                                        :readonly="!surnameModEnabled"/>
                                 <!-- TODO: maybe expand feedback-->
                                 <!-- TODO: check the i18n-->
@@ -59,7 +59,7 @@
                                         <img type="button" :src='editPencil' alt="editar" @click="enablePhoneMod">
                                     </label>
                                 </h3>
-                                <input class="form-control mb-3 w-75" id="phone" name="phone" v-model="phone"
+                                <input class="form-control mb-3 w-75" id="phone" name="phone" v-model="phone" type="text" autocomplete="phone"
                                        :readonly="!phoneModEnabled"/>
                                 <!-- TODO: if validation in phone then feedback should be provided probably -->
                             </div>
@@ -69,7 +69,7 @@
                                         <img type="button" :src='editPencil' alt="editar" @click="enableEmailMod"/>
                                     </label>
                                 </h3>
-                                <input class="form-control mb-3 w-75" id="email" name="email" v-model="email"
+                                <input class="form-control mb-3 w-75" id="email" name="email" v-model="email" type="text" autocomplete="username"
                                        :readonly="!emailModEnabled"/>
                                 <!-- TODO: maybe expand feedback-->
                                 <!-- TODO: check the i18n-->
@@ -83,7 +83,7 @@
                                         <img type="button" :src='editPencil' alt="editar" @click="enablePasswordMod"/>
                                     </label>
                                 </h3>
-                                <input :type='passwordVis? "text": "password"' class="form-control mb-3 w-75" id="password" name="password"
+                                <input :type='passwordVis? "text": "password"' class="form-control mb-3 w-75" id="password" name="password" autocomplete="new-password"
                                        :readonly="!passwordModEnabled"/>
                                 <label for="password" class="toggle-visibility">
                                     <img type="button" :src='eye' v-if="!passwordVis && passwordModEnabled" alt="not visible password" @click="passwordVis=true">
@@ -99,8 +99,8 @@
                                         <img :src='editPencil' alt="editar"/>
                                     </label>    
                                 </h3>
-                                <input :type='repeatPasswordVis? "text":"password"' class="form-control mb-3 w-75"
-                                       id="repeatPassword" name="repeatPassword"/>
+                                <input :type='repeatPasswordVis? "text":"password"' class="form-control mb-3 w-75" name="new-password" autocomplete="new-password"
+                                       id="repeatPassword"/>
                                 <label for="repeatPassword" class="toggle-visibility">
                                     <img type="button" :src='eye' v-if="!repeatPasswordVis" alt="not visible password" @click="repeatPasswordVis=true">
                                     <img type="button" :src='noeye' v-else alt="visible password" @click="repeatPasswordVis=false">
