@@ -141,7 +141,10 @@
                                             ])
                                     }}
                                 </p>
-                                <button class="btn cancel-workday-btn" type="button" @click="removeWorkday(workday.id)">X</button>
+                                <button v-if="beingWDDeleted[workday.id]" class="btn cancel-workday-btn" type="button">
+                                    <b-spinner small></b-spinner>
+                                </button>
+                                <button v-else class="btn cancel-workday-btn" type="button" @click="removeWorkday(workday.id)">X</button>
                             </div>
                             <div class="row d-flex align-items-center justify-content-center my-3">
                                 <button @click="openAddWorkday" class="btn btn-info">{{ $t('AddSchedule') }}</button>
@@ -156,7 +159,10 @@
                         <div v-for="specialty in specialties" :key="specialty.id" class="container p-0 m-0 pl-3">
                             <div class="row d-flex align-items-center justify-content-between">
                                 <p class="m-0">{{ specialty.name }}</p>
-                                <button class="btn cancel-specialty-btn" type="button" @click="removeSpecialty(specialty.id)">X</button>
+                                <button  v-if="beingSDeleted[specialty.id]" class="btn cancel-specialty-btn" type="button">
+                                    <b-spinner small></b-spinner>
+                                </button>
+                                <button v-else class="btn cancel-specialty-btn" type="button" @click="removeSpecialty(specialty.id)">X</button>
                             </div>
                         </div>
                     </div>
@@ -228,6 +234,9 @@ export default class MedicProfile extends Vue {
     private remainingSpecialties:DoctorSpecialty[] = [];
     @State(state => state.doctorSpecialties.doctorSpecialties)
     private readonly allSpecialties:DoctorSpecialty[];
+
+    private beingWDDeleted = {};
+    private beingSDeleted = {};
 
     private passwordVis = false;
     private repeatPasswordVis = false;
@@ -368,12 +377,6 @@ export default class MedicProfile extends Vue {
         this.showModal = true;
     }
 
-    // TODO: Guido: Hace un await y mientras mostra un loading spinner
-    /*
-        se podria armar un objeto que sea par clave valor entre el specialty/workday
-        y usar el que undefined es falsy para mostrar el boton y si esta en proceso
-        de borrarse asociamos un true y cundo se borra lo seteamos en false
-    */
     async removeSpecialty(id: number): Promise<void> {
         for (let doctor of this.doctors) {
             let specialties = doctor.specialtyIds.map(value => value);
@@ -381,6 +384,7 @@ export default class MedicProfile extends Vue {
             if (index < 0) continue;
             specialties.splice(index, 1);
 
+            Vue.set(this.beingSDeleted,id,true);
             await this.$store.dispatch('doctors/updateDoctor', doctorActionTypes.updateDoctor({
                 id: doctor.id,
                 doctor: {
@@ -389,15 +393,21 @@ export default class MedicProfile extends Vue {
                     specialtyIds: specialties
                 }
             }));
+            Vue.delete(this.beingSDeleted,id);
         }
     }
 
-    // TODO: Guido: Hace un await y mientras mostra un loading spinner
-    removeWorkday(id: number):void{
-        this.getWorkdayService().delete(id);
+    async removeWorkday(id: number){
+        Vue.set(this.beingWDDeleted,id,true);
+        await this.getWorkdayService().delete(id);
+        Vue.delete(this.beingWDDeleted,id);
     }
 
     changeProfilePic(e:InputEvent){
+        //@ts-ignore
+        if(!e.target.files||e.target.files.length<1){
+            return;
+        }
         //get profile pic file and check type
         //@ts-ignore
         let file = e.target.files[0];
@@ -405,13 +415,9 @@ export default class MedicProfile extends Vue {
             //TODO: toast error
             return;
         }
-        //append it to form
-        // let formData = new FormData();
-        // formData.append("pic", file);
-        //post to someurl
         fetch(this.getApiUrl(`/users/${this.user.id}/picture`), {
             method: "POST",
-            body: file  // TODO: CHECK
+            body: file
         }).then((r) => {
             if (r.ok) {
                 //TODO:show ok toast
