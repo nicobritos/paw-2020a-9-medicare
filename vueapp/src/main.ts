@@ -40,6 +40,6 @@ s.onload = function () {
   //@ts-ignore
   WhWidgetSendButton.init(host, proto, options);
 };
-let x = document.getElementsByTagName('head')[0];
+let x = document.getElementsByTagName('script')[0];
 //@ts-ignore
 x.parentNode.insertBefore(s, x);
