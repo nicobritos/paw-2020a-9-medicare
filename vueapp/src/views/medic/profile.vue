@@ -378,7 +378,6 @@ export default class MedicProfile extends Vue {
 
     async removeSpecialty(id: number): Promise<void> {
         for (let doctor of this.doctors) {
-            let specialties = doctor.specialtyIds.map(value => value);
             let index = specialties.findIndex(value => value === id);
             if (index < 0) continue;
             specialties.splice(index, 1);
@@ -397,8 +396,13 @@ export default class MedicProfile extends Vue {
     }
 
     async removeWorkday(id: number){
+        let index = this.workdays.findIndex(value => value.id == id);
+        if (index < 0) return;
+
         Vue.set(this.beingWDDeleted,id,true);
-        await this.getWorkdayService().delete(id);
+        if (await this.getWorkdayService().delete(id)) {
+            this.workdays.splice(index, 1);
+        }
         Vue.delete(this.beingWDDeleted,id);
     }
 
