@@ -16,6 +16,8 @@ public class PatientSerializer extends JsonSerializer<Patient> {
 
         jsonObject.put("id", patient.getId());
         jsonObject.put("userId", patient.getUser().getId());
+        jsonObject.put("firstName", patient.getUser().getFirstName());
+        jsonObject.put("surname", patient.getUser().getSurname());
         jsonObject.put("officeId", patient.getOffice().getId());
 
         return jsonObject;

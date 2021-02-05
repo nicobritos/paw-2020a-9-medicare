@@ -20,7 +20,7 @@ public class AppointmentSerializer extends JsonSerializer<Appointment> {
         jsonObject.put("date_from", appointment.getFromDate().toDateTime(DateTimeZone.UTC).getMillis()); // Epoch millis
         jsonObject.put("message", appointment.getMessage());
         jsonObject.put("motive", appointment.getMotive());
-        jsonObject.put("patientId", appointment.getPatient().getId());
+        jsonObject.put("patient", PatientSerializer.instance.toJson(appointment.getPatient()));
         jsonObject.put("doctorId", appointment.getDoctor().getId());
 
         return jsonObject;
