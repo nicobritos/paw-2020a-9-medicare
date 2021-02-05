@@ -53,6 +53,7 @@ public class WorkdayServiceImpl extends GenericServiceImpl<WorkdayDao, Workday, 
             throw new IllegalArgumentException();
         if(!doctors.contains(workdayOptional.get().getDoctor()))
             throw new MediCareException("The user is not allowed to delete this workday");
+        this.repository.remove(workdayOptional.get());
     }
 
     @Override
