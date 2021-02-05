@@ -223,7 +223,7 @@ export default class MedicHome extends Vue {
     private todayAppointments: Appointment[] = [];
     private weekAppointments: Appointment[][] = [[], [], [], [], [], [], []];
 
-    mounted(): Promise<void> {
+    mounted(): Promise<void[]> {
         let promises = [];
         promises.push(this.updateTodayAppointments());
         promises.push(this.updateWeekAppointments());
