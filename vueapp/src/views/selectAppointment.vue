@@ -68,7 +68,7 @@
 
                         </div>
                     </div>
-                    <div v-for="(_,i) in 7" :key="i" class="col-1 mr-4 p-0">
+                    <div v-for="i in 7" :key="i" class="col-1 mr-4 p-0">
                         <span class="d-flex flex-column align-items-center text-center">
                                 <p class="mb-0">
                                     {{ getDoW(monday.plusDays(i).getDay()) }}
@@ -88,14 +88,17 @@
                             </span>
                         <div class="d-flex flex-column align-content-center">
                             <RouterLink
-                                v-for="timeslot in weekSlots[monday.plusDays(i).getDay()]" :key="timeslot.id"
-                                :to="'patient/appointment/'+doctor.id+'/'+timeslot.date.year+'/'+timeslot.date.monthOfYear+'/'+timeslot.date.dayOfMonth+'/'+timeslot.date.hourOfDay+'/'+timeslot.date.minuteOfHour"
+                                v-for="timeslot in getTimeslots(monday.plusDays(i))" :key="timeslot.id"
+                                :to="getToUrl(monday.plusDays(i), timeslot)"
                                 class="btn btn-sm btn-secondary mb-2">
                                 <p class="m-0">
                                     {{
                                         $t(
                                             'hod_moh',
-                                            [timeWithZero(timeslot.date.hourOfDay), timeWithZero(timeslot.date.minuteOfHour)]
+                                            [
+                                                timeWithZero(timeslot.date.hour),
+                                                timeWithZero(timeslot.date)
+                                            ]
                                         )
                                     }}
                                 </p>
@@ -134,6 +137,8 @@ import { AppointmentTimeslotDate } from '~/logic/models/AppointmentTimeslotDate'
 import { APIError } from '~/logic/models/APIError';
 import {DoctorSpecialty} from '~/logic/models/DoctorSpecialty';
 import {doctorSpecialtyActionTypes} from '~/store/types/doctorSpecialties.types';
+import {DateTime} from 'luxon';
+import {AppointmentTimeslot} from '~/logic/models/AppointmentTimeslot';
 
 // @ts-ignore
 Date.prototype.plusDays = function (i) {
@@ -151,7 +156,7 @@ export default class SelectAppointment extends Vue {
     private readonly prev = '<';
     private readonly next = '>';
     private monday:Date = this.getMonday(new Date());
-    private weekSlots:AppointmentTimeslotDate[] = [];
+    private weekSlots: Record<number, Record<number, Record<number, AppointmentTimeslot[]>>> = {};
     private doctor:Nullable<Doctor> = null;
     private locality:Nullable<Locality> = null;
 
@@ -174,9 +179,23 @@ export default class SelectAppointment extends Vue {
     updateWeek(){
         let today = new Date();
         //@ts-ignore
-        today = today.plusDays( 7 * parseInt(this.$route.params.weekNo) );
+        today = today.plusDays(7 * parseInt(this.$route.params.weekNo));
         this.monday = this.getMonday(today);
         this.updateSlots();
+    }
+
+    getTimeslots(date: Date): AppointmentTimeslot[] {
+        if (!this.weekSlots[date.getFullYear()]) return [];
+        if (!this.weekSlots[date.getFullYear()][date.getMonth()]) return [];
+        if (!this.weekSlots[date.getFullYear()][date.getMonth()][date.getDate()]) return [];
+
+        return this.weekSlots[date.getFullYear()][date.getMonth()][date.getDate()];
+    }
+
+    getToUrl(date: Date, timeslot: AppointmentTimeslot): string {
+        if (!this.doctor) return '';
+
+        return `patient/appointment/${this.doctor.id}/${date.getFullYear()}/${date.getMonth()}/${date.getDate()}/${timeslot.hour}/${timeslot.minute}`;
     }
 
     async updateSlots(){
@@ -198,7 +217,16 @@ export default class SelectAppointment extends Vue {
                             } as FullDate
                     } as DateRange); 
         if(!(slots instanceof APIError)){
-            this.weekSlots = slots;
+            this.weekSlots = {};
+
+            for (let weekSlot of slots) {
+                let date = DateTime.local(weekSlot.date.year, weekSlot.date.month, weekSlot.date.day);
+                if (!this.weekSlots[date.year]) this.weekSlots[date.year] = {};
+                if (!this.weekSlots[date.year][date.month]) this.weekSlots[date.year][date.month] = {};
+                if (!this.weekSlots[date.year][date.month][date.day]) this.weekSlots[date.year][date.month][date.day] = {};
+
+                this.weekSlots[date.year][date.month][date.day] = weekSlot.timeslots;
+            }
         }       
     }
 
@@ -293,14 +321,7 @@ export default class SelectAppointment extends Vue {
 
     //checks if theres at least 1 timeslot this week
     get noSlotsAvailable(){
-        if(this.weekSlots.length > 0){
-            for (const daySlot of this.weekSlots) {
-                if(daySlot.timeslots.length > 0){
-                    return false;
-                }
-            }
-        }
-        return true;
+        return Object.keys(this.weekSlots).length <= 0;
     }
 }
 </script>

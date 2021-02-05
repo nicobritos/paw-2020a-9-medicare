@@ -271,32 +271,27 @@ export default class MedicHome extends Vue {
     }
 
     async updateWeekAppointments(){
-        let today = this.monday;
+        let week = DateTime.fromJSDate(today).plus({ weeks: 1 }).toJSDate();
 
-        for (let i = 0; i < this.weekAppointments.length; i++) {
-            let tomorrow = DateTime.fromJSDate(today).plus({ days: 1 }).toJSDate();
-
-            let appointments = await this.getService().list(
-                {
-                    from: {
-                        year: today.getFullYear(),
-                        month: today.getMonth(),
-                        day: today.getDate()
-                    },
-                    to: {
-                        year: tomorrow.getFullYear(),
-                        month: tomorrow.getMonth(),
-                        day: tomorrow.getDate()
-                    }
+        let appointments = await this.getService().list(
+            {
+                from: {
+                    year: this.today.getFullYear(),
+                    month: this.today.getMonth(),
+                    day: this.today.getDate()
+                },
+                to: {
+                    year: week.getFullYear(),
+                    month: week.getMonth(),
+                    day: week.getDate()
                 }
-            );
-            if(!(appointments instanceof APIError)){
-                this.weekAppointments[i] = appointments;
-            }else{
-                this.weekAppointments[i] = [];
             }
+        );
 
-            today = tomorrow;
+        if (!(appointments instanceof APIError)) {
+            for (let appointment of appointments) {
+                this.weekAppointments[appointment.dateFrom.getDay()].push(appointment);
+            }
         }
     }
 

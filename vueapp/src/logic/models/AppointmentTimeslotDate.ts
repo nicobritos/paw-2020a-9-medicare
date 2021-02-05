@@ -1,7 +1,7 @@
 import {AppointmentTimeslot} from '~/logic/models/AppointmentTimeslot';
 
 export interface TimeslotDate {
-    hour: number;
+    day: number;
     month: number;
     year: number;
 }

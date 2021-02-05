@@ -19,7 +19,15 @@ export class AppointmentTimeSlotServiceImpl implements AppointmentTimeSlotServic
 
     public async list(doctorId: number, dateRange: DateRange): Promise<AppointmentTimeslotDate[] | APIError> {
         let response = await this.rest.get<AppointmentTimeslotDate[]>(AppointmentTimeSlotServiceImpl.PATH, {
-            accepts: AppointmentTimeSlotMIME.LIST
+            accepts: AppointmentTimeSlotMIME.LIST,
+            params: {
+                from_year: dateRange.from.year,
+                from_month: dateRange.from.month,
+                from_day: dateRange.from.day,
+                to_year: dateRange.to.year,
+                to_month: dateRange.to.month,
+                to_day: dateRange.to.day,
+            }
         });
         return response.response;
     }
