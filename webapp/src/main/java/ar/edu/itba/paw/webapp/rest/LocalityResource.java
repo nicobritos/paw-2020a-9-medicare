@@ -24,6 +24,7 @@ import javax.ws.rs.core.Response;
 import java.util.Collection;
 import java.util.Optional;
 
+@Path("/")
 @Component
 public class LocalityResource extends GenericResource {
     @Autowired
