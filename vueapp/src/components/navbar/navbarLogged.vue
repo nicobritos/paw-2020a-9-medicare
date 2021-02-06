@@ -24,7 +24,7 @@
         <img v-if="!user.verified" id="navbarUnverifiedUserImage" class="ml-2"
              src="https://fonts.gstatic.com/s/i/materialicons/account_circle/v4/24px.svg" alt="unverified user image">
         <RouterLink v-else-if="!isDoctor" :to='getUrl("patient/profile")'>
-            <div style="width: 2em;" class="d-flex flex-column justify-content-center">
+            <div style="width: 2em;height:2em;" class="d-flex flex-column justify-content-center">
                 <div class="profile-picture-container">
                     <img
                         id="navbarPatientUserImage"
@@ -37,7 +37,7 @@
             </div>
         </RouterLink>
         <RouterLink v-else :to='getUrl("doctor/profile")'>
-            <div style="width: 2em;" class="d-flex flex-column justify-content-center">
+            <div style="width: 2em;height:2em;" class="d-flex flex-column justify-content-center">
                 <div class="profile-picture-container">
                     <img
                         id="navbarDoctorUserImage"
