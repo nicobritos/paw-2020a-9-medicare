@@ -4,7 +4,13 @@ import {Appointment} from '~/logic/models/Appointment';
 import {DateRange} from '~/logic/models/utils/DateRange';
 
 export interface CreateAppointment {
-    date_from: Date;
+    date_from: {
+        year: number;
+        month: number;
+        day: number;
+        hour: number;
+        minute: number;
+    };
     message?: string;
     motive?: string;
     doctorId: number;

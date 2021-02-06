@@ -167,6 +167,7 @@ export default class SelectAppointment extends Vue {
         this.monday = this.getMonday(today.plusDays(7*parseInt(this.$route.params.weekNo)));
 
         if (this.disabledPrevious) {
+            // @ts-ignore
             this.monday = this.getMonday(today.plusDays(7));
             this.resetWeek();
         }

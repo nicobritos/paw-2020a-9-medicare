@@ -231,7 +231,13 @@ export default class RequestAppointment extends Vue {
         e.preventDefault();
         this.$container.get<AppointmentService>(TYPES.Services.AppointmentService)
             .create({
-                date_from:this.date!,
+                date_from: {
+                    year: this.date!.getFullYear(),
+                    month: this.date!.getMonth() + 1,
+                    day: this.date!.getDate(),
+                    hour: this.date!.getHours(),
+                    minute: this.date!.getMinutes(),
+                },
                 doctorId:this.doctor!.id,
                 motive:this.motive,
                 message:this.comment
