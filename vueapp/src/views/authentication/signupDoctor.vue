@@ -292,6 +292,7 @@ export default class SignupDoctor extends Vue {
 <style scoped>
 .signup-container {
     background-color: rgba(0, 196, 186, 0.205);
+    min-height: 100%;
 }
 
 .register-form {
