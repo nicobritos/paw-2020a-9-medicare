@@ -3,6 +3,7 @@ package ar.edu.itba.paw.webapp.rest;
 import ar.edu.itba.paw.interfaces.services.AppointmentService;
 import ar.edu.itba.paw.interfaces.services.DoctorService;
 import ar.edu.itba.paw.models.Doctor;
+import ar.edu.itba.paw.models.User;
 import ar.edu.itba.paw.webapp.media_types.AppointmentTimeSlotMIME;
 import ar.edu.itba.paw.webapp.media_types.ErrorMIME;
 import ar.edu.itba.paw.webapp.media_types.MIMEHelper;
@@ -11,19 +12,16 @@ import ar.edu.itba.paw.webapp.rest.utils.GenericResource;
 import org.joda.time.Days;
 import org.joda.time.LocalDateTime;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
 
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
+import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.Response;
 import java.util.Optional;
 
-@Path("/appointmentTimeSlots")
+@Path("/doctors/{doctorId}/appointmentTimeSlots")
 @Component
 public class AppointmentTimeSlotResource extends GenericResource {
     private static final long MAX_DAYS_APPOINTMENTS = 7;
@@ -35,10 +33,10 @@ public class AppointmentTimeSlotResource extends GenericResource {
 
     @GET
     @Produces({AppointmentTimeSlotMIME.GET_LIST, ErrorMIME.ERROR})
-    @PreAuthorize("!hasRole('UNVERIFIED')")
     public Response getCollection(
             @Context HttpHeaders httpheaders,
-            @QueryParam("doctor_id") Integer doctorId,
+            @Context HttpServletRequest request,
+            @PathParam("doctorId") Integer doctorId,
             @QueryParam("from_year") Integer fromYear,
             @QueryParam("from_month") Integer fromMonth,
             @QueryParam("from_day") Integer fromDay,
@@ -47,7 +45,11 @@ public class AppointmentTimeSlotResource extends GenericResource {
             @QueryParam("to_day") Integer toDay) {
         MIMEHelper.assertServerType(httpheaders, AppointmentTimeSlotMIME.GET_LIST);
 
-        if (fromYear == null || fromMonth == null || fromDay == null || toYear == null || toMonth == null || toDay == null)
+        Optional<User> user = this.getUser(request);
+        if (!user.isPresent() || !user.get().getVerified())
+            throw this.forbidden();
+
+        if (fromYear == null || fromMonth == null || fromDay == null || toYear == null || toMonth == null || toDay == null || doctorId == null)
             throw this.missingQueryParams();
 
         Optional<Doctor> doctorOptional = this.doctorService.findById(doctorId);
