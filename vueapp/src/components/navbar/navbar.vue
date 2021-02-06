@@ -42,7 +42,7 @@ export default class Navbar extends Vue {
 }
 </script>
 
-<style scoped>
+<style>
 html,
 body {
     height: 100%;

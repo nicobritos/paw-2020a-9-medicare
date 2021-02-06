@@ -1,22 +1,6 @@
 import Vue from 'vue';
 import VueRouter from 'vue-router';
 import store from "./vuex";
-import MedicList from '@/views/medicList';
-import Landing from '@/views/landing';
-import Unverified from '@/views/unverified';
-import Login from '@/views/authentication/login';
-import Signup from '@/views/authentication/signup';
-import SignupPatient from '@/views/authentication/signupPatient';
-import SignupDoctor from '@/views/authentication/signupDoctor';
-import MedicHome from '@/views/medic/home';
-import MedicProfile from '@/views/medic/profile';
-import PatientProfile from '@/views/patient/profile';
-import PatientHome from '@/views/patient/home';
-import SelectAppointment from '@/views/selectAppointment';
-import RequestAppointment from '@/views/patient/requestAppointment';
-import Error403 from "@/views/error/403";
-import Error404 from "@/views/error/404";
-import Error500 from "@/views/error/500";
 
 Vue.use(VueRouter);
 
@@ -101,19 +85,10 @@ function notAuthGuardOrPatient(to,from,next) {
 }
 
 const routes = [
-    // example
-    // {
-    //   path: '/about',
-    //   name: 'About',
-    //   // route level code-splitting
-    //   // this generates a separate chunk (about.[hash].js) for this route
-    //   // which is lazy-loaded when the route is visited.
-    //   component: () => import(/* webpackChunkName: "about" */ '../views/About.vue')
-    // }
     {
         path: '/mediclist/:page([1-9][0-9]*)',
         name: 'MedicList',
-        component: MedicList,
+        component: () => import('@/views/medicList.vue'),
         beforeEnter:notAuthGuardOrPatient
     }, 
     {
@@ -127,18 +102,18 @@ const routes = [
     {
         path: '/verify/:token',
         name: 'Unverified',
-        component: Unverified,
+        component: () => import('@/views/unverified.vue'),
         beforeEnter:unverifiedGuard
     },
     {
         path: '/',
         name: 'Landing',
-        component: Landing,
+        component: () => import('@/views/landing.vue'),
         beforeEnter:notAuthGuardOrPatient
     }, {
         path: '/login',
         name: 'Login',
-        component: Login,
+        component: () => import('@/views/authentication/login'),
         meta:{
             hideNav:true
         },
@@ -146,7 +121,7 @@ const routes = [
     }, {
         path: '/signup',
         name: 'Signup',
-        component: Signup,
+        component:()=>import("@/views/authentication/signup"),
         meta:{
             hideNav:true
         },
@@ -155,7 +130,7 @@ const routes = [
     {
         path: '/signup/doctor',
         name: 'SignupDoctor',
-        component: SignupDoctor,
+        component:()=>import("@/views/authentication/signupDoctor"),
         meta:{
             hideNav:true
         },
@@ -164,7 +139,7 @@ const routes = [
     {
         path: '/signup/patient',
         name: 'SignupPatient',
-        component: SignupPatient,
+        component:()=>import("@/views/authentication/signupPatient"),
         meta:{
             hideNav:true
         },
@@ -173,58 +148,58 @@ const routes = [
     {
         path: '/doctor/home',
         name: 'MedicHome',
-        component: MedicHome,
+        component:()=>import("@/views/medic/home"),
         beforeEnter:doctorGuard
     },
     {
         path: '/doctor/profile',
         name: 'MedicProfile',
-        component: MedicProfile,
+        component:()=>import('@/views/medic/profile'),
         beforeEnter:doctorGuard
     },
     {
         path: '/patient/profile',
         name: 'PatientProfile',
-        component: PatientProfile,
+        component:()=>import('@/views/patient/profile'),
         beforeEnter:patientGuard
     },
     {
         path: '/patient/home',
         name: 'PatientHome',
-        component: PatientHome,
+        component:()=>import('@/views/patient/home'),
         beforeEnter:patientGuard
     },
     {
         path: '/appointment/:memberId([0-9][0-9]*)/:weekNo(-?[0-9][0-9]*)',
         name: 'SelectAppointment',
-        component: SelectAppointment,
+        component:()=>import('@/views/selectAppointment'),
         beforeEnter:patientGuard
     },
     {
         path: '/patient/appointment/:doctorId([0-9][0-9]*)/:year([0-9][0-9]*)/:monthOfYear([0-9][0-9]*)/:dayOfMonth([0-9][0-9]*)/:hourOfDay([0-9][0-9]*)/:minuteOfHour([0-9][0-9]*)',
         name: 'RequestAppointment',
-        component: RequestAppointment,
+        component:()=>import('@/views/patient/requestAppointment'),
         beforeEnter:patientGuard
     },
     {
         path:"/404",
         name:"Error404",
-        component:Error404
+        component:()=>import("@/views/error/404")
     },
     {
         path:"/403",
         name:"Error403",
-        component:Error403
+        component:()=>import("@/views/error/403")
     },
     {
         path:"/500",
         name:"Error500",
-        component:Error500
+        component:()=>import("@/views/error/500")
     },
     {
         path:"*",
         name:"Error404Fallback",
-        component:Error404
+        component:()=>import("@/views/error/404")
     },
 ];
 
