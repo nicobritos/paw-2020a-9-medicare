@@ -149,12 +149,12 @@ export default class PatientHome extends Vue {
             {
                 from:{
                     year: today.getFullYear(),
-                    month: today.getMonth(),
+                    month: today.getMonth() + 1,
                     day: today.getDate()
                 },
                 to:{
                     year: twoWeeks.getFullYear(),
-                    month: twoWeeks.getMonth(),
+                    month: twoWeeks.getMonth() + 1,
                     day: twoWeeks.getDate()
                 }
             }

@@ -255,12 +255,12 @@ export default class MedicHome extends Vue {
             {
                 from: {
                     year: this.today.getFullYear(),
-                    month: this.today.getMonth(),
+                    month: this.today.getMonth() + 1,
                     day: this.today.getDate()
                 },
                 to: {
                     year: tomorrow.getFullYear(),
-                    month: tomorrow.getMonth(),
+                    month: tomorrow.getMonth() + 1,
                     day: tomorrow.getDate()
                 }
             }
@@ -277,12 +277,12 @@ export default class MedicHome extends Vue {
             {
                 from: {
                     year: this.today.getFullYear(),
-                    month: this.today.getMonth(),
+                    month: this.today.getMonth() + 1,
                     day: this.today.getDate()
                 },
                 to: {
                     year: week.getFullYear(),
-                    month: week.getMonth(),
+                    month: week.getMonth() + 1,
                     day: week.getDate()
                 }
             }
