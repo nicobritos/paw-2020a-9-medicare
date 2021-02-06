@@ -107,6 +107,7 @@ body {
     display: inline-block;
     position: relative;
     width: 100%;
+    height: 100%;
 }
 
 .profile-picture {
