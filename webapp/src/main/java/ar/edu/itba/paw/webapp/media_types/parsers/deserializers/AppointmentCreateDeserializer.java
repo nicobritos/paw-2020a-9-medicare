@@ -12,6 +12,19 @@ import javax.ws.rs.BadRequestException;
 
 public class AppointmentCreateDeserializer extends JsonDeserializer<Appointment> {
     public static final AppointmentCreateDeserializer instance = new AppointmentCreateDeserializer();
+    private static final int MIN_YEAR = (new LocalDateTime()).getYear() - 2;
+    private static final int MAX_YEAR = (new LocalDateTime()).getYear() + 2;
+
+    private static final int MIN_HOUR = 0;
+    private static final int MAX_HOUR = 23;
+    private static final int MIN_MINUTE = 0;
+    private static final int MAX_MINUTE = 59;
+
+    private static final int MIN_DAY = 1;
+    private static final int MAX_DAY = 31;
+    private static final int MIN_MONTH = 1;
+    private static final int MAX_MONTH = 12;
+
 
     private AppointmentCreateDeserializer() {}
 
@@ -26,21 +39,51 @@ public class AppointmentCreateDeserializer extends JsonDeserializer<Appointment>
 
         Appointment appointment = new Appointment();
 
-        node = jsonObject.get("date_from");
-        if (node == null) {
-            throw UnprocessableEntityException
-                    .build()
-                    .withReason(ErrorConstants.APPOINTMENT_CREATE_MISSING_DATE_FROM)
-                    .getError();
-        } else if (node.isNull() || !node.isLong()) {
-            throw UnprocessableEntityException
-                    .build()
-                    .withReason(ErrorConstants.APPOINTMENT_CREATE_INVALID_DATE_FROM)
-                    .getError();
-        }
+        ObjectNode dateNode = this.getObjectNonNull(
+                jsonObject,
+                "date_from",
+                ErrorConstants.APPOINTMENT_CREATE_MISSING_DATE_FROM,
+                ErrorConstants.APPOINTMENT_CREATE_INVALID_DATE_FROM
+        );
+
+        int year = this.getIntegerNonNull(
+                dateNode,
+                "year",
+                integer -> integer >= MIN_YEAR && integer <= MAX_YEAR,
+                ErrorConstants.APPOINTMENT_CREATE_INVALID_DATE_FROM,
+                ErrorConstants.APPOINTMENT_CREATE_INVALID_DATE_FROM
+        );
+        int month = this.getIntegerNonNull(
+                dateNode,
+                "month",
+                integer -> integer >= MIN_MONTH && integer <= MAX_MONTH,
+                ErrorConstants.APPOINTMENT_CREATE_INVALID_DATE_FROM,
+                ErrorConstants.APPOINTMENT_CREATE_INVALID_DATE_FROM
+        );
+        int day = this.getIntegerNonNull(
+                dateNode,
+                "day",
+                integer -> integer >= MIN_DAY && integer <= MAX_DAY,
+                ErrorConstants.APPOINTMENT_CREATE_INVALID_DATE_FROM,
+                ErrorConstants.APPOINTMENT_CREATE_INVALID_DATE_FROM
+        );
+        int hour = this.getIntegerNonNull(
+                dateNode,
+                "hour",
+                integer -> integer >= MIN_HOUR && integer <= MAX_HOUR,
+                ErrorConstants.APPOINTMENT_CREATE_INVALID_DATE_FROM,
+                ErrorConstants.APPOINTMENT_CREATE_INVALID_DATE_FROM
+        );
+        int minute = this.getIntegerNonNull(
+                dateNode,
+                "minute",
+                integer -> integer >= MIN_MINUTE && integer <= MAX_MINUTE,
+                ErrorConstants.APPOINTMENT_CREATE_INVALID_DATE_FROM,
+                ErrorConstants.APPOINTMENT_CREATE_INVALID_DATE_FROM
+        );
 
         try {
-            appointment.setFromDate(new LocalDateTime(node.asLong())); // epoch millis
+            appointment.setFromDate(new LocalDateTime(year, month, day, hour, minute));
         } catch (Exception e) {
             throw UnprocessableEntityException
                     .build()
