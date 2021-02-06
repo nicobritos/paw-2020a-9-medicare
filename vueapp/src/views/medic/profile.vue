@@ -378,6 +378,7 @@ export default class MedicProfile extends Vue {
 
     async removeSpecialty(id: number): Promise<void> {
         for (let doctor of this.doctors) {
+            let specialties = doctor.specialtyIds.map(value => value);
             let index = specialties.findIndex(value => value === id);
             if (index < 0) continue;
             specialties.splice(index, 1);
