@@ -15,7 +15,6 @@ import ar.edu.itba.paw.webapp.rest.utils.GenericResource;
 import org.joda.time.Days;
 import org.joda.time.LocalDateTime;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
 
 import javax.servlet.http.HttpServletRequest;
@@ -45,7 +44,6 @@ public class AppointmentResource extends GenericResource {
 
     @GET
     @Produces({AppointmentMIME.GET_LIST, ErrorMIME.ERROR})
-    @PreAuthorize("!hasRole('UNVERIFIED')")
     public Response getEntity(
             @Context HttpHeaders httpheaders,
             @Context HttpServletRequest request,
@@ -54,11 +52,13 @@ public class AppointmentResource extends GenericResource {
             @QueryParam("from_day") Integer fromDay,
             @QueryParam("to_year") Integer toYear,
             @QueryParam("to_month") Integer toMonth,
-            @QueryParam("to_day") Integer toDay) {
-
+            @QueryParam("to_day") Integer toDay)
+    {
         MIMEHelper.assertServerType(httpheaders, AppointmentMIME.GET_LIST);
 
         User user = this.assertUserUnauthorized(request);
+        if (!user.getVerified())
+            throw this.forbidden();
 
         Collection<Doctor> doctors;
         Collection<Patient> patients;
@@ -110,7 +110,6 @@ public class AppointmentResource extends GenericResource {
     @POST
     @Produces({AppointmentMIME.GET, ErrorMIME.ERROR})
     @Consumes(AppointmentMIME.CREATE)
-    @PreAuthorize("hasRole('PATIENT')")
     public Response createEntity(
             Appointment appointment,
             @Context HttpServletRequest request,
@@ -147,7 +146,6 @@ public class AppointmentResource extends GenericResource {
     @GET
     @Path("{id}")
     @Produces({AppointmentMIME.GET, ErrorMIME.ERROR})
-    @PreAuthorize("!hasRole('UNVERIFIED')")
     public Response getEntity(
             @Context HttpHeaders httpheaders,
             @Context HttpServletRequest request,
@@ -157,6 +155,8 @@ public class AppointmentResource extends GenericResource {
         if (id == null) throw this.missingPathParams();
 
         User user = this.assertUserUnauthorized(request);
+        if (!user.getVerified())
+            throw this.forbidden();
 
         Collection<Doctor> doctors;
         Collection<Patient> patients;
@@ -190,13 +190,15 @@ public class AppointmentResource extends GenericResource {
     @DELETE
     @Path("{id}")
     @Produces({MediaType.WILDCARD, ErrorMIME.ERROR})
-    @PreAuthorize("!hasRole('UNVERIFIED')")
     public Response deleteEntity(
             @Context HttpHeaders httpheaders,
             @Context HttpServletRequest request,
             @PathParam("id") Integer id) {
         if (id == null) throw this.missingPathParams();
         User user = this.assertUserUnauthorized(request);
+
+        if (!user.getVerified())
+            throw this.forbidden();
 
         Optional<Appointment> appointmentOptional = this.appointmentService.findById(id);
         if (!appointmentOptional.isPresent())

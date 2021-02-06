@@ -14,7 +14,6 @@ import ar.edu.itba.paw.webapp.rest.utils.GenericResource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
 
 import javax.servlet.http.HttpServletRequest;
@@ -40,7 +39,6 @@ public class WorkdayResource extends GenericResource {
 
     @GET
     @Produces({WorkdayMIME.GET_LIST, ErrorMIME.ERROR})
-    @PreAuthorize("hasRole('DOCTOR')")
     public Response getCollection(
             @Context HttpServletRequest request,
             @Context HttpHeaders httpheaders) {
@@ -58,7 +56,6 @@ public class WorkdayResource extends GenericResource {
     @POST
     @Produces({WorkdayMIME.GET_LIST, ErrorMIME.ERROR})
     @Consumes(WorkdayMIME.CREATE_LIST)
-    @PreAuthorize("hasRole('DOCTOR')")
     public Response createEntities(
             Collection<Workday> workdays,
             @Context HttpServletRequest request,
@@ -97,7 +94,6 @@ public class WorkdayResource extends GenericResource {
     @GET
     @Path("{id}")
     @Produces({WorkdayMIME.GET, ErrorMIME.ERROR})
-    @PreAuthorize("hasRole('DOCTOR')")
     public Response getEntity(
             @Context HttpHeaders httpheaders,
             @Context HttpServletRequest request,
@@ -131,7 +127,6 @@ public class WorkdayResource extends GenericResource {
     @DELETE
     @Path("{id}")
     @Produces({MediaType.WILDCARD, ErrorMIME.ERROR})
-    @PreAuthorize("hasRole('DOCTOR')")
     public Response deleteEntity(
             @Context HttpHeaders httpheaders,
             @Context HttpServletRequest request,

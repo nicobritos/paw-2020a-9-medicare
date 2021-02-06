@@ -16,7 +16,7 @@ const DoctorMIME = {
 
 @injectable()
 export class DoctorServiceImpl implements DoctorService {
-    private static PATH = 'doctors';
+    public static PATH = 'doctors';
 
     @inject(TYPES.Repositories.RestRepository)
     private rest: RestRepository;
