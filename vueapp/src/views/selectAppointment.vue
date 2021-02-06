@@ -209,7 +209,7 @@ export default class SelectAppointment extends Vue {
     getToUrl(date: Date, timeslot: AppointmentTimeslot): string {
         if (!this.doctor) return '';
 
-        return `patient/appointment/${this.doctor.id}/${date.getFullYear()}/${date.getMonth() + 1}/${date.getDate()}/${timeslot.hour}/${timeslot.minute}`;
+        return `/patient/appointment/${this.doctor.id}/${date.getFullYear()}/${date.getMonth() + 1}/${date.getDate()}/${timeslot.hour}/${timeslot.minute}`;
     }
 
     timeWithZero(t: number): string {
