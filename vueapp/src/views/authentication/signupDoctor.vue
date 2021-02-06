@@ -147,13 +147,15 @@ import {Component, Vue, Watch} from 'vue-property-decorator';
 
 import {createPath, ID, isValidEmail, Nullable} from '~/logic/Utils';
 import {userActionTypes} from '~/store/types/user.types';
-import { Locality } from '~/logic/models/Locality';
-import { State } from 'vuex-class';
+import {Locality} from '~/logic/models/Locality';
+import {State} from 'vuex-class';
 import {countryActionTypes} from '~/store/types/countries.types';
 import {provinceActionTypes} from '~/store/types/provinces.types';
-import {localityActionTypes} from '~/store/types/localities.types';
 import {Country} from '~/logic/models/Country';
 import {Province} from '~/logic/models/Province';
+import {LocalityService} from '~/logic/interfaces/services/LocalityService';
+import TYPES from '~/logic/types';
+import {APIError} from '~/logic/models/APIError';
 
 @Component
 export default class SignupDoctor extends Vue {
@@ -167,8 +169,8 @@ export default class SignupDoctor extends Vue {
     private readonly countries: Country[];
     @State(state => state.provinces.provinces)
     private readonly provinces: Province[];
-    @State(state => state.localities.localities)
-    private readonly localities: Locality[];
+
+    private localities: Locality[] = [];
 
     private readonly minFirstnameLength = 2;
     private readonly maxFirstnameLength = 20;
@@ -203,13 +205,17 @@ export default class SignupDoctor extends Vue {
     }
 
     @Watch('province', {immediate: true})
-    loadLocalities(): void {
+    async loadLocalities(): Promise<void> {
         if (!this.province) return;
 
-        this.$store.dispatch('localities/loadLocalities', localityActionTypes.loadLocalities({
-            countryId: this.country!,
-            provinceId: this.province!
-        }));
+        let localities = await this.$container.get<LocalityService>(TYPES.Services.LocalityService)
+            .list({
+                provinceId: this.province!,
+                countryId: this.country!
+            });
+        if (!(localities instanceof APIError)) {
+            this.localities = localities || [];
+        }
     }
 
     toggleShowPassword(): void {
