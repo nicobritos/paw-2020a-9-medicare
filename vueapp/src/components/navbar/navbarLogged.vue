@@ -29,8 +29,7 @@
                     <img
                         id="navbarPatientUserImage"
                         class="profile-picture rounded-circle"
-                        :src="getApiUrl('/users/' + user.id + '/picture')"
-                        :srcset="defaultProfilePic"
+                        :src="getApiUrl('/users/' + user.id + '/picture') || defaultProfilePic"
                         alt="profile pic"
                     />
                 </div>
@@ -42,8 +41,7 @@
                     <img
                         id="navbarDoctorUserImage"
                         class="profile-picture rounded-circle"
-                        :src="getApiUrl('/users/' + user.id + '/picture')"
-                        :srcset="defaultProfilePic"
+                        :src="getApiUrl('/users/' + user.id + '/picture') || defaultProfilePic"
                         alt="profile pic"
                     />
                 </div>
