@@ -136,9 +136,6 @@ public class DoctorResource extends GenericResource {
         if (!this.isDoctor()) throw this.forbidden();
         if (id == null) throw this.missingPathParams();
         if (doctor == null) throw this.missingBodyParams();
-        if (doctor.getDoctorSpecialties().isEmpty()) {
-            throw this.unprocessableEntity(ErrorConstants.DOCTOR_UPDATE_EMPTY_SPECIALTIES);
-        }
 
         Optional<Doctor> doctorOptional = this.doctorService.findById(id);
         if (!doctorOptional.isPresent()) throw this.notFound();
