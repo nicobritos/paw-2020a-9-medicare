@@ -1,7 +1,11 @@
 <template>
   <span id="app">
-    <Navbar v-if="!hideNav"/>
-    <RouterView/>
+    <transition name="slide" mode="out-in">
+        <Navbar v-if="!hideNav"/>
+    </transition>
+    <transition name="slide" mode="out-in">
+        <RouterView/>
+    </transition>
   </span>
 </template>
 
@@ -50,4 +54,16 @@ export default class App extends Vue {
 </script>
 
 <style>
+.slide-enter-active,
+.slide-leave-active{
+    transition: opacity .5s,transform .5s;
+}
+.slide-enter{
+    opacity: 0;
+    transform: translateX(50%);
+}
+.slide-leave-to{
+    opacity: 0;
+    transform: translateX(-50%);
+}
 </style>
