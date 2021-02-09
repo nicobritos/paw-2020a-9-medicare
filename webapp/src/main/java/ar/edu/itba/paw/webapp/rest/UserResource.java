@@ -9,7 +9,7 @@ import ar.edu.itba.paw.webapp.models.*;
 import ar.edu.itba.paw.webapp.models.error.ErrorConstants;
 import ar.edu.itba.paw.webapp.rest.utils.GenericAuthenticationResource;
 import org.apache.commons.io.IOUtils;
-import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
+import org.glassfish.jersey.media.multipart.FormDataBodyPart;
 import org.glassfish.jersey.media.multipart.FormDataParam;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -170,19 +170,12 @@ public class UserResource extends GenericAuthenticationResource {
             @Context HttpServletRequest request,
             @Context HttpServletResponse response,
             @FormDataParam("picture") InputStream pictureFile,
-            @FormDataParam("picture") FormDataContentDisposition pictureDetails,
+            @FormDataParam("picture") FormDataBodyPart pictureDetails,
             @PathParam("id") Integer id) {
 
         if (id == null) throw this.missingPathParams();
 
         User user = this.assertUserUnauthorized(request);
-
-        String token = this.getRefreshTokenString(request);
-        if (token == null) throw this.forbidden();
-
-        Optional<RefreshToken> refreshTokenOptional = this.refreshTokenService.findByToken(token);
-        if (!refreshTokenOptional.isPresent())
-            throw this.forbidden();
 
         Optional<User> userPath = this.userService.findById(id);
         if (!userPath.isPresent())
@@ -190,15 +183,8 @@ public class UserResource extends GenericAuthenticationResource {
         if (!userPath.get().getId().equals(user.getId()))
             throw this.forbidden();
 
-        if (!pictureDetails.getType().toLowerCase().startsWith("image"))
+        if (!pictureDetails.getMediaType().toString().toLowerCase().startsWith("image"))
             throw this.error(Status.BAD_REQUEST).withReason(ErrorConstants.INVALID_IMAGE_TYPE).getError();
-
-        if (pictureDetails.getSize() > Constants.MAX_PROFILE_PICTURE_SIZE) {
-            throw UnprocessableEntityException
-                    .build()
-                    .withReason(ErrorConstants.IMAGE_TOO_BIG)
-                    .getError();
-        }
 
         Picture picture = new Picture();
         try {
@@ -206,17 +192,18 @@ public class UserResource extends GenericAuthenticationResource {
         } catch (IOException e) {
             throw this.error(Status.BAD_REQUEST).withReason(ErrorConstants.INVALID_IMAGE_TYPE).getError();
         }
-        picture.setSize(pictureDetails.getSize());
+        picture.setSize((long) picture.getData().length);
         picture.setName(pictureDetails.getName());
-        picture.setMimeType(pictureDetails.getType());
+        picture.setMimeType(pictureDetails.getMediaType().toString());
+
+        if (picture.getSize() > Constants.MAX_PROFILE_PICTURE_SIZE) {
+            throw UnprocessableEntityException
+                    .build()
+                    .withReason(ErrorConstants.IMAGE_TOO_BIG)
+                    .getError();
+        }
 
         user = this.pictureService.changeProfilePic(user, picture);
-
-        UserCredentials userCredentials = new UserCredentials();
-        userCredentials.setUsername(user.getEmail());
-        userCredentials.setPassword(token);
-
-        this.createJWTCookies(userCredentials, user, response, token, LOGGER);
 
         return Response
                 .created(this.joinPaths(this.baseUrl, this.apiPath, "/users/" + user.getId().toString() + "/picture"))

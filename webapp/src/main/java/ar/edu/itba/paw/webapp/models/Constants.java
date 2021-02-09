@@ -20,5 +20,5 @@ public abstract class Constants {
     public static final int UNPROCESSABLE_ENTITY_CODE = 422;
     public static final String UNPROCESSABLE_ENTITY_DESCRIPTION = "Validation failed";
 
-    public static final long MAX_PROFILE_PICTURE_SIZE = 1024 * 1024; // 1 MB
+    public static final long MAX_PROFILE_PICTURE_SIZE = 5 * 1024 * 1024; // 5 MB
 }
