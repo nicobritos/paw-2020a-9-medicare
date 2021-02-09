@@ -237,13 +237,16 @@ export default class MedicHome extends Vue {
     }
 
     selectDay(dow: number): void {
-        if (this.selectedDay.getDay() === dow) return;
+        // 0->6 with 0=sunday to 1-7 where 7=sunday
+        let selectedDow = this.selectedDay.getDay();
+        selectedDow = selectedDow == 0 ? 7 : selectedDow;
+        if (selectedDow === dow) return;
 
         let selectedDay = DateTime.fromJSDate(this.selectedDay);
-        if (this.selectedDay.getDay() < dow) {
-            selectedDay = selectedDay.plus({ days: dow - this.selectedDay.getDay() });
+        if (selectedDow < dow) {
+            selectedDay = selectedDay.plus({ days: dow - selectedDow });
         } else {
-            selectedDay = selectedDay.plus({ days: this.selectedDay.getDay() + dow });
+            selectedDay = selectedDay.minus({ days: selectedDow - dow });
         }
 
         this.selectedDay = selectedDay.toJSDate();
