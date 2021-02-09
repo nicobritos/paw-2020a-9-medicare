@@ -71,7 +71,7 @@
                                             <div style="margin-top: 100%;"></div>
                                             <img
                                                 class="profile-picture rounded-circle"
-                                                :src='getApiUrl("users/" + member.user.id + "/picture")'
+                                                :src='member.user.hasPicture ? getApiUrl("users/" + member.user.id + "/picture") || defaultProfilePic : defaultProfilePic'
                                                 alt="profile pic"
                                             />
                                         </div>
@@ -153,13 +153,15 @@ import TYPES from '~/logic/types';
 import {Pagination} from '~/logic/models/utils/Pagination';
 import {Doctor} from '~/logic/models/Doctor';
 import {APIError} from '~/logic/models/APIError';
+import defaultProfilePic from "@/assets/defaultProfilePic.svg";
 
 type I18NMessages = 'NoResultsFound' | 'SearchResults1' | 'SearchResults2More';
 
 @Component
 export default class MedicList extends Vue {
     private static readonly PER_PAGE = 10;
-    
+    private readonly defaultProfilePic = defaultProfilePic;
+
     @State(state => state.localities.localities)
     private readonly localities: Locality[];
     @State(state => state.doctorSpecialties.doctorSpecialties)

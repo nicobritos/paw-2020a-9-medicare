@@ -139,9 +139,8 @@ public class UserServiceImpl extends GenericSearchableServiceImpl<UserDao, User,
         if (user.getPhone() != null) {
             userToSave.setPhone(user.getPhone());
         }
-        // TODO: Check
         if (user.getVerificationToken() != null) {
-            userToSave.setPhone(user.getPhone());
+            userToSave.setVerificationToken(user.getVerificationToken());
         }
         if (user.getEmail() != null) {
             userToSave.setEmail(user.getEmail());
