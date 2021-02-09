@@ -377,34 +377,56 @@ export default class MedicProfile extends Vue {
     }
 
     async removeSpecialty(id: number): Promise<void> {
-        for (let doctor of this.doctors) {
-            let specialties = doctor.specialtyIds.map(value => value);
-            let index = specialties.findIndex(value => value === id);
-            if (index < 0) continue;
-            specialties.splice(index, 1);
-
-            Vue.set(this.beingSDeleted,id,true);
-            await this.$store.dispatch('doctors/updateDoctor', doctorActionTypes.updateDoctor({
-                id: doctor.id,
-                doctor: {
-                    email: doctor.email,
-                    phone: doctor.phone,
-                    specialtyIds: specialties
-                }
-            }));
-            Vue.delete(this.beingSDeleted,id);
+        let shouldDelete = await this.$bvModal.msgBoxConfirm(
+            this.$t("DoYouWantToContinue").toString(),
+            {
+                cancelTitle:"No",
+                okTitle:"Yes",
+                okVariant:"danger",
+                title:this.$t("YouAreAboutToDeleteASpecialty").toString()
+            }
+        )
+        if(shouldDelete){
+            for (let doctor of this.doctors) {
+                let specialties = doctor.specialtyIds.map(value => value);
+                let index = specialties.findIndex(value => value === id);
+                if (index < 0) continue;
+                specialties.splice(index, 1);
+    
+                Vue.set(this.beingSDeleted,id,true);
+                await this.$store.dispatch('doctors/updateDoctor', doctorActionTypes.updateDoctor({
+                    id: doctor.id,
+                    doctor: {
+                        email: doctor.email,
+                        phone: doctor.phone,
+                        specialtyIds: specialties
+                    }
+                }));
+                Vue.delete(this.beingSDeleted,id);
+            }
         }
     }
 
     async removeWorkday(id: number){
-        let index = this.workdays.findIndex(value => value.id == id);
-        if (index < 0) return;
-
-        Vue.set(this.beingWDDeleted,id,true);
-        if (await this.getWorkdayService().delete(id)) {
-            this.workdays.splice(index, 1);
+        let shouldDelete = await this.$bvModal.msgBoxConfirm(
+                this.$t("DoYouWantToContinue").toString(),
+                {
+                    cancelTitle:"No",
+                    okTitle:"Yes",
+                    okVariant:"danger",
+                    title:this.$t("YouAreAboutToCancelAWorkday").toString()
+                }
+            )
+        if(shouldDelete){
+            let index = this.workdays.findIndex(value => value.id == id);
+            if (index < 0) return;
+    
+            Vue.set(this.beingWDDeleted,id,true);
+            if (await this.getWorkdayService().delete(id)) {
+                this.workdays.splice(index, 1);
+            }
+            Vue.delete(this.beingWDDeleted,id);
         }
-        Vue.delete(this.beingWDDeleted,id);
     }
 
     changeProfilePic(e:InputEvent){
