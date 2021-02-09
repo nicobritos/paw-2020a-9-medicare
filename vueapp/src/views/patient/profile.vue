@@ -9,7 +9,7 @@
                             <img
                                 id="profilePic"
                                 class="profile-picture rounded-circle"
-                                :src="getApiUrl('/users/' + user.id + '/picture') || defaultProfilePic"
+                                :src="profilePicUrl"
                                 alt="profile pic"
                             />
                         </div>
@@ -141,6 +141,7 @@ export default class PatientProfile extends Vue {
 
     private passwordVis = false;
     private repeatPasswordVis = false;
+    private timestamp = new Date();
 
     @State(state => state.auth.user)
     private readonly user: User;
@@ -156,6 +157,10 @@ export default class PatientProfile extends Vue {
     enableEmailMod():void{this.emailModEnabled=true};
     private passwordModEnabled = false;
     enablePasswordMod():void{this.passwordModEnabled=true};
+
+    get profilePicUrl(): string {
+        return this.getApiUrl(`/users/${this.user.id}/picture?ts=${this.timestamp.getTime()}`) || defaultProfilePic;
+    }
 
     mounted(){
         let user = this.$store.state.auth.user;
@@ -182,11 +187,14 @@ export default class PatientProfile extends Vue {
             this.showErrorToast('Error');
             return;
         }
+        let formData = new FormData();
+        formData.append('picture', file);
         fetch(this.getApiUrl(`/users/${this.user.id}/picture`), {
             method: "POST",
-            body: file
+            body: formData
         }).then((r) => {
             if (r.ok) {
+                this.timestamp = new Date();
                 //TODO:show ok toast
             }
         }).catch((e) => {

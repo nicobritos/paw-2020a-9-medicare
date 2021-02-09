@@ -9,7 +9,7 @@
                             <img
                                 id="profilePic"
                                 class="profile-picture rounded-circle"
-                                :src="getApiUrl('/users/' + user.id + '/picture') || defaultProfilePic"
+                                :src="profilePicUrl"
                                 alt="profile pics"
                             />
                         </div>
@@ -252,11 +252,16 @@ export default class MedicProfile extends Vue {
 
     private showAddSpecialties = false;
     private showAddWorkday = false;
+    private timestamp = new Date();
     
     private showModal = false;
     private modtitle:string = "";
     private modbody:string = "";
     private modOnConfirm:Function = ()=>{};
+
+    get profilePicUrl(): string {
+        return this.getApiUrl(`/users/${this.user.id}/picture?ts=${this.timestamp.getTime()}`) || defaultProfilePic;
+    }
 
     mounted(){
         let user = this.$store.state.auth.user;
@@ -440,11 +445,14 @@ export default class MedicProfile extends Vue {
             //TODO: toast error
             return;
         }
+        let formData = new FormData();
+        formData.append('picture', file);
         fetch(this.getApiUrl(`/users/${this.user.id}/picture`), {
             method: "POST",
-            body: file
+            body: formData
         }).then((r) => {
             if (r.ok) {
+                this.timestamp = new Date();
                 //TODO:show ok toast
             }
         }).catch((e) => {
