@@ -14,9 +14,12 @@
                             />
                         </div>
                     </div>
-                    <div @click="triggerChangePPInput" class="picture-overlay d-flex flex-column align-items-center justify-content-center pb-3">
+                    <div v-if="!uploadingProfilePic" @click="triggerChangePPInput" class="picture-overlay d-flex flex-column align-items-center justify-content-center pb-3">
                         <input ref="PPInput" @change="changeProfilePic" id="profile-picture-input" style="display: none;" type="file" accept="image/*">
                         <b-icon class="edit-pencil-icon" icon="pencil"/>
+                    </div>
+                    <div v-else class="spinner-picture-overlay d-flex flex-column align-items-center justify-content-center pb-3">
+                        <b-spinner variant="success"></b-spinner>
                     </div>
                 </div>
             </div>
@@ -141,6 +144,8 @@ export default class PatientProfile extends Vue {
 
     private passwordVis = false;
     private repeatPasswordVis = false;
+
+    private uploadingProfilePic = false;
 
     @State(state => state.auth.user)
     private readonly user: User;
@@ -409,6 +414,12 @@ html, body {
     font-size: 3rem;
     color: #ffffff;
     cursor: pointer;
+}
+
+.picture-container .spinner-picture-overlay {
+    z-index: 1;
+    width: 100%;
+    height: 100%;
 }
 
 #profilePic {
