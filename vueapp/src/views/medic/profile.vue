@@ -452,6 +452,7 @@ export default class MedicProfile extends Vue {
         }
         let formData = new FormData();
         formData.append('picture', file);
+        this.uploadingProfilePic = true;
         fetch(this.getApiUrl(`/users/${this.user.id}/picture`), {
             method: "POST",
             body: formData
@@ -462,6 +463,8 @@ export default class MedicProfile extends Vue {
             }
         }).catch((e) => {
             //TODO:show error message
+        }).finally(()=>{
+            this.uploadingProfilePic = false;
         });
     }
 
