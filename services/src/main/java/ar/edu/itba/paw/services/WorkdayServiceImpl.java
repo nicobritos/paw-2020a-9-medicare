@@ -8,8 +8,10 @@ import ar.edu.itba.paw.models.*;
 import ar.edu.itba.paw.services.generics.GenericServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -40,8 +42,24 @@ public class WorkdayServiceImpl extends GenericServiceImpl<WorkdayDao, Workday, 
         return this.repository.doctorWorks(doctor, timeSlot);
     }
 
+    @Transactional
     @Override
     public Collection<Workday> create(Collection<Workday> workdays) {
+        if(workdays.isEmpty()){
+            return Collections.emptyList();
+        }
+        Doctor doctor = workdays.stream().findAny().get().getDoctor();
+        List<Workday> workdayList = findByDoctor(doctor);
+        for (Workday newWorkday : workdays) {
+            for (Workday workday : workdayList) {
+                if (workday.getDay().equals(newWorkday.getDay())){
+                    if ((newWorkday.getStartTime().isAfter(workday.getStartTime()) && newWorkday.getStartTime().isBefore(workday.getEndTime()))
+                            || (newWorkday.getEndTime().isBefore(workday.getEndTime()) && newWorkday.getEndTime().isAfter(workday.getStartTime()))){
+                        throw new MediCareException("Workday date overlaps with an existing one");
+                    }
+                }
+            }
+        }
         return this.repository.create(workdays);
     }
 

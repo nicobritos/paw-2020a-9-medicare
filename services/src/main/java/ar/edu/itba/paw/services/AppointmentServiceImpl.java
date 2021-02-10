@@ -130,7 +130,7 @@ public class AppointmentServiceImpl extends GenericServiceImpl<AppointmentDao, A
         for (Appointment appt : appointments) {
             if (appt.getFromDate().isAfter(appt.getFromDate()) && appt.getFromDate().isBefore(appt.getToDate())
                     || (appt.getToDate().isAfter(appt.getFromDate()) && appt.getToDate().isBefore(appt.getToDate()))) {
-                throw new MediCareException("Workday date overlaps with an existing one");
+                throw new MediCareException("Appointment date overlaps with an existing one");
             }
         }
         Appointment appt = this.appointmentRepository.create(appointment);
