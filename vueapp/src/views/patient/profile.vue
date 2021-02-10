@@ -126,13 +126,13 @@
 import noeye from '@/assets/noeye.svg';
 import eye from '@/assets/eye.svg';
 import editPencil from '@/assets/editPencil.svg';
-import {Component, Vue} from 'vue-property-decorator';
+import {Component, Vue, Watch} from 'vue-property-decorator';
 import {User} from '~/logic/models/User';
 
-import {createApiPath, isValidEmail} from '~/logic/Utils';
+import {createApiPath, isValidEmail, Nullable} from '~/logic/Utils';
 import defaultProfilePic from "@/assets/defaultProfilePic.svg";
 import { State } from 'vuex-class';
-import {userActionTypes} from '~/store/types/user.types';
+import {userActionTypes, userMutationTypes} from '~/store/types/user.types';
 import { UpdateUser } from '~/logic/interfaces/services/UserService';
 
 @Component
@@ -144,10 +144,11 @@ export default class PatientProfile extends Vue {
 
     private passwordVis = false;
     private repeatPasswordVis = false;
-    private timestamp = new Date();
 
     private uploadingProfilePic = false;
 
+    @State(state => state.users.profilePictureTimestamp)
+    private timestamp: Nullable<number>;
     @State(state => state.auth.user)
     private readonly user: User;
 
@@ -164,7 +165,22 @@ export default class PatientProfile extends Vue {
     enablePasswordMod():void{this.passwordModEnabled=true};
 
     get profilePicUrl(): string {
-        return this.getApiUrl(`/users/${this.user.id}/picture?ts=${this.timestamp.getTime()}`) || defaultProfilePic;
+        let ts;
+        if (this.timestamp)
+            ts = `?ts=${this.timestamp}`;
+        else
+            ts = '';
+
+        return this.getApiUrl(`/users/${this.user.id}/picture${ts}`) || defaultProfilePic;
+    }
+
+    @Watch('user', {immediate: true})
+    guardPage(): void {
+        if (!this.user) {
+            this.$router.push({
+                name: 'Landing',
+            }).catch(() => {});
+        }
     }
 
     mounted(){
@@ -200,7 +216,7 @@ export default class PatientProfile extends Vue {
             body: formData
         }).then((r) => {
             if (r.ok) {
-                this.timestamp = new Date();
+                this.$store.commit('users/updateProfilePictureTimestamp', userMutationTypes.updateProfilePictureTimestamp());
                 //TODO:show ok toast
             }
         }).catch((e) => {

@@ -1,11 +1,11 @@
 import container from '~/plugins/inversify.config';
 import TYPES from '~/logic/types';
-import {DefineActionTree} from '~/store/utils/helper.types';
+import {DefineActionTree, DefineMutationTree} from '~/store/utils/helper.types';
 import {RootState} from '~/store/types/root.types';
 import {Nullable} from '~/logic/Utils';
 import {Module} from 'vuex';
 import {UserService} from '~/logic/interfaces/services/UserService';
-import {UserActionReturnTypes, UserActions, UserState} from '~/store/types/user.types';
+import {UserActionReturnTypes, UserActions, UserMutations, UserState} from '~/store/types/user.types';
 import {User} from '~/logic/models/User';
 import {authMutationTypes} from '~/store/types/auth.types';
 import {APIError} from '~/logic/models/APIError';
@@ -16,6 +16,7 @@ function getService(): UserService {
 }
 
 const state = (): UserState => ({
+    profilePictureTimestamp: null
 });
 
 const actions: DefineActionTree<UserActions, UserState, RootState, UserActionReturnTypes> = {
@@ -109,9 +110,16 @@ const actions: DefineActionTree<UserActions, UserState, RootState, UserActionRet
     }
 };
 
+const mutations: DefineMutationTree<UserMutations, UserState> = {
+    updateProfilePictureTimestamp(state) {
+        state.profilePictureTimestamp = new Date().getTime();
+    }
+};
+
 const store: Module<any, any> = {
     namespaced: true,
     actions,
+    mutations,
     state
 };
 

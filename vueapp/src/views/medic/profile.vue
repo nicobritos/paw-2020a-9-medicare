@@ -208,7 +208,7 @@ import {APIError} from '~/logic/models/APIError';
 import { doctorSpecialtyActionTypes } from '~/store/types/doctorSpecialties.types';
 import { DoctorSpecialty } from '~/logic/models/DoctorSpecialty';
 import { Workday } from '~/logic/models/Workday';
-import {userActionTypes} from '~/store/types/user.types';
+import {userActionTypes, userMutationTypes} from '~/store/types/user.types';
 import { UpdateUser } from '~/logic/interfaces/services/UserService';
 
 @Component({
@@ -227,6 +227,8 @@ export default class MedicProfile extends Vue {
 
     private uploadingProfilePic = false;
 
+    @State(state => state.users.profilePictureTimestamp)
+    private timestamp: Nullable<number>;
     @State(state => state.auth.user)
     private readonly user: User;
     @State(state => state.auth.doctors)
@@ -257,15 +259,20 @@ export default class MedicProfile extends Vue {
 
     private showAddSpecialties = false;
     private showAddWorkday = false;
-    private timestamp = new Date();
-    
+
     private showModal = false;
     private modtitle:string = "";
     private modbody:string = "";
     private modOnConfirm:Function = ()=>{};
 
     get profilePicUrl(): string {
-        return this.getApiUrl(`/users/${this.user.id}/picture?ts=${this.timestamp.getTime()}`) || defaultProfilePic;
+        let ts;
+        if (this.timestamp)
+            ts = `?ts=${this.timestamp}`;
+        else
+            ts = '';
+
+        return this.getApiUrl(`/users/${this.user.id}/picture${ts}`) || defaultProfilePic;
     }
 
     mounted(){
@@ -277,6 +284,15 @@ export default class MedicProfile extends Vue {
         this.$store.dispatch("doctorSpecialties/loadDoctorSpecialties",doctorSpecialtyActionTypes.loadDoctorSpecialties())
         this.setSpecialties()
         this.setWorkdays();
+    }
+
+    @Watch('user', {immediate: true})
+    guardPage(): void {
+        if (!this.user) {
+            this.$router.push({
+                name: 'Landing',
+            }).catch(() => {});
+        }
     }
 
     @Watch("allSpecialties", {immediate: true, deep: true})
@@ -458,7 +474,7 @@ export default class MedicProfile extends Vue {
             body: formData
         }).then((r) => {
             if (r.ok) {
-                this.timestamp = new Date();
+                this.$store.commit('users/updateProfilePictureTimestamp', userMutationTypes.updateProfilePictureTimestamp());
                 //TODO:show ok toast
             }
         }).catch((e) => {

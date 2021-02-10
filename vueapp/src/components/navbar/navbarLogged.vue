@@ -3,7 +3,7 @@
         <RouterLink v-if="user.verified" :to="getUrl('/patient/home')" class="header-a-element nav-link mx-3">
             {{ $t('MyAppointments') }}
         </RouterLink>
-        <RouterLink v-if="user.verified && !isDoctor" :to='getUrl("mediclist/1")'
+        <RouterLink v-if="!isDoctor" :to='getUrl("mediclist/1")'
                      class="header-a-element nav-link mx-3">{{ $t('SearchMedics') }}
         </RouterLink>
 
@@ -29,7 +29,7 @@
                     <img
                         id="navbarPatientUserImage"
                         class="profile-picture rounded-circle"
-                        :src="getApiUrl('/users/' + user.id + '/picture') || defaultProfilePic"
+                        :src="profilePicUrl"
                         alt="profile pic"
                     />
                 </div>
@@ -41,7 +41,7 @@
                     <img
                         id="navbarDoctorUserImage"
                         class="profile-picture rounded-circle"
-                        :src="getApiUrl('/users/' + user.id + '/picture') || defaultProfilePic"
+                        :src="profilePicUrl"
                         alt="profile pic"
                     />
                 </div>
@@ -56,15 +56,27 @@ import {State} from 'vuex-class';
 import {User} from '~/logic/models/User';
 import defaultProfilePic from "@/assets/defaultProfilePic.svg";
 
-import {createApiPath, createPath} from '~/logic/Utils';
+import {createApiPath, createPath, Nullable} from '~/logic/Utils';
 
 @Component
 export default class NavbarLogged extends Vue {
+    @State(state => state.users.profilePictureTimestamp)
+    private timestamp: Nullable<number>;
     @State(state => state.auth.user)
     private readonly user: User;
     @State(state => state.auth.isDoctor)
     private readonly isDoctor: boolean;
     private readonly defaultProfilePic = defaultProfilePic;
+
+    get profilePicUrl(): string {
+        let ts;
+        if (this.timestamp)
+            ts = `?ts=${this.timestamp}`;
+        else
+            ts = '';
+
+        return this.getApiUrl(`/users/${this.user.id}/picture${ts}`) || defaultProfilePic;
+    }
 
     getApiUrl(url: string):string{
         return createApiPath(url);
