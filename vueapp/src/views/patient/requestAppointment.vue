@@ -242,7 +242,7 @@ export default class RequestAppointment extends Vue {
             .create({
                 date_from: {
                     year: this.date!.getFullYear(),
-                    month: this.date!.getMonth() + 1,
+                    month: this.date!.getMonth(),
                     day: this.date!.getDate(),
                     hour: this.date!.getHours(),
                     minute: this.date!.getMinutes(),
