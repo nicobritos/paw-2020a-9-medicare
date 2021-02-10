@@ -14,25 +14,23 @@
                     <div class="row mt-4">
                         <select class="select-css form-control w-100" type="text" name="specialties"
                                 id="selEspecialidad" v-model="selectedSpecialty">
-                            <option value="-1" disabled :selected="searchedSpecialties.length == 0">
+                            <option value="-1" disabled :selected="searchedSpecialties.length === 0">
                                 {{ $t('Specialty') }}
                             </option>
                             <option :value="null">{{ $t('Any') }}</option>
                             <option v-for="specialty in specialties" :key="specialty.id"
-                                    :value="specialty.id"
-                                    :selected="searchedSpecialties.some(v => specialty.id == v.id)">
+                                    :value="specialty.id">
                                 {{ specialty.name }}
                             </option>
                         </select>
                     </div>
                     <div class="row mt-4">
-                        <select class="select-css form-control w-100" type="text" name="localities" id="localidad">
-                            <option value="-1" disabled :selected="searchedLocalities.length == 0" v-model="selectedLocality">
+                        <select class="select-css form-control w-100" type="text" name="localities" id="localidad" v-model="selectedLocality">
+                            <option value="-1" disabled :selected="searchedLocalities.length == 0">
                                 {{ $t('Locality') }}
                             </option>
                             <option :value="null">{{ $t('Any') }}</option>
-                            <option v-for="locality in localities" :key="locality.id" :value="locality.id"
-                                    :selected="searchedLocalities.some(v => locality.id == v.id)">
+                            <option v-for="locality in localities" :key="locality.id" :value="locality.id">
                                 {{ locality.name }}
                             </option>
                         </select>
@@ -147,7 +145,7 @@ import {State} from 'vuex-class';
 import {localityActionTypes} from '~/store/types/localities.types';
 import {doctorSpecialtyActionTypes} from '~/store/types/doctorSpecialties.types';
 
-import {createApiPath, createPath, Nullable} from '~/logic/Utils';
+import {createApiPath, createPath, ID, Nullable} from '~/logic/Utils';
 import {DoctorService} from '~/logic/interfaces/services/DoctorService';
 import TYPES from '~/logic/types';
 import {Pagination} from '~/logic/models/utils/Pagination';
@@ -171,8 +169,8 @@ export default class MedicList extends Vue {
     private nextPage = '>';
     private lastPage = '>>';
     private inputName: string = this.name;
-    private selectedSpecialty: Nullable<DoctorSpecialty> = null;
-    private selectedLocality: Nullable<Locality> = null;
+    private selectedSpecialty: Nullable<ID> = null;
+    private selectedLocality: Nullable<ID> = null;
     private resultsMessage: I18NMessages = 'NoResultsFound';
     private resultsMessageParam: number[] = [];
     private doctorPagination: Pagination<Doctor> = new Pagination<Doctor>([], 0);
@@ -193,13 +191,19 @@ export default class MedicList extends Vue {
         let aux = this.$route.query.specialties;
         let searchedSpecialties: DoctorSpecialty[];
 
-        if (typeof aux !== 'string' && typeof aux !== 'object') return [];
+        if (typeof aux !== 'string' && typeof aux !== 'object') aux = [];
         if (typeof aux === 'string') aux = aux.split(',');
 
         searchedSpecialties = aux.map(v => {
             let filtered = this.specialties.filter(value => parseInt(v!) === value.id);
             return filtered.length > 0 ? filtered[0] : null;
         }).filter(value => value != null) as DoctorSpecialty[];
+
+        if (this.selectedSpecialty && !searchedSpecialties.find(value => value.id == this.selectedSpecialty)) {
+            let specialty = this.specialties.find(value => value.id == this.selectedSpecialty);
+            if (specialty)
+                searchedSpecialties.push(specialty);
+        }
 
         return searchedSpecialties;
     }
@@ -208,13 +212,19 @@ export default class MedicList extends Vue {
         let aux = this.$route.query.localities;
         let searchedLocalities: Locality[];
 
-        if (typeof aux !== 'string' && typeof aux !== 'object') return [];
+        if (typeof aux !== 'string' && typeof aux !== 'object') aux = [];
         if (typeof aux === 'string') aux = aux.split(',');
 
         searchedLocalities = aux.map(v => {
             let filtered = this.localities.filter(value => parseInt(v!) === value.id);
             return filtered.length > 0 ? filtered[0] : null;
         }).filter(value => value != null) as Locality[];
+
+        if (this.selectedLocality && !searchedLocalities.find(value => value.id == this.selectedLocality)) {
+            let locality = this.localities.find(value => value.id == this.selectedLocality);
+            if (locality)
+                searchedLocalities.push(locality);
+        }
 
         return searchedLocalities;
     }
@@ -255,11 +265,20 @@ export default class MedicList extends Vue {
     }
 
     async search() {
+        this.$router.push({
+            path: createPath("/mediclist/" + this.page.toString()),
+            query: {
+                name: this.name,
+                specialties: this.selectedSpecialty?.toString(),
+                localities: this.selectedLocality?.toString()
+            }
+        }).catch(() => {});
+
         let response = await this.getDoctorService().list({
             page: this.page,
             name: this.inputName,
-            localities: this.searchedLocalities.map(value => value.id),
-            specialties: this.searchedSpecialties.map(value => value.id)
+            specialties: this.selectedSpecialty ? [this.selectedSpecialty] : [],
+            localities: this.selectedLocality ? [this.selectedLocality] : []
         });
         if (!(response instanceof APIError)) {
             this.doctorPagination = response;
@@ -289,8 +308,8 @@ export default class MedicList extends Vue {
         this.$store.dispatch('doctorSpecialties/loadDoctorSpecialties', doctorSpecialtyActionTypes.loadDoctorSpecialties());
         this.search();
 
-        this.selectedSpecialty = this.searchedSpecialties.length > 0 ? this.searchedSpecialties[0] : null;
-        this.selectedLocality = this.searchedLocalities.length > 0 ? this.searchedLocalities[0] : null;
+        this.selectedSpecialty = this.searchedSpecialties.length > 0 ? this.searchedSpecialties[0].id : null;
+        this.selectedLocality = this.searchedLocalities.length > 0 ? this.searchedLocalities[0].id : null;
     }
 
     @Watch('doctorPagination')
