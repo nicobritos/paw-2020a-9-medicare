@@ -25,7 +25,7 @@ public class RefreshToken extends GenericModel<Integer> {
     @Type(type="org.jadira.usertype.dateandtime.joda.PersistentLocalDateTime")
     private LocalDateTime createdDate;
     @JoinColumn(name = "user_id")
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne()
     private User user;
     @Column(name = "user_id", insertable = false, updatable = false)
     private Integer userId;
