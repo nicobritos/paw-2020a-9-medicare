@@ -90,10 +90,12 @@
 import logo from '@/assets/logo.svg';
 import eye from '@/assets/eye.svg';
 import noeye from '@/assets/noeye.svg';
-import {Component, Vue} from 'vue-property-decorator';
+import {Component, Vue, Watch} from 'vue-property-decorator';
 
-import {createPath, isValidEmail} from "~/logic/Utils";
+import {createPath, isValidEmail, Nullable} from "~/logic/Utils";
 import {userActionTypes} from '~/store/types/user.types';
+import { State } from 'vuex-class';
+import { User } from '~/logic/models/User';
 
 @Component
 export default class SignupPatient extends Vue {
@@ -117,6 +119,19 @@ export default class SignupPatient extends Vue {
     private password:string = "";
     private repeatPassword:string = "";
 
+    @State(state => state.auth.user)
+    private readonly user: Nullable<User>;
+    @Watch('user')
+    public goBack(): void {
+        if(this.user && this.$route.params.prevto){
+            this.$router.push(this.$route.params.prevto).catch(()=>{})
+        }
+        else if( this.user ){
+                this.$router.push({
+                    name: 'Landing',
+                }).catch(()=>{});
+            }
+    }
 
     toggleShowPassword(): void {
         this.showPassword = !this.showPassword;

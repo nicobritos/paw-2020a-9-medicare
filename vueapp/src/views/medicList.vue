@@ -332,7 +332,7 @@ export default class MedicList extends Vue {
         this.$router.push({
             path: createPath("/mediclist/" + page.toString()),
             query: this.$route.query
-        });
+        }).catch(()=>{});
         this.search();
     }
 }

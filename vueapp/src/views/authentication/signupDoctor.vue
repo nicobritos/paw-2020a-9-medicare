@@ -156,6 +156,7 @@ import {Province} from '~/logic/models/Province';
 import {LocalityService} from '~/logic/interfaces/services/LocalityService';
 import TYPES from '~/logic/types';
 import {APIError} from '~/logic/models/APIError';
+import { User } from '~/logic/models/User';
 
 @Component
 export default class SignupDoctor extends Vue {
@@ -190,6 +191,20 @@ export default class SignupDoctor extends Vue {
     private province: Nullable<ID> = null;
     private locality: Nullable<number> = null;
     private address = "";
+
+    @State(state => state.auth.user)
+    private readonly user: Nullable<User>;
+    @Watch('user')
+    public goBack(): void {
+        if(this.user && this.$route.params.prevto){
+            this.$router.push(this.$route.params.prevto).catch(()=>{})
+        }
+        else if( this.user ){
+                this.$router.push({
+                    name: 'Landing',
+                }).catch(()=>{});
+            }
+    }
 
     public mounted(): void {
         this.$store.dispatch('countries/loadCountries', countryActionTypes.loadCountries());

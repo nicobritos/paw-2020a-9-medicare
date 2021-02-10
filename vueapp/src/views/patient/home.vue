@@ -289,7 +289,7 @@ export default class PatientHome extends Vue {
         this.$router.push({
             path: createPath("/mediclist"),
             query
-        });
+        }).catch(()=>{});
     }
 
     private getService(): AppointmentService {
