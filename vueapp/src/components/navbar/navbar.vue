@@ -32,7 +32,7 @@ export default class Navbar extends Vue {
         if(this.$route.name != 'Landing'){
             this.$router.push({
                 name:"Landing"
-            })
+            }).catch(()=>{})
         }
     }
 

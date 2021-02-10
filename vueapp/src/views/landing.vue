@@ -104,7 +104,7 @@ export default class Landing extends Vue {
         this.$router.push({
             path: createPath("/mediclist"),
             query
-        });
+        }).catch(()=>{});
     }
 }
 </script>

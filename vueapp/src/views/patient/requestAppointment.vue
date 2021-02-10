@@ -245,7 +245,7 @@ export default class RequestAppointment extends Vue {
                 if(!(res instanceof APIError)){
                     this.$router.push({
                         name:"PatientHome"
-                    })
+                    }).catch(()=>{});
                 }
             });
     }

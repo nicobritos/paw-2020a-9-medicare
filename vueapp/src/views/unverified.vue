@@ -34,7 +34,7 @@ export default class Unverified extends Vue {
         if(!this.user || this.user.verified){
             this.$router.push({
                 path:this.getUrl("/")
-            });
+            }).catch(()=>{});
         }else{
             this.email = this.user.email;
         }

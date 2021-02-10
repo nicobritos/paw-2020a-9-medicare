@@ -101,12 +101,12 @@ export default class Login extends Vue {
     @Watch('user')
     public goBack(): void {
         if(this.user && this.$route.params.prevto){
-            this.$router.push(this.$route.params.prevto)
+            this.$router.push(this.$route.params.prevto).catch(()=>{})
         }
         else if( this.user ){
                 this.$router.push({
                     name: 'Landing',
-                });
+                }).catch(()=>{});
             }
     }
 

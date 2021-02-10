@@ -331,7 +331,7 @@ export default class SelectAppointment extends Vue {
         this.$router.push({name:"SelectAppointment",params:{
                 ...this.$route.params,
                 weekNo:""+(prevnum+num)
-            }})
+            }}).catch(()=>{})
         this.updateWeek()
     }
 
@@ -340,7 +340,7 @@ export default class SelectAppointment extends Vue {
         this.$router.push({name:"SelectAppointment",params:{
                 ...this.$route.params,
                 weekNo: '0'
-            }})
+            }}).catch(()=>{})
         this.updateWeek()
     }
 
