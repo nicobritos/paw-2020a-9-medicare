@@ -1,9 +1,5 @@
 import {ActionContext, Store} from 'vuex';
 
-export interface Actions {
-    [key: string]: object
-}
-
 export type DefineMutationTree<Mutation, State> = {
     [Prop in keyof Mutation]: (state: State, handler: { payload: Mutation[Prop] }) => void;
 };

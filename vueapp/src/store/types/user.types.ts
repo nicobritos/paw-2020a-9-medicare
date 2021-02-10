@@ -4,7 +4,7 @@ import {Nullable} from '~/logic/Utils';
 import {User} from '~/logic/models/User';
 
 export interface UserState {
-
+    profilePictureTimestamp: Nullable<number>;
 }
 
 export interface UserActions {
@@ -32,4 +32,12 @@ export const userActionTypes: DefineTypes<UserActions> = {
     updateUser: (payload: UpdateUser) => ({payload, type: 'updateUser'}),
     createAsDoctor: payload => ({payload, type: 'createAsDoctor'}),
     createAsPatient: payload => ({payload, type: 'createAsPatient'})
+};
+
+export interface UserMutations {
+    updateProfilePictureTimestamp: void;
+}
+
+export const userMutationTypes: DefineTypes<UserMutations> = {
+    updateProfilePictureTimestamp: payload => ({payload, type: 'updateProfilePictureTimestamp'})
 };
