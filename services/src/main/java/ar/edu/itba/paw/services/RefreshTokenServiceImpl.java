@@ -60,11 +60,14 @@ public class RefreshTokenServiceImpl extends GenericServiceImpl<RefreshTokenDao,
 
     @Override
     public String refresh(String refreshToken) {
-        RefreshToken refreshTokenModel = new RefreshToken();
-        refreshTokenModel.setToken(refreshToken);
+        Optional<RefreshToken> refreshTokenModel = this.findByToken(refreshToken);
+        if (!refreshTokenModel.isPresent())
+            throw new IllegalArgumentException();
 
-        this.generateAndSaveToken(refreshTokenModel, this::secureUpdate);
-        return refreshTokenModel.getToken();
+        refreshTokenModel.get().setToken(refreshToken);
+
+        this.generateAndSaveToken(refreshTokenModel.get(), this::secureUpdate);
+        return refreshTokenModel.get().getToken();
     }
 
     @Override

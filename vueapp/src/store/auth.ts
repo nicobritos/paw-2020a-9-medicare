@@ -34,7 +34,8 @@ const state = (): AuthState => ({
     user: null as Nullable<User>,
     doctors: [],
     patients: [],
-    isDoctor: false
+    isDoctor: false,
+    reloading: null
 });
 
 const getters: DefineGetterTree<AuthGetters, AuthState, RootState> = {
@@ -199,6 +200,9 @@ const mutations: DefineMutationTree<AuthMutations, AuthState> = {
         state.patients = patients || [];
         state.doctors = doctors || [];
         state.isDoctor = isDoctor;
+    },
+    setReloading(state, {payload}): void {
+        state.reloading = payload;
     },
 };
 

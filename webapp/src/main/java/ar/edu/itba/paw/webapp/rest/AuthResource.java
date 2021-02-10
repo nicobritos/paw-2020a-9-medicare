@@ -58,24 +58,23 @@ public class AuthResource extends GenericAuthenticationResource {
         if (!refreshTokenOptional.isPresent())
             throw this.notFound();
 
-        User user = this.assertUserNotFound(request);
         if (refreshTokenOptional.get().getCreatedDate().plusMillis((int) Constants.JWT_REFRESH_EXPIRATION_MILLIS).toDateTime().isBeforeNow())
             throw this.unauthorized();
 
         UserCredentials userCredentials = new UserCredentials();
-        userCredentials.setUsername(user.getEmail());
+        userCredentials.setUsername(refreshTokenOptional.get().getUser().getEmail());
         userCredentials.setPassword(token);
 
-        if (!this.createJWTCookies(userCredentials, user, response, token, LOGGER)) {
+        if (!this.createJWTCookies(userCredentials, refreshTokenOptional.get().getUser(), response, token, LOGGER)) {
             throw this.error(Status.INTERNAL_SERVER_ERROR).getError();
         }
 
         UserMe userMe;
-        Collection<Doctor> doctors = this.doctorService.findByUser(user);
+        Collection<Doctor> doctors = this.doctorService.findByUser(refreshTokenOptional.get().getUser());
         if (doctors.size() == 0) {
-            userMe = UserMeFactory.withPatients(user, this.patientService.findByUser(user));
+            userMe = UserMeFactory.withPatients(refreshTokenOptional.get().getUser(), this.patientService.findByUser(refreshTokenOptional.get().getUser()));
         } else {
-            userMe = UserMeFactory.withDoctors(user, doctors);
+            userMe = UserMeFactory.withDoctors(refreshTokenOptional.get().getUser(), doctors);
         }
 
         return Response

@@ -61,35 +61,47 @@ export class RestRepositoryImpl implements RestRepository {
     }
 
     private static async refreshToken(): Promise<boolean> {
-        let axiosConfig = RestRepositoryImpl.getAxiosConfig({
-            accepts: UserMIME.ME,
-            data: undefined,
-            contentType: JSON_MIME
-        });
+        let response;
+        if (!store.state.auth.reloading) {
+            let axiosConfig = RestRepositoryImpl.getAxiosConfig({
+                accepts: UserMIME.ME,
+                data: undefined,
+                contentType: JSON_MIME
+            });
 
-        let response = RestRepositoryImpl.formatResponse(
-            await axios.post(
-                createApiPath(RestRepositoryImpl.REFRESH_PATH),
-                undefined,
-                axiosConfig
-            )
-        );
-        if (response.isOk) {
-            store.commit('auth/setUser', authMutationTypes.setUser((response.data as UserDoctors | UserPatients).user));
+            let promise: Promise<APIResponse<UserDoctors | UserPatients>> = new Promise(async (resolve, reject) => {
+                try {
+                    resolve(RestRepositoryImpl.formatResponse(
+                        await axios.post(
+                            createApiPath(RestRepositoryImpl.REFRESH_PATH),
+                            undefined,
+                            axiosConfig
+                        )
+                    ));
+                } catch (e) {
+                    reject(e);
+                }
+            });
 
-            if ((response.data as UserDoctors).doctors != null) {
-                store.commit('auth/setDoctors', authMutationTypes.setDoctors((response.data as UserDoctors).doctors));
+            store.commit('auth/setReloading', authMutationTypes.setReloading(promise));
+
+            response = await store.state.auth.reloading;
+
+            if (response.isOk) {
+                store.commit('auth/setUser', authMutationTypes.setUser((response.data as UserDoctors | UserPatients).user));
+
+                if ((response.data as UserDoctors).doctors != null) {
+                    store.commit('auth/setDoctors', authMutationTypes.setDoctors((response.data as UserDoctors).doctors));
+                } else {
+                    store.commit('auth/setPatients', authMutationTypes.setPatients((response.data as UserPatients).patients));
+                }
             } else {
-                store.commit('auth/setPatients', authMutationTypes.setPatients((response.data as UserPatients).patients));
-            }
-        } else {
-            store.commit('auth/setUser', authMutationTypes.setUser(null));
-
-            if ((response.data as UserDoctors).doctors != null) {
+                store.commit('auth/setUser', authMutationTypes.setUser(null));
                 store.commit('auth/setDoctors', authMutationTypes.setDoctors(null));
-            } else {
                 store.commit('auth/setPatients', authMutationTypes.setPatients(null));
             }
+        } else {
+            response = await store.state.auth.reloading;
         }
 
         return response.isOk;
