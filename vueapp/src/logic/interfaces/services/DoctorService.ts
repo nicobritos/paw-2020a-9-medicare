@@ -2,7 +2,7 @@ import {Doctor} from '~/logic/models/Doctor';
 import {DoctorSpecialty} from '~/logic/models/DoctorSpecialty';
 import {APIError} from '~/logic/models/APIError';
 import {Pagination} from '~/logic/models/utils/Pagination';
-import {Nullable} from '~/logic/Utils';
+import {ID, Nullable} from '~/logic/Utils';
 import {Locality} from '~/logic/models/Locality';
 
 export interface UpdateDoctor {
@@ -15,8 +15,8 @@ export interface DoctorSearchParams {
     page: number,
     perPage?: number,
     name?: string
-    specialties?: number[],
-    localities?: number[],
+    specialties?: ID[],
+    localities?: ID[],
 }
 
 export interface DoctorService {
