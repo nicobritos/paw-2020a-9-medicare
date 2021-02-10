@@ -104,7 +104,7 @@
 <script lang="ts">
 import mapIcon from '@/assets/mapIcon.svg';
 import calendarIcon from '@/assets/calendarIcon.svg';
-import {Component, Vue} from 'vue-property-decorator';
+import {Component, Vue, Watch} from 'vue-property-decorator';
 import {User} from '~/logic/models/User';
 import {Doctor} from '~/logic/models/Doctor';
 
@@ -135,6 +135,15 @@ export default class RequestAppointment extends Vue {
     private motive:string = "";
     private phone:string = "";
     private comment:string = "";
+
+    @Watch('user', {immediate: true})
+    guardPage(): void {
+        if (!this.user) {
+            this.$router.push({
+                name: 'Landing',
+            }).catch(() => {});
+        }
+    }
 
     async mounted(){
         this.$store.dispatch('doctorSpecialties/loadDoctorSpecialties', doctorSpecialtyActionTypes.loadDoctorSpecialties());

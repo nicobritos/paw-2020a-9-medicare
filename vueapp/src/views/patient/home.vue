@@ -113,7 +113,7 @@
 
 <script lang="ts">
 import moreOptions from '@/assets/moreOptions.svg';
-import {Component, Vue} from 'vue-property-decorator';
+import {Component, Vue, Watch} from 'vue-property-decorator';
 import { State } from 'vuex-class';
 import { AppointmentService } from '~/logic/interfaces/services/AppointmentService';
 import { APIError } from '~/logic/models/APIError';
@@ -126,9 +126,13 @@ import {doctorSpecialtyActionTypes} from '~/store/types/doctorSpecialties.types'
 import {DoctorSpecialty} from '~/logic/models/DoctorSpecialty';
 import {Locality} from '~/logic/models/Locality';
 import {DateTime} from 'luxon';
+import {User} from '~/logic/models/User';
 
 @Component
 export default class PatientHome extends Vue {
+    @State(state => state.auth.user)
+    private readonly user: Nullable<User>;
+
     private moreOptions = moreOptions;
     private appointments:Appointment[] = [];
     @State(state => state.localities.localities)
@@ -140,6 +144,15 @@ export default class PatientHome extends Vue {
     private localityId: Nullable<number> = null;
     private specialtyId: Nullable<number> = null;
     private appointmentDoctors: Record<ID, Doctor> = {};
+
+    @Watch('user', {immediate: true})
+    guardPage(): void {
+        if (!this.user) {
+            this.$router.push({
+                name: 'Landing',
+            }).catch(() => {});
+        }
+    }
 
     async mounted(){
         this.$store.dispatch('doctorSpecialties/loadDoctorSpecialties', doctorSpecialtyActionTypes.loadDoctorSpecialties());

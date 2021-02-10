@@ -82,6 +82,14 @@ export class RestRepositoryImpl implements RestRepository {
             } else {
                 store.commit('auth/setPatients', authMutationTypes.setPatients((response.data as UserPatients).patients));
             }
+        } else {
+            store.commit('auth/setUser', authMutationTypes.setUser(null));
+
+            if ((response.data as UserDoctors).doctors != null) {
+                store.commit('auth/setDoctors', authMutationTypes.setDoctors(null));
+            } else {
+                store.commit('auth/setPatients', authMutationTypes.setPatients(null));
+            }
         }
 
         return response.isOk;

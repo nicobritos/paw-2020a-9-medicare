@@ -200,10 +200,12 @@ import { AppointmentService } from '~/logic/interfaces/services/AppointmentServi
 import { APIError } from '~/logic/models/APIError';
 import {Appointment} from '~/logic/models/Appointment';
 import TYPES from '~/logic/types';
-import {createApiPath, createPath, ID} from '~/logic/Utils';
+import {createApiPath, createPath, ID, Nullable} from '~/logic/Utils';
 import {DoctorService} from '~/logic/interfaces/services/DoctorService';
 import {Doctor} from '~/logic/models/Doctor';
 import {DateTime} from 'luxon';
+import {State} from 'vuex-class';
+import {User} from '~/logic/models/User';
 
 // @ts-ignore
 Date.prototype.plusDays = function (i) {
@@ -214,6 +216,9 @@ Date.prototype.plusDays = function (i) {
 
 @Component
 export default class MedicHome extends Vue {
+    @State(state => state.auth.user)
+    private readonly user: Nullable<User>;
+
     private next = '>';
     private prev = '<';
     private moreOptions = moreOptions;
@@ -228,6 +233,15 @@ export default class MedicHome extends Vue {
         promises.push(this.updateTodayAppointments());
         promises.push(this.updateWeekAppointments());
         return Promise.all(promises);
+    }
+
+    @Watch('user', {immediate: true})
+    guardPage(): void {
+        if (!this.user) {
+            this.$router.push({
+                name: 'Landing',
+            }).catch(() => {});
+        }
     }
 
     setDisplayWeek(weeks: number): Promise<void> {

@@ -286,6 +286,15 @@ export default class MedicProfile extends Vue {
         this.setWorkdays();
     }
 
+    @Watch('user', {immediate: true})
+    guardPage(): void {
+        if (!this.user) {
+            this.$router.push({
+                name: 'Landing',
+            }).catch(() => {});
+        }
+    }
+
     @Watch("allSpecialties", {immediate: true, deep: true})
     @Watch("doctors", {immediate: true, deep: true})
     setSpecialties(){

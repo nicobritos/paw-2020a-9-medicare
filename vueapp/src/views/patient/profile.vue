@@ -126,7 +126,7 @@
 import noeye from '@/assets/noeye.svg';
 import eye from '@/assets/eye.svg';
 import editPencil from '@/assets/editPencil.svg';
-import {Component, Vue} from 'vue-property-decorator';
+import {Component, Vue, Watch} from 'vue-property-decorator';
 import {User} from '~/logic/models/User';
 
 import {createApiPath, isValidEmail, Nullable} from '~/logic/Utils';
@@ -172,6 +172,15 @@ export default class PatientProfile extends Vue {
             ts = '';
 
         return this.getApiUrl(`/users/${this.user.id}/picture${ts}`) || defaultProfilePic;
+    }
+
+    @Watch('user', {immediate: true})
+    guardPage(): void {
+        if (!this.user) {
+            this.$router.push({
+                name: 'Landing',
+            }).catch(() => {});
+        }
     }
 
     mounted(){
