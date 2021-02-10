@@ -6,6 +6,9 @@ Vue.use(VueRouter);
 
 function notAuthGuard(to,from,next) {
     if(store.getters["auth/loggedIn"]){
+        if(!store.state.auth.user.verified){
+            next({name:"Unverified"});
+        }
         if(store.state.auth.isDoctor){
             next({name:"MedicHome"});
         }
@@ -19,6 +22,9 @@ function notAuthGuard(to,from,next) {
 
 function patientGuard(to,from,next) {
     if(store.getters["auth/loggedIn"]){
+        if(!store.state.auth.user.verified){
+            next({name:"Unverified"});
+        }
         if(store.state.auth.isDoctor){   
             next({name:"MedicHome"});
         }
@@ -34,6 +40,9 @@ function patientGuard(to,from,next) {
 
 function doctorGuard(to,from,next) {
     if(store.getters["auth/loggedIn"]){
+        if(!store.state.auth.user.verified){
+            next({name:"Unverified"});
+        }
         if(store.state.auth.isDoctor){   
             next();
         }
