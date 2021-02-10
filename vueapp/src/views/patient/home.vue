@@ -162,7 +162,7 @@ export default class PatientHome extends Vue {
             {
                 from:{
                     year: today.getFullYear(),
-                    month: today.getMonth() + 1,
+                    month: today.getMonth(),
                     day: today.getDate()
                 },
                 to:{
@@ -176,9 +176,8 @@ export default class PatientHome extends Vue {
             this.appointmentDoctors = {};
             for (let appointment of appointments) {
                 // Hacemos async para no perder tiempo, no hace falta que sea bloqueante
-                this.setAppointmentDoctor(appointment.id, appointment.doctorId);
+                await this.setAppointmentDoctor(appointment.id, appointment.doctorId);
             }
-
             this.appointments = appointments;
         }
     }
@@ -202,7 +201,7 @@ export default class PatientHome extends Vue {
                 return this.$t('Friday').toString();
             case 6:
                 return this.$t('Saturday').toString();
-            case 7:
+            case 0:
                 return this.$t('Sunday').toString();
             default:
                 return t.toString();
@@ -210,7 +209,7 @@ export default class PatientHome extends Vue {
     }
 
     getMoY(t: number): string {
-        switch (t) {
+        switch (t+1) {
             case 1:
                 return this.$t('January').toString();
             case 2:
