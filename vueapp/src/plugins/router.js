@@ -9,7 +9,7 @@ function notAuthGuard(to,from,next) {
         if(!store.state.auth.user.verified){
             next({name:"Unverified"});
         }
-        if(store.state.auth.isDoctor){
+        else if(store.state.auth.isDoctor){
             next({name:"MedicHome"});
         }
         else{
@@ -25,7 +25,7 @@ function patientGuard(to,from,next) {
         if(!store.state.auth.user.verified){
             next({name:"Unverified"});
         }
-        if(store.state.auth.isDoctor){   
+        else if(store.state.auth.isDoctor){   
             next({name:"MedicHome"});
         }
         else{
@@ -43,7 +43,7 @@ function doctorGuard(to,from,next) {
         if(!store.state.auth.user.verified){
             next({name:"Unverified"});
         }
-        if(store.state.auth.isDoctor){   
+        else if(store.state.auth.isDoctor){   
             next();
         }
         else{
@@ -82,7 +82,11 @@ function unverifiedGuard(to,from,next) {
 
 function notAuthGuardOrPatient(to,from,next) {
     if(store.getters["auth/loggedIn"]){
-        if(store.state.auth.isDoctor){
+        console.log(store.state.auth.user.verified)
+        if(!store.state.auth.user.verified){
+            next({name:"Unverified"});
+        }
+        else if(store.state.auth.isDoctor){
             next({name:"MedicHome"});
         }
         else{
