@@ -3,15 +3,13 @@ package ar.edu.itba.paw.persistence;
 import ar.edu.itba.paw.interfaces.daos.RefreshTokenDao;
 import ar.edu.itba.paw.models.RefreshToken;
 import ar.edu.itba.paw.models.RefreshToken_;
+import ar.edu.itba.paw.models.User;
 import ar.edu.itba.paw.persistence.generics.GenericDaoImpl;
 import org.joda.time.LocalDateTime;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.persistence.criteria.CriteriaBuilder;
-import javax.persistence.criteria.CriteriaDelete;
-import javax.persistence.criteria.CriteriaQuery;
-import javax.persistence.criteria.Root;
+import javax.persistence.criteria.*;
 import java.util.Optional;
 
 @Repository
@@ -35,8 +33,12 @@ public class RefreshTokenDaoImpl extends GenericDaoImpl<RefreshToken, Integer> i
             throw new IllegalArgumentException();
         }
 
-        Optional<RefreshToken> refreshToken = this.findByToken(token);
-        refreshToken.ifPresent(value -> this.getEntityManager().remove(value));
+        CriteriaBuilder builder = this.getEntityManager().getCriteriaBuilder();
+        CriteriaDelete<RefreshToken> delete = builder.createCriteriaDelete(RefreshToken.class);
+
+        Root<RefreshToken> root = delete.from(RefreshToken.class);
+        delete.where(builder.equal(root.get(RefreshToken_.token), token));
+        this.getEntityManager().createQuery(delete).executeUpdate();
     }
 
     @Override

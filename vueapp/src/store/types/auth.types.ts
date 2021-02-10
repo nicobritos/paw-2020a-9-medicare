@@ -5,6 +5,7 @@ import {UserDoctors, UserPatients} from '~/logic/interfaces/services/AuthService
 import {APIError} from '~/logic/models/APIError';
 import {ID, Nullable} from '~/logic/Utils';
 import {User} from '~/logic/models/User';
+import {APIResponse} from '~/logic/models/APIResponse';
 
 export const LOGGED_IN_EXPIRATION_DATE_KEY = 'loggedInExpDate';
 export const USER_KEY = 'user';
@@ -19,7 +20,8 @@ export interface AuthState {
     user: Nullable<User>,
     doctors: Doctor[],
     patients: Patient[],
-    isDoctor: boolean
+    isDoctor: boolean,
+    reloading: Nullable<Promise<APIResponse<UserPatients | UserDoctors>>>
 }
 
 export interface AuthActions {
@@ -43,6 +45,7 @@ export interface AuthMutations {
     setDoctor: {id: ID, doctor: Nullable<Doctor>},
     setPatients: Nullable<Patient[]>,
     setPromise: AuthState['_userLoading']['promise'],
+    setReloading: AuthState['reloading'],
     loadUserFromLocalStorage: void
 }
 
@@ -52,6 +55,7 @@ export const authMutationTypes: DefineTypes<AuthMutations> = {
     setDoctors: payload => ({payload, type: 'setDoctors'}),
     setDoctor: payload => ({payload, type: 'setDoctor'}),
     setPatients: payload => ({payload, type: 'setPatients'}),
+    setReloading: payload => ({payload, type: 'setReloading'}),
     loadUserFromLocalStorage: payload => ({payload, type: 'loadUserFromLocalStorage'})
 };
 
