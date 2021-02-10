@@ -147,7 +147,9 @@ export default class AddWorkday extends Vue {
                 hour: start[0],
                 minute: start[1]
             }
-        }]);
+        }]).then(()=>{
+            this.$emit("added");
+        });
     }
 
     private getWorkdayService(): WorkdayService {
