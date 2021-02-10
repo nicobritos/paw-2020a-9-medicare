@@ -113,7 +113,7 @@ const routes = [
         redirect:redirectHomeTopord
     },
     {
-        path: '/verify/:token',
+        path: '/verify/:token?',
         name: 'Unverified',
         component: () => import('@/views/unverified.vue'),
         beforeEnter:unverifiedGuard
