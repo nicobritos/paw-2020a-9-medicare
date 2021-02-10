@@ -16,10 +16,16 @@
 import {Component, Vue} from 'vue-property-decorator';
 import TYPES from '~/logic/types';
 import {VerifyService} from '~/logic/interfaces/services/VerifyService';
+import { State } from 'vuex-class';
+import { User } from '~/logic/models/User';
 
 @Component
 export default class Unverified extends Vue {
+    @State(state => state.auth.user)
+    private readonly user:User;
+
     private tokenError: boolean = false;
+
 
     async mounted(): Promise<void> {
         let token: string = '';
