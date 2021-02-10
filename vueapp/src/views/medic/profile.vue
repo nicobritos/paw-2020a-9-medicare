@@ -174,7 +174,7 @@
             <div class="col-2">
             </div>
         </div>
-        <AddWorkday v-model="showAddWorkday"/>
+        <AddWorkday @added="setWorkdays" v-model="showAddWorkday"/>
         <AddSpecialty :specialties="remainingSpecialties" v-model="showAddSpecialties"/>
         <Modal  v-model="showModal"
                 @confirm="modOnConfirm" 
