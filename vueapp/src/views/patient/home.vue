@@ -265,14 +265,25 @@ export default class PatientHome extends Vue {
 
     // TODO: Guido spinner
     async cancelAppointment(id: number): Promise<void> {
-        Vue.set(this.beingCanceled,id,true);
-        let response = await this.getService().delete(id);
-        if (!(response instanceof APIError)) {
-            let index = this.appointments.findIndex(value => value.id == id);
-            if (index < 0) return;
-            this.appointments.splice(index, 1);
+        let shouldDelete = await this.$bvModal.msgBoxConfirm(
+            this.$t("DoYouWantToContinue").toString(),
+            {
+                cancelTitle:"No",
+                okTitle:"Yes",
+                okVariant:"danger",
+                title:this.$t("YouAreAboutToCancelAnAppointment").toString()
+            }
+        )
+        if(shouldDelete){
+            Vue.set(this.beingCanceled,id,true);
+            let response = await this.getService().delete(id);
+            if (!(response instanceof APIError)) {
+                let index = this.appointments.findIndex(value => value.id == id);
+                if (index < 0) return;
+                this.appointments.splice(index, 1);
+            }
+            Vue.delete(this.beingCanceled,id);
         }
-        Vue.delete(this.beingCanceled,id);
     }
 
     search(): void {
