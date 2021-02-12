@@ -83,8 +83,15 @@ export class AppointmentServiceImpl implements AppointmentService {
     private static formatAppointment(appointment: Appointment): Appointment {
         //TODO: check
         //@ts-ignore
-        let dateTime = DateTime.fromMillis(appointment.date_from);
-        appointment.dateFrom = dateTime.toJSDate();
+        let dateTime = DateTime.fromMillis(appointment.date_from).toUTC();
+        //TODO: check if theres a better way
+        appointment.dateFrom = new Date(
+            dateTime.get("year"),
+            dateTime.get("month")-1,
+            dateTime.get("day"),
+            dateTime.get("hour"),
+            dateTime.get("minute")
+        );
         appointment.dateTo = DateTime.fromJSDate(appointment.dateFrom).plus({ minutes: Appointment.DURATION_MINUTES }).toJSDate();
         return appointment;
     }
