@@ -46,17 +46,10 @@
                                     </div>
                                 </div>
                                 <div class="col-2 justify-content-start">
-                                    <div class="dropdown">
-                                        <img
-                                            :src='moreOptions'
-                                            class="moreOptionsButton"
-                                            alt=""
-                                            data-toggle="dropdown"
-                                        />
-                                        <div class="dropdown-menu">
-                                            <button type="submit" class="dropdown-item" @click="cancelAppointment(appointment.id, this.today.getDay())">{{ $t('Cancel') }}</button>
-                                        </div>
-                                    </div>
+                                    <button class="btn" v-if="beingCanceled[appointment.id]" >
+                                        <b-spinner small></b-spinner>
+                                    </button>
+                                    <button v-else type="button" class="dropdown-item" @click="cancelAppointment(appointment.id, this.today.getDay())">X</button>
                                 </div>
                             </div>
                         </div>
@@ -164,21 +157,14 @@
                                                     </div>
                                                 </div>
                                                 <div class="col-2 justify-content-start">
-                                                    <div class="dropdown">
-                                                        <img
-                                                            :src='moreOptions'
-                                                            class="moreOptionsButton"
-                                                            alt="more options"
-                                                            data-toggle="dropdown"
-                                                        />
-                                                        <div class="dropdown-menu">
-                                                            <button type="button" class="dropdown-item cancel-appt-btn"
-                                                                    @click="cancelAppointment(appointment.id, this.selectedDay.getDay())"
-                                                            >
-                                                                {{ $t('Cancel') }}
-                                                            </button>
-                                                        </div>
-                                                    </div>
+                                                    <button class="btn" v-if="beingCanceled[appointment.id]" >
+                                                        <b-spinner small></b-spinner>
+                                                    </button>
+                                                    <button v-else type="button" class="btn"
+                                                            @click="cancelAppointment(appointment.id, this.selectedDay.getDay())"
+                                                    >
+                                                        X
+                                                    </button>
                                                 </div>
                                             </div>
                                         </div>
@@ -227,6 +213,9 @@ export default class MedicHome extends Vue {
     private today = new Date();
     private todayAppointments: Appointment[] = [];
     private weekAppointments: Appointment[][] = [[], [], [], [], [], [], []];
+
+    private beingCanceled = {};
+
 
     mounted(): Promise<void[]> {
         let promises = [];
@@ -371,10 +360,12 @@ export default class MedicHome extends Vue {
 
     // TODO: Guido spinner
     async cancelAppointment(id: number, dow: number): Promise<void> {
+        Vue.set(this.beingCanceled,id,true);
         let response = await this.getService().delete(id);
         if (!(response instanceof APIError)) {
             this.deleteAppointment(id, dow);
         }
+        Vue.delete(this.beingCanceled,id);
     }
 
     private deleteAppointment(id: number, dow: number): void {

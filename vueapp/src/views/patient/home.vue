@@ -60,16 +60,11 @@
                                         </p>
                                     </div>
                                 </div>
-                                <div class="col-1 justify-content-start">
-                                    <div class="dropdown">
-                                        <img :src='moreOptions' class="moreOptionsButton"
-                                             alt="nore options" data-toggle="dropdown">
-                                        <div class="dropdown-menu">
-                                            <button type="button" class="dropdown-item cancel-appt-btn" @click="cancelAppointment(appointment.id)">
-                                                {{ $t('Cancel') }}
-                                            </button>
-                                        </div>
-                                    </div>
+                                <div class="col-1 justify-content-start align-items-center">
+                                    <button class="btn" v-if="beingCanceled[appointment.id]" >
+                                        <b-spinner small></b-spinner>
+                                    </button>
+                                    <button v-else class="btn" type="button" @click="cancelAppointment(appointment.id)">X</button>
                                 </div>
                             </div>
                         </div>
@@ -144,6 +139,8 @@ export default class PatientHome extends Vue {
     private localityId: Nullable<number> = null;
     private specialtyId: Nullable<number> = null;
     private appointmentDoctors: Record<ID, Doctor> = {};
+
+    private beingCanceled = {};
 
     @Watch('user', {immediate: true})
     guardPage(): void {
@@ -268,12 +265,14 @@ export default class PatientHome extends Vue {
 
     // TODO: Guido spinner
     async cancelAppointment(id: number): Promise<void> {
+        Vue.set(this.beingCanceled,id,true);
         let response = await this.getService().delete(id);
         if (!(response instanceof APIError)) {
             let index = this.appointments.findIndex(value => value.id == id);
             if (index < 0) return;
             this.appointments.splice(index, 1);
         }
+        Vue.delete(this.beingCanceled,id);
     }
 
     search(): void {
