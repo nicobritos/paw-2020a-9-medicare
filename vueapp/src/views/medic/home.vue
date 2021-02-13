@@ -276,15 +276,20 @@ export default class MedicHome extends Vue {
         }
     }
 
+    /*
+        TODO: nico check this
+        i changed this.today to this.selectedDay, i also made sure to wipe
+        this.weekAppoitnments before pushing new ones
+    */
     async updateWeekAppointments(){
-        let week = DateTime.fromJSDate(this.today).plus({ weeks: 1 }).toJSDate();
+        let week = DateTime.fromJSDate(this.selectedDay).plus({ weeks: 1 }).toJSDate();
 
         let appointments = await this.getService().list(
             {
                 from: {
-                    year: this.today.getFullYear(),
-                    month: this.today.getMonth() + 1,
-                    day: this.today.getDate()
+                    year: this.selectedDay.getFullYear(),
+                    month: this.selectedDay.getMonth() + 1,
+                    day: this.selectedDay.getDate()
                 },
                 to: {
                     year: week.getFullYear(),
@@ -293,11 +298,12 @@ export default class MedicHome extends Vue {
                 }
             }
         );
-
         if (!(appointments instanceof APIError)) {
+            let weekAppointments:Appointment[][] = [[],[],[],[],[],[],[]];
             for (let appointment of appointments) {
-                this.weekAppointments[appointment.dateFrom.getDay()].push(appointment);
+                weekAppointments[appointment.dateFrom.getDay()].push(appointment);
             }
+            this.weekAppointments = weekAppointments;
         }
     }
 
@@ -358,7 +364,6 @@ export default class MedicHome extends Vue {
         return day.plusDays( toAdd );
     }
 
-    // TODO: Guido spinner
     async cancelAppointment(id: number, dow: number): Promise<void> {
         let shouldDelete = await this.$bvModal.msgBoxConfirm(
             this.$t("DoYouWantToContinue").toString(),

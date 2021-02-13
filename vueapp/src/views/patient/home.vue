@@ -263,7 +263,6 @@ export default class PatientHome extends Vue {
         this.search();
     }
 
-    // TODO: Guido spinner
     async cancelAppointment(id: number): Promise<void> {
         let shouldDelete = await this.$bvModal.msgBoxConfirm(
             this.$t("DoYouWantToContinue").toString(),
