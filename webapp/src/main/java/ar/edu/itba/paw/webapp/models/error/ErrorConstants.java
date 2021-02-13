@@ -91,9 +91,6 @@ public abstract class ErrorConstants {
             = invalidField(39, "surname");
     public static final APISubError USER_UPDATE_INVALID_PHONE
             = invalidField(40, "phone");
-    // TODO: Guido front
-    public static final APISubError USER_UPDATE_INVALID_PASSWORD
-            = invalidField(401, "password");
 
     public static final APISubError WORKDAY_CREATE_INVALID_DAY
             = invalidField(41, "day");
@@ -147,20 +144,19 @@ public abstract class ErrorConstants {
     public static final APISubError MISSING_INVALID_JSON_BODY
             = new APISubError(63, "Missing or invalid JSON body");
 
-    // TODO: Guido
     public static final APISubError INVALID_IMAGE_TYPE
             = new APISubError(64, "Invalid image type");
     public static final APISubError IMAGE_TOO_BIG
             = new APISubError(65, "The supplied image is too big");
     public static final APISubError WORKDAY_CREATE_OVERLAPS
             = new APISubError(66, "The time range overlaps with an existing workday");
+    public static final APISubError USER_UPDATE_INVALID_PASSWORD
+            = invalidField(67, "password");
 
-    // TODO: Guido front
-    public static final APISubError INTERNAL_SERVER_ERROR
-            = new APISubError(500, "Internal server error");
-    // TODO: Guido front
     public static final APISubError FORBIDDEN
             = invalidField(403, "Forbidden");
+    public static final APISubError INTERNAL_SERVER_ERROR
+            = new APISubError(500, "Internal server error");
 
     private static APISubError invalidField(int code, String field) {
         return new APISubError(code, "Invalid \"" + field + "\" field");
