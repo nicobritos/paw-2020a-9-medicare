@@ -292,6 +292,14 @@
   "Error59": "Algunos de los parametros requeridos en el query",
   "Error60": "Algunos parametros pasados al query son invalidos",
   "Error61": "El email especificado esta en uso",
-  "Error62": "Una galletita de refresco de token valida era esperada con el nombre: \" X-Refresh-Token \"",
-  "Error63": "El cuerpo del JSON falta o es invalido"
+  "Error62": "Una galletita de refresco de token valida era esperada con el nombre: \"X-Refresh-Token\"",
+  "Error63": "El cuerpo del JSON falta o es invalido",
+
+  "Error64": "La imagen tiene un formato invalido",
+  "Error65": "La imagen es muy grande",
+  "Error66": "El intervalo de tiempo seleccionado se solapa con un horario existente",
+  "Error67": "Nueva contraseña invalida",
+
+  "Error403": "No tienes los permisos necesarios para realizar esta accion",
+  "Error500": "Un error desconocido ha ocurrido. Por favor, intenta nuevamente mas tarde"
 }
