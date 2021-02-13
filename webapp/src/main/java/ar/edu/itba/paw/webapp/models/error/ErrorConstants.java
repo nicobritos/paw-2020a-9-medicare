@@ -153,6 +153,13 @@ public abstract class ErrorConstants {
     public static final APISubError IMAGE_TOO_BIG
             = new APISubError(65, "The supplied image is too big");
 
+    // TODO: Guido front
+    public static final APISubError INTERNAL_SERVER_ERROR
+            = new APISubError(500, "Internal server error");
+    // TODO: Guido front
+    public static final APISubError FORBIDDEN
+            = invalidField(403, "Forbidden");
+
     private static APISubError invalidField(int code, String field) {
         return new APISubError(code, "Invalid \"" + field + "\" field");
     }

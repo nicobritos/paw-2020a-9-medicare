@@ -2,6 +2,7 @@ package ar.edu.itba.paw.webapp.exceptions.mappers;
 
 import ar.edu.itba.paw.webapp.exceptions.APIErrorFactory;
 import ar.edu.itba.paw.webapp.media_types.ErrorMIME;
+import ar.edu.itba.paw.webapp.models.error.ErrorConstants;
 
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
@@ -14,7 +15,15 @@ public class GlobalExceptionMapper implements ExceptionMapper<Throwable> {
     public Response toResponse(Throwable exception) {
         return Response
                 .status(Status.INTERNAL_SERVER_ERROR)
-                .entity(APIErrorFactory.buildError(Status.INTERNAL_SERVER_ERROR).build())
+                .entity(
+                        APIErrorFactory
+                                .buildError(Status.INTERNAL_SERVER_ERROR)
+                                .withReason(
+                                        Status.INTERNAL_SERVER_ERROR.getStatusCode(),
+                                        ErrorConstants.INTERNAL_SERVER_ERROR.getMessage()
+                                )
+                                .build()
+                )
                 .type(ErrorMIME.ERROR)
                 .build();
     }

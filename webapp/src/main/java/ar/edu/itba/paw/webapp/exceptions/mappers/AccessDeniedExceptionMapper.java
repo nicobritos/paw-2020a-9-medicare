@@ -2,6 +2,7 @@ package ar.edu.itba.paw.webapp.exceptions.mappers;
 
 import ar.edu.itba.paw.webapp.exceptions.APIErrorFactory;
 import ar.edu.itba.paw.webapp.media_types.ErrorMIME;
+import ar.edu.itba.paw.webapp.models.error.ErrorConstants;
 import org.springframework.security.access.AccessDeniedException;
 
 import javax.ws.rs.core.Response;
@@ -15,7 +16,15 @@ public class AccessDeniedExceptionMapper implements ExceptionMapper<AccessDenied
     public Response toResponse(AccessDeniedException exception) {
         return Response
                 .status(Status.FORBIDDEN)
-                .entity(APIErrorFactory.buildError(Status.FORBIDDEN).build())
+                .entity(
+                        APIErrorFactory
+                                .buildError(Status.FORBIDDEN)
+                                .withReason(
+                                        Status.FORBIDDEN.getStatusCode(),
+                                        ErrorConstants.FORBIDDEN.getMessage()
+                                )
+                                .build()
+                )
                 .type(ErrorMIME.ERROR)
                 .build();
     }
