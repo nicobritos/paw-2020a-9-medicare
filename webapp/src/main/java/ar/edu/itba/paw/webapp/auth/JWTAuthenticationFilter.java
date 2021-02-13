@@ -4,6 +4,7 @@ import ar.edu.itba.paw.interfaces.services.DoctorService;
 import ar.edu.itba.paw.interfaces.services.PatientService;
 import ar.edu.itba.paw.interfaces.services.UserService;
 import ar.edu.itba.paw.models.Doctor;
+import ar.edu.itba.paw.webapp.exceptions.APIErrorFactory;
 import ar.edu.itba.paw.webapp.exceptions.ExceptionResponseWriter;
 import ar.edu.itba.paw.webapp.media_types.LoginMIME;
 import ar.edu.itba.paw.webapp.media_types.MIMEHelper;
@@ -13,6 +14,7 @@ import ar.edu.itba.paw.webapp.models.Constants;
 import ar.edu.itba.paw.webapp.models.UserCredentials;
 import ar.edu.itba.paw.webapp.models.UserMe;
 import ar.edu.itba.paw.webapp.models.UserMeFactory;
+import ar.edu.itba.paw.webapp.models.error.ErrorConstants;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.exc.UnrecognizedPropertyException;
 import org.slf4j.Logger;
@@ -81,7 +83,13 @@ public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilte
 
         if (((boolean) request.getAttribute(Constants.VALID_JWT_REQUEST_ATTRIBUTE))) {
             // The user has already logged in
-            ExceptionResponseWriter.setError(response, Status.FORBIDDEN);
+            ExceptionResponseWriter.setError(
+                    response,
+                    APIErrorFactory
+                            .buildError(Status.FORBIDDEN)
+                            .withReason(ErrorConstants.FORBIDDEN)
+                            .build()
+            );
             return null;
         }
 
@@ -92,17 +100,35 @@ public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilte
             ExceptionResponseWriter.setError(response, Status.BAD_REQUEST);
             return null;
         } catch (IOException e) {
-            ExceptionResponseWriter.setError(response, Status.INTERNAL_SERVER_ERROR);
+            ExceptionResponseWriter.setError(
+                    response,
+                    APIErrorFactory
+                            .buildError(Status.INTERNAL_SERVER_ERROR)
+                            .withReason(ErrorConstants.INTERNAL_SERVER_ERROR)
+                            .build()
+            );
             return null;
         }
 
         try {
             return this.authenticator.attemptAuthentication(credentials);
         } catch (AuthenticationException e) {
-            ExceptionResponseWriter.setError(response, Status.UNAUTHORIZED, "Invalid username or password");
+            ExceptionResponseWriter.setError(
+                    response,
+                    APIErrorFactory
+                            .buildError(Status.UNAUTHORIZED)
+                            .withReason(ErrorConstants.LOGIN_INVALID_CREDENTIALS)
+                            .build()
+            );
             return null;
         } catch (Exception e) {
-            ExceptionResponseWriter.setError(response, Status.INTERNAL_SERVER_ERROR);
+            ExceptionResponseWriter.setError(
+                    response,
+                    APIErrorFactory
+                            .buildError(Status.INTERNAL_SERVER_ERROR)
+                            .withReason(ErrorConstants.INTERNAL_SERVER_ERROR)
+                            .build()
+            );
             return null;
         }
     }

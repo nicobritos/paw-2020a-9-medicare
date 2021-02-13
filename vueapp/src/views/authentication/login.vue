@@ -1,7 +1,7 @@
 <template>
     <div
         class="container-fluid w-100 h-100 d-flex flex-column justify-content-center align-items-center login-container">
-        <form class="register-form border p-5 rounded" @submit="submitForm">
+        <form class="register-form border p-5 rounded" @submit="login">
             <div class="row">
                 <h6>Medicare <img :src='logo' id="logo"/></h6>
             </div>
@@ -67,9 +67,9 @@ import logo from '@/assets/logo.svg';
 import eye from '@/assets/eye.svg';
 import noeye from '@/assets/noeye.svg';
 import {Component, Vue, Watch} from 'vue-property-decorator';
-import {isValidEmail, Nullable, createPath} from '~/logic/Utils';
+import {createPath, isValidEmail, Nullable} from '~/logic/Utils';
 import {authActionTypes} from '~/store/types/auth.types';
-import {Getter, State} from 'vuex-class';
+import {State} from 'vuex-class';
 import {User} from '~/logic/models/User';
 
 @Component
@@ -127,13 +127,6 @@ export default class Login extends Vue {
                 email: this.email
             }));
         }
-
-    }
-
-    public submitForm(e:Event){
-        e.preventDefault();
-        e.stopPropagation();
-        return this.login(e);
     }
 
     get valid(): boolean {

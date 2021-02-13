@@ -3,6 +3,7 @@ package ar.edu.itba.paw.webapp.auth;
 import ar.edu.itba.paw.webapp.exceptions.APIErrorFactory;
 import ar.edu.itba.paw.webapp.exceptions.ExceptionResponseWriter;
 import ar.edu.itba.paw.webapp.models.Constants;
+import ar.edu.itba.paw.webapp.models.error.APIError;
 import ar.edu.itba.paw.webapp.models.error.ErrorConstants;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.AuthenticationEntryPoint;
@@ -30,7 +31,20 @@ public class JWTAuthenticationEntryPoint implements AuthenticationEntryPoint {
             // If it was, then we need to throw a Forbidden error
             // It the user wasn't logged in, then we need to throw an Unauthorized error.
             boolean validJWT = (boolean) httpServletRequest.getAttribute(Constants.VALID_JWT_REQUEST_ATTRIBUTE);
-            ExceptionResponseWriter.setError(httpServletResponse, !validJWT ? Status.UNAUTHORIZED : Status.FORBIDDEN);
+            APIError apiError;
+            if (!validJWT) {
+                apiError = APIErrorFactory
+                        .buildError(Status.UNAUTHORIZED)
+                        .withReason(ErrorConstants.UNAUTHORIZED)
+                        .build();
+            } else {
+                apiError = APIErrorFactory
+                        .buildError(Status.FORBIDDEN)
+                        .withReason(ErrorConstants.FORBIDDEN)
+                        .build();
+            }
+
+            ExceptionResponseWriter.setError(httpServletResponse, apiError);
         }
     }
 }

@@ -152,9 +152,15 @@ public abstract class ErrorConstants {
             = new APISubError(66, "The time range overlaps with an existing workday");
     public static final APISubError USER_UPDATE_INVALID_PASSWORD
             = invalidField(67, "password");
+    public static final APISubError LOGIN_INVALID_CREDENTIALS
+            = invalidField(68, "Invalid username or password");
 
+    public static final APISubError UNAUTHORIZED
+            = invalidField(401, "Unauthorized");
     public static final APISubError FORBIDDEN
             = invalidField(403, "Forbidden");
+    public static final APISubError NOT_FOUND
+            = invalidField(404, "Not found");
     public static final APISubError INTERNAL_SERVER_ERROR
             = new APISubError(500, "Internal server error");
 

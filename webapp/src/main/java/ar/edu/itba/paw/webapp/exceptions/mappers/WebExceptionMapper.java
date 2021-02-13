@@ -37,10 +37,7 @@ public class WebExceptionMapper implements ExceptionMapper<WebApplicationExcepti
                     .entity(
                             APIErrorFactory
                                     .buildError(Status.INTERNAL_SERVER_ERROR)
-                                    .withReason(
-                                            Status.INTERNAL_SERVER_ERROR.getStatusCode(),
-                                            ErrorConstants.INTERNAL_SERVER_ERROR.getMessage()
-                                    )
+                                    .withReason(ErrorConstants.INTERNAL_SERVER_ERROR)
                                     .build()
                     )
                     .type(ErrorMIME.ERROR)

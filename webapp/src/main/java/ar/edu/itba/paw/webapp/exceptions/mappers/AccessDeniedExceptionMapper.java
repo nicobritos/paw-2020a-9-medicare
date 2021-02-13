@@ -19,10 +19,7 @@ public class AccessDeniedExceptionMapper implements ExceptionMapper<AccessDenied
                 .entity(
                         APIErrorFactory
                                 .buildError(Status.FORBIDDEN)
-                                .withReason(
-                                        Status.FORBIDDEN.getStatusCode(),
-                                        ErrorConstants.FORBIDDEN.getMessage()
-                                )
+                                .withReason(ErrorConstants.FORBIDDEN)
                                 .build()
                 )
                 .type(ErrorMIME.ERROR)

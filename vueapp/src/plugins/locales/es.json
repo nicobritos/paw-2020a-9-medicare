@@ -299,7 +299,9 @@
   "Error65": "La imagen es muy grande",
   "Error66": "El intervalo de tiempo seleccionado se solapa con un horario existente",
   "Error67": "Nueva contraseña invalida",
+  "Error68": "Usuario o contraseña invalida",
 
+  "Error401": "Necesitas iniciar sesion para realizar esta accion",
   "Error403": "No tienes los permisos necesarios para realizar esta accion",
   "Error500": "Un error desconocido ha ocurrido. Por favor, intenta nuevamente mas tarde"
 }

@@ -299,7 +299,9 @@
   "Error65": "The supplied image is too big",
   "Error66": "The time range overlaps with an existing workday",
   "Error67": "Invalid new password",
+  "Error68": "Invalid username or password",
 
+  "Error401": "You must log in to perform this action",
   "Error403": "You don't have the required permissions to perform this action",
   "Error500": "An unknown error occurred. Please, try again later"
 }

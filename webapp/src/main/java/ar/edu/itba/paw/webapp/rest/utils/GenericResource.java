@@ -138,15 +138,21 @@ public abstract class GenericResource {
     }
 
     protected WebApplicationException notFound() {
-        return this.error(Status.NOT_FOUND).getError();
+        return this.error(Status.NOT_FOUND)
+                .withReason(ErrorConstants.NOT_FOUND)
+                .getError();
     }
 
     protected WebApplicationException unauthorized() {
-        return this.error(Status.UNAUTHORIZED).getError();
+        return this.error(Status.UNAUTHORIZED)
+                .withReason(ErrorConstants.UNAUTHORIZED)
+                .getError();
     }
 
     protected WebApplicationException forbidden() {
-        return this.error(Status.FORBIDDEN).getError();
+        return this.error(Status.FORBIDDEN)
+                .withReason(ErrorConstants.FORBIDDEN)
+                .getError();
     }
 
     protected APIErrorBuilder error(int code, String message) {
