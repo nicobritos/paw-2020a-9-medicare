@@ -7,16 +7,15 @@
                 content-class="p-0"
                 @show="cleanValues"
                 #default="{ok,cancel}">
-        <form class="addturn-form border p-5 rounded" @submit="submitForm">
+        <form class="addturn-form border p-5 rounded" @submit.prevent="submitForm(ok)">
             <div class="row">
                 <h6>Medicare <img :src='logo' id="logo" alt="logo"/></h6>
             </div>
             <div class="row justify-content-start">
                 <h1 class="addturn-form-title">
-                    {{$t("AddTurno")}}
+                    {{$t("AddSchedule")}}
                 </h1>
             </div>
-
 
             <div class="form-group row">
                 <div class="col">
@@ -78,7 +77,7 @@
                 <button class="form-atras-btn btn" type="button" @click="cancel()">
                     {{$t("Back")}}
                 </button>
-                <button type="submit" class="btn btn-primary" @click="ok()">
+                <button type="submit" class="btn btn-primary" :disabled="disabledButton">
                     {{$t("Add")}}
                 </button>
             </div>
@@ -86,14 +85,15 @@
     </b-modal>    
 </template>
 <script lang="ts">
-import {Component, VModel, Vue} from 'vue-property-decorator';
+import {Component, VModel, Vue, Watch} from 'vue-property-decorator';
 import logo from "@/assets/logo.svg";
-import {createPath} from "@/logic/Utils";
+import {createPath, Nullable} from '@/logic/Utils';
 import {Doctor} from '~/logic/models/Doctor';
 import {State} from 'vuex-class';
 import TYPES from '~/logic/types';
 import {WorkdayService} from '~/logic/interfaces/services/WorkdayService';
-import { Day } from '~/logic/models/utils/DateRange';
+import {Day, WorkdayTime} from '~/logic/models/utils/DateRange';
+import {APIError} from '~/logic/models/APIError';
 
 @Component
 export default class AddWorkday extends Vue {
@@ -107,6 +107,7 @@ export default class AddWorkday extends Vue {
     private endHour = "";
     //this is selected on mount and on clean values
     private officeSelected = 0;
+    private disabledButton: boolean = true;
 
     @State(state => state.auth.doctors)
     private readonly doctors: Doctor[];
@@ -130,26 +131,47 @@ export default class AddWorkday extends Vue {
         }
     }
 
-    submitForm(e:Event){
-        e.preventDefault();
-        e.stopPropagation();
+    submitForm(okCallback: Function) {
+        let start = this.getWorkdayTime(this.startHour);
+        let end = this.getWorkdayTime(this.endHour);
+        if (!start || !end) return;
 
-        let start = this.startHour.split(":").map(v => parseInt(v));
-        let end = this.endHour.split(":").map(v => parseInt(v));
         let day = [ 'MONDAY','TUESDAY','WEDNESDAY','THURSDAY','FRIDAY','SATURDAY','SUNDAY'][this.dowSelected];
         this.getWorkdayService().createList([{
             day: day as Day,
-            end: {
-                hour: end[0],
-                minute: end[1]
-            },
-            start: {
-                hour: start[0],
-                minute: start[1]
+            end: end,
+            start: start
+        }]).then((value) => {
+            if (!(value instanceof APIError)) {
+                okCallback();
+                this.$emit('added');
             }
-        }]).then(()=>{
-            this.$emit("added");
         });
+    }
+
+    @Watch('startHour')
+    @Watch('endHour')
+    private setDisabledButton(): void {
+        let start = this.getWorkdayTime(this.startHour);
+        let end = this.getWorkdayTime(this.endHour);
+        console.log(start);
+        console.log(end);
+        this.disabledButton = !start || !end;
+    }
+
+    private getWorkdayTime(rawString: string): Nullable<WorkdayTime> {
+        let time = rawString.split(":");
+        try {
+            let value = {
+                hour: Number.parseInt(time[0]),
+                minute: Number.parseInt(time[1])
+            };
+            if (isNaN(value.hour) || isNaN(value.minute))
+                return null;
+            return value;
+        } catch (e) {
+            return null;
+        }
     }
 
     private getWorkdayService(): WorkdayService {
