@@ -82,7 +82,11 @@ public class WorkdayResource extends GenericResource {
         }
 
         Collection<Workday> newWorkdays;
-        newWorkdays = this.workdayService.create(workdays);
+        try {
+            newWorkdays = this.workdayService.create(workdays);
+        } catch (MediCareException e) {
+            throw this.unprocessableEntity(ErrorConstants.WORKDAY_CREATE_OVERLAPS);
+        }
 
         return Response
                 .status(Status.CREATED)

@@ -152,6 +152,8 @@ public abstract class ErrorConstants {
             = new APISubError(64, "Invalid image type");
     public static final APISubError IMAGE_TOO_BIG
             = new APISubError(65, "The supplied image is too big");
+    public static final APISubError WORKDAY_CREATE_OVERLAPS
+            = new APISubError(66, "The time range overlaps with an existing workday");
 
     // TODO: Guido front
     public static final APISubError INTERNAL_SERVER_ERROR
