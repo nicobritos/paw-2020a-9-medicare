@@ -256,7 +256,6 @@ export default class MedicHome extends Vue {
     }
 
     async updateTodayAppointments(): Promise<void> {
-        let tomorrow = DateTime.fromJSDate(this.today).plus({ days: 1 }).toJSDate();
         let appointments = await this.getService().list(
             {
                 from: {
@@ -265,24 +264,21 @@ export default class MedicHome extends Vue {
                     day: this.today.getDate()
                 },
                 to: {
-                    year: tomorrow.getFullYear(),
-                    month: tomorrow.getMonth() + 1,
-                    day: tomorrow.getDate()
+                    year: this.today.getFullYear(),
+                    month: this.today.getMonth() + 1,
+                    day: this.today.getDate()
                 }
             }
         );
         if (!(appointments instanceof APIError)) {
             this.todayAppointments = appointments;
+        } else {
+            this.todayAppointments = [];
         }
     }
 
-    /*
-        TODO: nico check this
-        i changed this.today to this.selectedDay, i also made sure to wipe
-        this.weekAppoitnments before pushing new ones
-    */
     async updateWeekAppointments(){
-        let week = DateTime.fromJSDate(this.selectedDay).plus({ weeks: 1 }).toJSDate();
+        let week = DateTime.fromJSDate(this.selectedDay).plus({ days: 6 }).toJSDate();
 
         let appointments = await this.getService().list(
             {
@@ -298,11 +294,15 @@ export default class MedicHome extends Vue {
                 }
             }
         );
+
+        let weekAppointments: Appointment[][] = [[],[],[],[],[],[],[]];
+
         if (!(appointments instanceof APIError)) {
-            let weekAppointments:Appointment[][] = [[],[],[],[],[],[],[]];
             for (let appointment of appointments) {
                 weekAppointments[appointment.dateFrom.getDay()].push(appointment);
             }
+            this.weekAppointments = weekAppointments;
+        } else {
             this.weekAppointments = weekAppointments;
         }
     }

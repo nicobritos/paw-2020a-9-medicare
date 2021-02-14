@@ -154,7 +154,7 @@ export default class PatientHome extends Vue {
     async mounted(){
         this.$store.dispatch('doctorSpecialties/loadDoctorSpecialties', doctorSpecialtyActionTypes.loadDoctorSpecialties());
         let today = new Date();
-        let twoWeeks = DateTime.fromJSDate(today).plus({ weeks: 2 }).toJSDate();
+        let twoWeeks = DateTime.fromJSDate(today).plus({ days: 13 }).toJSDate();
         let appointments = await this.getService().list(
             {
                 from:{

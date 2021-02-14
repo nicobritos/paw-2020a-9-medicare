@@ -203,7 +203,6 @@ export default class SelectAppointment extends Vue {
         if (!this.weekSlots[date.getFullYear()][date.getMonth() + 1]) return [];
         if (!this.weekSlots[date.getFullYear()][date.getMonth() + 1][date.getDate()]) return [];
 
-        console.log(this.weekSlots[date.getFullYear()][date.getMonth() + 1][date.getDate()]);
         return this.weekSlots[date.getFullYear()][date.getMonth() + 1][date.getDate()];
     }
 
@@ -244,7 +243,6 @@ export default class SelectAppointment extends Vue {
 
             for (let weekSlot of slots) {
                 let date = DateTime.local(weekSlot.date.year, weekSlot.date.month, weekSlot.date.day);
-                console.log(date);
                 if (!this.weekSlots[date.year]) this.weekSlots[date.year] = {};
                 if (!this.weekSlots[date.year][date.month]) this.weekSlots[date.year][date.month] = {};
                 if (!this.weekSlots[date.year][date.month][date.day]) this.weekSlots[date.year][date.month][date.day] = [];
