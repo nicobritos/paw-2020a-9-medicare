@@ -163,8 +163,8 @@ public class WebConfig {
         properties.setProperty("hibernate.order_inserts", "true");
         properties.setProperty("hibernate.jdbc.batch_size", "5");
         properties.setProperty("jadira.usertype.autoRegisterUserTypes", "true");
-        properties.setProperty("hibernate.show_sql", "true");
-        properties.setProperty("format_sql", "true");
+//        properties.setProperty("hibernate.show_sql", "true");
+//        properties.setProperty("format_sql", "true");
 
         factoryBean.setJpaProperties(properties);
         return factoryBean;
