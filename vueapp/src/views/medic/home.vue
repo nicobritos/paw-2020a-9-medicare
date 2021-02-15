@@ -49,7 +49,7 @@
                                     <button class="btn" v-if="beingCanceled[appointment.id]" >
                                         <b-spinner small></b-spinner>
                                     </button>
-                                    <button v-else type="button" class="dropdown-item" @click="cancelAppointment(appointment.id, this.today.getDay())">X</button>
+                                    <button v-else type="button" class="btn" @click="cancelAppointment(appointment.id, today.getDay())">X</button>
                                 </div>
                             </div>
                         </div>
@@ -161,7 +161,7 @@
                                                         <b-spinner small></b-spinner>
                                                     </button>
                                                     <button v-else type="button" class="btn"
-                                                            @click="cancelAppointment(appointment.id, this.selectedDay.getDay())"
+                                                            @click="cancelAppointment(appointment.id, selectedDay.getDay())"
                                                     >
                                                         X
                                                     </button>
