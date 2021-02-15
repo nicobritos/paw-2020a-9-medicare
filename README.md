@@ -13,7 +13,11 @@ Contraseña: Dolores1
 
 ## Deployment local
 ### Archivos .properties y .env
-Para poder configurar correctamente los paths de la aplicacion y otras configuraciones para un deployment local es necesario crear varios archivos
+Para poder configurar correctamente los paths de la aplicacion y otras configuraciones para un deployment local es necesario crear varios archivos.
+La aplicacion esta configurada para que primero tome la version local de estos archivos y, si no es encontrada,
+tome la version de produccion (que es el mismo nombre terminado en '-prod.properties' para el caso del properties o '.env' a secas para el caso de los env de Vue).
+Esto permite que se puedan crear archivos con configuracoin local y no tener que modificar datos de acceso a nivel de produccion.
+Por este motivo, los mismos no deberian de ser versionados.
 
 #### Java
 En el caso de Java es necesario crear un archivo 'application-local.properties' con las siguientes propiedades:
