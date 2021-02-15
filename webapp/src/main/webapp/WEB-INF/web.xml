@@ -59,7 +59,7 @@
         <url-pattern>/api/*</url-pattern>
     </servlet-mapping>
 
-    <servlet-mapping>
+    <!-- <servlet-mapping>
         <servlet-name>default</servlet-name>
         <url-pattern>*.css</url-pattern>
     </servlet-mapping>
@@ -81,7 +81,17 @@
             <url-pattern>*.jsp</url-pattern>
             <page-encoding>UTF-8</page-encoding>
         </jsp-property-group>
-    </jsp-config>
+    </jsp-config> -->
+
+    <servlet-mapping>
+        <servlet-name>default</servlet-name>
+        <url-pattern>/*</url-pattern>
+    </servlet-mapping>
+
+    <error-page>
+        <error-code>404</eror-code>
+        <error-page>index.html</error-page>
+    </error-page>
 
     <filter>
         <filter-name>encodingFilter</filter-name>
