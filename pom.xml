@@ -387,12 +387,12 @@
                     <version>3.2.2</version>
                     <configuration>
                         <packagingExcludes>**/logback-test.xml</packagingExcludes>
+                        <webResources>
+                            <resource>
+                                <directory>${vueapp.build-directory}</directory>
+                            </resource>
+                        </webResources>
                     </configuration>
-                    <webResources>
-                        <resource>
-                            <directory>${vueapp.build-directory}</directory>
-                        </resource>
-                    </webResources>
                 </plugin>
                 <plugin>
                     <artifactId>maven-install-plugin</artifactId>
