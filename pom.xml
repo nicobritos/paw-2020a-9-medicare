@@ -36,6 +36,14 @@
         <org.apache.commons.text.version>1.8</org.apache.commons.text.version>
         <jersey.version>3.0-SNAPSHOT</jersey.version>
         <jjwt.version>0.7.0</jjwt.version>
+
+        <!-- TODO: check version -->
+        <frontend-plugin.version>1.11.0</frontend-plugin.version>
+        <frontend-plugin.nodeversion>v10.19.0</frontend-plugin.nodeversion>
+        <!-- 
+            this property should be set in webapp
+            <frontend-plugin.wd>/vueapp</frontend-plugin.wd> 
+        -->
     </properties>
 
     <dependencyManagement>
@@ -421,6 +429,81 @@
                         </dependency>
                     </dependencies>
                 </plugin>
+
+                <!-- 
+                    TODO: check 
+                        esto agrega el front end plugin que paso agus al plugin management
+                -->
+                <plugin>
+                    <groupId>com.github.eirslett</groupId>
+                    <artifactId>frontend-maven-plugin</artifactId>
+                    <version>${frontend-plugin.version}</version>
+                    
+                    <configuration>
+                        <nodeVersion>${frontend-plugin.nodeversion}</nodeVersion>
+                        <workingDirectory>${frontend-plugin.wd}</workingDirectory>
+                    </configuration>
+                    <executions>
+                    
+                        <execution>
+                            <id>install node and yarn</id>
+                            <goals>
+                                <goal>install-node-and-yarn</goal>
+                            </goals>
+                            <phase>generate-resources</phase>
+                        </execution>
+
+                        <execution>
+                            <id>npm install</id>
+                            <goals>
+                                <goal>npm</goal>
+                            </goals>
+                            <phase>generate-resources</phase>
+                            <configuration>
+                                <arguments>install</arguments>
+                            </configuration>
+                        </execution>
+
+                        <execution>
+                            <id>npm build</id>
+                            <goals>
+                                <goal>npm</goal>
+                            </goals>
+                            <phase>generate-resources</phase>
+                            <configuration>
+                                <arguments>build</arguments>
+                            </configuration>
+                        </execution>
+                    </executions>
+                </plugin>
+
+                <!-- 
+                    TODO: check
+                    Esto copia el los resources de dist a resources
+                 -->
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-resources-plugin</artifactId>
+                    <executions>
+                        <execution>
+                            <id>Copy my VueJS app into my Spring Boot target static folder</id>
+                            <phase>process-resources</phase>
+                            <goals>
+                                <goal>copy-resources</goal>
+                            </goals>
+                            <configuration>
+                                <outputDirectory>target/classes/static</outputDirectory>
+                                <resources>
+                                    <resource>
+                                        <directory>src/myvueapp2/dist</directory>
+                                        <filtering>true</filtering>
+                                    </resource>
+                                </resources>
+                            </configuration>
+                        </execution>
+                    </executions>
+                </plugin>
+
             </plugins>
         </pluginManagement>
     </build>

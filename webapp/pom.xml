@@ -20,6 +20,8 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
+        <!-- TODO: check wd -->
+        <frontend-plugin.wd>src/main/vueapp</frontend-plugin.wd> 
     </properties>
 
     <dependencies>
@@ -194,5 +196,12 @@
     </dependencies>
     <build>
         <finalName>webapp</finalName>
+        <!-- TODO:check -->
+        <plugins>
+            <plugin>
+                <groupId>com.github.eirslett</groupId>
+                <artifactId>frontend-maven-plugin</artifactId>    
+            </plugin>
+        </plugins>
     </build>
 </project>
