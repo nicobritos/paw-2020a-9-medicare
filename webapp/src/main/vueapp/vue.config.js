@@ -2,6 +2,8 @@ const path = require("path");
 const vueSrc = "./src";
 
 module.exports = {
+  // TODO:check
+  publicPath: process.env.VUE_APP_ROOT_PATH ? VUE_APP_ROOT_PATH : "/",
     pluginOptions: {
       i18n: {
         locale: 'en',
