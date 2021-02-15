@@ -387,12 +387,12 @@
                     <version>3.2.2</version>
                     <configuration>
                         <packagingExcludes>**/logback-test.xml</packagingExcludes>
+                        <webResources>
+                            <resource>
+                                <directory>${vueapp.build-directory}</directory>
+                            </resource>
+                        </webResources>
                     </configuration>
-                    <webResources>
-                        <resource>
-                            <directory>${vueapp.build-directory}</directory>
-                        </resource>
-                    </webResources>
                 </plugin>
                 <plugin>
                     <artifactId>maven-install-plugin</artifactId>
@@ -448,13 +448,14 @@
                     <configuration>
                         <nodeVersion>${frontend-plugin.nodeversion}</nodeVersion>
                         <workingDirectory>${frontend-plugin.wd}</workingDirectory>
+                        <installDirectory>${frontend-plugin.wd}</installDirectory>
                     </configuration>
                     <executions>
                     
                         <execution>
-                            <id>install node and yarn</id>
+                            <id>install node and npm</id>
                             <goals>
-                                <goal>install-node-and-yarn</goal>
+                                <goal>install-node-and-npm</goal>
                             </goals>
                             <phase>generate-resources</phase>
                         </execution>
@@ -477,7 +478,7 @@
                             </goals>
                             <phase>generate-resources</phase>
                             <configuration>
-                                <arguments>build</arguments>
+                                <arguments>run build</arguments>
                             </configuration>
                         </execution>
                     </executions>
