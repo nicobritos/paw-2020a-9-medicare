@@ -43,6 +43,7 @@
         <!-- 
             this property should be set in webapp
             <frontend-plugin.wd>/vueapp</frontend-plugin.wd> 
+            <vueapp.build-directory></vueapp.build-directory>
         -->
     </properties>
 
@@ -387,6 +388,11 @@
                     <configuration>
                         <packagingExcludes>**/logback-test.xml</packagingExcludes>
                     </configuration>
+                    <webResources>
+                        <resource>
+                            <directory>${vueapp.build-directory}</directory>
+                        </resource>
+                    </webResources>
                 </plugin>
                 <plugin>
                     <artifactId>maven-install-plugin</artifactId>
@@ -476,34 +482,6 @@
                         </execution>
                     </executions>
                 </plugin>
-
-                <!-- 
-                    TODO: check
-                    Esto copia el los resources de dist a resources
-                 -->
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-resources-plugin</artifactId>
-                    <executions>
-                        <execution>
-                            <id>Copy my VueJS app into my Spring Boot target static folder</id>
-                            <phase>process-resources</phase>
-                            <goals>
-                                <goal>copy-resources</goal>
-                            </goals>
-                            <configuration>
-                                <outputDirectory>target/classes/static</outputDirectory>
-                                <resources>
-                                    <resource>
-                                        <directory>src/myvueapp2/dist</directory>
-                                        <filtering>true</filtering>
-                                    </resource>
-                                </resources>
-                            </configuration>
-                        </execution>
-                    </executions>
-                </plugin>
-
             </plugins>
         </pluginManagement>
     </build>

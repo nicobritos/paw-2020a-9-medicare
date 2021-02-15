@@ -21,7 +21,8 @@
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
         <!-- TODO: check wd -->
-        <frontend-plugin.wd>src/main/vueapp</frontend-plugin.wd> 
+        <frontend-plugin.wd>src/main/vueapp</frontend-plugin.wd>
+        <vueapp.build-directory>src/main/vueapp/dist</vueapp.build-directory> 
     </properties>
 
     <dependencies>
