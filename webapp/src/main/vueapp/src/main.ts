@@ -5,10 +5,13 @@ import i18n from './plugins/i18n'
 import { BootstrapVue, IconsPlugin } from 'bootstrap-vue'
 import store from '~/plugins/vuex';
 import {inversifyPlugin} from '~/plugins/inversify';
+import VueSocialSharing from 'vue-social-sharing'
 
 Vue.use(BootstrapVue);
 Vue.use(IconsPlugin);
 Vue.use(inversifyPlugin);
+Vue.use(VueSocialSharing);
+
 
 Vue.config.productionTip = false;
 

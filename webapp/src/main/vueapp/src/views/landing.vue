@@ -48,16 +48,55 @@
             </form>
             <br>
             <div class="container"><hr></div>
-            <ShareNetwork
-                network="facebook"
-                url="https://news.vuejs.org/issues/180"
-                title="¡Compartí MediCare con tus amigos!"
-            >
-                ¡Compartí MediCare con tus amigos!
-            </ShareNetwork>
-            <div class="shareContainer">
-                <h1></h1>
-
+            <div class="d-flex py-0 px-1 justify-content-center">
+                <h4 class="pt-1">{{$t("ShareMedicareWithFriends")}}</h4>
+                <div class="ml-3 d-flex justify-content-center">
+                    <ShareNetwork
+                        network="facebook"
+                        :url="getShareURL()"
+                        :title='$t("ShareMedicareWithFriends")'
+                        tag="a"
+                        class="ml-3"
+                    >
+                        <img class="sharing-social-icons" :src="facebookIcon">
+                    </ShareNetwork>
+                    <ShareNetwork
+                        network="twitter"
+                        :url="getShareURL()"
+                        :title='$t("ShareMedicareWithFriends")'
+                        tag="a"
+                        class="ml-3"
+                    >
+                        <img class="sharing-social-icons" :src="twitterIcon">
+                    </ShareNetwork>
+                    <ShareNetwork
+                        network="whatsapp"
+                        :url="getShareURL()"
+                        :title='$t("ShareMedicareWithFriends")'
+                        tag="a"
+                        class="ml-3"
+                    >
+                        <img class="sharing-social-icons" :src="whatsappIcon">
+                    </ShareNetwork>
+                    <ShareNetwork
+                        network="linkedin"
+                        :url="getShareURL()"
+                        :title='$t("ShareMedicareWithFriends")'
+                        tag="a"
+                        class="ml-3"
+                    >
+                        <img class="sharing-social-icons" :src="linkedinIcon">
+                    </ShareNetwork>
+                    <ShareNetwork
+                        network="pinterest"
+                        :url="getShareURL()"
+                        :title='$t("ShareMedicareWithFriends")'
+                        tag="a"
+                        class="ml-3"
+                    >
+                        <img class="sharing-social-icons" :src="pinterestIcon">
+                    </ShareNetwork>
+                </div>
                 <br>
             </div>
             <br>
@@ -74,6 +113,11 @@ import {State} from 'vuex-class';
 import {localityActionTypes} from '~/store/types/localities.types';
 import {doctorSpecialtyActionTypes} from '~/store/types/doctorSpecialties.types';
 import {createPath, Hash, Nullable} from '~/logic/Utils';
+import facebookIcon from "~/assets/logos/facebooklogo.svg";
+import linkedinIcon from "~/assets/logos/linkedinlogo.svg";
+import pinterestIcon from "~/assets/logos/pinterestlogo.svg";
+import twitterIcon from "~/assets/logos/twitterlogo.svg";
+import whatsappIcon from "~/assets/logos/whatsapplogo.svg";
 
 @Component
 export default class Landing extends Vue {
@@ -85,6 +129,13 @@ export default class Landing extends Vue {
     private name: string = '';
     private localityId: Nullable<number> = null;
     private specialtyId: Nullable<number> = null;
+
+    private readonly facebookIcon = facebookIcon;
+    private readonly linkedinIcon = linkedinIcon; 
+    private readonly pinterestIcon = pinterestIcon; 
+    private readonly twitterIcon = twitterIcon; 
+    private readonly whatsappIcon = whatsappIcon; 
+
 
     mounted(): void {
         this.$store.dispatch('localities/loadLocalities', localityActionTypes.loadLocalities());
@@ -111,6 +162,10 @@ export default class Landing extends Vue {
             path: createPath("/mediclist"),
             query
         }).catch(()=>{});
+    }
+
+    getShareURL(){
+        return location.href;
     }
 }
 </script>
@@ -144,18 +199,8 @@ export default class Landing extends Vue {
     background-color: rgb(214, 214, 214);
 }
 
-.shareContainer {
-    display: flex;
-    padding: 0% 10%;
-    justify-content: center;
-}
-
-.shareContainer > h1 {
-    font-size: 1.5em;
-    padding-top: 14px;
-}
-
-.shareContainer > .social {
-    margin-left: 30px;
+.sharing-social-icons{
+    width: 2em;
+    height: 2em;
 }
 </style>
