@@ -53,7 +53,7 @@ de la aplicacion seguira funcionando
 #### Vue
 En el caso de Vue es necesario crear un archivo '.env.local' con las siguientes entradas
 
-```env
+ ```dotenv
 # Host donde se encuentra el servidor. Todas las llamadas que se hacen en Vue
 # que no corresponden a alguna ruta .html sera proxeada a esta direccion
 # como lo son las llamadas a la API.
