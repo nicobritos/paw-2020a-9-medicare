@@ -12,15 +12,13 @@
                 <RouterLink :to='getUrl("signup/patient")' tag="div"
                              class="d-flex flex-column mr-5 align-items-center card card-shadow pointer p-2"
                              id="signup-patient">
-                    <!-- TODO: solve icons -->
-                    <i class="fa fa-hospital-user" style="font-size: 80px;"></i>
+                    <img :src="hospitalUserIcon" style="height:80px;">
                     <h4 class="mt-2">{{ $t('LookingForMedics') }}</h4>
                 </RouterLink>
                 <RouterLink :to='getUrl("signup/doctor")' tag="div"
                              class="d-flex flex-column align-items-center card card-shadow pointer p-2"
                              id="signup-doctor">
-                    <!-- TODO: solve icons -->
-                    <i class="fa fa-user-md" style="font-size: 80px;"></i>
+                    <img :src="userMdIcon" style="height:80px;">
                     <h4 class="mt-2">{{ $t('IMAMedic') }}</h4>
                 </RouterLink>
             </div>
@@ -32,11 +30,17 @@
 import logo from '@/assets/logo.svg';
 import {Component, Vue} from 'vue-property-decorator';
 
+/* this icons are from font awesome */
+import hospitalUserIcon from "~/assets/hospitalUser.svg";
+import userMdIcon from "~/assets/userMd.svg";
+
 import {createPath} from "~/logic/Utils";
 
 @Component
 export default class Signup extends Vue {
     private logo = logo;
+    private readonly hospitalUserIcon = hospitalUserIcon;
+    private readonly userMdIcon = userMdIcon;
 
     getUrl(url:string):string{
         return createPath(url);
