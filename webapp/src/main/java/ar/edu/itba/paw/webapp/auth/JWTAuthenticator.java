@@ -44,7 +44,7 @@ public class JWTAuthenticator {
 
     @Value("${app.api.path}")
     private String APP_SUBPATH;
-    @Value("${app.host}")
+    @Value("${app.jwt.cookie}")
     private String APP_HOST;
 
     private final String secret;
