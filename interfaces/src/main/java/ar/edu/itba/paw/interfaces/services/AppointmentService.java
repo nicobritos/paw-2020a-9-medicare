@@ -32,7 +32,11 @@ public interface AppointmentService extends GenericService<Appointment, Integer>
 
     List<Appointment> findAppointmentsOfDoctorsInDateInterval(Collection<Doctor> doctors, LocalDateTime from, LocalDateTime to);
 
+    List<Appointment> findPendingAppointmentsOfDoctorsInDateInterval(Collection<Doctor> doctors, LocalDateTime from, LocalDateTime to);
+
     List<Appointment> findAppointmentsOfPatientsInDateInterval(Collection<Patient> patients, LocalDateTime from, LocalDateTime to);
+
+    List<Appointment> findPendingAppointmentsOfPatientsInDateInterval(Collection<Patient> patients, LocalDateTime from, LocalDateTime to);
 
     List<Appointment> findPendingByWorkday(Workday workday);
 

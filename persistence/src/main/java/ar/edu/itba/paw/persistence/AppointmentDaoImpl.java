@@ -111,6 +111,33 @@ public class AppointmentDaoImpl extends GenericDaoImpl<Appointment, Integer> imp
     }
 
     @Override
+    public List<Appointment> findPendingByDoctorsAndDate(Collection<Doctor> doctors, LocalDateTime fromDate, LocalDateTime toDate) {
+        if (fromDate == null || toDate == null || doctors == null)
+            throw new IllegalArgumentException();
+        if (doctors.isEmpty())
+            return Collections.emptyList();
+
+        CriteriaBuilder builder = this.getEntityManager().getCriteriaBuilder();
+        CriteriaQuery<Appointment> query = builder.createQuery(Appointment.class);
+        Root<Appointment> root = query.from(Appointment.class);
+
+        query.select(root);
+        Path<?> expression = root.get(Appointment_.doctor);
+        Predicate predicate = expression.in(doctors);
+        query.where(builder.and(
+                predicate,
+                builder.between(
+                        root.get(Appointment_.fromDate),
+                        fromDate,
+                        toDate
+                ),
+                builder.equal(root.get(Appointment_.appointmentStatus), AppointmentStatus.PENDING)
+        ));
+
+        return this.selectQuery(builder, query, root);
+    }
+
+    @Override
     public List<Appointment> findByPatientsAndDate(Collection<Patient> patients, LocalDateTime fromDate, LocalDateTime toDate) {
         if (fromDate == null || patients == null)
             throw new IllegalArgumentException();
@@ -131,6 +158,33 @@ public class AppointmentDaoImpl extends GenericDaoImpl<Appointment, Integer> imp
                         fromDate,
                         toDate
                 )
+        ));
+
+        return this.selectQuery(builder, query, root);
+    }
+
+    @Override
+    public List<Appointment> findPendingByPatientsAndDate(Collection<Patient> patients, LocalDateTime fromDate, LocalDateTime toDate) {
+        if (fromDate == null || patients == null)
+            throw new IllegalArgumentException();
+        if (patients.isEmpty())
+            return Collections.emptyList();
+
+        CriteriaBuilder builder = this.getEntityManager().getCriteriaBuilder();
+        CriteriaQuery<Appointment> query = builder.createQuery(Appointment.class);
+        Root<Appointment> root = query.from(Appointment.class);
+
+        query.select(root);
+        Path<?> expression = root.get(Appointment_.patient);
+        Predicate predicate = expression.in(patients);
+        query.where(builder.and(
+                predicate,
+                builder.between(
+                        root.get(Appointment_.fromDate),
+                        fromDate,
+                        toDate
+                ),
+                builder.equal(root.get(Appointment_.appointmentStatus), AppointmentStatus.PENDING)
         ));
 
         return this.selectQuery(builder, query, root);

@@ -96,12 +96,12 @@ public class AppointmentResource extends GenericResource {
 
         if (this.isDoctor()) {
             return Response
-                    .ok(this.appointmentService.findAppointmentsOfDoctorsInDateInterval(doctors, dateFrom, dateTo))
+                    .ok(this.appointmentService.findPendingAppointmentsOfDoctorsInDateInterval(doctors, dateFrom, dateTo))
                     .type(AppointmentMIME.GET_LIST)
                     .build();
         } else {
             return Response
-                    .ok(this.appointmentService.findAppointmentsOfPatientsInDateInterval(patients, dateFrom, dateTo))
+                    .ok(this.appointmentService.findPendingAppointmentsOfPatientsInDateInterval(patients, dateFrom, dateTo))
                     .type(AppointmentMIME.GET_LIST)
                     .build();
         }
