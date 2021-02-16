@@ -61,7 +61,7 @@ public class AppointmentDaoImplTest {
     private static final String URL = "www.hnacional.com";
     private static final int REGISTRATION_NUMBER = 123;
     private static final AppointmentStatus STATUS = AppointmentStatus.PENDING;
-    private static final int YEAR = 2020;
+    private static final int YEAR = LocalDateTime.now().getYear() + 1;
     private static final int MONTH = 5;
     private static final int DAY = 25;
     private static final int HOUR = 11;
@@ -1423,7 +1423,7 @@ public class AppointmentDaoImplTest {
         insertAnotherAppointment();
 
         // 2. Ejercitar
-        List<Appointment> appointments = this.appointmentDao.findByDate(patientModel(), new LocalDateTime(2021, MONTH, DAY, HOUR, MINUTE));
+        List<Appointment> appointments = this.appointmentDao.findByDate(patientModel(), new LocalDateTime(YEAR, MONTH, DAY, HOUR, MINUTE));
 
         // 3. Postcondiciones
         assertNotNull(appointments);
@@ -1498,7 +1498,7 @@ public class AppointmentDaoImplTest {
         List<Appointment> appointments = this.appointmentDao.findByPatientsAndDate(
                 Collections.singletonList(patientModel()),
                 new LocalDateTime(YEAR, MONTH, DAY, HOUR, MINUTE),
-                LocalDateTime.now());
+                new LocalDateTime(YEAR, MONTH, DAY, HOUR + 1, MINUTE));
 
         // 3. Postcondiciones
         assertNotNull(appointments);
@@ -1583,7 +1583,7 @@ public class AppointmentDaoImplTest {
         insertAnotherAppointment();
 
         // 2. Ejercitar
-        List<Appointment> appointments = this.appointmentDao.findByPatientsAndDate(Collections.singletonList(patientModel()), new LocalDateTime(2021, MONTH, DAY, HOUR, MINUTE), LocalDateTime.now().plusYears(1));
+        List<Appointment> appointments = this.appointmentDao.findByPatientsAndDate(Collections.singletonList(patientModel()), new LocalDateTime(YEAR, MONTH, DAY, HOUR, MINUTE), LocalDateTime.now().plusYears(1));
 
         // 3. Postcondiciones
         assertNotNull(appointments);
@@ -1686,7 +1686,7 @@ public class AppointmentDaoImplTest {
         insertAnotherAppointment();
 
         // 2. Ejercitar
-        List<Appointment> appointments = this.appointmentDao.findByPatientsFromDate(Collections.singletonList(patientModel()), new LocalDateTime(2021, MONTH, DAY, HOUR, MINUTE));
+        List<Appointment> appointments = this.appointmentDao.findByPatientsFromDate(Collections.singletonList(patientModel()), new LocalDateTime(YEAR, MONTH, DAY, HOUR, MINUTE));
 
         // 3. Postcondiciones
         assertNotNull(appointments);
@@ -1843,7 +1843,7 @@ public class AppointmentDaoImplTest {
         insertAnotherAppointment();
 
         // 2. Ejercitar
-        List<Appointment> appointments = this.appointmentDao.findByDoctorsAndDate(Collections.singletonList(doctorModel()), new LocalDateTime(2021, MONTH, DAY, HOUR, MINUTE));
+        List<Appointment> appointments = this.appointmentDao.findByDoctorsAndDate(Collections.singletonList(doctorModel()), new LocalDateTime(YEAR, MONTH, DAY, HOUR, MINUTE));
 
         // 3. Postcondiciones
         assertNotNull(appointments);
@@ -2220,7 +2220,7 @@ public class AppointmentDaoImplTest {
 
         // 2. Ejercitar
         List<Appointment> appointments = this.appointmentDao.findAllAppointmentsToNotifyUpTo(
-                new LocalDateTime(YEAR, MONTH, DAY, HOUR_2, MINUTE_2));
+                new LocalDateTime(YEAR - 1, MONTH, DAY, HOUR_2, MINUTE_2));
 
         // 3. Postcondiciones
         assertNotNull(appointments);

@@ -40,7 +40,7 @@ public class AppointmentServiceImplTest {
     private static final String OFFICE_NAME = "Oficina";
     private static final String URL = "www.oficinahospital.com";
     private static final int PATIENT_ID = 1;
-    private static final int YEAR = 2021;
+    private static final int YEAR = LocalDateTime.now().getYear() + 1;
     private static final int MONTH = 1;
     private static final int DAY_OF_MONTH = 29;
     private static final int HOUR = 12;
@@ -176,10 +176,6 @@ public class AppointmentServiceImplTest {
                 .thenReturn(true);
         Mockito.when(workdayServiceMock.findByDoctor(doctorModel(), WorkdayDay.from(dateModel())))
                 .thenReturn(Collections.singletonList(workday));
-        Mockito.when(patientServiceMock.findByUserAndOffice(Mockito.eq(userModel()), Mockito.eq(officeModel())))
-                .thenReturn(Optional.empty());
-        Mockito.when(patientServiceMock.create(Mockito.eq(patientModel())))
-                .thenReturn(patientModel());
         Mockito.when(appointmentDaoMock.findByDoctorsAndDate(Mockito.eq(Collections.singletonList(doctorModel())), Mockito.eq(dateModel())))
                 .thenReturn(Collections.emptyList());
         Mockito.when(appointmentDaoMock.create(Mockito.eq(appointmentModel())))
