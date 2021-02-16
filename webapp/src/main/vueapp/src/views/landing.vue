@@ -48,10 +48,16 @@
             </form>
             <br>
             <div class="container"><hr></div>
-            <div class="shareDiv">
-                <h1 class="shareTitle">¡Compartí MediCare con tus amigos!</h1>
-                <div class="shareSocial"></div>
-                <!-- TODO:REDO THIS -->
+            <ShareNetwork
+                network="facebook"
+                url="https://news.vuejs.org/issues/180"
+                title="¡Compartí MediCare con tus amigos!"
+            >
+                ¡Compartí MediCare con tus amigos!
+            </ShareNetwork>
+            <div class="shareContainer">
+                <h1></h1>
+
                 <br>
             </div>
             <br>
@@ -138,18 +144,18 @@ export default class Landing extends Vue {
     background-color: rgb(214, 214, 214);
 }
 
-.shareDiv {
+.shareContainer {
     display: flex;
     padding: 0% 10%;
     justify-content: center;
 }
 
-.shareTitle {
+.shareContainer > h1 {
     font-size: 1.5em;
     padding-top: 14px;
 }
 
-.shareSocial {
+.shareContainer > .social {
     margin-left: 30px;
 }
 </style>
