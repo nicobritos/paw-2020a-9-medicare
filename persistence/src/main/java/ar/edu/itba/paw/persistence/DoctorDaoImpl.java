@@ -18,6 +18,7 @@ import java.util.stream.Collectors;
 @Repository
 public class DoctorDaoImpl extends GenericDaoImpl<Doctor, Integer> implements DoctorDao {
     private static final int DEFAULT_PAGE_SIZE = 10;
+    private static final String UNACCENT_FUNC = "unaccent";
 
     public DoctorDaoImpl() {
         super(Doctor.class, Doctor_.id);
@@ -252,7 +253,7 @@ public class DoctorDaoImpl extends GenericDaoImpl<Doctor, Integer> implements Do
             name = name.replace("_", "\\_");
             predicates.add(
                     builder.like(
-                            builder.lower(expression),
+                            builder.function(UNACCENT_FUNC, String.class, builder.lower(expression)),
                             StringSearchType.CONTAINS_NO_ACC.transform(name.toLowerCase())
                     )
             );
@@ -265,7 +266,7 @@ public class DoctorDaoImpl extends GenericDaoImpl<Doctor, Integer> implements Do
             name = name.replace("_", "\\_");
             predicates.add(
                     builder.like(
-                            builder.lower(expression),
+                            builder.function(UNACCENT_FUNC, String.class, builder.lower(expression)),
                             StringSearchType.CONTAINS_NO_ACC.transform(name.toLowerCase())
                     )
             );

@@ -19,6 +19,8 @@ import java.util.Optional;
 
 @Repository
 public class ProvinceDaoImpl extends GenericSearchableDaoImpl<Province, Integer> implements ProvinceDao {
+    private static final String UNACCENT_FUNC = "unaccent";
+
     public ProvinceDaoImpl() {
         super(Province.class, Province_.id);
     }
@@ -51,7 +53,7 @@ public class ProvinceDaoImpl extends GenericSearchableDaoImpl<Province, Integer>
         query.where(
                 builder.and(
                         builder.like(
-                                builder.lower(root.get(Province_.name).as(String.class)),
+                                builder.function(UNACCENT_FUNC, String.class, builder.lower(root.get(Province_.name).as(String.class))),
                                 StringSearchType.CONTAINS_NO_ACC.transform(name.toLowerCase())
                         ),
                         builder.equal(root.get(Province_.country), country)
