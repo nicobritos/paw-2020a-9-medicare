@@ -16,9 +16,9 @@
 import {Component, Vue, Watch} from 'vue-property-decorator';
 import TYPES from '~/logic/types';
 import {VerifyService} from '~/logic/interfaces/services/VerifyService';
-import { State } from 'vuex-class';
-import { User } from '~/logic/models/User';
-import { createPath } from "~/logic/Utils";
+import {State} from 'vuex-class';
+import {User} from '~/logic/models/User';
+import {createPath} from "~/logic/Utils";
 
 @Component
 export default class Unverified extends Vue {
@@ -54,7 +54,6 @@ export default class Unverified extends Vue {
             || typeof this.$route.params.token !== 'string'
             || (token = this.$route.params.token).length === 0)
         {
-            this.tokenError = true;
             return;
         }
 
