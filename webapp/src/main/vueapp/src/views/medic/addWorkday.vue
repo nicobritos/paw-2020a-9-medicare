@@ -87,7 +87,7 @@
 <script lang="ts">
 import {Component, VModel, Vue, Watch} from 'vue-property-decorator';
 import logo from "@/assets/logo.svg";
-import {createPath, Nullable} from '@/logic/Utils';
+import {Nullable} from '@/logic/Utils';
 import {Doctor} from '~/logic/models/Doctor';
 import {State} from 'vuex-class';
 import TYPES from '~/logic/types';
@@ -111,10 +111,6 @@ export default class AddWorkday extends Vue {
 
     @State(state => state.auth.doctors)
     private readonly doctors: Doctor[];
-
-    public getUrl(url:string):string{
-        return createPath(url);
-    }
 
     mounted(){
         if(this.doctors&&this.doctors[0]&&this.doctors[0].office&&this.doctors[0].office.id){

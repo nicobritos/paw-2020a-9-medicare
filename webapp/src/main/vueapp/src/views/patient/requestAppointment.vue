@@ -72,8 +72,8 @@
                                     )
                                 }}
                             </p>
-                            <a :href="getUrl('appointment/'+doctor.id+'/0')"><small
-                                class="white-text">{{ $t('ChangeDate') }}</small></a>
+                            <RouterLink :to="getUrl('appointment/'+doctor.id+'/0')"><small
+                                class="white-text">{{ $t('ChangeDate') }}</small></RouterLink>
                         </div>
                     </div>
                     <div class="row justify-content-center border-top border-light py-2">
@@ -109,13 +109,13 @@ import {User} from '~/logic/models/User';
 import {Doctor} from '~/logic/models/Doctor';
 
 import {createApiPath, createPath, Nullable} from '~/logic/Utils';
-import { State } from 'vuex-class';
-import { DoctorService } from '~/logic/interfaces/services/DoctorService';
+import {State} from 'vuex-class';
+import {DoctorService} from '~/logic/interfaces/services/DoctorService';
 import TYPES from '~/logic/types';
-import { Locality } from '~/logic/models/Locality';
-import { LocalityService } from '~/logic/interfaces/services/LocalityService';
-import { AppointmentService } from '~/logic/interfaces/services/AppointmentService';
-import { APIError } from '~/logic/models/APIError';
+import {Locality} from '~/logic/models/Locality';
+import {LocalityService} from '~/logic/interfaces/services/LocalityService';
+import {AppointmentService} from '~/logic/interfaces/services/AppointmentService';
+import {APIError} from '~/logic/models/APIError';
 import {DoctorSpecialty} from '~/logic/models/DoctorSpecialty';
 import {doctorSpecialtyActionTypes} from '~/store/types/doctorSpecialties.types';
 

@@ -45,11 +45,10 @@
 </template>
 
 <script lang="ts">
-import {Component, Emit, Prop, VModel, Vue} from 'vue-property-decorator';
+import {Component, Prop, VModel, Vue} from 'vue-property-decorator';
 import logo from "@/assets/logo.svg";
-import {createPath, ID, Nullable} from '@/logic/Utils';
-import {doctorSpecialtyActionTypes} from '~/store/types/doctorSpecialties.types';
-import { State } from 'vuex-class';
+import {Nullable} from '@/logic/Utils';
+import {State} from 'vuex-class';
 import {doctorActionTypes} from '~/store/types/doctor.types';
 import {Doctor} from '~/logic/models/Doctor';
 import {DoctorSpecialty} from '~/logic/models/DoctorSpecialty';
@@ -64,10 +63,6 @@ export default class AddSpecialty extends Vue {
     private readonly specialties: DoctorSpecialty[];
     @State(state => state.auth.doctors)
     private readonly doctors: Doctor[];
-
-    public getUrl(url:string):string{
-        return createPath(url);
-    }
 
     private cleanValues(){
         this.selectedSpecialtyId = null;

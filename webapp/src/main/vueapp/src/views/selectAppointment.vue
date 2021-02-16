@@ -121,20 +121,19 @@
 </template>
 
 <script lang="ts">
-import {Component, Vue, Watch} from 'vue-property-decorator';
+import {Component, Vue} from 'vue-property-decorator';
 import {User} from '~/logic/models/User';
 import {Doctor} from '~/logic/models/Doctor';
 
-import {createApiPath, createPath, Nullable} from '~/logic/Utils';
-import { State } from 'vuex-class';
-import { DoctorService } from '~/logic/interfaces/services/DoctorService';
+import {createApiPath, Nullable} from '~/logic/Utils';
+import {State} from 'vuex-class';
+import {DoctorService} from '~/logic/interfaces/services/DoctorService';
 import TYPES from '~/logic/types';
-import { Locality } from '~/logic/models/Locality';
-import { LocalityService } from '~/logic/interfaces/services/LocalityService';
-import { AppointmentTimeSlotService } from '~/logic/interfaces/services/AppointmentTimeSlotService';
-import { DateRange, FullDate } from '~/logic/models/utils/DateRange';
-import { AppointmentTimeslotDate } from '~/logic/models/AppointmentTimeslotDate';
-import { APIError } from '~/logic/models/APIError';
+import {Locality} from '~/logic/models/Locality';
+import {LocalityService} from '~/logic/interfaces/services/LocalityService';
+import {AppointmentTimeSlotService} from '~/logic/interfaces/services/AppointmentTimeSlotService';
+import {DateRange, FullDate} from '~/logic/models/utils/DateRange';
+import {APIError} from '~/logic/models/APIError';
 import {DoctorSpecialty} from '~/logic/models/DoctorSpecialty';
 import {doctorSpecialtyActionTypes} from '~/store/types/doctorSpecialties.types';
 import {DateTime} from 'luxon';
@@ -306,10 +305,6 @@ export default class SelectAppointment extends Vue {
 
     getApiUrl(url:string):string{
         return createApiPath(url);
-    }
-
-    getUrl(url:string):string{
-        return createPath(url);
     }
 
     getMonday(day:Date):Date {

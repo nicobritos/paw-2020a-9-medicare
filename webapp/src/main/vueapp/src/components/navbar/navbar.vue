@@ -14,8 +14,6 @@ import NavbarLogged from '~/components/navbar/navbarLogged.vue';
 import NavbarLogo from '~/components/navbar/navbarLogo.vue';
 import NavbarNotLogged from '~/components/navbar/navbarNotLogged.vue';
 
-import {createPath} from "~/logic/Utils";
-
 @Component({
     components: {
         NavbarLogged,
@@ -34,10 +32,6 @@ export default class Navbar extends Vue {
                 name:"Landing"
             }).catch(()=>{})
         }
-    }
-
-    getUrl(url:string):string{
-        return createPath(url);
     }
 }
 </script>
