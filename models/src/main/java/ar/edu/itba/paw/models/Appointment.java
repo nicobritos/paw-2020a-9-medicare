@@ -107,6 +107,9 @@ public class Appointment extends GenericModel<Integer> {
     }
 
     public Locale getLocale() {
+        if(this.locale == null){
+            return Locale.ENGLISH;
+        }
         return new Locale(locale);
     }
 
