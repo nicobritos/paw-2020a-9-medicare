@@ -83,8 +83,22 @@ public class AppointmentServiceImpl extends GenericServiceImpl<AppointmentDao, A
     }
 
     @Override
+    public List<Appointment> findPendingAppointmentsOfDoctorsInDateInterval(Collection<Doctor> doctors, LocalDateTime from, LocalDateTime to) {
+        if (from.isBefore(LocalDateTime.now())) {
+            from = LocalDateTime.now();
+        }
+
+        return this.appointmentRepository.findPendingByDoctorsAndDate(doctors, from, to);
+    }
+
+    @Override
     public List<Appointment> findAppointmentsOfPatientsInDateInterval(Collection<Patient> patients, LocalDateTime from, LocalDateTime to) {
         return this.appointmentRepository.findByPatientsAndDate(patients, from, to);
+    }
+
+    @Override
+    public List<Appointment> findPendingAppointmentsOfPatientsInDateInterval(Collection<Patient> patients, LocalDateTime from, LocalDateTime to) {
+        return this.appointmentRepository.findPendingByPatientsAndDate(patients, from, to);
     }
 
     @Override
