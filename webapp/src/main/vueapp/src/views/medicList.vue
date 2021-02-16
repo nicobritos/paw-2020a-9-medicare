@@ -303,13 +303,14 @@ export default class MedicList extends Vue {
         this.gotoPage(this.totalPages);
     }
 
-    mounted() {
-        this.$store.dispatch('localities/loadLocalities', localityActionTypes.loadLocalities());
-        this.$store.dispatch('doctorSpecialties/loadDoctorSpecialties', doctorSpecialtyActionTypes.loadDoctorSpecialties());
-        this.search();
+    async mounted() {
+        await this.$store.dispatch('localities/loadLocalities', localityActionTypes.loadLocalities());
+        await this.$store.dispatch('doctorSpecialties/loadDoctorSpecialties', doctorSpecialtyActionTypes.loadDoctorSpecialties());
 
         this.selectedSpecialty = this.searchedSpecialties.length > 0 ? this.searchedSpecialties[0].id : null;
         this.selectedLocality = this.searchedLocalities.length > 0 ? this.searchedLocalities[0].id : null;
+
+        await this.search();
     }
 
     @Watch('doctorPagination')
