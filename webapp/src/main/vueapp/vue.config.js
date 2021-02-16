@@ -3,7 +3,7 @@ const vueSrc = "./src";
 
 module.exports = {
   // TODO:check
-  publicPath: process.env.VUE_APP_ROOT_PATH ? process.env.VUE_APP_ROOT_PATH : "/",
+  publicPath: process.env.BASE_URL ? process.env.BASE_URL : "/",
     pluginOptions: {
       i18n: {
         locale: 'en',
