@@ -241,7 +241,6 @@ export default class SignupDoctor extends Vue {
         this.showRepeatPassword = !this.showRepeatPassword;
     }
 
-    // TODO: Guido convendria hacer un .trim() para sacar espacios en los finales
     get validFirstname():boolean {
         return  this.firstname.length>=this.minFirstnameLength 
                 && this.firstname.length<=this.maxFirstnameLength;

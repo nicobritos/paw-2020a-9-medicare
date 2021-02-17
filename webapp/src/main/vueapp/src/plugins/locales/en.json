@@ -304,5 +304,7 @@
 
   "Error401": "You must log in to perform this action",
   "Error403": "You don't have the required permissions to perform this action",
-  "Error500": "An unknown error occurred. Please, try again later"
+  "Error500": "An unknown error occurred. Please, try again later",
+
+  "ErrorC1": "Some of the fields are not included or are incorrect"
 }

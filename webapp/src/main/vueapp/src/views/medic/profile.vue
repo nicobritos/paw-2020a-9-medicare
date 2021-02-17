@@ -195,21 +195,19 @@ import AddSpecialty from "./addSpecialty.vue";
 import AddWorkday from "./addWorkday.vue";
 import Modal from "@/components/modal.vue";
 
-import {createApiPath, createPath, isValidEmail, Nullable} from '~/logic/Utils';
+import {createApiPath, isValidEmail, Nullable} from '~/logic/Utils';
 import defaultProfilePic from "@/assets/defaultProfilePic.svg";
 import {WorkdayService} from '~/logic/interfaces/services/WorkdayService';
 import TYPES from '~/logic/types';
 import {doctorActionTypes} from '~/store/types/doctor.types';
 import {State} from 'vuex-class';
 import {Doctor} from '~/logic/models/Doctor';
-import EventBus from '~/logic/EventBus';
-import {APIErrorEventName} from '~/logic/interfaces/APIErrorEvent';
 import {APIError} from '~/logic/models/APIError';
-import { doctorSpecialtyActionTypes } from '~/store/types/doctorSpecialties.types';
-import { DoctorSpecialty } from '~/logic/models/DoctorSpecialty';
-import { Workday } from '~/logic/models/Workday';
+import {doctorSpecialtyActionTypes} from '~/store/types/doctorSpecialties.types';
+import {DoctorSpecialty} from '~/logic/models/DoctorSpecialty';
+import {Workday} from '~/logic/models/Workday';
 import {userActionTypes, userMutationTypes} from '~/store/types/user.types';
-import { UpdateUser } from '~/logic/interfaces/services/UserService';
+import {UpdateUser} from '~/logic/interfaces/services/UserService';
 
 @Component({
     components:{
@@ -536,7 +534,6 @@ export default class MedicProfile extends Vue {
     }
 
     get validPhone():boolean{
-        this.phone = this.phone.trim();
         return  (this.phone.length >= 7 && this.phone.length <= 14)
                 || !this.phoneModEnabled; // Algunos lugares tienen tels con 7 dig
     }
@@ -545,6 +542,13 @@ export default class MedicProfile extends Vue {
     get validUserUpdate(): boolean {
         return  this.validFirstname && this.validSurname && this.validEmail &&
                 this.validPassword && this.validRepeatPassword && this.validPhone;
+    }
+
+    showErrorToast(message:string){
+        this.$bvToast.toast(message,{
+            title:this.$t("ThereWasAnError").toString(),
+            variant:"danger"
+        })
     }
 
     submitForm(e:any): void{
@@ -559,7 +563,7 @@ export default class MedicProfile extends Vue {
         if(this.validUserUpdate){
             this.$store.dispatch('users/updateUser', userActionTypes.updateUser(updateUser));
         }else{
-            //TODO: show invalid toast (aunque deberia de estar ya)
+            this.showErrorToast(this.$t('ErrorC1').toString());
         }
     }
 

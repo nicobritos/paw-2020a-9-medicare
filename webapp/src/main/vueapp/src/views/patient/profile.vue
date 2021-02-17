@@ -85,7 +85,9 @@
                                     </label>
                                 </h3>
                                 <input :type='passwordVis? "text": "password"' class="form-control mb-3 w-75" id="password" name="password" autocomplete="new-password"
-                                       :readonly="!passwordModEnabled" :disabled="!passwordModEnabled"/>
+                                       :readonly="!passwordModEnabled" :disabled="!passwordModEnabled"
+                                       v-model="password"
+                                />
                                 <label for="password" class="toggle-visibility">
                                     <img type="button" :src='eye' v-if="!passwordVis && passwordModEnabled" alt="not visible password" @click="passwordVis=true">
                                     <img type="button" :src='noeye' v-else-if="passwordModEnabled" alt="visible password" @click="passwordVis=false">
@@ -101,7 +103,9 @@
                                     </label>    
                                 </h3>
                                 <input :type='repeatPasswordVis? "text":"password"' class="form-control mb-3 w-75" name="new-password" autocomplete="new-password"
-                                       id="repeatPassword"/>
+                                       id="repeatPassword"
+                                       v-model="repeatPassword"
+                                />
                                 <label for="repeatPassword" class="toggle-visibility">
                                     <img type="button" :src='eye' v-if="!repeatPasswordVis" alt="not visible password" @click="repeatPasswordVis=true">
                                     <img type="button" :src='noeye' v-else alt="visible password" @click="repeatPasswordVis=false">
@@ -131,9 +135,9 @@ import {User} from '~/logic/models/User';
 
 import {createApiPath, isValidEmail, Nullable} from '~/logic/Utils';
 import defaultProfilePic from "@/assets/defaultProfilePic.svg";
-import { State } from 'vuex-class';
+import {State} from 'vuex-class';
 import {userActionTypes, userMutationTypes} from '~/store/types/user.types';
-import { UpdateUser } from '~/logic/interfaces/services/UserService';
+import {UpdateUser} from '~/logic/interfaces/services/UserService';
 
 @Component
 export default class PatientProfile extends Vue {
@@ -256,26 +260,22 @@ export default class PatientProfile extends Vue {
     private repeatPassword:string = "";
 
     get validFirstname():boolean {
-        this.firstname = this.firstname.trim();
         return  (this.firstname.length>=this.minFirstnameLength
                 && this.firstname.length<=this.maxFirstnameLength)
                 || !this.firstnameModEnabled;
     }
 
     get validSurname():boolean {
-        this.surname = this.surname.trim();
         return  (this.surname.length>=this.minSurnameLength
                 && this.surname.length<=this.maxSurnameLength)
                 || !this.surnameModEnabled;
     }
     get validEmail():boolean {
-        this.email = this.email.trim();
         return  isValidEmail(this.email)
                 || !this.emailModEnabled;
     }
     get validPassword():boolean {
-        this.password = this.password.trim();
-        return (this.password.length>=this.minPasswordLength 
+        return (this.password.length>=this.minPasswordLength
                 && this.password.length<=this.maxPasswordLength)
                 || !this.passwordModEnabled;
     }
@@ -285,7 +285,6 @@ export default class PatientProfile extends Vue {
     }
 
     get validPhone():boolean{
-        this.phone = this.phone.trim();
         return  (this.phone.length >= 7 && this.phone.length <= 14)
                 || !this.phoneModEnabled; // Algunos lugares tienen tels con 7 dig
     }
@@ -307,7 +306,7 @@ export default class PatientProfile extends Vue {
         if(this.validUserUpdate){
             this.$store.dispatch('users/updateUser', userActionTypes.updateUser(updateUser));
         }else{
-            //TODO: show invalid toast (aunque deberia de estar ya)
+            this.showErrorToast(this.$t('ErrorC1').toString());
         }
     }
 

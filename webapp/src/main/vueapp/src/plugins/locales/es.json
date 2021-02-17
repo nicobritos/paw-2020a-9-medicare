@@ -304,5 +304,7 @@
 
   "Error401": "Necesitas iniciar sesion para realizar esta accion",
   "Error403": "No tienes los permisos necesarios para realizar esta accion",
-  "Error500": "Un error desconocido ha ocurrido. Por favor, intenta nuevamente mas tarde"
+  "Error500": "Un error desconocido ha ocurrido. Por favor, intenta nuevamente mas tarde",
+
+  "ErrorC1": "Algunos de los campos tienen un formato incorrecto o no estan presentes"
 }
