@@ -7,8 +7,11 @@ import {
     AuthGetters,
     AuthMutations,
     authMutationTypes,
-    AuthState, DOCTORS_KEY, IS_DOCTOR_KEY,
-    LOGGED_IN_EXPIRATION_DATE_KEY, PATIENTS_KEY,
+    AuthState,
+    DOCTORS_KEY,
+    IS_DOCTOR_KEY,
+    LOGGED_IN_EXPIRATION_DATE_KEY,
+    PATIENTS_KEY,
     USER_KEY,
 } from '~/store/types/auth.types';
 import {RootState} from '~/store/types/root.types';
@@ -16,7 +19,6 @@ import {DefineActionTree, DefineGetterTree, DefineMutationTree} from '~/store/ut
 import {Nullable} from '~/logic/Utils';
 import {Module} from 'vuex';
 import {APIError} from '~/logic/models/APIError';
-import {Patient} from '~/logic/models/Patient';
 import {Doctor} from '~/logic/models/Doctor';
 import Vue from 'vue';
 
@@ -75,6 +77,30 @@ const actions: DefineActionTree<AuthActions, AuthState, RootState> = {
                 commit(authMutationTypes.setDoctors((data as UserDoctors).doctors));
             }
         }
+    },
+    async reload({state, commit}) {
+        if (state._userLoading.promise) return;
+
+        let promise = getService().reload();
+
+        commit(authMutationTypes.setReloading(promise));
+
+        let data: UserPatients | UserDoctors | APIError | null = null;
+        try {
+            data = await promise;
+        } catch (e) {
+        }
+
+        commit(authMutationTypes.setUser(data === null || data instanceof APIError ? null : data.user));
+        if (data != null && !(data instanceof APIError)) {
+            if ((data as UserPatients).patients != null) {
+                commit(authMutationTypes.setPatients((data as UserPatients).patients));
+            } else {
+                commit(authMutationTypes.setDoctors((data as UserDoctors).doctors));
+            }
+        }
+
+        return data;
     },
     async logout({state, commit}) {
         if (!state._userLoading.promise && !state.user) return;

@@ -5,7 +5,6 @@ import {UserDoctors, UserPatients} from '~/logic/interfaces/services/AuthService
 import {APIError} from '~/logic/models/APIError';
 import {ID, Nullable} from '~/logic/Utils';
 import {User} from '~/logic/models/User';
-import {APIResponse} from '~/logic/models/APIResponse';
 
 export const LOGGED_IN_EXPIRATION_DATE_KEY = 'loggedInExpDate';
 export const USER_KEY = 'user';
@@ -21,7 +20,7 @@ export interface AuthState {
     doctors: Doctor[],
     patients: Patient[],
     isDoctor: boolean,
-    reloading: Nullable<Promise<APIResponse<UserPatients | UserDoctors>>>
+    reloading: Nullable<Promise<UserPatients | UserDoctors | APIError>>
 }
 
 export interface AuthActions {
@@ -30,13 +29,15 @@ export interface AuthActions {
         password: string,
     },
     invalidate: void,
-    logout: void
+    logout: void,
+    reload: void
 }
 
 export const authActionTypes: DefineTypes<AuthActions> = {
     invalidate: payload => ({payload, type: 'invalidate'}),
     login: payload => ({payload, type: 'login'}),
-    logout: payload => ({payload, type: 'logout'})
+    logout: payload => ({payload, type: 'logout'}),
+    reload: payload => ({payload, type: 'reload'})
 };
 
 export interface AuthMutations {

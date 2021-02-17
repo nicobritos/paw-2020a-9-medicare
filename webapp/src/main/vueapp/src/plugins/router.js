@@ -5,55 +5,79 @@ import store from "./vuex";
 Vue.use(VueRouter);
 
 function notAuthGuard(to,from,next) {
-    if(store.getters["auth/loggedIn"]){
-        if(!store.state.auth.user.verified){
-            next({name:"Unverified"});
+    return new Promise(async resolve => {
+        if (!store.getters["auth/loggedIn"]) {
+            await store.dispatch("auth/reload");
         }
-        else if(store.state.auth.isDoctor){
-            next({name:"MedicHome"});
+
+        if (store.getters["auth/loggedIn"]) {
+            if(!store.state.auth.user.verified){
+                next({name:"Unverified"});
+            }
+            else if(store.state.auth.isDoctor){
+                next({name:"MedicHome"});
+            }
+            else{
+                next({name:"PatientHome"});
+            }
+        }else{
+            next();
         }
-        else{
-            next({name:"PatientHome"});
-        }
-    }else{
-        next();
-    }
+
+        resolve();
+    });
 }
 
 function patientGuard(to,from,next) {
-    if(store.getters["auth/loggedIn"]){
-        if(!store.state.auth.user.verified){
-            next({name:"Unverified"});
+    return new Promise(async resolve => {
+        if (!store.getters["auth/loggedIn"]) {
+            await store.dispatch("auth/reload");
         }
-        else if(store.state.auth.isDoctor){   
-            next({name:"MedicHome"});
+
+        if(store.getters["auth/loggedIn"]){
+            if(!store.state.auth.user.verified){
+                next({name:"Unverified"});
+            }
+            else if(store.state.auth.isDoctor){
+                next({name:"MedicHome"});
+            }
+            else{
+                next();
+            }
+        }else{
+            next({name:"Login",params:{
+                prevto:to
+            }});
         }
-        else{
-            next();
-        }
-    }else{
-        next({name:"Login",params:{
-            prevto:to
-        }});
-    }
+
+        resolve();
+    });
 }
 
 function doctorGuard(to,from,next) {
-    if(store.getters["auth/loggedIn"]){
-        if(!store.state.auth.user.verified){
-            next({name:"Unverified"});
+    return new Promise(async resolve => {
+        if (!store.getters["auth/loggedIn"]) {
+            await store.dispatch("auth/reload");
         }
-        else if(store.state.auth.isDoctor){   
-            next();
+
+        if(store.getters["auth/loggedIn"]){
+            if(!store.state.auth.user.verified){
+                next({name:"Unverified"});
+            }
+            else if(store.state.auth.isDoctor){
+                next();
+            }
+            else{
+                next({name:"PatientHome"});
+            }
+        }else{
+            next({name:"Login",params:{
+                    prevto:to
+                }});
         }
-        else{
-            next({name:"PatientHome"});
-        }
-    }else{
-        next({name:"Login",params:{
-            prevto:to
-        }});
-    }
+
+        resolve();
+    });
 }
 
 function redirectHomeTopord(to) {
@@ -65,35 +89,47 @@ function redirectHomeTopord(to) {
 }
 
 function unverifiedGuard(to,from,next) {
-    if(store.getters["auth/loggedIn"]){
-        if(!store.state.auth.user.verified){
-            store.commit('auth/loadUserFromLocalStorage');
-            if (!store.state.auth.user.verified)
+    return new Promise(async resolve => {
+        if (!store.getters["auth/loggedIn"] || !store.state.auth.user.verified) {
+            await store.dispatch("auth/reload");
+        }
+
+        if(store.getters["auth/loggedIn"]){
+            if(!store.state.auth.user.verified){
                 next();
-            else
+            } else {
                 next({name:"Landing"});
-        } else {
+            }
+        }else{
             next({name:"Landing"});
         }
-    }else{
-        next({name:"Landing"});
-    }
+
+        resolve();
+    });
 }
 
 function notAuthGuardOrPatient(to,from,next) {
-    if(store.getters["auth/loggedIn"]){
-        if(!store.state.auth.user.verified){
-            next({name:"Unverified"});
+    return new Promise(async resolve => {
+        if (!store.getters["auth/loggedIn"]) {
+            await store.dispatch("auth/reload");
         }
-        else if(store.state.auth.isDoctor){
-            next({name:"MedicHome"});
-        }
-        else{
+
+        if(store.getters["auth/loggedIn"]){
+            if(!store.state.auth.user.verified){
+                next({name:"Unverified"});
+            }
+            else if(store.state.auth.isDoctor){
+                next({name:"MedicHome"});
+            }
+            else{
+                next();
+            }
+        }else{
             next();
         }
-    }else{
-        next();
-    }
+
+        resolve();
+    });
 }
 
 const routes = [

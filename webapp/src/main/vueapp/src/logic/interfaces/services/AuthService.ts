@@ -21,5 +21,7 @@ export interface UserDoctors {
 export interface AuthService {
     login(loginUser: LoginUser): Promise<UserPatients | UserDoctors | APIError>;
 
+    reload(): Promise<UserPatients | UserDoctors | APIError>;
+
     logout(): Promise<true | APIError>;
 }

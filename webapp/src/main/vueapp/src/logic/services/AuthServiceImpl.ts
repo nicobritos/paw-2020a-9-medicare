@@ -14,6 +14,7 @@ const AuthMIME = {
 @injectable()
 export class AuthServiceImpl implements AuthService {
     private static LOGIN_PATH = 'login';
+    private static REFRESH_PATH = 'auth/refresh';
     private static LOGOUT_PATH = 'auth/logout';
 
     @inject(TYPES.Repositories.RestRepository)
@@ -25,6 +26,21 @@ export class AuthServiceImpl implements AuthService {
             data: loginUser,
             contentType: AuthMIME.LOGIN
         });
+
+        return response.response;
+    }
+
+    public async reload(): Promise<UserPatients | UserDoctors | APIError> {
+        let response = await this.rest.post<UserPatients | UserDoctors, {}>(
+            AuthServiceImpl.REFRESH_PATH,
+            {
+                accepts: UserMIME.ME,
+                data: {},
+                contentType: JSON_MIME,
+                retry: false
+            },
+            true
+        );
 
         return response.response;
     }

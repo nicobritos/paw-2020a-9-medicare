@@ -156,7 +156,7 @@ import {Province} from '~/logic/models/Province';
 import {LocalityService} from '~/logic/interfaces/services/LocalityService';
 import TYPES from '~/logic/types';
 import {APIError} from '~/logic/models/APIError';
-import { User } from '~/logic/models/User';
+import {User} from '~/logic/models/User';
 
 @Component
 export default class SignupDoctor extends Vue {
@@ -296,7 +296,8 @@ export default class SignupDoctor extends Vue {
                     password: this.password,
                     surname: this.surname,
                     specialtyIds: [],
-                    localityId: this.locality!
+                    localityId: this.locality!,
+                    address: address
                 }
             }));
         }

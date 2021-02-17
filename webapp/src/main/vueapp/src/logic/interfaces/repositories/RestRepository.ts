@@ -29,7 +29,7 @@ export const LOGGED_IN_TTL_HEADER_NAME = 'x-logged-in-ttl';
 export interface RestRepository {
     get<R, T = any>(path: string, config: GetConfig<T>): Promise<APIResponse<R>>;
 
-    post<R, T>(path: string, config: PostConfig<T>): Promise<APIResponse<R>>;
+    post<R, T>(path: string, config: PostConfig<T>, ignoreErrors?: boolean): Promise<APIResponse<R>>;
 
     put<R, T>(path: string, config: PutConfig<T>): Promise<APIResponse<R>>;
 

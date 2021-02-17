@@ -15,10 +15,8 @@ import parseLinkHeader from 'parse-link-header';
 import {injectable} from 'inversify';
 import {createApiPath} from '../Utils';
 import {UserDoctors, UserPatients} from '~/logic/interfaces/services/AuthService';
-import {UserMIME} from '~/logic/services/UserServiceImpl';
-import {JSON_MIME} from '~/logic/services/Utils';
 import store from '~/plugins/vuex';
-import {authMutationTypes, LOGGED_IN_EXPIRATION_DATE_KEY} from '~/store/types/auth.types';
+import {LOGGED_IN_EXPIRATION_DATE_KEY} from '~/store/types/auth.types';
 import EventBus from '~/logic/EventBus';
 import {APIErrorEventName} from '~/logic/interfaces/APIErrorEvent';
 
@@ -31,9 +29,9 @@ export class RestRepositoryImpl implements RestRepository {
         return RestRepositoryImpl.createResponse(config.retry, () => axios.get(createApiPath(path), axiosConfig));
     }
 
-    public async post<R, T>(path: string, config: PostConfig<T>): Promise<APIResponse<R>> {
+    public async post<R, T>(path: string, config: PostConfig<T>, ignoreErrors: boolean = false): Promise<APIResponse<R>> {
         let axiosConfig = RestRepositoryImpl.getAxiosConfig(config);
-        return RestRepositoryImpl.createResponse(config.retry, () => axios.post(createApiPath(path), axiosConfig.data, axiosConfig));
+        return RestRepositoryImpl.createResponse(config.retry, () => axios.post(createApiPath(path), axiosConfig.data, axiosConfig), ignoreErrors);
     }
 
     public async put<R, T>(path: string, config: PutConfig<T>): Promise<APIResponse<R>> {
@@ -46,8 +44,8 @@ export class RestRepositoryImpl implements RestRepository {
         return RestRepositoryImpl.createResponse(config?.retry, () => axios.delete(createApiPath(path), axiosConfig));
     }
 
-    private static async createResponse<R>(retry: boolean | undefined, runAction: () => Promise<AxiosResponse<R>>): Promise<APIResponse<R>> {
-        let apiResponse = RestRepositoryImpl.formatResponse<R>(await runAction());
+    private static async createResponse<R>(retry: boolean | undefined, runAction: () => Promise<AxiosResponse<R>>, ignoreErrors: boolean = false): Promise<APIResponse<R>> {
+        let apiResponse = RestRepositoryImpl.formatResponse<R>(await runAction(), ignoreErrors);
         // We want to retry on undefined (default behaviour)
         if (!apiResponse.isOk && apiResponse.error!.code === StatusCodes.UNAUTHORIZED && retry !== false) {
             if (!await RestRepositoryImpl.refreshToken())
@@ -61,50 +59,14 @@ export class RestRepositoryImpl implements RestRepository {
     }
 
     private static async refreshToken(): Promise<boolean> {
-        let response;
+        let response: UserPatients | UserDoctors | APIError | null;
         if (!store.state.auth.reloading) {
-            let axiosConfig = RestRepositoryImpl.getAxiosConfig({
-                accepts: UserMIME.ME,
-                data: undefined,
-                contentType: JSON_MIME
-            });
-
-            let promise: Promise<APIResponse<UserDoctors | UserPatients>> = new Promise(async (resolve, reject) => {
-                try {
-                    resolve(RestRepositoryImpl.formatResponse(
-                        await axios.post(
-                            createApiPath(RestRepositoryImpl.REFRESH_PATH),
-                            undefined,
-                            axiosConfig
-                        )
-                    ));
-                } catch (e) {
-                    reject(e);
-                }
-            });
-
-            store.commit('auth/setReloading', authMutationTypes.setReloading(promise));
-
-            response = await store.state.auth.reloading;
-
-            if (response.isOk) {
-                store.commit('auth/setUser', authMutationTypes.setUser((response.data as UserDoctors | UserPatients).user));
-
-                if ((response.data as UserDoctors).doctors != null) {
-                    store.commit('auth/setDoctors', authMutationTypes.setDoctors((response.data as UserDoctors).doctors));
-                } else {
-                    store.commit('auth/setPatients', authMutationTypes.setPatients((response.data as UserPatients).patients));
-                }
-            } else {
-                store.commit('auth/setUser', authMutationTypes.setUser(null));
-                store.commit('auth/setDoctors', authMutationTypes.setDoctors(null));
-                store.commit('auth/setPatients', authMutationTypes.setPatients(null));
-            }
+            response = await store.dispatch("auth/reload");
         } else {
             response = await store.state.auth.reloading;
         }
 
-        return response.isOk;
+        return response != null && !(response instanceof APIError);
     }
 
     private static getAxiosConfig<R>(config: GetConfig<R> | PostConfig<R> | PutConfig<R> | DeleteConfig<R>): AxiosRequestConfig {
@@ -166,10 +128,10 @@ export class RestRepositoryImpl implements RestRepository {
         }
     }
 
-    private static formatResponse<R>(response: AxiosResponse): APIResponse<R> {
+    private static formatResponse<R>(response: AxiosResponse, ignoreErrors: boolean = false): APIResponse<R> {
         if (typeof response.headers['content-type'] === 'string' && response.headers['content-type'].startsWith(ErrorMIME)) {
             let apiError: APIError = response.data;
-            if (apiError.errors && apiError.errors.length) {
+            if (apiError.errors && apiError.errors.length && !ignoreErrors) {
                 for (let error of apiError.errors)
                     EventBus.$emit(APIErrorEventName, error.code);
             }

@@ -1,6 +1,6 @@
 import {APIError} from '~/logic/models/APIError';
 import {User} from '~/logic/models/User';
-import {Base64, Nullable} from '~/logic/Utils';
+import {Nullable} from '~/logic/Utils';
 import {UserDoctors, UserPatients} from '~/logic/interfaces/services/AuthService';
 
 interface CreateUser {
@@ -15,6 +15,7 @@ export interface CreateUserDoctor extends CreateUser {
     registrationNumber?: number;
     specialtyIds: number[];
     localityId: number;
+    address: string;
 }
 
 export interface CreateUserPatient extends CreateUser {
