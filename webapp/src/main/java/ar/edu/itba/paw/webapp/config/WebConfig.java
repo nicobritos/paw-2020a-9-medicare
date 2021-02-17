@@ -48,7 +48,7 @@ import java.util.Properties;
 @EnableTransactionManagement
 @EnableAsync
 @PropertySource("classpath:application-prod.properties")
-@PropertySource("classpath:application-local.properties") // This will precede previous properties
+@PropertySource(value = "classpath:application-local.properties", ignoreResourceNotFound = true) // This will precede previous properties
 public class WebConfig {
     @Value("${db.host}")
     private String DB_HOST;
