@@ -97,11 +97,18 @@ public class UserServiceImpl extends GenericSearchableServiceImpl<UserDao, User,
     }
 
     @Override
+    @Transactional
     public void updatePassword(User user, String newPassword) {
-        user.setPassword(this.passwordEncoder.encode(newPassword));
-        this.refreshTokenService.removeByUserId(user.getId());
+        Optional<User> userOptional = this.repository.findById(user.getId());
+        if (!userOptional.isPresent())
+            throw new NoSuchElementException();
 
-        super.update(user);
+        User userToSave = userOptional.get();
+
+        userToSave.setPassword(this.passwordEncoder.encode(newPassword));
+        this.refreshTokenService.removeByUserId(userToSave.getId());
+
+        super.update(userToSave);
     }
 
     @Override

@@ -72,6 +72,9 @@ public class UserUpdateDeserializer extends JsonDeserializer<User> {
             ));
         }
 
+        user.setVerified(null);
+        user.setProfilePicture(null);
+
         return user;
     }
 }
