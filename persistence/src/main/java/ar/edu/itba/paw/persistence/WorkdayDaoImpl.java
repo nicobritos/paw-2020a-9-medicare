@@ -6,10 +6,15 @@ import ar.edu.itba.paw.persistence.generics.GenericDaoImpl;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.persistence.Tuple;
-import javax.persistence.criteria.*;
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Join;
+import javax.persistence.criteria.Root;
 import javax.persistence.metamodel.SingularAttribute;
-import java.util.*;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @Repository
 public class WorkdayDaoImpl extends GenericDaoImpl<Workday, Integer> implements WorkdayDao {
@@ -91,5 +96,10 @@ public class WorkdayDaoImpl extends GenericDaoImpl<Workday, Integer> implements 
 
     @Override
     protected void insertOrderBy(CriteriaBuilder builder, CriteriaQuery<Workday> query, Root<Workday> root) {
+        query.orderBy(
+                builder.asc(root.get(Workday_.day)),
+                builder.asc(root.get(Workday_.startHour)),
+                builder.asc(root.get(Workday_.startMinute))
+        );
     }
 }
