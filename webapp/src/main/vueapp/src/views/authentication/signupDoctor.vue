@@ -297,7 +297,7 @@ export default class SignupDoctor extends Vue {
                     surname: this.surname,
                     specialtyIds: [],
                     localityId: this.locality!,
-                    address: address
+                    address: this.address
                 }
             }));
         }
