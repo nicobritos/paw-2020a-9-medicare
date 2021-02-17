@@ -19,8 +19,7 @@ public class RefreshToken extends GenericModel<Integer> {
     @SequenceGenerator(sequenceName = "refresh_token_refresh_token_id_seq", name = "refresh_token_refresh_token_id_seq", allocationSize = 1)
     @Column(name = "refresh_token_id")
     private Integer id;
-    @Column(name = "token")
-    @Lob
+    @Column(name = "token", columnDefinition = "text")
     private String token;
     @Column(name = "created_date")
     @Type(type="org.jadira.usertype.dateandtime.joda.PersistentLocalDateTime")

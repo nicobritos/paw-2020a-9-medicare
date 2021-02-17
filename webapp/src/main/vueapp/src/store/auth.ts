@@ -115,12 +115,14 @@ const actions: DefineActionTree<AuthActions, AuthState, RootState> = {
 
         commit(authMutationTypes.setPromise(null));
         try {
-            await getService().logout();
+            let result = await getService().logout();
+            if (!(result instanceof APIError)) {
+                commit(authMutationTypes.setUser(null));
+                commit(authMutationTypes.setPatients([]));
+                commit(authMutationTypes.setDoctors([]));
+            }
         } catch (e) {
         }
-        commit(authMutationTypes.setUser(null));
-        commit(authMutationTypes.setPatients([]));
-        commit(authMutationTypes.setDoctors([]));
     }
 };
 

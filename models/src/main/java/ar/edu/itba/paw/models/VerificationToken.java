@@ -17,8 +17,7 @@ public class VerificationToken extends GenericModel<Integer> {
     @SequenceGenerator(sequenceName = "verification_token_verification_token_id_seq", name = "verification_token_verification_token_id_seq", allocationSize = 1)
     @Column(name = "verification_token_id")
     private Integer id;
-    @Column(name = "token")
-    @Lob
+    @Column(name = "token", columnDefinition = "text")
     private String token;
     @Column(name = "created_date")
     private DateTime createdDate;
