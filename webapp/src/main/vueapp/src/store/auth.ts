@@ -12,6 +12,7 @@ import {
     IS_DOCTOR_KEY,
     LOGGED_IN_EXPIRATION_DATE_KEY,
     PATIENTS_KEY,
+    REFRESH_TOKEN_EXPIRATION_DATE_KEY,
     USER_KEY,
 } from '~/store/types/auth.types';
 import {RootState} from '~/store/types/root.types';
@@ -43,6 +44,10 @@ const state = (): AuthState => ({
 const getters: DefineGetterTree<AuthGetters, AuthState, RootState> = {
     loggedIn(state): boolean {
         return !!state.user;
+    },
+    canRefreshUser(): boolean {
+        let refreshTokenExpDate = localStorage.getItem(REFRESH_TOKEN_EXPIRATION_DATE_KEY);
+        return refreshTokenExpDate != null && (new Date()).getTime() < Number.parseInt(refreshTokenExpDate);
     }
 };
 
@@ -79,7 +84,7 @@ const actions: DefineActionTree<AuthActions, AuthState, RootState> = {
         }
     },
     async reload({state, commit}) {
-        if (state._userLoading.promise) return;
+        if (state._userLoading.promise) return state._userLoading.promise;
 
         let promise = getService().reload();
 
@@ -134,6 +139,7 @@ const mutations: DefineMutationTree<AuthMutations, AuthState> = {
         } else {
             localStorage.removeItem(USER_KEY);
             localStorage.removeItem(LOGGED_IN_EXPIRATION_DATE_KEY);
+            localStorage.removeItem(REFRESH_TOKEN_EXPIRATION_DATE_KEY);
         }
 
         state._userLoading.promise = null;
@@ -203,13 +209,21 @@ const mutations: DefineMutationTree<AuthMutations, AuthState> = {
             return;
         }
 
-        // Chech epochs
+        // Check epochs
         if ((new Date()).getTime() >= Number.parseInt(expirationDateString)) {
             localStorage.removeItem(LOGGED_IN_EXPIRATION_DATE_KEY);
             localStorage.removeItem(USER_KEY);
             localStorage.removeItem(DOCTORS_KEY);
             localStorage.removeItem(PATIENTS_KEY);
             localStorage.removeItem(IS_DOCTOR_KEY);
+            return;
+        }
+
+        // Check epochs
+        let refreshTokenExpDate = localStorage.getItem(REFRESH_TOKEN_EXPIRATION_DATE_KEY);
+        if (!refreshTokenExpDate || (new Date()).getTime() >= Number.parseInt(refreshTokenExpDate)) {
+            localStorage.removeItem(REFRESH_TOKEN_EXPIRATION_DATE_KEY);
+            return;
         }
 
         let user, patients, doctors, isDoctor;

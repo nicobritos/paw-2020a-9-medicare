@@ -113,6 +113,7 @@ public class JWTAuthenticator {
 
     private void createJWTExpirationHeader(HttpServletResponse response) {
         response.setHeader(Constants.LOGGED_IN_TTL_HEADER_NAME, Long.toString(Constants.JWT_EXPIRATION_MILLIS));
+        response.setHeader(Constants.REFRESH_TOKEN_TTL_HEADER_NAME, Long.toString(Constants.JWT_REFRESH_EXPIRATION_MILLIS));
     }
 
     private Cookie createJWTCookie(String token) {

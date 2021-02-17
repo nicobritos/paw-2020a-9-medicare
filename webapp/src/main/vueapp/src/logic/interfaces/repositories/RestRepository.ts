@@ -25,6 +25,7 @@ export const StatusCodes = {
 };
 
 export const LOGGED_IN_TTL_HEADER_NAME = 'x-logged-in-ttl';
+export const REFRESH_TOKEN_TTL_HEADER_NAME = 'x-refresh-token-ttl';
 
 export interface RestRepository {
     get<R, T = any>(path: string, config: GetConfig<T>): Promise<APIResponse<R>>;

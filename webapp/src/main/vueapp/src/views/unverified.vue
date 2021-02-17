@@ -54,6 +54,7 @@ export default class Unverified extends Vue {
             || typeof this.$route.params.token !== 'string'
             || (token = this.$route.params.token).length === 0)
         {
+            await this.$store.dispatch("auth/reload");
             return;
         }
 

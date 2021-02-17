@@ -220,9 +220,10 @@ export default class SelectAppointment extends Vue {
     }
 
     async updateSlots(){
+        if (!this.doctor) return;
+
         //@ts-ignore
         let saturday = this.monday.plusDays(6);
-        
         let slots = await this.$container
                     .get<AppointmentTimeSlotService>(TYPES.Services.AppointmentTimeSlotService)
                     .list(this.doctor!.id,{

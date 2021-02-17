@@ -6,7 +6,8 @@ Vue.use(VueRouter);
 
 function notAuthGuard(to,from,next) {
     return new Promise(async resolve => {
-        if (!store.getters["auth/loggedIn"]) {
+        if (!store.getters["auth/loggedIn"] && store.getters["auth/canRefreshUser"]) {
+            console.log('notAuthGuard')
             await store.dispatch("auth/reload");
         }
 
@@ -30,7 +31,8 @@ function notAuthGuard(to,from,next) {
 
 function patientGuard(to,from,next) {
     return new Promise(async resolve => {
-        if (!store.getters["auth/loggedIn"]) {
+        if (!store.getters["auth/loggedIn"] && store.getters["auth/canRefreshUser"]) {
+            console.log('patientGuard')
             await store.dispatch("auth/reload");
         }
 
@@ -56,7 +58,8 @@ function patientGuard(to,from,next) {
 
 function doctorGuard(to,from,next) {
     return new Promise(async resolve => {
-        if (!store.getters["auth/loggedIn"]) {
+        if (!store.getters["auth/loggedIn"] && store.getters["auth/canRefreshUser"]) {
+            console.log('doctorGuard')
             await store.dispatch("auth/reload");
         }
 
@@ -90,7 +93,7 @@ function redirectHomeTopord(to) {
 
 function unverifiedGuard(to,from,next) {
     return new Promise(async resolve => {
-        if (!store.getters["auth/loggedIn"] || !store.state.auth.user.verified) {
+        if (!store.getters["auth/loggedIn"] && store.getters["auth/canRefreshUser"]) {
             await store.dispatch("auth/reload");
         }
 
@@ -110,7 +113,7 @@ function unverifiedGuard(to,from,next) {
 
 function notAuthGuardOrPatient(to,from,next) {
     return new Promise(async resolve => {
-        if (!store.getters["auth/loggedIn"]) {
+        if (!store.getters["auth/loggedIn"] && store.getters["auth/canRefreshUser"]) {
             await store.dispatch("auth/reload");
         }
 

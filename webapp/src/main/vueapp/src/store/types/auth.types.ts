@@ -7,6 +7,7 @@ import {ID, Nullable} from '~/logic/Utils';
 import {User} from '~/logic/models/User';
 
 export const LOGGED_IN_EXPIRATION_DATE_KEY = 'loggedInExpDate';
+export const REFRESH_TOKEN_EXPIRATION_DATE_KEY = 'refreshTokenExpDate';
 export const USER_KEY = 'user';
 export const DOCTORS_KEY = 'doctors';
 export const PATIENTS_KEY = 'patients';
@@ -61,5 +62,6 @@ export const authMutationTypes: DefineTypes<AuthMutations> = {
 };
 
 export interface AuthGetters {
-    loggedIn: boolean
+    loggedIn: boolean;
+    canRefreshUser: boolean;
 }

@@ -5,6 +5,7 @@ import {
     LOGGED_IN_TTL_HEADER_NAME,
     PostConfig,
     PutConfig,
+    REFRESH_TOKEN_TTL_HEADER_NAME,
     RestRepository,
     StatusCodes,
 } from '~/logic/interfaces/repositories/RestRepository';
@@ -16,14 +17,12 @@ import {injectable} from 'inversify';
 import {createApiPath} from '../Utils';
 import {UserDoctors, UserPatients} from '~/logic/interfaces/services/AuthService';
 import store from '~/plugins/vuex';
-import {LOGGED_IN_EXPIRATION_DATE_KEY} from '~/store/types/auth.types';
+import {LOGGED_IN_EXPIRATION_DATE_KEY, REFRESH_TOKEN_EXPIRATION_DATE_KEY} from '~/store/types/auth.types';
 import EventBus from '~/logic/EventBus';
 import {APIErrorEventName} from '~/logic/interfaces/APIErrorEvent';
 
 @injectable()
 export class RestRepositoryImpl implements RestRepository {
-    private static readonly REFRESH_PATH = 'auth/refresh';
-
     public async get<R, T = any>(path: string, config: GetConfig<T>): Promise<APIResponse<R>> {
         let axiosConfig = RestRepositoryImpl.getAxiosConfig(config);
         return RestRepositoryImpl.createResponse(config.retry, () => axios.get(createApiPath(path), axiosConfig));
@@ -79,6 +78,11 @@ export class RestRepositoryImpl implements RestRepository {
                 if (ttl) {
                     let expDate = (new Date()).getTime() + Number.parseInt(ttl);
                     localStorage.setItem(LOGGED_IN_EXPIRATION_DATE_KEY, expDate.toString());
+                }
+                let refreshTokenTTL = headers[REFRESH_TOKEN_TTL_HEADER_NAME];
+                if (ttl) {
+                    let expDate = (new Date()).getTime() + Number.parseInt(ttl);
+                    localStorage.setItem(REFRESH_TOKEN_EXPIRATION_DATE_KEY, expDate.toString());
                 }
 
                 let contentType = RestRepositoryImpl.parseContentType(headers);
