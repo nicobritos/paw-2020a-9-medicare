@@ -36,18 +36,11 @@ public class UserDaoImpl extends GenericSearchableDaoImpl<User, Integer> impleme
     }
 
     @Override
-    public boolean existsToken(String token) {
-        Map<SingularAttribute<? super User, ?>, Object> parametersValues = new HashMap<>();
-        parametersValues.put(User_.token, token);
-        return this.exists(parametersValues);
-    }
-
-    @Override
-    public Optional<User> findByToken(String token) {
-        if (token == null) {
+    public Optional<User> findByVerificationTokenId(Integer id) {
+        if (id == null) {
             throw new IllegalArgumentException();
         }
-        return this.findBy(User_.token, token).stream().findFirst();
+        return this.findBy(User_.verificationToken, id).stream().findFirst();
     }
 
     @Override

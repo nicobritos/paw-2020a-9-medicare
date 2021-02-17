@@ -4,7 +4,7 @@ public enum UserRole {
     ANONYMOUS,
     UNVERIFIED,
     PATIENT,
-    STAFF;
+    DOCTOR;
 
     public static String[] names() {
         String[] roles = new String[UserRole.values().length];
@@ -13,5 +13,9 @@ public enum UserRole {
             roles[i++] = userRole.name();
         }
         return roles;
+    }
+
+    public String getAsRole() {
+        return "ROLE_" + this.name();
     }
 }

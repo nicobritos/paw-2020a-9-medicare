@@ -19,17 +19,4 @@ public class CountryServiceImpl extends GenericSearchableServiceImpl<CountryDao,
     protected CountryDao getRepository() {
         return this.repository;
     }
-
-    @Override
-    public void addProvince(Country country, Province province) {
-        // TODO
-//        country.getProvinces().add(province);
-//        this.repository.update(country);
-    }
-
-    @Override
-    public void addProvinces(Country country, Set<Province> provinces) {
-//        country.getProvinces().addAll(provinces);
-//        this.repository.update(country);
-    }
 }

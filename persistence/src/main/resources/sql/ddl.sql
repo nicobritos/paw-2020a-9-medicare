@@ -40,6 +40,20 @@ create table picture
     data       bytea  not null
 );
 
+create table verification_token
+(
+    verification_token_id serial not null primary key ,
+    token text not null,
+    created_date timestamp not null
+);
+
+create table refresh_token
+(
+    refresh_token_id serial not null primary key,
+    token text not null,
+    created_date timestamp not null
+);
+
 create table users
 (
     email      text   not null,
@@ -49,12 +63,18 @@ create table users
     surname    text   not null,
     phone      text,
     verified bool default false,
-    token text,
-    token_created_date timestamp,
+    verification_token_id int,
+    refresh_token_id int,
     profile_id int,
     constraint users_picture_picture_id_fk
         foreign key (profile_id) references picture
-            on update cascade on delete set null
+            on update cascade on delete set null,
+    constraint users_refresh_token_refresh_token_id_fk
+        foreign key (refresh_token_id) references refresh_token
+            on update restrict on delete cascade,
+    constraint users_verification_token_verification_token_id_fk
+        foreign key (verification_token_id) references verification_token
+        on update restrict on delete cascade
 );
 
 create table office
@@ -73,25 +93,25 @@ create table office
     url text
 );
 
-create table staff
+create table doctor
 (
-    staff_id            serial not null
-        constraint staff_pk
+    doctor_id            serial not null
+        constraint doctor_pk
             primary key,
     office_id           integer
-        constraint staff_office
+        constraint doctor_office
             references office
             on update restrict on delete cascade,
     phone               text,
     email               text,
     registration_number integer,
     user_id int,
-    constraint staff_users_users_id_fk
+    constraint doctor_users_users_id_fk
         foreign key (user_id) references users
             on update restrict on delete set null
 );
 
-create table system_staff_specialty
+create table system_doctor_specialty
 (
     specialty_id serial not null
         constraint specialty_pk
@@ -99,18 +119,18 @@ create table system_staff_specialty
     name         text   not null
 );
 
-create table system_staff_specialty_staff
+create table system_doctor_specialty_doctor
 (
     specialty_id integer not null
-        constraint specialty_staff_system_specialty
-            references system_staff_specialty
+        constraint specialty_doctor_system_specialty
+            references system_doctor_specialty
             on update restrict on delete restrict,
-    staff_id     integer not null
-        constraint specialty_staff_staff
-            references staff
+    doctor_id     integer not null
+        constraint specialty_doctor_doctor
+            references doctor
             on update restrict on delete cascade,
-    constraint system_staff_specialty_staff_pk
-        primary key (specialty_id, staff_id)
+    constraint system_doctor_specialty_doctor_pk
+        primary key (specialty_id, doctor_id)
 );
 
 create table patient
@@ -136,21 +156,23 @@ create table appointment
         constraint appointment_patient_patient_id_fk
             references patient
             on update restrict on delete restrict,
-    staff_id       integer not null,
+    doctor_id       integer not null,
     from_date      timestamp    not null,
     motive text,
     message text,
-    constraint appointment_staff_staff_id_fk
-        foreign key (staff_id) references staff
-            on update set null on delete set null
+    constraint appointment_doctor_doctor_id_fk
+        foreign key (doctor_id) references doctor
+            on update set null on delete set null,
+    locale text,
+    was_notification_email_sent boolean
 );
 
 create table workday
 (
     workday_id   serial not null primary key,
-    staff_id     int    not null
-        constraint workday_staff_staff_id_fk
-            references staff
+    doctor_id     int    not null
+        constraint workday_doctor_doctor_id_fk
+            references doctor
             on update restrict on delete cascade,
     start_hour   int    not null,
     end_hour     int    not null,
@@ -166,13 +188,13 @@ create unique index system_province_province_id_uindex
     on system_province (province_id);
 
 create unique index specialty_specialty_id_uindex
-    on system_staff_specialty (specialty_id);
+    on system_doctor_specialty (specialty_id);
 
 create unique index office_office_id_uindex
     on office (office_id);
 
-create unique index staff_staff_id_uindex
-    on staff (staff_id);
+create unique index doctor_doctor_id_uindex
+    on doctor (doctor_id);
 
 create unique index system_locality_locality_id_uindex
     on system_locality (locality_id);
@@ -189,8 +211,8 @@ create unique index user_users_id_uindex
 create unique index patient_patient_id_uindex
     on patient (patient_id);
 
-create index staff_user_id_index
-    on staff (user_id);
+create index doctor_user_id_index
+    on doctor (user_id);
 
 create unique index appointment_appointment_id_uindex
     on appointment (appointment_id);
@@ -207,8 +229,17 @@ create index workday_day_index
 create unique index workday_workday_id_uindex
     on workday (workday_id);
 
-create unique index users_token_uindex
-    on users (token);
+create unique index verification_token_verification_token_id_uindex
+    on verification_token (verification_token_id);
+
+create unique index refresh_token_refresh_token_id_uindex
+    on refresh_token (refresh_token_id);
+
+create index users_verification_token_id_index
+    on users (verification_token_id);
+
+create index users_refresh_token_id_index
+    on users (refresh_token_id);
 
 create function unaccent(text) returns text
     immutable

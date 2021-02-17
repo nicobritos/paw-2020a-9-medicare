@@ -3,7 +3,7 @@ package ar.edu.itba.paw.interfaces.daos;
 import ar.edu.itba.paw.interfaces.daos.generic.GenericDao;
 import ar.edu.itba.paw.models.Appointment;
 import ar.edu.itba.paw.models.Patient;
-import ar.edu.itba.paw.models.Staff;
+import ar.edu.itba.paw.models.Doctor;
 import ar.edu.itba.paw.models.Workday;
 import org.joda.time.LocalDateTime;
 
@@ -13,29 +13,35 @@ import java.util.List;
 public interface AppointmentDao extends GenericDao<Appointment, Integer> {
     List<Appointment> find(Patient patient);
 
-    List<Appointment> findByPatients(List<Patient> patient);
+    List<Appointment> findByPatients(Collection<Patient> patient);
 
-    List<Appointment> find(Staff staff);
+    List<Appointment> find(Doctor doctor);
 
-    List<Appointment> findByStaffs(List<Staff> staffs);
+    List<Appointment> findByDoctors(Collection<Doctor> doctors);
 
     List<Appointment> findPending(Patient patient);
 
-    List<Appointment> findPending(Staff staff);
+    List<Appointment> findPending(Doctor doctor);
 
-    List<Appointment> findPending(Patient patient, Staff staff);
+    List<Appointment> findPending(Patient patient, Doctor doctor);
 
-    List<Appointment> findByStaffsAndDate(Collection<Staff> staffs, LocalDateTime date);
+    List<Appointment> findByDoctorsAndDate(Collection<Doctor> doctors, LocalDateTime date);
 
-    List<Appointment> findByStaffsAndDate(Collection<Staff> staffs, LocalDateTime fromDate, LocalDateTime toDate);
+    List<Appointment> findByDoctorsAndDate(Collection<Doctor> doctors, LocalDateTime fromDate, LocalDateTime toDate);
 
-    List<Appointment> findByPatientsAndDate(Collection<Patient> patients, LocalDateTime date);
+    List<Appointment> findPendingByDoctorsAndDate(Collection<Doctor> doctors, LocalDateTime fromDate, LocalDateTime toDate);
+
+    List<Appointment> findByPatientsAndDate(Collection<Patient> patients, LocalDateTime fromDate, LocalDateTime toDate);
+
+    List<Appointment> findPendingByPatientsAndDate(Collection<Patient> patients, LocalDateTime fromDate, LocalDateTime toDate);
 
     List<Appointment> findByDate(Patient patient, LocalDateTime date);
 
     List<Appointment> findByPatientsFromDate(Collection<Patient> patients, LocalDateTime from);
 
-    List<Appointment> findByWorkday(Workday workday);
+    List<Appointment> findPendingByWorkday(Workday workday);
+
+    List<Appointment> findAllAppointmentsToNotifyUpTo(LocalDateTime to);
 
     void cancelAppointments(Collection<Appointment> appointments);
 }

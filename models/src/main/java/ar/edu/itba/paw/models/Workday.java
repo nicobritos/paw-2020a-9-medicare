@@ -29,9 +29,9 @@ public class Workday extends GenericModel<Integer> {
     @JoinColumn(name = "day", nullable = false)
     @Enumerated(EnumType.STRING)
     private WorkdayDay day;
-    @JoinColumn(name = "staff_id", nullable = false)
+    @JoinColumn(name = "doctor_id", nullable = false)
     @ManyToOne(fetch = FetchType.EAGER)
-    private Staff staff;
+    private Doctor doctor;
 
     @Override
     public Integer getId() {
@@ -43,12 +43,12 @@ public class Workday extends GenericModel<Integer> {
         this.id = id;
     }
 
-    public Staff getStaff() {
-        return this.staff;
+    public Doctor getDoctor() {
+        return this.doctor;
     }
 
-    public void setStaff(Staff staff) {
-        this.staff = staff;
+    public void setDoctor(Doctor doctor) {
+        this.doctor = doctor;
     }
 
     public Integer getStartHour() {

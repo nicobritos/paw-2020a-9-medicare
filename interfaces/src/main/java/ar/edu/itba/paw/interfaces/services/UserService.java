@@ -2,21 +2,21 @@ package ar.edu.itba.paw.interfaces.services;
 
 import ar.edu.itba.paw.interfaces.services.exceptions.EmailAlreadyExistsException;
 import ar.edu.itba.paw.interfaces.services.generic.GenericSearchableService;
-import ar.edu.itba.paw.models.Office;
+import ar.edu.itba.paw.models.Doctor;
 import ar.edu.itba.paw.models.Patient;
-import ar.edu.itba.paw.models.Picture;
 import ar.edu.itba.paw.models.User;
 
+import java.util.Locale;
 import java.util.Optional;
 
 public interface UserService extends GenericSearchableService<User, Integer> {
     Optional<User> findByUsername(String username);
 
-    Optional<User> findByToken(String token);
+    Optional<User> findByVerificationTokenId(Integer id);
 
-    boolean isStaff(User user);
+    boolean isDoctor(User user);
 
-    User createAsStaff(User user, Office office) throws EmailAlreadyExistsException;
+    User createAsDoctor(User user, Doctor doctor) throws EmailAlreadyExistsException;
 
     void updatePassword(User user, String newPassword);
 
@@ -24,9 +24,7 @@ public interface UserService extends GenericSearchableService<User, Integer> {
 
     Patient createNewPatient(Patient patient);
 
-    String generateVerificationToken(User user);
+    String generateVerificationToken(User user, Locale locale, String confirmationRelativeUrl);
 
-    boolean confirm(User user, String token);
-
-    void setProfile(User user, Picture picture);
+    boolean verify(User user, String token);
 }

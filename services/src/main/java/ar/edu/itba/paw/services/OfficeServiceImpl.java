@@ -31,20 +31,6 @@ public class OfficeServiceImpl extends GenericSearchableServiceImpl<OfficeDao, O
     }
 
     @Override
-    public void addStaff(Office office, Staff staff) {
-//        TODO
-//        office.getStaffs().add(staff);
-//        this.repository.update(office);
-    }
-
-    @Override
-    public void addStaffs(Office office, Collection<Staff> staffs) {
-//        TODO
-//        office.getStaffs().addAll(staffs);
-//        this.repository.update(office);
-    }
-
-    @Override
     protected OfficeDao getRepository() {
         return this.repository;
     }

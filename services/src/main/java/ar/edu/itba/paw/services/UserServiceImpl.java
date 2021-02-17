@@ -8,7 +8,6 @@ import ar.edu.itba.paw.interfaces.services.exceptions.InvalidEmailDomain;
 import ar.edu.itba.paw.models.*;
 import ar.edu.itba.paw.services.generics.GenericSearchableServiceImpl;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,11 +29,17 @@ public class UserServiceImpl extends GenericSearchableServiceImpl<UserDao, User,
     @Autowired
     private OfficeService officeService;
     @Autowired
-    private StaffService staffService;
+    private DoctorService doctorService;
     @Autowired
     private PatientService patientService;
     @Autowired
     private PictureService pictureService;
+    @Autowired
+    private RefreshTokenService refreshTokenService;
+    @Autowired
+    private VerificationTokenService verificationTokenService;
+    @Autowired
+    private EmailService emailService;
     @Autowired
     private PasswordEncoder passwordEncoder;
 
@@ -62,8 +67,8 @@ public class UserServiceImpl extends GenericSearchableServiceImpl<UserDao, User,
     }
 
     @Override
-    public boolean isStaff(User user) {
-        return !this.staffService.findByUser(user).isEmpty();
+    public boolean isDoctor(User user) {
+        return !this.doctorService.findByUser(user).isEmpty();
     }
 
     @Override
@@ -74,46 +79,36 @@ public class UserServiceImpl extends GenericSearchableServiceImpl<UserDao, User,
 
     @Override
     @Transactional
-    public User createAsStaff(User user, Office office) throws EmailAlreadyExistsException {
+    public User createAsDoctor(User user, Doctor doctor) throws EmailAlreadyExistsException {
         User newUser = this.create(user);
-        if(office.getId()==null){
-            office = this.officeService.create(office);
-        }else{
-            Optional<Office> officeOptional = this.officeService.findById(office.getId());
-            if (!officeOptional.isPresent()) {
-                office = this.officeService.create(office);
-            }
-            else {
-                office = officeOptional.get();
-            }
+        Office office;
+
+        if (doctor.getOffice().getId() == null) {
+            office = this.officeService.create(doctor.getOffice());
+        } else {
+            Optional<Office> officeOptional = this.officeService.findById(doctor.getOffice().getId());
+            office = officeOptional.orElseGet(() -> this.officeService.create(doctor.getOffice()));
         }
 
-        Staff staff = new Staff();
-        staff.setEmail(newUser.getEmail());
-        staff.setUser(newUser);
-        staff.setOffice(office);
-        this.staffService.create(staff);
+        doctor.setOffice(office);
+        this.doctorService.create(doctor);
 
         return newUser;
     }
 
     @Override
     @Transactional
-    public void setProfile(User user, Picture picture) {
-        if (user.getProfilePicture() == null) {
-            picture = this.pictureService.create(picture);
-            user.setProfilePicture(picture);
-            this.update(user);
-        } else {
-            picture.setId(user.getProfilePicture().getId());
-            this.pictureService.update(picture);
-        }
-    }
-
-    @Override
     public void updatePassword(User user, String newPassword) {
-        user.setPassword(this.passwordEncoder.encode(newPassword));
-        super.update(user);
+        Optional<User> userOptional = this.repository.findById(user.getId());
+        if (!userOptional.isPresent())
+            throw new NoSuchElementException();
+
+        User userToSave = userOptional.get();
+
+        userToSave.setPassword(this.passwordEncoder.encode(newPassword));
+        this.refreshTokenService.removeByUserId(userToSave.getId());
+
+        super.update(userToSave);
     }
 
     @Override
@@ -126,21 +121,51 @@ public class UserServiceImpl extends GenericSearchableServiceImpl<UserDao, User,
                 throw new EmailAlreadyExistsException();
             }
         } else {
-            if (user.getId() != null && this.findById(user.getId()).isPresent()) {
+            if ((userOptional = this.findById(user.getId())).isPresent()) {
                 // Already exists in DB, the email has changed
                 if (!this.isValidEmailDomain(user.getEmail()))
                     throw new InvalidEmailDomain();
                 user.setVerified(false);
-                user.setToken(null);
-            } else {
-                Optional<User> userToken = this.repository.findByToken(user.getToken());
-                if (userToken.isPresent() && !userToken.get().equals(user)) {
-                    throw new MediCareException("Confirmation token already exists");
+                if (user.getVerificationToken() != null) {
+                    this.verificationTokenService.remove(user.getVerificationToken().getId());
+                    user.setVerificationToken(null);
                 }
+            } else {
+                throw new NoSuchElementException();
             }
         }
 
-        super.update(user);
+        if (user.getVerificationToken() != null) {
+            Optional<User> userToken = this.repository.findByVerificationTokenId(user.getVerificationToken().getId());
+            if (userToken.isPresent() && !userToken.get().equals(user)) {
+                throw new MediCareException("Verification token already exists");
+            }
+        }
+
+        User userToSave = userOptional.get();
+        if (user.getPhone() != null) {
+            userToSave.setPhone(user.getPhone());
+        }
+        if (user.getVerificationToken() != null) {
+            userToSave.setVerificationToken(user.getVerificationToken());
+        }
+        if (user.getEmail() != null) {
+            userToSave.setEmail(user.getEmail());
+        }
+        if (user.getVerified() != null) {
+            userToSave.setVerified(user.getVerified());
+        }
+        if (user.getProfilePicture() != null) {
+            userToSave.setProfilePicture(user.getProfilePicture());
+        }
+        if (user.getFirstName() != null) {
+            userToSave.setFirstName(user.getFirstName());
+        }
+        if (user.getSurname() != null) {
+            userToSave.setSurname(user.getSurname());
+        }
+
+        super.update(userToSave);
     }
 
     @Override
@@ -149,52 +174,45 @@ public class UserServiceImpl extends GenericSearchableServiceImpl<UserDao, User,
     }
 
     @Override
-    public Optional<User> findByToken(String token) {
-        return this.repository.findByToken(token);
+    public Optional<User> findByVerificationTokenId(Integer id) {
+        return this.repository.findByVerificationTokenId(id);
     }
 
     @Override
     @Transactional
-    public String generateVerificationToken(User user) {
+    public String generateVerificationToken(User user, Locale locale, String confirmationRelativeUrl) {
         user = this.findById(user.getId()).get();
+
         if (user.getVerified())
             return null;
-        if (user.getToken() != null) {
-            user.setTokenCreatedDate(DateTime.now());
+
+        String token;
+        if (user.getVerificationToken() != null) {
+            token = this.verificationTokenService.refresh(user.getVerificationToken());
+        } else {
+            VerificationToken verificationToken = this.verificationTokenService.generate();
+            user.setVerificationToken(verificationToken);
             this.update(user);
-            return user.getToken();
+            token = verificationToken.getToken();
         }
 
-        boolean set = false;
-        int tries = 10;
-        user.setVerified(false);
-        do {
-            try {
-                user.setToken(UUID.randomUUID().toString());
-                user.setTokenCreatedDate(DateTime.now());
-                this.update(user);
-                set = true;
-            } catch (MediCareException ignored) {
-                tries--;
-            }
-        } while (!set && tries > 0);
-        if (!set)
-            throw new MediCareException("");
+        emailService.sendEmailConfirmationEmail(user, token, confirmationRelativeUrl, locale);
 
-        return user.getToken();
+        return token;
     }
 
     @Override
     @Transactional
-    public boolean confirm(User user, String token) {
+    public boolean verify(User user, String token) {
         if (user.getVerified()) {
             return false;
         }
-        if (user.getToken() != null && user.getToken().equals(token)) {
+
+        if (user.getVerificationToken() != null && user.getVerificationToken().getToken().equals(token)) {
             user.setVerified(true);
-            user.setToken(null);
-            user.setTokenCreatedDate(null);
-            this.update(user);
+            user.setVerificationToken(null);
+            update(user);
+            verificationTokenService.remove(user.getVerificationToken().getId());
             return true;
         } else {
             return false;

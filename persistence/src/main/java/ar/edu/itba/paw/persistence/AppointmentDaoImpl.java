@@ -24,18 +24,18 @@ public class AppointmentDaoImpl extends GenericDaoImpl<Appointment, Integer> imp
     }
 
     @Override
-    public List<Appointment> findByPatients(List<Patient> patients) {
+    public List<Appointment> findByPatients(Collection<Patient> patients) {
         return this.findByIn(Appointment_.patient, patients);
     }
 
     @Override
-    public List<Appointment> find(Staff staff) {
-        return this.findBy(Appointment_.staff, staff);
+    public List<Appointment> find(Doctor doctor) {
+        return this.findBy(Appointment_.doctor, doctor);
     }
 
     @Override
-    public List<Appointment> findByStaffs(List<Staff> staffs) {
-        return this.findByIn(Appointment_.staff, staffs);
+    public List<Appointment> findByDoctors(Collection<Doctor> doctors) {
+        return this.findByIn(Appointment_.doctor, doctors);
     }
 
     @Override
@@ -50,45 +50,45 @@ public class AppointmentDaoImpl extends GenericDaoImpl<Appointment, Integer> imp
     }
 
     @Override
-    public List<Appointment> findPending(Staff staff) {
-        if (staff == null)
+    public List<Appointment> findPending(Doctor doctor) {
+        if (doctor == null)
             throw new IllegalArgumentException();
 
         Map<SingularAttribute<? super Appointment, ?>, Object> parameters = new HashMap<>();
-        parameters.put(Appointment_.staff, staff);
+        parameters.put(Appointment_.doctor, doctor);
         parameters.put(Appointment_.appointmentStatus, AppointmentStatus.PENDING);
         return this.findBy(parameters);
     }
 
     @Override
-    public List<Appointment> findPending(Patient patient, Staff staff) {
-        if (patient == null || staff == null)
+    public List<Appointment> findPending(Patient patient, Doctor doctor) {
+        if (patient == null || doctor == null)
             throw new IllegalArgumentException();
 
         Map<SingularAttribute<? super Appointment, ?>, Object> parameters = new HashMap<>();
         parameters.put(Appointment_.patient, patient);
-        parameters.put(Appointment_.staff, staff);
+        parameters.put(Appointment_.doctor, doctor);
         parameters.put(Appointment_.appointmentStatus, AppointmentStatus.PENDING);
         return this.findBy(parameters);
     }
 
     @Override
-    public List<Appointment> findByStaffsAndDate(Collection<Staff> staffs, LocalDateTime date) {
-        if (date == null || staffs == null)
+    public List<Appointment> findByDoctorsAndDate(Collection<Doctor> doctors, LocalDateTime date) {
+        if (date == null || doctors == null)
             throw new IllegalArgumentException();
-        if (staffs.isEmpty())
+        if (doctors.isEmpty())
             return Collections.emptyList();
 
         LocalDateTime fromDate = new LocalDateTime(date.getYear(), date.getMonthOfYear(), date.getDayOfMonth(), 0, 0);
         LocalDateTime toDate = new LocalDateTime(date.getYear(), date.getMonthOfYear(), date.getDayOfMonth(), 23, 59);
-        return this.findByStaffsAndDate(staffs, fromDate, toDate);
+        return this.findByDoctorsAndDate(doctors, fromDate, toDate);
     }
 
     @Override
-    public List<Appointment> findByStaffsAndDate(Collection<Staff> staffs, LocalDateTime fromDate, LocalDateTime toDate) {
-        if (fromDate == null || toDate == null || staffs == null)
+    public List<Appointment> findByDoctorsAndDate(Collection<Doctor> doctors, LocalDateTime fromDate, LocalDateTime toDate) {
+        if (fromDate == null || toDate == null || doctors == null)
             throw new IllegalArgumentException();
-        if (staffs.isEmpty())
+        if (doctors.isEmpty())
             return Collections.emptyList();
 
         CriteriaBuilder builder = this.getEntityManager().getCriteriaBuilder();
@@ -96,8 +96,8 @@ public class AppointmentDaoImpl extends GenericDaoImpl<Appointment, Integer> imp
         Root<Appointment> root = query.from(Appointment.class);
 
         query.select(root);
-        Path<?> expression = root.get(Appointment_.staff);
-        Predicate predicate = expression.in(staffs);
+        Path<?> expression = root.get(Appointment_.doctor);
+        Predicate predicate = expression.in(doctors);
         query.where(builder.and(
                 predicate,
                 builder.between(
@@ -111,8 +111,35 @@ public class AppointmentDaoImpl extends GenericDaoImpl<Appointment, Integer> imp
     }
 
     @Override
-    public List<Appointment> findByPatientsAndDate(Collection<Patient> patients, LocalDateTime date) {
-        if (date == null || patients == null)
+    public List<Appointment> findPendingByDoctorsAndDate(Collection<Doctor> doctors, LocalDateTime fromDate, LocalDateTime toDate) {
+        if (fromDate == null || toDate == null || doctors == null)
+            throw new IllegalArgumentException();
+        if (doctors.isEmpty())
+            return Collections.emptyList();
+
+        CriteriaBuilder builder = this.getEntityManager().getCriteriaBuilder();
+        CriteriaQuery<Appointment> query = builder.createQuery(Appointment.class);
+        Root<Appointment> root = query.from(Appointment.class);
+
+        query.select(root);
+        Path<?> expression = root.get(Appointment_.doctor);
+        Predicate predicate = expression.in(doctors);
+        query.where(builder.and(
+                predicate,
+                builder.between(
+                        root.get(Appointment_.fromDate),
+                        fromDate,
+                        toDate
+                ),
+                builder.equal(root.get(Appointment_.appointmentStatus), AppointmentStatus.PENDING)
+        ));
+
+        return this.selectQuery(builder, query, root);
+    }
+
+    @Override
+    public List<Appointment> findByPatientsAndDate(Collection<Patient> patients, LocalDateTime fromDate, LocalDateTime toDate) {
+        if (fromDate == null || patients == null)
             throw new IllegalArgumentException();
         if (patients.isEmpty())
             return Collections.emptyList();
@@ -120,9 +147,6 @@ public class AppointmentDaoImpl extends GenericDaoImpl<Appointment, Integer> imp
         CriteriaBuilder builder = this.getEntityManager().getCriteriaBuilder();
         CriteriaQuery<Appointment> query = builder.createQuery(Appointment.class);
         Root<Appointment> root = query.from(Appointment.class);
-
-        LocalDateTime fromDate = new LocalDateTime(date.getYear(), date.getMonthOfYear(), date.getDayOfMonth(), 0, 0);
-        LocalDateTime toDate = new LocalDateTime(date.getYear(), date.getMonthOfYear(), date.getDayOfMonth(), 23, 59);
 
         query.select(root);
         Path<?> expression = root.get(Appointment_.patient);
@@ -140,13 +164,43 @@ public class AppointmentDaoImpl extends GenericDaoImpl<Appointment, Integer> imp
     }
 
     @Override
+    public List<Appointment> findPendingByPatientsAndDate(Collection<Patient> patients, LocalDateTime fromDate, LocalDateTime toDate) {
+        if (fromDate == null || patients == null)
+            throw new IllegalArgumentException();
+        if (patients.isEmpty())
+            return Collections.emptyList();
+
+        CriteriaBuilder builder = this.getEntityManager().getCriteriaBuilder();
+        CriteriaQuery<Appointment> query = builder.createQuery(Appointment.class);
+        Root<Appointment> root = query.from(Appointment.class);
+
+        query.select(root);
+        Path<?> expression = root.get(Appointment_.patient);
+        Predicate predicate = expression.in(patients);
+        query.where(builder.and(
+                predicate,
+                builder.between(
+                        root.get(Appointment_.fromDate),
+                        fromDate,
+                        toDate
+                ),
+                builder.equal(root.get(Appointment_.appointmentStatus), AppointmentStatus.PENDING)
+        ));
+
+        return this.selectQuery(builder, query, root);
+    }
+
+    @Override
     public List<Appointment> findByDate(Patient patient, LocalDateTime date) {
         if (date == null || patient == null)
             throw new IllegalArgumentException();
 
         List<Patient> patients = new LinkedList<>();
         patients.add(patient);
-        return this.findByPatientsAndDate(patients, date);
+
+        LocalDateTime toDate = new LocalDateTime(date.getYear(), date.getMonthOfYear(), date.getDayOfMonth(), 23, 59);
+
+        return this.findByPatientsAndDate(patients, date, toDate);
     }
 
     @Override
@@ -172,8 +226,8 @@ public class AppointmentDaoImpl extends GenericDaoImpl<Appointment, Integer> imp
     }
 
     @Override
-    public List<Appointment> findByWorkday(Workday workday) {
-        if (workday == null || workday.getStaff() == null || workday.getDay() == null)
+    public List<Appointment> findPendingByWorkday(Workday workday) {
+        if (workday == null || workday.getDoctor() == null || workday.getDay() == null)
             throw new IllegalArgumentException();
 
         CriteriaBuilder builder = this.getEntityManager().getCriteriaBuilder();
@@ -185,7 +239,7 @@ public class AppointmentDaoImpl extends GenericDaoImpl<Appointment, Integer> imp
 
         query.select(root);
         query.where(builder.and(
-                builder.equal(root.get(Appointment_.staff), workday.getStaff()),
+                builder.equal(root.get(Appointment_.doctor), workday.getDoctor()),
                 builder.equal(root.get(Appointment_.appointmentStatus), AppointmentStatus.PENDING),
                 builder.equal(
                         builder.function("DATE_PART", Integer.class, builder.literal("isodow"), root.get(Appointment_.fromDate)),
@@ -227,6 +281,62 @@ public class AppointmentDaoImpl extends GenericDaoImpl<Appointment, Integer> imp
                 )
         ));
         return this.selectQuery(builder, query, root);
+    }
+
+    @Override
+    public List<Appointment> findAllAppointmentsToNotifyUpTo(LocalDateTime to) {
+        if (to == null)
+            throw new IllegalArgumentException();
+
+        CriteriaBuilder builder = this.getEntityManager().getCriteriaBuilder();
+        CriteriaQuery<Appointment> query = builder.createQuery(Appointment.class);
+        Root<Appointment> root = query.from(Appointment.class);
+
+        query.select(root);
+        query.where(
+                builder.and(
+                    builder.and(
+                        builder.equal(root.get(Appointment_.wasNotificationEmailSent),false),
+                        builder.and(
+                                builder.greaterThanOrEqualTo(root.get(Appointment_.fromDate), LocalDateTime.now()),
+                                builder.lessThanOrEqualTo(root.get(Appointment_.fromDate), to)
+                        )
+                    ),
+                        builder.equal(root.get(Appointment_.appointmentStatus), AppointmentStatus.PENDING)
+                )
+        );
+
+        return this.selectQuery(builder, query, root);
+    }
+
+    @Transactional
+    @Override
+    public void remove(Appointment appointment) {
+        if (appointment == null)
+            throw new IllegalArgumentException();
+
+        CriteriaBuilder builder = this.getEntityManager().getCriteriaBuilder();
+        CriteriaUpdate<Appointment> query = builder.createCriteriaUpdate(Appointment.class);
+        Root<Appointment> root = query.from(Appointment.class);
+
+        query.set(root.get(Appointment_.appointmentStatus), AppointmentStatus.CANCELLED);
+        query.where(builder.equal(root.get(Appointment_.id), appointment.getId()));
+        this.executeUpdate(query);
+    }
+
+    @Transactional
+    @Override
+    public void remove(Integer id) {
+        if (id == null)
+            throw new IllegalArgumentException();
+
+        CriteriaBuilder builder = this.getEntityManager().getCriteriaBuilder();
+        CriteriaUpdate<Appointment> query = builder.createCriteriaUpdate(Appointment.class);
+        Root<Appointment> root = query.from(Appointment.class);
+
+        query.set(root.get(Appointment_.appointmentStatus), AppointmentStatus.CANCELLED);
+        query.where(builder.equal(root.get(Appointment_.id), id));
+        this.executeUpdate(query);
     }
 
     @Transactional

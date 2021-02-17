@@ -7,98 +7,98 @@ import ar.edu.itba.paw.interfaces.services.exceptions.*;
 import ar.edu.itba.paw.models.*;
 import ar.edu.itba.paw.services.generics.GenericServiceImpl;
 import org.joda.time.LocalDateTime;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
-import java.time.DayOfWeek;
-import static org.joda.time.DateTimeConstants.MONDAY;
-import static org.joda.time.DateTimeConstants.SUNDAY;
 
 @Service
 public class AppointmentServiceImpl extends GenericServiceImpl<AppointmentDao, Appointment, Integer> implements AppointmentService {
+    private static final Logger LOGGER = LoggerFactory.getLogger(AppointmentServiceImpl.class);
+
     @Autowired
-    private AppointmentDao repository;
+    private AppointmentDao appointmentRepository;
     @Autowired
     private WorkdayService workdayService;
     @Autowired
     private PatientService patientService;
     @Autowired
-    private StaffService staffService;
+    private DoctorService doctorService;
     @Autowired
     private UserService userService;
     @Autowired
     private OfficeService officeService;
+    @Autowired
+    private EmailService emailService;
 
     @Override
-    public List<Appointment> find(Staff staff) {
-        return this.repository.find(staff);
+    public List<Appointment> findAllAppointments(Doctor doctor) {
+        return this.appointmentRepository.find(doctor);
     }
 
     @Override
-    public List<Appointment> findByStaffs(List<Staff> staffs) {
-        return this.repository.findByStaffs(staffs);
+    public List<Appointment> findAllAppointmentsOfDoctors(Collection<Doctor> doctors) {
+        return this.appointmentRepository.findByDoctors(doctors);
     }
 
     @Override
-    public List<Appointment> find(Patient patient) {
-        return this.repository.find(patient);
+    public List<Appointment> findAllAppointments(Patient patient) {
+        return this.appointmentRepository.find(patient);
     }
 
     @Override
-    public List<Appointment> findByPatients(List<Patient> patients) {
-        return this.repository.findByPatients(patients);
+    public List<Appointment> findAllAppointmentsOfPatients(Collection<Patient> patients) {
+        return this.appointmentRepository.findByPatients(patients);
     }
 
     @Override
-    public List<Appointment> findByPatientsFromDate(List<Patient> patients, LocalDateTime from) {
-        return this.repository.findByPatientsFromDate(patients, from);
+    public List<Appointment> findTodayAppointments(Collection<Doctor> doctors) {
+        return this.findAppointmentsOfDoctorsFromDate(doctors, LocalDateTime.now());
     }
 
     @Override
-    public List<Appointment> findToday(List<Staff> staffs) {
-        return this.findByStaffsAndDay(staffs, LocalDateTime.now());
+    public List<Appointment> findTodayAppointments(Patient patient) {
+        return this.appointmentRepository.findByDate(patient, LocalDateTime.now());
     }
 
     @Override
-    public List<Appointment> findToday(Patient patient) {
-        return this.repository.findByDate(patient, LocalDateTime.now());
+    public List<Appointment> findByDate(Doctor doctor, LocalDateTime date) {
+        return this.appointmentRepository.findByDoctorsAndDate(Collections.singletonList(doctor), date);
     }
 
     @Override
-    public List<Appointment> findByDay(Staff staff, LocalDateTime date) {
-        return this.repository.findByStaffsAndDate(Collections.singletonList(staff), date);
+    public List<Appointment> findAppointmentsOfDoctorsFromDate(Collection<Doctor> doctors, LocalDateTime date) {
+        return this.appointmentRepository.findByDoctorsAndDate(doctors, date);
     }
 
     @Override
-    public List<Appointment> findByStaffsAndDay(List<Staff> staffs, LocalDateTime date) {
-        return this.repository.findByStaffsAndDate(staffs, date);
-    }
-
-    @Override
-    public List<List<Appointment>> findByStaffsAndDay(List<Staff> staffs, LocalDateTime from, LocalDateTime to) {
-        if(from.isBefore(LocalDateTime.now())) {
+    public List<Appointment> findAppointmentsOfDoctorsInDateInterval(Collection<Doctor> doctors, LocalDateTime from, LocalDateTime to) {
+        if (from.isBefore(LocalDateTime.now())) {
             from = LocalDateTime.now();
         }
-        List<Appointment> appointments = this.repository.findByStaffsAndDate(staffs, from, to);
-        List<List<Appointment>> weekAppointments = new LinkedList<>();
-        for (int i = 0; i < DayOfWeek.values().length + 1; i++) { // +1 para guardar basura en caso que la haya (no deberia)
-            weekAppointments.add(new LinkedList<>());
-        }
 
-        for (Appointment appointment : appointments) {
-            if (appointment.getFromDate().getDayOfWeek() < MONDAY|| appointment.getFromDate().getDayOfWeek() > SUNDAY) { // Los dias en JodaTime van de Monday a Sunday
-                weekAppointments.get(0).add(appointment); // Basura (1 = Monday => 0 = libre)
-            } else {
-                weekAppointments.get(appointment.getFromDate().getDayOfWeek()).add(appointment);
-            }
-        }
-        return weekAppointments;
+        return this.appointmentRepository.findByDoctorsAndDate(doctors, from, to);
     }
 
     @Override
-    public List<Appointment> findByPatientsAndDay(List<Patient> patients, LocalDateTime date) {
-        return this.repository.findByPatientsAndDate(patients, date);
+    public List<Appointment> findPendingAppointmentsOfDoctorsInDateInterval(Collection<Doctor> doctors, LocalDateTime from, LocalDateTime to) {
+        if (from.isBefore(LocalDateTime.now())) {
+            from = LocalDateTime.now();
+        }
+
+        return this.appointmentRepository.findPendingByDoctorsAndDate(doctors, from, to);
+    }
+
+    @Override
+    public List<Appointment> findAppointmentsOfPatientsInDateInterval(Collection<Patient> patients, LocalDateTime from, LocalDateTime to) {
+        return this.appointmentRepository.findByPatientsAndDate(patients, from, to);
+    }
+
+    @Override
+    public List<Appointment> findPendingAppointmentsOfPatientsInDateInterval(Collection<Patient> patients, LocalDateTime from, LocalDateTime to) {
+        return this.appointmentRepository.findPendingByPatientsAndDate(patients, from, to);
     }
 
     @Override
@@ -118,30 +118,42 @@ public class AppointmentServiceImpl extends GenericServiceImpl<AppointmentDao, A
         }
 
         appointment.setAppointmentStatus(status);
-        this.repository.update(appointment);
+        this.appointmentRepository.update(appointment);
     }
 
     @Override
-    public Appointment create(Appointment model) throws InvalidAppointmentDateException {
-        if (model.getFromDate().getMinuteOfHour() % 15 != 0)
+    public Appointment create(Appointment appointment, User patientUser) throws InvalidAppointmentDateException {
+        if (appointment.getFromDate().getMinuteOfHour() % 15 != 0)
             throw new InvalidMinutesException();
-        if (!this.isValidDate(model.getStaff(), model.getFromDate()))
+        if (!this.isValidDate(appointment.getDoctor(), appointment.getFromDate()))
             throw new InvalidAppointmentDateException();
+        Optional<Patient> optionalPatient = patientService.findByUserAndOffice(patientUser, appointment.getDoctor().getOffice());
+        Patient patient;
+        if(!optionalPatient.isPresent()){
+            Patient toCreate = new Patient();
+            toCreate.setOffice(appointment.getDoctor().getOffice());
+            toCreate.setUser(patientUser);
+            patient = patientService.create(toCreate);
+        } else {
+            patient = optionalPatient.get();
+        }
+        appointment.setPatient(patient);
+        appointment.setAppointmentStatus(AppointmentStatus.PENDING);
 
-        model.setAppointmentStatus(AppointmentStatus.PENDING);
-
-        List<Appointment> appointments = this.findByDay(model.getStaff(), model.getFromDate());
-        for (Appointment appointment : appointments) {
-            if (model.getFromDate().isAfter(appointment.getFromDate()) && model.getFromDate().isBefore(appointment.getToDate())
-                    || (model.getToDate().isAfter(appointment.getFromDate()) && model.getToDate().isBefore(appointment.getToDate()))) {
-                throw new MediCareException("Workday date overlaps with an existing one");
+        List<Appointment> appointments = this.findByDate(appointment.getDoctor(), appointment.getFromDate());
+        for (Appointment appt : appointments) {
+            if (appt.getFromDate().isAfter(appt.getFromDate()) && appt.getFromDate().isBefore(appt.getToDate())
+                    || (appt.getToDate().isAfter(appt.getFromDate()) && appt.getToDate().isBefore(appt.getToDate()))) {
+                throw new MediCareException("Appointment date overlaps with an existing one");
             }
         }
-        return this.repository.create(model);
+        Appointment appt = this.appointmentRepository.create(appointment);
+        emailService.sendNewAppointmentNotificationEmail(appt);
+        return appt;
     }
 
     @Override
-    public List<AppointmentTimeSlot> findAvailableTimeslots(Staff staff, LocalDateTime fromDate, LocalDateTime toDate) {
+    public List<AppointmentTimeSlot> findAvailableTimeslotsInDateInterval(Doctor doctor, LocalDateTime fromDate, LocalDateTime toDate) {
         LocalDateTime now = LocalDateTime.now();
         List<AppointmentTimeSlot> appointmentTimeSlots = new LinkedList<>();
         if (now.isAfter(fromDate)) {
@@ -161,7 +173,7 @@ public class AppointmentServiceImpl extends GenericServiceImpl<AppointmentDao, A
         fromDate = fromDate.withTime(hour, minute, 0, 0);
         while (toDate.isAfter(fromDate)) {
             WorkdayDay workdayDay = WorkdayDay.from(fromDate);
-            List<Workday> workdays = this.workdayService.findByStaff(staff, workdayDay); // Los horarios de ese día
+            List<Workday> workdays = this.workdayService.findByDoctor(doctor, workdayDay); // Los horarios de ese día
             for (Workday workday : workdays) {
                 int startHour = workday.getStartHour();
                 int firstStartMinute = workday.getStartMinute();
@@ -170,7 +182,7 @@ public class AppointmentServiceImpl extends GenericServiceImpl<AppointmentDao, A
                     firstStartMinute = fromDate.getMinuteOfHour();
                 }
                 firstStartMinute = (int) Math.ceil((double) firstStartMinute / Appointment.DURATION) * Appointment.DURATION;
-                if(firstStartMinute == 60){
+                if (firstStartMinute == 60) {
                     firstStartMinute = 0;
                     startHour++;
                 }
@@ -197,7 +209,7 @@ public class AppointmentServiceImpl extends GenericServiceImpl<AppointmentDao, A
                     }
                 }
 
-                this.findByDay(staff, fromDate).forEach(appointment -> {
+                this.findByDate(doctor, fromDate).forEach(appointment -> {
                     AppointmentTimeSlot appointmentTimeSlot = new AppointmentTimeSlot();
                     appointmentTimeSlot.setDate(appointment.getFromDate());
                     appointmentTimeSlots.remove(appointmentTimeSlot);
@@ -210,8 +222,8 @@ public class AppointmentServiceImpl extends GenericServiceImpl<AppointmentDao, A
     }
 
     @Override
-    public List<List<AppointmentTimeSlot>> findWeekTimeslots(Staff staff, LocalDateTime from, LocalDateTime to) {
-        List<AppointmentTimeSlot> timeSlots = findAvailableTimeslots(staff, from, to);
+    public List<List<AppointmentTimeSlot>> findTimeslotsSortedByWeekday(Doctor doctor, LocalDateTime from, LocalDateTime to) {
+        List<AppointmentTimeSlot> timeSlots = findAvailableTimeslotsInDateInterval(doctor, from, to);
         List<List<AppointmentTimeSlot>> weekslots = new LinkedList<>();
         for (int i = 0; i <= 7; i++) {
             weekslots.add(new LinkedList<>());
@@ -227,38 +239,39 @@ public class AppointmentServiceImpl extends GenericServiceImpl<AppointmentDao, A
     }
 
     @Override
-    public List<AppointmentTimeSlot> findAvailableTimeslots(Staff staff, LocalDateTime date) {
-        return this.findAvailableTimeslots(staff, date, date.withTime(23, 59, 59, 999));
+    public List<AppointmentTimeSlot> findAvailableTimeslotsfromDate(Doctor doctor, LocalDateTime date) {
+        return this.findAvailableTimeslotsInDateInterval(doctor, date, date.withTime(23, 59, 59, 999));
     }
 
     @Override
     public List<Appointment> cancelAppointments(Workday workday) {
-        List<Appointment> cancelled = new LinkedList<>();
-        List<Appointment> appointments = findByWorkday(workday);
-        //check if user is allowed to cancel
-        for(Appointment a: appointments) {
-            if(workday.getStaff().equals(a.getStaff())) {
-                remove(a.getId());
-                cancelled.add(a);
-            }
+        List<Appointment> appointments = findPendingByWorkday(workday);
+        this.appointmentRepository.cancelAppointments(appointments);
+        for (Appointment a : appointments) {
+            emailService.sendCancelledAppointmentNotificationEmail(a, true);
         }
-        return cancelled;
+        return appointments;
     }
 
     @Override
-    public List<Appointment> findByWorkday(Workday workday) {
-        return this.repository.findByWorkday(workday);
+    public List<Appointment> findPendingByWorkday(Workday workday) {
+        return this.appointmentRepository.findPendingByWorkday(workday);
+    }
+
+    @Override
+    public List<Appointment> findAllAppointmentsInIntervalToNotify(LocalDateTime from, LocalDateTime to) {
+        return this.appointmentRepository.findAllAppointmentsToNotifyUpTo(to);
     }
 
     @Override
     public Map<Workday, Integer> appointmentQtyByWorkdayOfUser(User user) {
         Map<Workday, Integer> appointmentMap = new HashMap<>();
         List<Workday> workdays = this.workdayService.findByUser(user);
-        for(Workday workday: workdays){
-            List<Appointment> appointments = findByWorkday(workday);
+        for (Workday workday : workdays) {
+            List<Appointment> appointments = findPendingByWorkday(workday);
             List<Appointment> myAppts = new LinkedList<>();
-            for(Appointment appointment : appointments){
-                if(appointment.getStaff().getUser().equals(user)){
+            for (Appointment appointment : appointments) {
+                if (appointment.getDoctor().getUser().equals(user)) {
                     myAppts.add(appointment);
                 }
             }
@@ -268,37 +281,41 @@ public class AppointmentServiceImpl extends GenericServiceImpl<AppointmentDao, A
     }
 
     @Override
-    public void remove(Integer id, User user) {
+    public void remove(Integer id, User user, Locale locale) {
         Optional<Appointment> appointment = findById(id);
-        if(appointment.isPresent()) {
-            //get staff for current user
-            List<Staff> staffs = this.staffService.findByUser(user); // TODO: add staff list inside User model
+        if (appointment.isPresent()) {
+            //get doctor for current user
+            List<Doctor> doctors = this.doctorService.findByUser(user);
             //get patient for current user
             List<Patient> patient = this.patientService.findByUser(user);
             //check if user is allowed to cancel
             boolean isAllowed = false;
+            boolean isDoctor = false;
             for (Patient p : patient) {
                 if (p.equals(appointment.get().getPatient())) {
                     isAllowed = true;
+                    isDoctor = false;
                     break;
                 }
             }
             //check if user is allowed to cancel
-            for (Staff s : staffs) {
-                if (s.equals(appointment.get().getStaff())) {
+            for (Doctor s : doctors) {
+                if (s.equals(appointment.get().getDoctor())) {
                     isAllowed = true;
+                    isDoctor = true;
                     break;
                 }
             }
             if (isAllowed) {
-                super.remove(id);
+                appointmentRepository.remove(id);
+                emailService.sendCancelledAppointmentNotificationEmail(appointment.get(), isDoctor);
             }
         }
     }
 
     @Override
     protected AppointmentDao getRepository() {
-        return this.repository;
+        return this.appointmentRepository;
     }
 
     private boolean isValidStatusChange(AppointmentStatus appointmentStatus, AppointmentStatus newStatus) {
@@ -312,11 +329,11 @@ public class AppointmentServiceImpl extends GenericServiceImpl<AppointmentDao, A
         return false;
     }
 
-    private boolean isValidDate(Staff staff, LocalDateTime fromDate) {
+    private boolean isValidDate(Doctor doctor, LocalDateTime fromDate) {
         AppointmentTimeSlot appointmentTimeSlot = new AppointmentTimeSlot();
         appointmentTimeSlot.setDate(fromDate);
-        if (!this.workdayService.isStaffWorking(staff, appointmentTimeSlot))
+        if (!this.workdayService.doctorWorks(doctor, appointmentTimeSlot))
             return false;
-        return this.findAvailableTimeslots(staff, fromDate).contains(appointmentTimeSlot);
+        return this.findAvailableTimeslotsfromDate(doctor, fromDate).contains(appointmentTimeSlot);
     }
 }

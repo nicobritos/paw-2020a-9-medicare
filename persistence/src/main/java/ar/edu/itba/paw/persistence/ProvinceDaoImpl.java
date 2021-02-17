@@ -12,12 +12,25 @@ import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Root;
 import javax.persistence.metamodel.SingularAttribute;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 @Repository
 public class ProvinceDaoImpl extends GenericSearchableDaoImpl<Province, Integer> implements ProvinceDao {
+    private static final String UNACCENT_FUNC = "unaccent";
+
     public ProvinceDaoImpl() {
         super(Province.class, Province_.id);
+    }
+
+    @Override
+    public Optional<Province> findByCountryAndId(Country country, Integer id) {
+        Map<SingularAttribute<? super Province, ?>, Object> params = new HashMap<>();
+        params.put(Province_.country, country);
+        params.put(Province_.id, id);
+        return this.findBy(params).stream().findFirst();
     }
 
     @Override
@@ -35,10 +48,12 @@ public class ProvinceDaoImpl extends GenericSearchableDaoImpl<Province, Integer>
         Root<Province> root = query.from(Province.class);
 
         query.select(root);
+        name = name.replace("%", "\\%");
+        name = name.replace("_", "\\%");
         query.where(
                 builder.and(
                         builder.like(
-                                builder.lower(root.get(Province_.name).as(String.class)),
+                                builder.function(UNACCENT_FUNC, String.class, builder.lower(root.get(Province_.name).as(String.class))),
                                 StringSearchType.CONTAINS_NO_ACC.transform(name.toLowerCase())
                         ),
                         builder.equal(root.get(Province_.country), country)

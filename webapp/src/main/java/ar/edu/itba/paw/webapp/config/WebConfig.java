@@ -5,10 +5,13 @@ import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.PropertySource;
+import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
 import org.springframework.context.support.ReloadableResourceBundleMessageSource;
 import org.springframework.jdbc.datasource.SimpleDriverDataSource;
 import org.springframework.orm.jpa.JpaTransactionManager;
@@ -35,19 +38,48 @@ import java.util.Properties;
 
 @EnableWebMvc
 @ComponentScan({
-        "ar.edu.itba.paw.webapp.controller",
+        "ar.edu.itba.paw.webapp.rest",
         "ar.edu.itba.paw.services",
         "ar.edu.itba.paw.persistence",
-        "ar.edu.itba.paw.webapp.transformer",
-        "ar.edu.itba.paw.webapp.events"
+        "ar.edu.itba.paw.webapp.media_types.parsers",
+        "ar.edu.itba.paw.webapp.exceptions"
 })
 @Configuration
 @EnableTransactionManagement
 @EnableAsync
+@PropertySource("classpath:application-prod.properties")
+@PropertySource(value = "classpath:application-local.properties", ignoreResourceNotFound = true) // This will precede previous properties
 public class WebConfig {
-    protected static final String DB_URL = "jdbc:postgresql://10.16.1.110:5432/paw-2020a-9?useUnicode=true&amp;characterEncoding=utf8";
-    protected static final String DB_USER = "paw-2020a-9";
-    protected static final String DB_PASSWORD = "N4wC7cmxe";
+    @Value("${db.host}")
+    private String DB_HOST;
+    @Value("${db.port}")
+    private String DB_PORT;
+    @Value("${db.user}")
+    private String DB_USER;
+    @Value("${db.pass}")
+    private String DB_PASS;
+    @Value("${db.db}")
+    private String DB_DB;
+    @Value("${app.host}")
+    private String baseUrl;
+    @Value("${app.api.path}")
+    private String apiPath;
+
+    //Used in addition of @PropertySource
+    @Bean
+    public static PropertySourcesPlaceholderConfigurer propertySourcesPlaceholderConfigurer() {
+        return new PropertySourcesPlaceholderConfigurer();
+    }
+
+    @Bean
+    public String baseUrl(){
+        return "http://" + this.baseUrl;
+    }
+
+    @Bean
+    public String apiPath(){
+        return this.apiPath;
+    }
 
     @Bean
     public MessageSource messageSource() {
@@ -75,9 +107,9 @@ public class WebConfig {
         final SimpleDriverDataSource dataSource = new SimpleDriverDataSource();
 
         dataSource.setDriverClass(org.postgresql.Driver.class);
-        dataSource.setUrl(DB_URL);
-        dataSource.setUsername(DB_USER);
-        dataSource.setPassword(DB_PASSWORD);
+        dataSource.setUrl(this.buildJDBCUrl());
+        dataSource.setUsername(this.DB_USER);
+        dataSource.setPassword(this.DB_PASS);
 
         return dataSource;
     }
@@ -97,12 +129,9 @@ public class WebConfig {
         return new JpaTransactionManager(entityManagerFactory);
     }
 
-    //TODO:set max size upload maybe?
     @Bean(name = "multipartResolver")
     public MultipartResolver multipartResolver() {
-        //final long maxSize = 100000;
         CommonsMultipartResolver cmr = new CommonsMultipartResolver();
-        //cmr.setMaxUploadSize(maxSize);
         return cmr;
     }
 
@@ -131,10 +160,18 @@ public class WebConfig {
         final Properties properties = new Properties();
         properties.setProperty("hibernate.hbm2ddl.auto", "update");
         properties.setProperty("hibernate.dialect", "org.hibernate.dialect.PostgreSQL92Dialect");
+        properties.setProperty("hibernate.order_inserts", "true");
+        properties.setProperty("hibernate.jdbc.batch_size", "5");
         properties.setProperty("jadira.usertype.autoRegisterUserTypes", "true");
+//        properties.setProperty("hibernate.show_sql", "true");
+//        properties.setProperty("format_sql", "true");
 
         factoryBean.setJpaProperties(properties);
         return factoryBean;
+    }
+
+    private String buildJDBCUrl() {
+        return "jdbc:postgresql://" + this.DB_HOST + ":" + this.DB_PORT + "/" + this.DB_DB + "?useUnicode=true&amp;characterEncoding=utf8";
     }
 
     private static class MappingExceptionResolver extends SimpleMappingExceptionResolver {

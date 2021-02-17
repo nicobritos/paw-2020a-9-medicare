@@ -4,6 +4,7 @@ import org.hibernate.annotations.Type;
 import org.joda.time.LocalDateTime;
 
 import javax.persistence.*;
+import java.util.Locale;
 
 @Entity
 @Table(
@@ -36,8 +37,12 @@ public class Appointment extends GenericModel<Integer> {
     @JoinColumn(name = "patient_id", nullable = false)
     private Patient patient;
     @ManyToOne(fetch = FetchType.EAGER, optional = false)
-    @JoinColumn(name = "staff_id", nullable = false)
-    private Staff staff;
+    @JoinColumn(name = "doctor_id", nullable = false)
+    private Doctor doctor;
+    @Column(name = "locale", nullable = false)
+    private String locale;
+    @Column(name = "was_notification_email_sent", nullable = false)
+    private boolean wasNotificationEmailSent;
 
     @Override
     public Integer getId() {
@@ -65,12 +70,12 @@ public class Appointment extends GenericModel<Integer> {
         this.patient = patient;
     }
 
-    public Staff getStaff() {
-        return this.staff;
+    public Doctor getDoctor() {
+        return this.doctor;
     }
 
-    public void setStaff(Staff staff) {
-        this.staff = staff;
+    public void setDoctor(Doctor doctor) {
+        this.doctor = doctor;
     }
 
     public LocalDateTime getFromDate() {
@@ -99,6 +104,25 @@ public class Appointment extends GenericModel<Integer> {
 
     public void setMotive(String motive) {
         this.motive = motive;
+    }
+
+    public Locale getLocale() {
+        if(this.locale == null){
+            return Locale.ENGLISH;
+        }
+        return new Locale(locale);
+    }
+
+    public void setLocale(Locale locale) {
+        this.locale = locale.toString();
+    }
+
+    public boolean wasNotificationEmailSent() {
+        return wasNotificationEmailSent;
+    }
+
+    public void setWasNotificationEmailSent(boolean wasNotificationEmailSent) {
+        this.wasNotificationEmailSent = wasNotificationEmailSent;
     }
 
     @Override

@@ -5,8 +5,11 @@ import ar.edu.itba.paw.models.Country;
 import ar.edu.itba.paw.models.Province;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface ProvinceDao extends GenericSearchableDao<Province, Integer> {
+    Optional<Province> findByCountryAndId(Country country, Integer id);
+
     List<Province> findByCountry(Country country);
 
     /**
