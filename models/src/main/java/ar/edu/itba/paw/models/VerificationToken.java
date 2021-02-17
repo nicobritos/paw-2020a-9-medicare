@@ -18,6 +18,7 @@ public class VerificationToken extends GenericModel<Integer> {
     @Column(name = "verification_token_id")
     private Integer id;
     @Column(name = "token")
+    @Lob
     private String token;
     @Column(name = "created_date")
     private DateTime createdDate;
