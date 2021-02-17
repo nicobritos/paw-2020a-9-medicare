@@ -182,13 +182,11 @@
 <script lang="ts">
 import moreOptions from '@/assets/moreOptions.svg';
 import {Component, Vue, Watch} from 'vue-property-decorator';
-import { AppointmentService } from '~/logic/interfaces/services/AppointmentService';
-import { APIError } from '~/logic/models/APIError';
+import {AppointmentService} from '~/logic/interfaces/services/AppointmentService';
+import {APIError} from '~/logic/models/APIError';
 import {Appointment} from '~/logic/models/Appointment';
 import TYPES from '~/logic/types';
-import {createApiPath, createPath, ID, Nullable} from '~/logic/Utils';
-import {DoctorService} from '~/logic/interfaces/services/DoctorService';
-import {Doctor} from '~/logic/models/Doctor';
+import {createApiPath, Nullable} from '~/logic/Utils';
 import {DateTime} from 'luxon';
 import {State} from 'vuex-class';
 import {User} from '~/logic/models/User';
@@ -368,8 +366,8 @@ export default class MedicHome extends Vue {
         let shouldDelete = await this.$bvModal.msgBoxConfirm(
             this.$t("DoYouWantToContinue").toString(),
             {
-                cancelTitle:"No",
-                okTitle:"Yes",
+                cancelTitle:this.$t("No").toString(),
+                okTitle: this.$t("Yes").toString(),
                 okVariant:"danger",
                 title:this.$t("YouAreAboutToCancelAnAppointment").toString()
             }

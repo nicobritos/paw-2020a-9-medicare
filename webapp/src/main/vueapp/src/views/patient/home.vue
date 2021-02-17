@@ -109,14 +109,14 @@
 <script lang="ts">
 import moreOptions from '@/assets/moreOptions.svg';
 import {Component, Vue, Watch} from 'vue-property-decorator';
-import { State } from 'vuex-class';
-import { AppointmentService } from '~/logic/interfaces/services/AppointmentService';
-import { APIError } from '~/logic/models/APIError';
-import { Appointment } from '~/logic/models/Appointment';
+import {State} from 'vuex-class';
+import {AppointmentService} from '~/logic/interfaces/services/AppointmentService';
+import {APIError} from '~/logic/models/APIError';
+import {Appointment} from '~/logic/models/Appointment';
 import TYPES from '~/logic/types';
 import {createApiPath, createPath, Hash, ID, Nullable} from '~/logic/Utils';
 import {Doctor} from '~/logic/models/Doctor';
-import { DoctorService } from '~/logic/interfaces/services/DoctorService';
+import {DoctorService} from '~/logic/interfaces/services/DoctorService';
 import {doctorSpecialtyActionTypes} from '~/store/types/doctorSpecialties.types';
 import {DoctorSpecialty} from '~/logic/models/DoctorSpecialty';
 import {Locality} from '~/logic/models/Locality';
@@ -267,8 +267,8 @@ export default class PatientHome extends Vue {
         let shouldDelete = await this.$bvModal.msgBoxConfirm(
             this.$t("DoYouWantToContinue").toString(),
             {
-                cancelTitle:"No",
-                okTitle:"Yes",
+                cancelTitle:this.$t("No").toString(),
+                okTitle: this.$t("Yes").toString(),
                 okVariant:"danger",
                 title:this.$t("YouAreAboutToCancelAnAppointment").toString()
             }

@@ -403,8 +403,8 @@ export default class MedicProfile extends Vue {
         let shouldDelete = await this.$bvModal.msgBoxConfirm(
             this.$t("DoYouWantToContinue").toString(),
             {
-                cancelTitle:"No",
-                okTitle:"Yes",
+                cancelTitle:this.$t("No").toString(),
+                okTitle: this.$t("Yes").toString(),
                 okVariant:"danger",
                 title:this.$t("YouAreAboutToDeleteASpecialty").toString()
             }
@@ -434,8 +434,8 @@ export default class MedicProfile extends Vue {
         let shouldDelete = await this.$bvModal.msgBoxConfirm(
                 this.$t("DoYouWantToContinue").toString(),
                 {
-                    cancelTitle:"No",
-                    okTitle:"Yes",
+                    cancelTitle:this.$t("No").toString(),
+                    okTitle: this.$t("Yes").toString(),
                     okVariant:"danger",
                     title:this.$t("YouAreAboutToCancelAWorkday").toString()
                 }
