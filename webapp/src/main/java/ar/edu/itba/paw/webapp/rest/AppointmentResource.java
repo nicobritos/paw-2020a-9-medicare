@@ -26,6 +26,7 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Locale;
 import java.util.Optional;
 
 @Path("/appointments")
@@ -135,6 +136,11 @@ public class AppointmentResource extends GenericResource {
         newAppointment.setMotive(appointment.getMotive());
         newAppointment.setMessage(appointment.getMessage());
         newAppointment.setFromDate(appointment.getFromDate());
+
+        if (request.getLocale() != null)
+            newAppointment.setLocale(request.getLocale());
+        else
+            newAppointment.setLocale(Locale.ENGLISH);
 
         return Response
                 .status(Status.CREATED)
