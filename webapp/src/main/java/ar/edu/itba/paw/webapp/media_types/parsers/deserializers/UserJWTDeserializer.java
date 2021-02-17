@@ -24,7 +24,8 @@ public class UserJWTDeserializer extends JsonDeserializer<User> {
         user.setEmail(jsonObject.get("email").asText());
         user.setFirstName(jsonObject.get("firstName").asText());
         user.setId(jsonObject.get("id").asInt());
-        user.setPhone(jsonObject.get("phone").asText());
+        if (!jsonObject.get("phone").isNull())
+            user.setPhone(jsonObject.get("phone").asText());
         user.setSurname(jsonObject.get("surname").asText());
         user.setVerified(jsonObject.get("verified").asBoolean());
 
