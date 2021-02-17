@@ -41,8 +41,8 @@ public class DoctorResource extends GenericResource {
             @Context UriInfo uriInfo,
             @QueryParam("page") Integer page,
             @QueryParam("per_page") Integer perPage,
-            @QueryParam("localities[]") List<Integer> localities,
-            @QueryParam("specialties[]") List<Integer> specialties,
+            @QueryParam("locality") Integer locality,
+            @QueryParam("specialty") Integer specialty,
             @QueryParam("name") String name) {
         MIMEHelper.assertServerType(httpheaders, DoctorMIME.GET_LIST);
 
@@ -59,21 +59,19 @@ public class DoctorResource extends GenericResource {
         }
 
         Collection<Locality> searchedLocalities;
-        if (localities == null || localities.isEmpty()) {
+        if (locality == null) {
             searchedLocalities = Collections.emptyList();
-        } else if (localities.stream().anyMatch(Objects::isNull)) {
-            throw this.unprocessableEntity(ErrorConstants.DOCTOR_PAGINATION_INVALID_LOCALITIES);
         } else {
-            searchedLocalities = this.localityService.findByIds(localities);
+            Optional<Locality> searchedLocality = this.localityService.findById(locality);
+            searchedLocalities = searchedLocality.map(Collections::singletonList).orElse(Collections.emptyList());
         }
 
         Collection<DoctorSpecialty> searchedSpecialties;
-        if (specialties == null || specialties.isEmpty()) {
+        if (specialty == null) {
             searchedSpecialties = Collections.emptyList();
-        } else if (specialties.stream().anyMatch(Objects::isNull)) {
-            throw this.unprocessableEntity(ErrorConstants.DOCTOR_PAGINATION_INVALID_SPECIALTIES);
         } else {
-            searchedSpecialties = this.doctorSpecialtyService.findByIds(specialties);
+            Optional<DoctorSpecialty> searchedSpecialty = this.doctorSpecialtyService.findById(specialty);
+            searchedSpecialties = searchedSpecialty.map(Collections::singletonList).orElse(Collections.emptyList());
         }
 
         if (name != null) name = name.trim();

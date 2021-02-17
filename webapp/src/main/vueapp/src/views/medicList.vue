@@ -277,8 +277,8 @@ export default class MedicList extends Vue {
         let response = await this.getDoctorService().list({
             page: this.page,
             name: this.inputName,
-            specialties: this.selectedSpecialty ? [this.selectedSpecialty] : [],
-            localities: this.selectedLocality ? [this.selectedLocality] : []
+            specialty: this.selectedSpecialty || undefined,
+            locality: this.selectedLocality || undefined
         });
         if (!(response instanceof APIError)) {
             this.doctorPagination = response;
